@@ -9,13 +9,17 @@ def run_validation_command(command: str, cwd: str, timeout: int = 30) -> tuple[b
         return True, ""
 
     try:
-        # Windows cần shell=True để chạy npm.cmd, npx.cmd, và command string như "npm test".
-        use_shell = sys.platform == "win32"
+        is_windows = sys.platform == "win32"
+
+        shell_executable = None
+        if not is_windows:
+            shell_executable = "/bin/bash" if Path("/bin/bash").exists() else "/bin/sh"
 
         result = subprocess.run(
             command,
             cwd=cwd,
-            shell=use_shell,
+            shell=True,
+            executable=shell_executable,
             capture_output=True,
             text=True,
             timeout=timeout,

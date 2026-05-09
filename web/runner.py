@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-import os
+import os, uuid
 from pathlib import Path
 
 from core.agent_state import AgentState
@@ -144,11 +144,15 @@ def run_agent_web(
                     control_result,
                     repo_path,
                 )
-                eng_mem = get_engineering_memory(
-                    query_text=query,
-                    limit=5,
-                    project_tag=final_tag,
-                )
+                try:
+                    eng_mem = get_engineering_memory(
+                        query_text=query,
+                        limit=5,
+                        project_tag=final_tag,
+                    )
+                except Exception as e:
+                    print(f"⚠️ Engineering memory disabled: {e}")
+                    eng_mem = []
                 control_result["engineering_memory"] = eng_mem
 
                 control_result = maybe_enrich_with_scout(
@@ -191,12 +195,16 @@ def run_agent_web(
     )
 
     try:
-        session_id = create_session(
-            mode=mode,
-            language=language,
-            title=query[:80],
-            project_tag=final_tag,
-        )
+        try:
+            session_id = create_session(
+                mode=mode,
+                language=language,
+                title=query[:80],
+                project_tag=final_tag,
+            )
+        except Exception as e:
+            print(f"⚠️ DB session disabled: {e}")
+            session_id = f"no-db-{uuid.uuid4().hex[:8]}"
         state.session_id = session_id
         if state.control_result and state.control_result.get("scout"):
             scout_files = state.control_result["scout"].get("likely_files", [])
@@ -260,8 +268,11 @@ def run_agent_web(
 
         maybe_run_auto_patch(state, interactive=False)
         state.session_id = session_id
-        save_message(session_id, "user", query)
-        save_message(session_id, "assistant", state.final_answer)
+        try:
+            save_message(session_id, "user", query)
+            save_message(session_id, "assistant", state.final_answer)
+        except Exception as e:
+            print(f"⚠️ DB message save skipped: {e}")
         return {
             "answer": state.final_answer,
             "context": state.context_data,
