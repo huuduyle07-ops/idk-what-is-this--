@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C.A.T.T.U.S</title> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+      #graph {
+        position: relative;
+        overflow: hidden;
+        min-height: 400px;
+        cursor: grab;
+        background: #fafafa;
+      }
+      #graph:active { cursor: grabbing; }
+      #graph .mermaid-svg-wrapper {
+        transform-origin: 0 0;
+        transition: transform 0.05s linear;
+      }
+      .graph-controls {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        gap: 4px;
+        z-index: 10;
+      }
+      .graph-controls button {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <a class="new-chat" href="{{ url_for('new_session') }}">+ New Chat</a>
+
+        <h3>Recent</h3>
+
+        {% for s in sessions %}
+        <a class="session-item" href="{{ url_for('load_session', session_id=s.id) }}">
+            <div class="session-title">{{ s.title }}</div>
+            <div class="session-meta">{{ s.mode }} · {{ s.created_at }}</div>
+        </a>
+        {% endfor %}
+
+        <h3 class="sidebar-section-heading">
+          Dream runs
+          <button type="button" class="sidebar-refresh"
+                  onclick="refreshDreamRuns()" title="Reload dream-run list">⟳</button>
+        </h3>
+        <div id="dreamRuns" class="dream-runs">
+          <div class="dream-runs-empty">Set a repo path to load.</div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <h1>AI Coding Agent</h1>
+
+        <form method="POST">
+            <input
+                id="repoPathInput"
+                type="text"
+                name="repo_path"
+                placeholder="Repo path or drag folder here"
+                value="{{ current.repo_path if current else '' }}"
+                required
+            >
+            <input name="project_tag"
+                   value="{{ current.project_tag if current else '' }}"
+                   placeholder="Project tag (auto)" />
+            <input type="file" id="folderInput" webkitdirectory multiple hidden>
+
+            <textarea name="query" placeholder="Enter your query..." required>{{ current.query if current else '' }}</textarea>
+
+            <label for="modeSelect">Mode:</label>
+            <select id="modeSelect" name="mode">
+                <option value="retrieve" {% if current and current.mode == "retrieve" %}selected{% endif %}>Retrieve</option>
+                <option value="deep" {% if current and current.mode == "deep" %}selected{% endif %}>Deep Understand</option>
+                <option value="control" {% if current and current.mode == "control" %}selected{% endif %}>Control</option>
+                <option value="full" {% if current and current.mode == "full" %}selected{% endif %}>Full Agent</option>
+            </select>
+            
+            <label for="agentModeSelect">Agent mode:</label>
+            <select id="agentModeSelect" name="agent_mode">
+                <option value="reviewer">Reviewer</option>
+                <option value="planner">Planner</option>
+            </select>
+
+            <label for="patchStyleSelect" title="How aggressive/creative may patches be?">
+              Vibecoding style:
+            </label>
+            <select id="patchStyleSelect" name="patch_style"
+                    title="safe_minimal = strict, no new APIs · balanced = grounded design fix · vibe = creative, multi-file allowed (no auto-apply)">
+                <option value="safe_minimal"
+                  {% if current and current.patch_style == "safe_minimal" %}selected{% endif %}>
+                  Safe Minimal — smallest grounded edit, no new APIs
+                </option>
+                <option value="balanced"
+                  {% if current and current.patch_style == "balanced" %}selected{% endif %}>
+                  Balanced — design fix allowed, must stay grounded
+                </option>
+                <option value="vibe"
+                  {% if current and current.patch_style == "vibe" %}selected{% endif %}>
+                  Vibe — creative, multi-file, may invent helpers (manual review)
+                </option>
+            </select>
+
+            <label class="checkbox-label" title="When checked, patches use idiomatic language style instead of matching cached repo Code DNA.">
+              <input type="checkbox" name="ignore_repo_dna" value="1"
+                     {% if current and current.ignore_repo_dna %}checked{% endif %}>
+              <span>Ignore repo DNA (use idiomatic style)</span>
+            </label>
+
+            <label for="applyPolicy">Apply policy:</label>
+            <select id="applyPolicy" name="apply_policy">
+                <option value="ask">Ask before apply</option>
+                <option value="auto">Auto apply</option>
+                <option value="plan">Plan only</option>
+            </select>
+
+            <button type="submit">Run</button>
+        </form>
+
+        <div class="margin-top-info">
+            Current mode: {{ current.mode if current else 'none' }}
+            · Vibecoding: {{ current.patch_style if current and current.patch_style else 'safe_minimal' }}
+            · Code DNA: {{ 'ignored' if current and current.ignore_repo_dna else 'match repo' }}
+        </div>
+
+        {% if error %}
+        <div class="error-banner">
+            <strong>Error:</strong> {{ error }}
+            <br><small>Full traceback is in the Validation tab.</small>
+        </div>
+        {% endif %}
+
+        <div class="tabs">
+          <button type="button" onclick="showTab('answer')">Answer</button>
+          <button type="button" onclick="showTab('context')">Context</button>
+          <button type="button" onclick="showTab('state')">State</button>
+          <button type="button" onclick="showTab('patch')">Patch</button>
+          <button type="button" onclick="showTab('validation')">Validation</button>
+          <button type="button" onclick="showTab('diff')">Diff</button>
+          <button type="button" onclick="showTab('candidates')">Candidates</button>
+        </div>
+
+        <div class="actions">
+          <button type="button" onclick="generatePatch()">Generate Patch</button>
+          <button type="button" onclick="generateCandidates()">Generate Candidates</button>
+          <button type="button" onclick="testPatch()">Test Run Patch</button>
+          <button type="button" onclick="applyPatch()">Apply / Review Patch</button>
+          <button type="button" onclick="undoPatch()">Undo</button>
+          <button type="button" onclick="viewGraph('clean')"
+                  title="Clean view: only file/function/class nodes + contains/resolved_call/calls/imports edges">
+            Clean Graph
+          </button>
+          <button type="button" onclick="viewGraph('debug')"
+                  title="Debug view: every node and edge in the raw program graph (expr, call::, test files, etc.)">
+            Debug Graph
+          </button>
+          <label class="inline-toggle"
+                 title="In Clean mode, also include test files (off by default)">
+            <input type="checkbox" id="graphShowTests"> show tests
+          </label>
+          <button type="button" onclick="openObsidian()">Open Obsidian Vault</button>
+        </div>
+
+        <div class="dream-section">
+          <strong>Sleeping Consultant (overnight)</strong>
+          <div class="dream-row">
+            <select id="dreamKind" title="Kind of work to queue">
+              <option value="bug">bug</option>
+              <option value="debt">debt</option>
+              <option value="idea">idea (vibe only)</option>
+            </select>
+            <input id="dreamTitle" class="dream-title" type="text" placeholder="title">
+            <input id="dreamHint" class="dream-hint" type="text" placeholder="hint (optional)">
+            <button type="button" onclick="addDreamItem()">Add to queue</button>
+            <button type="button" onclick="viewDreamQueue()">View queue</button>
+            <button type="button" onclick="clearDreamQueue()">Clear queue</button>
+          </div>
+          <div class="dream-buttons">
+            <button type="button" onclick="startOvernight()"
+                    title="Runs the queue in temp clones in a background thread. Original repo is not touched.">
+              Start Overnight Run
+            </button>
+            <button type="button" onclick="applyDream()"
+                    title="Pick which proposals from the latest report to apply to the real repo (one commit per item).">
+              Apply Dream
+            </button>
+            <button type="button" onclick="refreshDreamStatus()" title="Manually refresh the status line.">
+              Refresh status
+            </button>
+          </div>
+          <div id="dreamStatus" class="dream-status"></div>
+        </div>
+
+        <div class="memory-section">
+          <strong>Memory consolidator</strong>
+          <div class="memory-row">
+            <span class="memory-hint">
+              Strict dedupe of memory_notes (scoped to the project tag above, if set)
+              and the web sessions log. Runs only when clicked — not part of the main pipeline.
+            </span>
+            <button type="button" onclick="consolidateMemory()"
+                    title="Removes exact-duplicate memory rows and dedupes web/sessions.json. No LLM calls.">
+              Consolidate memory
+            </button>
+          </div>
+          <div id="memoryStatus" class="memory-status"></div>
+        </div>
+
+        <pre id="answer" class="tab-content">{{ result.answer if result else "" }}</pre>
+        <pre id="context" class="tab-content">{{ result.context if result else "" }}</pre>
+        <div id="graph" class="tab-content">
+          <div class="graph-controls">
+            <button type="button" onclick="zoomGraph(1.25)" title="Zoom in">+</button>
+            <button type="button" onclick="zoomGraph(0.8)" title="Zoom out">−</button>
+            <button type="button" onclick="resetGraph()" title="Reset">⟳</button>
+          </div>
+          <div class="mermaid-svg-wrapper" id="graphCanvas">
+            <pre id="graphFallback">{{ result.graph if result else "Click Clean Graph for the architectural view, or Debug Graph for the full raw graph." }}</pre>
+          </div>
+        </div>
+        <pre id="state" class="tab-content">{{ result.state if result else "" }}</pre>
+        <pre id="patch" class="tab-content">{{ result.patch if result else "" }}</pre>
+        <pre id="validation" class="tab-content">{{ result.validation if result else "" }}</pre>
+        <pre id="diff" class="tab-content"></pre>
+        <div id="candidates" class="tab-content"></div>
+    </main>
+
+</div>
+<script>
+//Coding Agent That Trully Useful and Safe//
+window.lastAction = null;
+document.querySelectorAll("pre").forEach(p => {
+    try {
+        const obj = JSON.parse(p.innerText);
+        p.innerText = JSON.stringify(obj, null, 2);
+    } catch {}
+});
+
+// ============================================================
+// Graph viewer (Mermaid + wheel-zoom + drag-to-pan)
+// ============================================================
+mermaid.initialize({ startOnLoad: false, theme: "default", securityLevel: "loose" });
+
+const graphState = { scale: 1, panX: 0, panY: 0 };
+
+function applyGraphTransform() {
+    const wrapper = document.getElementById("graphCanvas");
+    if (!wrapper) return;
+    wrapper.style.transform =
+        `translate(${graphState.panX}px, ${graphState.panY}px) scale(${graphState.scale})`;
+}
+
+function resetGraph() {
+    graphState.scale = 1;
+    graphState.panX = 0;
+    graphState.panY = 0;
+    applyGraphTransform();
+}
+
+function zoomGraph(factor) {
+    graphState.scale = Math.max(0.1, Math.min(8, graphState.scale * factor));
+    applyGraphTransform();
+}
+
+function viewGraph(mode) {
+    mode = mode || "clean";
+    const repo = document.querySelector("input[name='repo_path']").value.trim();
+    if (!repo) {
+        alert("Set a repo path first.");
+        return;
+    }
+    const showTests = document.getElementById("graphShowTests")?.checked ? "1" : "";
+    const canvas = document.getElementById("graphCanvas");
+    canvas.innerHTML = `<pre>⏳ Building ${mode} graph…</pre>`;
+    showTab("graph");
+
+    fetch("/render_graph", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+            repo_path: repo,
+            mode: mode,
+            show_tests: showTests,
+        }),
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error && !data.mermaid) {
+            canvas.innerHTML = `<pre>Graph error: ${escapeHtml(data.error)}</pre>`;
+            return;
+        }
+        const id = "mermaid_" + Date.now();
+        mermaid.render(id, data.mermaid).then(({ svg }) => {
+            canvas.innerHTML = svg;
+
+            // Header banner showing what mode + filtering happened.
+            const banner = document.createElement("div");
+            banner.style.cssText = "padding:6px;font-size:12px;background:#e0f2fe;color:#075985;";
+            const filtered = data.filtered_out || 0;
+            const parts = [
+                `Mode: <b>${escapeHtml(data.mode || mode)}</b>`,
+                `edges shown: ${data.rendered_edges} / ${data.total_edges}`,
+            ];
+            if (data.mode === "clean" && filtered > 0) {
+                parts.push(`<span title="hidden by clean filter">filtered: ${filtered}</span>`);
+            }
+            if (data.show_tests) parts.push("show_tests=on");
+            banner.innerHTML = parts.join(" · ");
+            canvas.prepend(banner);
+
+            if (data.truncated) {
+                const note = document.createElement("div");
+                note.style.cssText = "padding:6px;font-size:12px;color:#92400e;background:#fef3c7;";
+                note.textContent =
+                    `Capped at ${data.rendered_edges} edges (largest hubs). ` +
+                    `Switch to Debug mode or raise max_edges if you need more.`;
+                canvas.prepend(note);
+            }
+            resetGraph();
+        }).catch(err => {
+            canvas.innerHTML = `<pre>Render failed: ${escapeHtml(String(err))}</pre>`;
+        });
+    })
+    .catch(err => {
+        canvas.innerHTML = `<pre>Network error: ${escapeHtml(String(err))}</pre>`;
+    });
+}
+
+// Wheel-zoom + drag-to-pan on the graph container.
+(function setupGraphInteractions() {
+    const container = document.getElementById("graph");
+    if (!container) return;
+
+    container.addEventListener("wheel", (e) => {
+        if (!e.ctrlKey && !e.metaKey) return;  // require Ctrl/Cmd to avoid hijacking page scroll
+        e.preventDefault();
+        zoomGraph(e.deltaY < 0 ? 1.1 : 0.9);
+    }, { passive: false });
+
+    let dragging = false, lastX = 0, lastY = 0;
+    container.addEventListener("mousedown", (e) => {
+        if (e.target.closest(".graph-controls")) return;
+        dragging = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+    });
+    window.addEventListener("mouseup", () => { dragging = false; });
+    window.addEventListener("mousemove", (e) => {
+        if (!dragging) return;
+        graphState.panX += e.clientX - lastX;
+        graphState.panY += e.clientY - lastY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        applyGraphTransform();
+    });
+})();
+
+function openObsidian() {
+    const repo = document.querySelector("input[name='repo_path']").value.trim();
+    if (!repo) {
+        alert("Set a repo path first — Obsidian needs a generated graph to open.");
+        return;
+    }
+
+    fetch("/vault_path", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ repo_path: repo }),
+    })
+    .then(res => res.json().then(data => ({ status: res.status, data })))
+    .then(({ status, data }) => {
+        if (status !== 200 || !data.exists) {
+            alert(
+                "Vault not generated yet.\n\n" +
+                "Run an analysis (mode = Full Agent or Retrieve) first.\n\n" +
+                "Expected location:\n" + (data.expected_path || "(unknown)")
+            );
+            return;
+        }
+
+        // Try launching by registered vault name.
+        // If the user hasn't registered this folder in Obsidian yet,
+        // we show the path so they can add it once via:
+        //   Obsidian → Open another vault → Open folder as vault → paste path
+        const vaultName = data.vault_name;
+        const vaultPath = data.vault_path;
+
+        const opened = window.open(
+            `obsidian://open?vault=${encodeURIComponent(vaultName)}`,
+            "_blank"
+        );
+
+        // Fallback: if Obsidian doesn't recognize the vault, prompt the user
+        // with the path they need to register one-time.
+        setTimeout(() => {
+            if (confirm(
+                `If Obsidian didn't open the vault, register this folder once:\n\n` +
+                `${vaultPath}\n\n` +
+                `Click OK to copy the path to your clipboard.`
+            )) {
+                navigator.clipboard.writeText(vaultPath).catch(() => {});
+            }
+        }, 1500);
+    })
+    .catch(err => alert(`Failed to resolve vault: ${err}`));
+}
+
+// ============================================================
+// Sleeping Consultant — overnight queue + report + selective apply
+// ============================================================
+function _dreamRepo() {
+    const repo = document.querySelector("input[name='repo_path']").value.trim();
+    if (!repo) { alert("Set a repo path first."); return null; }
+    return repo;
+}
+
+function _dreamPatchStyle() {
+    return document.getElementById("patchStyleSelect")?.value || "safe_minimal";
+}
+
+function addDreamItem() {
+    const repo = _dreamRepo(); if (!repo) return;
+    const kind  = document.getElementById("dreamKind").value;
+    const title = document.getElementById("dreamTitle").value.trim();
+    const hint  = document.getElementById("dreamHint").value.trim();
+    if (!title) { alert("Title is required."); return; }
+
+    fetch("/dream/queue", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ repo_path: repo, action: "add", kind, title, hint }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert(`Queue: ${data.error}`); return; }
+        document.getElementById("dreamTitle").value = "";
+        document.getElementById("dreamHint").value = "";
+        alert(`Added. Queue size: ${(data.queue || []).length}`);
+    })
+    .catch(err => alert(`Queue add failed: ${err}`));
+}
+
+function viewDreamQueue() {
+    const repo = _dreamRepo(); if (!repo) return;
+    fetch(`/dream/queue?repo_path=${encodeURIComponent(repo)}`)
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert(`Queue: ${data.error}`); return; }
+        const items = data.queue || [];
+        if (items.length === 0) { alert("Queue is empty."); return; }
+        const lines = items.map((it, i) =>
+            `${i + 1}. [${it.kind}] ${it.title}` + (it.hint ? `  —  ${it.hint}` : "")
+        );
+        alert("Queue:\n\n" + lines.join("\n"));
+    })
+    .catch(err => alert(`View queue failed: ${err}`));
+}
+
+function clearDreamQueue() {
+    const repo = _dreamRepo(); if (!repo) return;
+    if (!confirm("Clear the dream queue?")) return;
+    fetch("/dream/queue", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ repo_path: repo, action: "clear" }),
+    })
+    .then(r => r.json())
+    .then(_ => alert("Queue cleared."))
+    .catch(err => alert(`Clear failed: ${err}`));
+}
+
+// --- Async dream run + status polling -----------------------
+let _dreamPollTimer = null;
+
+function _renderDreamStatus(state) {
+    const el = document.getElementById("dreamStatus");
+    if (!el) return;
+
+    if (!state || state.status === "idle") {
+        el.textContent = "";
+        el.className = "dream-status";
+        return;
+    }
+
+    const total = state.total_items || 0;
+    const idx = state.current_idx || 0;
+    const doneCount = (state.items_done || []).length;
+
+    if (state.status === "running") {
+        const cur = state.current_title
+            ? `${state.current_kind || "?"} → ${state.current_title}`
+            : "(starting)";
+        el.textContent =
+            `💤 Running [${idx}/${total}] ${cur}  ·  done: ${doneCount}/${total}`;
+        el.className = "dream-status dream-status-running";
+        return;
+    }
+
+    if (state.status === "done") {
+        const lines = (state.items_done || []).map(it =>
+            `${it.idx}. [${it.kind}] ${it.title} — ${it.status}`
+        );
+        el.textContent =
+            `✅ Done in run.\nReport: ${state.report_dir}\n\n${lines.join("\n")}`;
+        el.className = "dream-status dream-status-done";
+        return;
+    }
+
+    if (state.status === "failed") {
+        el.textContent = `❌ Failed: ${state.error || "unknown error"}`;
+        el.className = "dream-status dream-status-failed";
+        return;
+    }
+
+    el.textContent = `Status: ${state.status}`;
+    el.className = "dream-status";
+}
+
+function refreshDreamStatus() {
+    return fetch("/dream/status")
+        .then(r => r.json())
+        .then(state => { _renderDreamStatus(state); return state; })
+        .catch(err => {
+            const el = document.getElementById("dreamStatus");
+            if (el) el.textContent = `Status fetch error: ${err}`;
+            return null;
+        });
+}
+
+function _startDreamPolling(intervalMs = 2000) {
+    if (_dreamPollTimer) return;  // already polling
+    _dreamPollTimer = setInterval(async () => {
+        const state = await refreshDreamStatus();
+        if (!state || state.status === "done" || state.status === "failed" || state.status === "idle") {
+            clearInterval(_dreamPollTimer);
+            _dreamPollTimer = null;
+            // Run just finished — sidebar should pick up the new report.
+            if (state && (state.status === "done" || state.status === "failed")) {
+                refreshDreamRuns();
+            }
+        }
+    }, intervalMs);
+}
+
+function startOvernight() {
+    const repo = _dreamRepo(); if (!repo) return;
+
+    fetch("/dream/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ repo_path: repo, patch_style: _dreamPatchStyle() }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert(`Overnight run: ${data.error}`); return; }
+        // Kick the poller; it'll auto-stop when the run finishes.
+        refreshDreamStatus();
+        _startDreamPolling();
+    })
+    .catch(err => alert(`Overnight run failed: ${err}`));
+}
+
+// Auto-resume polling if a run is in flight when the page loads.
+document.addEventListener("DOMContentLoaded", () => {
+    refreshDreamStatus().then(state => {
+        if (state && state.status === "running") _startDreamPolling();
+    });
+    // Pre-fill the sidebar's dream-runs list if a repo_path is already set
+    // (page reloaded into a session).
+    refreshDreamRuns();
+
+    // When the user types/pastes a new repo path, refresh the sidebar list.
+    const repoInput = document.querySelector("input[name='repo_path']");
+    if (repoInput) repoInput.addEventListener("change", refreshDreamRuns);
+});
+
+// --- Sidebar: past dream runs ------------------------------
+function _statusesPretty(statuses) {
+    if (!statuses) return "";
+    return Object.entries(statuses)
+        .map(([k, v]) => `${v}× ${k}`)
+        .join(", ");
+}
+
+function refreshDreamRuns() {
+    const repoEl = document.querySelector("input[name='repo_path']");
+    const repo = repoEl ? repoEl.value.trim() : "";
+    const container = document.getElementById("dreamRuns");
+    if (!container) return;
+
+    if (!repo) {
+        container.innerHTML = '<div class="dream-runs-empty">Set a repo path to load.</div>';
+        return;
+    }
+
+    fetch(`/dream/reports?repo_path=${encodeURIComponent(repo)}`)
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            container.innerHTML = `<div class="dream-runs-empty">${data.error}</div>`;
+            return;
+        }
+        const reports = data.reports || [];
+        if (reports.length === 0) {
+            container.innerHTML = '<div class="dream-runs-empty">No dream runs yet.</div>';
+            return;
+        }
+        container.innerHTML = reports.map(r => {
+            const meta = [
+                `${r.item_count} item${r.item_count === 1 ? "" : "s"}`,
+                r.patch_style || "",
+                _statusesPretty(r.statuses),
+            ].filter(Boolean).join(" · ");
+            return `
+              <a class="session-item dream-run-item" href="javascript:viewDreamRun('${r.date}')">
+                <div class="session-title">${r.date}</div>
+                <div class="session-meta">${meta}</div>
+              </a>
+            `;
+        }).join("");
+    })
+    .catch(err => {
+        container.innerHTML = `<div class="dream-runs-empty">Load error: ${err}</div>`;
+    });
+}
+
+function viewDreamRun(date) {
+    const repoEl = document.querySelector("input[name='repo_path']");
+    const repo = repoEl ? repoEl.value.trim() : "";
+    if (!repo) { alert("Set a repo path first."); return; }
+
+    fetch(`/dream/report?repo_path=${encodeURIComponent(repo)}&date=${encodeURIComponent(date)}`)
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert(`Dream report: ${data.error}`); return; }
+        const report = data.morning_report || "(no morning_report.txt)";
+        const preview = report.slice(0, 4000);
+        const more = report.length > 4000 ? "\n\n… (truncated; open the file to see the rest)" : "";
+        alert(`Dream report ${date}:\n${data.report_dir}\n\n${preview}${more}`);
+    })
+    .catch(err => alert(`Could not load report: ${err}`));
+}
+
+function applyDream() {
+    const repo = _dreamRepo(); if (!repo) return;
+
+    fetch(`/dream/list?repo_path=${encodeURIComponent(repo)}`)
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert(`Apply: ${data.error}`); return; }
+        const items = data.items || [];
+        if (items.length === 0) { alert("No items in last report."); return; }
+        const lines = items.map(it =>
+            `${it.idx}. [${it.kind}] ${it.title} (${it.status})`
+        );
+        const picked = prompt(
+            `Pick which to apply. Enter 1, 2, 1,2, or all:\n\n${lines.join("\n")}`,
+            "all"
+        );
+        if (!picked) return;
+
+        fetch("/dream/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ repo_path: repo, selection: picked }),
+        })
+        .then(r => r.json())
+        .then(out => {
+            if (out.error) { alert(`Apply: ${out.error}`); return; }
+            const summary = (out.results || []).map(r =>
+                `${r.idx}. ${r.title} → ${r.status}: ${r.message || ""}`
+            ).join("\n");
+            alert(`Apply done:\n\n${summary}`);
+        })
+        .catch(err => alert(`Apply failed: ${err}`));
+    })
+    .catch(err => alert(`Could not load report: ${err}`));
+}
+
+function consolidateMemory() {
+    const tagEl = document.querySelector("input[name='project_tag']");
+    const tag = tagEl ? tagEl.value.trim() : "";
+    const statusEl = document.getElementById("memoryStatus");
+
+    if (statusEl) {
+        statusEl.textContent = "💤 Consolidating…";
+        statusEl.className = "memory-status memory-status-running";
+    }
+
+    fetch("/consolidate_memory", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ project_tag: tag }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!statusEl) return;
+        if (!data.success) {
+            statusEl.textContent = `❌ ${data.error || "Failed"}`;
+            statusEl.className = "memory-status memory-status-failed";
+            return;
+        }
+        const sessLines = (data.sessions || [])
+            .filter(s => s.existed)
+            .map(s => `  ${s.path}: -${s.removed}`);
+        const scope = data.project_tag ? `tag=${data.project_tag}` : "all projects";
+        const lines = [
+            `✅ Done (${scope})`,
+            `memory_notes removed: ${data.memory_notes_removed}`,
+            `sessions removed: ${data.sessions_removed}`,
+            ...sessLines,
+        ];
+        statusEl.textContent = lines.join("\n");
+        statusEl.className = "memory-status memory-status-done";
+    })
+    .catch(err => {
+        if (!statusEl) return;
+        statusEl.textContent = `❌ Network error: ${err}`;
+        statusEl.className = "memory-status memory-status-failed";
+    });
+}
+
+function showTab(id) {
+    const target = document.getElementById(id);
+    if (!target) {
+        console.warn(`showTab: element '${id}' not found`);
+        return;
+    }
+    localStorage.setItem("activeTab", id);
+    window.lastAction = id;
+
+    let tabs = document.getElementsByClassName("tab-content");
+    for (let t of tabs) t.style.display = "none";
+    target.style.display = "block";
+}
+
+// Initial tab: explicit lastAction wins, else last persisted, else default.
+const saved = localStorage.getItem("activeTab");
+const validTabs = ["answer","context","graph","state","patch","validation","diff","candidates"];
+const initialTab = validTabs.includes(saved) ? saved : "answer";
+
+showTab(initialTab);
+
+
+
+function applyPatch() {
+    const patchText = document.getElementById("patch").innerText;
+    const repo = document.querySelector("input[name='repo_path']").value;
+    const policy = document.getElementById("applyPolicy").value;
+    const style = document.getElementById("patchStyleSelect")?.value || "safe_minimal";
+
+    if (policy === "plan") {
+        document.getElementById("validation").innerText =
+            "Plan only mode: patch was not applied. Review candidate manually.";
+        window.lastAction = "patch";
+        showTab("patch");
+        return;
+    }
+
+    // Detect plan vs candidate to route to the right endpoint.
+    let isPlan = false;
+    let opCount = 0;
+    try {
+        const parsed = JSON.parse(patchText);
+        if (Array.isArray(parsed.patch_plan) && parsed.patch_plan.length > 0) {
+            isPlan = true;
+            opCount = parsed.patch_plan.length;
+        }
+    } catch (e) {
+        // Not JSON or no patch_plan — fall through to single-file path.
+    }
+
+    if (policy === "ask") {
+        const msg = isPlan
+            ? `Apply this PATCH PLAN (${opCount} ops, possibly multi-file) to your project?`
+            : "Apply this patch to your project?";
+        if (!confirm(msg)) return;
+    }
+
+    const endpoint = isPlan ? "/apply_patch_plan" : "/apply_patch";
+    fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+            repo_path: repo,
+            patch: patchText,
+            apply_policy: policy,
+            patch_style: style,
+        }),
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("diff").innerHTML = renderDiff(data.diff || "");
+        const msgParts = [];
+        if (data.message) msgParts.push(data.message);
+        if (data.validation) msgParts.push("--- validation ---\n" + data.validation);
+        if (data.rollback_performed) msgParts.push("(rollback performed)");
+        if (Array.isArray(data.applied_ops) && data.applied_ops.length) {
+            msgParts.push(`Applied ${data.applied_ops.length} op(s).`);
+        }
+        document.getElementById("validation").innerText = msgParts.join("\n\n");
+        window.lastAction = "diff";
+        showTab("diff");
+    })
+    .catch(err => {
+        document.getElementById("validation").innerText = `Network error: ${err}`;
+        showTab("validation");
+    });
+}
+
+function generatePatch() {
+    const control = document.getElementById("context").innerText;
+    const repo = document.querySelector("input[name='repo_path']").value;
+
+    fetch("/generate_patch", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            repo_path: repo,
+            control: control
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.patch) {
+            document.getElementById("patch").innerText = data.patch;
+            window.lastAction = "patch";
+            showTab("patch");
+        }
+    });
+}
+
+function undoPatch() {
+    const repo = document.querySelector("input[name='repo_path']").value;
+
+    let patchText = document.getElementById("patch").innerText;
+
+    let file = "";
+
+    try {
+        const parsed = JSON.parse(patchText);
+        file = parsed.relative_path || parsed.file;
+    } catch {
+        alert("No valid patch to undo");
+        return;
+    }
+
+    fetch("/undo_patch", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            repo_path: repo,
+            file: file
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+    });
+}
+
+function escapeHtml(s) {
+    return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function renderDiff(diffText) {
+    const lines = (diffText || "").split("\n");
+    let html = "";
+
+    for (let line of lines) {
+        const safe = escapeHtml(line);
+        if (line.startsWith("@@")) {
+            html += `<div style="color:#6a737d;font-style:italic;">${safe}</div>`;
+        } else if (line.startsWith("+")) {
+            html += `<div style="background:#e6ffed;color:#22863a;">${safe}</div>`;
+        } else if (line.startsWith("-")) {
+            html += `<div style="background:#ffeef0;color:#b31d28;">${safe}</div>`;
+        } else {
+            html += `<div style="color:#24292e;">${safe}</div>`;
+        }
+    }
+
+    return html;
+}
+
+function generateCandidates() {
+    const control = document.getElementById("context").innerText;
+
+    fetch("/generate_candidates", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({ control })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById("candidates");
+
+        if (!data.candidates) {
+            container.innerText = data.error || "No candidates";
+            window.lastAction = "candidates";
+            showTab("candidates");
+            return;
+        }
+
+        container.innerHTML = "";
+        window.patchCandidates = data.candidates;
+
+        // 🔥 sort best first
+        data.candidates.sort((a, b) => b.confidence - a.confidence);
+
+        data.candidates.forEach((c, idx) => {
+            const box = document.createElement("div");
+            box.style.border = "1px solid #ddd";
+            box.style.padding = "10px";
+            box.style.marginBottom = "10px";
+
+            // file name
+            const file = c.patch.relative_path || c.patch.file || "unknown";
+
+            const title = document.createElement("div");
+            title.innerText = `Candidate ${idx + 1} (${c.name}) | ${file} | confidence=${c.confidence}`;
+            title.style.fontWeight = "bold";
+
+            const code = document.createElement("pre");
+            code.innerText = JSON.stringify(c.patch, null, 2);
+
+            const btn = document.createElement("button");
+            btn.innerText = "Use this";
+            btn.onclick = () => selectCandidate(idx);
+
+            box.appendChild(title);
+            box.appendChild(code);
+
+            // 🔥 optional diff preview
+            if (c.patch.diff) {
+                const diffBox = document.createElement("div");
+                diffBox.style.marginTop = "10px";
+                diffBox.style.fontSize = "12px";
+                diffBox.innerHTML = renderDiff(c.patch.diff);
+                box.appendChild(diffBox);
+            }
+
+            box.appendChild(btn);
+            container.appendChild(box);
+        });
+        window.lastAction = "candidates";
+        showTab("candidates");
+    });
+}
+
+function testPatch() {
+    const patchText = document.getElementById("patch").innerText;
+    const repo = document.querySelector("input[name='repo_path']").value;
+    const patchStyle = document.getElementById("patchStyleSelect").value;
+
+    let parsed = null;
+    try {
+        parsed = JSON.parse(patchText);
+    } catch {
+        alert("Patch tab does not contain valid JSON.");
+        return;
+    }
+
+    const isPlan = Array.isArray(parsed.patch_plan);
+    const endpoint = isPlan ? "/test_patch_plan" : "/test_patch";
+
+    fetch(endpoint, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            repo_path: repo,
+            patch: patchText,
+            patch_style: patchStyle
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("diff").innerHTML = renderDiff(data.diff || "");
+        document.getElementById("validation").innerText =
+            data.validation || data.message || "No validation output";
+        window.lastAction = "diff";
+        showTab("diff");
+    });
+}
+
+function selectCandidate(idx) {
+    const c = window.patchCandidates[idx];
+    document.getElementById("patch").innerText = JSON.stringify(c.patch, null, 2);
+    window.lastAction = "patch";
+    showTab("patch");
+}
+
+
+const repoInput = document.getElementById("repoPathInput");
+const folderInput = document.getElementById("folderInput");
+
+repoInput.addEventListener("dblclick", () => folderInput.click());
+
+repoInput.addEventListener("dragover", e => {
+    e.preventDefault();
+    repoInput.style.border = "2px dashed #3b82f6";
+});
+
+repoInput.addEventListener("dragleave", () => {
+    repoInput.style.border = "";
+});
+
+repoInput.addEventListener("drop", e => {
+    e.preventDefault();
+    repoInput.style.border = "";
+    folderInput.files = e.dataTransfer.files;
+    uploadFolderFiles(e.dataTransfer.files);
+});
+
+repoInput.addEventListener("change", () => {
+    const path = repoInput.value;
+    const name = path.split(/[/\\]/).pop().toLowerCase();
+
+    if (name && name !== "repo") {
+        document.querySelector("input[name='project_tag']").value = name;
+    }
+});
+
+folderInput.addEventListener("change", () => {
+    uploadFolderFiles(folderInput.files);
+});
+
+async function uploadFolderFiles(files) {
+    if (!files.length) return;
+
+    const formData = new FormData();
+
+    for (let file of files) {
+        formData.append("files", file, file.webkitRelativePath || file.name);
+    }
+
+    const res = await fetch("/upload_folder", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+
+    if (data.repo_path) {
+        repoInput.value = data.repo_path;
+        document.querySelector("input[name='project_tag']").value = data.project_tag;
+
+        alert(
+            "Folder loaded.\n\n" +
+            `Saved files: ${data.saved_count}\n` +
+            `Indexable files: ${data.indexable_count}\n\n` +
+            "Sample:\n" +
+            (data.sample_indexable_files || []).slice(0, 5).join("\n")
+        );
+    } else {
+        alert(data.error || "Upload failed.");
+    }
+}
+
+</script>
+
+</body>
+</html>

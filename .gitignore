@@ -1,0 +1,55 @@
+# Local env / secrets
+.env
+.env.*
+!.env.example
+
+# Runtime generated artifacts
+.agent/
+Obsidian Graph/
+obsidian_graph/
+storage/
+sessions_log.json
+session_log.json
+web/sessions.json
+web/sessions_log.json
+web/session_log.json
+web/session_logs/
+web/backups/
+output.txt
+debug_last_*.txt
+
+# Local scratch tests
+local_test_repos/
+scratch/
+tmp_tests/
+playground/
+
+# Editor / cache / build
+.vscode/
+__pycache__/
+*.pyc
+target/
+node_modules/
+dist/
+build/
+.venv/
+venv/
+.claude/
+.claude_cache/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Build artifacts inside benchmark fixtures
+benchmarks/**/target/
+benchmarks/**/*.exe
+benchmarks/**/*.dll
+benchmarks/**/*.pdb
+benchmarks/**/*.o
+benchmarks/**/*.obj
+benchmarks/**/*.out
+
+# Generated benchmark outputs
+benchmarks/reports/
+benchmarks/tmp/
+.agent/benchmarks/

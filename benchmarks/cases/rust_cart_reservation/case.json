@@ -1,0 +1,16 @@
+{
+  "name": "rust_cart_reservation",
+  "language": "rust",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "cargo run && echo OK",
+  "expected_changed_files": [
+    "src/agent.rs"
+  ],
+  "forbidden_changed_files": [
+    "src/inventory.rs",
+    "src/cart.rs",
+    "src/main.rs"
+  ],
+  "prompt": "Fix the Rust cart reservation logic.\n\nRequirements:\n- Modify src/agent.rs only.\n- reserve_item must reject quantity <= 0.\n- reserve_item must reject missing items.\n- reserve_item must reject insufficient stock.\n- A valid reservation must decrease inventory stock and increase cart quantity.\n- Failed reservations must not change stock or cart quantity.\n- Do not modify src/inventory.rs, src/cart.rs, or src/main.rs.\n- Do not create new files.\n- Use patch_candidate if only src/agent.rs is changed.\n- Use patch_plan only if absolutely necessary.\n- target_snippet must be copied verbatim from the actual file."
+}
