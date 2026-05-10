@@ -5,6 +5,10 @@
     "context": ".."
   },
   "forwardPorts": [5000],
+  "remoteEnv": {
+    "ROUTER_USE_EMBEDDINGS": "false",
+    "INDEX_USE_EMBEDDINGS": "false"
+  },
   "portsAttributes": {
     "5000": {
       "label": "Flask Web UI",

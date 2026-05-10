@@ -213,14 +213,27 @@ def run_agent_web(
                 + ", ".join(scout_files[:8])
             )
 
-            if not memory_note_exists("project_context", note, project_tag=state.project_tag):
-                save_engineering_memory(
-                    session_id=state.session_id,
-                    memory_type="project_context",
-                    value=note,
-                    importance=3,
+            try:
+                should_save_note = not memory_note_exists(
+                    "project_context",
+                    note,
                     project_tag=state.project_tag,
                 )
+            except Exception as e:
+                print(f"⚠️ DB memory lookup skipped: {e}")
+                should_save_note = False
+
+            if should_save_note:
+                try:
+                    save_engineering_memory(
+                        session_id=state.session_id,
+                        memory_type="project_context",
+                        value=note,
+                        importance=3,
+                        project_tag=state.project_tag,
+                    )
+                except Exception as e:
+                    print(f"⚠️ DB memory save skipped: {e}")
         draft = run_draft_pipeline(state)
         reviewed = run_review_pipeline(state, draft)
         finalize_answer(state, reviewed)

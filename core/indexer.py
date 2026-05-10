@@ -45,9 +45,11 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
     print(f"🚀 Starting Project-Wide Indexing: {repo_path}  [tag={project_tag}, files={indexable_count}]")
 
     # Ensure DB is initialized
+    db_available = True
     try:
         init_db()
     except Exception as e:
+        db_available = False
         print(f"⚠️ DB initialization failed: {e}. Indexing will proceed, but results won't be saved.")
 
     files_indexed = 0
@@ -121,17 +123,27 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
 
             if not units and not data.get("imports") and not data.get("calls"):
                 continue
-
-            clear_code_units_for_file(rel_path, project_tag=project_tag)
-            clear_dependencies_for_file(rel_path, project_tag=project_tag)
+            if db_available:
+                try:
+                    clear_code_units_for_file(rel_path, project_tag=project_tag)
+                    clear_dependencies_for_file(rel_path, project_tag=project_tag)
+                except Exception as e:
+                    print(f"⚠️ DB cleanup failed for {rel_path}: {e}")
+                    db_available = False
 
             for imp in data.get("imports", []):
-                save_dependency(
-                    source_file=rel_path,
-                    target_file=imp,
-                    dependency_type="import",
-                    project_tag=project_tag,
-                )
+                if db_available:
+                    try:
+                        save_dependency(
+                            source_file=rel_path,
+                            target_file=imp,
+                            dependency_type="import",
+                            project_tag=project_tag,
+                        )
+                    except Exception as e:
+                        print(f"⚠️ DB save failed for import in {rel_path}: {e}")
+                        db_available = False
+                
 
             all_symbol_calls = set()
             for symbol in data.get("symbols", []):
@@ -139,13 +151,18 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
 
                 for call in symbol.get("calls", []):
                     all_symbol_calls.add(call)
-                    save_dependency(
-                        source_file=rel_path,
-                        source_symbol=current_func,
-                        target_symbol=call,
-                        dependency_type="call",
-                        project_tag=project_tag,
-                    )
+                    if db_available:
+                        try:
+                            save_dependency(
+                                source_file=rel_path,
+                                source_symbol=current_func,
+                                target_symbol=call,
+                                dependency_type="call",
+                                project_tag=project_tag,
+                            )
+                        except Exception as e:
+                            print(f"⚠️ DB save failed for call in {rel_path}: {e}")
+                            db_available = False
 
             file_level_calls = [
                 c for c in data.get("calls", [])
@@ -153,25 +170,49 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
             ]
 
             for call in file_level_calls:
-                save_dependency(
-                    source_file=rel_path,
-                    target_symbol=call,
-                    dependency_type="call",
-                    project_tag=project_tag,
-                )
+                if db_available:
+                    try:
+                        save_dependency(
+                            source_file=rel_path,
+                            target_symbol=call,
+                            dependency_type="call",
+                            project_tag=project_tag,
+                        )
+                    except Exception as e:
+                        print(f"⚠️ DB save failed for file-level call in {rel_path}: {e}")
+                        db_available = False
 
-            for unit in units:
-                embedding = get_embedding(unit["content"])
-                save_code_unit(
-                    file_path=rel_path,
-                    kind=unit["kind"],
-                    name=unit["name"],
-                    content=unit["content"],
-                    embedding=embedding.tolist(),
-                    project_tag=project_tag,
-                )
-                units_saved += 1
+            use_index_embeddings = os.getenv(
+                "INDEX_USE_EMBEDDINGS",
+                "true",
+            ).lower() not in {"0", "false", "no"}
 
+            if db_available:
+                for unit in units:
+                    if use_index_embeddings:
+                        embedding = get_embedding(unit["content"])
+                        embedding_list = embedding.tolist()
+                    else:
+                        embedding_list = []
+
+                    try:
+                        save_code_unit(
+                            file_path=rel_path,
+                            kind=unit["kind"],
+                            name=unit["name"],
+                            content=unit["content"],
+                            embedding=embedding_list,
+                            project_tag=project_tag,
+                        )
+                        units_saved += 1
+                    except Exception as e:
+                        print(f"⚠️ DB save skipped for {rel_path}::{unit.get('name')}: {e}")
+                        db_available = False
+                        break
+            else:
+                # No DB: still index for project map / control / phantom limb,
+                # but skip persistence and embeddings.
+                pass
             files_indexed += 1
             print(
                 f"OK: Indexed {rel_path} "
@@ -179,7 +220,6 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
                 f"{len(data.get('imports', []))} imports, "
                 f"{len(data.get('calls', []))} calls)"
             )
-
         except Exception as e:
             print(f"ERR: Failed to index {rel_path}: {e}")
     dna = compute_dna(repo_path)

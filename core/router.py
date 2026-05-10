@@ -220,15 +220,26 @@ def classify_task(
         f"Language: {language}. Content: {prompt}"
     )
 
-    model = get_model()
-    task_embeddings = get_label_embeddings()
-    prompt_embedding = model.encode([enriched_prompt])[0]
-    scores = _cosine_scores(prompt_embedding, task_embeddings)
-
-    best_match = TASK_LABELS[int(np.argmax(scores))]
+    use_embedding_router = os.getenv(
+        "ROUTER_USE_EMBEDDINGS",
+        "true",
+    ).lower() not in {"0", "false", "no"}
 
     if intent_hint:
-        best_match = intent_hint
+       best_match = intent_hint
+    elif not use_embedding_router:
+        if mode == "reviewer":
+            best_match = "code_review"
+        elif mode == "planner":
+            best_match = "architecture_planning"
+        else:
+            best_match = "code_explanation"
+    else:
+        model = get_model()
+        task_embeddings = get_label_embeddings()
+        prompt_embedding = model.encode([enriched_prompt])[0]
+        scores = _cosine_scores(prompt_embedding, task_embeddings)
+        best_match = TASK_LABELS[int(np.argmax(scores))]
 
     complexity = estimate_complexity(prompt, mode=mode, audience=audience)
     if language == "unknown":
