@@ -7,7 +7,9 @@
   "forwardPorts": [5000],
   "remoteEnv": {
     "ROUTER_USE_EMBEDDINGS": "false",
-    "INDEX_USE_EMBEDDINGS": "false"
+    "INDEX_USE_EMBEDDINGS": "false",
+    "RETRIEVER_USE_EMBEDDINGS": "false",
+    "RETRIEVER_USE_DB": "false"
   },
   "portsAttributes": {
     "5000": {

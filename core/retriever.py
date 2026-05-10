@@ -237,10 +237,29 @@ def get_cached_graph(repo_path):
 
 # --- Embeddings ---
 
+def _flag(name: str, default: str = "true") -> bool:
+    return os.getenv(name, default).lower() not in {"0", "false", "no"}
+
+def retriever_embeddings_enabled() -> bool:
+    return _flag("RETRIEVER_USE_EMBEDDINGS", "true")
+
+def retriever_db_enabled() -> bool:
+    return _flag("RETRIEVER_USE_DB", "true")
+
+def _keyword_score(query: str, text: str) -> int:
+    q_words = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", query.lower()))
+    t = text.lower()
+    return sum(1 for w in q_words if w in t)
+
+def keyword_rank(query: str, items: list[str], top_k: int = 3) -> list[str]:
+    return sorted(
+        items,
+        key=lambda x: _keyword_score(query, x),
+        reverse=True,
+    )[:top_k]
+
 def embeddings_enabled() -> bool:
-    return os.getenv("RETRIEVER_USE_EMBEDDINGS", "true").lower() not in {
-        "0", "false", "no"
-    }
+    return retriever_embeddings_enabled()
 
 def get_embedding(text: str):
     if not embeddings_enabled():
@@ -391,20 +410,39 @@ def extract_relevant_project_sections(query, project_map):
     if not lines:
         return ""
 
+    if not retriever_embeddings_enabled():
+        ranked = keyword_rank(query, lines, top_k=20)
+        return "\n".join(ranked)
+
     model = get_model()
     line_embeddings = model.encode(lines)
     query_embedding = model.encode([query])[0]
-    
+
     norms = np.linalg.norm(line_embeddings, axis=1) * np.linalg.norm(query_embedding)
     scores = np.dot(line_embeddings, query_embedding) / np.where(norms == 0, 1e-9, norms)
 
     top_indices = np.argsort(scores)[-20:][::-1]
-
     return "\n".join(lines[i] for i in top_indices)
 
 # --- Semantic Search ---
 
 def semantic_rank(query: str, units: list[dict], top_k: int = 3) -> list[dict]:
+    if not retriever_embeddings_enabled():
+        ranked_units = sorted(
+            units,
+            key=lambda u: _keyword_score(
+                query,
+                f"{u.get('label', '')}\n{u.get('content', '')}",
+            ),
+            reverse=True,
+        )[:top_k]
+
+        output = []
+        for unit in ranked_units:
+            u = dict(unit)
+            u["score"] = float(_keyword_score(query, u.get("content", "")))
+            output.append(u)
+        return output    
     if not units:
         return []
 
@@ -452,10 +490,13 @@ def get_relevant_text_chunks(query: str, document: str, top_k: int = 3) -> list[
     chunks = split_text(document)
     if not chunks:
         return []
-
-    model = get_model()
-    chunk_embeddings = model.encode(chunks)
-    query_embedding = model.encode([query])[0]
+    
+    if not retriever_embeddings_enabled():
+        return keyword_rank(query, chunks, top_k=top_k)
+    else:
+        model = get_model()
+        chunk_embeddings = model.encode(chunks)
+        query_embedding = model.encode([query])[0]
 
     scores = np.dot(chunk_embeddings, query_embedding) / (
         np.linalg.norm(chunk_embeddings, axis=1) * np.linalg.norm(query_embedding)
@@ -473,7 +514,14 @@ def search_safe_code_units(
 ) -> List[Dict]:
     """Wraps search_code_units with safety filtering AND project_tag scoping."""
     tag = _tag_for(repo_path, project_tag)
-    hits = search_code_units(query, limit=limit * 3, project_tag=tag)  # Over-fetch for filtering
+    if not retriever_db_enabled():
+        return []
+
+    try:
+        hits = search_code_units(query, limit=limit * 3, project_tag=tag)
+    except Exception as e:
+        print(f"⚠️ DB code-unit search skipped: {e}")
+        return []
     safe = []
     allowed_roots = [repo_path] if repo_path else None
     for h in hits:
@@ -509,10 +557,20 @@ def search_dependencies(
     repo_path: Optional[str] = None,
     project_tag: Optional[str] = None,
 ) -> str:
+    if not retriever_db_enabled():
+        return ""
+
     tag = _tag_for(repo_path, project_tag)
-    results = search_dependencies_db(query, limit=top_k, project_tag=tag)
+
+    try:
+        results = search_dependencies_db(query, limit=top_k, project_tag=tag)
+    except Exception as e:
+        print(f"⚠️ DB dependency search skipped: {e}")
+        return ""
+
     if not results:
         return ""
+
     return format_dependency_graph(results, query)
 
 def _extract_symbol_candidates(query: str) -> list[str]:
@@ -614,6 +672,8 @@ def pick_seed_symbols(query, repo_path: str = None):
     return ranked[:3]
 
 def trace_call_chain(query: str, repo_path: str = None, max_depth: int = 3, fanout: int = 3) -> str:
+    if not retriever_db_enabled():
+        return ""
     tag = _tag_for(repo_path)
     seeds = pick_seed_symbols(query, repo_path=repo_path)
     if not seeds:
@@ -806,20 +866,23 @@ Dependency Interpretation:
             repo_abs = Path(repo_path).resolve()
             vault_path = str(get_agent_dir(str(repo_abs)) / "Obsidian Graph" / "latest")
 
-            semantic_graph_context = build_obsidian_semantic_context(
-                repo_path=str(repo_abs),
-                vault_path=vault_path,
-            )
+            if retriever_embeddings_enabled():
+                semantic_graph_context = build_obsidian_semantic_context(
+                    repo_path=str(repo_abs),
+                    vault_path=vault_path,
+                )
 
-            if semantic_graph_context:
-                blocks.insert(2, semantic_graph_context)
-            AI_TOP_NODES = get_ai_top_nodes(str(repo_abs), vault_path)
-            paths = walk_from_nodes(graph, AI_TOP_NODES)
+                if semantic_graph_context:
+                    blocks.insert(2, semantic_graph_context)
 
-            blocks.append("=== GRAPH TRACE FROM AI_TOP_NODES ===")
-            for p in paths[:5]:
-                blocks.append(" → ".join(p))
+                AI_TOP_NODES = get_ai_top_nodes(str(repo_abs), vault_path)
+                paths = walk_from_nodes(graph, AI_TOP_NODES)
 
+                blocks.append("=== GRAPH TRACE FROM AI_TOP_NODES ===")
+                for p in paths[:5]:
+                    blocks.append(" → ".join(p))
+            else:
+                blocks.append("Semantic graph disabled: RETRIEVER_USE_EMBEDDINGS=false")
             for word in query.split():
                 info = explain_symbol(graph, word)
                 if info["called_by"] or info["calls"]:
@@ -847,9 +910,14 @@ Dependency Interpretation:
 
     if level in {"meso", "hybrid"}:
         symbol_hits = search_safe_code_units(query, repo_path=repo_path, limit=8, project_tag=tag)
-        dependency_hits = search_dependencies_db(query, limit=5, project_tag=tag)
-        if dependency_hits:
-            blocks.append(format_dependency_graph(dependency_hits, query))
+        dependency_context = search_dependencies(
+            query,
+            top_k=5,
+            repo_path=repo_path,
+            project_tag=tag,
+        )
+        if dependency_context:
+            blocks.append(dependency_context)
         # new: trace call chain
         call_trace = trace_call_chain(query, repo_path=repo_path, max_depth=3, fanout=3)
         if call_trace:
