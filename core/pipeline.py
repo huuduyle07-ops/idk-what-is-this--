@@ -301,10 +301,10 @@ def execute_subtask(state: AgentState, subtask: dict) -> dict:
             validation_ok=patch_res.validation_ok,
             validation_output=patch_res.validation_output,
             rollback_performed=patch_res.rollback_performed,
-            project_tag=state.project_tag,
-            patch_payload=res_json["patch_candidate"],
             failure_category=None,
-            failure_reason=None
+            failure_reason=None,        
+            project_tag=state.project_tag,
+            patch_payload=res_json["patch_candidate"]
         )
 
         if not patch_res.success:
@@ -571,6 +571,8 @@ def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
                 validation_ok=result.get("success"),
                 validation_output=result.get("validation_output", ""),
                 rollback_performed=result.get("rollback_performed", False),
+                failure_category=None,
+                failure_reason=None,
                 project_tag=state.project_tag,
                 patch_payload={"patch_plan": plan},
             )
