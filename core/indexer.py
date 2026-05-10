@@ -80,12 +80,18 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
             data = {"symbols": [], "imports": [], "calls": []}
 
             if language:
-                raw_data = parse_code_with_treesitter(text, language)
-                if isinstance(raw_data, dict):
-                    data = raw_data
-                elif isinstance(raw_data, list):
-                    data["symbols"] = raw_data
-
+                try:
+                    raw_data = parse_code_with_treesitter(text, language)
+                    if isinstance(raw_data, dict):
+                        data = raw_data
+                    elif isinstance(raw_data, list):
+                        data["symbols"] = raw_data
+                except Exception as e:
+                    print(
+                        f"⚠️ Tree-sitter parse failed for {rel_path}: {e}. "
+                        "Falling back to text-based code units."
+                    )
+                    data = {"symbols": [], "imports": [], "calls": []}
             units = []
 
             if not data.get("symbols"):
