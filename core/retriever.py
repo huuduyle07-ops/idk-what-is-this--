@@ -237,7 +237,15 @@ def get_cached_graph(repo_path):
 
 # --- Embeddings ---
 
+def embeddings_enabled() -> bool:
+    return os.getenv("RETRIEVER_USE_EMBEDDINGS", "true").lower() not in {
+        "0", "false", "no"
+    }
+
 def get_embedding(text: str):
+    if not embeddings_enabled():
+        # Return stable dummy vector so callers don't crash.
+        return np.zeros(384, dtype=np.float32)
     if text in _cache:
         return _cache[text]
     model = get_model()
