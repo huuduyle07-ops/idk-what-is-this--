@@ -104,7 +104,16 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
                         "content": node.get("content", ""),
                         "execution_flow": node.get("execution_flow", ""),
                     })
-
+            # Hard fallback for Codespaces / parser mismatch:
+            # If Tree-sitter and build_code_units both fail to produce units,
+            # still keep a file-level unit so indexing/control can continue.
+            if not units and text.strip():
+                units = [{
+                    "kind": "file",
+                    "name": rel_path,
+                    "content": text,
+                    "execution_flow": "Tree-sitter unavailable; using full-file text fallback.",
+                }]
             summary_symbols = data.get("symbols", [])
             if not summary_symbols and units:
                 summary_symbols = [

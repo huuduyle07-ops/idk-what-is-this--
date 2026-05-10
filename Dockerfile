@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
     golang-go \
     && rm -rf /var/lib/apt/lists/*
 
-# Rust
+USER vscode
+
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
+
+ENV PATH="/home/vscode/.cargo/bin:${PATH}"
