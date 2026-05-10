@@ -9,18 +9,35 @@ root_dir = str(Path(__file__).parent.parent)
 if root_dir not in sys.path:
     sys.path.append(root_dir)
 
-from config import DATABASE_URL
+from config import DATABASE_URL, DB_ENABLED
 from typing import Optional, List, Dict, Any
-from psycopg_pool import ConnectionPool
 import json
 
-_pool: Optional[ConnectionPool] = None
+# psycopg_pool / libpq are imported lazily inside get_pool(). Keeping the
+# import lazy means DB_ENABLED=false (e.g. Codespaces) doesn't require the
+# native libpq library to be installed at all.
+_pool = None  # type: ignore[var-annotated]
 
-def get_pool() -> ConnectionPool:
+
+def db_enabled() -> bool:
+    """True iff persistence is on AND a connection string is configured.
+
+    Every public function in this module guards on this so a missing/down
+    Postgres never blocks the agent (or stalls 30s on connect timeout).
+    """
+    return DB_ENABLED and bool(DATABASE_URL)
+
+
+def get_pool():
     global _pool
+    if not db_enabled():
+        # Fast fail — never attempt a connection when DB is off.
+        raise RuntimeError("DB disabled (DB_ENABLED=false or DATABASE_URL unset).")
     if _pool is None:
-        if not DATABASE_URL:
-            raise RuntimeError("DATABASE_URL is not set in .env. Please check your configuration.")
+        try:
+            from psycopg_pool import ConnectionPool  # lazy: needs libpq
+        except Exception as e:
+            raise RuntimeError(f"psycopg_pool unavailable: {e}")
         try:
             _pool = ConnectionPool(DATABASE_URL)
         except Exception as e:
@@ -48,6 +65,8 @@ def get_conn():
 
 
 def init_db():
+    if not db_enabled():
+        return
     schema = """
 CREATE EXTENSION IF NOT EXISTS vector;
 
@@ -287,6 +306,9 @@ def create_session(
     title: Optional[str] = None,
     project_tag: Optional[str] = None,
 ) -> int:
+    if not db_enabled():
+        # Caller wraps this in try/except and falls back to a synthetic id.
+        raise RuntimeError("DB disabled")
     query = """
     INSERT INTO session_s (mode, language, title, project_tag)
     VALUES (%s, %s, %s, %s)
@@ -301,6 +323,8 @@ def create_session(
 
 
 def save_message(session_id: int, role: str, content: str):
+    if not db_enabled():
+        return
     query = """
     INSERT INTO messages (session_id, role, content)
     VALUES (%s, %s, %s);
@@ -312,6 +336,8 @@ def save_message(session_id: int, role: str, content: str):
 
 
 def save_artifact(session_id: int, kind: str, content: str):
+    if not db_enabled():
+        return
     query = """
     INSERT INTO artifacts (session_id, kind, content)
     VALUES (%s, %s, %s);
@@ -337,6 +363,8 @@ def save_memory_note(
     importance: int = 1,
     project_tag: Optional[str] = None,
 ):
+    if not db_enabled():
+        return
     embedding_list = _embed_text(note)
 
     query = """
@@ -378,6 +406,8 @@ def save_engineering_memory(
 
 
 def get_recent_messages(session_id: int, limit: int = 8) -> List[Dict]:
+    if not db_enabled():
+        return []
     query = """
     SELECT role, content, created_at
     FROM messages
@@ -398,6 +428,8 @@ def get_recent_messages(session_id: int, limit: int = 8) -> List[Dict]:
 
 
 def get_session_messages(session_id: int, limit: int = 30) -> List[Dict]:
+    if not db_enabled():
+        return []
     query = """
     SELECT role, content, created_at
     FROM messages
@@ -427,6 +459,8 @@ def memory_note_exists(
     otherwise an identical note in another project would falsely block a save.
     When project_tag is None, falls back to the legacy unscoped behavior.
     """
+    if not db_enabled():
+        return False
     if project_tag is not None:
         query = """
         SELECT 1
@@ -462,6 +496,8 @@ def get_relevant_memory_notes(
     Built dynamically so project_tag is honored in EVERY branch (previously
     only one of three branches filtered by it, leaking memory across projects).
     """
+    if not db_enabled():
+        return []
     where_clauses: List[str] = []
     params: List[Any] = []
 
@@ -529,6 +565,8 @@ def get_memory_by_category(
     limit: int = 10,
     project_tag: Optional[str] = None,
 ) -> List[Dict]:
+    if not db_enabled():
+        return []
     if project_tag is not None:
         sql = """
         SELECT category, note, importance, created_at
@@ -601,6 +639,8 @@ def create_task_run(
     language: str,
     user_input: str,
 ) -> int:
+    if not db_enabled():
+        return 0
     query = """
     INSERT INTO task_runs (
         session_id, audience, mode, intent, complexity, input_mode, language, user_input
@@ -625,6 +665,8 @@ def finish_task_run(
     confidence: Optional[float] = None,
     needs_escalation: bool = False,
 ):
+    if not db_enabled():
+        return
     query = """
     UPDATE task_runs
     SET status = %s,
@@ -656,6 +698,8 @@ def save_patch_attempt(
     project_tag: Optional[str],
     patch_payload: Optional[dict],
 ):
+    if not db_enabled():
+        return
     query = """
     INSERT INTO patch_attempts (
         task_run_id, session_id, target_file, matched_by, phase,
@@ -688,6 +732,8 @@ def upsert_tooling_profile(
     run_command: Optional[str] = None,
     notes: Optional[str] = None,
 ):
+    if not db_enabled():
+        return
     query = """
     INSERT INTO tooling_profiles (
         project_tag, language, test_command, build_command, lint_command,
@@ -724,6 +770,8 @@ def save_code_unit(
     embedding: List[float],
     project_tag: Optional[str] = None,
 ):
+    if not db_enabled():
+        return
     query = """
     INSERT INTO code_units (file_path, kind, name, content, embedding, project_tag)
     VALUES (%s, %s, %s, %s, %s::vector, %s);
@@ -735,6 +783,8 @@ def save_code_unit(
 
 
 def get_tooling_profile(project_tag: str, language: str) -> dict:
+    if not db_enabled():
+        return {}
     query = """
     SELECT test_command, build_command, lint_command, format_command, run_command, notes
     FROM tooling_profiles
@@ -759,6 +809,8 @@ def get_tooling_profile(project_tag: str, language: str) -> dict:
 def clear_code_units_for_file(file_path: str, project_tag: Optional[str] = None):
     """Delete code units for a file. Scoped by project_tag when given so we
     don't delete a same-named file's symbols belonging to a different project."""
+    if not db_enabled():
+        return
     if project_tag is not None:
         query = "DELETE FROM code_units WHERE file_path = %s AND project_tag = %s;"
         params = (file_path, project_tag)
@@ -776,6 +828,8 @@ def search_code_units(
     limit: int = 5,
     project_tag: Optional[str] = None,
 ) -> List[Dict]:
+    if not db_enabled():
+        return []
     embedding = _embed_text(query_text)
     emb_str = str(embedding)
 
@@ -853,6 +907,8 @@ def save_dependency(
     target_symbol: Optional[str] = None,
     project_tag: Optional[str] = None,
 ):
+    if not db_enabled():
+        return
     query = """
     INSERT INTO code_dependencies
         (source_file, target_file, source_symbol, target_symbol, dependency_type, project_tag)
@@ -870,6 +926,8 @@ def save_dependency(
 def clear_dependencies_for_file(source_file: str, project_tag: Optional[str] = None):
     """Delete dependency edges for a file. Scoped by project_tag when given so
     we don't delete the same file path belonging to a different project."""
+    if not db_enabled():
+        return
     if project_tag is not None:
         query = "DELETE FROM code_dependencies WHERE source_file = %s AND project_tag = %s;"
         params = (source_file, project_tag)
@@ -887,6 +945,8 @@ def search_dependencies(
     limit: int = 10,
     project_tag: Optional[str] = None,
 ) -> List[Dict]:
+    if not db_enabled():
+        return []
     embedding = _embed_text(query_text)
     emb_str = str(embedding)
 

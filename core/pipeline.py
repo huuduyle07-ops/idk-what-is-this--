@@ -558,21 +558,24 @@ def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
             validation_command=validation_command,
         )
         combined_diff = "\n\n".join(result.get("diffs", []) or [])
-        save_patch_attempt(
-            task_run_id=state.task_run_id,
-            session_id=state.session_id,
-            target_file="patch_plan",
-            matched_by="patch_plan_executor",
-            phase="validated" if result.get("success") else "patch_plan_failed",
-            risk_level=None,
-            risk_score=None,
-            diff=combined_diff,
-            validation_ok=result.get("success"),
-            validation_output=result.get("validation_output", ""),
-            rollback_performed=result.get("rollback_performed", False),
-            project_tag=state.project_tag,
-            patch_payload={"patch_plan": plan},
-        )
+        try:
+            save_patch_attempt(
+                task_run_id=state.task_run_id,
+                session_id=state.session_id,
+                target_file="patch_plan",
+                matched_by="patch_plan_executor",
+                phase="validated" if result.get("success") else "patch_plan_failed",
+                risk_level=None,
+                risk_score=None,
+                diff=combined_diff,
+                validation_ok=result.get("success"),
+                validation_output=result.get("validation_output", ""),
+                rollback_performed=result.get("rollback_performed", False),
+                project_tag=state.project_tag,
+                patch_payload={"patch_plan": plan},
+            )
+        except Exception as e:
+            print(f"⚠️ DB patch_attempt save skipped: {e}")
         state.validation_output = result.get("validation_output", "")
         state.auto_patch_result = result.get("message", "")
         print(result.get("message", ""))
@@ -641,7 +644,11 @@ def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
 
     project_root = Path(state.repo_path) if state.repo_path else Path.cwd()
     project_tag = state.project_tag or build_project_tag(state.repo_path)
-    tooling = get_tooling_profile(project_tag, state.language)
+    try:
+        tooling = get_tooling_profile(project_tag, state.language)
+    except Exception as e:
+        print(f"⚠️ DB tooling profile lookup skipped: {e}")
+        tooling = {}
 
     explicit_cmd = extract_user_validation_command(state.user_input)
 
@@ -686,33 +693,39 @@ def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
         user_validation_cmd = default_cmd
 
     if user_validation_cmd and user_validation_cmd != tooling.get("test_command"):
-        upsert_tooling_profile(
-            project_tag=project_tag,
-            language=state.language,
-            test_command=user_validation_cmd,
-        )
+        try:
+            upsert_tooling_profile(
+                project_tag=project_tag,
+                language=state.language,
+                test_command=user_validation_cmd,
+            )
+        except Exception as e:
+            print(f"⚠️ DB tooling profile save skipped: {e}")
         tooling["test_command"] = user_validation_cmd
 
     def _on_attempt(idx: int, result: ExecutionResult) -> Optional[bool]:
         print(f"\n🔁 Patch Loop {idx}/{PATCH_LOOP_MAX}")
         state.auto_patch_result = result.message
-        save_patch_attempt(
-            task_run_id=state.task_run_id,
-            session_id=state.session_id,
-            target_file=result.target_file,
-            matched_by=result.matched_by,
-            phase=result.phase,
-            risk_level=result.risk.level if result.risk else None,
-            risk_score=result.risk.score if result.risk else None,
-            diff=result.diff,
-            validation_ok=result.validation_ok,
-            validation_output=result.validation_output,
-            rollback_performed=result.rollback_performed,
-            failure_category=(result.failure_info or {}).get("category") if result.failure_info else None,
-            failure_reason=(result.failure_info or {}).get("reason") if result.failure_info else None,
-            project_tag=state.project_tag,
-            patch_payload=current_patch_holder["patch"],
-        )
+        try:
+            save_patch_attempt(
+                task_run_id=state.task_run_id,
+                session_id=state.session_id,
+                target_file=result.target_file,
+                matched_by=result.matched_by,
+                phase=result.phase,
+                risk_level=result.risk.level if result.risk else None,
+                risk_score=result.risk.score if result.risk else None,
+                diff=result.diff,
+                validation_ok=result.validation_ok,
+                validation_output=result.validation_output,
+                rollback_performed=result.rollback_performed,
+                failure_category=(result.failure_info or {}).get("category") if result.failure_info else None,
+                failure_reason=(result.failure_info or {}).get("reason") if result.failure_info else None,
+                project_tag=state.project_tag,
+                patch_payload=current_patch_holder["patch"],
+            )
+        except Exception as e:
+            print(f"⚠️ DB patch_attempt save skipped: {e}")
         print(f"🔎 Executor phase: {result.phase}")
         print(result.message)
 

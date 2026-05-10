@@ -9,13 +9,17 @@ load_dotenv()
 # --- DATABASE CONFIGURATION ---
 APP_ENV = os.getenv("APP_ENV", "local").lower()
 
+# Master switch for DB persistence. When false, every database.memory function
+# returns a safe default immediately — no connection attempt, no 30s timeout.
+DB_ENABLED = os.getenv("DB_ENABLED", "true").lower() not in {"0", "false", "no"}
+
 if APP_ENV == "docker":
     DATABASE_URL = os.getenv("DATABASE_URL_DOCKER")
 else:
     DATABASE_URL = os.getenv("DATABASE_URL_LOCAL")
 
 DATABASE_URL = DATABASE_URL or os.getenv("DATABASE_URL")
-if not DATABASE_URL:
+if DB_ENABLED and not DATABASE_URL:
     print("⚠️  WARNING: DATABASE_URL is not set in .env", file=sys.stderr)
 
 # --- API KEYS ---
