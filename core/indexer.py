@@ -45,7 +45,10 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
     print(f"🚀 Starting Project-Wide Indexing: {repo_path}  [tag={project_tag}, files={indexable_count}]")
 
     # Ensure DB is initialized
-    init_db()
+    try:
+        init_db()
+    except Exception as e:
+        print(f"⚠️ DB initialization failed: {e}. Indexing will proceed, but results won't be saved.")
 
     files_indexed = 0
     units_saved = 0
