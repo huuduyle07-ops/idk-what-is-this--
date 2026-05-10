@@ -15,23 +15,36 @@ from config import TREESITTER_LANG_MAP
 
 
 def parse_code_with_treesitter(code: str, language: str):
-    lang_key = TREESITTER_LANG_MAP.get(language.lower())
-
-    if not lang_key:
-        return {"symbols": [], "imports": [], "calls": []}
-
     try:
-        parser = get_parser(lang_key)
-    except Exception:
-        return {"symbols": [], "imports": [], "calls": []}
+        lang_key = TREESITTER_LANG_MAP.get(language.lower())
 
-    tree = parser.parse(bytes(code, "utf8"))
-    root = tree.root_node
+        if not lang_key:
+            return {"symbols": [], "imports": [], "calls": []}
 
-    symbols = []
-    imports = []
-    calls = []
-    
+        try:
+            parser = get_parser(lang_key)
+        except Exception:
+            return {"symbols": [], "imports": [], "calls": []}
+        
+        if not hasattr(parser, "parse"):
+            raise RuntimeError(
+                f"Tree-sitter parser for {language} has no parse() method"
+            )
+
+        tree = parser.parse(bytes(code, "utf8"))
+        root = tree.root_node
+
+        symbols = []
+        imports = []
+        calls = []
+    except Exception as e:
+        print(f"⚠️ Tree-sitter unavailable for {language}: {e}")
+        return {
+            "symbols": [],
+            "imports": [],
+            "calls": [],
+        }
+      
     def extract_execution_flow(node, code):
         flow = []
 

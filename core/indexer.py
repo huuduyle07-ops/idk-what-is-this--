@@ -261,8 +261,18 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
         print(f"Phantom Limb: no structural suggestions. Report written to: {phantom_path}")
 
     # Build project map
-    graph = build_graph_from_repo(repo_path)
-    content = build_project_map(file_summaries, graph=graph, repo_path=repo_path)
+    try:
+        graph = build_graph_from_repo(repo_path)
+    except Exception as e:
+        print(f"⚠️ Graph build failed: {e}. Continuing without graph.")
+        graph = None
+
+    try:
+        content = build_project_map(file_summaries, graph=graph, repo_path=repo_path)
+    except Exception as e:
+        print(f"⚠️ Project map graph rendering failed: {e}. Retrying without graph.")
+        content = build_project_map(file_summaries, graph=None, repo_path=repo_path)
+
     map_path = write_project_map(repo_path, content)
     print(f"🗺️ Project map written to: {map_path}")
     return {
