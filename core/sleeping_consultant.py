@@ -129,6 +129,41 @@ def _generate_patch_plan(
     return parsed, (raw or "")
 
 
+def _generate_plan_analysis(repo_path: str, item: dict) -> tuple[dict | None, str]:
+    """Fallback: ask the model for a structured plan without requiring a patch_plan.
+
+    Called when the main attempt did not produce a valid patch_plan list.
+    Returns (parsed_dict, raw_response).
+    """
+    query = _build_patch_query(item)
+    kind = item.get("kind", "bug")
+
+    prompt = f"""You are a senior engineer doing a planning pass on a software task.
+Do NOT write any code patch. Your only job is to analyse the task and return a plan.
+
+Task: {query}
+
+Return ONLY valid JSON — no markdown fences, no extra text:
+{{
+  "status": "planned",
+  "item_type": "{kind}",
+  "priority": "high|medium|low",
+  "problem_summary": "clear one-sentence description of the problem or goal",
+  "likely_files": ["relative/path/to/file.py"],
+  "recommended_steps": ["step 1", "step 2"],
+  "safe_to_patch_now": false,
+  "patch_style_required": "safe_minimal|balanced|vibe|none",
+  "validation_commands": ["python -m pytest tests/"],
+  "risks": ["risk 1"]
+}}
+
+Be specific — reference real file paths and symbols when you can.
+"""
+    raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path)
+    parsed = extract_json_block(raw)
+    return parsed, (raw or "")
+
+
 def _run_patch_item(
     repo_path: str,
     item: dict,
@@ -152,14 +187,24 @@ def _run_patch_item(
 
         plan = patch.get("patch_plan")
         if not isinstance(plan, list) or not plan:
+            # Model returned something (single-op patch or explanation) but no
+            # patch_plan list. Save what we got, then ask for a structured plan.
             (item_dir_path / "patch.json").write_text(
-                json.dumps(patch, indent=2, ensure_ascii=False),
+                json.dumps(patch, indent=2, ensure_ascii=False) if isinstance(patch, dict) else str(patch),
                 encoding="utf-8",
             )
+            plan_data, plan_raw = _generate_plan_analysis(repo_path, item)
+            (item_dir_path / "plan_analysis.json").write_text(
+                json.dumps(plan_data, indent=2, ensure_ascii=False) if isinstance(plan_data, dict) else plan_raw,
+                encoding="utf-8",
+            )
+            summary = ""
+            if isinstance(plan_data, dict):
+                summary = plan_data.get("problem_summary", "") or ""
             return {
                 **item, "idx": idx,
-                "status": "no_plan",
-                "summary": "Model returned a single-op patch (not a patch_plan). Skipped.",
+                "status": "planned_no_patch",
+                "summary": (summary or "Plan created; no patch generated.")[:200],
                 "item_dir_name": item_dir_path.name,
             }
 
@@ -243,6 +288,34 @@ def _run_idea_item(
     }
 
 
+def _run_plan_only_item(
+    repo_path: str,
+    item: dict,
+    idx: int,
+    item_dir_path: Path,
+) -> dict:
+    """Generate a structured plan for any item type without attempting a patch.
+
+    Used for idea items when patch_style != 'vibe', or as an explicit
+    plan-only pass for debt/bug items that need triage before patching.
+    """
+    item_dir_path.mkdir(parents=True, exist_ok=True)
+    plan_data, plan_raw = _generate_plan_analysis(repo_path, item)
+    (item_dir_path / "plan_analysis.json").write_text(
+        json.dumps(plan_data, indent=2, ensure_ascii=False) if isinstance(plan_data, dict) else plan_raw,
+        encoding="utf-8",
+    )
+    summary = ""
+    if isinstance(plan_data, dict):
+        summary = plan_data.get("problem_summary", "") or ""
+    return {
+        **item, "idx": idx,
+        "status": "planned_no_patch",
+        "summary": (summary or "Plan created; no patch generated.")[:200],
+        "item_dir_name": item_dir_path.name,
+    }
+
+
 def run_overnight(
     repo_path: str,
     patch_style: str = "balanced",
@@ -312,18 +385,14 @@ def run_overnight(
         try:
             if kind == "idea":
                 if patch_style != "vibe":
+                    # Not vibe — generate a plan instead of skipping entirely.
                     print(
-                        f"💤 DREAM: [{idx}/{len(queue)}] skipped — idea kind requires vibe style",
+                        f"💤 DREAM: [{idx}/{len(queue)}] idea → plan-only (patch_style={patch_style!r})",
                         flush=True,
                     )
-                    results.append({
-                        **item, "idx": idx,
-                        "status": "skipped_needs_vibe",
-                        "summary": "Idea items require patch_style='vibe'.",
-                        "item_dir_name": item_path.name,
-                    })
-                    continue
-                results.append(_run_idea_item(repo_path, item, idx, item_path))
+                    results.append(_run_plan_only_item(repo_path, item, idx, item_path))
+                else:
+                    results.append(_run_idea_item(repo_path, item, idx, item_path))
             else:
                 results.append(_run_patch_item(
                     repo_path=repo_path,
