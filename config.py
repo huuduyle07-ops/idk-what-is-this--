@@ -301,3 +301,9 @@ AUTO_PATCH_ENABLED = True
 ROLLBACK_ON_VALIDATION_FAIL = True
 CONTROL_TIME_BUDGET_SEC = 180
 MAX_REVIEW_AGENTS = 2
+
+# --- OLLAMA / LOCAL CRITIC ---
+OLLAMA_ENABLED = os.getenv("OLLAMA_ENABLED", "false").lower() not in {"0", "false", "no"}
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+LOCAL_REVIEWER_MODEL = os.getenv("LOCAL_REVIEWER_MODEL", "deepseek-r1:1.5b")
+SHOW_LOCAL_THOUGHT = os.getenv("SHOW_LOCAL_THOUGHT", "false").lower() not in {"0", "false", "no"}

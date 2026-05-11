@@ -159,6 +159,7 @@
           <button type="button" onclick="testPatch()">Test Run Patch</button>
           <button type="button" onclick="applyPatch()">Apply / Review Patch</button>
           <button type="button" onclick="undoPatch()">Undo</button>
+          <button type="button" onclick="localCritique()" title="Send current patch to local Ollama DeepSeek for review (does not auto-apply)">&#x1F9E0; Local Critique</button>
           <button type="button" onclick="viewGraph('clean')"
                   title="Clean view: only file/function/class nodes + contains/resolved_call/calls/imports edges">
             Clean Graph
@@ -217,6 +218,15 @@
             </button>
           </div>
           <div id="memoryStatus" class="memory-status"></div>
+        </div>
+
+        <div class="local-critique-section" id="localCritiqueSection" style="display:none">
+          <strong>&#x1F9E0; Local Critique result</strong>
+          <div id="localCritiqueMain" style="margin-top:8px"></div>
+          <details id="localCritiqueDebug" style="margin-top:8px;display:none">
+            <summary style="cursor:pointer;color:#888">Show raw local thought / debug</summary>
+            <pre id="localCritiqueThought" style="margin-top:4px;font-size:0.8em;white-space:pre-wrap"></pre>
+          </details>
         </div>
 
         <pre id="answer" class="tab-content">{{ result.answer if result else "" }}</pre>
@@ -1016,6 +1026,59 @@ function selectCandidate(idx) {
     showTab("patch");
 }
 
+
+async function localCritique() {
+    const patchText = document.getElementById("patch").innerText.trim();
+    if (!patchText) {
+        alert("No patch to critique — generate a patch first.");
+        return;
+    }
+
+    const query = document.querySelector("textarea[name='query']")?.value.trim() || "";
+    const contextText = document.getElementById("context").innerText.trim();
+
+    const section = document.getElementById("localCritiqueSection");
+    const main = document.getElementById("localCritiqueMain");
+    const debug = document.getElementById("localCritiqueDebug");
+    const thought = document.getElementById("localCritiqueThought");
+
+    section.style.display = "block";
+    debug.style.display = "none";
+    main.innerHTML = "<em>Running local critique…</em>";
+
+    const res = await fetch("/local_critique", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ query, patch: patchText, context: contextText })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+        main.innerHTML = `<span style="color:#e55">&#x26A0; ${data.error}</span>`;
+        return;
+    }
+
+    const c = data.critic;
+    const verdictColor = c.verdict === "accept" ? "#2a9d2a" : c.verdict === "reject" ? "#c0392b" : "#d97706";
+    const riskHtml = c.risk_flags?.length
+        ? `<div style="margin-top:6px"><strong>Risk flags:</strong> ${c.risk_flags.map(f => `<code>${f}</code>`).join(", ")}</div>`
+        : "";
+    const fixHtml = c.must_fix?.length
+        ? `<div style="margin-top:6px"><strong>Must fix:</strong><ul style="margin:4px 0 0 16px">${c.must_fix.map(f => `<li>${f}</li>`).join("")}</ul></div>`
+        : "";
+
+    main.innerHTML = `
+        <div><strong>Verdict:</strong> <span style="color:${verdictColor};font-weight:bold">${c.verdict}</span>
+        &nbsp;&nbsp;<strong>Confidence:</strong> ${Math.round((c.confidence || 0) * 100)}%</div>
+        <div style="margin-top:6px"><strong>Summary:</strong> ${c.critic_summary || "—"}</div>
+        ${riskHtml}${fixHtml}`;
+
+    if (data.thought) {
+        debug.style.display = "block";
+        thought.innerText = data.thought;
+    }
+}
 
 const repoInput = document.getElementById("repoPathInput");
 const folderInput = document.getElementById("folderInput");

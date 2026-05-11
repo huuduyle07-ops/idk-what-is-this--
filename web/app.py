@@ -1214,6 +1214,43 @@ def upload_folder():
         **inventory,
     }
 
+@app.route("/local_critique", methods=["POST"])
+def local_critique():
+    import os
+    from agents.ollama_client import run_local_critique
+
+    if os.getenv("OLLAMA_ENABLED", "false").lower() in {"0", "false", "no"}:
+        return {"ok": False, "error": "Ollama is disabled — set OLLAMA_ENABLED=true in .env to use local critique"}
+
+    patch_text = request.form.get("patch", "").strip()
+    if not patch_text:
+        return {"ok": False, "error": "No patch provided — generate a patch first"}
+
+    query = request.form.get("query", "")
+    context = request.form.get("context", "")
+    preflight = request.form.get("preflight", "")
+
+    prompt_parts = []
+    if query:
+        prompt_parts.append(f"User request:\n{query}")
+    if context:
+        prompt_parts.append(f"Context snippets:\n{context}")
+    if preflight:
+        prompt_parts.append(f"Preflight output:\n{preflight}")
+    prompt_parts.append(f"Patch JSON:\n{patch_text}")
+
+    result = run_local_critique("\n\n".join(prompt_parts))
+
+    if "error" in result:
+        return {"ok": False, "error": result["error"]}
+
+    show_thought = os.getenv("SHOW_LOCAL_THOUGHT", "false").lower() not in {"0", "false", "no"}
+    response: dict = {"ok": True, "critic": result["critic"]}
+    if show_thought and result.get("thought"):
+        response["thought"] = result["thought"]
+    return response
+
+
 @app.route("/new")
 def new_session():
     return redirect(url_for("index"))
