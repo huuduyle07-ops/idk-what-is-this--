@@ -432,6 +432,44 @@ def finalize_answer(state: AgentState, answer: str) -> None:
     reject_schema_drift(state)
     _enforce_safe_minimal(state)
 
+def normalize_patch_candidate_with_control_source(state: AgentState) -> None:
+    if not state.json_block:
+        return
+
+    patch = state.json_block.get("patch_candidate")
+    if not isinstance(patch, dict):
+        return
+
+    if patch.get("target_node_kind") != "function":
+        return
+
+    control = state.control_result or {}
+    patch_intent = control.get("patch_intent") or {}
+    source = patch_intent.get("source_snippet") or ""
+
+    if not source:
+        return
+
+    target = patch.get("target_snippet") or ""
+    patched = patch.get("patched_snippet") or ""
+
+    if not target or not patched:
+        return
+
+    # Already full-function enough.
+    if target.strip().startswith(("func ", "pub fn ", "fn ", "def ")):
+        return
+
+    if target not in source:
+        return
+
+    full_patched = source.replace(target, patched, 1)
+
+    patch["target_snippet"] = source
+    patch["patched_snippet"] = full_patched
+    patch["__normalized_from_partial_body"] = True
+
+    print("🧩 Normalized partial function patch to full CONTROL source_snippet")
 
 def is_low_risk_single_file_patch(state: AgentState) -> bool:
     if not state.json_block:
@@ -483,8 +521,7 @@ def is_low_risk_single_file_patch(state: AgentState) -> bool:
 
 
 def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
-    if not AUTO_PATCH_ENABLED or not state.json_block:
-        return
+    normalize_patch_candidate_with_control_source(state)
 
     confidence, _ = get_confidence_and_escalation(state.json_block)
 
