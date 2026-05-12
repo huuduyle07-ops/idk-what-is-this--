@@ -42,7 +42,7 @@ from patching.patch_gates import (
     normalize_patch_plan_schema,
     promote_go_missing_import_candidate_to_patch_plan,
 )
-
+from core.source_snippet_fallback import hydrate_control_source_from_scout
 
 def launch_web(host: str = "127.0.0.1", port: int = 5000, open_browser: bool = True) -> None:
     """Spin up the Flask UI (web/app.py). Imports lazily to avoid a hard
@@ -206,6 +206,19 @@ def run_agent_web(
             print(f"⚠️ DB session disabled: {e}")
             session_id = f"no-db-{uuid.uuid4().hex[:8]}"
         state.session_id = session_id
+        # Recover exact source_snippet when Tree-sitter/CONTROL cannot localize,
+        # but Scout has identified a likely file/symbol.
+        if state.control_result and state.control_result.get("scout") and state.repo_path:
+            state.control_result = hydrate_control_source_from_scout(
+                control_result=state.control_result,
+                repo_path=state.repo_path,
+                language=state.language or language,
+            )
+
+            patch_intent = state.control_result.get("patch_intent") or {}
+            if patch_intent.get("source_snippet"):
+                print("✅ CONTROL source_snippet recovered from Scout fallback")
+
         if state.control_result and state.control_result.get("scout"):
             scout_files = state.control_result["scout"].get("likely_files", [])
             note = (
