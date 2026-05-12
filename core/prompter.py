@@ -614,6 +614,7 @@ def build_re_patch_prompt(
     matched_by: Optional[str] = None,
     extra_hints: Optional[List[str]] = None,
     log_char_limit: int = 1000,
+    project_tag: Optional[str] = None,
 ) -> str:
     """Precision-Double-Tap re-patch prompt.
 
@@ -640,6 +641,24 @@ def build_re_patch_prompt(
     failed_patched = failed_patch.get("patched_snippet", "") or ""
     failed_issue = failed_patch.get("issue", "") or ""
 
+    # Ghost-graph recall: surface prior attempts on the same symbol so the
+    # re-patch doesn't rediscover failures that already burned us before.
+    ghost_block = ""
+    target_node_name = failed_patch.get("target_node_name")
+    if project_tag and target_node_name:
+        try:
+            from database.memory import lookup_ghosts, format_ghost_block
+            ghosts = lookup_ghosts(
+                project_tag=project_tag,
+                target_file=target_file or failed_patch.get("file") or failed_patch.get("relative_path"),
+                target_node_name=target_node_name,
+                limit=5,
+            )
+            ghost_block = format_ghost_block(ghosts)
+        except Exception:
+            ghost_block = ""
+    ghost_section = ("\n" + ghost_block + "\n") if ghost_block else ""
+
     return f"""
 You are repairing a patch that already failed once. Do not start over — fix the previous attempt.
 
@@ -658,7 +677,7 @@ PATCHED (this is what broke):
 
 ### VALIDATION LOG (truncated to {log_char_limit} chars)
 {log or '<empty>'}
-
+{ghost_section}
 ### FIX HINTS
 {hint_block}
 

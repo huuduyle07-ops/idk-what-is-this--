@@ -42,6 +42,14 @@ class ExecutionResult:
     failure_info: Optional[Dict[str, str]] = None
     matched_by: Optional[str] = None
 
+    # Mutation oracle (Phase 2). Populated only on successful validation when
+    # the oracle is enabled. None means "not run" or "no mutants applicable" —
+    # downstream code must treat None as "no signal" rather than "weak".
+    oracle_strength: Optional[float] = None
+    oracle_tested: int = 0
+    oracle_killed: int = 0
+    oracle_note: Optional[str] = None
+
     def get_failure_report(self) -> str:
         if self.success:
             return "Success"
@@ -186,6 +194,37 @@ class Executor:
         )
 
         if ok:
+            oracle_strength: Optional[float] = None
+            oracle_tested = 0
+            oracle_killed = 0
+            oracle_note: Optional[str] = None
+            try:
+                from config import MUTATION_ORACLE_ENABLED, MUTATION_ORACLE_MAX_MUTANTS
+            except ImportError:
+                MUTATION_ORACLE_ENABLED = False
+                MUTATION_ORACLE_MAX_MUTANTS = 0
+
+            if MUTATION_ORACLE_ENABLED and new_snippet:
+                try:
+                    from core.mutation_oracle import run_mutation_oracle
+                    print(f"🧬 Running mutation oracle (max={MUTATION_ORACLE_MAX_MUTANTS})...")
+                    oracle = run_mutation_oracle(
+                        project_root=str(self.project_root),
+                        target_file=target_file,
+                        applied_snippet=new_snippet,
+                        validation_command=validation_command,
+                        language=language,
+                        max_mutants=MUTATION_ORACLE_MAX_MUTANTS,
+                    )
+                    oracle_strength = oracle.strength
+                    oracle_tested = oracle.tested
+                    oracle_killed = oracle.killed
+                    oracle_note = oracle.summary_line()
+                    print(f"🧬 {oracle_note}")
+                except Exception as e:
+                    oracle_note = f"oracle error: {type(e).__name__}: {e}"
+                    print(f"⚠️ {oracle_note}")
+
             cleanup_backup(backup_path)
             return ExecutionResult(
                 success=True,
@@ -198,6 +237,10 @@ class Executor:
                 risk=risk,
                 applied_patch=patch,
                 matched_by=matched_by,
+                oracle_strength=oracle_strength,
+                oracle_tested=oracle_tested,
+                oracle_killed=oracle_killed,
+                oracle_note=oracle_note,
             )
         print("🧪 Executor validation output:")
         print(output or "<empty>") 

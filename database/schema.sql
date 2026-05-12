@@ -133,8 +133,21 @@ CREATE TABLE IF NOT EXISTS patch_attempts (
     failure_reason TEXT,
     project_tag TEXT,
     patch_payload JSONB,                        -- original patch JSON
+    target_node_name TEXT,                      -- ghost-graph: symbol the patch targeted
+    target_node_kind TEXT,                      -- ghost-graph: function | class | method | ...
+    ghost_key TEXT,                             -- sha256(project_tag|file|node_name|normalized_snippet)
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Ghost-graph migration for pre-existing deployments.
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS target_node_name TEXT;
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS target_node_kind TEXT;
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS ghost_key TEXT;
+
+-- Mutation oracle (Phase 2). NULL when oracle is disabled or no mutants applied.
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS oracle_strength REAL;
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS oracle_tested INTEGER;
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS oracle_killed INTEGER;
 
 CREATE INDEX IF NOT EXISTS patch_attempts_task_run_idx
     ON patch_attempts (task_run_id);
@@ -147,6 +160,15 @@ CREATE INDEX IF NOT EXISTS patch_attempts_phase_idx
 
 CREATE INDEX IF NOT EXISTS patch_attempts_matched_by_idx
     ON patch_attempts (matched_by);
+
+-- Ghost-graph lookup paths:
+--   (project_tag, target_file, target_node_name) → "have I touched this symbol before?"
+--   (project_tag, ghost_key)                     → "have I tried this exact edit before?"
+CREATE INDEX IF NOT EXISTS patch_attempts_ghost_symbol_idx
+    ON patch_attempts (project_tag, target_file, target_node_name);
+
+CREATE INDEX IF NOT EXISTS patch_attempts_ghost_key_idx
+    ON patch_attempts (project_tag, ghost_key);
 
 -- =========================
 -- Optional: symbol snapshots

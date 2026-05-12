@@ -36,6 +36,7 @@ def run_self_correct_loop(
     max_attempts: int = PATCH_LOOP_MAX,
     rollback_on_validation_fail: bool = True,
     fallback_candidates: Optional[List[Dict[str, Any]]] = None,
+    project_tag: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Precision-Double-Tap self-healing patch loop.
 
@@ -128,6 +129,7 @@ def run_self_correct_loop(
                 validation_output=result.validation_output or "",
                 target_file=result.target_file,
                 matched_by=result.matched_by,
+                project_tag=project_tag,
             )
             try:
                 next_patch = re_patch_fn(result, prompt)

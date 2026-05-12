@@ -11,7 +11,9 @@ if root_dir not in sys.path:
 
 from config import DATABASE_URL, DB_ENABLED
 from typing import Optional, List, Dict, Any
+import hashlib
 import json
+import re
 
 # psycopg_pool / libpq are imported lazily inside get_pool(). Keeping the
 # import lazy means DB_ENABLED=false (e.g. Codespaces) doesn't require the
@@ -203,8 +205,25 @@ CREATE TABLE IF NOT EXISTS patch_attempts (
     failure_reason TEXT,
     project_tag TEXT,
     patch_payload JSONB,                        -- original patch JSON
+    target_node_name TEXT,                      -- ghost-graph: symbol the patch targeted
+    target_node_kind TEXT,                      -- ghost-graph: function | class | method | ...
+    ghost_key TEXT,                             -- sha256(project_tag|file|node_name|normalized_snippet)
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS target_node_name TEXT;
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS target_node_kind TEXT;
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS ghost_key TEXT;
+
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS oracle_strength REAL;
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS oracle_tested INTEGER;
+ALTER TABLE patch_attempts ADD COLUMN IF NOT EXISTS oracle_killed INTEGER;
+
+CREATE INDEX IF NOT EXISTS patch_attempts_ghost_symbol_idx
+    ON patch_attempts (project_tag, target_file, target_node_name);
+
+CREATE INDEX IF NOT EXISTS patch_attempts_ghost_key_idx
+    ON patch_attempts (project_tag, ghost_key);
 
 CREATE INDEX IF NOT EXISTS patch_attempts_task_run_idx
     ON patch_attempts (task_run_id);
@@ -681,6 +700,57 @@ def finish_task_run(
         conn.commit()
 
 
+# =========================
+# Ghost graph — content-addressed patch memory
+# =========================
+
+_GHOST_WS_RE = re.compile(r"\s+")
+
+
+def _normalize_snippet(text: Optional[str]) -> str:
+    """Whitespace-insensitive normalization used in the ghost key.
+
+    Two snippets that differ only by indentation, trailing spaces, or blank-line
+    runs should hash to the same ghost — the agent is reaching for the same edit.
+    """
+    if not text:
+        return ""
+    return _GHOST_WS_RE.sub(" ", text).strip()
+
+
+def compute_ghost_key(
+    project_tag: Optional[str],
+    target_file: Optional[str],
+    target_node_name: Optional[str],
+    target_snippet: Optional[str],
+) -> Optional[str]:
+    """sha256 of the (project, file, symbol, normalized snippet) tuple.
+
+    Returns None when we don't have enough to identify the target — better to
+    skip ghosting than to write rows that collide spuriously.
+    """
+    if not (project_tag and target_file and target_node_name):
+        return None
+    payload = "|".join([
+        project_tag,
+        target_file,
+        target_node_name,
+        _normalize_snippet(target_snippet),
+    ])
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _extract_node_fields(patch_payload: Optional[dict]) -> Dict[str, Optional[str]]:
+    """Pull ghost-relevant fields out of the patch JSON, tolerating shape drift."""
+    if not isinstance(patch_payload, dict):
+        return {"target_node_name": None, "target_node_kind": None, "target_snippet": None}
+    return {
+        "target_node_name": patch_payload.get("target_node_name") or patch_payload.get("node_name"),
+        "target_node_kind": patch_payload.get("target_node_kind") or patch_payload.get("node_kind"),
+        "target_snippet": patch_payload.get("target_snippet"),
+    }
+
+
 def save_patch_attempt(
     task_run_id: Optional[int],
     session_id: Optional[int],
@@ -697,16 +767,28 @@ def save_patch_attempt(
     failure_reason: Optional[str],
     project_tag: Optional[str],
     patch_payload: Optional[dict],
+    oracle_strength: Optional[float] = None,
+    oracle_tested: Optional[int] = None,
+    oracle_killed: Optional[int] = None,
 ):
     if not db_enabled():
         return
+
+    node_fields = _extract_node_fields(patch_payload)
+    target_node_name = node_fields["target_node_name"]
+    target_node_kind = node_fields["target_node_kind"]
+    target_snippet = node_fields["target_snippet"]
+    ghost_key = compute_ghost_key(project_tag, target_file, target_node_name, target_snippet)
+
     query = """
     INSERT INTO patch_attempts (
         task_run_id, session_id, target_file, matched_by, phase,
         risk_level, risk_score, diff, validation_ok, validation_output,
-        rollback_performed, failure_category, failure_reason, project_tag, patch_payload
+        rollback_performed, failure_category, failure_reason, project_tag, patch_payload,
+        target_node_name, target_node_kind, ghost_key,
+        oracle_strength, oracle_tested, oracle_killed
     )
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb);
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s, %s, %s, %s, %s, %s);
     """
     payload_json = json.dumps(patch_payload, ensure_ascii=False) if patch_payload else None
     with get_conn() as conn:
@@ -716,10 +798,85 @@ def save_patch_attempt(
                 (
                     task_run_id, session_id, target_file, matched_by, phase,
                     risk_level, risk_score, diff, validation_ok, validation_output,
-                    rollback_performed, failure_category, failure_reason, project_tag, payload_json
+                    rollback_performed, failure_category, failure_reason, project_tag, payload_json,
+                    target_node_name, target_node_kind, ghost_key,
+                    oracle_strength, oracle_tested, oracle_killed,
                 ),
             )
         conn.commit()
+
+
+def lookup_ghosts(
+    project_tag: Optional[str],
+    target_file: Optional[str],
+    target_node_name: Optional[str],
+    limit: int = 5,
+) -> List[Dict[str, Any]]:
+    """Return recent patch attempts that targeted the same symbol.
+
+    Newest first. Empty list when DB is off or any of the join keys are missing.
+    """
+    if not db_enabled():
+        return []
+    if not (project_tag and target_file and target_node_name):
+        return []
+
+    query = """
+    SELECT
+        id, phase, validation_ok, rollback_performed,
+        failure_category, failure_reason, matched_by,
+        risk_level, risk_score, ghost_key, created_at
+    FROM patch_attempts
+    WHERE project_tag = %s
+      AND target_file = %s
+      AND target_node_name = %s
+    ORDER BY created_at DESC
+    LIMIT %s;
+    """
+    rows: List[Dict[str, Any]] = []
+    try:
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(query, (project_tag, target_file, target_node_name, limit))
+                cols = [c.name for c in cur.description]
+                for row in cur.fetchall():
+                    rows.append(dict(zip(cols, row)))
+    except Exception:
+        # Ghost lookup is best-effort context; never block a patch on a DB hiccup.
+        return []
+    return rows
+
+
+def format_ghost_block(ghosts: List[Dict[str, Any]], max_items: int = 5) -> str:
+    """Render ghosts into a compact prompt fragment, or '' when there are none."""
+    if not ghosts:
+        return ""
+
+    lines: List[str] = []
+    for g in ghosts[:max_items]:
+        outcome = (
+            "PASSED" if g.get("validation_ok") is True
+            else "FAILED" if g.get("validation_ok") is False
+            else g.get("phase") or "unknown"
+        )
+        when = g.get("created_at")
+        when_str = when.strftime("%Y-%m-%d %H:%M") if hasattr(when, "strftime") else str(when or "")
+        cat = g.get("failure_category") or "-"
+        reason = (g.get("failure_reason") or "").strip().replace("\n", " ")
+        if len(reason) > 140:
+            reason = reason[:137] + "..."
+        matched = g.get("matched_by") or "-"
+        risk = g.get("risk_level") or "-"
+        lines.append(
+            f"- [{when_str}] {outcome} via {matched} (risk={risk}) cat={cat}"
+            + (f" — {reason}" if reason else "")
+        )
+
+    header = (
+        "### PRIOR ATTEMPTS ON THIS SYMBOL (ghost graph)\n"
+        "Past patches against the same (file, symbol). Do not rediscover failures:"
+    )
+    return header + "\n" + "\n".join(lines)
 
 
 def upsert_tooling_profile(

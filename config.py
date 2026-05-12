@@ -302,6 +302,14 @@ ROLLBACK_ON_VALIDATION_FAIL = True
 CONTROL_TIME_BUDGET_SEC = 180
 MAX_REVIEW_AGENTS = 2
 
+# --- MUTATION ORACLE (Phase 2 of the ghost+oracle+MCTS stack) ---
+# After a patch passes validation, optionally generate small mutants of the
+# patched snippet and re-run validation on each. Surviving mutants = the
+# validation command is too weak to trust as a green light.
+# Off by default: it multiplies validation-command runtime by N+1.
+MUTATION_ORACLE_ENABLED = os.getenv("MUTATION_ORACLE_ENABLED", "false").lower() not in {"0", "false", "no"}
+MUTATION_ORACLE_MAX_MUTANTS = int(os.getenv("MUTATION_ORACLE_MAX_MUTANTS", "5"))
+
 # --- OLLAMA / LOCAL CRITIC ---
 OLLAMA_ENABLED = os.getenv("OLLAMA_ENABLED", "false").lower() not in {"0", "false", "no"}
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")

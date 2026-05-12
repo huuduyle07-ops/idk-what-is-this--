@@ -302,9 +302,12 @@ def execute_subtask(state: AgentState, subtask: dict) -> dict:
             validation_output=patch_res.validation_output,
             rollback_performed=patch_res.rollback_performed,
             failure_category=None,
-            failure_reason=None,        
+            failure_reason=None,
             project_tag=state.project_tag,
-            patch_payload=res_json["patch_candidate"]
+            patch_payload=res_json["patch_candidate"],
+            oracle_strength=getattr(patch_res, "oracle_strength", None),
+            oracle_tested=getattr(patch_res, "oracle_tested", None),
+            oracle_killed=getattr(patch_res, "oracle_killed", None),
         )
 
         if not patch_res.success:
@@ -725,6 +728,9 @@ def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
                 failure_reason=(result.failure_info or {}).get("reason") if result.failure_info else None,
                 project_tag=state.project_tag,
                 patch_payload=current_patch_holder["patch"],
+                oracle_strength=getattr(result, "oracle_strength", None),
+                oracle_tested=getattr(result, "oracle_tested", None),
+                oracle_killed=getattr(result, "oracle_killed", None),
             )
         except Exception as e:
             print(f"⚠️ DB patch_attempt save skipped: {e}")
@@ -825,6 +831,7 @@ def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
                 target_file=result.target_file,
                 matched_by=result.matched_by,
                 extra_hints=issues_for_recheck,
+                project_tag=state.project_tag,
             )
 
         agents = [
@@ -871,6 +878,7 @@ def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
         validation_command=user_validation_cmd or "",
         max_attempts=PATCH_LOOP_MAX,
         rollback_on_validation_fail=ROLLBACK_ON_VALIDATION_FAIL,
+        project_tag=state.project_tag,
     )
 
     if loop_result["success"]:
