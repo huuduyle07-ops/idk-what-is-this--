@@ -89,6 +89,26 @@ def hydrate_control_source_from_scout(
     language: str,
     query: str = "",
 ) -> dict:
+    if not isinstance(control_result, dict):
+        return control_result
+
+    patch_intent = control_result.get("patch_intent")
+    if not isinstance(patch_intent, dict):
+        patch_intent = {}
+        control_result["patch_intent"] = patch_intent
+
+    if patch_intent.get("source_snippet"):
+        return control_result
+
+    scout = control_result.get("scout")
+    if not isinstance(scout, dict):
+        return control_result
+
+    top = control_result.get("top_hypothesis")
+    if not isinstance(top, dict):
+        top = {}
+        control_result["top_hypothesis"] = top
+
     patch_intent = control_result.setdefault("patch_intent", {})
     if patch_intent.get("source_snippet"):
         return control_result
@@ -135,9 +155,9 @@ def hydrate_control_source_from_scout(
 
         if snippet:
             patch_intent["target_file"] = rel_path
+            patch_intent["symbol"] = symbol or rel_path
             patch_intent["source_snippet"] = snippet
 
-            top = control_result.setdefault("top_hypothesis", {})
             top["symbol"] = symbol or rel_path
             top["confidence"] = max(float(top.get("confidence") or 0.0), 0.55)
             top["recommended_action"] = "patch"
