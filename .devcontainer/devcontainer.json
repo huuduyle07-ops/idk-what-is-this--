@@ -9,7 +9,10 @@
     "ROUTER_USE_EMBEDDINGS": "false",
     "INDEX_USE_EMBEDDINGS": "false",
     "RETRIEVER_USE_EMBEDDINGS": "false",
-    "RETRIEVER_USE_DB": "false"
+    "RETRIEVER_USE_DB": "false",
+    "DB_ENABLED": "false",
+    "MUTATION_ORACLE_ENABLED": "false",
+    "OLLAMA_ENABLED": "false"
   },
   "portsAttributes": {
     "5000": {
