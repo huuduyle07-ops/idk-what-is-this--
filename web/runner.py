@@ -213,6 +213,7 @@ def run_agent_web(
                 control_result=state.control_result,
                 repo_path=state.repo_path,
                 language=state.language or language,
+                query=state.user_input,
             )
 
             patch_intent = state.control_result.get("patch_intent") or {}

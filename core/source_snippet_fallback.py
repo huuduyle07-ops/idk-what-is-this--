@@ -14,6 +14,35 @@ def _find_matching_brace(text: str, open_idx: int) -> Optional[int]:
                 return i + 1
     return None
 
+def _candidate_names_from_scout(scout: dict, query: str = "") -> list[str]:
+    raw = []
+
+    for symbol in scout.get("likely_symbols") or []:
+        raw.append(symbol.split("::")[-1])
+
+    raw.extend(scout.get("target_concepts") or [])
+
+    reason = scout.get("reason") or ""
+    raw.append(reason)
+    raw.append(query)
+
+    names = []
+    seen = set()
+
+    for chunk in raw:
+        for token in re.findall(r"\b[A-Za-z_][A-Za-z0-9_]*\b", str(chunk)):
+            low = token.lower()
+            if low in {
+                "the", "and", "or", "to", "from", "within", "logic",
+                "validation", "state", "updates", "function", "file",
+                "cart", "inventory", "stock", "quantity",
+            }:
+                continue
+            if low not in seen:
+                seen.add(low)
+                names.append(token)
+
+    return names
 
 def extract_symbol_snippet_from_text(text: str, language: str, symbol_name: str) -> Optional[str]:
     name = symbol_name.split("::")[-1]
@@ -54,7 +83,12 @@ def extract_symbol_snippet_from_text(text: str, language: str, symbol_name: str)
     return None
 
 
-def hydrate_control_source_from_scout(control_result: dict, repo_path: str, language: str) -> dict:
+def hydrate_control_source_from_scout(
+    control_result: dict,
+    repo_path: str,
+    language: str,
+    query: str = "",
+) -> dict:
     patch_intent = control_result.setdefault("patch_intent", {})
     if patch_intent.get("source_snippet"):
         return control_result
@@ -73,6 +107,8 @@ def hydrate_control_source_from_scout(control_result: dict, repo_path: str, lang
     for rel_path in likely_files:
         candidates.append((rel_path, ""))
 
+    candidate_names = _candidate_names_from_scout(scout, query=query)
+
     for rel_path, symbol in candidates:
         path = Path(repo_path) / rel_path
         if not path.exists() or not path.is_file():
@@ -81,21 +117,28 @@ def hydrate_control_source_from_scout(control_result: dict, repo_path: str, lang
         text = path.read_text(encoding="utf-8", errors="replace")
 
         snippet = None
+
         if symbol:
             snippet = extract_symbol_snippet_from_text(text, language, symbol)
 
+        if not snippet:
+            for name in candidate_names:
+                snippet = extract_symbol_snippet_from_text(text, language, name)
+                if snippet:
+                    symbol = f"{rel_path}::{name}"
+                    break
+
+        # Last resort: only use full file if it is small.
         if not snippet and len(text) < 12000:
             snippet = text.strip()
+            symbol = rel_path
 
         if snippet:
             patch_intent["target_file"] = rel_path
             patch_intent["source_snippet"] = snippet
 
             top = control_result.setdefault("top_hypothesis", {})
-            if symbol:
-                top["symbol"] = symbol
-            else:
-                top["symbol"] = rel_path
+            top["symbol"] = symbol or rel_path
             top["confidence"] = max(float(top.get("confidence") or 0.0), 0.55)
             top["recommended_action"] = "patch"
 
