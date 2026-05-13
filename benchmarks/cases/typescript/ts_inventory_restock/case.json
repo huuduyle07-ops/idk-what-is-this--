@@ -1,0 +1,17 @@
+{
+  "name": "ts_inventory_restock",
+  "language": "typescript",
+  "category": "logic_validation",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node --experimental-strip-types main.ts",
+  "expected_changed_files": [
+    "restock.ts"
+  ],
+  "forbidden_changed_files": [
+    "main.ts",
+    "products.ts"
+  ],
+  "prompt": "Fix the TypeScript inventory restock bug.\n\nRequirements:\n- Modify restock.ts only.\n- calculateRestockAmount must reject negative currentStock.\n- calculateRestockAmount must reject negative reorderPoint.\n- calculateRestockAmount must reject non-positive maxCapacity.\n- calculateRestockAmount must reject reorderPoint > maxCapacity.\n- When currentStock < reorderPoint, return (maxCapacity - currentStock).\n- When currentStock >= reorderPoint, return 0.\n- Rejected inputs must throw an Error.\n- Do not modify main.ts or products.ts.\n- Do not create new files.\n- Use patch_candidate if only calculateRestockAmount changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node --experimental-strip-types main.ts"
+}

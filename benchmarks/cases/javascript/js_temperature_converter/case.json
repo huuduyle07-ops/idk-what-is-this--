@@ -1,0 +1,17 @@
+{
+  "name": "js_temperature_converter",
+  "language": "javascript",
+  "category": "logic_validation",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node main.js",
+  "expected_changed_files": [
+    "converter.js"
+  ],
+  "forbidden_changed_files": [
+    "main.js",
+    "units.js"
+  ],
+  "prompt": "Fix the JavaScript temperature converter bug.\n\nRequirements:\n- Modify converter.js only.\n- convertCelsius must reject values below absolute zero (celsius < -273.15).\n- convertCelsius must reject unknown target units.\n- Valid conversions must return the correct value (C -> F, C -> K, C -> C).\n- Rejected inputs must throw an Error.\n- Do not modify main.js or units.js.\n- Do not create new files.\n- Use patch_candidate if only convertCelsius changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node main.js"
+}

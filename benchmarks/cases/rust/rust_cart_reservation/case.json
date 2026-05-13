@@ -1,6 +1,8 @@
 {
   "name": "rust_cart_reservation",
   "language": "rust",
+  "category": "logic_validation",
+  "difficulty": "easy",
   "agent_mode": "reviewer",
   "patch_style": "balanced",
   "validation_command": "cargo run && echo OK",
@@ -12,5 +14,5 @@
     "src/cart.rs",
     "src/main.rs"
   ],
-  "prompt": "Fix the Rust cart reservation logic.\n\nRequirements:\n- Modify src/agent.rs only.\n- reserve_item must reject quantity <= 0.\n- reserve_item must reject missing items.\n- reserve_item must reject insufficient stock.\n- A valid reservation must decrease inventory stock and increase cart quantity.\n- Failed reservations must not change stock or cart quantity.\n- Do not modify src/inventory.rs, src/cart.rs, or src/main.rs.\n- Do not create new files.\n- Use patch_candidate if only src/agent.rs is changed.\n- Use patch_plan only if absolutely necessary.\n- target_snippet must be copied verbatim from the actual file."
+  "prompt": "Fix the Rust cart reservation logic.\n\nRequirements:\n- Modify src/agent.rs only.\n- reserve_item must reject quantity <= 0.\n- reserve_item must reject missing items.\n- reserve_item must reject insufficient stock.\n- A valid reservation must decrease inventory stock and increase cart quantity.\n- Failed reservations must not change stock or cart quantity.\n- Do not modify src/inventory.rs, src/cart.rs, or src/main.rs.\n- Do not create new files.\n- Use patch_candidate if only src/agent.rs is changed.\n- Use patch_plan only if absolutely necessary.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: cargo run && echo OK"
 }

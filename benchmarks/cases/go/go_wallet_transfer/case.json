@@ -1,6 +1,8 @@
 {
   "name": "go_wallet_transfer",
   "language": "go",
+  "category": "logic_validation",
+  "difficulty": "easy",
   "agent_mode": "reviewer",
   "patch_style": "balanced",
   "validation_command": "go run .",
