@@ -10,6 +10,16 @@ import time
 from pathlib import Path
 from typing import Any
 
+# Use the Windows trust store for SSL verification. The default certifi
+# bundle won't include locally-installed CAs (e.g. AVG/Kaspersky/corporate
+# proxies that MITM HTTPS), and those break Gemini calls. truststore is the
+# stdlib-recommended way to honor the OS trust store from Python.
+try:
+    import truststore
+    truststore.inject_into_ssl()
+except ImportError:
+    pass
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))

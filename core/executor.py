@@ -348,12 +348,24 @@ class Executor:
         if not first_line:
             return False
 
-        starts_with_fn_keyword = first_line.startswith((
+        fn_keyword_prefixes = (
             "pub fn ", "pub(crate) fn ", "pub async fn ", "async fn ", "fn ",
             "def ", "async def ",
-            "function ",
-        ))
-        return starts_with_fn_keyword and target_node_name in target_snippet
+            "function ", "async function ",
+            "export function ", "export async function ",
+            "export default function ", "export default async function ",
+        )
+        if first_line.startswith(fn_keyword_prefixes) and target_node_name in target_snippet:
+            return True
+
+        # C/C++/Java/C#-style: "<type/qualifiers> name(args)" — no leading
+        # keyword to anchor on. Accept iff the name is followed by ( on the
+        # first line and the snippet contains an opening brace.
+        name_pat = re.compile(rf"\b{re.escape(target_node_name)}\s*\(")
+        if name_pat.search(first_line) and "{" in target_snippet:
+            return True
+
+        return False
 
     def _adjust_risk_by_match_source(self, risk: PatchRisk, matched_by: Optional[str]) -> PatchRisk:
         score = risk.score
