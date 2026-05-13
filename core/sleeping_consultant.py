@@ -29,6 +29,7 @@ _RUN_STATE: dict = {
     "completed_at": None,      # iso timestamp
     "report_dir": None,        # str path
     "patch_style": None,
+    "dream_mode": None,        # plan_only | patch_if_safe | research
     "total_items": 0,
     "current_idx": 0,          # 1-based; 0 = nothing in flight
     "current_kind": "",
@@ -57,6 +58,7 @@ def _reset_state_for_run(total: int, patch_style: str, report_dir: Path) -> None
             "completed_at": None,
             "report_dir": str(report_dir),
             "patch_style": patch_style,
+            "dream_mode": None,
             "total_items": total,
             "current_idx": 0,
             "current_kind": "",
@@ -130,16 +132,19 @@ def _generate_patch_plan(
 
 
 def _generate_plan_analysis(repo_path: str, item: dict) -> tuple[dict | None, str]:
-    """Fallback: ask the model for a structured plan without requiring a patch_plan.
+    """Dream V2 planning pass — structured plan, never a code patch.
 
-    Called when the main attempt did not produce a valid patch_plan list.
-    Returns (parsed_dict, raw_response).
+    Returns (parsed_dict, raw_response). The model is told explicitly that
+    `safe_to_patch_now=true` is a strong claim it must justify; the caller uses
+    that field to decide whether to attempt a patch in `patch_if_safe` mode.
     """
     query = _build_patch_query(item)
     kind = item.get("kind", "bug")
 
-    prompt = f"""You are a senior engineer doing a planning pass on a software task.
-Do NOT write any code patch. Your only job is to analyse the task and return a plan.
+    prompt = f"""You are in Dream planning mode.
+
+Your job is to create a plan first. Do not write any code patch.
+Do not require a `patch_plan` — produce a plan even when patching is unsafe.
 
 Task: {query}
 
@@ -152,16 +157,42 @@ Return ONLY valid JSON — no markdown fences, no extra text:
   "likely_files": ["relative/path/to/file.py"],
   "recommended_steps": ["step 1", "step 2"],
   "safe_to_patch_now": false,
-  "patch_style_required": "safe_minimal|balanced|vibe|none",
+  "patch_style_required": "none|safe_minimal|balanced|vibe",
   "validation_commands": ["python -m pytest tests/"],
   "risks": ["risk 1"]
 }}
 
-Be specific — reference real file paths and symbols when you can.
+Rules:
+- Be specific. Reference real file paths and symbols when you can.
+- Set `safe_to_patch_now=true` ONLY when ALL of the following are true:
+    * the task is a narrow bug fix (not architecture, not "find a bug", not idea/debt),
+    * the target file(s) are known,
+    * an exact source snippet is identifiable without guessing,
+    * the patch can stay within `safe_minimal` style.
+- Otherwise leave `safe_to_patch_now=false` and explain via `recommended_steps` and `risks`.
+- Do NOT skip the item. Always return the JSON object above.
 """
     raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path)
     parsed = extract_json_block(raw)
     return parsed, (raw or "")
+
+
+def _normalize_dream_mode(value: str | None) -> str:
+    """Map UI/string aliases to Dream V2 modes. Default = plan_only."""
+    v = (value or "").strip().lower()
+    aliases = {
+        "": "plan_only",
+        "plan": "plan_only",
+        "plan_only": "plan_only",
+        "planonly": "plan_only",
+        "safe": "patch_if_safe",
+        "patch": "patch_if_safe",
+        "patch_if_safe": "patch_if_safe",
+        "research": "research",
+        "design": "research",
+        "proposal": "research",
+    }
+    return aliases.get(v, "plan_only")
 
 
 def _run_patch_item(
@@ -296,8 +327,8 @@ def _run_plan_only_item(
 ) -> dict:
     """Generate a structured plan for any item type without attempting a patch.
 
-    Used for idea items when patch_style != 'vibe', or as an explicit
-    plan-only pass for debt/bug items that need triage before patching.
+    Default path in Dream V2 `plan_only` mode and for non-bug items in
+    `patch_if_safe` mode.
     """
     item_dir_path.mkdir(parents=True, exist_ok=True)
     plan_data, plan_raw = _generate_plan_analysis(repo_path, item)
@@ -316,17 +347,119 @@ def _run_plan_only_item(
     }
 
 
+def _run_research_item(
+    repo_path: str,
+    item: dict,
+    idx: int,
+    item_dir_path: Path,
+) -> dict:
+    """Research mode — produce a proposal markdown only, no patch attempt.
+
+    Used for ideas / architectural / open-ended items (MCTS, ghost graph,
+    MCP integration, etc.) where patching is never appropriate.
+    """
+    item_dir_path.mkdir(parents=True, exist_ok=True)
+
+    title = item.get("title", "untitled")
+    hint = item.get("hint", "")
+    kind = item.get("kind", "research")
+    prompt = (
+        "You are in Dream research mode. Produce a written proposal, not code.\n\n"
+        f"Topic ({kind}): {title}\n"
+        f"Hint: {hint}\n\n"
+        "Write a markdown proposal covering:\n"
+        "1. What problem this solves / why it matters here.\n"
+        "2. Concrete first-step sketch (file paths or modules welcome).\n"
+        "3. Two design variants with trade-offs.\n"
+        "4. Risks, failure modes, and what would kill this idea.\n"
+        "5. A minimal experiment that would prove or disprove the approach.\n"
+        "Be specific. Reference real symbols/paths when you can. No code patches."
+    )
+
+    raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path) or ""
+    (item_dir_path / "proposal.md").write_text(raw, encoding="utf-8")
+
+    # Also save a small plan_analysis.json for consistency with other modes.
+    plan_data, _plan_raw = _generate_plan_analysis(repo_path, item)
+    (item_dir_path / "plan_analysis.json").write_text(
+        json.dumps(plan_data, indent=2, ensure_ascii=False) if isinstance(plan_data, dict) else "{}",
+        encoding="utf-8",
+    )
+
+    summary = ""
+    if isinstance(plan_data, dict):
+        summary = plan_data.get("problem_summary", "") or ""
+    if not summary:
+        summary = raw[:200].replace("\n", " ")
+
+    return {
+        **item, "idx": idx,
+        "status": "research_note_created",
+        "summary": summary[:200],
+        "item_dir_name": item_dir_path.name,
+    }
+
+
+def _run_patch_if_safe_item(
+    repo_path: str,
+    item: dict,
+    idx: int,
+    retry_per_item: int,
+    item_dir_path: Path,
+) -> dict:
+    """Dream V2 patch_if_safe — plan first, patch only when the planner agrees.
+
+    Always writes `plan_analysis.json`. Delegates to `_run_patch_item` for the
+    sandbox/validation flow only when the model marks `safe_to_patch_now=true`.
+    """
+    item_dir_path.mkdir(parents=True, exist_ok=True)
+    plan_data, plan_raw = _generate_plan_analysis(repo_path, item)
+    (item_dir_path / "plan_analysis.json").write_text(
+        json.dumps(plan_data, indent=2, ensure_ascii=False) if isinstance(plan_data, dict) else plan_raw,
+        encoding="utf-8",
+    )
+
+    summary = ""
+    safe = False
+    if isinstance(plan_data, dict):
+        summary = plan_data.get("problem_summary", "") or ""
+        safe = bool(plan_data.get("safe_to_patch_now"))
+
+    if not safe:
+        return {
+            **item, "idx": idx,
+            "status": "planned_no_patch",
+            "summary": (summary or "Planner judged the task not safe to auto-patch.")[:200],
+            "item_dir_name": item_dir_path.name,
+        }
+
+    return _run_patch_item(
+        repo_path=repo_path,
+        item=item,
+        idx=idx,
+        retry_per_item=retry_per_item,
+        item_dir_path=item_dir_path,
+    )
+
+
 def run_overnight(
     repo_path: str,
     patch_style: str = "balanced",
     time_budget_sec: int = 6 * 3600,
     retry_per_item: int = 1,
+    dream_mode: str = "plan_only",
 ) -> dict:
     """Run the dream queue. The original repo is never touched.
 
     Each item is run in a fresh temp clone. Results land in
     .agent/dreams/<YYYY-MM-DD>/. The user picks which to apply later via the
     web UI.
+
+    `dream_mode` controls behaviour:
+      - "plan_only" (default): every item gets a structured plan, never patches.
+      - "patch_if_safe": bug items may patch when the planner marks them safe;
+        all other kinds stay plan-only.
+      - "research": every item becomes a written proposal (no patch).
     """
     repo_path = str(Path(repo_path).resolve())
     if not Path(repo_path).is_dir():
@@ -336,6 +469,7 @@ def run_overnight(
     if not queue:
         return {"error": "Queue is empty. Add items first."}
 
+    mode = _normalize_dream_mode(dream_mode)
     report_dir = dream_artifacts.today_dir(repo_path)
     report_dir.mkdir(parents=True, exist_ok=True)
 
@@ -346,11 +480,12 @@ def run_overnight(
     )
 
     print(
-        f"💤 DREAM: starting run | items={len(queue)} | "
+        f"💤 DREAM: starting run | items={len(queue)} | mode={mode} | "
         f"style={patch_style} | report_dir={report_dir}",
         flush=True,
     )
     _reset_state_for_run(total=len(queue), patch_style=patch_style, report_dir=report_dir)
+    _set_state(dream_mode=mode)
 
     start = time.time()
     results: list[dict] = []
@@ -383,24 +518,41 @@ def run_overnight(
         item_started = time.time()
 
         try:
-            if kind == "idea":
-                if patch_style != "vibe":
-                    # Not vibe — generate a plan instead of skipping entirely.
-                    print(
-                        f"💤 DREAM: [{idx}/{len(queue)}] idea → plan-only (patch_style={patch_style!r})",
-                        flush=True,
-                    )
+            if mode == "plan_only":
+                print(
+                    f"💤 DREAM: [{idx}/{len(queue)}] plan_only → {kind}",
+                    flush=True,
+                )
+                results.append(_run_plan_only_item(repo_path, item, idx, item_path))
+            elif mode == "research":
+                print(
+                    f"💤 DREAM: [{idx}/{len(queue)}] research → {kind}",
+                    flush=True,
+                )
+                results.append(_run_research_item(repo_path, item, idx, item_path))
+            else:  # patch_if_safe
+                if kind == "bug":
+                    results.append(_run_patch_if_safe_item(
+                        repo_path=repo_path,
+                        item=item,
+                        idx=idx,
+                        retry_per_item=retry_per_item,
+                        item_dir_path=item_path,
+                    ))
+                elif kind == "idea":
+                    if patch_style == "vibe":
+                        results.append(_run_idea_item(repo_path, item, idx, item_path))
+                    else:
+                        # Plan the idea but flag that patching needs vibe style.
+                        out = _run_plan_only_item(repo_path, item, idx, item_path)
+                        out["status"] = "patch_skipped_needs_vibe"
+                        out["summary"] = (
+                            "Idea-class task: patching requires vibe style. "
+                            + (out.get("summary") or "")
+                        )[:200]
+                        results.append(out)
+                else:  # debt, research, anything else
                     results.append(_run_plan_only_item(repo_path, item, idx, item_path))
-                else:
-                    results.append(_run_idea_item(repo_path, item, idx, item_path))
-            else:
-                results.append(_run_patch_item(
-                    repo_path=repo_path,
-                    item=item,
-                    idx=idx,
-                    retry_per_item=retry_per_item,
-                    item_dir_path=item_path,
-                ))
         except Exception as e:
             item_path.mkdir(parents=True, exist_ok=True)
             (item_path / "error.txt").write_text(
@@ -430,11 +582,12 @@ def run_overnight(
     )
 
     # Write outputs
-    dream_artifacts.write_report_markdown(report_dir, results)
+    dream_artifacts.write_report_markdown(report_dir, results, dream_mode=mode)
     (report_dir / "list.json").write_text(
         json.dumps({
             "items": results,
             "patch_style": patch_style,
+            "dream_mode": mode,
             "completed_at": datetime.now().isoformat(timespec="seconds"),
         }, indent=2, ensure_ascii=False),
         encoding="utf-8",
@@ -443,6 +596,7 @@ def run_overnight(
     return {
         "report_dir": str(report_dir),
         "items": results,
+        "dream_mode": mode,
     }
 
 
@@ -451,6 +605,7 @@ def start_overnight_async(
     patch_style: str = "balanced",
     time_budget_sec: int = 6 * 3600,
     retry_per_item: int = 1,
+    dream_mode: str = "plan_only",
 ) -> dict:
     """Kick a dream run on a background daemon thread.
 
@@ -472,6 +627,7 @@ def start_overnight_async(
                 patch_style=patch_style,
                 time_budget_sec=time_budget_sec,
                 retry_per_item=retry_per_item,
+                dream_mode=dream_mode,
             )
             if result.get("error"):
                 _set_state(

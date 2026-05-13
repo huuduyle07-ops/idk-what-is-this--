@@ -182,6 +182,12 @@
               <option value="bug">bug</option>
               <option value="debt">debt</option>
               <option value="idea">idea (vibe only)</option>
+              <option value="research">research</option>
+            </select>
+            <select id="dreamMode" title="Dream V2 mode: plan-only is safest; patch_if_safe lets narrow bug fixes auto-patch; research writes proposals only.">
+              <option value="plan_only" selected>plan_only</option>
+              <option value="patch_if_safe">patch_if_safe</option>
+              <option value="research">research</option>
             </select>
             <input id="dreamTitle" class="dream-title" type="text" placeholder="title">
             <input id="dreamHint" class="dream-hint" type="text" placeholder="hint (optional)">
@@ -441,6 +447,10 @@ function _dreamPatchStyle() {
     return document.getElementById("patchStyleSelect")?.value || "safe_minimal";
 }
 
+function _dreamMode() {
+    return document.getElementById("dreamMode")?.value || "plan_only";
+}
+
 function addDreamItem() {
     const repo = _dreamRepo(); if (!repo) return;
     const kind  = document.getElementById("dreamKind").value;
@@ -571,7 +581,11 @@ function startOvernight() {
     fetch("/dream/run", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ repo_path: repo, patch_style: _dreamPatchStyle() }),
+        body: new URLSearchParams({
+            repo_path: repo,
+            patch_style: _dreamPatchStyle(),
+            dream_mode: _dreamMode(),
+        }),
     })
     .then(r => r.json())
     .then(data => {

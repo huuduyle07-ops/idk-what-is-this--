@@ -69,6 +69,7 @@ def list_all_reports(repo_path: str) -> list[dict]:
             "item_count": len(items),
             "statuses": statuses,
             "patch_style": data.get("patch_style"),
+            "dream_mode": data.get("dream_mode"),
             "completed_at": data.get("completed_at"),
         })
     return summaries
@@ -98,11 +99,19 @@ def read_report(report_dir: Path) -> dict:
         except Exception:
             pass
 
+    dream_mode = None
+    if list_path.exists():
+        try:
+            dream_mode = json.loads(list_path.read_text(encoding="utf-8")).get("dream_mode")
+        except Exception:
+            pass
+
     return {
         "report_dir": str(report_dir),
         "morning_report": morning,
         "items": items,
         "patch_style": patch_style,
+        "dream_mode": dream_mode,
         "completed_at": completed_at,
     }
 
@@ -147,13 +156,34 @@ def item_dir(report_dir: Path, idx: int, title: str) -> Path:
     return report_dir / f"{idx:02d}-{slugify(title)}"
 
 
-def write_report_markdown(report_dir: Path, items: list[dict]) -> Path:
+STATUS_LEGEND: dict[str, str] = {
+    "planned_no_patch": "Plan created; patching not attempted.",
+    "ready_to_apply": "Patch validated in sandbox; awaiting user apply.",
+    "patch_applied": "Patch applied to repo.",
+    "patch_skipped_needs_vibe": "Task type requires vibe style; planned only.",
+    "research_note_created": "Proposal markdown written; no patch.",
+    "needs_manual_review": "Planner is unsure; human review needed.",
+    "blocked_missing_context": "Plan blocked because grounding context is missing.",
+    "idea_written": "Free-form design note written (legacy idea-flow).",
+    "rejected": "Patch failed validation after all attempts.",
+    "error": "Item crashed during processing.",
+    "skipped_time_budget": "Time budget exhausted before reaching this item.",
+}
+
+
+def write_report_markdown(
+    report_dir: Path,
+    items: list[dict],
+    dream_mode: str | None = None,
+) -> Path:
     lines: list[str] = [
         f"# Morning report — {datetime.now():%Y-%m-%d %H:%M}",
         "",
         f"Total items: {len(items)}",
-        "",
     ]
+    if dream_mode:
+        lines.append(f"Dream mode: `{dream_mode}`")
+    lines.append("")
 
     status_counts: dict[str, int] = {}
     for it in items:
@@ -163,7 +193,11 @@ def write_report_markdown(report_dir: Path, items: list[dict]) -> Path:
     if status_counts:
         lines.append("## Summary")
         for st, count in sorted(status_counts.items()):
-            lines.append(f"- {st}: {count}")
+            descr = STATUS_LEGEND.get(st)
+            if descr:
+                lines.append(f"- **{st}** ({count}) — {descr}")
+            else:
+                lines.append(f"- **{st}** ({count})")
         lines.append("")
 
     lines.append("## Items")

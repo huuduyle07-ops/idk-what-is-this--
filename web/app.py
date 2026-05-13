@@ -631,7 +631,7 @@ def dream_queue_route():
 
     if action == "add":
         kind = request.form.get("kind", "bug").strip().lower()
-        if kind not in {"bug", "debt", "idea"}:
+        if kind not in {"bug", "debt", "idea", "research"}:
             return {"error": f"unknown kind: {kind}"}
         title = request.form.get("title", "").strip()
         hint = request.form.get("hint", "").strip()
@@ -649,16 +649,22 @@ def dream_queue_route():
 def dream_run_route():
     """Phase 2: kicks the run on a background thread and returns immediately.
 
-    Poll /dream/status to follow progress.
+    Poll /dream/status to follow progress. `dream_mode` selects Dream V2
+    behaviour (`plan_only` default / `patch_if_safe` / `research`).
     """
     repo_path = request.form.get("repo_path", "").strip()
     if not repo_path or not Path(repo_path).is_dir():
         return {"error": f"repo_path is not a directory: {repo_path}"}
 
     patch_style = normalize_patch_style(request.form.get("patch_style"))
+    dream_mode = request.form.get("dream_mode", "plan_only")
 
     try:
-        return start_overnight_async(repo_path, patch_style=patch_style)
+        return start_overnight_async(
+            repo_path,
+            patch_style=patch_style,
+            dream_mode=dream_mode,
+        )
     except Exception as e:
         return {"error": f"start_overnight_async failed: {e}"}
 
@@ -687,6 +693,7 @@ def dream_list_route():
         "report_dir": str(latest),
         "items": data.get("items", []),
         "patch_style": data.get("patch_style"),
+        "dream_mode": data.get("dream_mode"),
         "completed_at": data.get("completed_at"),
     }
 
@@ -763,11 +770,32 @@ def dream_apply_route():
         kind = (it.get("kind") or "").lower()
         item_dir_path = latest / it.get("item_dir_name", "")
 
-        if kind == "idea":
+        if kind in {"idea", "research"}:
             results.append({
                 "idx": idx, "title": title,
-                "status": "skipped_idea",
-                "message": "Idea items have no patch (see design.md in artifacts).",
+                "status": f"skipped_{kind}",
+                "message": (
+                    "Non-patch item — see design.md / proposal.md / plan_analysis.json "
+                    "in artifacts."
+                ),
+            })
+            continue
+
+        item_status = it.get("status")
+        if item_status in {
+            "planned_no_patch",
+            "patch_skipped_needs_vibe",
+            "research_note_created",
+            "needs_manual_review",
+            "blocked_missing_context",
+        }:
+            results.append({
+                "idx": idx, "title": title,
+                "status": "skipped_plan_only",
+                "message": (
+                    f"Item is `{item_status}`; nothing to apply. "
+                    "Re-run Dream in patch_if_safe mode if you want a patch."
+                ),
             })
             continue
 
