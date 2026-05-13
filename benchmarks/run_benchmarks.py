@@ -35,6 +35,27 @@ IGNORE_FILES = {
     "Cargo.lock",
 }
 
+def discover_case_files(cases_root: Path) -> list[Path]:
+    """
+    Supports both:
+    benchmarks/cases/go_wallet_transfer/case.json
+    benchmarks/cases/go/go_wallet_transfer/case.json
+    """
+    return sorted(cases_root.rglob("case.json"))
+
+
+def load_case(case_file: Path) -> dict:
+    with case_file.open("r", encoding="utf-8") as f:
+        case = json.load(f)
+
+    case.setdefault("category", "uncategorized")
+    case.setdefault("difficulty", "unknown")
+
+    # Useful for report/debug
+    case["_case_file"] = str(case_file)
+    case["_case_dir"] = str(case_file.parent)
+
+    return case
 
 def _ignore_patterns(dir_path: str, names: list[str]):
     ignored = []
@@ -83,19 +104,9 @@ def changed_files(before: dict[str, str], after: dict[str, str]) -> list[str]:
         if before.get(k) != after.get(k)
     )
 
-
-def load_case(case_dir: Path) -> dict[str, Any]:
-    manifest_path = case_dir / "case.json"
-    if not manifest_path.exists():
-        raise FileNotFoundError(f"Missing case.json: {manifest_path}")
-
-    data = json.loads(manifest_path.read_text(encoding="utf-8"))
-    data["_case_dir"] = str(case_dir)
-    return data
-
-
-def run_case(case_dir: Path) -> dict[str, Any]:
-    case = load_case(case_dir)
+def run_case(case_file: Path) -> dict[str, Any]:
+    case = load_case(case_file)
+    case_dir = case_file.parent
 
     name = case.get("name") or case_dir.name
     buggy_repo = case_dir / "buggy_repo"
@@ -159,7 +170,11 @@ def run_case(case_dir: Path) -> dict[str, Any]:
             "success": success,
             "validation_ok": ok,
             "patch_style": patch_style,
+            "language": case.get("language"),
+            "case_file": str("case_file"),            
             "duration_sec": round(time.time() - started, 2),
+            "difficulty": case.get("difficulty"),
+            "category": case.get("category", "uncategorized"),
             "changed_files": changed,
             "missing_expected_files": missing_expected,
             "touched_forbidden_files": touched_forbidden,
@@ -174,11 +189,7 @@ def discover_cases(root: Path) -> list[Path]:
     if not cases_root.exists():
         return []
 
-    return sorted(
-        p for p in cases_root.iterdir()
-        if p.is_dir() and (p / "case.json").exists()
-    )
-
+    return discover_case_files(cases_root)
 
 def main() -> int:
     parser = argparse.ArgumentParser()
@@ -190,20 +201,31 @@ def main() -> int:
     cases = discover_cases(root)
 
     if args.case:
-        cases = [p for p in cases if p.name == args.case]
+        if args.case:
+            filtered = []
+            for case_file in cases:
+                try:
+                    case = load_case(case_file)
+                    case_name = case.get("name") or case_file.parent.name
+                    if case_name == args.case or case_file.parent.name == args.case:
+                        filtered.append(case_file)
+                except Exception:
+                    continue
+    cases = filtered
 
     if not cases:
         print("No benchmark cases found.")
         return 1
 
     results = []
-    for case_dir in cases:
-        print(f"\n🧪 Running benchmark: {case_dir.name}")
+    for case_file in cases:
+        case_label = case_file.parent.name
+        print(f"\n🧪 Running benchmark: {case_label}")
         try:
-            res = run_case(case_dir)
+            res = run_case(case_file)
         except Exception as e:
             res = {
-                "name": case_dir.name,
+                "name": case_file.parent.name,
                 "success": False,
                 "error": repr(e),
             }
