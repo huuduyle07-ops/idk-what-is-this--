@@ -171,7 +171,7 @@ def run_case(case_file: Path) -> dict[str, Any]:
             "validation_ok": ok,
             "patch_style": patch_style,
             "language": case.get("language"),
-            "case_file": str("case_file"),            
+            "case_file": str(case_file),            
             "duration_sec": round(time.time() - started, 2),
             "difficulty": case.get("difficulty"),
             "category": case.get("category", "uncategorized"),
@@ -199,19 +199,18 @@ def main() -> int:
 
     root = Path(__file__).resolve().parent
     cases = discover_cases(root)
-
+    seen_names = set()
     if args.case:
-        if args.case:
-            filtered = []
-            for case_file in cases:
-                try:
-                    case = load_case(case_file)
-                    case_name = case.get("name") or case_file.parent.name
-                    if case_name == args.case or case_file.parent.name == args.case:
-                        filtered.append(case_file)
-                except Exception:
-                    continue
-    cases = filtered
+        filtered = []
+        for case_file in cases:
+            try:
+                case = load_case(case_file)
+                case_name = case.get("name") or case_file.parent.name
+                if case_name == args.case or case_file.parent.name == args.case:
+                    filtered.append(case_file)
+            except Exception:
+                continue
+        cases = filtered
 
     if not cases:
         print("No benchmark cases found.")
@@ -220,8 +219,16 @@ def main() -> int:
     results = []
     for case_file in cases:
         case_label = case_file.parent.name
-        print(f"\n🧪 Running benchmark: {case_label}")
+
         try:
+            case = load_case(case_file)
+            case_name = case.get("name") or case_label
+
+            if case_name in seen_names:
+                raise ValueError(f"Duplicate benchmark case name: {case_name}")
+            seen_names.add(case_name)
+
+            print(f"\n🧪 Running benchmark: {case_name}")
             res = run_case(case_file)
         except Exception as e:
             res = {
