@@ -1,4 +1,6 @@
+import os
 import platform
+import shutil
 import subprocess
 import sys
 import time
@@ -15,13 +17,31 @@ EXE = HERE / ("validation_test.exe" if IS_WINDOWS else "validation_test")
 NTSTATUS_ERROR_THRESHOLD = 0xC0000000
 
 
-def run_and_forward(cmd):
+def gxx_runtime_env():
+    """Ensure the freshly-built EXE loads the libstdc++/libgcc/libwinpthread
+    DLLs from the SAME MinGW install that built it. Without this, a different
+    MinGW runtime on PATH first (e.g. Git's bundled mingw64) gets loaded and
+    the ABI mismatch crashes the process with 0xC0000005 at startup."""
+    env = os.environ.copy()
+    if not IS_WINDOWS:
+        return env
+    gxx = shutil.which("g++")
+    if not gxx:
+        return env
+    gxx_dir = str(Path(gxx).resolve().parent)
+    if env.get("PATH", "").split(os.pathsep)[0].lower() != gxx_dir.lower():
+        env["PATH"] = gxx_dir + os.pathsep + env.get("PATH", "")
+    return env
+
+
+def run_and_forward(cmd, env=None):
     result = subprocess.run(
         cmd,
         capture_output=True,
         text=True,
         encoding="utf-8",
         errors="replace",
+        env=env,
     )
     if result.stdout:
         sys.stdout.write(result.stdout)
@@ -55,14 +75,16 @@ try:
 except OSError:
     pass
 
+runtime_env = gxx_runtime_env()
+
 exit_code = 0
 try:
-    rc = run_and_forward(compile_cmd)
+    rc = run_and_forward(compile_cmd, env=runtime_env)
     if rc != 0:
         print(f"compile failed (exit {rc})", file=sys.stderr)
         exit_code = rc
     else:
-        rc = run_and_forward([str(EXE)])
+        rc = run_and_forward([str(EXE)], env=runtime_env)
         if is_windows_av_crash(rc):
             print(
                 f"validation_test crashed with NTSTATUS {rc} (0x{rc & 0xFFFFFFFF:08X}); "
@@ -70,7 +92,7 @@ try:
                 file=sys.stderr,
             )
             time.sleep(1.5)
-            rc = run_and_forward([str(EXE)])
+            rc = run_and_forward([str(EXE)], env=runtime_env)
         if rc != 0:
             print(f"validation_test failed (exit {rc})", file=sys.stderr)
             exit_code = rc

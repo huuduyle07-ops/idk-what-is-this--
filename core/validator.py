@@ -1,8 +1,38 @@
+import os
 import re
+import shutil
 import subprocess, sys
 import shlex
 from pathlib import Path
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Optional
+
+# Compilers whose runtime DLLs frequently collide with Anaconda's bundled
+# mingw-w64 stubs (or other parallel installs) on Windows. When we see one of
+# these on PATH, we prepend its install dir to PATH for the child process so
+# the freshly-built binary loads the matching libstdc++/libgcc/libwinpthread
+# instead of crashing with NTSTATUS 0xC0000005 at startup due to ABI drift.
+_NATIVE_COMPILERS = ("g++", "gcc", "clang++", "clang")
+
+
+def _native_toolchain_env() -> Optional[dict]:
+    """Return an env dict with the native compiler's bin dir prepended to PATH,
+    or None when no fix is needed (non-Windows, or no compiler on PATH)."""
+    if sys.platform != "win32":
+        return None
+    for tool in _NATIVE_COMPILERS:
+        found = shutil.which(tool)
+        if not found:
+            continue
+        tool_dir = str(Path(found).resolve().parent)
+        current_path = os.environ.get("PATH", "")
+        first_segment = current_path.split(os.pathsep)[0] if current_path else ""
+        if first_segment.lower() == tool_dir.lower():
+            return None
+        env = os.environ.copy()
+        env["PATH"] = tool_dir + os.pathsep + current_path
+        return env
+    return None
+
 
 def run_validation_command(command: str, cwd: str, timeout: int = 30) -> tuple[bool, str]:
     if not command:
@@ -25,6 +55,7 @@ def run_validation_command(command: str, cwd: str, timeout: int = 30) -> tuple[b
             timeout=timeout,
             encoding="utf-8",
             errors="replace",
+            env=_native_toolchain_env(),
         )
 
         output = (result.stdout or "") + (result.stderr or "")
