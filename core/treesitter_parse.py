@@ -3,7 +3,7 @@ import re
 import os
 import json
 from pathlib import Path
-from tree_sitter_language_pack import get_language, get_parser
+
 
 # Add project root to sys.path to allow importing config.py
 root_dir = str(Path(__file__).parent.parent)
@@ -22,6 +22,7 @@ def parse_code_with_treesitter(code: str, language: str):
             return {"symbols": [], "imports": [], "calls": []}
 
         try:
+            from tree_sitter_language_pack import get_parser
             parser = get_parser(lang_key)
         except Exception:
             return {"symbols": [], "imports": [], "calls": []}
