@@ -14,6 +14,17 @@ from core.security import is_safe_path
 
 load_dotenv()
 
+
+def _max_model_fallbacks(default: int) -> int:
+    raw = os.environ.get("MAX_MODEL_FALLBACKS")
+    if not raw:
+        return default
+    try:
+        return max(1, int(raw))
+    except ValueError:
+        return default
+
+
 def safe_print(text: str) -> None:
     encoding = sys.stdout.encoding or "utf-8"
     print(text.encode(encoding, errors="replace").decode(encoding))
@@ -67,7 +78,7 @@ def run_gemini_request(prompt: str, file_paths: list[str] | None = None) -> str:
 
     # 2. Try the models one by one using the uploaded contents
     last_error = None
-    for model_name in MODELS:
+    for model_name in MODELS[:_max_model_fallbacks(len(MODELS))]:
         try:
             response = client.models.generate_content(
                 model=model_name,
@@ -143,7 +154,7 @@ def run_gemini_request_2(
         "gemma-4-26b-a4b-it",
     ]
 
-    for model_name in reviewer_models:
+    for model_name in reviewer_models[:_max_model_fallbacks(len(reviewer_models))]:
         try:
             response = client.models.generate_content(
                 model=model_name,

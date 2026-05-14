@@ -249,32 +249,40 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
             "but 0 files were successfully processed."
         )
 
-    phantom_findings = scan_phantom_limb(file_summaries, repo_path)
-    phantom_path = write_phantom_limb_report(repo_path, phantom_findings)
-    if phantom_findings:
-        warn_count = sum(1 for f in phantom_findings if f.get("severity") == "warn")
-        print(
-            f"Phantom Limb: {len(phantom_findings)} suggestion(s) "
-            f"({warn_count} warn) written to: {phantom_path}"
-        )
+    if os.getenv("BENCHMARK_SKIP_PHANTOM", "").lower() == "true":
+        phantom_findings: list = []
+        phantom_path = None
     else:
-        print(f"Phantom Limb: no structural suggestions. Report written to: {phantom_path}")
+        phantom_findings = scan_phantom_limb(file_summaries, repo_path)
+        phantom_path = write_phantom_limb_report(repo_path, phantom_findings)
+        if phantom_findings:
+            warn_count = sum(1 for f in phantom_findings if f.get("severity") == "warn")
+            print(
+                f"Phantom Limb: {len(phantom_findings)} suggestion(s) "
+                f"({warn_count} warn) written to: {phantom_path}"
+            )
+        else:
+            print(f"Phantom Limb: no structural suggestions. Report written to: {phantom_path}")
 
-    # Build project map
-    try:
-        graph = build_graph_from_repo(repo_path)
-    except Exception as e:
-        print(f"⚠️ Graph build failed: {e}. Continuing without graph.")
+    # Build project map (graph is only used to render the map, so skip both together)
+    if os.getenv("BENCHMARK_SKIP_PROJECT_MAP", "").lower() == "true":
         graph = None
+        map_path = None
+    else:
+        try:
+            graph = build_graph_from_repo(repo_path)
+        except Exception as e:
+            print(f"⚠️ Graph build failed: {e}. Continuing without graph.")
+            graph = None
 
-    try:
-        content = build_project_map(file_summaries, graph=graph, repo_path=repo_path)
-    except Exception as e:
-        print(f"⚠️ Project map graph rendering failed: {e}. Retrying without graph.")
-        content = build_project_map(file_summaries, graph=None, repo_path=repo_path)
+        try:
+            content = build_project_map(file_summaries, graph=graph, repo_path=repo_path)
+        except Exception as e:
+            print(f"⚠️ Project map graph rendering failed: {e}. Retrying without graph.")
+            content = build_project_map(file_summaries, graph=None, repo_path=repo_path)
 
-    map_path = write_project_map(repo_path, content)
-    print(f"🗺️ Project map written to: {map_path}")
+        map_path = write_project_map(repo_path, content)
+        print(f"🗺️ Project map written to: {map_path}")
     return {
         "repo_path": repo_path,
         "project_tag": project_tag,

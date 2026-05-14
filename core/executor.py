@@ -13,6 +13,10 @@ from patching.patch_engine import (
 )
 from core.validator import run_validation_command, classify_validation_output
 
+# Markup / style files have no function-signature semantics, so risk heuristics
+# tuned for code (signature change, function whitelist) misfire on them.
+MARKUP_EXTENSIONS = {".html", ".htm", ".css", ".scss", ".sass"}
+
 
 # =========================
 # Data Models
@@ -332,10 +336,20 @@ class Executor:
         opening line begins with a recognised function keyword and contains
         the declared target_node_name. The check stays language-agnostic
         and conservative: any miss falls back to the normal block path.
+
+        Markup files (HTML/CSS) are also whitelisted: a literal match
+        guarantees the snippet is verbatim from source, and there are no
+        function semantics to drift, so the normal "fragile literal match"
+        concern does not apply.
         """
         target_snippet = str(patch.get("target_snippet") or "")
         target_node_name = str(patch.get("target_node_name") or "")
         node_kind = patch.get("target_node_kind") or "function"
+        patch_file = str(patch.get("file") or patch.get("relative_path") or "")
+        patch_ext = Path(patch_file).suffix.lower() if patch_file else ""
+
+        if patch_ext in MARKUP_EXTENSIONS and target_snippet:
+            return True
 
         if not target_snippet or not target_node_name or node_kind != "function":
             return False
@@ -397,6 +411,8 @@ class Executor:
         patched_snippet = patch.get("patched_snippet", "")
         node_kind = patch.get("target_node_kind", "")
         issue = str(patch.get("issue", "")).lower()
+        patch_file = str(patch.get("file") or patch.get("relative_path") or "")
+        patch_ext = Path(patch_file).suffix.lower() if patch_file else ""
 
         removed = [l for l in diff.splitlines() if l.startswith("-") and not l.startswith("---")]
         added = [l for l in diff.splitlines() if l.startswith("+") and not l.startswith("+++")]
@@ -416,8 +432,9 @@ class Executor:
             score += 2
             reasons.append("Patch touches class.")
 
-        # Signature change
-        if self._is_signature_changed(target_snippet, patched_snippet):
+        # Signature change — skip for markup (no function signatures, and the
+        # regex misreads HTML comments like `<!-- BUG: ... -->` as a delimiter).
+        if patch_ext not in MARKUP_EXTENSIONS and self._is_signature_changed(target_snippet, patched_snippet):
             score += 3
             reasons.append("Function signature changed.")
 

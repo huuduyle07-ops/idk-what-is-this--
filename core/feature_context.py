@@ -5,6 +5,7 @@ import re
 from core.prompter import SCOUT_PROMPT
 from core.repo_librarian import inspect_repo_inventory
 from core.json_utils import extract_json_block
+from config import SUPPORTED_EXTENSIONS
 from pathlib import Path
 
 def extract_scout_snippets(repo_path: str, scout: dict) -> list[dict]:
@@ -95,10 +96,9 @@ def build_file_inventory(repo_path: str) -> list[dict]:
     inventory = inspect_repo_inventory(repo_path) or {}
     allowed_extensions = inventory.get("allowed_extensions", []) or []
     if not allowed_extensions:
-        allowed_extensions = {
-            ".rs", ".py", ".js", ".ts", ".cs", ".go",
-            ".java", ".cpp", ".c", ".h", ".toml", ".json"
-        }
+        # Mirror the indexer's view (config.SUPPORTED_EXTENSIONS) so Scout
+        # doesn't drop files the indexer accepted (e.g. .html, .css, .tsx).
+        allowed_extensions = SUPPORTED_EXTENSIONS
 
     ignored_parts = {
         "target", ".git", ".agent", "__pycache__",

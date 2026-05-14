@@ -1,0 +1,16 @@
+{
+  "name": "html_signup_form_accessibility",
+  "language": "html",
+  "category": "markup_validation",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python validate.py",
+  "expected_changed_files": [
+    "index.html"
+  ],
+  "forbidden_changed_files": [
+    "validate.py"
+  ],
+  "prompt": "Fix the HTML signup form accessibility and validation bug.\n\nRequirements:\n- Modify index.html only.\n- The email input must have type=\"email\".\n- The email input must be required.\n- The password input must have type=\"password\".\n- The password input must be required.\n- Each input must have a matching label using for/id.\n- The submit button must have type=\"submit\".\n- Do not modify validate.py.\n- Do not create new files.\n- Use patch_candidate if only the form block changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python validate.py"
+}
