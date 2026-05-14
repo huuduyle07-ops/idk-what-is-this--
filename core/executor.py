@@ -18,6 +18,31 @@ from core.validator import run_validation_command, classify_validation_output
 MARKUP_EXTENSIONS = {".html", ".htm", ".css", ".scss", ".sass"}
 
 
+# Regexes that identify function/class declaration lines across the languages
+# we benchmark. `_is_signature_changed` uses them to compare the actual
+# declaration line instead of "everything before the first '{' or ':'" — the
+# old heuristic false-positived on any prologue edit (imports, package
+# declarations, top-level comments).
+_FN_KW_PATTERNS = (
+    re.compile(r"\b(?:async\s+)?def\s+\w+\s*\("),                       # Python
+    re.compile(r"\b(?:async\s+)?function\s+\w+\s*\("),                  # JS / TS
+    re.compile(r"\bfn\s+\w+\s*\("),                                      # Rust
+    re.compile(r"\bfunc\s+(?:\([^)]*\)\s+)?\w+\s*\("),                   # Go (incl. methods)
+)
+_CLASS_KW_PATTERNS = (
+    re.compile(r"\bclass\s+\w+"),                                        # Python / JS / TS / Java / C++ / C#
+    re.compile(r"\b(?:struct|enum|trait|impl)\s+\w+"),                   # Rust
+    re.compile(r"\btype\s+\w+\s+(?:struct|interface)\b"),                # Go
+)
+# C-style fallback for languages without a function keyword (C, C++, Java, C#).
+# Only used when none of the keyword patterns matched.
+_CSTYLE_FN_PATTERN = re.compile(r"^\s*[\w<>:&*][\w<>:&*\s,]*\s+\w+\s*\(")
+_CSTYLE_BLACKLIST = frozenset({
+    "if", "while", "for", "switch", "return", "do", "else", "case",
+})
+_COMMENT_PREFIXES = ("//", "#", "/*", "*", "--")
+
+
 # =========================
 # Data Models
 # =========================
@@ -368,9 +393,18 @@ class Executor:
             "function ", "async function ",
             "export function ", "export async function ",
             "export default function ", "export default async function ",
+            "func ",  # Go (incl. methods with explicit receiver)
         )
-        if first_line.startswith(fn_keyword_prefixes) and target_node_name in target_snippet:
-            return True
+        # Accept if the declaration is on any non-blank line, not just the
+        # first. Scanning every line lets patches that include file-level
+        # context (imports, package declarations, top-level comments) still
+        # qualify, as long as the named function declaration itself is
+        # present verbatim. The literal-match has already confirmed the
+        # snippet is taken from source, so the snippet is unambiguous.
+        for line in target_snippet.splitlines():
+            stripped = line.strip()
+            if stripped.startswith(fn_keyword_prefixes) and target_node_name in line:
+                return True
 
         # C/C++/Java/C#-style: "<type/qualifiers> name(args)" — no leading
         # keyword to anchor on. Accept iff the name is followed by ( on the
@@ -459,28 +493,75 @@ class Executor:
         return PatchRisk(level=level, score=score, reasons=reasons)
 
     def _is_signature_changed(self, old: str, new: str) -> bool:
-        """
-        Detects if a function/class signature changed.
-        Works across multiple lines and ignores formatting changes.
-        """
-        def get_signature_block(text: str) -> str:
-            # Capture until first ':' (Python) or '{' (C, C#, JS, Rust)
-            match = re.search(r"^(.*?)(?::|\{)", text, re.DOTALL | re.MULTILINE)
-            if match:
-                sig = match.group(1)
-            else:
-                # Fallback to first line if no delimiter found
-                lines = [l.strip() for l in text.splitlines() if l.strip()]
-                sig = lines[0] if lines else ""
-            
-            # Normalize whitespace: remove newlines, replace multiple spaces with one
-            sig = re.sub(r"\s+", " ", sig).strip()
-            return sig
+        """Detect if a function/class signature changed.
 
-        old_sig = get_signature_block(old)
-        new_sig = get_signature_block(new)
-        
+        Compares the first function/class declaration in each snippet
+        (whitespace-normalised, parens balanced across lines). Edits to
+        surrounding prologue — imports, package declarations, top-level
+        comments — do not register as a signature change, which was the
+        prior heuristic's most common false positive.
+        """
+        old_sig = self._find_signature_line(old)
+        new_sig = self._find_signature_line(new)
+
+        if not old_sig and not new_sig:
+            return False
         return old_sig != new_sig
+
+    def _find_signature_line(self, text: str) -> str:
+        """Return the first function/class declaration in ``text``.
+
+        For function declarations the result spans across lines until parens
+        balance, so multi-line argument lists are captured intact. Returns
+        an empty string if no declaration is found.
+        """
+        lines = text.splitlines()
+        for i, raw_line in enumerate(lines):
+            stripped = raw_line.strip()
+            if not stripped or stripped.startswith(_COMMENT_PREFIXES):
+                continue
+
+            # Function-keyword anchored (Python, JS/TS, Rust, Go).
+            if any(p.search(raw_line) for p in _FN_KW_PATTERNS):
+                return self._collect_signature(lines, i)
+
+            # Class / type declarations (single-line is sufficient).
+            if any(p.search(raw_line) for p in _CLASS_KW_PATTERNS):
+                return re.sub(r"\s+", " ", stripped)
+
+            # C-style fallback: "<type> name(" with no leading keyword.
+            # Reject control-flow constructs and method-call expressions.
+            first_word = stripped.split(None, 1)[0] if stripped else ""
+            if (
+                first_word not in _CSTYLE_BLACKLIST
+                and _CSTYLE_FN_PATTERN.match(raw_line)
+                and "." not in stripped.split("(", 1)[0]
+            ):
+                return self._collect_signature(lines, i)
+
+        return ""
+
+    def _collect_signature(self, lines: List[str], start_idx: int) -> str:
+        """Concatenate lines from ``start_idx`` until parens balance.
+
+        Captures multi-line argument lists; stops at the line that closes
+        the last opening paren, or at end of input.
+        """
+        depth = 0
+        seen_open = False
+        collected: List[str] = []
+        for i in range(start_idx, len(lines)):
+            line = lines[i]
+            collected.append(line)
+            for ch in line:
+                if ch == "(":
+                    depth += 1
+                    seen_open = True
+                elif ch == ")":
+                    depth -= 1
+            if seen_open and depth <= 0:
+                break
+        return re.sub(r"\s+", " ", " ".join(collected)).strip()
 
 
     # =========================
