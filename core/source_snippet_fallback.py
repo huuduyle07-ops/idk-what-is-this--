@@ -53,6 +53,10 @@ def extract_symbol_snippet_from_text(text: str, language: str, symbol_name: str)
         pattern = rf"\b(?:pub\s+)?fn\s+{re.escape(name)}\s*\("
     elif language == "python":
         pattern = rf"(?m)^def\s+{re.escape(name)}\s*\("
+    elif language in {"javascript", "js", "typescript", "ts"}:
+        pattern = rf"\b(?:export\s+)?function\s+{re.escape(name)}\s*\("
+    elif language in {"cpp", "c++", "c"}:
+        pattern = rf"\b[A-Za-z_][\w:<>,\s*&]*\s+{re.escape(name)}\s*\("
     else:
         return None
 
@@ -60,7 +64,7 @@ def extract_symbol_snippet_from_text(text: str, language: str, symbol_name: str)
     if not match:
         return None
 
-    if language in {"go", "rust"}:
+    if language in {"go", "rust", "javascript", "js", "typescript", "ts", "cpp", "c++", "c"}:
         open_idx = text.find("{", match.start())
         if open_idx == -1:
             return None

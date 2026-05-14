@@ -29,5 +29,10 @@
         "rust-lang.rust-analyzer"
       ]
     }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "24"
+    }
   }
 }
