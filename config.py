@@ -297,7 +297,7 @@ Return your answer in the following JSON format:
 Only output JSON.
 """
 
-AUTO_PATCH_ENABLED = True
+AUTO_PATCH_ENABLED = os.getenv("AUTO_PATCH_ENABLED", "true").lower() not in {"0", "false", "no"}
 ROLLBACK_ON_VALIDATION_FAIL = True
 CONTROL_TIME_BUDGET_SEC = 180
 MAX_REVIEW_AGENTS = 2

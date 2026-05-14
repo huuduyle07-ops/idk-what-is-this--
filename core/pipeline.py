@@ -521,6 +521,10 @@ def is_low_risk_single_file_patch(state: AgentState) -> bool:
 
 
 def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
+    if not AUTO_PATCH_ENABLED:
+        print("Auto-patch disabled by AUTO_PATCH_ENABLED=false.")
+        return
+
     normalize_patch_candidate_with_control_source(state)
 
     confidence, _ = get_confidence_and_escalation(state.json_block)

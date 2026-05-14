@@ -7,12 +7,42 @@ _VALIDATION_CMD_RE = re.compile(
     r"(?im)^\s*validation\s+command\s*:\s*(.+?)\s*$"
 )
 
+_DANGEROUS_VALIDATION_CMD_RE = re.compile(
+    r"(?i)(?:^|[;&|]\s*)("
+    r"rm\s+-(?:r|f|rf|fr)\b|"
+    r"del\s+(?:/s|/q|/f)\b|"
+    r"erase\s+(?:/s|/q|/f)\b|"
+    r"rmdir\s+(?:/s|/q)\b|"
+    r"rd\s+(?:/s|/q)\b|"
+    r"remove-item\b|"
+    r"format\b|"
+    r"mkfs\b|"
+    r"shutdown\b|"
+    r"reboot\b|"
+    r"git\s+reset\s+--hard\b|"
+    r"git\s+clean\b[^\n]*\s-[^\n]*f"
+    r")"
+)
+
+
+def validation_command_safety_issue(command: str) -> str:
+    if not command.strip():
+        return ""
+    if _DANGEROUS_VALIDATION_CMD_RE.search(command):
+        return "Validation command contains a destructive shell operation."
+    return ""
+
 
 def extract_user_validation_command(text: str) -> str:
     m = _VALIDATION_CMD_RE.search(text or "")
     if not m:
         return ""
-    return m.group(1).strip()
+    command = m.group(1).strip()
+    issue = validation_command_safety_issue(command)
+    if issue:
+        print(f"Validation command ignored: {issue}")
+        return ""
+    return command
 
 
 def get_default_validation_command(language: str, project_root: Path) -> str:

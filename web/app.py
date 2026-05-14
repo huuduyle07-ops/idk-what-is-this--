@@ -982,7 +982,7 @@ def test_patch():
             patch=patch,
             language=lang,
             validation_command=validation_command,
-            dry_run_only=True,
+            dry_run_only=False,
         )
 
         return {
