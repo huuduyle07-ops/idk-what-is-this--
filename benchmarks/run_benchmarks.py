@@ -5,6 +5,7 @@ import contextlib
 import hashlib
 import io
 import json
+import os
 import shutil
 import sys
 import tempfile
@@ -84,6 +85,46 @@ def _ignore_patterns(dir_path: str, names: list[str]):
         if name.endswith(".exe"):
             ignored.append(name)
     return ignored
+
+
+def _safe_temp_name(name: str) -> str:
+    safe = "".join(ch.lower() if ch.isalnum() else "-" for ch in name)
+    safe = "-".join(part for part in safe.split("-") if part)
+    return safe[:48] or "case"
+
+
+def _make_benchmark_temp_dir(case_name: str) -> Path:
+    prefix = f"agentbench-{_safe_temp_name(case_name)}-"
+    return Path(tempfile.mkdtemp(prefix=prefix))
+
+
+def _rmtree_onerror(func, path, exc_info):
+    # Windows sometimes leaves freshly executed files read-only or briefly locked.
+    # Make a best effort to relax permissions, then retry the failing operation.
+    try:
+        os.chmod(path, 0o700)
+        func(path)
+    except Exception:
+        pass
+
+
+def cleanup_temp_dir(path: Path, retries: int = 8, delay_sec: float = 0.25) -> tuple[bool, str]:
+    last_error = ""
+    for attempt in range(retries):
+        if not path.exists():
+            return True, ""
+        try:
+            shutil.rmtree(path, onerror=_rmtree_onerror)
+            if not path.exists():
+                return True, ""
+        except Exception as e:
+            last_error = f"{type(e).__name__}: {e}"
+
+        time.sleep(delay_sec * (attempt + 1))
+
+    if path.exists() and not last_error:
+        last_error = "cleanup incomplete; temp directory still exists"
+    return not path.exists(), last_error
 
 
 def file_hash(path: Path) -> str:
@@ -240,8 +281,13 @@ def run_case(case_file: Path) -> dict[str, Any]:
 
     started = time.time()
 
-    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
-        temp_repo = Path(tmp) / "repo"
+    tmp_path = _make_benchmark_temp_dir(name)
+    cleanup_ok = False
+    cleanup_error = ""
+    case_result: dict[str, Any] | None = None
+
+    try:
+        temp_repo = tmp_path / "repo"
         shutil.copytree(
             buggy_repo,
             temp_repo,
@@ -284,7 +330,7 @@ def run_case(case_file: Path) -> dict[str, Any]:
         if touched_forbidden:
             success = False
 
-        return {
+        case_result = {
             "name": name,
             "success": success,
             "validation_ok": ok,
@@ -314,7 +360,18 @@ def run_case(case_file: Path) -> dict[str, Any]:
             "patch_loop_attempts": result.get("patch_loop_attempts", 0),
             "patch_loop_stop_reason": result.get("patch_loop_stop_reason"),
             "self_corrected": (result.get("patch_loop_attempts") or 0) > 1,
+            "temp_dir": str(tmp_path),
         }
+    finally:
+        cleanup_ok, cleanup_error = cleanup_temp_dir(tmp_path)
+
+    if case_result is not None:
+        case_result["temp_cleanup_ok"] = cleanup_ok
+        if cleanup_error:
+            case_result["temp_cleanup_error"] = cleanup_error
+        return case_result
+
+    raise RuntimeError(f"Benchmark case {name} did not produce a result")
 
 
 def discover_cases(root: Path) -> list[Path]:
@@ -400,6 +457,41 @@ def _run_case_with_capture(case_file: Path, capture: bool) -> dict[str, Any]:
             }
     res["runner_log_tail"] = buf.getvalue()[-4000:]
     return res
+
+
+def _duration_aggregates(
+    results: list[dict[str, Any]],
+    top_n: int = 5,
+) -> dict[str, Any]:
+    """Slowest cases + average duration across non-skipped results.
+
+    Skipped cases have duration 0 and would skew the average toward zero,
+    so they're excluded — same convention as success_rate.
+    """
+    runnable: list[tuple[str, float, bool]] = [
+        (
+            str(r.get("name") or "(unknown)"),
+            float(r.get("duration_sec") or 0.0),
+            bool(r.get("success")),
+        )
+        for r in results
+        if not r.get("skipped") and isinstance(r.get("duration_sec"), (int, float))
+    ]
+
+    if not runnable:
+        return {"slowest_cases": [], "avg_duration_sec": 0.0}
+
+    avg = sum(d for _, d, _ in runnable) / len(runnable)
+    by_duration = sorted(runnable, key=lambda x: x[1], reverse=True)
+    slowest = [
+        {"name": name, "duration_sec": round(dur, 2), "success": success}
+        for name, dur, success in by_duration[:top_n]
+    ]
+
+    return {
+        "slowest_cases": slowest,
+        "avg_duration_sec": round(avg, 2),
+    }
 
 
 def _aggregate_models(results: list[dict[str, Any]]) -> dict[str, dict[str, int]]:
@@ -526,6 +618,14 @@ def summarize_report(report: dict[str, Any], top_slowest: int = 3) -> None:
     if isinstance(duration, (int, float)):
         print(f"Duration: {duration:.2f}s")
 
+    avg = report.get("avg_duration_sec")
+    if avg is None:
+        # Backwards-compat: compute from results when the report predates
+        # the baked-in avg field.
+        avg = _duration_aggregates(results).get("avg_duration_sec", 0.0)
+    if avg:
+        print(f"Average per case: {avg:.2f}s")
+
     # Prefer pre-computed groups; fall back to computing from results
     # (backwards-compat for older report files).
     groups = report.get("groups") or {}
@@ -535,16 +635,16 @@ def summarize_report(report: dict[str, Any], top_slowest: int = 3) -> None:
             grouped = group_results(results, label)
         _print_group(label, grouped)
 
-    durations = [
-        (r.get("name") or "(unknown)", r.get("duration_sec"))
-        for r in results
-        if isinstance(r.get("duration_sec"), (int, float))
-    ]
-    durations.sort(key=lambda x: x[1], reverse=True)
-    if durations:
+    slowest = report.get("slowest_cases")
+    if not slowest:
+        # Backwards-compat path.
+        slowest = _duration_aggregates(results, top_n=top_slowest).get(
+            "slowest_cases", []
+        )
+    if slowest:
         print("\nSlowest:")
-        for name, dur in durations[:top_slowest]:
-            print(f"{name} {dur:.2f}s")
+        for entry in slowest[:top_slowest]:
+            print(f"{entry['name']} {entry['duration_sec']:.2f}s")
 
 
 def _md_cell(s: Any) -> str:
@@ -962,6 +1062,12 @@ def main() -> int:
                 print(f"{status} {name} ({dur:.2f}s)")
             else:
                 print(f"{status} {name}")
+            if res.get("temp_cleanup_ok") is False:
+                print(
+                    "Temp cleanup failed:",
+                    res.get("temp_dir", "<unknown>"),
+                    res.get("temp_cleanup_error", ""),
+                )
 
             if not summary:
                 if res.get("changed_files"):
@@ -1010,6 +1116,7 @@ def main() -> int:
         "self_corrected_count": sum(
             1 for r in results if not r.get("skipped") and r.get("self_corrected")
         ),
+        **_duration_aggregates(results),
         "results": results,
     }
 
