@@ -1,0 +1,36 @@
+# Python
+.venv
+venv
+.venv-py312
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+
+# Node / Rust / build artifacts
+node_modules
+target
+dist
+build
+
+# Git
+.git
+.gitignore
+
+# Secrets — never bake .env into an image
+.env
+.env.*
+!.env.example
+
+# Editor / IDE
+.vscode
+.idea
+
+# Project-specific noise
+.agent
+web/backups
+benchmarks/cases/*/buggy_repo
+*.bak
+
+# Scout outputs
+scout-reports

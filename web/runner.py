@@ -44,9 +44,12 @@ from patching.patch_gates import (
 )
 from core.source_snippet_fallback import hydrate_control_source_from_scout
 
-def launch_web(host: str = "127.0.0.1", port: int = 5000, open_browser: bool = True) -> None:
+def launch_web(host: str | None = None, port: int = 5000, open_browser: bool = True) -> None:
     """Spin up the Flask UI (web/app.py). Imports lazily to avoid a hard
     Flask dependency on every CLI run."""
+    host = host or os.getenv("WEB_HOST", "127.0.0.1")
+    if os.getenv("APP_ENV") == "docker":
+        open_browser = False
     try:
         from web.app import app  # lazy import — Flask only loaded if user picks web
     except ImportError as e:

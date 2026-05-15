@@ -14,3 +14,12 @@ USER vscode
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 ENV PATH="/home/vscode/.cargo/bin:${PATH}"
+
+WORKDIR /app
+
+COPY --chown=vscode:vscode requirements.txt requirements_optional.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 5000
+ENV WEB_HOST=0.0.0.0
+CMD ["python", "main.py", "--web"]
