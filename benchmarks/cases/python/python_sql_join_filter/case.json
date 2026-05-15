@@ -1,0 +1,16 @@
+{
+  "name": "python_sql_join_filter",
+  "language": "python",
+  "category": "sql_join_logic",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "report.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py"
+  ],
+  "prompt": "Fix the Python SQLite join filter bug.\n\nRequirements:\n- Modify report.py only.\n- paid_order_totals_by_customer must return active customers in the requested city.\n- Customers must be sorted by name ascending.\n- Totals must include only orders whose status is 'paid'.\n- Active customers with no paid orders must still be returned with a total of 0.\n- Inactive customers must be excluded.\n- Customers in other cities must be excluded.\n- Do not modify main.py.\n- Do not create new files.\n- Do not install packages; use only the Python standard library.\n- Use patch_candidate if only the SQL query changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

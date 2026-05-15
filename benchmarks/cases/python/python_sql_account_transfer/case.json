@@ -1,0 +1,16 @@
+{
+  "name": "python_sql_account_transfer",
+  "language": "python",
+  "category": "sql_transaction_logic",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "transfer.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py"
+  ],
+  "prompt": "Fix the Python SQLite account transfer bug.\n\nRequirements:\n- Modify transfer.py only.\n- transfer_funds must reject amount_cents <= 0.\n- transfer_funds must reject missing source accounts.\n- transfer_funds must reject missing destination accounts.\n- transfer_funds must reject transfers when source balance is less than amount_cents.\n- Valid transfers must decrease the source balance and increase the destination balance by amount_cents.\n- Failed transfers must not change any account balance.\n- Rejected transfers must raise ValueError.\n- Do not modify main.py.\n- Do not create new files.\n- Do not install packages; use only the Python standard library.\n- Use patch_candidate if only transfer_funds changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

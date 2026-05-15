@@ -1,0 +1,16 @@
+{
+  "name": "js_array_mutation_side_effect",
+  "language": "javascript",
+  "category": "side_effect",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node main.js",
+  "expected_changed_files": [
+    "leaderboard.js"
+  ],
+  "forbidden_changed_files": [
+    "main.js"
+  ],
+  "prompt": "Fix the JavaScript array mutation side effect.\n\nRequirements:\n- Modify leaderboard.js only.\n- topScores must return the highest scores in descending order.\n- topScores must respect the requested limit.\n- topScores must not mutate the input array.\n- A zero limit must return an empty array.\n- Do not modify main.js.\n- Do not create new files.\n- Use patch_candidate if only topScores changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node main.js"
+}

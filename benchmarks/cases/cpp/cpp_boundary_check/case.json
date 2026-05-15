@@ -1,0 +1,18 @@
+{
+  "name": "cpp_boundary_check",
+  "language": "cpp",
+  "category": "boundary_logic",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python validate.py",
+  "expected_changed_files": [
+    "bounds.cpp"
+  ],
+  "forbidden_changed_files": [
+    "main.cpp",
+    "bounds.h",
+    "validate.py"
+  ],
+  "prompt": "Fix the C++ grid boundary check bug.\n\nRequirements:\n- Modify bounds.cpp only.\n- is_in_bounds must return true for coordinates inside 0 <= row < height and 0 <= col < width.\n- is_in_bounds must return false for negative row or col values.\n- is_in_bounds must return false when row equals height.\n- is_in_bounds must return false when col equals width.\n- Do not modify main.cpp, bounds.h, or validate.py.\n- Do not create new files.\n- Use patch_candidate if only is_in_bounds changes.\n- Do not add or remove #include directives.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python validate.py"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "python_off_by_one_pagination",
+  "language": "python",
+  "category": "boundary_logic",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "pagination.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py"
+  ],
+  "prompt": "Fix the Python pagination off-by-one bug.\n\nRequirements:\n- Modify pagination.py only.\n- paginate must reject page numbers less than 1.\n- paginate must reject per_page values less than 1.\n- Page 1 must return the first per_page items when available.\n- Later pages must return exactly per_page items when enough items remain.\n- The final partial page must return the remaining items.\n- Pages beyond the end must return an empty list.\n- Do not modify main.py.\n- Do not create new files.\n- Use patch_candidate if only paginate changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

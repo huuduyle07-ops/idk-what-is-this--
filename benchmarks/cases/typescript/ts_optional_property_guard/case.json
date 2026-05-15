@@ -1,0 +1,16 @@
+{
+  "name": "ts_optional_property_guard",
+  "language": "typescript",
+  "category": "null_guard",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node --experimental-strip-types main.ts",
+  "expected_changed_files": [
+    "userSummary.ts"
+  ],
+  "forbidden_changed_files": [
+    "main.ts"
+  ],
+  "prompt": "Fix the TypeScript optional property guard bug.\n\nRequirements:\n- Modify userSummary.ts only.\n- displayEmail must return a normalized lowercase profile.email when it is present and non-blank.\n- displayEmail must fall back to fallbackEmail when profile.email is missing, null, undefined, or blank.\n- displayEmail must return \"unknown\" when no usable email is available.\n- Returned emails must be trimmed and lowercased.\n- Do not modify main.ts.\n- Do not create new files.\n- Use patch_candidate if only displayEmail changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node --experimental-strip-types main.ts"
+}
