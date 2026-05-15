@@ -145,16 +145,16 @@
 
         <!-- Phase 5 Slice 1: workspace tabs (top-level). -->
         <div class="ws-tabs" role="tablist">
-          <button type="button" class="ws-tab" data-ws="chat"       onclick="showWorkspaceTab('chat')">Chat / Patch</button>
-          <button type="button" class="ws-tab" data-ws="benchmarks" onclick="showWorkspaceTab('benchmarks')">Benchmarks</button>
-          <button type="button" class="ws-tab" data-ws="dream"      onclick="showWorkspaceTab('dream')">Dream</button>
-          <button type="button" class="ws-tab" data-ws="memory"     onclick="showWorkspaceTab('memory')">Memory</button>
-          <button type="button" class="ws-tab" data-ws="graph"      onclick="showWorkspaceTab('graph')">Graph</button>
-          <button type="button" class="ws-tab" data-ws="settings"   onclick="showWorkspaceTab('settings')">Settings / Health</button>
+          <button type="button" id="ws-tab-chat"       role="tab" aria-controls="ws-chat"       class="ws-tab" data-ws="chat"       onclick="showWorkspaceTab('chat')">Chat / Patch</button>
+          <button type="button" id="ws-tab-benchmarks" role="tab" aria-controls="ws-benchmarks" class="ws-tab" data-ws="benchmarks" onclick="showWorkspaceTab('benchmarks')">Benchmarks</button>
+          <button type="button" id="ws-tab-dream"      role="tab" aria-controls="ws-dream"      class="ws-tab" data-ws="dream"      onclick="showWorkspaceTab('dream')">Dream</button>
+          <button type="button" id="ws-tab-memory"     role="tab" aria-controls="ws-memory"     class="ws-tab" data-ws="memory"     onclick="showWorkspaceTab('memory')">Memory</button>
+          <button type="button" id="ws-tab-graph"      role="tab" aria-controls="ws-graph"      class="ws-tab" data-ws="graph"      onclick="showWorkspaceTab('graph')">Graph</button>
+          <button type="button" id="ws-tab-settings"   role="tab" aria-controls="ws-settings"   class="ws-tab" data-ws="settings"   onclick="showWorkspaceTab('settings')">Settings / Health</button>
         </div>
 
         <!-- Chat / Patch (default workspace tab) -->
-        <div id="ws-chat" class="ws-content">
+        <div id="ws-chat" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-chat">
           <div class="tabs">
             <button type="button" onclick="showTab('answer')">Answer</button>
             <button type="button" onclick="showTab('context')">Context</button>
@@ -174,26 +174,34 @@
             <button type="button" onclick="localCritique()" title="Send current patch to local Ollama DeepSeek for review (does not auto-apply)">&#x1F9E0; Local Critique</button>
           </div>
 
-          <div class="local-critique-section" id="localCritiqueSection" style="display:none">
+          <div class="local-critique-section" id="localCritiqueSection">
             <strong>&#x1F9E0; Local Critique result</strong>
-            <div id="localCritiqueMain" style="margin-top:8px"></div>
-            <details id="localCritiqueDebug" style="margin-top:8px;display:none">
-              <summary style="cursor:pointer;color:#888">Show raw local thought / debug</summary>
-              <pre id="localCritiqueThought" style="margin-top:4px;font-size:0.8em;white-space:pre-wrap"></pre>
+            <div id="localCritiqueMain"></div>
+            <details id="localCritiqueDebug">
+              <summary>Show raw local thought / debug</summary>
+              <pre id="localCritiqueThought"></pre>
             </details>
           </div>
 
           <pre id="answer" class="tab-content">{{ result.answer if result else "" }}</pre>
           <pre id="context" class="tab-content">{{ result.context if result else "" }}</pre>
           <pre id="state" class="tab-content">{{ result.state if result else "" }}</pre>
-          <pre id="patch" class="tab-content">{{ result.patch if result else "" }}</pre>
+          <div id="patch" class="tab-content">
+            <div id="patchCard" class="patch-card">
+              <div class="health-empty">No patch yet. Submit a query and click Generate Patch.</div>
+            </div>
+            <details class="patch-raw-details">
+              <summary>Raw JSON</summary>
+              <pre id="patchRawJson" class="patch-raw">{{ result.patch if result else "" }}</pre>
+            </details>
+          </div>
           <pre id="validation" class="tab-content">{{ result.validation if result else "" }}</pre>
           <pre id="diff" class="tab-content"></pre>
           <div id="candidates" class="tab-content"></div>
         </div>
 
         <!-- Benchmarks -->
-        <div id="ws-benchmarks" class="ws-content">
+        <div id="ws-benchmarks" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-benchmarks">
           <div class="bench-layout">
             <aside class="bench-sidebar">
               <div class="bench-sidebar-header">
@@ -213,7 +221,7 @@
         </div>
 
         <!-- Dream -->
-        <div id="ws-dream" class="ws-content">
+        <div id="ws-dream" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-dream">
           <div class="dream-section">
             <strong>Sleeping Consultant (overnight)</strong>
             <div class="dream-row">
@@ -256,7 +264,7 @@
         </div>
 
         <!-- Memory -->
-        <div id="ws-memory" class="ws-content">
+        <div id="ws-memory" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-memory">
           <div class="memory-section">
             <strong>Memory consolidator</strong>
             <div class="memory-row">
@@ -274,7 +282,7 @@
         </div>
 
         <!-- Graph (no longer a result-tab; lives in its own workspace tab) -->
-        <div id="ws-graph" class="ws-content">
+        <div id="ws-graph" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-graph">
           <div class="actions">
             <button type="button" onclick="viewGraph('clean')"
                     title="Clean view: only file/function/class nodes + contains/resolved_call/calls/imports edges">
@@ -303,7 +311,7 @@
         </div>
 
         <!-- Settings / Health -->
-        <div id="ws-settings" class="ws-content">
+        <div id="ws-settings" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-settings">
           <div class="health-section">
             <div class="health-header">
               <strong>System health</strong>
@@ -603,6 +611,136 @@ function _renderDreamItemCard(it, opts = {}) {
             </div>
         </div>
     `;
+}
+
+// ============================================================
+// Phase 5 Slice 5: Patch card state + renderer.
+// Single source of truth for "what does the Patch tab card look like now."
+// ============================================================
+let _currentPatchState = {
+    raw: null,                  // parsed patch JSON, or null
+    risk: null,                 // {level, score, reasons[]} from /test_patch or /apply_patch
+    validation_command: null,   // string, set after test/apply
+    last_action: null,          // "generated"|"tested"|"applied"|"undone"
+    last_status: null,          // success/failed message from last test/apply
+};
+
+function _setPatchState(updates) {
+    Object.assign(_currentPatchState, updates);
+    _renderPatchCard();
+}
+
+function _patchType(raw) {
+    if (!raw) return null;
+    if (Array.isArray(raw.patch_plan) && raw.patch_plan.length > 0) return "plan";
+    if (raw.patch_candidate) return "candidate";
+    return "unknown";
+}
+
+function _patchTargetFiles(raw) {
+    if (!raw) return [];
+    if (Array.isArray(raw.patch_plan) && raw.patch_plan.length > 0) {
+        const seen = new Set();
+        for (const op of raw.patch_plan) {
+            const f = op.relative_path || op.file;
+            if (f) seen.add(f);
+        }
+        return Array.from(seen);
+    }
+    if (raw.patch_candidate) {
+        const f = raw.patch_candidate.relative_path || raw.patch_candidate.file;
+        return f ? [f] : [];
+    }
+    return [];
+}
+
+function _confidenceBar(c) {
+    if (typeof c !== "number") return `<span class="patch-card__muted">unknown</span>`;
+    const pct = Math.round(c * 100);
+    return `<div class="patch-confidence-bar" title="${pct}%"><div class="patch-confidence-bar__fill" style="width:${pct}%"></div></div><span class="patch-confidence-pct">${pct}%</span>`;
+}
+
+function _riskBadgeClass(level) {
+    return ({
+        low:    "patch-risk-badge--ok",
+        medium: "patch-risk-badge--missing",
+        high:   "patch-risk-badge--error",
+    })[level] || "patch-risk-badge--off";
+}
+
+function _renderPatchCard() {
+    const card = document.getElementById("patchCard");
+    if (!card) return;
+    const s = _currentPatchState;
+    const raw = s.raw;
+    if (!raw) {
+        card.innerHTML = `<div class="health-empty">No patch yet. Submit a query and click Generate Patch.</div>`;
+        return;
+    }
+
+    const type = _patchType(raw);
+    const files = _patchTargetFiles(raw);
+    const conf = raw.confidence;
+    const escalation = raw.needs_escalation;
+    const summary = raw.summary || "";
+    const issues = Array.isArray(raw.issues) ? raw.issues : [];
+
+    const riskRow = s.risk
+        ? `<span class="patch-risk-badge ${_riskBadgeClass(s.risk.level)}">${_escapeHtml(s.risk.level)}</span>
+           <span class="patch-card__muted"> · score ${s.risk.score}</span>
+           ${(s.risk.reasons && s.risk.reasons.length) ? `<span class="patch-card__muted"> · ${_escapeHtml(s.risk.reasons.join(", "))}</span>` : ""}`
+        : `<span class="patch-card__muted">not yet evaluated (run Test or Apply)</span>`;
+
+    const validationRow = s.validation_command
+        ? `<code>${_escapeHtml(s.validation_command)}</code>`
+        : `<span class="patch-card__muted">not yet evaluated</span>`;
+
+    const lastActionRow = s.last_action
+        ? `<div class="patch-card__last-action">Last action: <strong>${_escapeHtml(s.last_action)}</strong>${s.last_status ? ` — ${_escapeHtml(s.last_status)}` : ""}</div>`
+        : "";
+
+    card.innerHTML = `
+        <div class="patch-card__head">
+            <span class="patch-type-badge patch-type-badge--${type || "unknown"}">${type || "unknown"}</span>
+            ${escalation ? `<span class="patch-risk-badge patch-risk-badge--missing">needs escalation</span>` : ""}
+        </div>
+        <div class="patch-card__row">
+            <span class="patch-card__label">Confidence</span>
+            <span class="patch-card__value">${_confidenceBar(conf)}</span>
+        </div>
+        <div class="patch-card__row">
+            <span class="patch-card__label">Risk</span>
+            <span class="patch-card__value">${riskRow}</span>
+        </div>
+        <div class="patch-card__row">
+            <span class="patch-card__label">Validation</span>
+            <span class="patch-card__value">${validationRow}</span>
+        </div>
+        <div class="patch-card__row">
+            <span class="patch-card__label">Forbidden-file check</span>
+            <span class="patch-card__value patch-card__muted">not yet implemented (Phase 6)</span>
+        </div>
+        <div class="patch-card__row">
+            <span class="patch-card__label">Changed files (${files.length})</span>
+            <span class="patch-card__value">${files.length === 0 ? `<span class="patch-card__muted">none</span>` : files.map(f => `<code>${_escapeHtml(f)}</code>`).join(" · ")}</span>
+        </div>
+        ${summary ? `<div class="patch-card__section"><div class="patch-card__section-heading">Summary</div><div>${_escapeHtml(summary)}</div></div>` : ""}
+        ${issues.length ? `<div class="patch-card__section"><div class="patch-card__section-heading">Issues identified</div><ul class="patch-card__issues">${issues.map(i => `<li>${_escapeHtml(typeof i === "string" ? i : JSON.stringify(i))}</li>`).join("")}</ul></div>` : ""}
+        ${lastActionRow}
+    `;
+}
+
+// Initial render on page load — parse server-rendered raw JSON into state.
+function _initPatchCardFromRaw() {
+    const raw = document.getElementById("patchRawJson");
+    if (!raw) return;
+    const txt = raw.innerText.trim();
+    if (!txt) return;
+    try {
+        _setPatchState({ raw: JSON.parse(txt) });
+    } catch {
+        // Server-side rendered something non-JSON; leave card showing the empty state.
+    }
 }
 
 // ============================================================
@@ -1028,7 +1166,10 @@ function showWorkspaceTab(id) {
     if (target) target.style.display = "block";
 
     document.querySelectorAll(".ws-tab").forEach(btn => {
-        btn.classList.toggle("ws-tab--active", btn.dataset.ws === id);
+        const isActive = btn.dataset.ws === id;
+        btn.classList.toggle("ws-tab--active", isActive);
+        btn.setAttribute("aria-selected", isActive ? "true" : "false");
+        btn.setAttribute("tabindex", isActive ? "0" : "-1");
     });
 
     // Phase 5 Slice 2: lazy-load Health panel on first show.
@@ -1311,10 +1452,15 @@ showTab(initialTab);
 const savedWs = localStorage.getItem("activeWorkspaceTab") || "chat";
 showWorkspaceTab(savedWs);
 
+// Phase 5 Slice 5: hydrate the Patch card from server-rendered raw JSON.
+_initPatchCardFromRaw();
+
 
 
 function applyPatch() {
-    const patchText = document.getElementById("patch").innerText;
+    // Phase 5 Slice 5: read raw JSON from the dedicated #patchRawJson <pre>
+    // (the visible #patch element is now the structured card).
+    const patchText = document.getElementById("patchRawJson").innerText;
     const repo = document.querySelector("input[name='repo_path']").value;
     const policy = document.getElementById("applyPolicy").value;
     const style = document.getElementById("patchStyleSelect")?.value || "safe_minimal";
@@ -1324,6 +1470,7 @@ function applyPatch() {
             "Plan only mode: patch was not applied. Review candidate manually.";
         window.lastAction = "patch";
         showTab("patch");
+        _setPatchState({ last_action: "apply blocked (plan-only policy)" });
         return;
     }
 
@@ -1371,10 +1518,18 @@ function applyPatch() {
         document.getElementById("validation").innerText = msgParts.join("\n\n");
         window.lastAction = "diff";
         showTab("diff");
+        // Phase 5 Slice 5: feed the new risk + validation_command into the card.
+        _setPatchState({
+            risk: data.risk || null,
+            validation_command: data.validation_command || null,
+            last_action: data.success ? "applied" : "apply failed",
+            last_status: data.message || (data.success ? "OK" : "failed"),
+        });
     })
     .catch(err => {
         document.getElementById("validation").innerText = `Network error: ${err}`;
         showTab("validation");
+        _setPatchState({ last_action: "apply error", last_status: String(err) });
     });
 }
 
@@ -1395,7 +1550,19 @@ function generatePatch() {
     .then(res => res.json())
     .then(data => {
         if (data.patch) {
-            document.getElementById("patch").innerText = data.patch;
+            // Phase 5 Slice 5: write raw JSON to #patchRawJson, then refresh card.
+            document.getElementById("patchRawJson").innerText = data.patch;
+            try {
+                _setPatchState({
+                    raw: JSON.parse(data.patch),
+                    risk: null,
+                    validation_command: null,
+                    last_action: "generated",
+                    last_status: null,
+                });
+            } catch {
+                _setPatchState({ raw: null, last_action: "generated (invalid JSON)" });
+            }
             window.lastAction = "patch";
             showTab("patch");
         }
@@ -1405,13 +1572,16 @@ function generatePatch() {
 function undoPatch() {
     const repo = document.querySelector("input[name='repo_path']").value;
 
-    let patchText = document.getElementById("patch").innerText;
+    // Phase 5 Slice 5: read raw JSON from #patchRawJson.
+    let patchText = document.getElementById("patchRawJson").innerText;
 
     let file = "";
 
     try {
         const parsed = JSON.parse(patchText);
-        file = parsed.relative_path || parsed.file;
+        // Handle both top-level patch and {patch_candidate: {...}} envelopes.
+        const inner = parsed.patch_candidate || parsed;
+        file = inner.relative_path || inner.file;
     } catch {
         alert("No valid patch to undo");
         return;
@@ -1430,6 +1600,7 @@ function undoPatch() {
     .then(res => res.json())
     .then(data => {
         alert(data.message);
+        _setPatchState({ last_action: "undone", last_status: data.message || "reverted" });
     });
 }
 
@@ -1530,7 +1701,8 @@ function generateCandidates() {
 }
 
 function testPatch() {
-    const patchText = document.getElementById("patch").innerText;
+    // Phase 5 Slice 5: read raw JSON from #patchRawJson.
+    const patchText = document.getElementById("patchRawJson").innerText;
     const repo = document.querySelector("input[name='repo_path']").value;
     const patchStyle = document.getElementById("patchStyleSelect").value;
 
@@ -1563,19 +1735,36 @@ function testPatch() {
             data.validation || data.message || "No validation output";
         window.lastAction = "diff";
         showTab("diff");
+        // Phase 5 Slice 5: feed risk + validation_command into the card.
+        _setPatchState({
+            risk: data.risk || null,
+            validation_command: data.validation_command || null,
+            last_action: data.success ? "tested" : "test failed",
+            last_status: data.message || (data.success ? "OK" : "failed"),
+        });
     });
 }
 
 function selectCandidate(idx) {
     const c = window.patchCandidates[idx];
-    document.getElementById("patch").innerText = JSON.stringify(c.patch, null, 2);
+    // Phase 5 Slice 5: write to #patchRawJson and refresh the card.
+    const json = JSON.stringify(c.patch, null, 2);
+    document.getElementById("patchRawJson").innerText = json;
+    _setPatchState({
+        raw: c.patch,
+        risk: null,
+        validation_command: null,
+        last_action: "candidate selected",
+        last_status: c.name || `#${idx + 1}`,
+    });
     window.lastAction = "patch";
     showTab("patch");
 }
 
 
 async function localCritique() {
-    const patchText = document.getElementById("patch").innerText.trim();
+    // Phase 5 Slice 5: read raw JSON from #patchRawJson.
+    const patchText = document.getElementById("patchRawJson").innerText.trim();
     if (!patchText) {
         alert("No patch to critique — generate a patch first.");
         return;

@@ -18,18 +18,29 @@ This project is an AI coding mentor and repair system. It supports two main ways
 - Human learning mode: explains code, teaches step by step, and helps the user understand bugs or design choices.
 - Agent mode: reviews code, plans changes, generates structured patch JSON, applies safe edits, validates them, and logs the result.
 
-The system can run from the terminal or from a Flask web interface.
+The system can run from the terminal or from a Flask web interface. The web interface has grown into a workspace-style dashboard with separate areas for chat/patching, benchmarks, dream runs, memory, graphs, and system health.
 
 ## Main Features
 
-### 1. CLI and Web Interface
+### 1. CLI and Web Workspace
 
 The project starts from `main.py`.
 
 You can use:
 
 - Terminal mode for interactive prompts.
-- Web mode for a browser interface with repo path input, tabs, patch controls, graph views, and session history.
+- Web mode for a browser workspace with repo path input, patch controls, benchmark history, graph views, health checks, dream queue controls, and session history.
+
+Current web workspaces:
+
+- Chat / Patch: answer, context, state, patch card, validation, diff, and candidate views.
+- Benchmarks: browse past benchmark reports and inspect results.
+- Dream: queue overnight bug/debt/idea/research work.
+- Memory: run memory consolidation.
+- Graph: render clean or debug program graphs.
+- Settings / Health: check API keys, DB, embeddings, Ollama, Tree-sitter, and local toolchains.
+
+The Patch tab now shows a structured patch card instead of only raw JSON. It summarizes patch type, confidence, risk, validation command, changed files, and last action, while keeping raw JSON available for debugging.
 
 Important files:
 
@@ -38,6 +49,9 @@ Important files:
 - `web/app.py`
 - `web/runner.py`
 - `web/templates/index.html`
+- `web/static/style.css`
+- `core/health.py`
+- `core/benchmarks_view.py`
 
 ### 2. Task Router
 
@@ -115,12 +129,14 @@ The system uses AI models in different roles.
 - Gemini drafts answers or patch proposals.
 - DeepSeek or Ollama can review or critique.
 - The pipeline can refine answers after review.
+- Model-call attempts can be recorded during benchmark runs, including fallback count and selected model by role.
 
 Important files:
 
 - `agents/gemini_client.py`
 - `agents/deepseek_client.py`
 - `agents/ollama_client.py`
+- `agents/model_stats.py`
 
 ### 7. Patch Generation and Safety Gates
 
@@ -152,6 +168,8 @@ npm test
 ```
 
 If validation fails, the executor can roll back the file to its previous state.
+
+The web "Test Run Patch" flow now runs against a temporary copy of the repository. That means the real project stays safe while the user gets a more honest signal than a dry-run-only check.
 
 Important files:
 
@@ -229,6 +247,8 @@ The Sleeping Consultant is an overnight planning and research workflow. It can q
 
 This protects the real project while the agent explores.
 
+It can also seed dream items from benchmark reports: failed cases become bug follow-ups, and slow passing cases can become technical-debt items.
+
 Important files:
 
 - `core/sleeping_consultant.py`
@@ -241,18 +261,58 @@ The benchmark suite checks whether the agent can fix small broken projects in di
 
 Current case types include:
 
-- Go wallet transfer logic
-- Rust cart reservation logic
-- Python discount validation
-- JavaScript async missing await
-- HTML accessibility
 - C++ account interest
+- C++ boundary checks
+- Go wallet transfers
+- Go missing imports
+- Go logging side effects
+- Go wrong-file temptation
+- HTML signup form accessibility
+- JavaScript async missing await
+- JavaScript array mutation side effect
+- JavaScript null user profile
+- JavaScript temperature conversion
+- Python discount validation
+- Python mutable default argument
+- Python off-by-one pagination
+- Python exception parsing
+- Python SQL account transfer
+- Python SQL join filter
+- Rust cart reservation
+- Rust result error handling
+- TypeScript import/export mismatch
 - TypeScript inventory restock
+- TypeScript optional property guard
+
+Benchmark reports are saved under `.agent/benchmarks/` as JSON, with optional Markdown reports. The web UI can list and open past reports.
 
 Important files:
 
 - `benchmarks/run_benchmarks.py`
 - `benchmarks/cases/`
+- `core/benchmarks_view.py`
+
+### 15. Health and Observability
+
+The Settings / Health workspace gives cheap, non-blocking checks for the local environment.
+
+It checks:
+
+- Google API key
+- optional API keys
+- PostgreSQL status
+- embedding settings
+- Ollama status
+- Tree-sitter availability
+- local toolchain binaries such as Python, Node, Go, Cargo, and g++
+
+The benchmark runner also records useful metadata such as selected model, model attempts, fallback count, changed files, validation output, skipped toolchain failures, and grouped pass rates.
+
+Important files:
+
+- `core/health.py`
+- `agents/model_stats.py`
+- `benchmarks/run_benchmarks.py`
 
 ## Pipeline
 
@@ -271,6 +331,7 @@ flowchart TD
     I -->|Yes| J[Save result and memory]
     I -->|No| K[Rollback or ask AI to repair]
     K --> E
+    J --> L[Web UI shows patch, risk, diff, reports, or dream follow-ups]
 ```
 
 ## Pipeline Explained Like a School Project
@@ -295,8 +356,8 @@ Imagine your codebase is a big school notebook.
 | `config.py` | Environment variables, model names, file extensions, and safety settings. |
 | `agents/` | AI model clients for Gemini, DeepSeek, and Ollama. |
 | `cli/` | Terminal prompts and state creation. |
-| `web/` | Flask web UI, patch buttons, sessions, graph view, and dream routes. |
-| `core/` | Main system logic: routing, retrieval, prompts, validation, memory refresh, control engine. |
+| `web/` | Flask web UI, workspace tabs, patch card, sessions, graph view, health panel, benchmark views, and dream routes. |
+| `core/` | Main system logic: routing, retrieval, prompts, validation, memory refresh, control engine, health checks, benchmark report views. |
 | `patching/` | Patch application, patch plans, and safety gates. |
 | `graph/` | Program graph construction, querying, Mermaid export, and Obsidian export. |
 | `database/` | PostgreSQL schema, memory storage, sessions, artifacts, patch attempts. |
@@ -359,6 +420,22 @@ Run benchmarks:
 python benchmarks\run_benchmarks.py --fast --summary
 ```
 
+Useful benchmark options:
+
+```bash
+python benchmarks\run_benchmarks.py --fast --summary --markdown
+python benchmarks\run_benchmarks.py --turbo --summary --limit 5
+python benchmarks\run_benchmarks.py --latest
+python benchmarks\run_benchmarks.py --compare .agent\benchmarks\old.json .agent\benchmarks\new.json
+python benchmarks\run_benchmarks.py --fast --summary --skip-toolchain-failures
+```
+
+On Windows, if emoji output causes an encoding error, run:
+
+```powershell
+$env:PYTHONIOENCODING='utf-8'
+```
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
@@ -378,6 +455,17 @@ Important environment variables include:
 - `INDEX_USE_EMBEDDINGS`
 - `RETRIEVER_USE_EMBEDDINGS`
 - `OLLAMA_ENABLED`
+- `AUTO_PATCH_ENABLED`
+
+Some expensive or environment-sensitive features are intentionally easy to turn off for web/local runs:
+
+- Docker is optional.
+- Ollama is optional.
+- PostgreSQL memory is optional.
+- Embeddings are optional.
+- Tree-sitter may be skipped when Python environment switching becomes inconvenient.
+
+This means the project can run in a lighter mode first, then grow into the full memory/retrieval stack when the environment is ready.
 
 ## Safety Principles
 
@@ -390,6 +478,9 @@ This project is designed to avoid reckless code changes.
 - It can run validation before trusting a fix.
 - It can roll back when validation fails.
 - It stores patch attempts for later learning.
+- It can disable auto-patching through `AUTO_PATCH_ENABLED=false`.
+- It ignores obviously destructive user-provided validation commands.
+- It tests web patches in temporary repository copies before touching the real project.
 
 ## Current Project Status
 
@@ -401,10 +492,14 @@ This is an active AI engineering project, not a tiny demo. The code already incl
 - automatic patch execution
 - validation and rollback
 - memory storage
-- benchmark cases across several languages
-- web UI for patch review and project graphs
+- 22 benchmark cases across several languages
+- benchmark reports with summary, latest, compare, markdown, and web viewing support
+- model-call statistics for benchmark runs
+- web UI workspace tabs for chat/patch, benchmarks, dream, memory, graph, and health
+- structured patch card showing confidence, risk, validation command, changed files, and last action
 - overnight planning through the Sleeping Consultant
+- health checks for API keys, optional services, and local toolchains
 
 ## Short Summary
 
-C.A.T.T.U.S is a repo-aware AI coding agent. It reads a project, finds the important code, reasons about bugs or features, proposes safe patches, validates the result, and learns from each run.
+C.A.T.T.U.S is a repo-aware AI coding agent. It reads a project, finds the important code, reasons about bugs or features, proposes safe patches, validates the result, reports what happened through a web workspace, and learns from each run.

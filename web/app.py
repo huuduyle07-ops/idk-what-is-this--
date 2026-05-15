@@ -358,11 +358,22 @@ def apply_patch():
         validation_command=validation_command,
     )
 
+    # Phase 5 Slice 5: surface risk + validation_command for the Patch card.
+    risk_dict = None
+    if getattr(result, "risk", None):
+        risk_dict = {
+            "level": result.risk.level,
+            "score": result.risk.score,
+            "reasons": list(result.risk.reasons or []),
+        }
+
     return {
         "message": result.message,
         "diff": result.diff,
         "validation": result.validation_output,
         "success": result.success,
+        "risk": risk_dict,
+        "validation_command": validation_command or "",
     }
 
 @app.route("/test_patch_plan", methods=["POST"])
@@ -474,6 +485,10 @@ def test_patch_plan():
             "validation": result.get("validation_output", ""),
             "applied_ops": result.get("applied_ops", []),
             "rollback_performed": result.get("rollback_performed", False),
+            # Phase 5 Slice 5: risk is not computed for patch_plan flows;
+            # validation_command is, so surface it for the Patch card.
+            "risk": None,
+            "validation_command": validation_command or "",
         }
 
 @app.route("/apply_patch_plan", methods=["POST"])
@@ -576,6 +591,10 @@ def apply_patch_plan_route():
         "validation": result.get("validation_output", ""),
         "applied_ops": result.get("applied_ops", []),
         "rollback_performed": result.get("rollback_performed", False),
+        # Phase 5 Slice 5: risk is not computed for patch_plan flows;
+        # validation_command is, so surface it for the Patch card.
+        "risk": None,
+        "validation_command": validation_command or "",
     }
 
 @app.route("/undo_patch", methods=["POST"])
@@ -1064,11 +1083,22 @@ def test_patch():
             dry_run_only=False,
         )
 
+        # Phase 5 Slice 5: surface risk + validation_command for the Patch card.
+        risk_dict = None
+        if getattr(result, "risk", None):
+            risk_dict = {
+                "level": result.risk.level,
+                "score": result.risk.score,
+                "reasons": list(result.risk.reasons or []),
+            }
+
         return {
             "message": result.message,
             "diff": result.diff,
             "validation": result.validation_output,
             "success": result.success,
+            "risk": risk_dict,
+            "validation_command": validation_command or "",
         }
 
 @app.route("/render_graph", methods=["POST"])

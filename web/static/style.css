@@ -134,6 +134,31 @@ button {
     padding-top: 10px;
     border-top: 1px solid #334155;
 }
+
+.local-critique-section {
+    display: none;
+}
+
+#localCritiqueMain {
+    margin-top: 8px;
+}
+
+#localCritiqueDebug {
+    display: none;
+    margin-top: 8px;
+}
+
+#localCritiqueDebug > summary {
+    color: #888;
+    cursor: pointer;
+}
+
+#localCritiqueThought {
+    margin-top: 4px;
+    font-size: 0.8em;
+    white-space: pre-wrap;
+}
+
 .margin-top-info {
     margin-top: 10px;
     color: #94a3b8;
@@ -767,4 +792,152 @@ button {
     margin-top: 12px;
     font-size: 12px;
     color: #94a3b8;
+}
+
+/* ============================================================ */
+/* Patch card (Phase 5 Slice 5)                                  */
+/* ============================================================ */
+.patch-card {
+    background: #1e293b;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.patch-card__head {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.patch-card__row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #0f172a;
+    font-size: 13px;
+}
+
+.patch-card__label {
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 11px;
+}
+
+.patch-card__value {
+    word-break: break-word;
+}
+
+.patch-card__muted {
+    color: #64748b;
+    font-style: italic;
+    font-size: 12px;
+}
+
+.patch-card__section {
+    margin-top: 16px;
+}
+
+.patch-card__section-heading {
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 11px;
+    margin-bottom: 6px;
+}
+
+.patch-card__issues {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.patch-card__issues li {
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.patch-card__last-action {
+    margin-top: 16px;
+    padding: 8px;
+    background: #0f172a;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.patch-type-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+.patch-type-badge--candidate { background: #1e3a8a; color: #93c5fd; }
+.patch-type-badge--plan      { background: #1e3a3a; color: #5eead4; }
+.patch-type-badge--unknown   { background: #1e293b; color: #94a3b8; }
+
+.patch-risk-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+.patch-risk-badge--ok      { background: #052e16; color: #bbf7d0; }
+.patch-risk-badge--missing { background: #422006; color: #fdba74; }
+.patch-risk-badge--error   { background: #450a0a; color: #fecaca; }
+.patch-risk-badge--off     { background: #1e293b; color: #94a3b8; }
+
+.patch-confidence-bar {
+    display: inline-block;
+    width: 160px;
+    height: 8px;
+    background: #0f172a;
+    border-radius: 4px;
+    overflow: hidden;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.patch-confidence-bar__fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    transition: width 0.2s;
+}
+
+.patch-confidence-pct {
+    font-variant-numeric: tabular-nums;
+    color: #cbd5e1;
+}
+
+.patch-raw-details {
+    margin-top: 16px;
+    background: #0f172a;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.patch-raw-details > summary {
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.patch-raw {
+    margin: 8px 0 0;
+    padding: 8px;
+    background: #020617;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #cbd5e1;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 50vh;
+    overflow-y: auto;
 }
