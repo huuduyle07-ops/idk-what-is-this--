@@ -147,6 +147,123 @@ def clear_queue(repo_path: str) -> None:
     write_queue(repo_path, [])
 
 
+def seed_queue_from_latest_benchmark(
+    repo_path: str | Path,
+    max_failed: int = 5,
+    max_slow: int = 3,
+    min_total: int = 5,
+    report_filename: str | None = None,
+) -> list[dict]:
+    """Seed the dream queue with items derived from a benchmark report.
+
+    By default reads `<repo_path>/.agent/benchmarks/benchmark_report_*.json`
+    and picks the newest report whose `total >= min_total` (skips one-off
+    test runs like `total=1`); falls back to the absolute newest if no
+    report meets `min_total`.
+
+    If `report_filename` is provided (Phase 5 Slice 3), seeds from that
+    specific report instead. Filename is validated against the
+    `benchmark_report_*.json` pattern AND must resolve to a file inside
+    the bench dir (path-traversal guard).
+
+    From the chosen report:
+      - failed cases (`results[i].success == False`) become `kind="bug"` items
+        (up to `max_failed`)
+      - top slowest passing cases (from `slowest_cases[]`) become `kind="debt"`
+        items (up to `max_slow`)
+
+    Each item carries `source="benchmark"`, `benchmark_report` (filename), and
+    `case_name` for traceability. Items are appended to the existing queue via
+    `append_to_queue()`.
+
+    Returns the list of items appended (empty if no benchmark report is
+    available, or the report has nothing seedable).
+    """
+    bench_dir = Path(repo_path).resolve() / ".agent" / "benchmarks"
+    if not bench_dir.is_dir():
+        return []
+
+    chosen: Path | None = None
+
+    if report_filename:
+        # Explicit-filename path: validate and use that report directly.
+        if not re.match(r"^benchmark_report_\d+\.json$", report_filename):
+            return []
+        candidate = (bench_dir / report_filename).resolve()
+        try:
+            candidate.relative_to(bench_dir.resolve())
+        except ValueError:
+            return []
+        if not candidate.is_file():
+            return []
+        chosen = candidate
+    else:
+        reports = sorted(bench_dir.glob("benchmark_report_*.json"))
+        if not reports:
+            return []
+
+        # Prefer newest report with total >= min_total; fall back to newest overall.
+        for path in reversed(reports):
+            try:
+                d = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if (d.get("total") or 0) >= min_total:
+                chosen = path
+                break
+        if chosen is None:
+            chosen = reports[-1]
+
+    try:
+        data = json.loads(chosen.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+    items: list[dict] = []
+
+    # Failed cases → bug items.
+    for r in (data.get("results") or []):
+        if r.get("success"):
+            continue
+        if len(items) >= max_failed:
+            break
+        reason_bits: list[str] = []
+        val_out = r.get("validation_output") or ""
+        if val_out and val_out != "OK":
+            reason_bits.append(f"validation: {val_out[:200]}")
+        if r.get("missing_expected_files"):
+            reason_bits.append(f"missing: {r['missing_expected_files']}")
+        if r.get("toolchain_issue"):
+            reason_bits.append(f"toolchain: {r['toolchain_issue']}")
+        items.append({
+            "kind": "bug",
+            "title": f"Benchmark failure: {r.get('name', '?')}",
+            "hint": "; ".join(reason_bits) or "see runner_log_tail in benchmark report",
+            "source": "benchmark",
+            "benchmark_report": chosen.name,
+            "case_name": r.get("name"),
+        })
+
+    # Slowest passing cases → debt items.
+    for s in (data.get("slowest_cases") or [])[:max_slow]:
+        if not s.get("success"):
+            continue
+        name = s.get("name", "?")
+        dur = s.get("duration_sec", 0) or 0
+        items.append({
+            "kind": "debt",
+            "title": f"Slow case: {name} ({dur:.1f}s)",
+            "hint": f"Investigate why {name} takes {dur:.1f}s to patch.",
+            "source": "benchmark",
+            "benchmark_report": chosen.name,
+            "case_name": name,
+        })
+
+    for it in items:
+        append_to_queue(repo_path, it)
+    return items
+
+
 def slugify(text: str, max_len: int = 40) -> str:
     s = re.sub(r"[^a-zA-Z0-9]+", "-", text or "").strip("-").lower()
     return s[:max_len] or "untitled"

@@ -287,3 +287,484 @@ button {
     border: 1px solid #7f1d1d;
 }
 
+/* ============================================================ */
+/* Workspace tabs (Phase 5 Slice 1)                              */
+/* Top-level tabs above the existing result-tab area.            */
+/* ============================================================ */
+.ws-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 16px;
+    border-bottom: 2px solid #334155;
+    padding-bottom: 0;
+}
+
+.ws-tab {
+    background: transparent;
+    color: #94a3b8;
+    padding: 8px 16px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 0;
+}
+
+.ws-tab:hover {
+    color: #e2e8f0;
+}
+
+.ws-tab--active {
+    color: #60a5fa;
+    border-bottom-color: #3b82f6;
+    font-weight: 600;
+}
+
+.ws-content {
+    display: none;
+    padding-top: 16px;
+}
+
+.ws-placeholder {
+    color: #64748b;
+    font-style: italic;
+    padding: 24px;
+    text-align: center;
+    background: #1e293b;
+    border-radius: 4px;
+}
+
+/* Active state for existing result tabs (Answer/Context/etc.) */
+.tabs button.tab-active {
+    background: #1e40af;
+    box-shadow: inset 0 -2px 0 #60a5fa;
+}
+
+/* ============================================================ */
+/* Health panel (Phase 5 Slice 2)                                */
+/* ============================================================ */
+.health-section {
+    background: #1e293b;
+    padding: 16px;
+    border-radius: 6px;
+}
+
+.health-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.health-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+
+.health-summary-pill {
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.health-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.health-empty {
+    color: #64748b;
+    font-style: italic;
+    padding: 12px 0;
+}
+
+.health-row {
+    display: grid;
+    grid-template-columns: 200px 100px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 6px 8px;
+    background: #0f172a;
+    border-radius: 4px;
+}
+
+.health-name {
+    font-weight: 600;
+}
+
+.health-detail {
+    font-size: 12px;
+    color: #94a3b8;
+    word-break: break-word;
+}
+
+.health-badge {
+    text-align: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.health-badge--ok        { background: #052e16; color: #bbf7d0; }
+.health-badge--available { background: #1e293b; color: #93c5fd; border: 1px solid #334155; }
+.health-badge--off       { background: #1e293b; color: #64748b; }
+.health-badge--missing   { background: #422006; color: #fdba74; }
+.health-badge--error     { background: #450a0a; color: #fecaca; }
+
+/* ============================================================ */
+/* Benchmarks panel (Phase 5 Slice 3)                            */
+/* ============================================================ */
+.bench-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
+    min-height: 400px;
+}
+
+.bench-sidebar {
+    background: #1e293b;
+    border-radius: 6px;
+    padding: 12px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.bench-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.bench-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.bench-list-item {
+    background: #0f172a;
+    border-radius: 4px;
+    padding: 8px;
+    cursor: pointer;
+    border-left: 3px solid #334155;
+}
+
+.bench-list-item:hover {
+    background: #1e293b;
+}
+
+.bench-list-item.is-active {
+    border-left-color: #3b82f6;
+    background: #1e293b;
+}
+
+.bench-list-item-date {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.bench-list-item-summary {
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.bench-detail {
+    background: #1e293b;
+    border-radius: 6px;
+    padding: 16px;
+    overflow: auto;
+    max-height: 600px;
+}
+
+.bench-totals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+
+.bench-section-heading {
+    margin: 16px 0 8px;
+    font-size: 13px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.bench-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.bench-table th, .bench-table td {
+    padding: 4px 8px;
+    text-align: left;
+    border-bottom: 1px solid #334155;
+}
+
+.bench-table th {
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.bench-table td.right {
+    text-align: right;
+}
+
+.bench-fail-row {
+    background: #1e0a0a;
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 4px;
+    border-left: 3px solid #b91c1c;
+}
+
+.bench-fail-name {
+    font-weight: 600;
+}
+
+.bench-fail-detail {
+    font-size: 12px;
+    color: #fca5a5;
+    margin-top: 2px;
+    word-break: break-word;
+}
+
+.bench-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+}
+
+/* ============================================================ */
+/* Shared modal component (Phase 5 Slice 4)                      */
+/* ============================================================ */
+.app-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.app-modal[hidden] { display: none; }
+
+.app-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.7);
+}
+
+.app-modal__panel {
+    position: relative;
+    background: #1e293b;
+    border-radius: 8px;
+    width: min(800px, 92vw);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.app-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #334155;
+}
+
+.app-modal__title {
+    margin: 0;
+    font-size: 16px;
+}
+
+.app-modal__close {
+    background: transparent;
+    color: #94a3b8;
+    font-size: 22px;
+    line-height: 1;
+    padding: 0 8px;
+    border: none;
+    cursor: pointer;
+}
+.app-modal__close:hover { color: #e2e8f0; }
+
+.app-modal__body {
+    padding: 16px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.app-modal__footer {
+    padding: 12px 16px;
+    border-top: 1px solid #334155;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+.app-modal__footer:empty { display: none; }
+
+/* ============================================================ */
+/* Dream item cards (queue, report, apply, live status)          */
+/* ============================================================ */
+.dream-item-card {
+    background: #0f172a;
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.dream-item-card__check {
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+.dream-item-card__main {
+    flex: 1;
+    min-width: 0;
+}
+
+.dream-item-card__head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 13px;
+}
+
+.dream-item-card__idx {
+    color: #64748b;
+    font-weight: 600;
+}
+
+.dream-item-card__kind {
+    color: #94a3b8;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dream-item-card__title {
+    color: #e2e8f0;
+    flex: 1;
+    word-break: break-word;
+}
+
+.dream-item-card__summary {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #94a3b8;
+    word-break: break-word;
+    max-height: 120px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+.dream-item-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+.dream-item-badge--ok       { background: #052e16; color: #bbf7d0; }
+.dream-item-badge--ready    { background: #1e3a8a; color: #93c5fd; }
+.dream-item-badge--research { background: #1e3a3a; color: #5eead4; }
+.dream-item-badge--off      { background: #1e293b; color: #94a3b8; }
+.dream-item-badge--missing  { background: #422006; color: #fdba74; }
+.dream-item-badge--error    { background: #450a0a; color: #fecaca; }
+
+/* ============================================================ */
+/* Dream live-status header + container                          */
+/* ============================================================ */
+.dream-status {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    background: transparent;
+    padding: 0;
+    min-height: 1em;
+}
+
+.dream-status-header {
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    background: #1e293b;
+}
+.dream-status-header--running { background: #1e293b; color: #93c5fd; border: 1px solid #334155; }
+.dream-status-header--done    { background: #052e16; color: #bbf7d0; border: 1px solid #166534; }
+.dream-status-header--failed  { background: #450a0a; color: #fecaca; border: 1px solid #7f1d1d; }
+
+/* Override the old single-line dream-status-* rules so they don't double-style. */
+.dream-status-running, .dream-status-done, .dream-status-failed {
+    background: transparent !important;
+    color: inherit !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+/* ============================================================ */
+/* Dream apply / report bits                                     */
+/* ============================================================ */
+.dream-apply-controls {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #334155;
+}
+
+.dream-section-heading {
+    margin: 16px 0 8px;
+    font-size: 13px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.dream-report-summary {
+    background: #0f172a;
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 8px;
+}
+.dream-report-summary > summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.dream-report-pre {
+    margin: 8px 0 0;
+    padding: 8px;
+    background: #020617;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #cbd5e1;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.dream-report-meta {
+    margin-top: 12px;
+    font-size: 12px;
+    color: #94a3b8;
+}

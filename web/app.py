@@ -875,6 +875,85 @@ def dream_apply_route():
 
     return {"results": results}
 
+
+@app.route("/health", methods=["GET"])
+def health_route():
+    """Settings/Health panel data (Phase 5 Slice 2). Cheap checks only — no
+    model loads, no long-running probes. See core/health.py for the per-check
+    rules and timeouts."""
+    from core.health import get_system_health  # lazy import; isolates failures
+    try:
+        return get_system_health()
+    except Exception as e:
+        return (
+            {"error": f"health check crashed: {e}", "checks": [], "summary": {}},
+            500,
+        )
+
+
+@app.route("/benchmarks/list", methods=["GET"])
+def benchmarks_list_route():
+    """List past benchmark reports for the Benchmarks tab (Phase 5 Slice 3).
+    Returns metadata only — call /benchmarks/report for full content."""
+    repo_path = request.values.get("repo_path", "").strip()
+    if not repo_path or not Path(repo_path).is_dir():
+        return {"error": f"repo_path is not a directory: {repo_path}"}
+    from core.benchmarks_view import list_benchmark_reports
+    return {"reports": list_benchmark_reports(repo_path)}
+
+
+@app.route("/benchmarks/report", methods=["GET"])
+def benchmarks_report_route():
+    """Full content of one benchmark report (Phase 5 Slice 3).
+
+    `filename` must match `benchmark_report_<digits>.json` and resolve to a
+    file inside `<repo_path>/.agent/benchmarks/` (path-traversal guard)."""
+    repo_path = request.values.get("repo_path", "").strip()
+    filename = request.values.get("filename", "").strip()
+    if not repo_path or not Path(repo_path).is_dir():
+        return {"error": f"repo_path is not a directory: {repo_path}"}
+    if not filename:
+        return {"error": "filename is required"}
+    from core.benchmarks_view import read_benchmark_report
+    data = read_benchmark_report(repo_path, filename)
+    if data is None:
+        return {"error": f"report not found or invalid name: {filename}"}, 404
+    return data
+
+
+@app.route("/dream/seed-from-benchmark", methods=["POST"])
+def dream_seed_from_benchmark_route():
+    """Append items to the dream queue based on a benchmark report.
+
+    Failed cases become `kind=bug`, slowest passing cases become `kind=debt`.
+    Each appended item carries `source=benchmark`, `benchmark_report` (the JSON
+    filename used), and `case_name` for traceability.
+
+    Optional form field `report_filename` (Phase 5 Slice 3) seeds from a
+    specific historical report instead of auto-picking the newest.
+    """
+    repo_path = request.form.get("repo_path", "").strip()
+    if not repo_path or not Path(repo_path).is_dir():
+        return {"error": f"repo_path is not a directory: {repo_path}"}
+
+    report_filename = (request.form.get("report_filename") or "").strip() or None
+
+    try:
+        items = dream_artifacts.seed_queue_from_latest_benchmark(
+            repo_path,
+            report_filename=report_filename,
+        )
+    except Exception as e:
+        return {"error": f"seed failed: {e}"}, 500
+
+    if not items:
+        return (
+            {"error": "No benchmark reports found in .agent/benchmarks/, or nothing seedable."},
+            404,
+        )
+    return {"added": items, "count": len(items)}
+
+
 @app.route("/session/<session_id>")
 def load_session(session_id):
     sessions = load_sessions()

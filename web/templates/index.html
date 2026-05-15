@@ -143,118 +143,198 @@
         </div>
         {% endif %}
 
-        <div class="tabs">
-          <button type="button" onclick="showTab('answer')">Answer</button>
-          <button type="button" onclick="showTab('context')">Context</button>
-          <button type="button" onclick="showTab('state')">State</button>
-          <button type="button" onclick="showTab('patch')">Patch</button>
-          <button type="button" onclick="showTab('validation')">Validation</button>
-          <button type="button" onclick="showTab('diff')">Diff</button>
-          <button type="button" onclick="showTab('candidates')">Candidates</button>
+        <!-- Phase 5 Slice 1: workspace tabs (top-level). -->
+        <div class="ws-tabs" role="tablist">
+          <button type="button" class="ws-tab" data-ws="chat"       onclick="showWorkspaceTab('chat')">Chat / Patch</button>
+          <button type="button" class="ws-tab" data-ws="benchmarks" onclick="showWorkspaceTab('benchmarks')">Benchmarks</button>
+          <button type="button" class="ws-tab" data-ws="dream"      onclick="showWorkspaceTab('dream')">Dream</button>
+          <button type="button" class="ws-tab" data-ws="memory"     onclick="showWorkspaceTab('memory')">Memory</button>
+          <button type="button" class="ws-tab" data-ws="graph"      onclick="showWorkspaceTab('graph')">Graph</button>
+          <button type="button" class="ws-tab" data-ws="settings"   onclick="showWorkspaceTab('settings')">Settings / Health</button>
         </div>
 
-        <div class="actions">
-          <button type="button" onclick="generatePatch()">Generate Patch</button>
-          <button type="button" onclick="generateCandidates()">Generate Candidates</button>
-          <button type="button" onclick="testPatch()">Test Run Patch</button>
-          <button type="button" onclick="applyPatch()">Apply / Review Patch</button>
-          <button type="button" onclick="undoPatch()">Undo</button>
-          <button type="button" onclick="localCritique()" title="Send current patch to local Ollama DeepSeek for review (does not auto-apply)">&#x1F9E0; Local Critique</button>
-          <button type="button" onclick="viewGraph('clean')"
-                  title="Clean view: only file/function/class nodes + contains/resolved_call/calls/imports edges">
-            Clean Graph
-          </button>
-          <button type="button" onclick="viewGraph('debug')"
-                  title="Debug view: every node and edge in the raw program graph (expr, call::, test files, etc.)">
-            Debug Graph
-          </button>
-          <label class="inline-toggle"
-                 title="In Clean mode, also include test files (off by default)">
-            <input type="checkbox" id="graphShowTests"> show tests
-          </label>
-          <button type="button" onclick="openObsidian()">Open Obsidian Vault</button>
-        </div>
-
-        <div class="dream-section">
-          <strong>Sleeping Consultant (overnight)</strong>
-          <div class="dream-row">
-            <select id="dreamKind" title="Kind of work to queue">
-              <option value="bug">bug</option>
-              <option value="debt">debt</option>
-              <option value="idea">idea (vibe only)</option>
-              <option value="research">research</option>
-            </select>
-            <select id="dreamMode" title="Dream V2 mode: plan-only is safest; patch_if_safe lets narrow bug fixes auto-patch; research writes proposals only.">
-              <option value="plan_only" selected>plan_only</option>
-              <option value="patch_if_safe">patch_if_safe</option>
-              <option value="research">research</option>
-            </select>
-            <input id="dreamTitle" class="dream-title" type="text" placeholder="title">
-            <input id="dreamHint" class="dream-hint" type="text" placeholder="hint (optional)">
-            <button type="button" onclick="addDreamItem()">Add to queue</button>
-            <button type="button" onclick="viewDreamQueue()">View queue</button>
-            <button type="button" onclick="clearDreamQueue()">Clear queue</button>
+        <!-- Chat / Patch (default workspace tab) -->
+        <div id="ws-chat" class="ws-content">
+          <div class="tabs">
+            <button type="button" onclick="showTab('answer')">Answer</button>
+            <button type="button" onclick="showTab('context')">Context</button>
+            <button type="button" onclick="showTab('state')">State</button>
+            <button type="button" onclick="showTab('patch')">Patch</button>
+            <button type="button" onclick="showTab('validation')">Validation</button>
+            <button type="button" onclick="showTab('diff')">Diff</button>
+            <button type="button" onclick="showTab('candidates')">Candidates</button>
           </div>
-          <div class="dream-buttons">
-            <button type="button" onclick="startOvernight()"
-                    title="Runs the queue in temp clones in a background thread. Original repo is not touched.">
-              Start Overnight Run
+
+          <div class="actions">
+            <button type="button" onclick="generatePatch()">Generate Patch</button>
+            <button type="button" onclick="generateCandidates()">Generate Candidates</button>
+            <button type="button" onclick="testPatch()">Test Run Patch</button>
+            <button type="button" onclick="applyPatch()">Apply / Review Patch</button>
+            <button type="button" onclick="undoPatch()">Undo</button>
+            <button type="button" onclick="localCritique()" title="Send current patch to local Ollama DeepSeek for review (does not auto-apply)">&#x1F9E0; Local Critique</button>
+          </div>
+
+          <div class="local-critique-section" id="localCritiqueSection" style="display:none">
+            <strong>&#x1F9E0; Local Critique result</strong>
+            <div id="localCritiqueMain" style="margin-top:8px"></div>
+            <details id="localCritiqueDebug" style="margin-top:8px;display:none">
+              <summary style="cursor:pointer;color:#888">Show raw local thought / debug</summary>
+              <pre id="localCritiqueThought" style="margin-top:4px;font-size:0.8em;white-space:pre-wrap"></pre>
+            </details>
+          </div>
+
+          <pre id="answer" class="tab-content">{{ result.answer if result else "" }}</pre>
+          <pre id="context" class="tab-content">{{ result.context if result else "" }}</pre>
+          <pre id="state" class="tab-content">{{ result.state if result else "" }}</pre>
+          <pre id="patch" class="tab-content">{{ result.patch if result else "" }}</pre>
+          <pre id="validation" class="tab-content">{{ result.validation if result else "" }}</pre>
+          <pre id="diff" class="tab-content"></pre>
+          <div id="candidates" class="tab-content"></div>
+        </div>
+
+        <!-- Benchmarks -->
+        <div id="ws-benchmarks" class="ws-content">
+          <div class="bench-layout">
+            <aside class="bench-sidebar">
+              <div class="bench-sidebar-header">
+                <strong>Past runs</strong>
+                <button type="button" class="sidebar-refresh"
+                        onclick="loadBenchmarksPanel(true)"
+                        title="Re-scan .agent/benchmarks/">⟳</button>
+              </div>
+              <div id="benchList" class="bench-list">
+                <div class="health-empty">Loading…</div>
+              </div>
+            </aside>
+            <section id="benchDetail" class="bench-detail">
+              <div class="health-empty">Pick a run from the left to see details.</div>
+            </section>
+          </div>
+        </div>
+
+        <!-- Dream -->
+        <div id="ws-dream" class="ws-content">
+          <div class="dream-section">
+            <strong>Sleeping Consultant (overnight)</strong>
+            <div class="dream-row">
+              <select id="dreamKind" title="Kind of work to queue">
+                <option value="bug">bug</option>
+                <option value="debt">debt</option>
+                <option value="idea">idea (vibe only)</option>
+                <option value="research">research</option>
+              </select>
+              <select id="dreamMode" title="Dream V2 mode: plan-only is safest; patch_if_safe lets narrow bug fixes auto-patch; research writes proposals only.">
+                <option value="plan_only" selected>plan_only</option>
+                <option value="patch_if_safe">patch_if_safe</option>
+                <option value="research">research</option>
+              </select>
+              <input id="dreamTitle" class="dream-title" type="text" placeholder="title">
+              <input id="dreamHint" class="dream-hint" type="text" placeholder="hint (optional)">
+              <button type="button" onclick="addDreamItem()">Add to queue</button>
+              <button type="button" onclick="viewDreamQueue()">View queue</button>
+              <button type="button" onclick="clearDreamQueue()">Clear queue</button>
+            </div>
+            <div class="dream-buttons">
+              <button type="button" onclick="startOvernight()"
+                      title="Runs the queue in temp clones in a background thread. Original repo is not touched.">
+                Start Overnight Run
+              </button>
+              <button type="button" onclick="applyDream()"
+                      title="Pick which proposals from the latest report to apply to the real repo (one commit per item).">
+                Apply Dream
+              </button>
+              <button type="button" onclick="seedDreamFromBenchmark()"
+                      title="Add failed + slowest cases from the latest benchmark run as queue items.">
+                Seed from latest benchmark
+              </button>
+              <button type="button" onclick="refreshDreamStatus()" title="Manually refresh the status line.">
+                Refresh status
+              </button>
+            </div>
+            <div id="dreamStatus" class="dream-status"></div>
+          </div>
+        </div>
+
+        <!-- Memory -->
+        <div id="ws-memory" class="ws-content">
+          <div class="memory-section">
+            <strong>Memory consolidator</strong>
+            <div class="memory-row">
+              <span class="memory-hint">
+                Strict dedupe of memory_notes (scoped to the project tag above, if set)
+                and the web sessions log. Runs only when clicked — not part of the main pipeline.
+              </span>
+              <button type="button" onclick="consolidateMemory()"
+                      title="Removes exact-duplicate memory rows and dedupes web/sessions.json. No LLM calls.">
+                Consolidate memory
+              </button>
+            </div>
+            <div id="memoryStatus" class="memory-status"></div>
+          </div>
+        </div>
+
+        <!-- Graph (no longer a result-tab; lives in its own workspace tab) -->
+        <div id="ws-graph" class="ws-content">
+          <div class="actions">
+            <button type="button" onclick="viewGraph('clean')"
+                    title="Clean view: only file/function/class nodes + contains/resolved_call/calls/imports edges">
+              Clean Graph
             </button>
-            <button type="button" onclick="applyDream()"
-                    title="Pick which proposals from the latest report to apply to the real repo (one commit per item).">
-              Apply Dream
+            <button type="button" onclick="viewGraph('debug')"
+                    title="Debug view: every node and edge in the raw program graph (expr, call::, test files, etc.)">
+              Debug Graph
             </button>
-            <button type="button" onclick="refreshDreamStatus()" title="Manually refresh the status line.">
-              Refresh status
-            </button>
+            <label class="inline-toggle"
+                   title="In Clean mode, also include test files (off by default)">
+              <input type="checkbox" id="graphShowTests"> show tests
+            </label>
+            <button type="button" onclick="openObsidian()">Open Obsidian Vault</button>
           </div>
-          <div id="dreamStatus" class="dream-status"></div>
+          <div id="graph">
+            <div class="graph-controls">
+              <button type="button" onclick="zoomGraph(1.25)" title="Zoom in">+</button>
+              <button type="button" onclick="zoomGraph(0.8)" title="Zoom out">−</button>
+              <button type="button" onclick="resetGraph()" title="Reset">⟳</button>
+            </div>
+            <div class="mermaid-svg-wrapper" id="graphCanvas">
+              <pre id="graphFallback">{{ result.graph if result else "Click Clean Graph for the architectural view, or Debug Graph for the full raw graph." }}</pre>
+            </div>
+          </div>
         </div>
 
-        <div class="memory-section">
-          <strong>Memory consolidator</strong>
-          <div class="memory-row">
-            <span class="memory-hint">
-              Strict dedupe of memory_notes (scoped to the project tag above, if set)
-              and the web sessions log. Runs only when clicked — not part of the main pipeline.
-            </span>
-            <button type="button" onclick="consolidateMemory()"
-                    title="Removes exact-duplicate memory rows and dedupes web/sessions.json. No LLM calls.">
-              Consolidate memory
-            </button>
-          </div>
-          <div id="memoryStatus" class="memory-status"></div>
-        </div>
-
-        <div class="local-critique-section" id="localCritiqueSection" style="display:none">
-          <strong>&#x1F9E0; Local Critique result</strong>
-          <div id="localCritiqueMain" style="margin-top:8px"></div>
-          <details id="localCritiqueDebug" style="margin-top:8px;display:none">
-            <summary style="cursor:pointer;color:#888">Show raw local thought / debug</summary>
-            <pre id="localCritiqueThought" style="margin-top:4px;font-size:0.8em;white-space:pre-wrap"></pre>
-          </details>
-        </div>
-
-        <pre id="answer" class="tab-content">{{ result.answer if result else "" }}</pre>
-        <pre id="context" class="tab-content">{{ result.context if result else "" }}</pre>
-        <div id="graph" class="tab-content">
-          <div class="graph-controls">
-            <button type="button" onclick="zoomGraph(1.25)" title="Zoom in">+</button>
-            <button type="button" onclick="zoomGraph(0.8)" title="Zoom out">−</button>
-            <button type="button" onclick="resetGraph()" title="Reset">⟳</button>
-          </div>
-          <div class="mermaid-svg-wrapper" id="graphCanvas">
-            <pre id="graphFallback">{{ result.graph if result else "Click Clean Graph for the architectural view, or Debug Graph for the full raw graph." }}</pre>
+        <!-- Settings / Health -->
+        <div id="ws-settings" class="ws-content">
+          <div class="health-section">
+            <div class="health-header">
+              <strong>System health</strong>
+              <button type="button" class="sidebar-refresh"
+                      onclick="loadHealthPanel(true)"
+                      title="Re-poll all checks.">⟳ Refresh</button>
+            </div>
+            <div id="healthSummary" class="health-summary"></div>
+            <div id="healthList" class="health-list">
+              <div class="health-empty">Loading…</div>
+            </div>
           </div>
         </div>
-        <pre id="state" class="tab-content">{{ result.state if result else "" }}</pre>
-        <pre id="patch" class="tab-content">{{ result.patch if result else "" }}</pre>
-        <pre id="validation" class="tab-content">{{ result.validation if result else "" }}</pre>
-        <pre id="diff" class="tab-content"></pre>
-        <div id="candidates" class="tab-content"></div>
     </main>
 
 </div>
+
+<!-- Phase 5 Slice 4: shared modal component (used by Dream UI; available for
+     future panels). Singleton: one instance reused per call. -->
+<div id="appModal" class="app-modal" hidden>
+  <div class="app-modal__backdrop" onclick="closeAppModal()"></div>
+  <div class="app-modal__panel" role="dialog" aria-modal="true" aria-labelledby="appModalTitle">
+    <div class="app-modal__header">
+      <h2 id="appModalTitle" class="app-modal__title">Modal</h2>
+      <button type="button" class="app-modal__close" onclick="closeAppModal()" aria-label="Close">×</button>
+    </div>
+    <div id="appModalBody" class="app-modal__body"></div>
+    <div id="appModalFooter" class="app-modal__footer"></div>
+  </div>
+</div>
+
 <script>
 //Coding Agent That Trully Useful and Safe//
 window.lastAction = null;
@@ -301,7 +381,10 @@ function viewGraph(mode) {
     const showTests = document.getElementById("graphShowTests")?.checked ? "1" : "";
     const canvas = document.getElementById("graphCanvas");
     canvas.innerHTML = `<pre>⏳ Building ${mode} graph…</pre>`;
-    showTab("graph");
+    // #graph is now in the Graph workspace tab (Phase 5 Slice 1) and no longer
+    // a result tab, so showTab("graph") is no longer needed — the user is
+    // already on ws-graph when this button is clickable.
+    showWorkspaceTab("graph");
 
     fetch("/render_graph", {
         method: "POST",
@@ -435,6 +518,94 @@ function openObsidian() {
 }
 
 // ============================================================
+// Phase 5 Slice 4: shared modal helpers (used by Dream UI; reusable for
+// future panels). One singleton modal, repurposed per call.
+// ============================================================
+function openAppModal(title, bodyHtml, footerHtml = "") {
+    const modal = document.getElementById("appModal");
+    if (!modal) return;
+    document.getElementById("appModalTitle").textContent = title;
+    document.getElementById("appModalBody").innerHTML = bodyHtml;
+    document.getElementById("appModalFooter").innerHTML = footerHtml;
+    modal.removeAttribute("hidden");
+    // Move focus into modal for keyboard users.
+    const closeBtn = modal.querySelector(".app-modal__close");
+    if (closeBtn) closeBtn.focus();
+}
+
+function closeAppModal() {
+    const modal = document.getElementById("appModal");
+    if (!modal) return;
+    modal.setAttribute("hidden", "");
+    document.getElementById("appModalBody").innerHTML = "";
+    document.getElementById("appModalFooter").innerHTML = "";
+}
+
+// Global ESC handler closes the modal if open.
+document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    const modal = document.getElementById("appModal");
+    if (modal && !modal.hasAttribute("hidden")) closeAppModal();
+});
+
+// Phase 5 Slice 4: status string → CSS class for Dream items.
+// Covers run-time statuses (core/dream_artifacts.py STATUS_LEGEND) plus the
+// apply-result statuses returned by /dream/apply.
+function _dreamStatusClass(s) {
+    const map = {
+        // run-time item statuses
+        patch_applied:            "dream-item-badge--ok",
+        ready_to_apply:           "dream-item-badge--ready",
+        research_note_created:    "dream-item-badge--research",
+        idea_written:             "dream-item-badge--research",
+        planned_no_patch:         "dream-item-badge--off",
+        patch_skipped_needs_vibe: "dream-item-badge--off",
+        needs_manual_review:      "dream-item-badge--missing",
+        blocked_missing_context:  "dream-item-badge--error",
+        rejected:                 "dream-item-badge--error",
+        error:                    "dream-item-badge--error",
+        skipped_time_budget:      "dream-item-badge--off",
+        // apply-result statuses
+        applied:                  "dream-item-badge--ok",
+        apply_failed:             "dream-item-badge--error",
+        skipped_idea:             "dream-item-badge--off",
+        skipped_research:         "dream-item-badge--off",
+        skipped_plan_only:        "dream-item-badge--off",
+        skipped_not_ready:        "dream-item-badge--off",
+        skipped_no_plan:          "dream-item-badge--off",
+        // synthetic for queue view (no run yet)
+        queued:                   "dream-item-badge--off",
+    };
+    return map[s] || "dream-item-badge--off";
+}
+
+// One renderer for every place Dream items appear (queue, report, apply, live status).
+function _renderDreamItemCard(it, opts = {}) {
+    const idx = it.idx ?? "?";
+    const kind = _escapeHtml(it.kind || "?");
+    const title = _escapeHtml(it.title || "(untitled)");
+    const status = it.status || "—";
+    const summary = _escapeHtml(it.summary || it.message || it.hint || "");
+    const checkbox = opts.selectable
+        ? `<input type="checkbox" class="dream-item-card__check" data-idx="${_escapeHtml(String(idx))}">`
+        : "";
+    return `
+        <div class="dream-item-card">
+            ${checkbox}
+            <div class="dream-item-card__main">
+                <div class="dream-item-card__head">
+                    <span class="dream-item-card__idx">${_escapeHtml(String(idx))}.</span>
+                    <span class="dream-item-card__kind">[${kind}]</span>
+                    <span class="dream-item-card__title">${title}</span>
+                    <span class="dream-item-badge ${_dreamStatusClass(status)}">${_escapeHtml(status)}</span>
+                </div>
+                ${summary ? `<div class="dream-item-card__summary">${summary}</div>` : ""}
+            </div>
+        </div>
+    `;
+}
+
+// ============================================================
 // Sleeping Consultant — overnight queue + report + selective apply
 // ============================================================
 function _dreamRepo() {
@@ -473,20 +644,44 @@ function addDreamItem() {
     .catch(err => alert(`Queue add failed: ${err}`));
 }
 
+function seedDreamFromBenchmark() {
+    const repo = _dreamRepo(); if (!repo) return;
+    fetch("/dream/seed-from-benchmark", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ repo_path: repo }),
+    })
+    .then(r => r.json().then(data => ({ status: r.status, data })))
+    .then(({ status, data }) => {
+        if (data.error) { alert(`Seed: ${data.error}`); return; }
+        const items = data.added || [];
+        const summary = items.map(it => `[${it.kind}] ${it.title}`).join("\n");
+        alert(`Seeded ${data.count} items from benchmark:\n\n${summary || "(none)"}`);
+    })
+    .catch(err => alert(`Seed failed: ${err}`));
+}
+
 function viewDreamQueue() {
     const repo = _dreamRepo(); if (!repo) return;
     fetch(`/dream/queue?repo_path=${encodeURIComponent(repo)}`)
     .then(r => r.json())
     .then(data => {
-        if (data.error) { alert(`Queue: ${data.error}`); return; }
+        if (data.error) {
+            openAppModal("Queue error", `<p>${_escapeHtml(data.error)}</p>`);
+            return;
+        }
         const items = data.queue || [];
-        if (items.length === 0) { alert("Queue is empty."); return; }
-        const lines = items.map((it, i) =>
-            `${i + 1}. [${it.kind}] ${it.title}` + (it.hint ? `  —  ${it.hint}` : "")
-        );
-        alert("Queue:\n\n" + lines.join("\n"));
+        if (items.length === 0) {
+            openAppModal("Dream queue", `<div class="health-empty">Queue is empty.</div>`);
+            return;
+        }
+        // Queue items don't have idx until run-time; use array position as a label.
+        const body = items.map((it, i) =>
+            _renderDreamItemCard({ ...it, idx: i + 1, status: "queued" })
+        ).join("");
+        openAppModal(`Dream queue (${items.length})`, body);
     })
-    .catch(err => alert(`View queue failed: ${err}`));
+    .catch(err => openAppModal("Queue error", `<p>${_escapeHtml(err)}</p>`));
 }
 
 function clearDreamQueue() {
@@ -510,42 +705,32 @@ function _renderDreamStatus(state) {
     if (!el) return;
 
     if (!state || state.status === "idle") {
-        el.textContent = "";
+        el.innerHTML = "";
         el.className = "dream-status";
         return;
     }
 
     const total = state.total_items || 0;
     const idx = state.current_idx || 0;
-    const doneCount = (state.items_done || []).length;
+    const itemsDone = state.items_done || [];
+
+    let header = "";
 
     if (state.status === "running") {
         const cur = state.current_title
-            ? `${state.current_kind || "?"} → ${state.current_title}`
+            ? `${_escapeHtml(state.current_kind || "?")} → ${_escapeHtml(state.current_title)}`
             : "(starting)";
-        el.textContent =
-            `💤 Running [${idx}/${total}] ${cur}  ·  done: ${doneCount}/${total}`;
-        el.className = "dream-status dream-status-running";
-        return;
+        header = `<div class="dream-status-header dream-status-header--running">💤 Running [${idx}/${total}] ${cur} · done: ${itemsDone.length}/${total}</div>`;
+    } else if (state.status === "done") {
+        header = `<div class="dream-status-header dream-status-header--done">✅ Done. Report: <code>${_escapeHtml(state.report_dir || "")}</code></div>`;
+    } else if (state.status === "failed") {
+        header = `<div class="dream-status-header dream-status-header--failed">❌ Failed: ${_escapeHtml(state.error || "unknown error")}</div>`;
+    } else {
+        header = `<div class="dream-status-header">Status: ${_escapeHtml(state.status)}</div>`;
     }
 
-    if (state.status === "done") {
-        const lines = (state.items_done || []).map(it =>
-            `${it.idx}. [${it.kind}] ${it.title} — ${it.status}`
-        );
-        el.textContent =
-            `✅ Done in run.\nReport: ${state.report_dir}\n\n${lines.join("\n")}`;
-        el.className = "dream-status dream-status-done";
-        return;
-    }
-
-    if (state.status === "failed") {
-        el.textContent = `❌ Failed: ${state.error || "unknown error"}`;
-        el.className = "dream-status dream-status-failed";
-        return;
-    }
-
-    el.textContent = `Status: ${state.status}`;
+    const cards = itemsDone.map(it => _renderDreamItemCard(it)).join("");
+    el.innerHTML = header + cards;
     el.className = "dream-status";
 }
 
@@ -669,13 +854,28 @@ function viewDreamRun(date) {
     fetch(`/dream/report?repo_path=${encodeURIComponent(repo)}&date=${encodeURIComponent(date)}`)
     .then(r => r.json())
     .then(data => {
-        if (data.error) { alert(`Dream report: ${data.error}`); return; }
-        const report = data.morning_report || "(no morning_report.txt)";
-        const preview = report.slice(0, 4000);
-        const more = report.length > 4000 ? "\n\n… (truncated; open the file to see the rest)" : "";
-        alert(`Dream report ${date}:\n${data.report_dir}\n\n${preview}${more}`);
+        if (data.error) {
+            openAppModal("Report error", `<p>${_escapeHtml(data.error)}</p>`);
+            return;
+        }
+        const items = data.items || [];
+        const morning = data.morning_report || "(no morning_report.txt)";
+        const body = `
+            <details class="dream-report-summary" open>
+                <summary>Morning report</summary>
+                <pre class="dream-report-pre">${_escapeHtml(morning)}</pre>
+            </details>
+            <div class="dream-section-heading">Items (${items.length})</div>
+            ${items.map(it => _renderDreamItemCard(it)).join("")}
+            <div class="dream-report-meta">
+                Report dir: <code>${_escapeHtml(data.report_dir || "")}</code>
+                ${data.dream_mode ? ` · mode: <code>${_escapeHtml(data.dream_mode)}</code>` : ""}
+                ${data.patch_style ? ` · style: <code>${_escapeHtml(data.patch_style)}</code>` : ""}
+            </div>
+        `;
+        openAppModal(`Dream report — ${date}`, body);
     })
-    .catch(err => alert(`Could not load report: ${err}`));
+    .catch(err => openAppModal("Report error", `<p>${_escapeHtml(err)}</p>`));
 }
 
 function applyDream() {
@@ -684,34 +884,72 @@ function applyDream() {
     fetch(`/dream/list?repo_path=${encodeURIComponent(repo)}`)
     .then(r => r.json())
     .then(data => {
-        if (data.error) { alert(`Apply: ${data.error}`); return; }
+        if (data.error) {
+            openAppModal("Apply error", `<p>${_escapeHtml(data.error)}</p>`);
+            return;
+        }
         const items = data.items || [];
-        if (items.length === 0) { alert("No items in last report."); return; }
-        const lines = items.map(it =>
-            `${it.idx}. [${it.kind}] ${it.title} (${it.status})`
-        );
-        const picked = prompt(
-            `Pick which to apply. Enter 1, 2, 1,2, or all:\n\n${lines.join("\n")}`,
-            "all"
-        );
-        if (!picked) return;
-
-        fetch("/dream/apply", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ repo_path: repo, selection: picked }),
-        })
-        .then(r => r.json())
-        .then(out => {
-            if (out.error) { alert(`Apply: ${out.error}`); return; }
-            const summary = (out.results || []).map(r =>
-                `${r.idx}. ${r.title} → ${r.status}: ${r.message || ""}`
-            ).join("\n");
-            alert(`Apply done:\n\n${summary}`);
-        })
-        .catch(err => alert(`Apply failed: ${err}`));
+        if (items.length === 0) {
+            openAppModal("Apply Dream", `<div class="health-empty">No items in last report.</div>`);
+            return;
+        }
+        const body = `
+            <div class="dream-apply-controls">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="dreamApplySelectAll"
+                           onchange="document.querySelectorAll('.dream-item-card__check').forEach(c => c.checked = this.checked)">
+                    <span>Select all</span>
+                </label>
+            </div>
+            <div id="dreamApplyList">
+                ${items.map(it => _renderDreamItemCard(it, { selectable: true })).join("")}
+            </div>
+            <div id="dreamApplyResults"></div>
+        `;
+        const footer = `
+            <button type="button" onclick="_doDreamApply()">Apply selected</button>
+            <button type="button" onclick="closeAppModal()">Cancel</button>
+        `;
+        openAppModal(`Apply Dream — ${items.length} items in last report`, body, footer);
     })
-    .catch(err => alert(`Could not load report: ${err}`));
+    .catch(err => openAppModal("Apply error", `<p>${_escapeHtml(err)}</p>`));
+}
+
+function _doDreamApply() {
+    const repo = _dreamRepo(); if (!repo) return;
+    const selected = Array.from(document.querySelectorAll(".dream-item-card__check"))
+        .filter(c => c.checked)
+        .map(c => c.dataset.idx);
+    const resultsEl = document.getElementById("dreamApplyResults");
+    if (selected.length === 0) {
+        if (resultsEl) resultsEl.innerHTML = `<div class="health-empty">Pick at least one item to apply.</div>`;
+        return;
+    }
+
+    if (resultsEl) resultsEl.innerHTML = `<div class="health-empty">Applying ${selected.length} items…</div>`;
+
+    fetch("/dream/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ repo_path: repo, selection: selected.join(",") }),
+    })
+    .then(r => r.json())
+    .then(out => {
+        if (out.error) {
+            if (resultsEl) resultsEl.innerHTML = `<div class="health-empty">Error: ${_escapeHtml(out.error)}</div>`;
+            return;
+        }
+        const results = out.results || [];
+        if (resultsEl) {
+            resultsEl.innerHTML = `
+                <div class="dream-section-heading">Results</div>
+                ${results.map(r => _renderDreamItemCard(r)).join("")}
+            `;
+        }
+    })
+    .catch(err => {
+        if (resultsEl) resultsEl.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+    });
 }
 
 function consolidateMemory() {
@@ -769,14 +1007,309 @@ function showTab(id) {
     let tabs = document.getElementsByClassName("tab-content");
     for (let t of tabs) t.style.display = "none";
     target.style.display = "block";
+
+    // Phase 5 Slice 1: visually mark the active result tab button.
+    document.querySelectorAll(".tabs button").forEach(btn => {
+        const onclick = btn.getAttribute("onclick") || "";
+        btn.classList.toggle("tab-active", onclick.includes(`'${id}'`));
+    });
+}
+
+// Phase 5 Slice 1: top-level workspace tabs (Chat/Patch, Benchmarks, Dream,
+// Memory, Graph, Settings/Health). Mirrors the showTab() pattern but operates
+// on .ws-content / .ws-tab. Persistence key: activeWorkspaceTab.
+function showWorkspaceTab(id) {
+    const valid = ["chat", "benchmarks", "dream", "memory", "graph", "settings"];
+    if (!valid.includes(id)) id = "chat";
+    localStorage.setItem("activeWorkspaceTab", id);
+
+    document.querySelectorAll(".ws-content").forEach(el => { el.style.display = "none"; });
+    const target = document.getElementById("ws-" + id);
+    if (target) target.style.display = "block";
+
+    document.querySelectorAll(".ws-tab").forEach(btn => {
+        btn.classList.toggle("ws-tab--active", btn.dataset.ws === id);
+    });
+
+    // Phase 5 Slice 2: lazy-load Health panel on first show.
+    if (id === "settings") loadHealthPanel(false);
+    // Phase 5 Slice 3: lazy-load Benchmarks panel on first show.
+    if (id === "benchmarks") loadBenchmarksPanel(false);
+}
+
+// Phase 5 Slice 2: Health panel — fetches /health, renders status rows.
+let _healthLoaded = false;
+
+function _healthBadgeClass(s) {
+    return {
+        ok:        "health-badge--ok",
+        available: "health-badge--available",
+        off:       "health-badge--off",
+        missing:   "health-badge--missing",
+        error:     "health-badge--error",
+    }[s] || "health-badge--off";
+}
+
+function _escapeHtml(s) {
+    return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+function _renderHealth(data) {
+    const list = document.getElementById("healthList");
+    const summary = document.getElementById("healthSummary");
+    if (!list || !summary) return;
+
+    if (data.error) {
+        list.innerHTML = `<div class="health-empty">Error: ${_escapeHtml(data.error)}</div>`;
+        summary.innerHTML = "";
+        return;
+    }
+
+    const checks = data.checks || [];
+    summary.innerHTML = Object.entries(data.summary || {})
+        .filter(([_, v]) => v > 0)
+        .map(([k, v]) =>
+            `<span class="health-summary-pill health-badge--${k}">${k}: ${v}</span>`
+        )
+        .join(" ");
+
+    list.innerHTML = checks.map(c => `
+        <div class="health-row">
+            <span class="health-name">${_escapeHtml(c.name)}</span>
+            <span class="health-badge ${_healthBadgeClass(c.status)}">${_escapeHtml(c.status)}</span>
+            <span class="health-detail">${_escapeHtml(c.detail || "")}</span>
+        </div>
+    `).join("");
+}
+
+function loadHealthPanel(force = false) {
+    if (_healthLoaded && !force) return;
+    const list = document.getElementById("healthList");
+    if (list) list.innerHTML = `<div class="health-empty">Loading…</div>`;
+    fetch("/health")
+        .then(r => r.json())
+        .then(data => {
+            _renderHealth(data);
+            _healthLoaded = true;
+        })
+        .catch(err => {
+            if (list) list.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        });
+}
+
+// Phase 5 Slice 3: Benchmarks panel — list past runs, view details, seed Dream.
+let _benchLoaded = false;
+let _benchActiveFilename = null;
+
+function _benchFmtDate(iso) {
+    // Render ISO timestamp as "YYYY-MM-DD HH:MM" in the user's locale.
+    if (!iso) return "—";
+    try {
+        const d = new Date(iso);
+        const pad = n => String(n).padStart(2, "0");
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    } catch {
+        return iso;
+    }
+}
+
+function _benchFmtRate(rate) {
+    if (rate == null) return "—";
+    return (rate * 100).toFixed(1) + "%";
+}
+
+function _renderBenchmarkList(reports) {
+    const list = document.getElementById("benchList");
+    if (!list) return;
+    if (!reports || reports.length === 0) {
+        list.innerHTML = `<div class="health-empty">No reports in .agent/benchmarks/.</div>`;
+        return;
+    }
+    list.innerHTML = reports.map(r => `
+        <div class="bench-list-item ${r.filename === _benchActiveFilename ? "is-active" : ""}"
+             onclick="viewBenchmarkReport('${_escapeHtml(r.filename)}')">
+            <div class="bench-list-item-date">${_benchFmtDate(r.timestamp_iso)}</div>
+            <div class="bench-list-item-summary">
+                ${r.passed}/${r.total} · ${_benchFmtRate(r.success_rate)} · ${(r.duration_sec || 0).toFixed(1)}s
+            </div>
+        </div>
+    `).join("");
+}
+
+function loadBenchmarksPanel(force = false) {
+    if (_benchLoaded && !force) return;
+    const list = document.getElementById("benchList");
+    if (list) list.innerHTML = `<div class="health-empty">Loading…</div>`;
+    const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
+    if (!repo) {
+        if (list) list.innerHTML = `<div class="health-empty">Set a repo path in the form above first.</div>`;
+        return;
+    }
+    fetch(`/benchmarks/list?repo_path=${encodeURIComponent(repo)}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                if (list) list.innerHTML = `<div class="health-empty">${_escapeHtml(data.error)}</div>`;
+                return;
+            }
+            _renderBenchmarkList(data.reports || []);
+            _benchLoaded = true;
+        })
+        .catch(err => {
+            if (list) list.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        });
+}
+
+function _renderGroupTable(label, grouped) {
+    if (!grouped || Object.keys(grouped).length === 0) return "";
+    const rows = Object.entries(grouped)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([k, v]) => `<tr><td><code>${_escapeHtml(k)}</code></td><td class="right">${v.passed}/${v.total}</td></tr>`)
+        .join("");
+    return `
+        <div class="bench-section-heading">By ${label}</div>
+        <table class="bench-table">
+            <thead><tr><th>${label}</th><th class="right">Passed/Total</th></tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+    `;
+}
+
+function _renderBenchmarkDetail(report, filename) {
+    const detail = document.getElementById("benchDetail");
+    if (!detail) return;
+    if (report.error) {
+        detail.innerHTML = `<div class="health-empty">Error: ${_escapeHtml(report.error)}</div>`;
+        return;
+    }
+
+    const total = report.total ?? 0;
+    const passed = report.passed ?? 0;
+    const failed = report.failed ?? 0;
+    const skipped = report.skipped ?? 0;
+    const duration = report.duration_sec ?? 0;
+    const rate = report.success_rate ?? 0;
+
+    const totalsHtml = `
+        <div class="bench-totals">
+            <span class="health-summary-pill health-badge--ok">passed: ${passed}</span>
+            ${failed > 0 ? `<span class="health-summary-pill health-badge--error">failed: ${failed}</span>` : ""}
+            ${skipped > 0 ? `<span class="health-summary-pill health-badge--off">skipped: ${skipped}</span>` : ""}
+            <span class="health-summary-pill health-badge--available">total: ${total}</span>
+            <span class="health-summary-pill health-badge--available">${(rate * 100).toFixed(1)}% · ${duration.toFixed(1)}s</span>
+        </div>
+    `;
+
+    const groups = report.groups || {};
+    const groupsHtml =
+        _renderGroupTable("language", groups.language) +
+        _renderGroupTable("category", groups.category) +
+        _renderGroupTable("difficulty", groups.difficulty);
+
+    const slowest = report.slowest_cases || [];
+    const slowestHtml = slowest.length === 0 ? "" : `
+        <div class="bench-section-heading">Slowest cases</div>
+        <table class="bench-table">
+            <thead><tr><th>Case</th><th class="right">Duration</th></tr></thead>
+            <tbody>${slowest.map(s => `
+                <tr>
+                    <td><code>${_escapeHtml(s.name || "?")}</code></td>
+                    <td class="right">${(s.duration_sec || 0).toFixed(2)}s</td>
+                </tr>
+            `).join("")}</tbody>
+        </table>
+    `;
+
+    const failures = (report.results || []).filter(r => !r.success);
+    const failuresHtml = failures.length === 0 ? "" : `
+        <div class="bench-section-heading">Failed cases (${failures.length})</div>
+        ${failures.map(f => `
+            <div class="bench-fail-row">
+                <div class="bench-fail-name">${_escapeHtml(f.name || "?")} <span style="color:#94a3b8;font-weight:400">· ${_escapeHtml(f.language || "?")}/${_escapeHtml(f.category || "?")}</span></div>
+                <div class="bench-fail-detail">
+                    ${f.validation_output && f.validation_output !== "OK" ? `validation: ${_escapeHtml(String(f.validation_output).slice(0, 240))}` : ""}
+                    ${f.toolchain_issue ? `toolchain: ${_escapeHtml(f.toolchain_issue)}` : ""}
+                    ${(f.missing_expected_files || []).length ? `missing: ${_escapeHtml(JSON.stringify(f.missing_expected_files))}` : ""}
+                </div>
+            </div>
+        `).join("")}
+    `;
+
+    const actionsHtml = `
+        <div class="bench-actions">
+            <button type="button" onclick="seedDreamFromReport('${_escapeHtml(filename)}')"
+                    title="Add failed + slowest cases from THIS report into the Dream queue.">
+                Seed Dream queue from this report
+            </button>
+        </div>
+    `;
+
+    detail.innerHTML = `
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:8px;">
+            <code>${_escapeHtml(filename)}</code>
+        </div>
+        ${totalsHtml}
+        ${groupsHtml}
+        ${slowestHtml}
+        ${failuresHtml}
+        ${actionsHtml}
+    `;
+}
+
+function viewBenchmarkReport(filename) {
+    _benchActiveFilename = filename;
+    // Re-render list to update the active highlight (keeps existing data).
+    const items = document.querySelectorAll(".bench-list-item");
+    items.forEach(el => el.classList.toggle("is-active", el.getAttribute("onclick")?.includes(`'${filename}'`)));
+
+    const detail = document.getElementById("benchDetail");
+    if (detail) detail.innerHTML = `<div class="health-empty">Loading ${_escapeHtml(filename)}…</div>`;
+    const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
+    if (!repo) {
+        if (detail) detail.innerHTML = `<div class="health-empty">Set a repo path first.</div>`;
+        return;
+    }
+    fetch(`/benchmarks/report?repo_path=${encodeURIComponent(repo)}&filename=${encodeURIComponent(filename)}`)
+        .then(r => r.json())
+        .then(data => _renderBenchmarkDetail(data, filename))
+        .catch(err => {
+            if (detail) detail.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        });
+}
+
+function seedDreamFromReport(filename) {
+    const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
+    if (!repo) { alert("Set a repo path first."); return; }
+    fetch("/dream/seed-from-benchmark", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ repo_path: repo, report_filename: filename }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert(`Seed: ${data.error}`); return; }
+        const summary = (data.added || []).map(it => `[${it.kind}] ${it.title}`).join("\n");
+        alert(`Seeded ${data.count} items from ${filename}:\n\n${summary || "(none)"}`);
+    })
+    .catch(err => alert(`Seed failed: ${err}`));
 }
 
 // Initial tab: explicit lastAction wins, else last persisted, else default.
+// Note: "graph" was removed from validTabs in Phase 5 Slice 1 — #graph is no
+// longer a result-tab, it lives in its own workspace tab now.
 const saved = localStorage.getItem("activeTab");
-const validTabs = ["answer","context","graph","state","patch","validation","diff","candidates"];
+const validTabs = ["answer","context","state","patch","validation","diff","candidates"];
 const initialTab = validTabs.includes(saved) ? saved : "answer";
 
 showTab(initialTab);
+
+// Restore the last-active workspace tab (default: chat).
+const savedWs = localStorage.getItem("activeWorkspaceTab") || "chat";
+showWorkspaceTab(savedWs);
 
 
 
