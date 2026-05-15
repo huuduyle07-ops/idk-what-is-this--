@@ -13,6 +13,11 @@ function main(): void {
     "profile email should be normalized",
   );
   assertEqual(
+    displayEmail({ profile: { email: "   " }, fallbackEmail: "backup@example.com" }),
+    "backup@example.com",
+    "blank profile email should use fallback",
+  );
+  assertEqual(
     displayEmail({ fallbackEmail: " FALLBACK@Example.COM " }),
     "fallback@example.com",
     "missing profile should use fallback",
@@ -21,11 +26,6 @@ function main(): void {
     displayEmail({ profile: null, fallbackEmail: "NULLPROFILE@Example.COM" }),
     "nullprofile@example.com",
     "null profile should use fallback",
-  );
-  assertEqual(
-    displayEmail({ profile: { email: "   " }, fallbackEmail: "backup@example.com" }),
-    "backup@example.com",
-    "blank profile email should use fallback",
   );
   assertEqual(displayEmail({ profile: {} }), "unknown", "missing emails should be unknown");
 

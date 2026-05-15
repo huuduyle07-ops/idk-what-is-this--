@@ -308,6 +308,8 @@ def run_agent_web(
             "patch": json.dumps(state.json_block, indent=2) if state.json_block else "",
             "validation": state.validation_output or "",
             "project_tag": final_tag,
+            "patch_loop_attempts": state.patch_loop_attempts,
+            "patch_loop_stop_reason": state.patch_loop_stop_reason,
         }
 
     except Exception as e:
@@ -319,4 +321,6 @@ def run_agent_web(
             "patch": "",
             "validation": "",
             "project_tag": final_tag,
+            "patch_loop_attempts": 0,
+            "patch_loop_stop_reason": None,
         }

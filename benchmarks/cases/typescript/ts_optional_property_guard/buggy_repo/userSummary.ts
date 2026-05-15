@@ -6,7 +6,7 @@ export type UserRecord = {
 };
 
 export function displayEmail(user: UserRecord): string {
-  // BUG: assumes nested optional profile data is always present.
+  // BUG: assumes nested optional profile data is always present instead of checking profile and fallback candidates.
   const email = user.profile.email.trim().toLowerCase();
   return email || "unknown";
 }

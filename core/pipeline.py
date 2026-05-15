@@ -947,6 +947,9 @@ def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
         project_tag=state.project_tag,
     )
 
+    state.patch_loop_attempts = len(loop_result.get("attempts", []))
+    state.patch_loop_stop_reason = loop_result.get("stop_reason")
+
     if loop_result["success"]:
         print("✅ Executor finished successfully.")
         return

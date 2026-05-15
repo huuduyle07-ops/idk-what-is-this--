@@ -221,6 +221,7 @@ def detect_rollback(agent_validation: str, validation_output: str) -> bool:
 def run_case(case_file: Path) -> dict[str, Any]:
     from web.runner import run_agent_web
     from core.validator import run_validation_command
+    from agents.model_stats import ModelStatsScope, summarize as summarize_model_stats
     case = load_case(case_file)
     case_dir = case_file.parent
 
@@ -249,14 +250,16 @@ def run_case(case_file: Path) -> dict[str, Any]:
 
         before = snapshot_files(temp_repo)
 
-        result = run_agent_web(
-            query=prompt,
-            repo_path=str(temp_repo),
-            agent_mode=agent_mode,
-            project_tag=f"bench-{name}",
-            patch_style=patch_style,
-            ignore_repo_dna=False,
-        )
+        with ModelStatsScope() as model_calls:
+            result = run_agent_web(
+                query=prompt,
+                repo_path=str(temp_repo),
+                agent_mode=agent_mode,
+                project_tag=f"bench-{name}",
+                patch_style=patch_style,
+                ignore_repo_dna=False,
+            )
+        model_stats = summarize_model_stats(model_calls)
 
         after = snapshot_files(temp_repo)
         changed = changed_files(before, after)
@@ -303,6 +306,14 @@ def run_case(case_file: Path) -> dict[str, Any]:
             ),
             "agent_answer": result.get("answer", ""),
             "agent_validation": result.get("validation", ""),
+            "model_calls": list(model_calls),
+            "selected_model": model_stats["selected_model"],
+            "model_attempts": model_stats["attempts"],
+            "fallback_count": model_stats["fallback_count"],
+            "models_by_role": model_stats["models_by_role"],
+            "patch_loop_attempts": result.get("patch_loop_attempts", 0),
+            "patch_loop_stop_reason": result.get("patch_loop_stop_reason"),
+            "self_corrected": (result.get("patch_loop_attempts") or 0) > 1,
         }
 
 
@@ -389,6 +400,41 @@ def _run_case_with_capture(case_file: Path, capture: bool) -> dict[str, Any]:
             }
     res["runner_log_tail"] = buf.getvalue()[-4000:]
     return res
+
+
+def _aggregate_models(results: list[dict[str, Any]]) -> dict[str, dict[str, int]]:
+    """role -> {model_name: cases_won} across non-skipped cases."""
+    by_role: dict[str, dict[str, int]] = {}
+    for r in results:
+        if r.get("skipped"):
+            continue
+        for role, model in (r.get("models_by_role") or {}).items():
+            if not model:
+                continue
+            by_role.setdefault(role, {})
+            by_role[role][model] = by_role[role].get(model, 0) + 1
+    return by_role
+
+
+def _print_model_usage(results: list[dict[str, Any]]) -> None:
+    """Print which models actually won the work, per role."""
+    by_role = _aggregate_models(results)
+    if not by_role:
+        return
+    print("\nModels used:")
+    role_w = max(len(r) for r in by_role)
+    for role in sorted(by_role):
+        items = sorted(by_role[role].items(), key=lambda x: -x[1])
+        parts = [f"{model} ({count})" for model, count in items]
+        print(f"  {role:<{role_w}}  {', '.join(parts)}")
+    total_fallbacks = sum(r.get("fallback_count", 0) for r in results if not r.get("skipped"))
+    if total_fallbacks:
+        print(f"Fallbacks: {total_fallbacks}")
+    self_corrected = sum(
+        1 for r in results if not r.get("skipped") and r.get("self_corrected")
+    )
+    if self_corrected:
+        print(f"Self-corrected: {self_corrected} (needed a 2nd patch attempt)")
 
 
 def _print_summary_table(results: list[dict[str, Any]]) -> None:
@@ -957,6 +1003,13 @@ def main() -> int:
             "category": group_results(results, "category"),
             "difficulty": group_results(results, "difficulty"),
         },
+        "models_used": _aggregate_models(results),
+        "total_fallbacks": sum(
+            r.get("fallback_count", 0) for r in results if not r.get("skipped")
+        ),
+        "self_corrected_count": sum(
+            1 for r in results if not r.get("skipped") and r.get("self_corrected")
+        ),
         "results": results,
     }
 
@@ -980,6 +1033,7 @@ def main() -> int:
 
     if summary or quiet:
         _print_summary_table(results)
+        _print_model_usage(results)
         print(f"\nTotal: {passed}/{runnable} passed{skip_note}")
         print(f"Success rate: {rate:.1f}%")
         print(f"Report: {out_path}")

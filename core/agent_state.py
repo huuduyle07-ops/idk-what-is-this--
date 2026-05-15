@@ -44,6 +44,8 @@ class AgentState:
     patch_style: str = "safe_minimal"
     ignore_repo_dna: bool = False
     patch_policy: dict[str, Any] = field(default_factory=dict)
+    patch_loop_attempts: int = 0
+    patch_loop_stop_reason: Optional[str] = None
 
 
 def time_budget_exceeded(state: AgentState) -> bool:

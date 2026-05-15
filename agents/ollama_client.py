@@ -1,9 +1,20 @@
 import json
 import os
 import re
+import sys
+from pathlib import Path
 from typing import Optional, Dict, Any
 
 import requests
+
+# Add project root to sys.path to allow importing agents.model_stats when
+# ollama_client is imported as a top-level module (it lives under agents/
+# already, but tools sometimes invoke files directly).
+_root = str(Path(__file__).parent.parent)
+if _root not in sys.path:
+    sys.path.append(_root)
+
+from agents.model_stats import record_model_call
 
 
 class OllamaClient:
@@ -46,8 +57,10 @@ class OllamaClient:
             response = requests.post(url, json=payload, timeout=self.timeout)
             response.raise_for_status()
             result = response.json()
+            record_model_call(self.model, success=True, role="local_critic")
             return result.get("response", "")
         except Exception as e:
+            record_model_call(self.model, success=False, role="local_critic", error=str(e))
             return f"AGENT_ERROR: Ollama request failed: {e}"
 
     def generate_with_thought(self, prompt: str, system_prompt: Optional[str] = None) -> Dict[str, str]:

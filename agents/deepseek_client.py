@@ -12,6 +12,7 @@ if root_dir not in sys.path:
 
 from config import DEEPSEEK_MODELS
 from agents.gemini_client import run_gemini_request_2
+from agents.model_stats import record_model_call
 
 
 def run_deepseek_review(content: str) -> str:
@@ -33,9 +34,11 @@ def run_deepseek_review(content: str) -> str:
         for model_name in DEEPSEEK_MODELS:
             try:
                 response = ollama.chat(model=model_name, messages=messages)
+                record_model_call(model_name, success=True, role="deepseek_review")
                 return response["message"]["content"]
             except Exception as e:
                 last_error = e
+                record_model_call(model_name, success=False, role="deepseek_review", error=str(e))
                 sys.stderr.write(f"\n⚠️ DeepSeek model '{model_name}' failed: {e}\n")
                 continue
 
