@@ -456,9 +456,34 @@ def normalize_patch_candidate_with_control_source(state: AgentState) -> None:
     if not target or not patched:
         return
 
-    # Already full-function enough.
-    if target.strip().startswith(("func ", "pub fn ", "fn ", "def ")):
+    # Already full-function enough. Skip the rewrite when the AI's snippet
+    # already looks like a complete named function — broadening to the
+    # control's source_snippet only helps when the AI returned a partial
+    # body, and otherwise risks introducing whitespace/newline drift
+    # between `source` and the actual file bytes (which makes the
+    # downstream literal apply silently miss).
+    target_stripped = target.strip()
+    function_keyword_prefixes = (
+        "func ",
+        "pub fn ", "pub(crate) fn ", "pub async fn ", "async fn ", "fn ",
+        "def ", "async def ",
+        "function ", "async function ",
+        "export function ", "export async function ",
+        "export default function ", "export default async function ",
+    )
+    if target_stripped.startswith(function_keyword_prefixes):
         return
+
+    # C/C++/Java/C#-style: declaration is `<type/qualifiers> name(args) {`
+    # with no anchor keyword. Treat as already-complete if the declared
+    # `target_node_name` appears followed by `(` on the first non-blank
+    # line and the snippet has an opening brace.
+    target_node_name = patch.get("target_node_name") or ""
+    if target_node_name:
+        import re as _re
+        first_line = next((ln.strip() for ln in target.splitlines() if ln.strip()), "")
+        if _re.search(rf"\b{_re.escape(target_node_name)}\s*\(", first_line) and "{" in target:
+            return
 
     if target not in source:
         return

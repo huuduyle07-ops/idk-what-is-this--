@@ -10,6 +10,7 @@ if root_dir not in sys.path:
 
 from config import GOOGLE_API_KEY, MODELS
 import google.genai as genai
+from google.genai import types as genai_types
 from core.security import is_safe_path
 
 load_dotenv()
@@ -82,7 +83,8 @@ def run_gemini_request(prompt: str, file_paths: list[str] | None = None) -> str:
         try:
             response = client.models.generate_content(
                 model=model_name,
-                contents=contents
+                contents=contents,
+                config=genai_types.GenerateContentConfig(temperature=0.0),
             )
 
             output = response.text if getattr(response, "text", None) else "Gemini returned no text."
@@ -159,6 +161,7 @@ def run_gemini_request_2(
             response = client.models.generate_content(
                 model=model_name,
                 contents=contents,
+                config=genai_types.GenerateContentConfig(temperature=0.0),
             )
             return response.text if getattr(response, "text", None) else "Gemini returned no text."
         except Exception as e:

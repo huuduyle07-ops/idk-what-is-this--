@@ -19,10 +19,17 @@ FAST_ENV: dict[str, str] = {
     "BENCHMARK_SKIP_PHANTOM": "true",
     "BENCHMARK_SKIP_PROJECT_MAP": "true",
     "BENCHMARK_FAST_MODE": "true",
+}
+
+TURBO_ENV = {
+    **FAST_ENV,
     "MAX_MODEL_FALLBACKS": "1",
 }
 
-
 def apply_fast_env() -> None:
     for k, v in FAST_ENV.items():
+        os.environ[k] = v
+
+def apply_turbo_env() -> None:
+    for k, v in TURBO_ENV.items():
         os.environ[k] = v

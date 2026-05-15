@@ -150,12 +150,34 @@ def _score_fuzzy_candidate(
     Returns (score, consumed_line_count).
     """
     curr_orig = start_idx
-    
+    is_first_target = True
+
     for target_line in target_lines_stripped:
         while curr_orig < len(original_lines):
             line = original_lines[curr_orig].strip()
-            if line == target_line:
+            matched = (line == target_line)
+            # Rescue path for the FIRST target line: accept it when it appears
+            # as a token-boundary suffix of the original line. This handles
+            # the case where the LLM dropped a leading modifier from
+            # target_snippet (e.g. emitted `function foo(...)` against a file
+            # that has `async function foo(...)`). patched_snippet carries the
+            # correct header — the AI wrote what the function *should* look
+            # like — so replacing the matched range with patched_snippet
+            # stays semantically correct. We require a whitespace separator
+            # between the dropped prefix and the target content to avoid
+            # mid-token matches like `Foo` matching inside `MyFoo`.
+            if (
+                not matched
+                and is_first_target
+                and target_line
+                and line.endswith(target_line)
+            ):
+                remainder = line[: -len(target_line)]
+                if remainder.endswith((" ", "\t")) and remainder.strip():
+                    matched = True
+            if matched:
                 curr_orig += 1
+                is_first_target = False
                 break
             elif not line:
                 curr_orig += 1
@@ -164,12 +186,12 @@ def _score_fuzzy_candidate(
                 return -10**9, 0
         else:
             return -10**9, 0
-            
+
     total_consumed = curr_orig - start_idx
     score = 100
     # Penalty for skipping too many lines
     score -= (total_consumed - len(target_lines_stripped)) * 2
-    
+
     return score, total_consumed
 
 def apply_patch_from_json(project_root: str, patch: dict) -> Dict[str, Any]:
@@ -242,22 +264,36 @@ def apply_patch_from_json(project_root: str, patch: dict) -> Dict[str, Any]:
     # If the LLM provided an exact target_snippet, trust that first.
     # This is safer than AST slicing for simple edits because tree-sitter
     # offsets can become fragile across encodings/newlines/parser quirks.
-    if target_snippet in original_text:
-        backup_path = backup_file(target_file)
-        new_text = original_text.replace(target_snippet, patched_snippet, 1)
+    #
+    # Guard against mid-line substring matches: `target_snippet` of
+    # "function checkout(...)" finds a substring inside
+    # "async function checkout(...)" and a blind .replace() would yield
+    # "async async function checkout(...)" (a real failure mode for the
+    # js_async_missing_await benchmark when the LLM drops a leading
+    # modifier). Require the match to be line-aligned — i.e. the chars
+    # between the line start and the match must be whitespace only.
+    # Indented method definitions still qualify because the prefix is
+    # entirely whitespace.
+    idx = original_text.find(target_snippet)
+    if idx != -1:
+        line_start = original_text.rfind("\n", 0, idx) + 1
+        prefix = original_text[line_start:idx]
+        if not prefix.strip():
+            backup_path = backup_file(target_file)
+            new_text = original_text.replace(target_snippet, patched_snippet, 1)
 
-        with target_file.open("w", encoding="utf-8", newline=newline) as f:
-            f.write(new_text)
+            with target_file.open("w", encoding="utf-8", newline=newline) as f:
+                f.write(new_text)
 
-        result.update({
-            "success": True,
-            "target_file": target_file,
-            "old_snippet": target_snippet,
-            "new_snippet": patched_snippet,
-            "backup_path": backup_path,
-            "matched_by": "literal",
-        })
-        return result
+            result.update({
+                "success": True,
+                "target_file": target_file,
+                "old_snippet": target_snippet,
+                "new_snippet": patched_snippet,
+                "backup_path": backup_path,
+                "matched_by": "literal",
+            })
+            return result
 
     # =========================
     # 1. AST PATCH

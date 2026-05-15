@@ -164,7 +164,7 @@ class Executor:
             # but a literal match against a complete named function body with a
             # runnable validation command is exactly the safe case — the snippet
             # is unambiguous and the result will be checked. Don't reject those.
-            if self._is_verbatim_named_function_patch(patch) and validation_command and risk.level == "medium":
+            if self._is_verbatim_named_function_patch(patch) and validation_command:
                 print(
                     "⚠️ Literal match allowed: target is a verbatim named full-function "
                     "snippet and validation command is available."
@@ -407,11 +407,17 @@ class Executor:
                 return True
 
         # C/C++/Java/C#-style: "<type/qualifiers> name(args)" — no leading
-        # keyword to anchor on. Accept iff the name is followed by ( on the
-        # first line and the snippet contains an opening brace.
+        # keyword to anchor on. Accept iff the name is followed by ( on any
+        # non-blank line and the snippet contains an opening brace. Scanning
+        # every line (not just the first) mirrors the keyword-anchored path
+        # above so patches that include file-level context — for instance an
+        # `#include <...>` line prepended by normalize_patch_candidate_with_
+        # control_source — still qualify.
         name_pat = re.compile(rf"\b{re.escape(target_node_name)}\s*\(")
-        if name_pat.search(first_line) and "{" in target_snippet:
-            return True
+        if "{" in target_snippet:
+            for line in target_snippet.splitlines():
+                if name_pat.search(line):
+                    return True
 
         return False
 

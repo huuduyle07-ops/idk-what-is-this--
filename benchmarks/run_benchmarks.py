@@ -26,15 +26,15 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from benchmarks.fast_env import FAST_ENV, apply_fast_env
+from benchmarks.fast_env import apply_fast_env, apply_turbo_env
 
 # Pre-pass: apply --fast env vars before importing modules that may read env
 # at import time (web.runner, core.validator, etc.). Re-applied in main() too,
 # so the effect is idempotent.
 if "--fast" in sys.argv:
     apply_fast_env()
-
-
+if "--turbo" in sys.argv:
+    apply_turbo_env()
 
 
 IGNORE_DIRS = {
@@ -123,6 +123,101 @@ def changed_files(before: dict[str, str], after: dict[str, str]) -> list[str]:
         if before.get(k) != after.get(k)
     )
 
+
+def classify_toolchain_issue(output: str) -> str | None:
+    text = output.lower()
+
+    if "python was not found" in text:
+        return "python command not available"
+    if "node: bad option: --experimental-strip-types" in text:
+        return "node version does not support --experimental-strip-types"
+    if "node: command not found" in text or "'node' is not recognized" in text:
+        return "node not available"
+    if "npm: command not found" in text or "'npm' is not recognized" in text:
+        return "npm not available"
+    if "g++: command not found" in text or "'g++' is not recognized" in text:
+        return "g++ not available"
+    if "cargo: command not found" in text or "'cargo' is not recognized" in text:
+        return "cargo not available"
+    if "go: command not found" in text or "'go' is not recognized" in text:
+        return "go not available"
+
+    return None
+
+
+# Language → CLI tools the case's validation step needs available on PATH.
+# Kept narrow on purpose: only tools that, if missing, deterministically
+# break the case. Optional helpers (npm/npx/gcc) aren't listed because
+# their absence depends on what the case's validation_command actually
+# invokes.
+LANGUAGE_TOOLCHAINS: dict[str, list[str]] = {
+    "python": ["python"],
+    "go": ["go"],
+    "rust": ["cargo"],
+    "cpp": ["g++"],
+    "c": ["gcc"],
+    "javascript": ["node"],
+    "typescript": ["node"],
+    "html": [],
+}
+
+# Tools recognised when they appear as the first token of validation_command.
+# Stays a small allowlist so we don't mistakenly treat a project-local
+# script (e.g. `./run.sh`, `bench-tool`) as a toolchain requirement.
+_VALIDATION_TOOL_ALLOWLIST = {
+    "python", "python3", "node", "npm", "npx",
+    "go", "cargo", "rustc", "g++", "gcc", "make",
+}
+
+
+def required_tools(case: dict) -> list[str]:
+    """CLI tools that must resolve on PATH for the case to validate.
+
+    Combines a language→tool map with the binary named as the first
+    token of `validation_command` (when it's a known interpreter).
+    Returns a deduplicated list preserving insertion order.
+    """
+    language = (case.get("language") or "").lower()
+    tools: list[str] = list(LANGUAGE_TOOLCHAINS.get(language, []))
+
+    vc = (case.get("validation_command") or "").strip()
+    if vc:
+        first = vc.split()[0]
+        first_name = Path(first).name
+        if first_name in _VALIDATION_TOOL_ALLOWLIST and first_name not in tools:
+            tools.append(first_name)
+
+    return tools
+
+
+def detect_missing_tools(case: dict) -> list[str]:
+    """Subset of required_tools(case) that shutil.which() can't resolve."""
+    return [t for t in required_tools(case) if shutil.which(t) is None]
+
+
+def classify_patch_kind(agent_answer: str) -> str:
+    try:
+        data = json.loads(agent_answer or "")
+    except (json.JSONDecodeError, TypeError):
+        return "unknown"
+    if not isinstance(data, dict):
+        return "unknown"
+    if data.get("patch_plan") is not None:
+        return "patch_plan"
+    if data.get("patch_candidate") is not None:
+        return "patch_candidate"
+    return "unknown"
+
+
+def detect_rollback(agent_validation: str, validation_output: str) -> bool:
+    text = ((agent_validation or "") + "\n" + (validation_output or "")).lower()
+    return (
+        '"rollback_performed": true' in text
+        or "rollback_performed=true" in text
+        or "rollback performed" in text
+    )
+
+
 def run_case(case_file: Path) -> dict[str, Any]:
     from web.runner import run_agent_web
     from core.validator import run_validation_command
@@ -200,6 +295,12 @@ def run_case(case_file: Path) -> dict[str, Any]:
             "missing_expected_files": missing_expected,
             "touched_forbidden_files": touched_forbidden,
             "validation_output": validation_output[-4000:],
+            "toolchain_issue": classify_toolchain_issue(validation_output),
+            "patch_kind": classify_patch_kind(result.get("answer", "")),
+            "rollback_happened": detect_rollback(
+                result.get("validation", ""),
+                validation_output,
+            ),
             "agent_answer": result.get("answer", ""),
             "agent_validation": result.get("validation", ""),
         }
@@ -293,7 +394,12 @@ def _run_case_with_capture(case_file: Path, capture: bool) -> dict[str, Any]:
 def _print_summary_table(results: list[dict[str, Any]]) -> None:
     print("\n📊 Benchmark Summary")
     for r in results:
-        status = "PASS" if r.get("success") else "FAIL"
+        if r.get("skipped"):
+            status = "SKIP"
+        elif r.get("success"):
+            status = "PASS"
+        else:
+            status = "FAIL"
         name = str(r.get("name") or "")[:32].ljust(32)
         lang = str(r.get("language") or "")[:12].ljust(12)
         cat = str(r.get("category") or "")[:18].ljust(18)
@@ -395,6 +501,170 @@ def summarize_report(report: dict[str, Any], top_slowest: int = 3) -> None:
             print(f"{name} {dur:.2f}s")
 
 
+def _md_cell(s: Any) -> str:
+    return str(s).replace("|", "\\|")
+
+
+def write_markdown_report(report: dict[str, Any], path: Path) -> None:
+    results = report.get("results", []) or []
+    total = report.get("total", len(results))
+    passed = report.get("passed", sum(1 for r in results if r.get("success")))
+    skipped = report.get("skipped", sum(1 for r in results if r.get("skipped")))
+    failed = report.get("failed", max(0, total - passed - skipped))
+    rate = (passed / total * 100) if total else 0.0
+    duration = report.get("duration_sec")
+    filters = report.get("filters") or {}
+    groups = report.get("groups") or {}
+
+    lines: list[str] = []
+    lines.append("# Benchmark Report")
+    lines.append("")
+
+    lines.append("## Totals")
+    lines.append(f"- Total: {total}")
+    lines.append(f"- Passed: {passed}")
+    lines.append(f"- Failed: {failed}")
+    lines.append(f"- Skipped: {skipped}")
+    lines.append(f"- Success rate: {rate:.1f}%")
+    if isinstance(duration, (int, float)):
+        lines.append(f"- Duration: {duration:.2f}s")
+    lines.append("")
+
+    if filters:
+        lines.append("## Filters")
+        for k, v in filters.items():
+            lines.append(f"- {k}: {v}")
+        lines.append("")
+
+    for label in ("language", "category", "difficulty"):
+        grouped = groups.get(label)
+        if not grouped:
+            grouped = group_results(results, label)
+        if not grouped:
+            continue
+        title = label.capitalize()
+        lines.append(f"## By {label}")
+        lines.append("")
+        lines.append(f"| {title} | Passed/Total |")
+        lines.append("|---|---|")
+        for key in sorted(grouped):
+            bucket = grouped[key]
+            lines.append(
+                f"| `{_md_cell(key)}` | "
+                f"{bucket.get('passed', 0)}/{bucket.get('total', 0)} |"
+            )
+        lines.append("")
+
+    durations = [
+        (r.get("name") or "(unknown)", r.get("duration_sec"))
+        for r in results
+        if isinstance(r.get("duration_sec"), (int, float))
+    ]
+    durations.sort(key=lambda x: x[1], reverse=True)
+    if durations:
+        lines.append("## Slowest Cases")
+        lines.append("")
+        lines.append("| Name | Duration |")
+        lines.append("|---|---|")
+        for name, dur in durations[:5]:
+            lines.append(f"| `{_md_cell(name)}` | {dur:.2f}s |")
+        lines.append("")
+
+    failed_results = [
+        r for r in results
+        if not r.get("success") and not r.get("skipped")
+    ]
+    if failed_results:
+        lines.append("## Failed Cases")
+        lines.append("")
+        for r in failed_results:
+            name = r.get("name") or "(unknown)"
+            lines.append(f"### `{name}`")
+            if r.get("missing_expected_files"):
+                files = ", ".join(f"`{f}`" for f in r["missing_expected_files"])
+                lines.append(f"- missing_expected_files: {files}")
+            if r.get("touched_forbidden_files"):
+                files = ", ".join(f"`{f}`" for f in r["touched_forbidden_files"])
+                lines.append(f"- touched_forbidden_files: {files}")
+            if r.get("toolchain_issue"):
+                lines.append(f"- toolchain_issue: {r['toolchain_issue']}")
+            if r.get("patch_kind"):
+                lines.append(f"- patch_kind: {r['patch_kind']}")
+            if r.get("rollback_happened"):
+                lines.append("- rollback_happened: true")
+            if r.get("error"):
+                lines.append(f"- error: `{_md_cell(r['error'])}`")
+            lines.append("")
+
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def compare_reports(
+    old: dict[str, Any],
+    new: dict[str, Any],
+    top_slowest: int = 3,
+) -> None:
+    print("📊 Benchmark Comparison")
+
+    old_passed = old.get("passed", 0)
+    old_total = old.get("total", 0)
+    new_passed = new.get("passed", 0)
+    new_total = new.get("total", 0)
+    print(f"Old: {old_passed}/{old_total}")
+    print(f"New: {new_passed}/{new_total}")
+
+    old_results = old.get("results", []) or []
+    new_results = new.get("results", []) or []
+    old_by_name = {r.get("name"): r for r in old_results if r.get("name")}
+    new_by_name = {r.get("name"): r for r in new_results if r.get("name")}
+
+    new_cases = sorted(set(new_by_name) - set(old_by_name))
+    removed_cases = sorted(set(old_by_name) - set(new_by_name))
+
+    if new_cases:
+        print(f"\nNew cases ({len(new_cases)}):")
+        for n in new_cases:
+            print(f"  + {n}")
+    if removed_cases:
+        print(f"\nRemoved cases ({len(removed_cases)}):")
+        for n in removed_cases:
+            print(f"  - {n}")
+
+    changes: list[tuple[str, bool, bool]] = []
+    for name in sorted(set(old_by_name) & set(new_by_name)):
+        op = bool(old_by_name[name].get("success"))
+        np = bool(new_by_name[name].get("success"))
+        if op != np:
+            changes.append((name, op, np))
+    if changes:
+        print(f"\nStatus changes ({len(changes)}):")
+        for name, op, np in changes:
+            arrow = "PASS → FAIL" if op else "FAIL → PASS"
+            print(f"  {name}: {arrow}")
+
+    def _avg_dur(results: list[dict]) -> float:
+        durs = [
+            r.get("duration_sec") for r in results
+            if isinstance(r.get("duration_sec"), (int, float))
+        ]
+        return sum(durs) / len(durs) if durs else 0.0
+
+    old_avg = _avg_dur(old_results)
+    new_avg = _avg_dur(new_results)
+    print(f"\nAvg duration: {old_avg:.2f}s → {new_avg:.2f}s")
+
+    durations = [
+        (r.get("name") or "(unknown)", r.get("duration_sec"))
+        for r in new_results
+        if isinstance(r.get("duration_sec"), (int, float))
+    ]
+    durations.sort(key=lambda x: x[1], reverse=True)
+    if durations:
+        print("\nSlowest in new:")
+        for name, dur in durations[:top_slowest]:
+            print(f"  {name} {dur:.2f}s")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--case", help="Run one case by folder name")
@@ -419,6 +689,11 @@ def main() -> int:
         action="store_true",
         help="Disable expensive optional subsystems (DB, embeddings, etc.) via env.",
     )
+    parser.add_argument(
+        "--turbo",
+        action="store_true",
+        help="Like --fast, but limits model fallbacks to 1. Faster but may be flaky.",
+    )
     parser.add_argument("--language", help="Filter by language (exact match)")
     parser.add_argument("--category", help="Filter by category (exact match)")
     parser.add_argument("--difficulty", help="Filter by difficulty (exact match)")
@@ -429,13 +704,84 @@ def main() -> int:
         help="Stop after first failed case",
     )
     parser.add_argument(
+        "--skip-toolchain-failures",
+        action="store_true",
+        help=(
+            "Skip cases whose required CLI tools (python/node/go/cargo/g++/...) "
+            "aren't on PATH instead of running and counting them as failures."
+        ),
+    )
+    parser.add_argument(
         "--report",
         help="Read an existing benchmark_report JSON and print summary; no agent runs.",
+    )
+    parser.add_argument(
+        "--markdown",
+        action="store_true",
+        help="Write a Markdown report next to the JSON report.",
+    )
+    parser.add_argument(
+        "--latest",
+        action="store_true",
+        help="Summarize the newest benchmark_report_*.json in .agent/benchmarks.",
+    )
+    parser.add_argument(
+        "--compare",
+        nargs=2,
+        metavar=("OLD", "NEW"),
+        help="Compare two benchmark report JSON files; no agent runs.",
     )
     args = parser.parse_args()
 
     if args.fast:
         apply_fast_env()
+    if args.turbo:
+        apply_turbo_env()
+
+    # --compare: load two reports and diff them; no discovery, no agent.
+    if args.compare:
+        old_path = Path(args.compare[0])
+        new_path = Path(args.compare[1])
+        if not old_path.exists():
+            print(f"Old report not found: {old_path}")
+            return 1
+        if not new_path.exists():
+            print(f"New report not found: {new_path}")
+            return 1
+        try:
+            old = json.loads(old_path.read_text(encoding="utf-8"))
+            new = json.loads(new_path.read_text(encoding="utf-8"))
+        except Exception as e:
+            print(f"Failed to read report: {e!r}")
+            return 1
+        compare_reports(old, new)
+        return 0
+
+    # --latest: find newest benchmark_report_*.json and summarize it.
+    if args.latest:
+        out_dir = PROJECT_ROOT / ".agent" / "benchmarks"
+        if not out_dir.exists():
+            print(f"No benchmark reports found (missing {out_dir}).")
+            return 1
+        candidates = list(out_dir.glob("benchmark_report_*.json"))
+        if not candidates:
+            print(f"No benchmark_report_*.json in {out_dir}.")
+            return 1
+        report_path = max(candidates, key=lambda p: p.stat().st_mtime)
+        try:
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+        except Exception as e:
+            print(f"Failed to read report: {e!r}")
+            return 1
+        print(f"Latest report: {report_path}")
+        summarize_report(report)
+        if args.markdown:
+            md_path = report_path.with_suffix(".md")
+            write_markdown_report(report, md_path)
+            print(f"\nMarkdown report: {md_path}")
+        passed = report.get("passed", 0)
+        total = report.get("total", 0)
+        return 0 if total and passed == total else 2
 
     # --report: read-and-summarize mode, no discovery, no agent.
     if args.report:
@@ -449,6 +795,10 @@ def main() -> int:
             print(f"Failed to read report: {e!r}")
             return 1
         summarize_report(report)
+        if args.markdown:
+            md_path = report_path.with_suffix(".md")
+            write_markdown_report(report, md_path)
+            print(f"\nMarkdown report: {md_path}")
         passed = report.get("passed", 0)
         total = report.get("total", 0)
         return 0 if total and passed == total else 2
@@ -509,9 +859,41 @@ def main() -> int:
                 raise ValueError(f"Duplicate benchmark case name: {case_name}")
             seen_names.add(case_name)
 
-            if not quiet:
-                print(f"\n🧪 Running benchmark: {case_name}")
-            res = _run_case_with_capture(case_file, capture=capture)
+            missing = (
+                detect_missing_tools(case)
+                if args.skip_toolchain_failures
+                else []
+            )
+            if missing:
+                if not quiet:
+                    print(
+                        f"\n⏭️ Skipping benchmark: {case_name} "
+                        f"(missing tools: {', '.join(missing)})"
+                    )
+                res = {
+                    "name": case_name,
+                    "success": False,
+                    "skipped": True,
+                    "skip_reason": "toolchain",
+                    "toolchain_issue": f"missing tools: {', '.join(missing)}",
+                    "case_file": str(case_file),
+                    "language": case.get("language"),
+                    "difficulty": case.get("difficulty"),
+                    "category": case.get("category", "uncategorized"),
+                    "duration_sec": 0.0,
+                    "changed_files": [],
+                    "missing_expected_files": [],
+                    "touched_forbidden_files": [],
+                    "validation_output": "",
+                    "patch_kind": "skipped",
+                    "rollback_happened": False,
+                    "agent_answer": "",
+                    "agent_validation": "",
+                }
+            else:
+                if not quiet:
+                    print(f"\n🧪 Running benchmark: {case_name}")
+                res = _run_case_with_capture(case_file, capture=capture)
         except Exception as e:
             res = {
                 "name": case_file.parent.name,
@@ -522,7 +904,12 @@ def main() -> int:
         results.append(res)
 
         if not quiet:
-            status = "✅ PASS" if res.get("success") else "❌ FAIL"
+            if res.get("skipped"):
+                status = "⏭️ SKIP"
+            elif res.get("success"):
+                status = "✅ PASS"
+            else:
+                status = "❌ FAIL"
             name = res.get("name")
             dur = res.get("duration_sec")
             if summary and isinstance(dur, (int, float)):
@@ -540,7 +927,7 @@ def main() -> int:
                 if res.get("error"):
                     print("Error:", res["error"])
 
-        if args.fail_fast and not res.get("success"):
+        if args.fail_fast and not res.get("success") and not res.get("skipped"):
             break
 
     run_duration = round(time.time() - run_started, 2)
@@ -554,7 +941,7 @@ def main() -> int:
         "failed": failed,
         "skipped": skipped,
         "total": total,
-        "success_rate": passed / total if total else 0,
+        "success_rate": (passed / (total - skipped)) if (total - skipped) else 0,
         "duration_sec": run_duration,
         "filters": {
             "case": args.case,
@@ -563,6 +950,7 @@ def main() -> int:
             "difficulty": args.difficulty,
             "limit": args.limit,
             "fast": bool(args.fast),
+            "turbo": bool(args.turbo),
         },
         "groups": {
             "language": group_results(results, "language"),
@@ -574,26 +962,39 @@ def main() -> int:
 
     out_dir = PROJECT_ROOT / ".agent" / "benchmarks"
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / f"benchmark_report_{int(time.time())}.json"
+    ts = int(time.time())
+    out_path = out_dir / f"benchmark_report_{ts}.json"
     out_path.write_text(
         json.dumps(report, indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
 
+    md_path: Path | None = None
+    if args.markdown:
+        md_path = out_dir / f"benchmark_report_{ts}.md"
+        write_markdown_report(report, md_path)
+
+    runnable = total - skipped
+    rate = (passed / runnable * 100) if runnable else 0.0
+    skip_note = f" ({skipped} skipped)" if skipped else ""
+
     if summary or quiet:
         _print_summary_table(results)
-        rate = (passed / total * 100) if total else 0.0
-        print(f"\nTotal: {passed}/{total} passed")
+        print(f"\nTotal: {passed}/{runnable} passed{skip_note}")
         print(f"Success rate: {rate:.1f}%")
         print(f"Report: {out_path}")
+        if md_path is not None:
+            print(f"Markdown: {md_path}")
     else:
-        print(f"\n📊 Benchmark: {passed}/{total} passed")
+        print(f"\n📊 Benchmark: {passed}/{runnable} passed{skip_note}")
         print(f"Report written to: {out_path}")
+        if md_path is not None:
+            print(f"Markdown written to: {md_path}")
 
     if args.json:
         print(json.dumps(report, indent=2, ensure_ascii=False))
 
-    return 0 if passed == total else 2
+    return 0 if failed == 0 else 2
 
 
 if __name__ == "__main__":
