@@ -10,8 +10,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from benchmarks.report_compare import report_success_rate, regression_alert
+
 BENCH_DIR = PROJECT_ROOT / ".agent" / "benchmarks"
 REPORT_DIR = PROJECT_ROOT / ".agent" / "reports"
 
@@ -75,57 +78,12 @@ def benchmark_reports() -> list[Path]:
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
-
-def success_rate(report: dict[str, Any]) -> float:
-    value = report.get("success_rate")
-    if isinstance(value, (int, float)):
-        # Existing reports store this as 0.0–1.0.
-        return float(value)
-
-    total = int(report.get("total") or 0)
-    skipped = int(report.get("skipped") or 0)
-    passed = int(report.get("passed") or 0)
-    runnable = total - skipped
-    return passed / runnable if runnable else 0.0
-
-
 def find_previous_report(new_report_path: Path) -> Path | None:
     reports = [p for p in benchmark_reports() if p != new_report_path]
     if not reports:
         return None
     older = [p for p in reports if p.stat().st_mtime <= new_report_path.stat().st_mtime]
     return older[-1] if older else reports[-1]
-
-
-def regression_alert(
-    old_report: dict[str, Any] | None,
-    new_report: dict[str, Any],
-    threshold_pp: float = 5.0,
-) -> dict[str, Any] | None:
-    if not old_report:
-        return None
-
-    old_rate = success_rate(old_report)
-    new_rate = success_rate(new_report)
-    drop_pp = (old_rate - new_rate) * 100
-
-    if drop_pp <= threshold_pp:
-        return None
-
-    old_stamp = old_report.get("brain_stamp") or {}
-    new_stamp = new_report.get("brain_stamp") or {}
-
-    return {
-        "kind": "regression",
-        "drop_pp": round(drop_pp, 2),
-        "old_success_rate": round(old_rate * 100, 1),
-        "new_success_rate": round(new_rate * 100, 1),
-        "old_git_sha": old_stamp.get("git_sha"),
-        "new_git_sha": new_stamp.get("git_sha"),
-        "old_dirty": old_stamp.get("git_dirty"),
-        "new_dirty": new_stamp.get("git_dirty"),
-    }
-
 
 def summarize_report(report: dict[str, Any]) -> list[str]:
     total = report.get("total", 0)
@@ -134,7 +92,7 @@ def summarize_report(report: dict[str, Any]) -> list[str]:
     skipped = report.get("skipped", 0)
     flaky = report.get("flaky", 0)
     duration = report.get("duration_sec")
-    rate = success_rate(report) * 100
+    rate = report_success_rate(report) * 100
 
     lines = [
         "## Benchmark Summary",
