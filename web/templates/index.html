@@ -1366,6 +1366,62 @@ function _renderGroupTable(label, grouped) {
     `;
 }
 
+function _benchInt(value, fallback = 0) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+}
+
+function _benchFlakyCount(report) {
+    if (report && report.flaky != null) return _benchInt(report.flaky, 0);
+    return (report?.results || []).filter(r => r && r.flaky === true).length;
+}
+
+function _benchFlakyCases(report) {
+    const results = report?.results || [];
+    const marked = results.filter(r => r && r.flaky === true);
+    if (marked.length > 0) return marked;
+    if (_benchFlakyCount(report) <= 0) return [];
+    return results.filter(r => r && r.success === true && _benchTotalAttempts(r) > 1);
+}
+
+function _benchPassedAttempt(result) {
+    const retries = Array.isArray(result.retry_results) ? result.retry_results : [];
+    const passed = retries.find(attempt => attempt && attempt.success === true);
+    if (passed && passed.attempt != null) return _benchInt(passed.attempt, "n/a");
+    if (result.flaky === true && result.success === true) return _benchInt(result.attempts, "n/a");
+    return "n/a";
+}
+
+function _benchTotalAttempts(result) {
+    const retries = Array.isArray(result.retry_results) ? result.retry_results : [];
+    return _benchInt(result.attempts, retries.length || 1);
+}
+
+function _renderFlakyCasesTable(report) {
+    const flakyCases = _benchFlakyCases(report);
+    if (flakyCases.length === 0) return "";
+
+    return `
+        <div class="bench-section-heading">Flaky cases (${flakyCases.length})</div>
+        <table class="bench-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th class="right">Passed on attempt</th>
+                    <th class="right">Total attempts</th>
+                </tr>
+            </thead>
+            <tbody>${flakyCases.map(f => `
+                <tr>
+                    <td><code>${_escapeHtml(f.name || "?")}</code></td>
+                    <td class="right">${_escapeHtml(String(_benchPassedAttempt(f)))}</td>
+                    <td class="right">${_escapeHtml(String(_benchTotalAttempts(f)))}</td>
+                </tr>
+            `).join("")}</tbody>
+        </table>
+    `;
+}
+
 function _renderBenchmarkDetail(report, filename) {
     const detail = document.getElementById("benchDetail");
     if (!detail) return;
@@ -1380,12 +1436,14 @@ function _renderBenchmarkDetail(report, filename) {
     const skipped = report.skipped ?? 0;
     const duration = report.duration_sec ?? 0;
     const rate = report.success_rate ?? 0;
+    const flaky = _benchFlakyCount(report);
 
     const totalsHtml = `
         <div class="bench-totals">
             <span class="health-summary-pill health-badge--ok">passed: ${passed}</span>
             ${failed > 0 ? `<span class="health-summary-pill health-badge--error">failed: ${failed}</span>` : ""}
             ${skipped > 0 ? `<span class="health-summary-pill health-badge--off">skipped: ${skipped}</span>` : ""}
+            <span class="health-summary-pill health-badge--missing">flaky: ${flaky}</span>
             <span class="health-summary-pill health-badge--available">total: ${total}</span>
             <span class="health-summary-pill health-badge--available">${(rate * 100).toFixed(1)}% · ${duration.toFixed(1)}s</span>
         </div>
@@ -1410,6 +1468,8 @@ function _renderBenchmarkDetail(report, filename) {
             `).join("")}</tbody>
         </table>
     `;
+
+    const flakyHtml = flaky > 0 ? _renderFlakyCasesTable(report) : "";
 
     const failures = (report.results || []).filter(r => !r.success);
     const failuresHtml = failures.length === 0 ? "" : `
@@ -1441,6 +1501,7 @@ function _renderBenchmarkDetail(report, filename) {
         </div>
         ${totalsHtml}
         ${groupsHtml}
+        ${flakyHtml}
         ${slowestHtml}
         ${failuresHtml}
         ${actionsHtml}

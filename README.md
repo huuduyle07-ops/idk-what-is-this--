@@ -430,6 +430,43 @@ python benchmarks\run_benchmarks.py --compare .agent\benchmarks\old.json .agent\
 python benchmarks\run_benchmarks.py --fast --summary --skip-toolchain-failures
 ```
 
+View benchmark cases in the web UI:
+
+1. Start the web app:
+
+   ```bash
+   python main.py --web
+   ```
+
+2. Open `http://127.0.0.1:5000` if the browser does not open automatically.
+
+3. In the repo path box near the top, enter the project folder path. For this
+   repo, that is usually:
+
+   ```text
+   C:\Users\Admin\Documents\Code\day 14\AI project
+   ```
+
+4. Click the **Benchmarks** tab.
+
+5. Under **Past runs**, click a benchmark report. The detail panel shows totals,
+   grouped results, flaky cases, slowest cases, and failed cases.
+
+If **Past runs** is empty, create a report first:
+
+```bash
+python benchmarks\run_benchmarks.py --fast --summary --limit 5
+```
+
+To generate reports that can show flaky cases, run with retry:
+
+```bash
+python benchmarks\run_benchmarks.py --fast --summary --limit 5 --retry-failed 1
+```
+
+Note: the Benchmarks tab shows saved reports from `.agent\benchmarks\`. The raw
+benchmark case folders live in `benchmarks\cases\`.
+
 On Windows, if emoji output causes an encoding error, run:
 
 ```powershell
