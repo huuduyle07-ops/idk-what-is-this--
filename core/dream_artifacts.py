@@ -41,6 +41,72 @@ def _benchmark_seed_key(item: dict) -> tuple:
         item.get("kind"),
     )
 
+
+def _first_successful_retry_attempt(result: dict) -> int | None:
+    retries = result.get("retry_results")
+    if isinstance(retries, list):
+        for attempt in retries:
+            if not isinstance(attempt, dict):
+                continue
+            if attempt.get("success") is True and attempt.get("attempt") is not None:
+                try:
+                    return int(attempt["attempt"])
+                except (TypeError, ValueError):
+                    return None
+
+    if result.get("success") is True and result.get("attempts") is not None:
+        try:
+            return int(result["attempts"])
+        except (TypeError, ValueError):
+            return None
+
+    return None
+
+
+def _total_attempts(result: dict) -> int | None:
+    if result.get("attempts") is not None:
+        try:
+            return int(result["attempts"])
+        except (TypeError, ValueError):
+            return None
+
+    retries = result.get("retry_results")
+    if isinstance(retries, list) and retries:
+        return len(retries)
+
+    return None
+
+
+def _flaky_case_item(result: dict, report_name: str) -> dict:
+    case_name = result.get("name") or "?"
+    passed_attempt = _first_successful_retry_attempt(result)
+    attempts = _total_attempts(result)
+    attempt_label = (
+        f"{passed_attempt if passed_attempt is not None else '?'}/"
+        f"{attempts if attempts is not None else '?'}"
+    )
+
+    item = {
+        "kind": "bug",
+        "title": f"Flaky case: {case_name}",
+        "hint": (
+            f"Case passed on retry attempt {attempt_label}. Investigate model "
+            "pressure, prompt instability, or case fragility."
+        ),
+        "source": "benchmark",
+        "benchmark_report": report_name,
+        "case_name": case_name,
+        "flaky": True,
+        "attempts": attempts,
+    }
+
+    retries = result.get("retry_results")
+    if isinstance(retries, list):
+        item["retry_results"] = retries
+
+    return item
+
+
 def list_all_reports(repo_path: str) -> list[dict]:
     """All past dream runs for this repo, newest first.
 
@@ -176,6 +242,7 @@ def seed_queue_from_latest_benchmark(
     From the chosen report:
       - failed cases (`results[i].success == False`) become `kind="bug"` items
         (up to `max_failed`)
+      - flaky cases (`results[i].flaky == True`) become `kind="bug"` items
       - top slowest passing cases (from `slowest_cases[]`) become `kind="debt"`
         items (up to `max_slow`)
 
@@ -251,7 +318,14 @@ def seed_queue_from_latest_benchmark(
             "case_name": r.get("name"),
         })
 
-    # Slowest passing cases → debt items.
+    # Flaky cases -> bug items. Keep separate from failures so retry instability
+    # is visible even when the final report status is passing.
+    for r in (data.get("results") or []):
+        if r.get("flaky") is not True:
+            continue
+        items.append(_flaky_case_item(r, chosen.name))
+
+    # Slowest passing cases -> debt items.
     for s in (data.get("slowest_cases") or [])[:max_slow]:
         if not s.get("success"):
             continue

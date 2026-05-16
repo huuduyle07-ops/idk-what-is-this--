@@ -969,7 +969,8 @@ def benchmarks_report_route():
 def dream_seed_from_benchmark_route():
     """Append items to the dream queue based on a benchmark report.
 
-    Failed cases become `kind=bug`, slowest passing cases become `kind=debt`.
+    Failed and flaky cases become `kind=bug`; slowest passing cases become
+    `kind=debt`.
     Each appended item carries `source=benchmark`, `benchmark_report` (the JSON
     filename used), and `case_name` for traceability.
 

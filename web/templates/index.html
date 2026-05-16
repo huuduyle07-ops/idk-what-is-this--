@@ -234,7 +234,7 @@
                 Apply Dream
               </button>
               <button type="button" onclick="seedDreamFromBenchmark()"
-                      title="Add failed + slowest cases from the latest benchmark run as queue items.">
+                      title="Add failed, flaky, and slowest cases from the latest benchmark run as queue items.">
                 Seed from latest benchmark
               </button>
               <button type="button" id="stopDreamBtn" onclick="stopOvernight()"
@@ -1489,7 +1489,7 @@ function _renderBenchmarkDetail(report, filename) {
     const actionsHtml = `
         <div class="bench-actions">
             <button type="button" onclick="seedDreamFromReport('${_escapeHtml(filename)}')"
-                    title="Add failed + slowest cases from THIS report into the Dream queue.">
+                    title="Add failed, flaky, and slowest cases from THIS report into the Dream queue.">
                 Seed Dream queue from this report
             </button>
         </div>
