@@ -28,7 +28,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from benchmarks.fast_env import apply_fast_env, apply_turbo_env
-
+from core.brain_stamp import collect_brain_stamp, format_brain_stamp_markdown
 # Pre-pass: apply --fast env vars before importing modules that may read env
 # at import time (web.runner, core.validator, etc.). Re-applied in main() too,
 # so the effect is idempotent.
@@ -717,6 +717,8 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
     if isinstance(duration, (int, float)):
         lines.append(f"- Duration: {duration:.2f}s")
     lines.append("")
+    lines.append(format_brain_stamp_markdown(report.get('brain_stamp', {})))
+    lines.append("")
 
     if filters:
         lines.append("## Filters")
@@ -1233,6 +1235,7 @@ def main() -> int:
         **_duration_aggregates(results),
         "results": results,
     }
+    report["brain_stamp"] = collect_brain_stamp(PROJECT_ROOT)
 
     out_dir = PROJECT_ROOT / ".agent" / "benchmarks"
     out_dir.mkdir(parents=True, exist_ok=True)
