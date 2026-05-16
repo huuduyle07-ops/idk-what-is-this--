@@ -809,6 +809,30 @@ button {
     margin-left: 4px;
 }
 
+.dream-lesson-badge {
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.dream-lesson-badge--auto {
+    background: #052e16;
+    color: #bbf7d0;
+}
+
+.dream-lesson-badge--review {
+    background: #422006;
+    color: #fdba74;
+}
+
+.dream-lesson-badge--blocked {
+    background: #450a0a;
+    color: #fecaca;
+}
+
 /* Override the old single-line dream-status-* rules so they don't double-style. */
 .dream-status-running, .dream-status-done, .dream-status-failed {
     background: transparent !important;

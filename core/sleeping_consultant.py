@@ -11,6 +11,7 @@ from pathlib import Path
 from core.control_engine import run_control_structured, build_control_prompt
 from core.feature_context import maybe_enrich_with_scout
 from core.json_utils import extract_json_block
+from core.lesson_quality import evaluate_lesson_candidate
 from agents.gemini_client import run_gemini_request_2
 from patching.patch_plan_executor import apply_patch_plan
 from core import dream_artifacts
@@ -126,6 +127,7 @@ def _update_item_done(updated_item: dict) -> None:
         "latest_refinement_error_summary": updated_item.get(
             "latest_refinement_error_summary"
         ),
+        "lesson_evaluation": updated_item.get("lesson_evaluation"),
     }
     with _STATE_LOCK:
         items = _RUN_STATE.get("items_done", [])
@@ -501,14 +503,79 @@ def _run_patch_if_safe_item(
 
 
 # ============================================================
-# Slice γ.1: refinement-phase helpers (plan_only + research_note_created only).
-# Patch revalidation + lesson_quality grading deferred to γ.2.
+# Slice γ.2: refinement-phase helpers.
+# γ.1 plan/research refinement remains unchanged; ready_to_apply now gets
+# no-LLM patch revalidation + lesson_quality grading.
 # ============================================================
 
-# Items eligible for γ.1 refinement (Phase B). ready_to_apply explicitly NOT
-# included — that path requires patch revalidation + lesson_quality, which
-# lands in γ.2.
 _REFINABLE_STATUSES_GAMMA1 = frozenset({"planned_no_patch", "research_note_created"})
+_REFINABLE_STATUSES_GAMMA2 = _REFINABLE_STATUSES_GAMMA1 | frozenset({"ready_to_apply"})
+
+_LESSON_FORBIDDEN_PATH_PARTS = {".agent", ".git", "node_modules", "target"}
+
+
+def _normalize_relative_path_for_lesson(path: str) -> str:
+    normalized = str(path or "").strip().replace("\\", "/")
+    while normalized.startswith("./"):
+        normalized = normalized[2:]
+    return normalized
+
+
+def _changed_files_from_patch_plan(plan: list[dict]) -> list[str]:
+    changed: list[str] = []
+    seen: set[str] = set()
+    for op in plan:
+        if not isinstance(op, dict):
+            continue
+        path = _normalize_relative_path_for_lesson(
+            op.get("relative_path") or op.get("file") or ""
+        )
+        if not path or path in seen:
+            continue
+        seen.add(path)
+        changed.append(path)
+    return changed
+
+
+def _touched_forbidden_files(changed_files: list[str]) -> list[str]:
+    forbidden: list[str] = []
+    for path in changed_files:
+        parts = [part for part in path.lower().split("/") if part]
+        if any(part in _LESSON_FORBIDDEN_PATH_PARTS for part in parts):
+            forbidden.append(path)
+            continue
+        if any(part == ".env" or part.startswith(".env.") for part in parts):
+            forbidden.append(path)
+    return forbidden
+
+
+def _read_saved_patch_plan(plan_path: Path) -> tuple[list[dict], str]:
+    raw = plan_path.read_text(encoding="utf-8")
+    parsed = json.loads(raw)
+    if isinstance(parsed, dict):
+        parsed = parsed.get("patch_plan")
+    if not isinstance(parsed, list) or not parsed:
+        raise ValueError("patch_plan.json must contain a non-empty patch_plan list")
+    if not all(isinstance(op, dict) for op in parsed):
+        raise ValueError("patch_plan.json contains a non-object operation")
+    return parsed, raw
+
+
+def _lesson_candidate_from_revalidation(
+    result: dict,
+    changed_files: list[str],
+    diff_text: str,
+) -> dict:
+    return {
+        "validation_ok": result.get("validation_ok"),
+        "touched_forbidden_files": _touched_forbidden_files(changed_files),
+        "missing_expected_files": [],
+        "patch_kind": "patch_plan",
+        "rollback_happened": bool(result.get("rollback_performed")),
+        "changed_files": changed_files,
+        "diff": diff_text,
+        "diffs": result.get("diffs", []),
+    }
 
 
 def _refine_plan_only_item(
@@ -617,6 +684,78 @@ def _refine_research_item(
     return before_summary, "(empty response)", None, False
 
 
+def _revalidate_ready_to_apply_item(
+    repo_path: str,
+    item: dict,
+    idx: int,
+    item_dir_path: Path,
+    pass_num: int,
+) -> tuple[str, str, str, bool]:
+    """Re-apply a saved patch_plan in a fresh temp copy and grade lesson quality.
+
+    This path never calls an LLM, never touches the real repo, and never
+    overwrites the original patch_plan.json.
+    """
+    plan_path = item_dir_path / "patch_plan.json"
+    plan, raw_plan = _read_saved_patch_plan(plan_path)
+    before_summary = (
+        f"patch_plan.json ({len(plan)} op{'s' if len(plan) != 1 else ''}) "
+        + raw_plan[:160].replace("\n", " ")
+    )[:220]
+
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
+        temp_repo = Path(temp_dir) / "repo"
+        shutil.copytree(repo_path, temp_repo, ignore=_IGNORE)
+
+        validation = _validation_command(temp_repo)
+        result = apply_patch_plan(
+            str(temp_repo),
+            plan,
+            validation_command=validation,
+        )
+
+    changed_files = _changed_files_from_patch_plan(plan)
+    diffs = result.get("diffs", [])
+    if not isinstance(diffs, list):
+        diffs = []
+    diff_text = "\n\n".join(str(d) for d in diffs if d)
+    candidate = _lesson_candidate_from_revalidation(result, changed_files, diff_text)
+    lesson_evaluation = evaluate_lesson_candidate(candidate)
+    item["lesson_evaluation"] = lesson_evaluation
+
+    artifact_name = f"patch_revalidation_pass{pass_num}.json"
+    success = bool(result.get("success"))
+    artifact = {
+        "ok": success,
+        "success": success,
+        "message": result.get("message") or "",
+        "error": result.get("error"),
+        "validation_command": validation or "",
+        "validation_ok": result.get("validation_ok"),
+        "validation_output": result.get("validation_output") or "",
+        "changed_files": changed_files,
+        "rollback_performed": bool(result.get("rollback_performed")),
+        "diff": diff_text,
+        "diffs": diffs,
+        "failed_op_index": result.get("failed_op_index"),
+        "failed_op": result.get("failed_op"),
+        "lesson_candidate": candidate,
+        "lesson_evaluation": lesson_evaluation,
+    }
+    (item_dir_path / artifact_name).write_text(
+        json.dumps(artifact, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    promotion = lesson_evaluation.get("promotion", "unknown")
+    score = lesson_evaluation.get("score", "unknown")
+    result_summary = result.get("message") or result.get("error") or "Revalidation completed."
+    after_summary = (
+        f"{result_summary} lesson_quality={promotion} score={score}"
+    )[:220]
+    return before_summary, after_summary, artifact_name, success
+
+
 def _refine_one_pass(
     repo_path: str,
     item: dict,
@@ -648,9 +787,13 @@ def _refine_one_pass(
             before, after, refined_name, ok = _refine_research_item(
                 repo_path, item, idx, item_dir_path, pass_num,
             )
+        elif status == "ready_to_apply":
+            before, after, refined_name, ok = _revalidate_ready_to_apply_item(
+                repo_path, item, idx, item_dir_path, pass_num,
+            )
         else:
             # Defensive guard — shouldn't be reached because the orchestrator
-            # filters by _REFINABLE_STATUSES_GAMMA1 before calling.
+            # filters by _REFINABLE_STATUSES_GAMMA2 before calling.
             return
     except Exception as e:
         failed_artifact = f"refinement_error_pass{pass_num}.txt"
@@ -661,7 +804,7 @@ def _refine_one_pass(
         after = f"{type(e).__name__}: {e}"
         ok = False
 
-    if not ok and failed_artifact is None:
+    if not ok and failed_artifact is None and refined_name is None:
         failed_artifact = f"refinement_raw_pass{pass_num}.txt"
 
     history = item.setdefault("refinement_history", [])
@@ -680,11 +823,12 @@ def _refine_one_pass(
     # produce a useful refined artifact, so we don't count them as "refined").
     item["refinement_attempt_count"] = len(history)
     item["refinement_count"] = sum(1 for h in history if h.get("ok"))
-    if refined_name:
+    if ok and refined_name:
         item["latest_refined_artifact"] = refined_name
     if not ok:
-        if failed_artifact:
-            item["latest_failed_refinement_artifact"] = failed_artifact
+        latest_failed = failed_artifact or refined_name
+        if latest_failed:
+            item["latest_failed_refinement_artifact"] = latest_failed
         item["latest_refinement_error_summary"] = after
 
 
@@ -702,7 +846,7 @@ def _run_refinement_phase(
     """
     eligible_indices = [
         i for i, r in enumerate(results)
-        if r.get("status") in _REFINABLE_STATUSES_GAMMA1
+        if r.get("status") in _REFINABLE_STATUSES_GAMMA2
     ]
     if not eligible_indices:
         return
@@ -903,9 +1047,9 @@ def run_overnight(
         flush=True,
     )
 
-    # Slice γ.1: refinement phase. Uses leftover time budget to improve each
-    # eligible item's plan/proposal (round-robin, capped at max_refine_rounds).
-    # ready_to_apply items deferred to slice γ.2.
+    # Slice γ.2: refinement phase. Uses leftover time budget to improve each
+    # eligible item's plan/proposal, and to revalidate ready_to_apply patches
+    # in temp clones before grading lesson_quality.
     # Wrapped in try/finally so `phase` always returns to "idle" on exit —
     # even if an exception escapes the refinement loop.
     deadline_ts = start + time_budget_sec

@@ -585,6 +585,29 @@ function _dreamLatestFailedRefinement(it) {
     return null;
 }
 
+function _renderLessonEvaluationBadge(it) {
+    const evaluation = it.lesson_evaluation || null;
+    if (!evaluation || !evaluation.promotion) return "";
+    const promotion = String(evaluation.promotion);
+    const className = ({
+        auto_approved: "dream-lesson-badge--auto",
+        needs_human_review: "dream-lesson-badge--review",
+        blocked: "dream-lesson-badge--blocked",
+    })[promotion] || "dream-lesson-badge--review";
+    const score = typeof evaluation.score === "number"
+        ? evaluation.score.toFixed(2)
+        : "unknown";
+    const reasons = Array.isArray(evaluation.reasons)
+        ? evaluation.reasons.join("; ")
+        : "";
+    const tooltip = [
+        `lesson_quality: ${promotion}`,
+        `score: ${score}`,
+        reasons ? `reasons: ${reasons}` : "",
+    ].filter(Boolean).join(" · ");
+    return `<span class="dream-lesson-badge ${className}" title="${_escapeHtml(tooltip)}">${_escapeHtml(promotion)}</span>`;
+}
+
 function _renderDreamItemCard(it, opts = {}) {
     const idx = it.idx ?? "?";
     const kind = _escapeHtml(it.kind || "?");
@@ -600,6 +623,7 @@ function _renderDreamItemCard(it, opts = {}) {
     const refinedBadge = (it.refinement_count && it.refinement_count > 0)
         ? `<span class="dream-refined-badge" title="Refined ${it.refinement_count}×${it.latest_refined_artifact ? ' · latest: ' + _escapeHtml(it.latest_refined_artifact) : ''}">✨ refined ${it.refinement_count}×</span>`
         : "";
+    const lessonBadge = _renderLessonEvaluationBadge(it);
     const failedRefinement = _dreamLatestFailedRefinement(it);
     const attemptCount = it.refinement_attempt_count ?? (
         Array.isArray(it.refinement_history) ? it.refinement_history.length : 0
@@ -628,6 +652,7 @@ function _renderDreamItemCard(it, opts = {}) {
                     <span class="dream-item-card__title">${title}</span>
                     <span class="dream-item-badge ${_dreamStatusClass(status)}">${_escapeHtml(status)}</span>
                     ${refinedBadge}
+                    ${lessonBadge}
                     ${refineFailedBadge}
                 </div>
                 ${summary ? `<div class="dream-item-card__summary">${summary}</div>` : ""}
