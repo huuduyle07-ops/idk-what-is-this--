@@ -12,6 +12,8 @@ from core.control_engine import run_control_structured, build_control_prompt
 from core.feature_context import maybe_enrich_with_scout
 from core.json_utils import extract_json_block
 from core.lesson_quality import evaluate_lesson_candidate
+from core.repo_librarian import inspect_repo_inventory
+from core.source_snippet_fallback import hydrate_control_source_from_scout
 from agents.gemini_client import run_gemini_request_2
 from patching.patch_plan_executor import apply_patch_plan
 from core import dream_artifacts
@@ -184,6 +186,13 @@ def _generate_patch_plan(
     # heuristic, leaving CONTROL without source snippets and the model
     # correctly refusing to invent a patch ("no exact source_snippet").
     control = maybe_enrich_with_scout(query, repo_path, control, force=True) or control
+    language = inspect_repo_inventory(repo_path).get("primary_language", "unknown")
+    control = hydrate_control_source_from_scout(
+        control_result=control,
+        repo_path=repo_path,
+        language=language,
+        query=query,
+    )
 
     prompt = build_control_prompt(control, f"Generate patch_plan for: {query}")
     raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path)
@@ -225,7 +234,8 @@ Return ONLY valid JSON — no markdown fences, no extra text:
 Rules:
 - Be specific. Reference real file paths and symbols when you can.
 - Set `safe_to_patch_now=true` ONLY when ALL of the following are true:
-    * the task is a narrow bug fix (not architecture, not "find a bug", not idea/debt),
+    * the task is a narrow bug fix or debt/doc maintenance fix
+      (not architecture, not "find a bug", not idea/research),
     * the target file(s) are known,
     * an exact source snippet is identifiable without guessing,
     * the patch can stay within `safe_minimal` style.
@@ -901,14 +911,18 @@ def run_overnight(
 
     `dream_mode` controls behaviour:
       - "plan_only" (default): every item gets a structured plan, never patches.
-      - "patch_if_safe": bug items may patch when the planner marks them safe;
-        all other kinds stay plan-only.
+      - "patch_if_safe": bug/debt items may patch when the planner marks them
+        safe; ideas still require vibe and research stays plan-only.
       - "research": every item becomes a written proposal (no patch).
 
-    `max_refine_rounds` (Slice γ.1) controls iterative self-improvement.
-    After the main pass, eligible items (planned_no_patch / research_note_created)
-    are refined round-robin up to `max_refine_rounds` times, stopping early on
-    deadline or user stop. Clamped to [1, 3]. Set 0 to disable refinement.
+    `max_refine_rounds` (Slice γ.2) controls iterative self-improvement.
+    After the main pass, eligible items are processed round-robin up to
+    `max_refine_rounds` times:
+      - planned_no_patch
+      - research_note_created
+      - ready_to_apply revalidation
+    Stops early on deadline or user stop. Clamped to [1, 3]. Set 0 to
+    disable refinement.
     """
     repo_path = str(Path(repo_path).resolve())
     if not Path(repo_path).is_dir():
@@ -919,7 +933,12 @@ def run_overnight(
         return {"error": "Queue is empty. Add items first."}
 
     mode = _normalize_dream_mode(dream_mode)
-    report_dir = dream_artifacts.today_dir(repo_path)
+    # Slice γ.3.1: each run gets its own timestamped subdir under today's date
+    # to prevent artifact mixing between multiple same-day runs.
+    # Path shape: <dreams>/<YYYY-MM-DD>/<HHMMSS-run>/
+    report_dir = dream_artifacts.new_run_dir(repo_path)
+    # mkdir is idempotent — new_run_dir already created the directory, but
+    # the parents=True is harmless and matches the prior contract.
     report_dir.mkdir(parents=True, exist_ok=True)
 
     # Snapshot the queue used for this run
@@ -997,7 +1016,7 @@ def run_overnight(
                 )
                 results.append(_run_research_item(repo_path, item, idx, item_path))
             else:  # patch_if_safe
-                if kind == "bug":
+                if kind in {"bug", "debt"}:
                     results.append(_run_patch_if_safe_item(
                         repo_path=repo_path,
                         item=item,
@@ -1098,7 +1117,7 @@ def start_overnight_async(
     `{error: "already running"}` if a run is already in flight. Poll
     /dream/status (or call get_run_state()) to follow progress.
 
-    `max_refine_rounds` (Slice γ.1) — see run_overnight() docstring.
+    `max_refine_rounds` (Slice γ.2) — see run_overnight() docstring.
 
     Daemon thread caveat: if the Flask process is killed (or hot-reloaded
     on file change in dev mode) the run dies with it. For overnight use,

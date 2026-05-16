@@ -642,6 +642,22 @@ function _renderDreamItemCard(it, opts = {}) {
     const refineFailedBadge = failedRefinement
         ? `<span class="dream-refine-failed-badge" title="${_escapeHtml(failedTooltip)}">⚠ refine failed</span>`
         : "";
+    // Slice γ3.2: preferred refined artifact badge — gold accent so it visually
+    // outranks the purple "exists a refined" badge from γ1.
+    const preferredBadge = it.preferred_artifact
+        ? `<span class="dream-preferred-badge" title="preferred: ${_escapeHtml(it.preferred_artifact)}">★ preferred: ${_escapeHtml(it.preferred_artifact)}</span>`
+        : "";
+    // Slice γ3.2: "Promote refined" button. Hidden when (a) there is no refined
+    // artifact yet, (b) the latest refined is already the preferred one
+    // (idempotence — the button reappears after a new refinement pass), or
+    // (c) the card has no run context (legacy report viewer; promotion is
+    // restricted to timestamped run dirs server-side).
+    const canPromote = !!it.latest_refined_artifact
+        && it.preferred_artifact !== it.latest_refined_artifact
+        && !!opts.runId;
+    const promoteBtn = canPromote
+        ? `<button type="button" class="dream-action-btn" onclick="promoteDreamArtifact('${_escapeHtml(opts.date || "")}', '${_escapeHtml(opts.runId)}', ${Number(it.idx)}, '${_escapeHtml(it.latest_refined_artifact)}')">Promote refined</button>`
+        : "";
     return `
         <div class="dream-item-card">
             ${checkbox}
@@ -654,8 +670,10 @@ function _renderDreamItemCard(it, opts = {}) {
                     ${refinedBadge}
                     ${lessonBadge}
                     ${refineFailedBadge}
+                    ${preferredBadge}
                 </div>
                 ${summary ? `<div class="dream-item-card__summary">${summary}</div>` : ""}
+                ${promoteBtn ? `<div class="dream-item-card__actions">${promoteBtn}</div>` : ""}
             </div>
         </div>
     `;
@@ -1084,9 +1102,13 @@ function refreshDreamRuns() {
                 r.patch_style || "",
                 _statusesPretty(r.statuses),
             ].filter(Boolean).join(" · ");
+            // Slice γ.3.1: show run_id (HHMMSS-run) when present, fall back
+            // to just date for legacy runs.
+            const label = r.run_id ? `${r.date} · ${_escapeHtml(r.run_id)}` : r.date;
+            const runArg = r.run_id ? `'${r.run_id}'` : "''";
             return `
-              <a class="session-item dream-run-item" href="javascript:viewDreamRun('${r.date}')">
-                <div class="session-title">${r.date}</div>
+              <a class="session-item dream-run-item" href="javascript:viewDreamRun('${r.date}', ${runArg})">
+                <div class="session-title">${label}</div>
                 <div class="session-meta">${meta}</div>
               </a>
             `;
@@ -1097,12 +1119,15 @@ function refreshDreamRuns() {
     });
 }
 
-function viewDreamRun(date) {
+function viewDreamRun(date, runId) {
     const repoEl = document.querySelector("input[name='repo_path']");
     const repo = repoEl ? repoEl.value.trim() : "";
     if (!repo) { alert("Set a repo path first."); return; }
 
-    fetch(`/dream/report?repo_path=${encodeURIComponent(repo)}&date=${encodeURIComponent(date)}`)
+    // Slice γ.3.1: forward the per-run id when present. Empty string =
+    // legacy report under <date>/list.json without a run subdir.
+    const runParam = runId ? `&run=${encodeURIComponent(runId)}` : "";
+    fetch(`/dream/report?repo_path=${encodeURIComponent(repo)}&date=${encodeURIComponent(date)}${runParam}`)
     .then(r => r.json())
     .then(data => {
         if (data.error) {
@@ -1117,14 +1142,15 @@ function viewDreamRun(date) {
                 <pre class="dream-report-pre">${_escapeHtml(morning)}</pre>
             </details>
             <div class="dream-section-heading">Items (${items.length})</div>
-            ${items.map(it => _renderDreamItemCard(it)).join("")}
+            ${items.map(it => _renderDreamItemCard(it, { date, runId })).join("")}
             <div class="dream-report-meta">
                 Report dir: <code>${_escapeHtml(data.report_dir || "")}</code>
                 ${data.dream_mode ? ` · mode: <code>${_escapeHtml(data.dream_mode)}</code>` : ""}
                 ${data.patch_style ? ` · style: <code>${_escapeHtml(data.patch_style)}</code>` : ""}
             </div>
         `;
-        openAppModal(`Dream report — ${date}`, body);
+        const titleLabel = runId ? `${date} · ${runId}` : date;
+        openAppModal(`Dream report — ${titleLabel}`, body);
     })
     .catch(err => openAppModal("Report error", `<p>${_escapeHtml(err)}</p>`));
 }
@@ -1201,6 +1227,32 @@ function _doDreamApply() {
     .catch(err => {
         if (resultsEl) resultsEl.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
     });
+}
+
+// Slice γ3.2: POST /dream/promote-artifact, then re-fetch + re-render the open
+// report modal so the new preferred-badge / hidden promote-button take effect.
+function promoteDreamArtifact(date, runId, itemIdx, artifact) {
+    const repo = _dreamRepo(); if (!repo) return;
+    fetch("/dream/promote-artifact", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+            repo_path: repo,
+            date,
+            run: runId,
+            item_idx: String(itemIdx),
+            artifact,
+        }),
+    })
+    .then(r => r.json())
+    .then(out => {
+        if (!out.ok) {
+            openAppModal("Promote error", `<p>${_escapeHtml(out.error || "unknown error")}</p>`);
+            return;
+        }
+        viewDreamRun(date, runId);
+    })
+    .catch(err => openAppModal("Promote error", `<p>${_escapeHtml(err)}</p>`));
 }
 
 function consolidateMemory() {

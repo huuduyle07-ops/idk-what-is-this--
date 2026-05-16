@@ -249,6 +249,16 @@ This protects the real project while the agent explores.
 
 It can also seed dream items from benchmark reports: failed cases become bug follow-ups, and slow passing cases can become technical-debt items.
 
+How to see `auto_approved` or `needs_human_review` in Dream:
+
+- Use Dream mode `patch_if_safe`.
+- Queue a narrow `bug` or `debt` item. The planner must decide `safe_to_patch_now=true`.
+- If the patch plan applies and validates in a temporary repository, the item status becomes `ready_to_apply`.
+- During the refinement phase, `ready_to_apply` items are revalidated in a fresh temporary copy and graded by `lesson_quality`.
+- Open the Dream report after the run. A successful revalidation shows badges like `READY_TO_APPLY`, `REFINED 1x`, and one lesson badge: `auto_approved`, `needs_human_review`, or `blocked`.
+
+If the item only shows `PLANNED_NO_PATCH` and `REFINED 1x`, that means Dream only refined the plan. There was no saved `patch_plan.json`, so there is no lesson-quality badge yet. This usually happens when the item is too broad, marked unsafe to patch, or queued as `research` / `idea` instead of a narrow patchable `bug` or `debt`.
+
 Important files:
 
 - `core/sleeping_consultant.py`

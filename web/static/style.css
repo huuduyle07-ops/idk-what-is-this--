@@ -809,6 +809,39 @@ button {
     margin-left: 4px;
 }
 
+/* γ3.2: preferred refined artifact — active user choice, gold accent. */
+.dream-preferred-badge {
+    background: #422006;
+    color: #fde68a;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-left: 4px;
+    border: 1px solid #92400e;
+}
+
+.dream-item-card__actions {
+    margin-top: 6px;
+}
+
+.dream-action-btn {
+    background: #1e293b;
+    color: #c4b5fd;
+    border: 1px solid #4c1d95;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: monospace;
+}
+
+.dream-action-btn:hover {
+    background: #312e81;
+    color: #e9d5ff;
+}
+
 .dream-lesson-badge {
     padding: 2px 6px;
     border-radius: 999px;

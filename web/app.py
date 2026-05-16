@@ -753,17 +753,45 @@ def dream_reports_route():
 
 @app.route("/dream/report", methods=["GET"])
 def dream_report_route():
-    """Full content of one historical dream run, by date (YYYY-MM-DD)."""
+    """Full content of one historical dream run.
+
+    Slice γ.3.1: accepts an optional `run` query parameter. With `run`, the
+    report path is `<dreams>/<date>/<run>/` (new layout). Without `run`,
+    falls back to `<dreams>/<date>/` (legacy layout — pre-γ.3.1 runs).
+
+    Defensive: `run` is validated against a strict regex to prevent path
+    traversal (only digits, dashes, and the literal suffix "-run" allowed).
+    """
+    import re
     repo_path = request.values.get("repo_path", "").strip()
     date = request.values.get("date", "").strip()
+    run = request.values.get("run", "").strip()
     if not repo_path or not Path(repo_path).is_dir():
         return {"error": f"repo_path is not a directory: {repo_path}"}
     if not date:
         return {"error": "date is required (YYYY-MM-DD)"}
+    # Validate date shape (YYYY-MM-DD) — defensive.
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
+        return {"error": f"invalid date format: {date}"}
 
-    report_dir = dream_artifacts.dreams_root(repo_path) / date
+    dreams_root = dream_artifacts.dreams_root(repo_path)
+    if run:
+        # Validate run shape (HHMMSS-run, optionally with -N collision suffix).
+        if not re.match(r"^\d{6}-run(-\d+)?$", run):
+            return {"error": f"invalid run id: {run}"}
+        report_dir = dreams_root / date / run
+    else:
+        # Legacy path: list.json directly under the date dir.
+        report_dir = dreams_root / date
+
+    # Defensive: ensure resolved path stays inside dreams_root.
+    try:
+        report_dir.resolve().relative_to(dreams_root.resolve())
+    except ValueError:
+        return {"error": "report path escapes dreams root"}
+
     if not report_dir.is_dir():
-        return {"error": f"no report for date: {date}"}
+        return {"error": f"no report for date={date}{(' run=' + run) if run else ' (legacy)'}"}
     return dream_artifacts.read_report(report_dir)
 
 
@@ -918,6 +946,55 @@ def dream_apply_route():
         })
 
     return {"results": results}
+
+
+@app.route("/dream/promote-artifact", methods=["POST"])
+def dream_promote_artifact_route():
+    """Slice γ3.2: mark one refined artifact as preferred for a Dream item.
+
+    Pure metadata operation. No LLM, no patch apply, no artifact writes —
+    only the `list.json` for the run is rewritten with `preferred_artifact`
+    and `preferred_artifact_kind` fields on the matching item.
+
+    Inputs (form-data): `repo_path`, `date` (YYYY-MM-DD), `run` (HHMMSS-run),
+    `item_idx` (int), `artifact` (filename only — must match
+    `plan_analysis.refined_passN.json` or `proposal.refined_passN.md`).
+
+    Legacy reports without a `run` are rejected with a friendly 400.
+    """
+    import re
+
+    repo_path = request.form.get("repo_path", "").strip()
+    date = request.form.get("date", "").strip()
+    run = request.form.get("run", "").strip()
+    artifact = request.form.get("artifact", "").strip()
+    item_idx_raw = request.form.get("item_idx", "").strip()
+
+    if not repo_path or not Path(repo_path).is_dir():
+        return {"ok": False, "error": f"repo_path is not a directory: {repo_path}"}, 400
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
+        return {"ok": False, "error": f"invalid date format: {date}"}, 400
+    if not run:
+        return {
+            "ok": False,
+            "error": "Promotion only supported for timestamped run directories. This is a legacy report.",
+        }, 400
+    if not re.match(r"^\d{6}-run(-\d+)?$", run):
+        return {"ok": False, "error": f"invalid run id: {run}"}, 400
+    try:
+        item_idx = int(item_idx_raw)
+    except (TypeError, ValueError):
+        return {"ok": False, "error": "item_idx must be an integer"}, 400
+
+    try:
+        out = dream_artifacts.promote_artifact(repo_path, date, run, item_idx, artifact)
+        return out
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except (FileNotFoundError, LookupError) as e:
+        return {"ok": False, "error": str(e)}, 404
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
 
 
 @app.route("/health", methods=["GET"])
