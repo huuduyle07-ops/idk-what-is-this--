@@ -25,6 +25,7 @@ from core.sleeping_consultant import (
     run_overnight,
     start_overnight_async,
     get_run_state,
+    request_stop,
 )
 from core import dream_artifacts
 from database.memory_consolidator import consolidate_all
@@ -670,6 +671,8 @@ def dream_run_route():
 
     Poll /dream/status to follow progress. `dream_mode` selects Dream V2
     behaviour (`plan_only` default / `patch_if_safe` / `research`).
+    `time_budget_sec` (Slice α) lets the user override the default 6-hour
+    cap from the web UI; clamped to [60, 86400] (1 min – 24 hr) for sanity.
     """
     repo_path = request.form.get("repo_path", "").strip()
     if not repo_path or not Path(repo_path).is_dir():
@@ -678,11 +681,19 @@ def dream_run_route():
     patch_style = normalize_patch_style(request.form.get("patch_style"))
     dream_mode = request.form.get("dream_mode", "plan_only")
 
+    # Parse + clamp time budget. Default 6 hours matches start_overnight_async().
+    try:
+        budget_raw = int(request.form.get("time_budget_sec", 6 * 3600))
+    except (TypeError, ValueError):
+        budget_raw = 6 * 3600
+    time_budget_sec = max(60, min(86400, budget_raw))  # [1 min, 24 hr]
+
     try:
         return start_overnight_async(
             repo_path,
             patch_style=patch_style,
             dream_mode=dream_mode,
+            time_budget_sec=time_budget_sec,
         )
     except Exception as e:
         return {"error": f"start_overnight_async failed: {e}"}
@@ -691,6 +702,20 @@ def dream_run_route():
 @app.route("/dream/status", methods=["GET"])
 def dream_status_route():
     return get_run_state()
+
+
+@app.route("/dream/stop", methods=["POST"])
+def dream_stop_route():
+    """Slice β: ask the in-flight dream run to stop gracefully.
+
+    Returns {stopped: bool, reason: str}. The actual stop happens between
+    queue items; the currently-running item finishes first. Polling
+    /dream/status will show stop_requested=true until the run exits.
+    """
+    try:
+        return request_stop()
+    except Exception as e:
+        return {"error": f"stop request failed: {e}"}
 
 
 @app.route("/dream/list", methods=["GET"])
@@ -965,11 +990,9 @@ def dream_seed_from_benchmark_route():
     except Exception as e:
         return {"error": f"seed failed: {e}"}, 500
 
-    if not items:
-        return (
-            {"error": "No benchmark reports found in .agent/benchmarks/, or nothing seedable."},
-            404,
-        )
+    # Empty list is a valid outcome (dedupe matched everything, OR no reports
+    # exist yet, OR the chosen report had no failures/slow cases). Caller's JS
+    # distinguishes count=0 from count>0 to show a friendly message.
     return {"added": items, "count": len(items)}
 
 

@@ -1,3 +1,34 @@
+/* ============================================================ */
+/* Mermaid graph viewer (moved out of index.html <head> for      */
+/* lint cleanliness — no-inline-styles rule)                    */
+/* ============================================================ */
+#graph {
+    position: relative;
+    overflow: hidden;
+    min-height: 400px;
+    cursor: grab;
+    background: #fafafa;
+}
+#graph:active { cursor: grabbing; }
+#graph .mermaid-svg-wrapper {
+    transform-origin: 0 0;
+    transition: transform 0.05s linear;
+}
+.graph-controls {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+}
+.graph-controls button {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 body {
     margin: 0;
     background: #0f172a;
@@ -191,6 +222,22 @@ button {
 
 .dream-section input.dream-title { flex: 1; min-width: 200px; }
 .dream-section input.dream-hint  { flex: 2; min-width: 200px; }
+
+/* Time-budget label inside .dream-buttons (Slice α) */
+.dream-budget-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 8px;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.dream-budget-label select {
+    width: auto;
+    margin: 0;
+    padding: 4px 8px;
+}
 
 .error-banner {
     margin: 10px 0;
@@ -736,6 +783,7 @@ button {
 .dream-status-header--running { background: #1e293b; color: #93c5fd; border: 1px solid #334155; }
 .dream-status-header--done    { background: #052e16; color: #bbf7d0; border: 1px solid #166534; }
 .dream-status-header--failed  { background: #450a0a; color: #fecaca; border: 1px solid #7f1d1d; }
+.dream-status-header--stopping { background: #422006; color: #fdba74; border: 1px solid #92400e; }
 
 /* Override the old single-line dream-status-* rules so they don't double-style. */
 .dream-status-running, .dream-status-done, .dream-status-failed {
@@ -940,4 +988,59 @@ button {
     word-break: break-word;
     max-height: 50vh;
     overflow-y: auto;
+}
+
+/* ============================================================ */
+/* Diff renderer (replaces inline styles in renderDiff() JS)    */
+/* ============================================================ */
+.diff-hunk {
+    color: #6a737d;
+    font-style: italic;
+}
+.diff-add {
+    background: #e6ffed;
+    color: #22863a;
+}
+.diff-del {
+    background: #ffeef0;
+    color: #b31d28;
+}
+.diff-ctx {
+    color: #24292e;
+}
+
+/* ============================================================ */
+/* Local critique result (replaces inline styles in JS)         */
+/* ============================================================ */
+.critique-error {
+    color: #e55;
+}
+
+.critique-section {
+    margin-top: 6px;
+}
+
+.critique-fix-list {
+    margin: 4px 0 0 16px;
+}
+
+.critique-verdict {
+    font-weight: bold;
+}
+.critique-verdict--accept  { color: #2a9d2a; }
+.critique-verdict--reject  { color: #c0392b; }
+.critique-verdict--unclear { color: #d97706; }
+
+/* ============================================================ */
+/* Benchmarks detail bits (replaces inline styles in JS)        */
+/* ============================================================ */
+.bench-detail-filename {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.bench-fail-meta {
+    color: #94a3b8;
+    font-weight: 400;
 }

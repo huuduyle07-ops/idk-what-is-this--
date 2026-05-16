@@ -33,6 +33,13 @@ def latest_report_dir(repo_path: str) -> Path | None:
         return None
     return max(candidates, key=lambda p: p.name)
 
+def _benchmark_seed_key(item: dict) -> tuple:
+    return (
+        item.get("source"),
+        item.get("benchmark_report"),
+        item.get("case_name"),
+        item.get("kind"),
+    )
 
 def list_all_reports(repo_path: str) -> list[dict]:
     """All past dream runs for this repo, newest first.
@@ -259,9 +266,29 @@ def seed_queue_from_latest_benchmark(
             "case_name": name,
         })
 
+    # Dedupe against existing queue: skip benchmark-seeded items that match
+    # (source, benchmark_report, case_name, kind) of something already queued.
+    # Re-clicking "Seed from latest benchmark" or "Seed from this report" thus
+    # becomes idempotent, which is what users expect.
+    existing_queue = read_queue(repo_path)
+    existing_keys = {
+        _benchmark_seed_key(it)
+        for it in existing_queue
+        if it.get("source") == "benchmark"
+    }
+
+    deduped_items: list[dict] = []
     for it in items:
+        key = _benchmark_seed_key(it)
+        if key in existing_keys:
+            continue
+        deduped_items.append(it)
+        existing_keys.add(key)
+
+    for it in deduped_items:
         append_to_queue(repo_path, it)
-    return items
+
+    return deduped_items
 
 
 def slugify(text: str, max_len: int = 40) -> str:
@@ -285,6 +312,7 @@ STATUS_LEGEND: dict[str, str] = {
     "rejected": "Patch failed validation after all attempts.",
     "error": "Item crashed during processing.",
     "skipped_time_budget": "Time budget exhausted before reaching this item.",
+    "skipped_user_stop": "Run was manually stopped by user before this item.",
 }
 
 

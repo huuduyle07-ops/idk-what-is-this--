@@ -7,34 +7,6 @@
     <title>C.A.T.T.U.S</title> 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <style>
-      #graph {
-        position: relative;
-        overflow: hidden;
-        min-height: 400px;
-        cursor: grab;
-        background: #fafafa;
-      }
-      #graph:active { cursor: grabbing; }
-      #graph .mermaid-svg-wrapper {
-        transform-origin: 0 0;
-        transition: transform 0.05s linear;
-      }
-      .graph-controls {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        display: flex;
-        gap: 4px;
-        z-index: 10;
-      }
-      .graph-controls button {
-        width: 32px;
-        height: 32px;
-        font-size: 16px;
-        cursor: pointer;
-      }
-    </style>
 </head>
 <body>
 
@@ -243,6 +215,16 @@
               <button type="button" onclick="clearDreamQueue()">Clear queue</button>
             </div>
             <div class="dream-buttons">
+              <label class="dream-budget-label" title="How long Dream can run before it stops accepting new items (Slice α).">
+                Budget:
+                <select id="dreamBudget">
+                  <option value="1800">30 min</option>
+                  <option value="3600">1 hour</option>
+                  <option value="7200">2 hours</option>
+                  <option value="21600" selected>6 hours (default)</option>
+                  <option value="43200">12 hours</option>
+                </select>
+              </label>
               <button type="button" onclick="startOvernight()"
                       title="Runs the queue in temp clones in a background thread. Original repo is not touched.">
                 Start Overnight Run
@@ -254,6 +236,11 @@
               <button type="button" onclick="seedDreamFromBenchmark()"
                       title="Add failed + slowest cases from the latest benchmark run as queue items.">
                 Seed from latest benchmark
+              </button>
+              <button type="button" id="stopDreamBtn" onclick="stopOvernight()"
+                      title="Ask Dream to stop after the current item finishes (Slice β)."
+                      hidden>
+                Stop Dream
               </button>
               <button type="button" onclick="refreshDreamStatus()" title="Manually refresh the status line.">
                 Refresh status
@@ -657,6 +644,9 @@ function _patchTargetFiles(raw) {
 function _confidenceBar(c) {
     if (typeof c !== "number") return `<span class="patch-card__muted">unknown</span>`;
     const pct = Math.round(c * 100);
+    // The width is intentionally inline — it's a dynamic per-render value
+    // that can't be expressed as a static CSS class (we'd need 101 classes
+    // for 0–100%). Lint exception for this case.
     return `<div class="patch-confidence-bar" title="${pct}%"><div class="patch-confidence-bar__fill" style="width:${pct}%"></div></div><span class="patch-confidence-pct">${pct}%</span>`;
 }
 
@@ -793,8 +783,17 @@ function seedDreamFromBenchmark() {
     .then(({ status, data }) => {
         if (data.error) { alert(`Seed: ${data.error}`); return; }
         const items = data.added || [];
+        if (items.length === 0) {
+            alert(
+                "Nothing new to seed.\n\n" +
+                "Either every failure / slow case from the latest benchmark report " +
+                "is already in your queue, or no benchmark reports exist yet " +
+                "(check the Benchmarks tab)."
+            );
+            return;
+        }
         const summary = items.map(it => `[${it.kind}] ${it.title}`).join("\n");
-        alert(`Seeded ${data.count} items from benchmark:\n\n${summary || "(none)"}`);
+        alert(`Seeded ${data.count} new item(s) from benchmark:\n\n${summary}`);
     })
     .catch(err => alert(`Seed failed: ${err}`));
 }
@@ -840,6 +839,26 @@ let _dreamPollTimer = null;
 
 function _renderDreamStatus(state) {
     const el = document.getElementById("dreamStatus");
+    const stopBtn = document.getElementById("stopDreamBtn");
+
+    // Slice β: Stop button visibility + label, independent of #dreamStatus.
+    if (stopBtn) {
+        if (state && state.status === "running") {
+            stopBtn.hidden = false;
+            if (state.stop_requested) {
+                stopBtn.disabled = true;
+                stopBtn.textContent = "Stopping…";
+            } else {
+                stopBtn.disabled = false;
+                stopBtn.textContent = "Stop Dream";
+            }
+        } else {
+            stopBtn.hidden = true;
+            stopBtn.disabled = false;
+            stopBtn.textContent = "Stop Dream";
+        }
+    }
+
     if (!el) return;
 
     if (!state || state.status === "idle") {
@@ -858,7 +877,12 @@ function _renderDreamStatus(state) {
         const cur = state.current_title
             ? `${_escapeHtml(state.current_kind || "?")} → ${_escapeHtml(state.current_title)}`
             : "(starting)";
-        header = `<div class="dream-status-header dream-status-header--running">💤 Running [${idx}/${total}] ${cur} · done: ${itemsDone.length}/${total}</div>`;
+        // Slice β: orange "stopping" variant when user has clicked Stop.
+        if (state.stop_requested) {
+            header = `<div class="dream-status-header dream-status-header--stopping">🛑 Stopping after current item · [${idx}/${total}] ${cur}</div>`;
+        } else {
+            header = `<div class="dream-status-header dream-status-header--running">💤 Running [${idx}/${total}] ${cur} · done: ${itemsDone.length}/${total}</div>`;
+        }
     } else if (state.status === "done") {
         header = `<div class="dream-status-header dream-status-header--done">✅ Done. Report: <code>${_escapeHtml(state.report_dir || "")}</code></div>`;
     } else if (state.status === "failed") {
@@ -901,6 +925,11 @@ function _startDreamPolling(intervalMs = 2000) {
 function startOvernight() {
     const repo = _dreamRepo(); if (!repo) return;
 
+    // Slice α: read selected budget (default "21600" = 6 hr) and thread it
+    // through to the backend; clamping + safety handled server-side.
+    const budgetEl = document.getElementById("dreamBudget");
+    const budgetSec = budgetEl ? budgetEl.value : "21600";
+
     fetch("/dream/run", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -908,6 +937,7 @@ function startOvernight() {
             repo_path: repo,
             patch_style: _dreamPatchStyle(),
             dream_mode: _dreamMode(),
+            time_budget_sec: budgetSec,
         }),
     })
     .then(r => r.json())
@@ -918,6 +948,22 @@ function startOvernight() {
         _startDreamPolling();
     })
     .catch(err => alert(`Overnight run failed: ${err}`));
+}
+
+// Slice β: graceful stop. Sets a backend flag; current item finishes, then
+// the loop exits with remaining items marked skipped_user_stop.
+function stopOvernight() {
+    if (!confirm("Stop Dream after the current item finishes?\n\nThe item already in flight will complete normally (no rollback). All remaining queue items will be skipped.")) return;
+    fetch("/dream/stop", { method: "POST" })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert(`Stop: ${data.error}`); return; }
+        if (!data.stopped) { alert(`Stop: ${data.reason}`); return; }
+        // Don't toggle UI here — the next poll tick picks up stop_requested
+        // from /dream/status and renders the "Stopping…" state.
+        refreshDreamStatus();
+    })
+    .catch(err => alert(`Stop failed: ${err}`));
 }
 
 // Auto-resume polling if a run is in flight when the page loads.
@@ -1370,7 +1416,7 @@ function _renderBenchmarkDetail(report, filename) {
         <div class="bench-section-heading">Failed cases (${failures.length})</div>
         ${failures.map(f => `
             <div class="bench-fail-row">
-                <div class="bench-fail-name">${_escapeHtml(f.name || "?")} <span style="color:#94a3b8;font-weight:400">· ${_escapeHtml(f.language || "?")}/${_escapeHtml(f.category || "?")}</span></div>
+                <div class="bench-fail-name">${_escapeHtml(f.name || "?")} <span class="bench-fail-meta">· ${_escapeHtml(f.language || "?")}/${_escapeHtml(f.category || "?")}</span></div>
                 <div class="bench-fail-detail">
                     ${f.validation_output && f.validation_output !== "OK" ? `validation: ${_escapeHtml(String(f.validation_output).slice(0, 240))}` : ""}
                     ${f.toolchain_issue ? `toolchain: ${_escapeHtml(f.toolchain_issue)}` : ""}
@@ -1390,7 +1436,7 @@ function _renderBenchmarkDetail(report, filename) {
     `;
 
     detail.innerHTML = `
-        <div style="font-size:13px;color:#94a3b8;margin-bottom:8px;">
+        <div class="bench-detail-filename">
             <code>${_escapeHtml(filename)}</code>
         </div>
         ${totalsHtml}
@@ -1433,8 +1479,17 @@ function seedDreamFromReport(filename) {
     .then(r => r.json())
     .then(data => {
         if (data.error) { alert(`Seed: ${data.error}`); return; }
-        const summary = (data.added || []).map(it => `[${it.kind}] ${it.title}`).join("\n");
-        alert(`Seeded ${data.count} items from ${filename}:\n\n${summary || "(none)"}`);
+        const items = data.added || [];
+        if (items.length === 0) {
+            alert(
+                `Nothing new to seed from ${filename}.\n\n` +
+                "Every failure / slow case from this report is already in your queue. " +
+                "Use \"Clear queue\" in the Dream tab if you want a fresh seed."
+            );
+            return;
+        }
+        const summary = items.map(it => `[${it.kind}] ${it.title}`).join("\n");
+        alert(`Seeded ${data.count} new item(s) from ${filename}:\n\n${summary}`);
     })
     .catch(err => alert(`Seed failed: ${err}`));
 }
@@ -1620,13 +1675,13 @@ function renderDiff(diffText) {
     for (let line of lines) {
         const safe = escapeHtml(line);
         if (line.startsWith("@@")) {
-            html += `<div style="color:#6a737d;font-style:italic;">${safe}</div>`;
+            html += `<div class="diff-hunk">${safe}</div>`;
         } else if (line.startsWith("+")) {
-            html += `<div style="background:#e6ffed;color:#22863a;">${safe}</div>`;
+            html += `<div class="diff-add">${safe}</div>`;
         } else if (line.startsWith("-")) {
-            html += `<div style="background:#ffeef0;color:#b31d28;">${safe}</div>`;
+            html += `<div class="diff-del">${safe}</div>`;
         } else {
-            html += `<div style="color:#24292e;">${safe}</div>`;
+            html += `<div class="diff-ctx">${safe}</div>`;
         }
     }
 
@@ -1791,23 +1846,28 @@ async function localCritique() {
     const data = await res.json();
 
     if (!data.ok) {
-        main.innerHTML = `<span style="color:#e55">&#x26A0; ${data.error}</span>`;
+        main.innerHTML = `<span class="critique-error">&#x26A0; ${data.error}</span>`;
         return;
     }
 
     const c = data.critic;
-    const verdictColor = c.verdict === "accept" ? "#2a9d2a" : c.verdict === "reject" ? "#c0392b" : "#d97706";
+    // Class-per-verdict instead of dynamic inline color.
+    const verdictClass = c.verdict === "accept"
+        ? "critique-verdict--accept"
+        : c.verdict === "reject"
+            ? "critique-verdict--reject"
+            : "critique-verdict--unclear";
     const riskHtml = c.risk_flags?.length
-        ? `<div style="margin-top:6px"><strong>Risk flags:</strong> ${c.risk_flags.map(f => `<code>${f}</code>`).join(", ")}</div>`
+        ? `<div class="critique-section"><strong>Risk flags:</strong> ${c.risk_flags.map(f => `<code>${f}</code>`).join(", ")}</div>`
         : "";
     const fixHtml = c.must_fix?.length
-        ? `<div style="margin-top:6px"><strong>Must fix:</strong><ul style="margin:4px 0 0 16px">${c.must_fix.map(f => `<li>${f}</li>`).join("")}</ul></div>`
+        ? `<div class="critique-section"><strong>Must fix:</strong><ul class="critique-fix-list">${c.must_fix.map(f => `<li>${f}</li>`).join("")}</ul></div>`
         : "";
 
     main.innerHTML = `
-        <div><strong>Verdict:</strong> <span style="color:${verdictColor};font-weight:bold">${c.verdict}</span>
+        <div><strong>Verdict:</strong> <span class="critique-verdict ${verdictClass}">${c.verdict}</span>
         &nbsp;&nbsp;<strong>Confidence:</strong> ${Math.round((c.confidence || 0) * 100)}%</div>
-        <div style="margin-top:6px"><strong>Summary:</strong> ${c.critic_summary || "—"}</div>
+        <div class="critique-section"><strong>Summary:</strong> ${c.critic_summary || "—"}</div>
         ${riskHtml}${fixHtml}`;
 
     if (data.thought) {

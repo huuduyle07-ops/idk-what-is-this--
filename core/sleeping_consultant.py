@@ -36,6 +36,7 @@ _RUN_STATE: dict = {
     "current_title": "",
     "items_done": [],          # list of {idx, kind, title, status}
     "error": None,             # str when status=failed
+    "stop_requested": False,   # Slice β — user clicked Stop; loop exits after current item
 }
 
 
@@ -65,7 +66,27 @@ def _reset_state_for_run(total: int, patch_style: str, report_dir: Path) -> None
             "current_title": "",
             "items_done": [],
             "error": None,
+            "stop_requested": False,   # Slice β — clear from any previous run
         })
+
+
+def request_stop() -> dict:
+    """Slice β: request a graceful stop. The dream loop checks this flag
+    between items and exits cleanly, marking remaining items as
+    `skipped_user_stop`.
+
+    The currently-executing item is allowed to finish naturally (no rollback,
+    no half-written artifacts). Hard cancellation of an in-flight LLM call is
+    NOT supported in this slice — would require cancellation tokens through
+    every client.
+    """
+    with _STATE_LOCK:
+        if _RUN_STATE["status"] != "running":
+            return {"stopped": False, "reason": "no run in progress"}
+        if _RUN_STATE["stop_requested"]:
+            return {"stopped": True, "reason": "stop already requested"}
+        _RUN_STATE["stop_requested"] = True
+        return {"stopped": True, "reason": "will stop after current item"}
 
 
 def _record_item_done(item_result: dict) -> None:
@@ -500,6 +521,23 @@ def run_overnight(
                 **item, "idx": idx,
                 "status": "skipped_time_budget",
                 "summary": "Time budget exceeded.",
+            }
+            results.append(skipped)
+            _record_item_done(skipped)
+            continue
+
+        # Slice β: user-requested stop. Mark this + remaining items as skipped
+        # without running them. The current item (if one was already in flight
+        # at click time) finished before we reached here — no rollback needed.
+        if _RUN_STATE.get("stop_requested"):
+            print(
+                f"💤 DREAM: [{idx}/{len(queue)}] skipped — user stop requested",
+                flush=True,
+            )
+            skipped = {
+                **item, "idx": idx,
+                "status": "skipped_user_stop",
+                "summary": "Run stopped by user before this item.",
             }
             results.append(skipped)
             _record_item_done(skipped)

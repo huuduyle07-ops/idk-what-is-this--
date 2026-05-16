@@ -459,6 +459,44 @@ def _run_case_with_capture(case_file: Path, capture: bool) -> dict[str, Any]:
     return res
 
 
+def _should_retry(res: dict[str, Any]) -> bool:
+    """Decide whether a failed case is worth retrying.
+
+    Skips retry for: explicit skips, toolchain failures, forbidden-file
+    touches, and structural errors (run_case raised). These are deterministic
+    or safety-related — retries can't fix them and would just hide intent.
+    """
+    if res.get("success"):
+        return False
+    if res.get("skipped"):
+        return False
+    if res.get("toolchain_issue"):
+        return False
+    if res.get("touched_forbidden_files"):
+        return False
+    if res.get("error"):
+        return False
+    return True
+
+
+def _retry_attempt_snapshot(res: dict[str, Any], attempt: int) -> dict[str, Any]:
+    """Slim per-attempt record for the retry_results[] list.
+
+    Keeps just enough to diff a failure attempt against a success attempt
+    (Gemini's poisoning-of-flake-data fix: knowing a case is flaky is useless
+    without the prompt/log delta between attempts). Full per-attempt result
+    dicts would balloon the report; tails are enough for debug.
+    """
+    return {
+        "attempt": attempt,
+        "success": bool(res.get("success")),
+        "validation_ok": res.get("validation_ok"),
+        "validation_output_tail": (res.get("validation_output") or "")[-1500:],
+        "runner_log_tail": (res.get("runner_log_tail") or "")[-1500:],
+        "duration_sec": res.get("duration_sec"),
+    }
+
+
 def _duration_aggregates(
     results: list[dict[str, Any]],
     top_n: int = 5,
@@ -657,6 +695,8 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
     passed = report.get("passed", sum(1 for r in results if r.get("success")))
     skipped = report.get("skipped", sum(1 for r in results if r.get("skipped")))
     failed = report.get("failed", max(0, total - passed - skipped))
+    # Backwards-compat: older reports predate the `flaky` field.
+    flaky = report.get("flaky", sum(1 for r in results if r.get("flaky")))
     rate = (passed / total * 100) if total else 0.0
     duration = report.get("duration_sec")
     filters = report.get("filters") or {}
@@ -671,6 +711,8 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
     lines.append(f"- Passed: {passed}")
     lines.append(f"- Failed: {failed}")
     lines.append(f"- Skipped: {skipped}")
+    if flaky:
+        lines.append(f"- Flaky: {flaky} (passed on retry)")
     lines.append(f"- Success rate: {rate:.1f}%")
     if isinstance(duration, (int, float)):
         lines.append(f"- Duration: {duration:.2f}s")
@@ -716,6 +758,23 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
             lines.append(f"| `{_md_cell(name)}` | {dur:.2f}s |")
         lines.append("")
 
+    flaky_results = [r for r in results if r.get("flaky")]
+    if flaky_results:
+        lines.append("## Flaky Cases (passed on retry)")
+        lines.append("")
+        lines.append("| Name | Passed on attempt | Total attempts |")
+        lines.append("|---|---|---|")
+        for r in flaky_results:
+            name = r.get("name") or "(unknown)"
+            attempts = r.get("attempts", 1)
+            # The first successful attempt = first retry_results entry with success=true.
+            passing_attempt = next(
+                (a.get("attempt") for a in (r.get("retry_results") or []) if a.get("success")),
+                attempts,
+            )
+            lines.append(f"| `{_md_cell(name)}` | {passing_attempt} | {attempts} |")
+        lines.append("")
+
     failed_results = [
         r for r in results
         if not r.get("success") and not r.get("skipped")
@@ -740,6 +799,10 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
                 lines.append("- rollback_happened: true")
             if r.get("error"):
                 lines.append(f"- error: `{_md_cell(r['error'])}`")
+            if r.get("attempts", 1) > 1:
+                lines.append(
+                    f"- attempts: {r['attempts']} (all failed)"
+                )
             lines.append("")
 
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -876,6 +939,18 @@ def main() -> int:
         nargs=2,
         metavar=("OLD", "NEW"),
         help="Compare two benchmark report JSON files; no agent runs.",
+    )
+    parser.add_argument(
+        "--retry-failed",
+        type=int,
+        default=0,
+        metavar="N",
+        help=(
+            "Rerun failed cases up to N times. If a retry passes, mark the case "
+            "as flaky=true (still counts as passed). Toolchain failures, "
+            "forbidden-file touches, and structural errors are NEVER retried. "
+            "Costs ~N× tokens per flaky case; default 0 = no retries."
+        ),
     )
     args = parser.parse_args()
 
@@ -1047,13 +1122,50 @@ def main() -> int:
                 "error": repr(e),
             }
 
+        # Retry-on-failure (AI Suggestion § A + Gemini's per-attempt context
+        # capture). Toolchain failures, forbidden-file touches, and structural
+        # errors are excluded by `_should_retry()` — retries can't fix them.
+        retry_n = args.retry_failed
+        if retry_n > 0 and _should_retry(res):
+            attempts_log: list[dict[str, Any]] = [
+                _retry_attempt_snapshot(res, attempt=1)
+            ]
+            for attempt in range(2, retry_n + 2):  # total max = 1 + retry_n
+                if not quiet:
+                    print(
+                        f"  🔁 Retry {attempt}/{retry_n + 1} for {case_label}…"
+                    )
+                retry_res = _run_case_with_capture(case_file, capture=capture)
+                attempts_log.append(
+                    _retry_attempt_snapshot(retry_res, attempt=attempt)
+                )
+                res = retry_res  # final attempt wins for the per-case entry
+                if retry_res.get("success"):
+                    break
+            res["attempts"] = len(attempts_log)
+            res["flaky"] = bool(res.get("success")) and any(
+                not a["success"] for a in attempts_log
+            )
+            res["retry_results"] = attempts_log
+        else:
+            # No-retry path: still set fields for shape consistency so the
+            # report schema is uniform (Dream seeder + Benchmarks tab don't
+            # need to special-case absence).
+            res.setdefault("attempts", 1)
+            res.setdefault("flaky", False)
+            res.setdefault("retry_results", [])
+
         results.append(res)
 
         if not quiet:
             if res.get("skipped"):
                 status = "⏭️ SKIP"
+            elif res.get("success") and res.get("flaky"):
+                status = f"✅ PASS (flaky, attempt {res.get('attempts', 1)})"
             elif res.get("success"):
                 status = "✅ PASS"
+            elif res.get("attempts", 1) > 1:
+                status = f"❌ FAIL (after {res.get('attempts')} attempts)"
             else:
                 status = "❌ FAIL"
             name = res.get("name")
@@ -1087,11 +1199,13 @@ def main() -> int:
     skipped = sum(1 for r in results if r.get("skipped"))
     total = len(results)
     failed = max(0, total - passed - skipped)
+    flaky = sum(1 for r in results if r.get("flaky"))
 
     report = {
         "passed": passed,
         "failed": failed,
         "skipped": skipped,
+        "flaky": flaky,
         "total": total,
         "success_rate": (passed / (total - skipped)) if (total - skipped) else 0,
         "duration_sec": run_duration,
