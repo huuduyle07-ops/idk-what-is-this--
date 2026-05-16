@@ -866,6 +866,49 @@ button {
     color: #fecaca;
 }
 
+.dream-patch-blockers {
+    margin-top: 5px;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.dream-patch-blockers > summary {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    list-style: none;
+}
+
+.dream-patch-blockers > summary::-webkit-details-marker {
+    display: none;
+}
+
+.dream-patch-blocker-badge {
+    background: #1e293b;
+    color: #cbd5e1;
+    border: 1px solid #334155;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.dream-patch-blockers ul {
+    margin: 5px 0 0;
+    padding-left: 16px;
+}
+
+.dream-patch-blockers li {
+    margin: 2px 0;
+    line-height: 1.35;
+}
+
+.dream-patch-blocker-evidence {
+    color: #64748b;
+    margin-left: 4px;
+}
+
 /* Override the old single-line dream-status-* rules so they don't double-style. */
 .dream-status-running, .dream-status-done, .dream-status-failed {
     background: transparent !important;

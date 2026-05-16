@@ -729,7 +729,7 @@ def dream_list_route():
         return {"error": "No dream report found yet."}
 
     try:
-        data = json.loads((latest / "list.json").read_text(encoding="utf-8"))
+        data = dream_artifacts.read_report(latest)
     except Exception as e:
         return {"error": f"failed to read list.json: {e}"}
 

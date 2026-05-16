@@ -216,21 +216,18 @@ def read_report(report_dir: Path) -> dict:
     items: list[dict] = []
     patch_style = None
     completed_at = None
+    dream_mode = None
     if list_path.exists():
         try:
             data = json.loads(list_path.read_text(encoding="utf-8"))
             items = data.get("items", []) or []
             patch_style = data.get("patch_style")
             completed_at = data.get("completed_at")
+            dream_mode = data.get("dream_mode")
         except Exception:
             pass
 
-    dream_mode = None
-    if list_path.exists():
-        try:
-            dream_mode = json.loads(list_path.read_text(encoding="utf-8")).get("dream_mode")
-        except Exception:
-            pass
+    items = enrich_report_patch_blockers(report_dir, items, dream_mode)
 
     return {
         "report_dir": str(report_dir),
@@ -240,6 +237,80 @@ def read_report(report_dir: Path) -> dict:
         "dream_mode": dream_mode,
         "completed_at": completed_at,
     }
+
+
+def _report_item_dir(report_dir: Path, item: dict) -> Path | None:
+    item_dir_name = item.get("item_dir_name")
+    if item_dir_name:
+        candidate = (report_dir / str(item_dir_name)).resolve()
+    else:
+        idx = item.get("idx")
+        if not isinstance(idx, int):
+            return None
+        candidate = item_dir(report_dir, idx, item.get("title", "")).resolve()
+    try:
+        candidate.relative_to(report_dir.resolve())
+    except ValueError:
+        return None
+    return candidate
+
+
+def _chosen_plan_artifact_name(item: dict) -> str:
+    preferred = item.get("preferred_artifact")
+    if item.get("preferred_artifact_kind") == "plan" and isinstance(preferred, str):
+        try:
+            kind, artifact = validate_preferred_artifact_name(preferred)
+        except ValueError:
+            return "plan_analysis.json"
+        if kind == "plan":
+            return artifact
+    return "plan_analysis.json"
+
+
+def read_item_plan_analysis(report_dir: Path, item: dict) -> dict | None:
+    item_dir_path = _report_item_dir(report_dir, item)
+    if item_dir_path is None:
+        return None
+
+    plan_path = item_dir_path / _chosen_plan_artifact_name(item)
+    if not plan_path.is_file():
+        return None
+    try:
+        parsed = json.loads(plan_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    return parsed if isinstance(parsed, dict) else None
+
+
+def enrich_report_patch_blockers(
+    report_dir: Path,
+    items: list[dict],
+    dream_mode: str | None = None,
+) -> list[dict]:
+    enriched: list[dict] = []
+    for raw_item in items:
+        if not isinstance(raw_item, dict):
+            continue
+        item = dict(raw_item)
+        status = item.get("status")
+        refreshable_status = status in {
+            "planned_no_patch",
+            "patch_skipped_needs_vibe",
+            "needs_manual_review",
+            "blocked_missing_context",
+        }
+        should_refresh = (
+            (refreshable_status and not item.get("patch_blockers"))
+            or item.get("preferred_artifact_kind") == "plan"
+        )
+        if should_refresh:
+            plan = read_item_plan_analysis(report_dir, item)
+            plan_context = dict(plan) if isinstance(plan, dict) else {}
+            if dream_mode and plan_context:
+                plan_context["dream_mode"] = dream_mode
+            attach_patch_blockers(item, plan_context)
+        enriched.append(item)
+    return enriched
 
 
 def read_queue(repo_path: str) -> list[dict]:
@@ -427,6 +498,241 @@ def item_dir(report_dir: Path, idx: int, title: str) -> Path:
     return report_dir / f"{idx:02d}-{slugify(title)}"
 
 
+def _json_evidence(value) -> str:
+    try:
+        rendered = json.dumps(value, ensure_ascii=False)
+    except TypeError:
+        rendered = str(value)
+    return rendered[:240]
+
+
+def _context_value(item: dict, plan: dict | None, key: str, default=None):
+    if isinstance(plan, dict) and key in plan:
+        return plan.get(key)
+    return item.get(key, default)
+
+
+def _is_false_value(value) -> bool:
+    if value is False:
+        return True
+    if isinstance(value, str):
+        return value.strip().lower() in {"false", "no", "0"}
+    return False
+
+
+def _as_nonempty_list(value) -> list:
+    if isinstance(value, str):
+        stripped = value.strip()
+        return [stripped] if stripped else []
+    if isinstance(value, (list, tuple, set)):
+        return [v for v in value if str(v or "").strip()]
+    return []
+
+
+_VAGUE_FILE_VALUES = {
+    ".",
+    "./",
+    "unknown",
+    "n/a",
+    "na",
+    "none",
+    "null",
+    "tbd",
+    "todo",
+    "various",
+    "multiple",
+    "repo",
+    "repository",
+    "project",
+    "codebase",
+    "source",
+    "src",
+    "app",
+    "core",
+    "tests",
+    "test",
+    "files",
+    "file",
+}
+
+_VAGUE_FILE_SUBSTRINGS = (
+    "unknown",
+    "tbd",
+    "todo",
+    "various",
+    "multiple",
+    "relevant",
+    "appropriate",
+    "likely",
+    "target file",
+    "path/to",
+    "relative/path",
+    "...",
+    "*",
+)
+
+_KNOWN_EXTENSIONLESS_FILES = {
+    "dockerfile",
+    "makefile",
+    "rakefile",
+    "gemfile",
+    "procfile",
+    "license",
+    "readme",
+}
+
+
+def _is_vague_likely_file(path_value) -> bool:
+    path = str(path_value or "").strip().strip("`'\"").replace("\\", "/")
+    lower = path.lower()
+    if not lower or lower in _VAGUE_FILE_VALUES:
+        return True
+    if lower.endswith("/"):
+        return True
+    if any(marker in lower for marker in _VAGUE_FILE_SUBSTRINGS):
+        return True
+
+    final = lower.rsplit("/", 1)[-1]
+    if final in _VAGUE_FILE_VALUES:
+        return True
+
+    # A lone directory-ish token is not enough to safely target a patch.
+    if "/" not in lower and "." not in final and final not in _KNOWN_EXTENSIONLESS_FILES:
+        return True
+    return False
+
+
+def _has_patch_payload(item: dict, plan: dict | None) -> bool:
+    for key in ("patch_plan", "patch_candidate"):
+        value = _context_value(item, plan, key)
+        if isinstance(value, list) and value:
+            return True
+        if isinstance(value, dict) and value:
+            return True
+    return False
+
+
+def classify_patch_blockers(item: dict, plan: dict | None = None) -> list[dict]:
+    """Explain why a Dream item is not currently ready_to_apply.
+
+    Pure metadata: this helper never calls an LLM, edits artifacts, or changes
+    whether a patch is generated/applied.
+    """
+    blockers: list[dict] = []
+    status = str(item.get("status") or "")
+    mode = str(
+        _context_value(item, plan, "dream_mode")
+        or _context_value(item, plan, "mode")
+        or ""
+    ).strip().lower()
+
+    def add(code: str, message: str, evidence: str) -> None:
+        if any(existing.get("code") == code for existing in blockers):
+            return
+        blockers.append({
+            "code": code,
+            "message": message,
+            "evidence": str(evidence)[:240],
+        })
+
+    safe_value = _context_value(item, plan, "safe_to_patch_now")
+    safe_is_false = _is_false_value(safe_value)
+    if safe_is_false:
+        add(
+            "safe_to_patch_false",
+            "Planner marked this item as not safe to patch now.",
+            f"safe_to_patch_now={safe_value!r}",
+        )
+
+    validation_commands = _context_value(item, plan, "validation_commands")
+    if mode == "patch_if_safe" and not _as_nonempty_list(validation_commands):
+        add(
+            "missing_validation_command",
+            "No validation command was provided for patch_if_safe.",
+            f"validation_commands={_json_evidence(validation_commands)}",
+        )
+
+    likely_files = _context_value(item, plan, "likely_files")
+    has_likely_files_field = (
+        (isinstance(plan, dict) and "likely_files" in plan)
+        or "likely_files" in item
+    )
+    likely_file_values = _as_nonempty_list(likely_files)
+    if has_likely_files_field and (
+        not likely_file_values
+        or all(_is_vague_likely_file(path) for path in likely_file_values)
+    ):
+        add(
+            "target_file_uncertain",
+            "No concrete target file was identified.",
+            f"likely_files={_json_evidence(likely_files)}",
+        )
+
+    patch_style = str(_context_value(item, plan, "patch_style_required") or "").strip().lower()
+    if patch_style == "none":
+        add(
+            "patch_style_none",
+            "Planner indicated no patch style is appropriate for this item.",
+            "patch_style_required=none",
+        )
+
+    if status == "needs_manual_review":
+        add(
+            "needs_manual_review",
+            "Item status requires manual review before patching.",
+            "status=needs_manual_review",
+        )
+
+    if status == "blocked_missing_context":
+        add(
+            "blocked_missing_context",
+            "Item is blocked because required context is missing.",
+            "status=blocked_missing_context",
+        )
+
+    if status == "patch_skipped_needs_vibe":
+        add(
+            "vibe_required",
+            "This item requires vibe style before patching.",
+            "status=patch_skipped_needs_vibe",
+        )
+
+    patch_generation_attempted = bool(
+        _context_value(item, plan, "patch_generation_attempted")
+        or _context_value(item, plan, "patch_generation_failed")
+    )
+    if (
+        status == "planned_no_patch"
+        and mode == "patch_if_safe"
+        and not _has_patch_payload(item, plan)
+        and (patch_generation_attempted or not safe_is_false)
+    ):
+        add(
+            "patch_generation_failed",
+            "Patch generation did not produce a patch_plan or patch_candidate.",
+            "mode=patch_if_safe; status=planned_no_patch; patch_plan/patch_candidate missing",
+        )
+
+    return blockers
+
+
+def patch_blocker_summary(blockers: list[dict]) -> str:
+    if not blockers:
+        return ""
+    codes = [str(blocker.get("code") or "unknown") for blocker in blockers]
+    shown = ", ".join(codes[:3])
+    if len(codes) > 3:
+        shown = f"{shown}, +{len(codes) - 3} more"
+    return f"why no patch: {shown}"
+
+
+def attach_patch_blockers(item: dict, plan: dict | None = None) -> dict:
+    blockers = classify_patch_blockers(item, plan)
+    item["patch_blockers"] = blockers
+    item["patch_blocker_summary"] = patch_blocker_summary(blockers)
+    return item
+
+
 STATUS_LEGEND: dict[str, str] = {
     "planned_no_patch": "Plan created; patching not attempted.",
     "ready_to_apply": "Patch validated in sandbox; awaiting user apply.",
@@ -486,6 +792,18 @@ def write_report_markdown(
         lines.append(f"- status: **{status}**")
         if summary:
             lines.append(f"- summary: {summary}")
+        blockers = it.get("patch_blockers") or []
+        if blockers:
+            blocker_summary = it.get("patch_blocker_summary") or patch_blocker_summary(blockers)
+            lines.append(f"- {blocker_summary}")
+            for blocker in blockers:
+                code = blocker.get("code", "unknown")
+                message = blocker.get("message", "")
+                evidence = blocker.get("evidence", "")
+                detail = f"  - `{code}`: {message}"
+                if evidence:
+                    detail += f" ({evidence})"
+                lines.append(detail)
         if artifacts:
             lines.append(f"- artifacts: `{artifacts}/`")
         lines.append("")

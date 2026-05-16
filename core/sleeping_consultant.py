@@ -103,6 +103,8 @@ def _record_item_done(item_result: dict) -> None:
             "kind": item_result.get("kind"),
             "title": item_result.get("title"),
             "status": item_result.get("status"),
+            "patch_blockers": item_result.get("patch_blockers", []),
+            "patch_blocker_summary": item_result.get("patch_blocker_summary", ""),
         })
 
 
@@ -130,6 +132,8 @@ def _update_item_done(updated_item: dict) -> None:
             "latest_refinement_error_summary"
         ),
         "lesson_evaluation": updated_item.get("lesson_evaluation"),
+        "patch_blockers": updated_item.get("patch_blockers", []),
+        "patch_blocker_summary": updated_item.get("patch_blocker_summary", ""),
     }
     with _STATE_LOCK:
         items = _RUN_STATE.get("items_done", [])
@@ -165,6 +169,19 @@ def _build_patch_query(item: dict) -> str:
     if hint:
         return f"[{kind}] {title} — Hint: {hint}"
     return f"[{kind}] {title}"
+
+
+def _attach_patch_blockers(
+    item_result: dict,
+    plan: dict | None = None,
+    dream_mode: str | None = None,
+    **extra_context,
+) -> dict:
+    plan_context = dict(plan) if isinstance(plan, dict) else {}
+    if dream_mode:
+        plan_context["dream_mode"] = dream_mode
+    plan_context.update(extra_context)
+    return dream_artifacts.attach_patch_blockers(item_result, plan_context)
 
 
 def _generate_patch_plan(
@@ -302,12 +319,20 @@ def _run_patch_item(
             summary = ""
             if isinstance(plan_data, dict):
                 summary = plan_data.get("problem_summary", "") or ""
-            return {
+            out = {
                 **item, "idx": idx,
                 "status": "planned_no_patch",
                 "summary": (summary or "Plan created; no patch generated.")[:200],
                 "item_dir_name": item_dir_path.name,
             }
+            return _attach_patch_blockers(
+                out,
+                plan_data,
+                dream_mode="patch_if_safe",
+                patch_generation_attempted=True,
+                patch_plan=patch.get("patch_plan"),
+                patch_candidate=patch.get("patch_candidate"),
+            )
 
         # Fresh sandbox per attempt — failed apply never contaminates next item.
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
@@ -347,12 +372,12 @@ def _run_patch_item(
             + (result.get("validation_output") or "")
         ).strip()[:1500]
 
-    return {
+    return _attach_patch_blockers({
         **item, "idx": idx,
         "status": "rejected",
         "summary": (feedback or "Patch failed validation after all attempts.")[:200],
         "item_dir_name": item_dir_path.name,
-    }
+    })
 
 
 def _run_idea_item(
@@ -381,12 +406,12 @@ def _run_idea_item(
     raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path) or ""
     (item_dir_path / "design.md").write_text(raw, encoding="utf-8")
 
-    return {
+    return _attach_patch_blockers({
         **item, "idx": idx,
         "status": "idea_written",
         "summary": raw[:200].replace("\n", " "),
         "item_dir_name": item_dir_path.name,
-    }
+    })
 
 
 def _run_plan_only_item(
@@ -394,6 +419,7 @@ def _run_plan_only_item(
     item: dict,
     idx: int,
     item_dir_path: Path,
+    dream_mode: str = "plan_only",
 ) -> dict:
     """Generate a structured plan for any item type without attempting a patch.
 
@@ -409,12 +435,12 @@ def _run_plan_only_item(
     summary = ""
     if isinstance(plan_data, dict):
         summary = plan_data.get("problem_summary", "") or ""
-    return {
+    return _attach_patch_blockers({
         **item, "idx": idx,
         "status": "planned_no_patch",
         "summary": (summary or "Plan created; no patch generated.")[:200],
         "item_dir_name": item_dir_path.name,
-    }
+    }, plan_data, dream_mode=dream_mode)
 
 
 def _run_research_item(
@@ -462,12 +488,12 @@ def _run_research_item(
     if not summary:
         summary = raw[:200].replace("\n", " ")
 
-    return {
+    return _attach_patch_blockers({
         **item, "idx": idx,
         "status": "research_note_created",
         "summary": summary[:200],
         "item_dir_name": item_dir_path.name,
-    }
+    }, plan_data, dream_mode="research")
 
 
 def _run_patch_if_safe_item(
@@ -496,12 +522,12 @@ def _run_patch_if_safe_item(
         safe = bool(plan_data.get("safe_to_patch_now"))
 
     if not safe:
-        return {
+        return _attach_patch_blockers({
             **item, "idx": idx,
             "status": "planned_no_patch",
             "summary": (summary or "Planner judged the task not safe to auto-patch.")[:200],
             "item_dir_name": item_dir_path.name,
-        }
+        }, plan_data, dream_mode="patch_if_safe")
 
     return _run_patch_item(
         repo_path=repo_path,
@@ -1008,7 +1034,9 @@ def run_overnight(
                     f"💤 DREAM: [{idx}/{len(queue)}] plan_only → {kind}",
                     flush=True,
                 )
-                results.append(_run_plan_only_item(repo_path, item, idx, item_path))
+                results.append(_run_plan_only_item(
+                    repo_path, item, idx, item_path, dream_mode=mode,
+                ))
             elif mode == "research":
                 print(
                     f"💤 DREAM: [{idx}/{len(queue)}] research → {kind}",
@@ -1029,15 +1057,33 @@ def run_overnight(
                         results.append(_run_idea_item(repo_path, item, idx, item_path))
                     else:
                         # Plan the idea but flag that patching needs vibe style.
-                        out = _run_plan_only_item(repo_path, item, idx, item_path)
+                        out = _run_plan_only_item(
+                            repo_path, item, idx, item_path, dream_mode=mode,
+                        )
                         out["status"] = "patch_skipped_needs_vibe"
                         out["summary"] = (
                             "Idea-class task: patching requires vibe style. "
                             + (out.get("summary") or "")
                         )[:200]
+                        existing_blockers = list(out.get("patch_blockers") or [])
+                        existing_codes = {
+                            blocker.get("code")
+                            for blocker in existing_blockers
+                            if isinstance(blocker, dict)
+                        }
+                        for blocker in dream_artifacts.classify_patch_blockers(out, {}):
+                            if blocker.get("code") not in existing_codes:
+                                existing_blockers.append(blocker)
+                                existing_codes.add(blocker.get("code"))
+                        out["patch_blockers"] = existing_blockers
+                        out["patch_blocker_summary"] = dream_artifacts.patch_blocker_summary(
+                            existing_blockers
+                        )
                         results.append(out)
                 else:  # debt, research, anything else
-                    results.append(_run_plan_only_item(repo_path, item, idx, item_path))
+                    results.append(_run_plan_only_item(
+                        repo_path, item, idx, item_path, dream_mode=mode,
+                    ))
         except Exception as e:
             item_path.mkdir(parents=True, exist_ok=True)
             (item_path / "error.txt").write_text(

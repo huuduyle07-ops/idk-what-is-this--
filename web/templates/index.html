@@ -608,6 +608,34 @@ function _renderLessonEvaluationBadge(it) {
     return `<span class="dream-lesson-badge ${className}" title="${_escapeHtml(tooltip)}">${_escapeHtml(promotion)}</span>`;
 }
 
+function _renderPatchBlockerDetails(it) {
+    const blockers = Array.isArray(it.patch_blockers)
+        ? it.patch_blockers.filter(Boolean)
+        : [];
+    if (!blockers.length) return "";
+    const summary = it.patch_blocker_summary || "why no patch";
+    const rows = blockers.map(blocker => {
+        const code = blocker && blocker.code ? String(blocker.code) : "unknown";
+        const message = blocker && blocker.message ? String(blocker.message) : "";
+        const evidence = blocker && blocker.evidence ? String(blocker.evidence) : "";
+        return `
+            <li>
+                <code>${_escapeHtml(code)}</code>
+                <span>${_escapeHtml(message)}</span>
+                ${evidence ? `<span class="dream-patch-blocker-evidence" title="${_escapeHtml(evidence)}">${_escapeHtml(evidence)}</span>` : ""}
+            </li>
+        `;
+    }).join("");
+    return `
+        <details class="dream-patch-blockers">
+            <summary>
+                <span class="dream-patch-blocker-badge" title="${_escapeHtml(summary)}">why no patch</span>
+            </summary>
+            <ul>${rows}</ul>
+        </details>
+    `;
+}
+
 function _renderDreamItemCard(it, opts = {}) {
     const idx = it.idx ?? "?";
     const kind = _escapeHtml(it.kind || "?");
@@ -658,6 +686,7 @@ function _renderDreamItemCard(it, opts = {}) {
     const promoteBtn = canPromote
         ? `<button type="button" class="dream-action-btn" onclick="promoteDreamArtifact('${_escapeHtml(opts.date || "")}', '${_escapeHtml(opts.runId)}', ${Number(it.idx)}, '${_escapeHtml(it.latest_refined_artifact)}')">Promote refined</button>`
         : "";
+    const patchBlockerDetails = _renderPatchBlockerDetails(it);
     return `
         <div class="dream-item-card">
             ${checkbox}
@@ -673,6 +702,7 @@ function _renderDreamItemCard(it, opts = {}) {
                     ${preferredBadge}
                 </div>
                 ${summary ? `<div class="dream-item-card__summary">${summary}</div>` : ""}
+                ${patchBlockerDetails}
                 ${promoteBtn ? `<div class="dream-item-card__actions">${promoteBtn}</div>` : ""}
             </div>
         </div>
