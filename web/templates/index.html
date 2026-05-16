@@ -218,6 +218,7 @@
               <label class="dream-budget-label" title="How long Dream can run before it stops accepting new items (Slice α).">
                 Budget:
                 <select id="dreamBudget">
+                  <option value="300">5 min</option>
                   <option value="1800">30 min</option>
                   <option value="3600">1 hour</option>
                   <option value="7200">2 hours</option>
@@ -575,6 +576,15 @@ function _dreamStatusClass(s) {
 }
 
 // One renderer for every place Dream items appear (queue, report, apply, live status).
+function _dreamLatestFailedRefinement(it) {
+    const history = Array.isArray(it.refinement_history) ? it.refinement_history : [];
+    for (let i = history.length - 1; i >= 0; i--) {
+        const entry = history[i];
+        if (entry && entry.ok === false) return entry;
+    }
+    return null;
+}
+
 function _renderDreamItemCard(it, opts = {}) {
     const idx = it.idx ?? "?";
     const kind = _escapeHtml(it.kind || "?");
@@ -583,6 +593,30 @@ function _renderDreamItemCard(it, opts = {}) {
     const summary = _escapeHtml(it.summary || it.message || it.hint || "");
     const checkbox = opts.selectable
         ? `<input type="checkbox" class="dream-item-card__check" data-idx="${_escapeHtml(String(idx))}">`
+        : "";
+    // Slice γ.1: refinement badge — only when refinement_count > 0. Hover
+    // tooltip shows latest_refined_artifact filename so user can find it
+    // in the report dir without diving into refinement_history.
+    const refinedBadge = (it.refinement_count && it.refinement_count > 0)
+        ? `<span class="dream-refined-badge" title="Refined ${it.refinement_count}×${it.latest_refined_artifact ? ' · latest: ' + _escapeHtml(it.latest_refined_artifact) : ''}">✨ refined ${it.refinement_count}×</span>`
+        : "";
+    const failedRefinement = _dreamLatestFailedRefinement(it);
+    const attemptCount = it.refinement_attempt_count ?? (
+        Array.isArray(it.refinement_history) ? it.refinement_history.length : 0
+    );
+    const failedArtifact = failedRefinement
+        ? (failedRefinement.failed_artifact || failedRefinement.artifact || it.latest_failed_refinement_artifact || "")
+        : "";
+    const failedSummary = failedRefinement
+        ? (failedRefinement.error || failedRefinement.after_summary || it.latest_refinement_error_summary || "")
+        : "";
+    const failedTooltip = [
+        `Refinement failed${attemptCount ? ` after ${attemptCount} attempt${attemptCount === 1 ? "" : "s"}` : ""}.`,
+        failedArtifact ? `Latest artifact: ${failedArtifact}` : "",
+        !failedArtifact && failedSummary ? `Error: ${failedSummary}` : "",
+    ].filter(Boolean).join(" ");
+    const refineFailedBadge = failedRefinement
+        ? `<span class="dream-refine-failed-badge" title="${_escapeHtml(failedTooltip)}">⚠ refine failed</span>`
         : "";
     return `
         <div class="dream-item-card">
@@ -593,6 +627,8 @@ function _renderDreamItemCard(it, opts = {}) {
                     <span class="dream-item-card__kind">[${kind}]</span>
                     <span class="dream-item-card__title">${title}</span>
                     <span class="dream-item-badge ${_dreamStatusClass(status)}">${_escapeHtml(status)}</span>
+                    ${refinedBadge}
+                    ${refineFailedBadge}
                 </div>
                 ${summary ? `<div class="dream-item-card__summary">${summary}</div>` : ""}
             </div>
@@ -877,8 +913,14 @@ function _renderDreamStatus(state) {
         const cur = state.current_title
             ? `${_escapeHtml(state.current_kind || "?")} → ${_escapeHtml(state.current_title)}`
             : "(starting)";
+        // Slice γ.1: refining-phase variant (purple) — takes priority over the
+        // running header but yields to the stopping header when Stop is clicked.
+        if (state.phase === "refining" && !state.stop_requested) {
+            const round = state.refinement_round || 1;
+            header = `<div class="dream-status-header dream-status-header--refining">✨ Refining (round ${round}) · ${itemsDone.length}/${total} items in pass</div>`;
+        }
         // Slice β: orange "stopping" variant when user has clicked Stop.
-        if (state.stop_requested) {
+        else if (state.stop_requested) {
             header = `<div class="dream-status-header dream-status-header--stopping">🛑 Stopping after current item · [${idx}/${total}] ${cur}</div>`;
         } else {
             header = `<div class="dream-status-header dream-status-header--running">💤 Running [${idx}/${total}] ${cur} · done: ${itemsDone.length}/${total}</div>`;

@@ -37,6 +37,8 @@ _RUN_STATE: dict = {
     "items_done": [],          # list of {idx, kind, title, status}
     "error": None,             # str when status=failed
     "stop_requested": False,   # Slice β — user clicked Stop; loop exits after current item
+    "phase": "idle",           # Slice γ.1 — "idle" | "main" | "refining"
+    "refinement_round": 0,     # Slice γ.1 — 1-based current refinement round (0 outside refinement)
 }
 
 
@@ -67,6 +69,8 @@ def _reset_state_for_run(total: int, patch_style: str, report_dir: Path) -> None
             "items_done": [],
             "error": None,
             "stop_requested": False,   # Slice β — clear from any previous run
+            "phase": "main",           # Slice γ.1 — Phase A starts here
+            "refinement_round": 0,     # Slice γ.1 — set during Phase B
         })
 
 
@@ -97,6 +101,39 @@ def _record_item_done(item_result: dict) -> None:
             "title": item_result.get("title"),
             "status": item_result.get("status"),
         })
+
+
+def _update_item_done(updated_item: dict) -> None:
+    """Slice γ.1: replace an items_done entry by idx, or append if missing.
+
+    Used during refinement so we don't append a duplicate UI row each pass.
+    Phase A keeps using _record_item_done() (append-only). The polling UI
+    sees the latest refinement_count + status without dupes.
+    """
+    target_idx = updated_item.get("idx")
+    snapshot = {
+        "idx": target_idx,
+        "kind": updated_item.get("kind"),
+        "title": updated_item.get("title"),
+        "status": updated_item.get("status"),
+        "refinement_count": updated_item.get("refinement_count", 0),
+        "refinement_attempt_count": updated_item.get("refinement_attempt_count", 0),
+        "refinement_history": updated_item.get("refinement_history", []),
+        "latest_refined_artifact": updated_item.get("latest_refined_artifact"),
+        "latest_failed_refinement_artifact": updated_item.get(
+            "latest_failed_refinement_artifact"
+        ),
+        "latest_refinement_error_summary": updated_item.get(
+            "latest_refinement_error_summary"
+        ),
+    }
+    with _STATE_LOCK:
+        items = _RUN_STATE.get("items_done", [])
+        for pos, existing in enumerate(items):
+            if existing.get("idx") == target_idx:
+                items[pos] = snapshot
+                return
+        items.append(snapshot)
 
 
 _IGNORE = shutil.ignore_patterns(
@@ -463,12 +500,254 @@ def _run_patch_if_safe_item(
     )
 
 
+# ============================================================
+# Slice γ.1: refinement-phase helpers (plan_only + research_note_created only).
+# Patch revalidation + lesson_quality grading deferred to γ.2.
+# ============================================================
+
+# Items eligible for γ.1 refinement (Phase B). ready_to_apply explicitly NOT
+# included — that path requires patch revalidation + lesson_quality, which
+# lands in γ.2.
+_REFINABLE_STATUSES_GAMMA1 = frozenset({"planned_no_patch", "research_note_created"})
+
+
+def _refine_plan_only_item(
+    repo_path: str,
+    item: dict,
+    idx: int,
+    item_dir_path: Path,
+    pass_num: int,
+) -> tuple[str, str, str | None, bool]:
+    """Re-prompt the planner with the existing plan + ask for improvements.
+
+    Writes `plan_analysis.refined_pass{N}.json` ALONGSIDE the original
+    (never overwrites `plan_analysis.json`). Returns
+    `(before_summary, after_summary, refined_filename_or_None, ok)`.
+
+    On JSON-parse failure, returns ok=False, refined_filename=None, and
+    writes the raw response to refinement_raw_pass{N}.txt for debugging.
+    """
+    original_path = item_dir_path / "plan_analysis.json"
+    old_text = original_path.read_text(encoding="utf-8") if original_path.exists() else ""
+    before_summary = (old_text[:200] or "(no prior plan)").replace("\n", " ")
+
+    query = _build_patch_query(item)
+    # Gemini-proposed critique-driven refinement: force the model to identify
+    # gaps FIRST before producing the new plan, so it doesn't just paraphrase.
+    refine_prompt = (
+        "CRITICAL REVIEW INSTRUCTIONS:\n"
+        "1. First, identify at least 2 concrete gaps, edge cases, or missing "
+        "   risks in the PREVIOUS PLAN below (be specific — name files, "
+        "   scenarios, or assumptions).\n"
+        "2. THEN produce the NEW updated plan incorporating fixes for those "
+        "   gaps. Sharpen recommendations and remove redundancy.\n"
+        "3. Return ONLY the new plan as JSON in the same schema "
+        "   (problem_summary, recommended_steps[], likely_files[], "
+        "   validation_commands[], safe_to_patch_now, risks[]). Do NOT include "
+        "   your gap analysis in the JSON — it should inform the plan, not "
+        "   pollute the schema.\n\n"
+        f"Task: {query}\n\n"
+        f"PREVIOUS PLAN (pass {pass_num - 1} or original):\n{old_text[:4000]}"
+    )
+    raw = run_gemini_request_2(prompt=refine_prompt, repo_path=repo_path) or ""
+    parsed = extract_json_block(raw)
+
+    if isinstance(parsed, dict):
+        refined_name = f"plan_analysis.refined_pass{pass_num}.json"
+        (item_dir_path / refined_name).write_text(
+            json.dumps(parsed, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        after_summary = (parsed.get("problem_summary") or "(refined plan written)")[:200]
+        return before_summary, after_summary, refined_name, True
+
+    # Parse failed — keep original, dump raw for debugging.
+    raw_name = f"refinement_raw_pass{pass_num}.txt"
+    (item_dir_path / raw_name).write_text(raw[:4000] or "(empty)", encoding="utf-8")
+    after_summary = ((raw[:200] or "(empty response)")).replace("\n", " ")
+    return before_summary, after_summary, None, False
+
+
+def _refine_research_item(
+    repo_path: str,
+    item: dict,
+    idx: int,
+    item_dir_path: Path,
+    pass_num: int,
+) -> tuple[str, str, str | None, bool]:
+    """Re-prompt the researcher to expand ideas and add depth.
+
+    Writes `proposal.refined_pass{N}.md` ALONGSIDE the original
+    (never overwrites `proposal.md`). Returns
+    `(before_summary, after_summary, refined_filename_or_None, ok)`.
+    """
+    original_path = item_dir_path / "proposal.md"
+    old_text = original_path.read_text(encoding="utf-8") if original_path.exists() else ""
+    before_summary = (old_text[:200] or "(no prior proposal)").replace("\n", " ")
+
+    title = item.get("title", "untitled")
+    hint = item.get("hint", "")
+    # Same Gemini-proposed critique-driven structure as the plan refiner.
+    refine_prompt = (
+        "CRITICAL REVIEW INSTRUCTIONS:\n"
+        "1. First, identify at least 2 concrete weaknesses in the PREVIOUS "
+        "   PROPOSAL below: missing design variants, weak experiment design, "
+        "   unaddressed risks, or shallow analysis sections.\n"
+        "2. THEN produce the NEW expanded proposal that fixes those specific "
+        "   weaknesses. Add: (a) one more design variant with trade-offs, "
+        "   (b) a sharper minimal experiment, (c) a deeper risk analysis. "
+        "   Keep all valuable existing content.\n"
+        "3. Output ONLY the new full markdown proposal. Do NOT include your "
+        "   critique as a preamble — it should inform the proposal, not "
+        "   appear in it.\n\n"
+        f"Topic: {title}\nHint: {hint}\n\n"
+        f"PREVIOUS PROPOSAL (pass {pass_num - 1} or original):\n{old_text[:6000]}"
+    )
+    raw = run_gemini_request_2(prompt=refine_prompt, repo_path=repo_path) or ""
+
+    if raw.strip():
+        refined_name = f"proposal.refined_pass{pass_num}.md"
+        (item_dir_path / refined_name).write_text(raw, encoding="utf-8")
+        after_summary = raw[:200].replace("\n", " ")
+        return before_summary, after_summary, refined_name, True
+
+    # Empty response — keep original, mark failure.
+    raw_name = f"refinement_raw_pass{pass_num}.txt"
+    (item_dir_path / raw_name).write_text("(empty response)", encoding="utf-8")
+    return before_summary, "(empty response)", None, False
+
+
+def _refine_one_pass(
+    repo_path: str,
+    item: dict,
+    idx: int,
+    report_dir: Path,
+    pass_num: int,
+) -> None:
+    """Run one refinement pass on a single item. Mutates `item` in place.
+
+    Does NOT touch the original artifact — writes refined_pass{N} alongside.
+    On any exception, records the error and continues; the refinement loop
+    must never die because one item misbehaved.
+    """
+    status = item.get("status")
+    item_dir_path = dream_artifacts.item_dir(report_dir, idx, item.get("title", ""))
+    item_dir_path.mkdir(parents=True, exist_ok=True)
+    started = time.time()
+
+    before = after = ""
+    refined_name: str | None = None
+    failed_artifact: str | None = None
+    ok = False
+    try:
+        if status == "planned_no_patch":
+            before, after, refined_name, ok = _refine_plan_only_item(
+                repo_path, item, idx, item_dir_path, pass_num,
+            )
+        elif status == "research_note_created":
+            before, after, refined_name, ok = _refine_research_item(
+                repo_path, item, idx, item_dir_path, pass_num,
+            )
+        else:
+            # Defensive guard — shouldn't be reached because the orchestrator
+            # filters by _REFINABLE_STATUSES_GAMMA1 before calling.
+            return
+    except Exception as e:
+        failed_artifact = f"refinement_error_pass{pass_num}.txt"
+        (item_dir_path / failed_artifact).write_text(
+            f"{type(e).__name__}: {e}", encoding="utf-8",
+        )
+        before = before or "(error)"
+        after = f"{type(e).__name__}: {e}"
+        ok = False
+
+    if not ok and failed_artifact is None:
+        failed_artifact = f"refinement_raw_pass{pass_num}.txt"
+
+    history = item.setdefault("refinement_history", [])
+    entry = {
+        "pass": pass_num,
+        "before_summary": before,
+        "after_summary": after,
+        "elapsed_sec": round(time.time() - started, 2),
+        "artifact": refined_name,
+        "ok": ok,
+    }
+    if not ok and failed_artifact:
+        entry["failed_artifact"] = failed_artifact
+    history.append(entry)
+    # refinement_count = count of *successful* passes (failed ones don't
+    # produce a useful refined artifact, so we don't count them as "refined").
+    item["refinement_attempt_count"] = len(history)
+    item["refinement_count"] = sum(1 for h in history if h.get("ok"))
+    if refined_name:
+        item["latest_refined_artifact"] = refined_name
+    if not ok:
+        if failed_artifact:
+            item["latest_failed_refinement_artifact"] = failed_artifact
+        item["latest_refinement_error_summary"] = after
+
+
+def _run_refinement_phase(
+    repo_path: str,
+    report_dir: Path,
+    results: list[dict],
+    deadline_ts: float,
+    max_rounds: int,
+) -> None:
+    """Phase B: round-robin refine eligible items for at most `max_rounds`
+    rounds, stopping early on deadline / stop_requested / no eligible items.
+
+    Mutates `results` in place. Updates `_RUN_STATE` for UI polling.
+    """
+    eligible_indices = [
+        i for i, r in enumerate(results)
+        if r.get("status") in _REFINABLE_STATUSES_GAMMA1
+    ]
+    if not eligible_indices:
+        return
+
+    _set_state(phase="refining", refinement_round=0)
+    print(
+        f"💤 DREAM: entering refinement phase "
+        f"({len(eligible_indices)} eligible items, max {max_rounds} round(s))",
+        flush=True,
+    )
+
+    for round_num in range(1, max_rounds + 1):
+        if time.time() >= deadline_ts:
+            print("💤 DREAM: refinement halted — deadline reached", flush=True)
+            return
+        if _RUN_STATE.get("stop_requested"):
+            print("💤 DREAM: refinement halted — user stop requested", flush=True)
+            return
+        _set_state(refinement_round=round_num)
+        any_refined = False
+        for i in eligible_indices:
+            if time.time() >= deadline_ts or _RUN_STATE.get("stop_requested"):
+                return
+            item = results[i]
+            idx = item.get("idx", i + 1)
+            print(
+                f"💤 DREAM: ✨ refining [{idx}] round {round_num} "
+                f"({item.get('status')})",
+                flush=True,
+            )
+            _refine_one_pass(repo_path, item, idx, report_dir, round_num)
+            # Update existing items_done entry rather than appending a dupe.
+            _update_item_done(item)
+            any_refined = True
+        if not any_refined:
+            return
+
+
 def run_overnight(
     repo_path: str,
     patch_style: str = "balanced",
     time_budget_sec: int = 6 * 3600,
     retry_per_item: int = 1,
     dream_mode: str = "plan_only",
+    max_refine_rounds: int = 1,
 ) -> dict:
     """Run the dream queue. The original repo is never touched.
 
@@ -481,6 +760,11 @@ def run_overnight(
       - "patch_if_safe": bug items may patch when the planner marks them safe;
         all other kinds stay plan-only.
       - "research": every item becomes a written proposal (no patch).
+
+    `max_refine_rounds` (Slice γ.1) controls iterative self-improvement.
+    After the main pass, eligible items (planned_no_patch / research_note_created)
+    are refined round-robin up to `max_refine_rounds` times, stopping early on
+    deadline or user stop. Clamped to [1, 3]. Set 0 to disable refinement.
     """
     repo_path = str(Path(repo_path).resolve())
     if not Path(repo_path).is_dir():
@@ -615,6 +899,24 @@ def run_overnight(
         )
 
     print(
+        f"💤 DREAM: main pass complete in {time.time() - start:.1f}s",
+        flush=True,
+    )
+
+    # Slice γ.1: refinement phase. Uses leftover time budget to improve each
+    # eligible item's plan/proposal (round-robin, capped at max_refine_rounds).
+    # ready_to_apply items deferred to slice γ.2.
+    # Wrapped in try/finally so `phase` always returns to "idle" on exit —
+    # even if an exception escapes the refinement loop.
+    deadline_ts = start + time_budget_sec
+    rounds = max(1, min(3, int(max_refine_rounds))) if max_refine_rounds and int(max_refine_rounds) > 0 else 0
+    try:
+        if rounds > 0 and (deadline_ts - time.time()) > 60 and not _RUN_STATE.get("stop_requested"):
+            _run_refinement_phase(repo_path, report_dir, results, deadline_ts, rounds)
+    finally:
+        _set_state(phase="idle", refinement_round=0)
+
+    print(
         f"💤 DREAM: run complete in {time.time() - start:.1f}s — wrote {report_dir / 'morning_report.txt'}",
         flush=True,
     )
@@ -644,12 +946,15 @@ def start_overnight_async(
     time_budget_sec: int = 6 * 3600,
     retry_per_item: int = 1,
     dream_mode: str = "plan_only",
+    max_refine_rounds: int = 1,
 ) -> dict:
     """Kick a dream run on a background daemon thread.
 
     Returns immediately with `{started: True}` on success, or
     `{error: "already running"}` if a run is already in flight. Poll
     /dream/status (or call get_run_state()) to follow progress.
+
+    `max_refine_rounds` (Slice γ.1) — see run_overnight() docstring.
 
     Daemon thread caveat: if the Flask process is killed (or hot-reloaded
     on file change in dev mode) the run dies with it. For overnight use,
@@ -666,6 +971,7 @@ def start_overnight_async(
                 time_budget_sec=time_budget_sec,
                 retry_per_item=retry_per_item,
                 dream_mode=dream_mode,
+                max_refine_rounds=max_refine_rounds,
             )
             if result.get("error"):
                 _set_state(

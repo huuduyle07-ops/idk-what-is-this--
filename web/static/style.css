@@ -784,6 +784,30 @@ button {
 .dream-status-header--done    { background: #052e16; color: #bbf7d0; border: 1px solid #166534; }
 .dream-status-header--failed  { background: #450a0a; color: #fecaca; border: 1px solid #7f1d1d; }
 .dream-status-header--stopping { background: #422006; color: #fdba74; border: 1px solid #92400e; }
+.dream-status-header--refining { background: #1e1b4b; color: #c4b5fd; border: 1px solid #4c1d95; }
+
+/* Slice γ.1: per-item refinement count badge (purple to match the refining header) */
+.dream-refined-badge {
+    background: #1e1b4b;
+    color: #c4b5fd;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.dream-refine-failed-badge {
+    background: #422006;
+    color: #fdba74;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-left: 4px;
+}
 
 /* Override the old single-line dream-status-* rules so they don't double-style. */
 .dream-status-running, .dream-status-done, .dream-status-failed {
