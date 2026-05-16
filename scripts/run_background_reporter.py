@@ -13,7 +13,7 @@ from typing import Any
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-from benchmarks.report_compare import report_success_rate, regression_alert
+from benchmarks.report_compare import report_success_rate, regression_comparison
 
 BENCH_DIR = PROJECT_ROOT / ".agent" / "benchmarks"
 REPORT_DIR = PROJECT_ROOT / ".agent" / "reports"
@@ -154,6 +154,7 @@ def write_background_reports(
     benchmark_report: dict[str, Any] | None,
     previous_report_path: Path | None,
     previous_report: dict[str, Any] | None,
+    comparison: dict[str, Any] | None,
     alert: dict[str, Any] | None,
 ) -> tuple[Path, Path]:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
@@ -168,6 +169,7 @@ def write_background_reports(
         "benchmark_command": bench_result,
         "benchmark_report": str(benchmark_report_path) if benchmark_report_path else None,
         "previous_benchmark_report": str(previous_report_path) if previous_report_path else None,
+        "regression_comparison": comparison,
         "regression_alert": alert,
     }
 
@@ -192,7 +194,17 @@ def write_background_reports(
             f"- Dirty tree: `{alert.get('old_dirty')}` → `{alert.get('new_dirty')}`",
             "",
         ])
-
+    elif comparison and comparison.get("checked") is False:
+        lines.extend([
+            "## Regression comparison",
+            "",
+            f"- Checked: `False`",
+            f"- Reason: `{comparison.get('reason')}`",
+            f"- Old runnable: `{comparison.get('old_runnable')}`",
+            f"- New runnable: `{comparison.get('new_runnable')}`",
+            "",
+        ])
+        
     lines.extend([
         "## Check",
         "",
@@ -273,6 +285,7 @@ def main() -> int:
     benchmark_report = None
     previous_report_path = None
     previous_report = None
+    comparison = None
     alert = None
 
     if check_result["ok"] and not args.skip_benchmark:
@@ -306,7 +319,8 @@ def main() -> int:
             previous_report_path = find_previous_report(benchmark_report_path)
             if previous_report_path:
                 previous_report = load_json(previous_report_path)
-            alert = regression_alert(previous_report, benchmark_report)
+            comparison = regression_comparison(previous_report, benchmark_report)
+            alert = comparison.get("alert")
 
     md_path, json_path = write_background_reports(
         check_result=check_result,
@@ -315,6 +329,7 @@ def main() -> int:
         benchmark_report=benchmark_report,
         previous_report_path=previous_report_path,
         previous_report=previous_report,
+        comparison=comparison,
         alert=alert,
     )
 
