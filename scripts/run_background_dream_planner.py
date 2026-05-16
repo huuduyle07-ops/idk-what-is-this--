@@ -129,7 +129,7 @@ def _base_item(
         "reason": reason,
         "source_benchmark_report": report_name,
         "suggested_mode": suggested_mode,
-        "human_approved_for_proposal": True,
+        "human_approved_for_proposal": False,
         "level3_gate": "Set human_approved_for_proposal=true after human review to allow proposal generation.",
     }
     if result:
