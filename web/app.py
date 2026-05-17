@@ -28,6 +28,7 @@ from core.sleeping_consultant import (
     request_stop,
 )
 from core import dream_artifacts
+from core import benchmark_web
 from core import lesson_store
 from database.memory_consolidator import consolidate_all
 from policy.decision_helper import normalize_patch_style
@@ -1024,6 +1025,86 @@ def benchmarks_list_route():
     return {"reports": list_benchmark_reports(repo_path)}
 
 
+@app.route("/benchmarks/cases", methods=["GET"])
+def benchmarks_cases_route():
+    """List benchmark cases for the Run Selected modal."""
+    try:
+        return {"ok": True, "cases": benchmark_web.list_benchmark_cases()}
+    except Exception as e:
+        return {"ok": False, "error": f"failed to list benchmark cases: {type(e).__name__}"}, 500
+
+
+@app.route("/benchmarks/run", methods=["POST"])
+def benchmarks_run_route():
+    """Start a background benchmark run.
+
+    Form fields:
+      - repo_path: where reports should be written under .agent/benchmarks.
+      - selection: all | selected.
+      - cases: JSON list or comma-separated names when selection=selected.
+    """
+    repo_path = request.form.get("repo_path", "").strip()
+    if not repo_path or not Path(repo_path).is_dir():
+        return {"error": f"repo_path is not a directory: {repo_path}"}, 400
+
+    selection = request.form.get("selection", "all").strip().lower()
+    selected_cases: list[str] | None = None
+    if selection == "selected":
+        raw_cases = request.form.get("cases", "").strip()
+        try:
+            parsed = json.loads(raw_cases) if raw_cases.startswith("[") else None
+        except Exception:
+            parsed = None
+        if isinstance(parsed, list):
+            selected_cases = [str(item).strip() for item in parsed if str(item).strip()]
+        else:
+            selected_cases = [item.strip() for item in raw_cases.split(",") if item.strip()]
+        if not selected_cases:
+            return {"error": "choose at least one benchmark case"}, 400
+    elif selection != "all":
+        return {"error": f"unknown benchmark selection: {selection}"}, 400
+
+    def _form_bool(name: str, default: bool = False) -> bool:
+        raw = request.form.get(name)
+        if raw is None:
+            return default
+        return raw.strip().lower() not in {"0", "false", "no", "off", ""}
+
+    try:
+        retry_failed = int(request.form.get("retry_failed", "0"))
+    except (TypeError, ValueError):
+        retry_failed = 0
+    retry_failed = max(0, min(3, retry_failed))
+
+    try:
+        result = benchmark_web.start_benchmark_run_async(
+            repo_path=repo_path,
+            selected_cases=selected_cases,
+            fast=_form_bool("fast", True),
+            turbo=_form_bool("turbo", False),
+            skip_toolchain_failures=_form_bool("skip_toolchain_failures", True),
+            retry_failed=retry_failed,
+            markdown=_form_bool("markdown", True),
+        )
+    except Exception as e:
+        return {"error": f"failed to start benchmark run: {type(e).__name__}: {e}"}, 500
+    status = 409 if result.get("error") else 200
+    return result, status
+
+
+@app.route("/benchmarks/status", methods=["GET"])
+def benchmarks_status_route():
+    return benchmark_web.get_benchmark_state()
+
+
+@app.route("/benchmarks/stop", methods=["POST"])
+def benchmarks_stop_route():
+    try:
+        return benchmark_web.request_benchmark_stop()
+    except Exception as e:
+        return {"error": f"stop request failed: {type(e).__name__}: {e}"}, 500
+
+
 @app.route("/benchmarks/report", methods=["GET"])
 def benchmarks_report_route():
     """Full content of one benchmark report (Phase 5 Slice 3).
@@ -1041,6 +1122,38 @@ def benchmarks_report_route():
     if data is None:
         return {"error": f"report not found or invalid name: {filename}"}, 404
     return data
+
+
+@app.route("/benchmarks/create-case", methods=["POST"])
+def benchmarks_create_case_route():
+    """Create a new benchmark case by copying a source repo into cases/."""
+    try:
+        result = benchmark_web.create_benchmark_case_from_repo(
+            source_repo_path=request.form.get("source_repo_path", "").strip(),
+            case_name=request.form.get("case_name", "").strip(),
+            user_prompt=request.form.get("prompt", "").strip(),
+            validation_command=request.form.get("validation_command", "").strip(),
+            expected_changed_files=request.form.get("expected_changed_files", ""),
+            forbidden_changed_files=request.form.get("forbidden_changed_files", ""),
+            use_llm=(request.form.get("use_llm", "true").strip().lower() not in {"0", "false", "no", "off"}),
+            overwrite=(request.form.get("overwrite", "false").strip().lower() not in {"0", "false", "no", "off", ""}),
+        )
+    except Exception as e:
+        return {"ok": False, "error": f"failed to create case: {type(e).__name__}: {e}"}, 500
+    return result, 200 if result.get("ok") else 400
+
+
+@app.route("/benchmarks/case-defaults", methods=["GET"])
+def benchmarks_case_defaults_route():
+    """Suggest Add Case defaults from repo structure and current git diff."""
+    try:
+        result = benchmark_web.infer_case_defaults(
+            request.values.get("source_repo_path", "").strip(),
+            user_prompt=request.values.get("prompt", "").strip(),
+        )
+    except Exception as e:
+        return {"ok": False, "error": f"failed to infer defaults: {type(e).__name__}: {e}"}, 500
+    return result, 200 if result.get("ok") else 400
 
 
 @app.route("/dream/seed-from-benchmark", methods=["POST"])
@@ -1395,6 +1508,72 @@ def _lesson_repo_path(raw: str | None) -> str | None:
     return value or None
 
 
+_MAX_LESSON_PROPOSAL_BYTES = 512_000
+
+
+def _path_is_inside(child: Path, parent: Path) -> bool:
+    try:
+        child.resolve().relative_to(parent.resolve())
+        return True
+    except (OSError, ValueError):
+        return False
+
+
+def _lesson_proposal_roots(repo_path: str | None) -> list[Path]:
+    roots = [
+        PROJECT_ROOT / ".agent" / "proposals",
+        get_agent_dir(None) / "proposals",
+    ]
+    if repo_path:
+        roots.append(get_agent_dir(repo_path) / "proposals")
+
+    out: list[Path] = []
+    seen: set[str] = set()
+    for root in roots:
+        try:
+            resolved = root.resolve()
+        except OSError:
+            resolved = root
+        key = str(resolved).lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(resolved)
+    return out
+
+
+def _find_lesson_record(lesson_id: str, repo_path: str | None) -> dict:
+    for record in lesson_store.list_lessons(repo_path=repo_path):
+        if record.get("id") == lesson_id:
+            return record
+    raise LookupError(f"lesson not found: {lesson_id}")
+
+
+def _resolve_lesson_proposal_md(record: dict, repo_path: str | None) -> Path:
+    raw = record.get("source_report")
+    if not isinstance(raw, str) or not raw.strip():
+        raise FileNotFoundError("lesson has no source_report")
+
+    source_report = Path(raw.strip())
+    if not source_report.is_absolute():
+        source_report = PROJECT_ROOT / source_report
+    try:
+        proposal_dir = source_report.resolve()
+    except OSError as e:
+        raise FileNotFoundError("source_report path cannot be resolved") from e
+
+    allowed_roots = _lesson_proposal_roots(repo_path)
+    if not any(_path_is_inside(proposal_dir, root) for root in allowed_roots):
+        raise ValueError("lesson source_report is outside allowed proposal roots")
+
+    proposal_md = (proposal_dir / "proposal.md").resolve()
+    if not _path_is_inside(proposal_md, proposal_dir):
+        raise ValueError("proposal path escapes source_report")
+    if not proposal_md.is_file():
+        raise FileNotFoundError("proposal.md not found for this lesson")
+    return proposal_md
+
+
 @app.route("/lessons/list", methods=["GET"])
 def lessons_list_route():
     """List lessons for the Memory tab.
@@ -1415,6 +1594,43 @@ def lessons_list_route():
     except Exception as e:
         return {"ok": False, "error": f"failed to list lessons: {type(e).__name__}"}, 500
     return {"ok": True, "lessons": lessons}
+
+
+@app.route("/lessons/proposal", methods=["GET"])
+def lessons_proposal_route():
+    """Read proposal.md for a lesson created from proposal artifacts.
+
+    Query params:
+      - repo_path (optional): same scope rules as /lessons/list.
+      - lesson_id: lesson record id.
+    """
+    repo_path = _lesson_repo_path(request.values.get("repo_path"))
+    lesson_id = (request.values.get("lesson_id") or "").strip()
+    if not lesson_id:
+        return {"ok": False, "error": "lesson_id is required"}, 400
+
+    try:
+        record = _find_lesson_record(lesson_id, repo_path)
+        proposal_md = _resolve_lesson_proposal_md(record, repo_path)
+        if proposal_md.stat().st_size > _MAX_LESSON_PROPOSAL_BYTES:
+            return {"ok": False, "error": "proposal.md is too large to display"}, 413
+        content = proposal_md.read_text(encoding="utf-8", errors="replace")
+    except LookupError as e:
+        return {"ok": False, "error": str(e)}, 404
+    except FileNotFoundError as e:
+        return {"ok": False, "error": str(e)}, 404
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"failed to read proposal: {type(e).__name__}"}, 500
+
+    return {
+        "ok": True,
+        "lesson_id": lesson_id,
+        "title": record.get("title") or "Untitled lesson",
+        "proposal_path": str(proposal_md),
+        "content": content,
+    }
 
 
 @app.route("/lessons/promote", methods=["POST"])

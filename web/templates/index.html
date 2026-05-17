@@ -174,6 +174,35 @@
 
         <!-- Benchmarks -->
         <div id="ws-benchmarks" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-benchmarks">
+          <div class="bench-runner">
+            <div class="bench-runner-header">
+              <strong>Benchmark Runner</strong>
+              <span class="bench-runner-note">Runs in the Flask process and writes reports to .agent/benchmarks.</span>
+            </div>
+            <div class="bench-runner-actions">
+              <button type="button" onclick="runAllBenchmarks()"
+                      title="Run every benchmark case in the background.">
+                Run all
+              </button>
+              <button type="button" onclick="openBenchmarkCasePicker()"
+                      title="Choose one or more benchmark cases to run.">
+                Run selected
+              </button>
+              <button type="button" onclick="openCreateBenchmarkCaseModal()"
+                      title="Copy a repo into benchmarks/cases and write a case.json.">
+                Add case
+              </button>
+              <button type="button" id="stopBenchBtn" onclick="stopBenchmarkRun()"
+                      title="Ask the benchmark runner to stop after the current case."
+                      hidden>
+                Stop run
+              </button>
+              <button type="button" onclick="refreshBenchmarkStatus()" title="Refresh benchmark run status.">
+                Refresh status
+              </button>
+            </div>
+            <div id="benchRunStatus" class="bench-run-status"></div>
+          </div>
           <div class="bench-layout">
             <aside class="bench-sidebar">
               <div class="bench-sidebar-header">
@@ -1396,6 +1425,9 @@ function _renderLessonCard(lesson) {
 
     const idAttr = _escapeHtml(lesson.id || "");
     const buttons = [];
+    if (lesson.source === "patch_proposal" && lesson.source_report) {
+        buttons.push(`<button type="button" class="lesson-btn--secondary" onclick="viewLessonProposal('${idAttr}')" title="Open proposal.md for this lesson">View proposal</button>`);
+    }
     if (status === "candidate") {
         buttons.push(`<button type="button" onclick="promoteLessonById('${idAttr}')" title="Move to active">Promote</button>`);
         buttons.push(`<button type="button" class="lesson-btn--danger" onclick="blockLessonById('${idAttr}')" title="Move to blocked">Block</button>`);
@@ -1440,6 +1472,38 @@ function _renderLessonCard(lesson) {
         ${buttons.length ? `<div class="lesson-actions">${buttons.join(" ")}</div>` : ""}
       </div>
     `;
+}
+
+function viewLessonProposal(lessonId) {
+    if (!lessonId) return;
+    openAppModal("Proposal idea", `<div class="health-empty">Loading proposal.md...</div>`);
+
+    const params = new URLSearchParams();
+    params.set("lesson_id", lessonId);
+    const repo = _lessonRepoPath();
+    if (repo) params.set("repo_path", repo);
+
+    fetch("/lessons/proposal?" + params.toString())
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                openAppModal("Proposal idea", `<div class="health-empty">Failed: ${_escapeHtml(data.error || "unknown error")}</div>`);
+                return;
+            }
+            const pathHtml = data.proposal_path
+                ? `<div class="lesson-proposal-path"><code>${_escapeHtml(data.proposal_path)}</code></div>`
+                : "";
+            const bodyHtml = `
+                <div class="lesson-proposal-view">
+                    ${pathHtml}
+                    <pre class="lesson-proposal-body">${_escapeHtml(data.content || "")}</pre>
+                </div>
+            `;
+            openAppModal(data.title ? `Proposal: ${data.title}` : "Proposal idea", bodyHtml);
+        })
+        .catch(err => {
+            openAppModal("Proposal idea", `<div class="health-empty">Network error: ${_escapeHtml(err)}</div>`);
+        });
 }
 
 function promoteLessonById(lessonId) {
@@ -1564,7 +1628,10 @@ function showWorkspaceTab(id) {
     // Phase 5 Slice 2: lazy-load Health panel on first show.
     if (id === "settings") loadHealthPanel(false);
     // Phase 5 Slice 3: lazy-load Benchmarks panel on first show.
-    if (id === "benchmarks") loadBenchmarksPanel(false);
+    if (id === "benchmarks") {
+        loadBenchmarksPanel(false);
+        refreshBenchmarkStatus();
+    }
     // Phase 6.1: lazy-load Lessons on first Memory-tab show.
     if (id === "memory") loadLessons(false);
 }
@@ -1652,6 +1719,326 @@ function _benchFmtDate(iso) {
 function _benchFmtRate(rate) {
     if (rate == null) return "—";
     return (rate * 100).toFixed(1) + "%";
+}
+
+let _benchStatusTimer = null;
+
+function _benchmarkRepoPath() {
+    return document.querySelector("input[name='repo_path']")?.value.trim() || "";
+}
+
+function _startBenchmarkPolling() {
+    if (_benchStatusTimer) clearInterval(_benchStatusTimer);
+    _benchStatusTimer = setInterval(refreshBenchmarkStatus, 3000);
+}
+
+function _stopBenchmarkPolling() {
+    if (_benchStatusTimer) {
+        clearInterval(_benchStatusTimer);
+        _benchStatusTimer = null;
+    }
+}
+
+function runAllBenchmarks() {
+    if (!confirm("Run all benchmark cases now? This can take a while.")) return;
+    startBenchmarkRun("all", []);
+}
+
+function startBenchmarkRun(selection, cases) {
+    const repo = _benchmarkRepoPath();
+    if (!repo) { alert("Set a repo path first."); return; }
+
+    const statusEl = document.getElementById("benchRunStatus");
+    if (statusEl) {
+        statusEl.className = "bench-run-status bench-run-status--running";
+        statusEl.innerHTML = `<div class="health-empty">Starting benchmark run...</div>`;
+    }
+
+    fetch("/benchmarks/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+            repo_path: repo,
+            selection,
+            cases: JSON.stringify(cases || []),
+            fast: "true",
+            skip_toolchain_failures: "true",
+            markdown: "true",
+            retry_failed: "0",
+        }),
+    })
+    .then(r => r.json().then(data => ({ status: r.status, data })))
+    .then(({ status, data }) => {
+        if (status >= 400 || data.error) {
+            if (statusEl) {
+                statusEl.className = "bench-run-status bench-run-status--failed";
+                statusEl.innerHTML = `<div class="health-empty">Failed to start: ${_escapeHtml(data.error || "unknown error")}</div>`;
+            }
+            return;
+        }
+        closeAppModal();
+        refreshBenchmarkStatus();
+        _startBenchmarkPolling();
+    })
+    .catch(err => {
+        if (statusEl) {
+            statusEl.className = "bench-run-status bench-run-status--failed";
+            statusEl.innerHTML = `<div class="health-empty">Network error: ${_escapeHtml(err)}</div>`;
+        }
+    });
+}
+
+function openBenchmarkCasePicker() {
+    openAppModal("Run selected benchmarks", `<div class="health-empty">Loading cases...</div>`);
+    fetch("/benchmarks/cases")
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                openAppModal("Run selected benchmarks", `<div class="health-empty">Failed: ${_escapeHtml(data.error || "unknown error")}</div>`);
+                return;
+            }
+            const cases = data.cases || [];
+            if (!cases.length) {
+                openAppModal("Run selected benchmarks", `<div class="health-empty">No benchmark cases found.</div>`);
+                return;
+            }
+            const rows = cases.map(c => `
+                <label class="bench-case-row">
+                    <input type="checkbox" class="bench-case-check" value="${_escapeHtml(c.id || c.name || "")}">
+                    <span class="bench-case-name">${_escapeHtml(c.name || c.folder || "?")}</span>
+                    <span class="bench-case-meta">${_escapeHtml(c.language || "?")} / ${_escapeHtml(c.category || "?")} / ${_escapeHtml(c.difficulty || "?")}</span>
+                </label>
+            `).join("");
+            const body = `
+                <div class="bench-case-list">
+                    <div class="bench-case-tools">
+                        <button type="button" onclick="document.querySelectorAll('.bench-case-check').forEach(x => x.checked = true)">Select all</button>
+                        <button type="button" onclick="document.querySelectorAll('.bench-case-check').forEach(x => x.checked = false)">Clear</button>
+                    </div>
+                    ${rows}
+                </div>
+            `;
+            const footer = `<button type="button" onclick="startSelectedBenchmarkCases()">Run selected</button>`;
+            openAppModal(`Run selected benchmarks (${cases.length})`, body, footer);
+        })
+        .catch(err => openAppModal("Run selected benchmarks", `<div class="health-empty">Network error: ${_escapeHtml(err)}</div>`));
+}
+
+function startSelectedBenchmarkCases() {
+    const selected = Array.from(document.querySelectorAll(".bench-case-check:checked"))
+        .map(el => el.value)
+        .filter(Boolean);
+    if (!selected.length) {
+        alert("Choose at least one benchmark case.");
+        return;
+    }
+    startBenchmarkRun("selected", selected);
+}
+
+function _renderBenchmarkStatus(state) {
+    const el = document.getElementById("benchRunStatus");
+    const stopBtn = document.getElementById("stopBenchBtn");
+    if (!el) return;
+
+    const status = state.status || "idle";
+    if (stopBtn) stopBtn.hidden = status !== "running";
+
+    if (status === "idle") {
+        el.className = "bench-run-status";
+        el.innerHTML = "";
+        return;
+    }
+
+    const done = state.cases_done || [];
+    const total = state.total_items || 0;
+    let header = "";
+    if (status === "running") {
+        header = `<div class="bench-run-header bench-run-header--running">Running ${state.current_idx || 0}/${total}: ${_escapeHtml(state.current_name || "starting")}</div>`;
+    } else if (status === "done") {
+        header = `<div class="bench-run-header bench-run-header--done">Done. Report: <code>${_escapeHtml(state.report_path || "")}</code></div>`;
+        _stopBenchmarkPolling();
+        loadBenchmarksPanel(true);
+    } else if (status === "stopped") {
+        header = `<div class="bench-run-header bench-run-header--done">Stopped after ${done.length}/${total}. Report: <code>${_escapeHtml(state.report_path || "")}</code></div>`;
+        _stopBenchmarkPolling();
+        loadBenchmarksPanel(true);
+    } else {
+        header = `<div class="bench-run-header bench-run-header--failed">Failed: ${_escapeHtml(state.error || "unknown error")}</div>`;
+        _stopBenchmarkPolling();
+    }
+
+    const rows = done.slice(-8).map(item => `
+        <div class="bench-run-case bench-run-case--${_escapeHtml(item.status || "unknown")}">
+            <span>${_escapeHtml(item.name || "?")}</span>
+            <strong>${_escapeHtml(item.status || "?")}</strong>
+            ${item.duration_sec ? `<span>${Number(item.duration_sec).toFixed(1)}s</span>` : ""}
+        </div>
+    `).join("");
+    el.className = `bench-run-status bench-run-status--${_escapeHtml(status)}`;
+    el.innerHTML = header + (rows ? `<div class="bench-run-cases">${rows}</div>` : "");
+}
+
+function refreshBenchmarkStatus() {
+    return fetch("/benchmarks/status")
+        .then(r => r.json())
+        .then(state => { _renderBenchmarkStatus(state); return state; })
+        .catch(err => {
+            const el = document.getElementById("benchRunStatus");
+            if (el) {
+                el.className = "bench-run-status bench-run-status--failed";
+                el.innerHTML = `<div class="health-empty">Status failed: ${_escapeHtml(err)}</div>`;
+            }
+        });
+}
+
+function stopBenchmarkRun() {
+    fetch("/benchmarks/stop", { method: "POST" })
+        .then(r => r.json())
+        .then(data => refreshBenchmarkStatus())
+        .catch(err => alert(`Stop failed: ${err}`));
+}
+
+function openCreateBenchmarkCaseModal() {
+    const repo = _benchmarkRepoPath();
+    const queryPrompt = document.querySelector("textarea[name='query']")?.value.trim() || "";
+    const patchFiles = _patchTargetFiles(_currentPatchState.raw);
+    const expectedDefault = patchFiles.join("\n");
+    const validationDefault = _currentPatchState.validation_command || "";
+    const body = `
+        <div class="bench-case-form">
+            <div class="bench-case-default-row">
+                <label>Source repo path
+                    <input id="benchCaseSourceRepo" type="text" value="${_escapeHtml(repo)}" placeholder="C:/path/to/buggy-repo">
+                </label>
+                <button type="button" onclick="loadBenchmarkCaseDefaults(false)">Load defaults</button>
+            </div>
+            <label>Case name
+                <input id="benchCaseName" type="text" placeholder="python_discount_validation">
+            </label>
+            <label>Benchmark prompt / intent
+                <textarea id="benchCasePrompt" rows="6" placeholder="Describe the bug, constraints, expected behavior, and files the agent should or should not touch.">${_escapeHtml(queryPrompt)}</textarea>
+            </label>
+            <label>Validation command
+                <input id="benchCaseValidation" type="text" value="${_escapeHtml(validationDefault)}" placeholder="python main.py">
+            </label>
+            <label>Expected / allowed changed files
+                <textarea id="benchCaseExpected" rows="2" placeholder="pricing.py">${_escapeHtml(expectedDefault)}</textarea>
+            </label>
+            <label>Forbidden changed files
+                <textarea id="benchCaseForbidden" rows="2" placeholder="main.py, tests.py"></textarea>
+            </label>
+            <label class="bench-case-checkline">
+                <input id="benchCaseUseLlm" type="checkbox" checked>
+                Ask LLM to classify category/difficulty and strengthen the prompt
+            </label>
+            <label class="bench-case-checkline">
+                <input id="benchCaseOverwrite" type="checkbox">
+                Overwrite existing case with same name
+            </label>
+            <div id="benchCaseCreateStatus" class="bench-create-status"></div>
+        </div>
+    `;
+    const footer = `<button type="button" onclick="submitBenchmarkCase()">Create case</button>`;
+    openAppModal("Add benchmark case", body, footer);
+    loadBenchmarkCaseDefaults(true);
+}
+
+function loadBenchmarkCaseDefaults(soft) {
+    const statusEl = document.getElementById("benchCaseCreateStatus");
+    const repo = document.getElementById("benchCaseSourceRepo")?.value.trim() || "";
+    if (!repo) {
+        if (statusEl) {
+            statusEl.className = "bench-create-status bench-create-status--failed";
+            statusEl.textContent = "Source repo path is required before loading defaults.";
+        }
+        return;
+    }
+    if (statusEl) {
+        statusEl.className = "bench-create-status bench-create-status--running";
+        statusEl.textContent = "Loading defaults from repo and current diff...";
+    }
+    const params = new URLSearchParams({
+        source_repo_path: repo,
+        prompt: document.getElementById("benchCasePrompt")?.value.trim() || "",
+    });
+    fetch(`/benchmarks/case-defaults?${params.toString()}`)
+        .then(r => r.json().then(data => ({ status: r.status, data })))
+        .then(({ status, data }) => {
+            if (status >= 400 || !data.ok) {
+                if (statusEl) {
+                    statusEl.className = "bench-create-status bench-create-status--failed";
+                    statusEl.textContent = data.error || "failed to load defaults";
+                }
+                return;
+            }
+            const fill = (id, value) => {
+                const el = document.getElementById(id);
+                if (!el || value === undefined || value === null) return;
+                if (!soft || !el.value.trim()) el.value = value;
+            };
+            fill("benchCaseName", data.name || "");
+            fill("benchCasePrompt", data.prompt || "");
+            fill("benchCaseValidation", data.validation_command || "");
+            fill("benchCaseExpected", (data.expected_changed_files || []).join("\n"));
+            if (statusEl) {
+                statusEl.className = "bench-create-status bench-create-status--ok";
+                const source = data.expected_changed_files_source || "repo defaults";
+                statusEl.textContent = `Defaults loaded (${source}). LLM can still rewrite the final prompt when creating.`;
+            }
+        })
+        .catch(err => {
+            if (statusEl) {
+                statusEl.className = "bench-create-status bench-create-status--failed";
+                statusEl.textContent = `Default load failed: ${err}`;
+            }
+        });
+}
+
+function submitBenchmarkCase() {
+    const statusEl = document.getElementById("benchCaseCreateStatus");
+    if (statusEl) {
+        statusEl.className = "bench-create-status bench-create-status--running";
+        statusEl.textContent = "Creating benchmark case...";
+    }
+    fetch("/benchmarks/create-case", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+            source_repo_path: document.getElementById("benchCaseSourceRepo")?.value.trim() || "",
+            case_name: document.getElementById("benchCaseName")?.value.trim() || "",
+            prompt: document.getElementById("benchCasePrompt")?.value.trim() || "",
+            validation_command: document.getElementById("benchCaseValidation")?.value.trim() || "",
+            expected_changed_files: document.getElementById("benchCaseExpected")?.value || "",
+            forbidden_changed_files: document.getElementById("benchCaseForbidden")?.value || "",
+            use_llm: document.getElementById("benchCaseUseLlm")?.checked ? "true" : "false",
+            overwrite: document.getElementById("benchCaseOverwrite")?.checked ? "true" : "false",
+        }),
+    })
+    .then(r => r.json().then(data => ({ status: r.status, data })))
+    .then(({ status, data }) => {
+        if (status >= 400 || !data.ok) {
+            if (statusEl) {
+                statusEl.className = "bench-create-status bench-create-status--failed";
+                statusEl.textContent = data.error || "failed to create case";
+            }
+            return;
+        }
+        const warning = data.llm_warning ? `<div class="bench-create-warning">${_escapeHtml(data.llm_warning)}</div>` : "";
+        const body = `
+            <div class="bench-create-result">
+                <div>Created: <code>${_escapeHtml(data.case_file || "")}</code></div>
+                ${warning}
+                <pre class="lesson-proposal-body">${_escapeHtml(JSON.stringify(data.case || {}, null, 2))}</pre>
+            </div>
+        `;
+        openAppModal("Benchmark case created", body);
+    })
+    .catch(err => {
+        if (statusEl) {
+            statusEl.className = "bench-create-status bench-create-status--failed";
+            statusEl.textContent = `Network error: ${err}`;
+        }
+    });
 }
 
 function _renderBenchmarkList(reports) {
