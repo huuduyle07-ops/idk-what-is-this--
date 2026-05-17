@@ -7,8 +7,10 @@ that wiring is Phase 6.3.
 """
 from __future__ import annotations
 
+import re
 from typing import Any
 
+import config
 from core.lesson_store import STATUS_ACTIVE, list_lessons
 
 
@@ -16,6 +18,7 @@ _LIMIT_MIN = 1
 _LIMIT_MAX = 20
 
 _SCORE_CASE_NAME = 100
+_SCORE_TAG = 25
 _SCORE_LANGUAGE = 10
 _SCORE_CATEGORY = 10
 _SCORE_QUERY = 5
@@ -28,26 +31,109 @@ _KNOWN_LANGUAGE_PREFIXES = {
     "html", "java", "csharp", "cs", "kotlin", "swift",
 }
 
+# Stopwords dropped from query tokenization. Two groups:
+#   (1) English connectives ("the", "of", ...) so queries like "Fix the X bug"
+#       don't match every lesson on "the".
+#   (2) Generic problem/action nouns ("fix", "bug", "patch", "issue",
+#       "problem") that appear in nearly every lesson title/summary. Without
+#       this, a query like "Fix the JS null bug" would match an unrelated
+#       C++ lesson just because both summaries contain "fix" or "bug".
+# Domain identifiers (case_name slugs, language names, identifiers like
+# `compound`, `inventory`, `null`, `patch_plan`) stay through tokenization.
+_QUERY_STOPWORDS = frozenset({
+    # English connectives
+    "a", "an", "the",
+    "and", "or", "but", "if",
+    "of", "to", "in", "on", "at", "for", "with", "by", "from", "as",
+    "is", "are", "was", "were", "be", "been", "being",
+    "do", "does", "did",
+    "i", "you", "we", "they", "it",
+    "this", "that", "these", "those",
+    # Generic problem/action words — present in almost every lesson
+    "fix", "bug", "patch", "issue", "problem",
+})
+
+# Whitespace + sentence punctuation. Hyphens and underscores are preserved
+# so identifiers like "auto-approval" and "off_by_one" stay as one token.
+_QUERY_SPLIT_RE = re.compile(r'[\s,;.!?()\[\]{}<>"`\']+')
+
+
+def _tokenize_query(query: str | None) -> list[str]:
+    """Split a free-form query into lowercase content tokens.
+
+    Drops short tokens (<2 chars) and a small English stopword list.
+    Returns [] for empty / whitespace-only / all-stopword queries; the
+    caller should treat that as "no query filter" rather than "no match".
+    """
+    if not query:
+        return []
+    pieces = _QUERY_SPLIT_RE.split(query.lower())
+    out: list[str] = []
+    seen: set[str] = set()
+    for piece in pieces:
+        token = piece.strip()
+        if len(token) < 2:
+            continue
+        if token in _QUERY_STOPWORDS:
+            continue
+        if token in seen:
+            continue
+        seen.add(token)
+        out.append(token)
+    return out
+
 
 def list_active_lessons(repo_path: str | None = None) -> list[dict]:
     """Return active, retrieval-eligible lessons.
+
+    Scope union (Phase 6.2 extension): when `repo_path` is set and resolves
+    to a per-repo `.agent/<tag>/` directory, this also reads the global
+    `.agent/lessons/active/` bucket and unions the results (deduped by id,
+    per-repo wins on collision). Lessons saved without `--repo-path` are
+    treated as org-wide knowledge available from any repo. When `repo_path`
+    is None (or already maps to the global agent dir), only the global
+    bucket is read — no cross-repo leakage.
 
     Defensive double-check: filters anything where `status != "active"` or
     top-level `active_knowledge_allowed` is not True. The storage layer
     enforces the invariant, but a corrupted file or future bug must not
     leak a candidate or tampered record into context.
     """
-    raw = list_lessons(status=STATUS_ACTIVE, repo_path=repo_path)
+    primary_dir = _resolve_agent_dir(repo_path)
+    global_dir = _resolve_agent_dir(None)
+
+    sources: list[list[dict]] = [
+        list_lessons(status=STATUS_ACTIVE, repo_path=repo_path),
+    ]
+    if primary_dir != global_dir:
+        sources.append(list_lessons(status=STATUS_ACTIVE, repo_path=None))
+
+    seen_ids: set[str] = set()
     out: list[dict] = []
-    for record in raw:
-        if not isinstance(record, dict):
-            continue
-        if record.get("status") != STATUS_ACTIVE:
-            continue
-        if record.get("active_knowledge_allowed") is not True:
-            continue
-        out.append(record)
+    for source in sources:
+        for record in source:
+            if not isinstance(record, dict):
+                continue
+            if record.get("status") != STATUS_ACTIVE:
+                continue
+            if record.get("active_knowledge_allowed") is not True:
+                continue
+            lesson_id = record.get("id")
+            if not isinstance(lesson_id, str) or lesson_id in seen_ids:
+                continue
+            seen_ids.add(lesson_id)
+            out.append(record)
     return out
+
+
+def _resolve_agent_dir(repo_path: str | None):
+    """Resolve to a comparable path. Falls back to a sentinel string if
+    config.get_agent_dir raises so a config failure doesn't bring down
+    retrieval."""
+    try:
+        return config.get_agent_dir(repo_path).resolve()
+    except Exception:
+        return f"<unresolved:{repo_path!r}>"
 
 
 def find_active_lessons(
@@ -84,8 +170,10 @@ def find_active_lessons(
     case_name_norm = (case_name or "").strip()
     language_norm = (language or "").strip().lower()
     category_norm = (category or "").strip().lower()
-    query_norm = (query or "").strip().lower()
-    has_filter = bool(case_name_norm or language_norm or category_norm or query_norm)
+    # Tokenize once; a query of only stopwords yields [] and is treated as
+    # "no query filter" rather than dropping every lesson.
+    query_tokens = _tokenize_query(query)
+    has_filter = bool(case_name_norm or language_norm or category_norm or query_tokens)
 
     scored: list[tuple[int, dict]] = []
     for lesson in lessons:
@@ -94,7 +182,7 @@ def find_active_lessons(
             case_name=case_name_norm,
             language=language_norm,
             category=category_norm,
-            query=query_norm,
+            query_tokens=query_tokens,
         )
         if has_filter and score <= 0:
             continue
@@ -168,7 +256,7 @@ def _score_lesson(
     case_name: str,
     language: str,
     category: str,
-    query: str,
+    query_tokens: list[str],
 ) -> int:
     score = 0
 
@@ -199,12 +287,29 @@ def _score_lesson(
         if cat_val.lower() == category:
             score += _SCORE_CATEGORY
 
-    if query:
+    if query_tokens:
         haystack = _build_haystack(lesson, candidate)
-        if query in haystack:
+        # Binary: any token hit grants the query boost. Keeps scoring
+        # deterministic and prevents long queries from dominating ranking.
+        if any(token in haystack for token in query_tokens):
             score += _SCORE_QUERY
 
+        # Phase 6.2.2: tag match grants a higher boost than a generic
+        # title/summary substring hit. Lessons without `tags` (older
+        # records) silently skip this — they can still match via query.
+        tag_haystack = _build_tag_haystack(lesson)
+        if tag_haystack and any(token in tag_haystack for token in query_tokens):
+            score += _SCORE_TAG
+
     return score
+
+
+def _build_tag_haystack(lesson: dict) -> str:
+    tags = lesson.get("tags")
+    if not isinstance(tags, list):
+        return ""
+    parts = [t.lower() for t in tags if isinstance(t, str) and t.strip()]
+    return " ".join(parts)
 
 
 def _language_from_case_name(case_name: str) -> str | None:

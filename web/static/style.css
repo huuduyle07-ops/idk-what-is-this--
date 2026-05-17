@@ -1277,6 +1277,26 @@ button {
 .lesson-badge--active    { background: #052e16; color: #bbf7d0; }
 .lesson-badge--blocked   { background: #450a0a; color: #fecaca; }
 
+/* Phase 6.2.2 — tag chips */
+.lesson-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 4px 0 6px 0;
+}
+
+.lesson-tag {
+    display: inline-block;
+    padding: 1px 8px;
+    font-size: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: #1e293b;
+    color: #93c5fd;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    letter-spacing: 0.2px;
+}
+
 .lesson-meta {
     font-size: 12px;
     color: #94a3b8;

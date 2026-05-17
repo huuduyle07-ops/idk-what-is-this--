@@ -122,6 +122,33 @@ def _item_dir(repo: Path, run: str = "20260517_120000", item: str = "01-test") -
 # --- success path ---------------------------------------------------------
 
 
+def test_proposal_lesson_includes_expected_tags(proposals_repo):
+    """Phase 6.2.2: the CLI must populate tags from language/category/
+    case_name/changed_files. Matches the user's spec for the proposal flow."""
+    item_dir = _item_dir(proposals_repo)
+    _write_artifacts(
+        item_dir,
+        case_name="cpp_account_interest",
+        language="cpp",
+        category="logic_validation",
+        changed_files=["interest.cpp"],
+        expected_files=["interest.cpp"],
+        forbidden_files=["main.cpp"],
+        summary="Fix the compound interest calculation by adding validation for negative inputs.",
+    )
+
+    lesson = cl.create_lesson_from_proposal(item_dir)
+
+    tags = lesson["tags"]
+    assert "cpp" in tags
+    assert "logic-validation" in tags
+    assert "cpp-account-interest" in tags
+    assert "interest" in tags
+    # Generic action words must NOT be tags
+    assert "fix" not in tags
+    assert "bug" not in tags
+
+
 def test_validated_proposal_creates_lesson_candidate(proposals_repo):
     item_dir = _item_dir(proposals_repo)
     _write_artifacts(item_dir)

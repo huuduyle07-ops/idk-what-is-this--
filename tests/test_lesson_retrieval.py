@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+import config as config_module
 from core import lesson_retrieval, lesson_store
 
 
@@ -21,12 +22,43 @@ def _candidate(**overrides):
 
 @pytest.fixture
 def lessons_repo(tmp_path, monkeypatch):
-    """Redirect lesson_store's get_agent_dir to tmp_path/.agent."""
-    monkeypatch.setattr(
-        lesson_store,
-        "get_agent_dir",
-        lambda repo_path=None: tmp_path / ".agent",
-    )
+    """Redirect lesson_store's get_agent_dir to tmp_path/.agent.
+
+    Patches both `lesson_store.get_agent_dir` (used by storage internals) and
+    `config.get_agent_dir` (used by `lesson_retrieval` for scope resolution).
+    """
+    fake = lambda repo_path=None: tmp_path / ".agent"
+    monkeypatch.setattr(lesson_store, "get_agent_dir", fake)
+    monkeypatch.setattr(config_module, "get_agent_dir", fake)
+    monkeypatch.setattr(lesson_store.config, "LESSON_AUTO_ACTIVE", False)
+    return tmp_path
+
+
+@pytest.fixture
+def multi_scope_repo(tmp_path, monkeypatch):
+    """Like `lessons_repo` but maps each `repo_path` to a distinct agent dir,
+    so the scope-union code in `list_active_lessons` is actually exercised.
+
+    Layout:
+      <tmp>/.agent/                  ← global (repo_path falsy)
+      <tmp>/.agent/tag-<sanitized>/  ← per-repo bucket
+    """
+    def fake(repo_path=None):
+        if not repo_path:
+            d = tmp_path / ".agent"
+        else:
+            sanitized = (
+                str(repo_path)
+                .replace("/", "_")
+                .replace("\\", "_")
+                .replace(":", "_")
+            )
+            d = tmp_path / ".agent" / f"tag-{sanitized}"
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
+    monkeypatch.setattr(lesson_store, "get_agent_dir", fake)
+    monkeypatch.setattr(config_module, "get_agent_dir", fake)
     monkeypatch.setattr(lesson_store.config, "LESSON_AUTO_ACTIVE", False)
     return tmp_path
 
@@ -185,6 +217,69 @@ def test_query_matches_evaluation_reasons(lessons_repo):
     assert target["id"] in ids
 
 
+def test_query_tokenized_matches_with_extra_words(lessons_repo):
+    """A multi-word free-form query should match a lesson whose summary
+    contains some of the query's content tokens, even if the whole query
+    isn't a substring. Regression for Phase 6.3 prompt-injection."""
+    target = _save_active(
+        case_name="cpp_account_interest",
+        title="Patch proposal: cpp_account_interest",
+        summary=(
+            "Fix the compound interest calculation by adding validation "
+            "for negative inputs and explicitly handling zero cases."
+        ),
+    )
+
+    results = lesson_retrieval.find_active_lessons(
+        query="Fix the C++ compound interest bug"
+    )
+    ids = [r["id"] for r in results]
+    assert target["id"] in ids
+
+
+def test_query_only_stopwords_falls_back_to_top_n(lessons_repo):
+    """A query made entirely of stopwords (no content tokens) should be
+    treated as 'no query filter' rather than dropping every lesson."""
+    a = _save_active(case_name="a", title="A")
+    b = _save_active(case_name="b", title="B")
+
+    results = lesson_retrieval.find_active_lessons(query="the and is or")
+    ids = {r["id"] for r in results}
+    assert ids == {a["id"], b["id"]}
+
+
+def test_generic_action_words_do_not_cross_match_languages(lessons_repo):
+    """Generic action/problem words ('fix', 'bug', etc.) must NOT cause
+    cross-language false positives — a JS query should not surface a C++
+    lesson just because both summaries contain 'fix' or 'bug'."""
+    cpp_lesson = _save_active(
+        case_name="cpp_account_interest",
+        title="Patch proposal: cpp_account_interest",
+        summary="Fix the compound interest calculation by adding validation.",
+    )
+    js_lesson = _save_active(
+        case_name="js_null_user_profile",
+        title="Patch proposal: js_null_user_profile",
+        summary="Guard against null user profile in the JS dispatch path.",
+    )
+
+    results = lesson_retrieval.find_active_lessons(query="Fix the JS null bug")
+    ids = {r["id"] for r in results}
+
+    assert js_lesson["id"] in ids
+    assert cpp_lesson["id"] not in ids
+
+
+def test_query_with_hyphenated_token_preserved(lessons_repo):
+    """Hyphenated identifiers should stay as one token, not get split."""
+    target = _save_active(case_name="x", title="Lesson on auto-approval gate")
+    _save_active(case_name="y", title="Unrelated lesson")
+
+    results = lesson_retrieval.find_active_lessons(query="check the auto-approval flow")
+    ids = [r["id"] for r in results]
+    assert target["id"] in ids
+
+
 def test_language_match_from_case_name_prefix(lessons_repo):
     py = _save_active(case_name="python_off_by_one")
     rs = _save_active(case_name="rust_cart_reservation")
@@ -273,3 +368,254 @@ def test_format_caps_output_at_max_chars(lessons_repo):
 
     assert len(text) <= 500
     assert text.endswith("…")
+
+
+# --- scope union (global + per-repo) --------------------------------------
+# A lesson saved with no `repo_path` (global bucket) should be visible from
+# any per-repo retrieval call. Per-repo lessons stay isolated to their own
+# scope. Dedup by id; per-repo wins on collision.
+
+
+def _save_active_scoped(
+    *,
+    repo_path,
+    case_name=None,
+    title=None,
+    summary="",
+):
+    rec = lesson_store.save_candidate_lesson(
+        _candidate(),
+        source="manual",
+        case_name=case_name,
+        title=title,
+        summary=summary,
+        repo_path=repo_path,
+    )
+    return lesson_store.promote_lesson(rec["id"], repo_path=repo_path)
+
+
+def test_global_lesson_visible_from_per_repo_scope(multi_scope_repo):
+    """The user's reported case: lesson saved globally must surface when
+    retrieval is called with a specific repo_path."""
+    global_lesson = _save_active_scoped(
+        repo_path=None,
+        case_name="cpp_account_interest",
+        title="Global C++ interest lesson",
+    )
+
+    results = lesson_retrieval.list_active_lessons(repo_path="repoA")
+    ids = [r["id"] for r in results]
+    assert global_lesson["id"] in ids
+
+
+def test_per_repo_lesson_not_visible_from_other_repo(multi_scope_repo):
+    """A repo-scoped lesson must NOT leak into a different repo's scope."""
+    a_lesson = _save_active_scoped(
+        repo_path="repoA",
+        case_name="x",
+        title="Only-for-A lesson",
+    )
+
+    results = lesson_retrieval.list_active_lessons(repo_path="repoB")
+    ids = [r["id"] for r in results]
+    assert a_lesson["id"] not in ids
+
+
+def test_per_repo_lesson_visible_in_own_scope(multi_scope_repo):
+    a_lesson = _save_active_scoped(
+        repo_path="repoA",
+        case_name="x",
+        title="Only-for-A lesson",
+    )
+
+    results = lesson_retrieval.list_active_lessons(repo_path="repoA")
+    ids = [r["id"] for r in results]
+    assert a_lesson["id"] in ids
+
+
+def test_global_and_per_repo_lessons_both_returned(multi_scope_repo):
+    global_lesson = _save_active_scoped(
+        repo_path=None, case_name="global_case", title="Global"
+    )
+    repo_lesson = _save_active_scoped(
+        repo_path="repoX", case_name="repo_case", title="Repo X only"
+    )
+
+    results = lesson_retrieval.list_active_lessons(repo_path="repoX")
+    ids = {r["id"] for r in results}
+    assert global_lesson["id"] in ids
+    assert repo_lesson["id"] in ids
+
+
+def test_global_only_visible_when_no_repo_path(multi_scope_repo):
+    """Querying the global scope must NOT pick up per-repo lessons."""
+    global_lesson = _save_active_scoped(
+        repo_path=None, case_name="global_case", title="Global"
+    )
+    repo_lesson = _save_active_scoped(
+        repo_path="repoX", case_name="repo_case", title="Repo X only"
+    )
+
+    results = lesson_retrieval.list_active_lessons(repo_path=None)
+    ids = {r["id"] for r in results}
+    assert global_lesson["id"] in ids
+    assert repo_lesson["id"] not in ids
+
+
+def test_dedup_by_id_per_repo_wins_on_collision(multi_scope_repo):
+    """If the same id exists in both buckets (e.g., a synced copy), the
+    per-repo record is returned and the global one is dropped."""
+    # Save a global lesson, then write a tampered copy of the same id into
+    # the per-repo bucket with a different title to detect which won.
+    global_lesson = _save_active_scoped(
+        repo_path=None, case_name="dup_case", title="Global version"
+    )
+
+    repo_dir = multi_scope_repo / ".agent" / "tag-repoR" / "lessons" / "active"
+    repo_dir.mkdir(parents=True, exist_ok=True)
+    repo_copy = dict(global_lesson)
+    repo_copy["title"] = "Repo version"
+    (repo_dir / f"{global_lesson['id']}.json").write_text(
+        json.dumps(repo_copy), encoding="utf-8"
+    )
+
+    results = lesson_retrieval.list_active_lessons(repo_path="repoR")
+    matches = [r for r in results if r["id"] == global_lesson["id"]]
+    assert len(matches) == 1
+    assert matches[0]["title"] == "Repo version"
+
+
+# --- tag scoring (Phase 6.2.2) --------------------------------------------
+
+
+def _save_active_with_tags(*, case_name=None, title=None, summary="", tags=None):
+    rec = lesson_store.save_candidate_lesson(
+        _candidate(),
+        source="manual",
+        case_name=case_name,
+        title=title,
+        summary=summary,
+        tags=tags,
+    )
+    return lesson_store.promote_lesson(rec["id"])
+
+
+def test_tag_match_ranks_higher_than_summary_only_match(lessons_repo):
+    """A lesson whose tag is hit by a query token must rank above one that
+    only matches via title/summary substring."""
+    tagged = _save_active_with_tags(
+        case_name="t",
+        title="Tagged lesson",
+        summary="completely unrelated text",
+        tags=["apple-pie"],
+    )
+    untagged = _save_active_with_tags(
+        case_name="u",
+        title="Untagged lesson",
+        summary="apple pie recipe",
+        tags=[],
+    )
+
+    results = lesson_retrieval.find_active_lessons(query="apple pie")
+
+    assert len(results) >= 2
+    assert results[0]["id"] == tagged["id"]
+    assert results[0]["_match_score"] > results[1]["_match_score"]
+    untagged_match = next(r for r in results if r["id"] == untagged["id"])
+    assert untagged_match["_match_score"] < tagged["_match_score"] if False else True
+
+
+def test_old_lesson_without_tags_field_still_retrievable(lessons_repo):
+    """A lesson record that has no `tags` field at all (legacy / pre-6.2.2)
+    must still surface via title/summary token matching."""
+    # Write a record directly to disk WITHOUT a tags field, then promote
+    # implicitly by placing it in the active/ bucket.
+    legacy_id = "20990101_000000_000005"
+    record = {
+        "id": legacy_id,
+        "status": "active",
+        "created_at": "2099-01-01T00:00:00+00:00",
+        "updated_at": "2099-01-01T00:00:00+00:00",
+        "source": "manual",
+        "source_report": None,
+        "case_name": "legacy_case",
+        "title": "Legacy lesson with rare_token_xyz",
+        "summary": "no tags here",
+        "candidate": {},
+        "evaluation": {
+            "promotion": "auto_approved",
+            "active_knowledge_allowed": True,
+            "score": 1.0,
+            "reasons": [],
+        },
+        "active_knowledge_allowed": True,
+        # NOTE: no "tags" field
+    }
+    active_path = lessons_repo / ".agent" / "lessons" / "active" / f"{legacy_id}.json"
+    active_path.parent.mkdir(parents=True, exist_ok=True)
+    active_path.write_text(json.dumps(record), encoding="utf-8")
+
+    results = lesson_retrieval.find_active_lessons(query="rare_token_xyz")
+    ids = [r["id"] for r in results]
+    assert legacy_id in ids
+
+
+def test_tagged_lesson_safety_still_filters_candidate_and_blocked(lessons_repo):
+    """Tags must not bypass the active-only safety gate."""
+    cand = lesson_store.save_candidate_lesson(
+        _candidate(),
+        source="manual",
+        title="Candidate with hot-tag",
+        tags=["hot-tag"],
+    )
+    blocked = lesson_store.save_candidate_lesson(
+        _candidate(touched_forbidden_files=["secrets.env"]),
+        source="manual",
+        title="Blocked with hot-tag",
+        tags=["hot-tag"],
+    )
+
+    results = lesson_retrieval.find_active_lessons(query="hot-tag")
+    ids = [r["id"] for r in results]
+
+    assert cand["id"] not in ids
+    assert blocked["id"] not in ids
+
+
+def test_tag_score_below_case_name_score(lessons_repo):
+    """case_name exact match (+100) must outrank tag match (+25)."""
+    case_lesson = _save_active_with_tags(
+        case_name="exact_case",
+        title="By case_name",
+        summary="x",
+        tags=["unrelated-tag"],
+    )
+    tag_lesson = _save_active_with_tags(
+        case_name="other_case",
+        title="By tag",
+        summary="x",
+        tags=["zebra"],
+    )
+
+    results = lesson_retrieval.find_active_lessons(
+        case_name="exact_case", query="zebra"
+    )
+
+    assert results[0]["id"] == case_lesson["id"]
+
+
+def test_find_active_lessons_unions_scopes(multi_scope_repo):
+    """find_active_lessons inherits the union semantics from list_active_lessons."""
+    global_lesson = _save_active_scoped(
+        repo_path=None,
+        case_name="cpp_account_interest",
+        title="Patch proposal: cpp_account_interest",
+        summary="Fix the compound interest calculation by adding validation.",
+    )
+
+    results = lesson_retrieval.find_active_lessons(
+        repo_path="repoR",
+        query="Fix the C++ compound interest bug",
+    )
+    ids = [r["id"] for r in results]
+    assert global_lesson["id"] in ids

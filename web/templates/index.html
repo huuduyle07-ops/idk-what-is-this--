@@ -278,7 +278,7 @@
             </div>
             <div class="lessons-note">
               Only <strong>Active</strong> lessons will be retrieval-eligible in future phases.
-              This UI does not wire lessons into patch prompts yet.
+              Only Active lessons can be used as patch-prompt hints, and only when LESSON_RETRIEVAL_ENABLED=true.
             </div>
             <div class="lessons-filters" role="group" aria-label="Lesson status filter">
               <button type="button" class="lessons-filter lessons-filter--active"
@@ -1392,6 +1392,7 @@ function _renderLessonCard(lesson) {
     const promotion = evaluation.promotion || "unknown";
     const allowed = lesson.active_knowledge_allowed === true;
     const reasons = Array.isArray(evaluation.reasons) ? evaluation.reasons : [];
+    const tags = Array.isArray(lesson.tags) ? lesson.tags.filter(t => typeof t === "string" && t) : [];
 
     const idAttr = _escapeHtml(lesson.id || "");
     const buttons = [];
@@ -1413,6 +1414,10 @@ function _renderLessonCard(lesson) {
         metaRows.push(`<div><strong>updated:</strong> ${_escapeHtml(lesson.updated_at)}</div>`);
     }
 
+    const tagsHtml = tags.length
+        ? `<div class="lesson-tags">${tags.map(t => `<span class="lesson-tag">${_escapeHtml(t)}</span>`).join("")}</div>`
+        : "";
+
     const reasonsHtml = reasons.length
         ? `<details class="lesson-reasons"><summary>evaluation reasons (${reasons.length})</summary><ul>${reasons.map(r => `<li>${_escapeHtml(r)}</li>`).join("")}</ul></details>`
         : "";
@@ -1427,6 +1432,7 @@ function _renderLessonCard(lesson) {
           <span class="lesson-title">${_escapeHtml(lesson.title || "Untitled lesson")}</span>
           <span class="lesson-badge lesson-badge--${_escapeHtml(status)}">${_escapeHtml(status)}</span>
         </div>
+        ${tagsHtml}
         <div class="lesson-meta">${metaRows.join("")}</div>
         ${summaryHtml}
         ${reasonsHtml}

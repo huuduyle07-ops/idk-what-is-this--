@@ -85,7 +85,7 @@ def test_save_blocked_lands_in_blocked(lessons_repo):
     assert (_bucket_dir(lessons_repo, "blocked") / f"{saved['id']}.json").is_file()
 
 
-def test_lesson_record_has_all_12_fields(lessons_repo):
+def test_lesson_record_has_all_13_fields(lessons_repo):
     saved = lesson_store.save_candidate_lesson(
         _valid_candidate(),
         source="benchmark",
@@ -105,6 +105,7 @@ def test_lesson_record_has_all_12_fields(lessons_repo):
         "case_name",
         "title",
         "summary",
+        "tags",
         "candidate",
         "evaluation",
         "active_knowledge_allowed",
@@ -117,10 +118,78 @@ def test_lesson_record_has_all_12_fields(lessons_repo):
     assert saved["title"] == "Pagination off-by-one fix"
     assert saved["summary"] == "Caller-provided summary"
     assert saved["created_at"] == saved["updated_at"]
+    assert isinstance(saved["tags"], list)
 
     on_disk = _bucket_dir(lessons_repo, "candidate") / f"{saved['id']}.json"
     on_disk_record = json.loads(on_disk.read_text(encoding="utf-8"))
     assert set(on_disk_record.keys()) == expected_keys
+
+
+def test_save_auto_derives_tags_when_omitted(lessons_repo):
+    saved = lesson_store.save_candidate_lesson(
+        _valid_candidate(language="python", category="logic_validation"),
+        source="benchmark",
+        case_name="python_off_by_one_pagination",
+        title="Pagination off-by-one fix",
+        summary="Fix off-by-one in paginator iteration boundary.",
+    )
+
+    tags = saved["tags"]
+    assert "python" in tags
+    assert "logic-validation" in tags
+    assert "python-off-by-one-pagination" in tags
+    # File basename ("src/app.py" → "app") should appear
+    assert "app" in tags
+
+
+def test_save_explicit_tags_override_auto_derive(lessons_repo):
+    saved = lesson_store.save_candidate_lesson(
+        _valid_candidate(language="python"),
+        source="manual",
+        case_name="python_off_by_one_pagination",
+        tags=["custom-only", "another-tag"],
+    )
+
+    assert saved["tags"] == ["custom-only", "another-tag"]
+    # Auto-derive would have produced "python" — explicit list wins
+    assert "python" not in saved["tags"]
+
+
+def test_save_explicit_empty_tags_kept_empty(lessons_repo):
+    saved = lesson_store.save_candidate_lesson(
+        _valid_candidate(language="python"),
+        source="manual",
+        case_name="python_off_by_one_pagination",
+        tags=[],
+    )
+
+    assert saved["tags"] == []
+
+
+def test_derive_lesson_tags_basic_shape():
+    candidate = {
+        "language": "cpp",
+        "category": "logic_validation",
+        "changed_files": ["interest.cpp"],
+    }
+    tags = lesson_store.derive_lesson_tags(
+        candidate,
+        case_name="cpp_account_interest",
+        title="Patch proposal: cpp_account_interest",
+        summary="Fix the compound interest calculation by adding validation.",
+    )
+
+    assert "cpp" in tags
+    assert "logic-validation" in tags
+    assert "cpp-account-interest" in tags
+    assert "interest" in tags
+    # At least one content token (e.g., "compound", "calculation", "validation")
+    assert any(t in tags for t in ("compound", "calculation", "validation"))
+    # Stopword-only inputs shouldn't sneak in
+    assert "fix" not in tags
+    assert "the" not in tags
+    # Deduped
+    assert len(tags) == len(set(tags))
 
 
 def test_list_lessons_returns_all_when_no_status(lessons_repo):

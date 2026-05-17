@@ -217,18 +217,32 @@ def create_lesson_from_proposal(
 
     # Lazy import: keeps the path-traversal helper testable without
     # requiring lesson_store to be importable (e.g., during CI without DB).
-    from core.lesson_store import save_candidate_lesson
+    from core.lesson_store import derive_lesson_tags, save_candidate_lesson
+
+    case_name = candidate.get("case_name") or None
+    title = _generate_title(
+        candidate.get("case_name") or "",
+        candidate.get("summary") or "",
+    )
+    summary = candidate.get("summary") or ""
+
+    # Phase 6.2.2: explicitly derive tags here so this CLI is the
+    # authoritative tag-source for proposal-derived lessons.
+    tags = derive_lesson_tags(
+        candidate,
+        case_name=case_name,
+        title=title,
+        summary=summary,
+    )
 
     return save_candidate_lesson(
         candidate,
         source="patch_proposal",
         source_report=str(proposal_dir),
-        case_name=candidate.get("case_name") or None,
-        title=_generate_title(
-            candidate.get("case_name") or "",
-            candidate.get("summary") or "",
-        ),
-        summary=candidate.get("summary") or "",
+        case_name=case_name,
+        title=title,
+        summary=summary,
+        tags=tags,
         repo_path=repo_path,
     )
 

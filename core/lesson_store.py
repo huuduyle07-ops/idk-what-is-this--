@@ -14,6 +14,7 @@ import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 import config
 from config import get_agent_dir
@@ -36,6 +37,24 @@ _BUCKET_DIRS = {
 }
 
 _LESSON_ID_RE = re.compile(r"^\d{8}_\d{6}_\d{6}(-\d+)?$")
+
+# Phase 6.2.2 — tag derivation
+_TAG_TEXT_SPLIT_RE = re.compile(r"""[\s,;:.!?()\[\]{}<>"`'/\\]+""")
+_TAG_STOPWORDS = frozenset({
+    # English connectives
+    "a", "an", "the", "and", "or", "but", "if",
+    "of", "to", "in", "on", "at", "for", "with", "by", "from", "as",
+    "is", "are", "was", "were", "be", "been", "being",
+    "do", "does", "did",
+    "i", "you", "we", "they", "it",
+    "this", "that", "these", "those",
+    # Generic action/problem words (mirror lesson_retrieval._QUERY_STOPWORDS)
+    "fix", "bug", "patch", "issue", "problem",
+    # Generic descriptive nouns commonly present in titles
+    "case", "test", "lesson", "proposal",
+})
+_TAG_MIN_TOKEN_LEN = 4
+_TAG_MAX_TEXT_TOKENS = 3
 
 
 def _now_iso() -> str:
@@ -143,6 +162,116 @@ def _status_routing(promotion: str | None, *, auto_active: bool) -> str:
     return STATUS_CANDIDATE
 
 
+def derive_lesson_tags(
+    candidate: dict,
+    *,
+    case_name: str | None = None,
+    title: str | None = None,
+    summary: str | None = None,
+) -> list[str]:
+    """Deterministically derive a small list of tags from a lesson candidate.
+
+    Tags surface in `lesson_retrieval.find_active_lessons` with a higher
+    score than free-form title/summary matches, so they should be high-signal
+    only: language, category, case_name slug, changed-file basenames, and a
+    handful of distinctive content tokens from title/summary.
+
+    Underscores in source strings are normalized to hyphens. Tokens are
+    lowercased and deduped (insertion order preserved).
+    """
+    if not isinstance(candidate, dict):
+        candidate = {}
+
+    tags: list[str] = []
+
+    language = _candidate_str(candidate, "language")
+    if language:
+        tags.append(language.lower())
+
+    category = _candidate_str(candidate, "category")
+    if category:
+        tags.append(_normalize_tag(category))
+
+    if isinstance(case_name, str) and case_name.strip():
+        tags.append(_normalize_tag(case_name))
+
+    changed_files = candidate.get("changed_files")
+    if isinstance(changed_files, list):
+        for entry in changed_files:
+            if isinstance(entry, str) and entry.strip():
+                stem = Path(entry).stem
+                if stem:
+                    tags.append(_normalize_tag(stem))
+
+    text_pool_parts = [s for s in (title, summary) if isinstance(s, str) and s.strip()]
+    if text_pool_parts:
+        for token in _extract_content_tokens(" ".join(text_pool_parts)):
+            tags.append(token)
+
+    return _dedupe_tags(tags)
+
+
+def _candidate_str(candidate: dict, key: str) -> str | None:
+    value = candidate.get(key)
+    if isinstance(value, str) and value.strip():
+        return value.strip()
+    return None
+
+
+def _normalize_tag(text: str) -> str:
+    return text.strip().lower().replace("_", "-")
+
+
+def _extract_content_tokens(text: str) -> list[str]:
+    out: list[str] = []
+    seen: set[str] = set()
+    for piece in _TAG_TEXT_SPLIT_RE.split(text.lower()):
+        token = piece.strip()
+        if len(token) < _TAG_MIN_TOKEN_LEN:
+            continue
+        if token in _TAG_STOPWORDS:
+            continue
+        normalized = token.replace("_", "-")
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        out.append(normalized)
+        if len(out) >= _TAG_MAX_TEXT_TOKENS:
+            break
+    return out
+
+
+def _dedupe_tags(tags: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for tag in tags:
+        if not isinstance(tag, str):
+            continue
+        token = tag.strip()
+        if not token or token in seen:
+            continue
+        seen.add(token)
+        out.append(token)
+    return out
+
+
+def _coerce_tags(raw: Any) -> list[str]:
+    """Normalize a caller-supplied tags argument to a clean list[str]."""
+    if not isinstance(raw, list):
+        return []
+    out: list[str] = []
+    seen: set[str] = set()
+    for entry in raw:
+        if not isinstance(entry, str):
+            continue
+        token = _normalize_tag(entry)
+        if not token or token in seen:
+            continue
+        seen.add(token)
+        out.append(token)
+    return out
+
+
 def save_candidate_lesson(
     candidate: dict,
     *,
@@ -151,9 +280,14 @@ def save_candidate_lesson(
     case_name: str | None = None,
     title: str | None = None,
     summary: str | None = None,
+    tags: list[str] | None = None,
     repo_path: str | None = None,
 ) -> dict:
-    """Evaluate `candidate` via lesson_quality and persist as a lesson record."""
+    """Evaluate `candidate` via lesson_quality and persist as a lesson record.
+
+    If `tags` is None, tags are auto-derived via `derive_lesson_tags(...)`.
+    Pass `tags=[]` to explicitly save with no tags.
+    """
     evaluation = evaluate_lesson_candidate(candidate)
     promotion = evaluation.get("promotion")
     auto_active = bool(getattr(config, "LESSON_AUTO_ACTIVE", False))
@@ -162,6 +296,16 @@ def save_candidate_lesson(
     lessons_root = _lessons_root(repo_path)
     lesson_id = _generate_lesson_id(lessons_root)
     now = _now_iso()
+
+    if tags is None:
+        resolved_tags = derive_lesson_tags(
+            candidate,
+            case_name=case_name,
+            title=title,
+            summary=summary,
+        )
+    else:
+        resolved_tags = _coerce_tags(tags)
 
     record = {
         "id": lesson_id,
@@ -173,6 +317,7 @@ def save_candidate_lesson(
         "case_name": case_name,
         "title": title if title is not None else f"Lesson from {case_name or source}",
         "summary": summary if summary is not None else "",
+        "tags": resolved_tags,
         "candidate": candidate,
         "evaluation": evaluation,
         # Top-level field strictly mirrors the bucket: only true when the file
