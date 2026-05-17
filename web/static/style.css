@@ -1168,3 +1168,187 @@ button {
     color: #94a3b8;
     font-weight: 400;
 }
+
+/* ============================================================ */
+/* Phase 6.1 — Lessons (Memory tab)                             */
+/* ============================================================ */
+.lessons-section {
+    margin-top: 16px;
+}
+
+.lessons-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.lessons-note {
+    font-size: 12px;
+    color: #94a3b8;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+}
+
+.lessons-filters {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.lessons-filter {
+    padding: 4px 12px;
+    font-size: 12px;
+    background: #1e293b;
+    color: #94a3b8;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.lessons-filter:hover {
+    background: #273549;
+    color: #cbd5e1;
+}
+
+.lessons-filter--active {
+    background: #1e3a8a;
+    color: #ffffff;
+    border-color: #3b82f6;
+}
+
+.lessons-status {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 8px;
+    min-height: 16px;
+}
+
+.lessons-status--running { color: #93c5fd; }
+.lessons-status--done    { color: #bbf7d0; }
+.lessons-status--failed  { color: #fecaca; }
+
+.lessons-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lesson-card {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-left: 4px solid #334155;
+    border-radius: 6px;
+    padding: 10px 12px;
+}
+
+.lesson-card--candidate { border-left-color: #fdba74; }
+.lesson-card--active    { border-left-color: #34d399; }
+.lesson-card--blocked   { border-left-color: #f87171; }
+
+.lesson-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.lesson-title {
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.lesson-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+}
+
+.lesson-badge--candidate { background: #422006; color: #fdba74; }
+.lesson-badge--active    { background: #052e16; color: #bbf7d0; }
+.lesson-badge--blocked   { background: #450a0a; color: #fecaca; }
+
+.lesson-meta {
+    font-size: 12px;
+    color: #94a3b8;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2px 12px;
+    margin-bottom: 6px;
+}
+
+.lesson-meta strong {
+    color: #cbd5e1;
+    font-weight: 500;
+}
+
+.lesson-summary {
+    font-size: 13px;
+    color: #cbd5e1;
+    margin: 6px 0;
+}
+
+.lesson-reasons {
+    font-size: 12px;
+    color: #94a3b8;
+    margin: 4px 0;
+}
+
+.lesson-reasons summary {
+    cursor: pointer;
+    color: #cbd5e1;
+}
+
+.lesson-reasons ul {
+    margin: 4px 0 0 16px;
+    padding-left: 0;
+}
+
+.lesson-id {
+    font-size: 11px;
+    color: #64748b;
+    margin: 4px 0;
+}
+
+.lesson-id code {
+    background: #1e293b;
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+
+.lesson-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.lesson-actions button {
+    padding: 4px 12px;
+    font-size: 12px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.lesson-actions button:hover {
+    background: #2563eb;
+}
+
+.lesson-actions .lesson-btn--danger {
+    background: #7f1d1d;
+}
+
+.lesson-actions .lesson-btn--danger:hover {
+    background: #991b1b;
+}

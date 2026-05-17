@@ -299,6 +299,18 @@ Only output JSON.
 
 AUTO_PATCH_ENABLED = os.getenv("AUTO_PATCH_ENABLED", "true").lower() not in {"0", "false", "no"}
 ROLLBACK_ON_VALIDATION_FAIL = True
+
+# Phase 6.0: when true, lessons that pass the Context Poisoning Guard
+# (promotion == auto_approved) land directly in active/. Default false:
+# human must explicitly promote via promote_lesson().
+LESSON_AUTO_ACTIVE = os.getenv("LESSON_AUTO_ACTIVE", "false").lower() not in {"0", "false", "no"}
+
+# Phase 6.3: when true, build_control_prompt injects an [ACTIVE LESSONS]
+# advisory block from Active_Knowledge lessons (via core.lesson_retrieval).
+# Default false: no behavior change until explicitly enabled.
+LESSON_RETRIEVAL_ENABLED = os.getenv("LESSON_RETRIEVAL_ENABLED", "false").lower() not in {"0", "false", "no"}
+LESSON_RETRIEVAL_LIMIT = int(os.getenv("LESSON_RETRIEVAL_LIMIT", "5"))
+LESSON_RETRIEVAL_MAX_CHARS = int(os.getenv("LESSON_RETRIEVAL_MAX_CHARS", "3000"))
 CONTROL_TIME_BUDGET_SEC = 180
 MAX_REVIEW_AGENTS = 2
 

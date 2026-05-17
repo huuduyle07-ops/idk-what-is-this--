@@ -807,13 +807,77 @@ def _resolve_code_dna_block(control_result: dict) -> str:
     return "REPO STYLE: not available. Use idiomatic style for the language."
 
 
-def build_control_prompt(control_result: dict, user_query: str) -> str:
+def _lessons_prompt_block(repo_path: str | None, user_query: str) -> str:
+    """Phase 6.3: return an [ACTIVE LESSONS] advisory section, or "" on any
+    disabled/empty/error condition.
+
+    Fail-closed: never raises. Reads only from core.lesson_retrieval (which
+    in turn reads only `lessons/active/`). The block is intentionally framed
+    as advisory hints with lower priority than user request / repo state /
+    validation / forbidden files / patch safety rules.
+    """
+    try:
+        import config as _config
+    except Exception:
+        return ""
+    if not getattr(_config, "LESSON_RETRIEVAL_ENABLED", False):
+        return ""
+    try:
+        from core import lesson_retrieval
+        try:
+            limit = int(getattr(_config, "LESSON_RETRIEVAL_LIMIT", 5))
+        except (TypeError, ValueError):
+            limit = 5
+        try:
+            max_chars = int(getattr(_config, "LESSON_RETRIEVAL_MAX_CHARS", 3000))
+        except (TypeError, ValueError):
+            max_chars = 3000
+        lessons = lesson_retrieval.find_active_lessons(
+            repo_path=repo_path,
+            query=user_query or None,
+            limit=limit,
+        )
+        if not lessons:
+            return ""
+        formatted = lesson_retrieval.format_lessons_for_prompt(
+            lessons, max_chars=max_chars
+        )
+        if not formatted.strip():
+            return ""
+        return (
+            "\n[ACTIVE LESSONS — advisory hints, lowest priority]\n"
+            "These are advisory hints from past auto-approved lessons.\n"
+            "User request, repo state, validation command, forbidden files,\n"
+            "and patch safety rules all have higher priority. Do NOT copy a\n"
+            "lesson blindly.\n"
+            "\n"
+            f"{formatted}\n"
+        )
+    except Exception as exc:
+        # Fail closed: lessons are advisory, never block the patch flow.
+        try:
+            import sys
+            sys.stderr.write(
+                f"[control_engine] lesson retrieval skipped: {type(exc).__name__}: {exc}\n"
+            )
+        except Exception:
+            pass
+        return ""
+
+
+def build_control_prompt(
+    control_result: dict,
+    user_query: str,
+    *,
+    repo_path: str | None = None,
+) -> str:
     top = control_result.get("top_hypothesis") or {}
     patch_intent = control_result.get("patch_intent") or {}
     preflight = control_result.get("preflight_validation") or {}
     related_snippets = control_result.get("related_snippets") or []
     scout = control_result.get("scout") or {}
     code_dna_block = _resolve_code_dna_block(control_result)
+    lessons_block = _lessons_prompt_block(repo_path, user_query)
 
     # Use the canonical schema constant from prompter.py.
     from core.prompter import PATCH_RESPONSE_SCHEMA
@@ -929,7 +993,7 @@ Do not use the top hypothesis as the patch target unless it is directly relevant
 
 [PHANTOM LIMB SUGGESTIONS - structural hints, not proof]
 {phantom_block}
-
+{lessons_block}
 [USER]
 {user_query}
 
@@ -1070,7 +1134,7 @@ source_snippet:
 
 [PHANTOM LIMB SUGGESTIONS - structural hints, not proof]
 {phantom_block}
-
+{lessons_block}
 [USER]
 {user_query}
 

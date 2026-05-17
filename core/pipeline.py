@@ -86,6 +86,7 @@ def run_draft_pipeline(state: AgentState) -> str:
             prompt = build_control_prompt(
                 control_result=state.control_result,
                 user_query=state.user_input,
+                repo_path=state.repo_path,
             )
         else:
             prompt = build_control_prompt_human(

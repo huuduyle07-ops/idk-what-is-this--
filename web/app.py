@@ -28,6 +28,7 @@ from core.sleeping_consultant import (
     request_stop,
 )
 from core import dream_artifacts
+from core import lesson_store
 from database.memory_consolidator import consolidate_all
 from policy.decision_helper import normalize_patch_style
 from graph.builder import build_graph_from_repo
@@ -274,7 +275,7 @@ def generate_patch():
     except Exception:
         return {"error": "Invalid control JSON"}
 
-    prompt = build_control_prompt(control, "Generate patch")
+    prompt = build_control_prompt(control, "Generate patch", repo_path=repo_path or None)
 
     response = run_gemini_request(prompt)
     patch = extract_json_block(response)
@@ -1089,6 +1090,7 @@ def load_session(session_id):
 @app.route("/generate_candidates", methods=["POST"])
 def generate_candidates():
     control_json = request.form["control"]
+    repo_path = (request.form.get("repo_path") or "").strip() or None
 
     try:
         control = json.loads(control_json)
@@ -1096,9 +1098,9 @@ def generate_candidates():
         return {"error": "Invalid control JSON"}
 
     prompts = [
-        ("gemini_default", build_control_prompt(control, "Generate the best safe patch.")),
-        ("gemini_minimal", build_control_prompt(control, "Generate the smallest possible patch.")),
-        ("deepseek_review", build_control_prompt(control, "Generate an alternative conservative patch.")),
+        ("gemini_default", build_control_prompt(control, "Generate the best safe patch.", repo_path=repo_path)),
+        ("gemini_minimal", build_control_prompt(control, "Generate the smallest possible patch.", repo_path=repo_path)),
+        ("deepseek_review", build_control_prompt(control, "Generate an alternative conservative patch.", repo_path=repo_path)),
     ]
 
     candidates = []
@@ -1376,6 +1378,81 @@ def consolidate_memory_route():
         "test_logs": test_logs,
         "project_tag": stats["project_tag"],
     }
+
+
+# ============================================================
+# Phase 6.1 — Lesson management routes
+# ============================================================
+# Backed by core/lesson_store.py. These routes are read/write JSON only:
+# no patch flow, no retrieval helper, no auto-creation. The Memory tab UI
+# is the sole consumer today.
+
+def _lesson_repo_path(raw: str | None) -> str | None:
+    """Normalize an optional repo_path argument. Empty string => None."""
+    if not raw:
+        return None
+    value = raw.strip()
+    return value or None
+
+
+@app.route("/lessons/list", methods=["GET"])
+def lessons_list_route():
+    """List lessons for the Memory tab.
+
+    Query params:
+      - repo_path (optional): scopes to .agent/<project_tag>/lessons/. Defaults
+        to the global .agent/lessons/ if omitted.
+      - status (optional): one of candidate | active | blocked.
+    """
+    repo_path = _lesson_repo_path(request.values.get("repo_path"))
+    status = (request.values.get("status") or "").strip() or None
+    if status is not None and status not in lesson_store.LESSON_STATUSES:
+        return {"ok": False, "error": f"invalid status: {status!r}"}, 400
+    try:
+        lessons = lesson_store.list_lessons(status=status, repo_path=repo_path)
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"failed to list lessons: {type(e).__name__}"}, 500
+    return {"ok": True, "lessons": lessons}
+
+
+@app.route("/lessons/promote", methods=["POST"])
+def lessons_promote_route():
+    """Move a candidate lesson to active. JSON body: {repo_path?, lesson_id}."""
+    payload = request.get_json(silent=True) or {}
+    repo_path = _lesson_repo_path(payload.get("repo_path"))
+    lesson_id = (payload.get("lesson_id") or "").strip()
+    if not lesson_id:
+        return {"ok": False, "error": "lesson_id is required"}, 400
+    try:
+        record = lesson_store.promote_lesson(lesson_id, repo_path=repo_path)
+    except LookupError as e:
+        return {"ok": False, "error": str(e)}, 404
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"failed to promote lesson: {type(e).__name__}"}, 500
+    return {"ok": True, "lesson": record}
+
+
+@app.route("/lessons/block", methods=["POST"])
+def lessons_block_route():
+    """Move any lesson to blocked. JSON body: {repo_path?, lesson_id}."""
+    payload = request.get_json(silent=True) or {}
+    repo_path = _lesson_repo_path(payload.get("repo_path"))
+    lesson_id = (payload.get("lesson_id") or "").strip()
+    if not lesson_id:
+        return {"ok": False, "error": "lesson_id is required"}, 400
+    try:
+        record = lesson_store.block_lesson(lesson_id, repo_path=repo_path)
+    except LookupError as e:
+        return {"ok": False, "error": str(e)}, 404
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"failed to block lesson: {type(e).__name__}"}, 500
+    return {"ok": True, "lesson": record}
 
 
 @app.route("/upload_folder", methods=["POST"])

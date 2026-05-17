@@ -211,7 +211,11 @@ def _generate_patch_plan(
         query=query,
     )
 
-    prompt = build_control_prompt(control, f"Generate patch_plan for: {query}")
+    prompt = build_control_prompt(
+        control,
+        f"Generate patch_plan for: {query}",
+        repo_path=repo_path,
+    )
     raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path)
     parsed = extract_json_block(raw)
     return parsed, (raw or "")

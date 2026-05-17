@@ -267,6 +267,34 @@
             </div>
             <div id="memoryStatus" class="memory-status"></div>
           </div>
+
+          <!-- Phase 6.1: Lessons (Context Poisoning Guard storage) -->
+          <div class="memory-section lessons-section">
+            <div class="lessons-header">
+              <strong>Lessons</strong>
+              <button type="button" class="sidebar-refresh"
+                      onclick="loadLessons(true)"
+                      title="Re-scan .agent/<project_tag>/lessons/">⟳ Refresh</button>
+            </div>
+            <div class="lessons-note">
+              Only <strong>Active</strong> lessons will be retrieval-eligible in future phases.
+              This UI does not wire lessons into patch prompts yet.
+            </div>
+            <div class="lessons-filters" role="group" aria-label="Lesson status filter">
+              <button type="button" class="lessons-filter lessons-filter--active"
+                      data-status="" onclick="filterLessons('')">All</button>
+              <button type="button" class="lessons-filter"
+                      data-status="candidate" onclick="filterLessons('candidate')">Candidate</button>
+              <button type="button" class="lessons-filter"
+                      data-status="active" onclick="filterLessons('active')">Active</button>
+              <button type="button" class="lessons-filter"
+                      data-status="blocked" onclick="filterLessons('blocked')">Blocked</button>
+            </div>
+            <div id="lessonsStatus" class="lessons-status"></div>
+            <div id="lessonsList" class="lessons-list">
+              <div class="health-empty">Click ⟳ Refresh to load lessons.</div>
+            </div>
+          </div>
         </div>
 
         <!-- Graph (no longer a result-tab; lives in its own workspace tab) -->
@@ -1285,6 +1313,166 @@ function promoteDreamArtifact(date, runId, itemIdx, artifact) {
     .catch(err => openAppModal("Promote error", `<p>${_escapeHtml(err)}</p>`));
 }
 
+// ============================================================
+// Phase 6.1 — Lessons (Memory tab)
+// ============================================================
+let _lessonsLoaded = false;
+let _lessonsCurrentStatus = "";
+
+function _lessonRepoPath() {
+    const el = document.querySelector("input[name='repo_path']");
+    return el ? el.value.trim() : "";
+}
+
+function loadLessons(force) {
+    if (_lessonsLoaded && !force) return;
+    _lessonsLoaded = true;
+
+    const statusEl = document.getElementById("lessonsStatus");
+    const listEl = document.getElementById("lessonsList");
+    if (statusEl) {
+        statusEl.textContent = "Loading…";
+        statusEl.className = "lessons-status lessons-status--running";
+    }
+
+    const params = new URLSearchParams();
+    const repo = _lessonRepoPath();
+    if (repo) params.set("repo_path", repo);
+    if (_lessonsCurrentStatus) params.set("status", _lessonsCurrentStatus);
+
+    fetch("/lessons/list?" + params.toString())
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                if (statusEl) {
+                    statusEl.textContent = `❌ ${data.error || "Failed to load lessons"}`;
+                    statusEl.className = "lessons-status lessons-status--failed";
+                }
+                if (listEl) listEl.innerHTML = "";
+                return;
+            }
+            const lessons = data.lessons || [];
+            if (statusEl) {
+                const scope = _lessonsCurrentStatus || "all";
+                statusEl.textContent = `${lessons.length} lesson(s) [${scope}]`;
+                statusEl.className = "lessons-status lessons-status--done";
+            }
+            _renderLessonsList(lessons);
+        })
+        .catch(err => {
+            if (statusEl) {
+                statusEl.textContent = `❌ Network error: ${err}`;
+                statusEl.className = "lessons-status lessons-status--failed";
+            }
+        });
+}
+
+function filterLessons(status) {
+    _lessonsCurrentStatus = status || "";
+    document.querySelectorAll(".lessons-filter").forEach(btn => {
+        const isActive = (btn.dataset.status || "") === _lessonsCurrentStatus;
+        btn.classList.toggle("lessons-filter--active", isActive);
+    });
+    loadLessons(true);
+}
+
+function _renderLessonsList(lessons) {
+    const listEl = document.getElementById("lessonsList");
+    if (!listEl) return;
+    if (!lessons.length) {
+        listEl.innerHTML = '<div class="health-empty">No lessons in this view.</div>';
+        return;
+    }
+    listEl.innerHTML = lessons.map(_renderLessonCard).join("");
+}
+
+function _renderLessonCard(lesson) {
+    const status = lesson.status || "candidate";
+    const evaluation = lesson.evaluation || {};
+    const promotion = evaluation.promotion || "unknown";
+    const allowed = lesson.active_knowledge_allowed === true;
+    const reasons = Array.isArray(evaluation.reasons) ? evaluation.reasons : [];
+
+    const idAttr = _escapeHtml(lesson.id || "");
+    const buttons = [];
+    if (status === "candidate") {
+        buttons.push(`<button type="button" onclick="promoteLessonById('${idAttr}')" title="Move to active">Promote</button>`);
+        buttons.push(`<button type="button" class="lesson-btn--danger" onclick="blockLessonById('${idAttr}')" title="Move to blocked">Block</button>`);
+    } else if (status === "active") {
+        buttons.push(`<button type="button" class="lesson-btn--danger" onclick="blockLessonById('${idAttr}')" title="Move to blocked">Block</button>`);
+    }
+
+    const metaRows = [];
+    if (lesson.source) metaRows.push(`<div><strong>source:</strong> ${_escapeHtml(lesson.source)}</div>`);
+    if (lesson.source_report) metaRows.push(`<div><strong>report:</strong> ${_escapeHtml(lesson.source_report)}</div>`);
+    if (lesson.case_name) metaRows.push(`<div><strong>case:</strong> ${_escapeHtml(lesson.case_name)}</div>`);
+    metaRows.push(`<div><strong>promotion:</strong> ${_escapeHtml(promotion)}</div>`);
+    metaRows.push(`<div><strong>active_knowledge_allowed:</strong> ${allowed ? "true" : "false"}</div>`);
+    if (lesson.created_at) metaRows.push(`<div><strong>created:</strong> ${_escapeHtml(lesson.created_at)}</div>`);
+    if (lesson.updated_at && lesson.updated_at !== lesson.created_at) {
+        metaRows.push(`<div><strong>updated:</strong> ${_escapeHtml(lesson.updated_at)}</div>`);
+    }
+
+    const reasonsHtml = reasons.length
+        ? `<details class="lesson-reasons"><summary>evaluation reasons (${reasons.length})</summary><ul>${reasons.map(r => `<li>${_escapeHtml(r)}</li>`).join("")}</ul></details>`
+        : "";
+
+    const summaryHtml = lesson.summary
+        ? `<div class="lesson-summary">${_escapeHtml(lesson.summary)}</div>`
+        : "";
+
+    return `
+      <div class="lesson-card lesson-card--${_escapeHtml(status)}">
+        <div class="lesson-card-header">
+          <span class="lesson-title">${_escapeHtml(lesson.title || "Untitled lesson")}</span>
+          <span class="lesson-badge lesson-badge--${_escapeHtml(status)}">${_escapeHtml(status)}</span>
+        </div>
+        <div class="lesson-meta">${metaRows.join("")}</div>
+        ${summaryHtml}
+        ${reasonsHtml}
+        <div class="lesson-id"><code>${idAttr}</code></div>
+        ${buttons.length ? `<div class="lesson-actions">${buttons.join(" ")}</div>` : ""}
+      </div>
+    `;
+}
+
+function promoteLessonById(lessonId) {
+    if (!lessonId) return;
+    fetch("/lessons/promote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ repo_path: _lessonRepoPath(), lesson_id: lessonId }),
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                alert(`❌ Promote failed: ${data.error || "unknown error"}`);
+                return;
+            }
+            loadLessons(true);
+        })
+        .catch(err => alert(`Network error: ${err}`));
+}
+
+function blockLessonById(lessonId) {
+    if (!lessonId) return;
+    if (!confirm("Block this lesson? It will not be retrieval-eligible (now or later).")) return;
+    fetch("/lessons/block", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ repo_path: _lessonRepoPath(), lesson_id: lessonId }),
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                alert(`❌ Block failed: ${data.error || "unknown error"}`);
+                return;
+            }
+            loadLessons(true);
+        })
+        .catch(err => alert(`Network error: ${err}`));
+}
+
 function consolidateMemory() {
     const tagEl = document.querySelector("input[name='project_tag']");
     const tag = tagEl ? tagEl.value.trim() : "";
@@ -1371,6 +1559,8 @@ function showWorkspaceTab(id) {
     if (id === "settings") loadHealthPanel(false);
     // Phase 5 Slice 3: lazy-load Benchmarks panel on first show.
     if (id === "benchmarks") loadBenchmarksPanel(false);
+    // Phase 6.1: lazy-load Lessons on first Memory-tab show.
+    if (id === "memory") loadLessons(false);
 }
 
 // Phase 5 Slice 2: Health panel — fetches /health, renders status rows.
