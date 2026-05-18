@@ -45,6 +45,8 @@ def _summarize_one(path: Path) -> dict | None:
         "skipped": data.get("skipped", 0),
         "success_rate": data.get("success_rate", 0),
         "duration_sec": data.get("duration_sec", 0),
+        "total_tokens": data.get("total_tokens", 0),
+        "total_estimated_cost_usd": data.get("total_estimated_cost_usd", 0),
     }
 
 

@@ -65,6 +65,64 @@ def test_planned_no_patch_patch_if_safe_without_payload_creates_generation_faile
     assert "patch_generation_failed" in _codes(blockers)
 
 
+# --- override_hint field --------------------------------------------------
+
+
+def test_every_blocker_carries_override_hint_field():
+    """All eight blocker codes are paired with a non-empty override hint, so
+    the UI can always show the human what would unlock the rule (or that no
+    override exists)."""
+    cases = [
+        ({"status": "planned_no_patch"}, {"safe_to_patch_now": False}),
+        ({"status": "planned_no_patch"}, {"dream_mode": "patch_if_safe", "validation_commands": []}),
+        ({"status": "planned_no_patch"}, {"likely_files": []}),
+        ({"status": "planned_no_patch"}, {"patch_style_required": "none"}),
+        ({"status": "needs_manual_review"}, None),
+        ({"status": "blocked_missing_context"}, None),
+        ({"status": "patch_skipped_needs_vibe"}, None),
+        ({"status": "planned_no_patch"}, {"dream_mode": "patch_if_safe"}),
+    ]
+    for item, plan in cases:
+        blockers = dream_artifacts.classify_patch_blockers(item, plan)
+        assert blockers, f"expected at least one blocker for {item} / {plan}"
+        for blocker in blockers:
+            assert "override_hint" in blocker, f"blocker {blocker['code']} missing override_hint"
+            assert isinstance(blocker["override_hint"], str)
+            assert blocker["override_hint"], (
+                f"blocker {blocker['code']} has an empty override_hint — every code "
+                f"in _DREAM_BLOCKER_OVERRIDE_HINTS should have an entry"
+            )
+
+
+def test_override_hint_for_validation_command_points_at_plan_field():
+    blockers = dream_artifacts.classify_patch_blockers(
+        {"status": "planned_no_patch"},
+        {"dream_mode": "patch_if_safe", "validation_commands": []},
+    )
+    hint = next(
+        b["override_hint"] for b in blockers if b["code"] == "missing_validation_command"
+    )
+    # Should mention validation_commands so the user knows what to add.
+    assert "validation_commands" in hint or "validation command" in hint.lower()
+
+
+def test_override_hint_for_safe_to_patch_false_mentions_human_approval():
+    blockers = dream_artifacts.classify_patch_blockers(
+        {"status": "planned_no_patch"},
+        {"safe_to_patch_now": False},
+    )
+    hint = next(
+        b["override_hint"] for b in blockers if b["code"] == "safe_to_patch_false"
+    )
+    assert "human approval" in hint.lower() or "manually" in hint.lower()
+
+
+def test_override_hint_helper_returns_empty_for_unknown_code():
+    # Public helper returns "" for unknown codes so the UI can omit the hint
+    # block rather than crash.
+    assert dream_artifacts.dream_blocker_override_hint("not-a-real-code") == ""
+
+
 def _extract_between(source: str, start_marker: str, end_marker: str) -> str:
     start = source.index(start_marker)
     end = source.index(end_marker, start)

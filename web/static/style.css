@@ -239,6 +239,201 @@ button {
     padding: 4px 8px;
 }
 
+/* Phase 5 Polish — Plan items + proposal-run status (Dream tab) */
+.plan-items-section {
+    margin-top: 12px;
+}
+
+.plan-items-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.plan-items-note {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.plan-items-status {
+    margin: 6px 0;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.plan-items-status--running { color: #fbbf24; }
+.plan-items-status--done { color: #86efac; }
+.plan-items-status--failed { color: #fca5a5; }
+.plan-items-status--empty { color: #94a3b8; font-style: italic; }
+
+.plan-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.plan-item-card {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 4px;
+    padding: 8px 10px;
+}
+
+.plan-item-card__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.plan-item-card__tag {
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 1px 6px;
+    background: #1e293b;
+    border-radius: 999px;
+    color: #cbd5e1;
+}
+
+.plan-item-card__tag--mode {
+    background: #312e81;
+    color: #c7d2fe;
+}
+
+.plan-item-card__reason {
+    font-size: 12px;
+    color: #cbd5e1;
+    margin-bottom: 4px;
+}
+
+.plan-item-card__meta {
+    font-size: 11px;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.plan-item-card__actions {
+    display: flex;
+    gap: 6px;
+}
+
+.proposal-run-status {
+    margin-top: 10px;
+    padding: 8px;
+    background: #0f172a;
+    border-left: 3px solid #6366f1;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #cbd5e1;
+}
+
+/* Phase 5 Polish — Proposals section (Memory tab) */
+.proposals-section {
+    margin-top: 12px;
+}
+
+.proposals-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.proposals-note {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.proposals-status {
+    margin: 6px 0;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.proposals-status--running { color: #fbbf24; }
+.proposals-status--done { color: #86efac; }
+.proposals-status--failed { color: #fca5a5; }
+
+.proposals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.proposal-run {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 4px;
+    padding: 8px 10px;
+}
+
+.proposal-run__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 12px;
+}
+
+.proposal-run__count {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.proposal-run__items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.proposal-item {
+    background: #0b1220;
+    border: 1px solid #1e293b;
+    border-radius: 4px;
+    padding: 6px 8px;
+}
+
+.proposal-item__head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+}
+
+.proposal-item__rel {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.proposal-item__badges {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+}
+
+.proposal-item__badge {
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: #1e293b;
+    color: #cbd5e1;
+}
+
+.proposal-item__badge--ok { background: #064e3b; color: #86efac; }
+.proposal-item__badge--fail { background: #7f1d1d; color: #fecaca; }
+.proposal-item__badge--muted { background: #1e293b; color: #64748b; }
+
+.proposal-item__actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
 .error-banner {
     margin: 10px 0;
     padding: 10px;
@@ -1072,6 +1267,17 @@ button {
     margin-left: 4px;
 }
 
+.dream-patch-blocker-override {
+    margin: 4px 0 0 0;
+    padding: 4px 8px;
+    background: #0f172a;
+    border-left: 2px solid #475569;
+    color: #94a3b8;
+    font-size: 11px;
+    font-style: italic;
+    line-height: 1.4;
+}
+
 /* Override the old single-line dream-status-* rules so they don't double-style. */
 .dream-status-running, .dream-status-done, .dream-status-failed {
     background: transparent !important;
@@ -1204,6 +1410,48 @@ button {
     border-radius: 4px;
     font-size: 12px;
     color: #94a3b8;
+}
+
+.patch-card__safety-list {
+    margin: 6px 0 0 0;
+    padding-left: 20px;
+    font-size: 12px;
+    color: #fca5a5;
+}
+
+.patch-card__safety-list li {
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #1e293b;
+}
+
+.patch-card__safety-list li:last-child {
+    border-bottom: none;
+}
+
+.patch-card__safety-cat {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 6px;
+    font-size: 10px;
+    text-transform: uppercase;
+    background: #7f1d1d;
+    color: #fecaca;
+    border-radius: 999px;
+}
+
+.patch-card__safety-reason {
+    margin-top: 2px;
+    color: #fca5a5;
+    font-size: 12px;
+}
+
+.patch-card__safety-why {
+    margin-top: 4px;
+    color: #94a3b8;
+    font-size: 11px;
+    font-style: italic;
+    line-height: 1.4;
 }
 
 .patch-type-badge {

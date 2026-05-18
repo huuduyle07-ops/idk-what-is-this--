@@ -179,6 +179,9 @@ def _record_case_done(result: dict[str, Any]) -> None:
                 "difficulty": result.get("difficulty"),
                 "toolchain_issue": result.get("toolchain_issue"),
                 "error": result.get("error"),
+                "input_tokens": result.get("input_tokens", 0),
+                "output_tokens": result.get("output_tokens", 0),
+                "estimated_cost_usd": result.get("estimated_cost_usd", 0),
             }
         )
 
@@ -357,6 +360,7 @@ def _build_report(
         "total_fallbacks": sum(
             item.get("fallback_count", 0) for item in results if not item.get("skipped")
         ),
+        **benchmark_runner._usage_aggregates(results),
         "self_corrected_count": sum(
             1 for item in results if not item.get("skipped") and item.get("self_corrected")
         ),

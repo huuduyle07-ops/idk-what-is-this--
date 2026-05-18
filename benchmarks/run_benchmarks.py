@@ -357,6 +357,11 @@ def run_case(case_file: Path) -> dict[str, Any]:
             "model_attempts": model_stats["attempts"],
             "fallback_count": model_stats["fallback_count"],
             "models_by_role": model_stats["models_by_role"],
+            "input_tokens": model_stats["input_tokens"],
+            "output_tokens": model_stats["output_tokens"],
+            "total_tokens": model_stats["total_tokens"],
+            "estimated_cost_usd": model_stats["estimated_cost_usd"],
+            "unknown_cost_calls": model_stats["unknown_cost_calls"],
             "patch_loop_attempts": result.get("patch_loop_attempts", 0),
             "patch_loop_stop_reason": result.get("patch_loop_stop_reason"),
             "self_corrected": (result.get("patch_loop_attempts") or 0) > 1,
@@ -532,6 +537,31 @@ def _duration_aggregates(
     }
 
 
+def _usage_aggregates(results: list[dict[str, Any]]) -> dict[str, Any]:
+    """Token and estimated-cost totals across non-skipped case results."""
+    runnable = [r for r in results if not r.get("skipped")]
+    input_tokens = sum(int(r.get("input_tokens") or 0) for r in runnable)
+    output_tokens = sum(int(r.get("output_tokens") or 0) for r in runnable)
+    total_tokens = sum(
+        int(r.get("total_tokens") or ((r.get("input_tokens") or 0) + (r.get("output_tokens") or 0)))
+        for r in runnable
+    )
+    estimated_cost = 0.0
+    for r in runnable:
+        try:
+            estimated_cost += float(r.get("estimated_cost_usd") or 0.0)
+        except (TypeError, ValueError):
+            pass
+    unknown_cost_calls = sum(int(r.get("unknown_cost_calls") or 0) for r in runnable)
+    return {
+        "input_tokens": input_tokens,
+        "output_tokens": output_tokens,
+        "total_tokens": total_tokens,
+        "total_estimated_cost_usd": round(estimated_cost, 10),
+        "unknown_cost_calls": unknown_cost_calls,
+    }
+
+
 def _aggregate_models(results: list[dict[str, Any]]) -> dict[str, dict[str, int]]:
     """role -> {model_name: cases_won} across non-skipped cases."""
     by_role: dict[str, dict[str, int]] = {}
@@ -549,17 +579,31 @@ def _aggregate_models(results: list[dict[str, Any]]) -> dict[str, dict[str, int]
 def _print_model_usage(results: list[dict[str, Any]]) -> None:
     """Print which models actually won the work, per role."""
     by_role = _aggregate_models(results)
-    if not by_role:
+    usage = _usage_aggregates(results)
+    if not by_role and not usage.get("total_tokens"):
         return
     print("\nModels used:")
-    role_w = max(len(r) for r in by_role)
-    for role in sorted(by_role):
-        items = sorted(by_role[role].items(), key=lambda x: -x[1])
-        parts = [f"{model} ({count})" for model, count in items]
-        print(f"  {role:<{role_w}}  {', '.join(parts)}")
+    if by_role:
+        role_w = max(len(r) for r in by_role)
+        for role in sorted(by_role):
+            items = sorted(by_role[role].items(), key=lambda x: -x[1])
+            parts = [f"{model} ({count})" for model, count in items]
+            print(f"  {role:<{role_w}}  {', '.join(parts)}")
     total_fallbacks = sum(r.get("fallback_count", 0) for r in results if not r.get("skipped"))
     if total_fallbacks:
         print(f"Fallbacks: {total_fallbacks}")
+    if usage.get("total_tokens"):
+        from agents.model_stats import format_usd
+
+        print(
+            "Tokens: "
+            f"{usage['input_tokens']} in, "
+            f"{usage['output_tokens']} out, "
+            f"{usage['total_tokens']} total"
+        )
+        print(f"Estimated API cost: {format_usd(usage['total_estimated_cost_usd'])}")
+        if usage.get("unknown_cost_calls"):
+            print(f"Cost unknown for {usage['unknown_cost_calls']} call(s)")
     self_corrected = sum(
         1 for r in results if not r.get("skipped") and r.get("self_corrected")
     )
@@ -664,6 +708,20 @@ def summarize_report(report: dict[str, Any], top_slowest: int = 3) -> None:
     if avg:
         print(f"Average per case: {avg:.2f}s")
 
+    total_tokens = report.get("total_tokens")
+    if total_tokens:
+        from agents.model_stats import format_usd
+
+        print(
+            "Tokens: "
+            f"{report.get('input_tokens', 0)} in, "
+            f"{report.get('output_tokens', 0)} out, "
+            f"{total_tokens} total"
+        )
+        print(f"Estimated API cost: {format_usd(report.get('total_estimated_cost_usd'))}")
+        if report.get("unknown_cost_calls"):
+            print(f"Cost unknown for {report['unknown_cost_calls']} call(s)")
+
     # Prefer pre-computed groups; fall back to computing from results
     # (backwards-compat for older report files).
     groups = report.get("groups") or {}
@@ -716,6 +774,20 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
     lines.append(f"- Success rate: {rate:.1f}%")
     if isinstance(duration, (int, float)):
         lines.append(f"- Duration: {duration:.2f}s")
+    if report.get("total_tokens"):
+        from agents.model_stats import format_usd
+
+        lines.append(
+            "- Tokens: "
+            f"{report.get('input_tokens', 0)} input / "
+            f"{report.get('output_tokens', 0)} output / "
+            f"{report.get('total_tokens', 0)} total"
+        )
+        lines.append(
+            f"- Estimated API cost: {format_usd(report.get('total_estimated_cost_usd'))}"
+        )
+        if report.get("unknown_cost_calls"):
+            lines.append(f"- Cost unknown calls: {report['unknown_cost_calls']}")
     lines.append("")
     lines.append(format_brain_stamp_markdown(report.get('brain_stamp', {})))
     lines.append("")
@@ -1229,6 +1301,7 @@ def main() -> int:
         "total_fallbacks": sum(
             r.get("fallback_count", 0) for r in results if not r.get("skipped")
         ),
+        **_usage_aggregates(results),
         "self_corrected_count": sum(
             1 for r in results if not r.get("skipped") and r.get("self_corrected")
         ),

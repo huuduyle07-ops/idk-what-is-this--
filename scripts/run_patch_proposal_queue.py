@@ -599,26 +599,17 @@ def _process_item(
         _write_json(item_dir / "validation.json", validation)
         (item_dir / "validation.log").write_text(validation.get("output") or "", encoding="utf-8")
 
-        proposal_md = [
-            f"# Patch Proposal: {case_name}",
-            "",
-            f"- Source benchmark report: `{source_report.name}`",
-            f"- Validation command: `{validation_command}`",
-            f"- Validation OK: `{validation.get('validation_ok')}`",
-            "- Apply status: proposal only; human approval is still required.",
-            "",
-            "## Summary",
-            "",
-            str(payload.get("summary") or "No summary provided."),
-            "",
-            "## Diff",
-            "",
-            "```diff",
-            diff_text or "(no diff)",
-            "```",
-            "",
-        ]
-        (item_dir / "proposal.md").write_text("\n".join(proposal_md), encoding="utf-8")
+        proposal_md = build_proposal_markdown(
+            case_name=case_name,
+            case=case,
+            payload=payload,
+            plan=plan,
+            validation=validation,
+            validation_command=validation_command,
+            source_report_name=source_report.name,
+            diff_text=diff_text,
+        )
+        (item_dir / "proposal.md").write_text(proposal_md, encoding="utf-8")
 
         return {
             "case_name": case_name,
@@ -627,6 +618,199 @@ def _process_item(
             "artifact_dir": str(item_dir),
             "changed_files": _plan_paths(plan),
         }
+
+
+def _normalize_text(value: Any, fallback: str = "") -> str:
+    if not isinstance(value, str):
+        return fallback
+    stripped = value.strip()
+    return stripped if stripped else fallback
+
+
+def _format_what_was_wrong(case: dict[str, Any], payload: dict[str, Any]) -> str:
+    """Prefer model-reported issues; fall back to the benchmark case prompt.
+
+    The case prompt is the canonical description of the bug in the benchmark
+    suite; reusing it gives the human a self-contained explanation instead of
+    relying on the model's terse summary.
+    """
+    issues = payload.get("issues")
+    if isinstance(issues, list):
+        bullets = [
+            f"- {item.strip()}"
+            for item in issues
+            if isinstance(item, str) and item.strip()
+        ]
+        if bullets:
+            return "\n".join(bullets)
+
+    prompt = _normalize_text(case.get("prompt"))
+    if prompt:
+        return prompt
+    return "_No bug description available — neither `payload.issues` nor `case.prompt` were populated._"
+
+
+def _format_concept(case: dict[str, Any], lessons: list[dict[str, Any]]) -> str:
+    language = _normalize_text(case.get("language"), "unknown")
+    category = _normalize_text(case.get("category"), "unknown")
+    difficulty = _normalize_text(case.get("difficulty"))
+
+    parts = [f"- Discipline area: `{language}` · `{category}`"]
+    if difficulty:
+        parts.append(f"- Difficulty: `{difficulty}`")
+
+    if lessons:
+        parts.append("")
+        parts.append("Active lessons covering this area:")
+        for lesson in lessons[:3]:
+            title = _normalize_text(lesson.get("title"), "(untitled lesson)")
+            summary = _normalize_text(lesson.get("summary"))
+            line = f"- **{title}**"
+            if summary:
+                # Keep one sentence to avoid drowning the proposal.
+                first = summary.split(". ")[0].rstrip(".")
+                line += f" — {first}."
+            parts.append(line)
+    return "\n".join(parts)
+
+
+def _format_watch_pattern(
+    case: dict[str, Any],
+    plan: list[dict[str, Any]],
+    lessons: list[dict[str, Any]],
+) -> str:
+    parts: list[str] = []
+
+    plan_paths = _plan_paths(plan)
+    expected = case.get("expected_changed_files") or []
+    forbidden = case.get("forbidden_changed_files") or []
+
+    if plan_paths:
+        parts.append("Files touched by this patch — similar bugs often cluster here:")
+        for path in plan_paths:
+            parts.append(f"- `{path}`")
+
+    if expected:
+        parts.append("")
+        parts.append("Files the benchmark expects to change (compare your patch against these):")
+        for path in expected:
+            parts.append(f"- `{path}`")
+
+    if forbidden:
+        parts.append("")
+        parts.append("Files the benchmark forbids touching (Patch Safety gate covers these at apply time):")
+        for path in forbidden:
+            parts.append(f"- `{path}`")
+
+    tag_set: set[str] = set()
+    for lesson in lessons[:5]:
+        tags = lesson.get("tags")
+        if isinstance(tags, list):
+            for tag in tags:
+                if isinstance(tag, str) and tag.strip():
+                    tag_set.add(tag.strip())
+    if tag_set:
+        parts.append("")
+        parts.append("Lesson tags that match this case (search Memory tab → Lessons by these):")
+        parts.append(", ".join(f"`{t}`" for t in sorted(tag_set)))
+
+    if not parts:
+        return "_No related files or lessons surfaced for this case yet._"
+    return "\n".join(parts)
+
+
+def _lookup_active_lessons(case: dict[str, Any]) -> list[dict[str, Any]]:
+    """Best-effort lesson retrieval; silent on failure so proposal.md still writes."""
+    try:
+        from core.lesson_retrieval import find_active_lessons
+
+        return find_active_lessons(
+            case_name=_normalize_text(case.get("name")) or None,
+            language=_normalize_text(case.get("language")) or None,
+            category=_normalize_text(case.get("category")) or None,
+            limit=5,
+        )
+    except Exception:
+        return []
+
+
+def build_proposal_markdown(
+    *,
+    case_name: str,
+    case: dict[str, Any],
+    payload: dict[str, Any],
+    plan: list[dict[str, Any]],
+    validation: dict[str, Any],
+    validation_command: str,
+    source_report_name: str,
+    diff_text: str,
+) -> str:
+    """Render a tutor-style proposal.md.
+
+    Pulls from artifacts already on disk:
+      - case.prompt          → "What was wrong"
+      - payload.summary      → "Why this patch works"
+      - case.language/category, active lessons → "Concept to learn"
+      - plan paths, expected/forbidden files, lesson tags → "Patterns to watch for"
+      - diff_text            → "Diff"
+
+    No LLM calls. If a section has no data it shows a clear muted message
+    instead of being silently omitted, so a human reader knows what is
+    missing.
+    """
+    lessons = _lookup_active_lessons(case)
+
+    language = _normalize_text(case.get("language"), "unknown")
+    category = _normalize_text(case.get("category"), "unknown")
+    difficulty = _normalize_text(case.get("difficulty"), "unknown")
+    summary = _normalize_text(payload.get("summary"), "_No summary provided by the model._")
+    validation_ok = validation.get("validation_ok")
+    validation_label = "✓ passed" if validation_ok is True else (
+        "✗ failed" if validation_ok is False else "(not run)"
+    )
+
+    lines: list[str] = []
+
+    # Header — keeps the existing fields readable at the top, but reformatted
+    # so the explanation sections below are the focus.
+    lines.append(f"# Patch Proposal: {case_name}")
+    lines.append("")
+    lines.append(
+        f"> `{language}` · `{category}` · `{difficulty}` · "
+        f"validation `{validation_command}` → {validation_label}"
+    )
+    lines.append(f"> Source benchmark report: `{source_report_name}`")
+    lines.append("> Apply policy: proposal only; human approval is still required.")
+    lines.append("")
+
+    lines.append("## What was wrong")
+    lines.append("")
+    lines.append(_format_what_was_wrong(case, payload))
+    lines.append("")
+
+    lines.append("## Why this patch works")
+    lines.append("")
+    lines.append(summary)
+    lines.append("")
+
+    lines.append("## Concept to learn")
+    lines.append("")
+    lines.append(_format_concept(case, lessons))
+    lines.append("")
+
+    lines.append("## Similar patterns to watch for")
+    lines.append("")
+    lines.append(_format_watch_pattern(case, plan, lessons))
+    lines.append("")
+
+    lines.append("## Diff")
+    lines.append("")
+    lines.append("```diff")
+    lines.append(diff_text or "(no diff)")
+    lines.append("```")
+    lines.append("")
+
+    return "\n".join(lines)
 
 
 def render_summary_markdown(summary: dict[str, Any]) -> str:

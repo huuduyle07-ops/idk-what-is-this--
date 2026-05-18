@@ -3,6 +3,21 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+# Single source of truth for forbidden-path rules. Apply-time gating
+# (core.patch_safety) and lesson promotion (this module) must use the
+# same constants and helpers.
+from core.patch_safety import (
+    _PROTECTED_DIRS,
+    _TEST_DIRS,
+    _TEST_FILE_NAMES,
+    _TEST_SUFFIXES,
+    _blocked_changed_path_reason,
+    _is_benchmark_validation_path,
+    _is_env_path,
+    _is_test_path,
+    _normalize_path,
+)
+
 
 AUTO_APPROVED = "auto_approved"
 NEEDS_HUMAN_REVIEW = "needs_human_review"
@@ -19,34 +34,6 @@ _REQUIRED_FIELDS = (
     "patch_kind",
     "rollback_happened",
     "changed_files",
-)
-
-_PROTECTED_DIRS = {".agent", ".git", "node_modules", "target"}
-_TEST_DIRS = {"test", "tests", "__test__", "__tests__", "spec", "specs"}
-_TEST_FILE_NAMES = {
-    "test.py",
-    "tests.py",
-    "test.js",
-    "tests.js",
-    "test.ts",
-    "tests.ts",
-}
-_TEST_SUFFIXES = (
-    "_test.py",
-    "_tests.py",
-    "_test.go",
-    "_test.rs",
-    "_test.c",
-    "_test.cpp",
-    "_test.cc",
-    ".test.js",
-    ".test.jsx",
-    ".test.ts",
-    ".test.tsx",
-    ".spec.js",
-    ".spec.jsx",
-    ".spec.ts",
-    ".spec.tsx",
 )
 
 
@@ -161,59 +148,6 @@ def _coerce_path_list(value: Any) -> list[str] | None:
     if isinstance(value, Sequence) and not isinstance(value, (bytes, bytearray, str)):
         return [str(item) for item in value if str(item).strip()]
     return None
-
-
-def _blocked_changed_path_reason(path: str) -> str | None:
-    normalized = _normalize_path(path)
-    parts = [part for part in normalized.split("/") if part]
-    lowered_parts = [part.lower() for part in parts]
-    name = lowered_parts[-1] if lowered_parts else ""
-
-    for part in lowered_parts:
-        if part in _PROTECTED_DIRS:
-            return f"changed_files touches protected path {part}: {path}"
-
-    if _is_env_path(lowered_parts):
-        return f"changed_files touches env file: {path}"
-
-    if _is_test_path(lowered_parts, name):
-        return f"changed_files touches test path: {path}"
-
-    if _is_benchmark_validation_path(lowered_parts, name):
-        return f"changed_files touches benchmark validation file: {path}"
-
-    return None
-
-
-def _normalize_path(path: str) -> str:
-    text = str(path).strip().replace("\\", "/")
-    while text.startswith("./"):
-        text = text[2:]
-    return text
-
-
-def _is_env_path(parts: list[str]) -> bool:
-    return any(part == ".env" or part.startswith(".env.") for part in parts)
-
-
-def _is_test_path(parts: list[str], name: str) -> bool:
-    if any(part in _TEST_DIRS for part in parts[:-1]):
-        return True
-    if name in _TEST_FILE_NAMES:
-        return True
-    if name.startswith("test_"):
-        return True
-    return any(name.endswith(suffix) for suffix in _TEST_SUFFIXES)
-
-
-def _is_benchmark_validation_path(parts: list[str], name: str) -> bool:
-    if "benchmarks" not in parts:
-        return False
-    if name == "case.json":
-        return True
-    if name.startswith("expected"):
-        return True
-    return "validation" in name or name.startswith("validate")
 
 
 def _extract_diff_stats(candidate: Mapping[str, Any]) -> dict[str, int] | None:

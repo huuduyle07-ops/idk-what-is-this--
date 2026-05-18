@@ -14,6 +14,7 @@ from reasoning.deep_project_understand import deep_project_understand
 from core.control_engine import run_control_structured, run_control, build_control_prompt
 from core.executor import Executor
 from agents.gemini_client import run_gemini_request
+from agents.model_stats import ModelStatsScope, format_usage_report
 from core.json_utils import extract_json_block
 from core.validation_command import get_default_validation_command
 from web.runner import run_agent_web
@@ -30,6 +31,7 @@ from core.sleeping_consultant import (
 from core import dream_artifacts
 from core import benchmark_web
 from core import lesson_store
+from core.patch_safety import evaluate_patch_safety
 from database.memory_consolidator import consolidate_all
 from policy.decision_helper import normalize_patch_style
 from graph.builder import build_graph_from_repo
@@ -107,7 +109,15 @@ def _empty_result(answer: str = "") -> dict:
         "state": "",
         "patch": "",
         "validation": "",
+        "usage": "",
     }
+
+
+def _attach_model_usage(result: dict, model_calls: list[dict] | None) -> dict:
+    if model_calls is not None:
+        result["usage"] = format_usage_report(model_calls)
+        result["model_calls"] = list(model_calls)
+    return result
 
 def should_show_node_clean(node_id: str, show_tests: bool = False) -> bool:
     if "::expr::" in node_id:
@@ -234,17 +244,20 @@ def index():
             # Compute the canonical tag once per real submission.
             project_tag = build_project_tag(repo_path, user_tag)
             final_tag = project_tag
+            model_calls = None
 
             try:
-                result, final_tag = _run_mode(
-                    mode=mode,
-                    query=query,
-                    repo_path=repo_path,
-                    agent_mode=agent_mode,
-                    project_tag=project_tag,
-                    patch_style=patch_style,
-                    ignore_repo_dna=ignore_repo_dna,
-                )
+                with ModelStatsScope() as scoped_calls:
+                    model_calls = scoped_calls
+                    result, final_tag = _run_mode(
+                        mode=mode,
+                        query=query,
+                        repo_path=repo_path,
+                        agent_mode=agent_mode,
+                        project_tag=project_tag,
+                        patch_style=patch_style,
+                        ignore_repo_dna=ignore_repo_dna,
+                    )
             except Exception as e:
                 import traceback
                 tb = traceback.format_exc()
@@ -252,6 +265,8 @@ def index():
                 error = f"Pipeline error: {type(e).__name__}: {e}"
                 result = _empty_result(error)
                 result["validation"] = tb  # show traceback in the validation tab
+            finally:
+                _attach_model_usage(result, model_calls)
 
             current = save_session(
                 query, repo_path, mode, result, final_tag, patch_style, ignore_repo_dna
@@ -278,14 +293,19 @@ def generate_patch():
 
     prompt = build_control_prompt(control, "Generate patch", repo_path=repo_path or None)
 
-    response = run_gemini_request(prompt)
+    with ModelStatsScope() as model_calls:
+        response = run_gemini_request(prompt)
     patch = extract_json_block(response)
 
     if not patch:
-        return {"error": "Failed to generate patch"}
+        return {
+            "error": "Failed to generate patch",
+            "usage": format_usage_report(model_calls),
+        }
 
     return {
-        "patch": json.dumps(patch, indent=2, ensure_ascii=False)
+        "patch": json.dumps(patch, indent=2, ensure_ascii=False),
+        "usage": format_usage_report(model_calls),
     }
 
 @app.route("/apply_patch", methods=["POST"])
@@ -327,6 +347,23 @@ def apply_patch():
         return {"error": "Patch missing target file"}
 
     repo_root = Path(repo_path).resolve()
+
+    # Phase 5 Polish: apply-time Patch Safety gate. Refuses forbidden paths
+    # (env / test / .agent / node_modules / target / benchmark validation)
+    # and path traversal before any disk write. The gate rules live in
+    # core.patch_safety alongside lesson_quality so the two cannot drift.
+    patch_safety = evaluate_patch_safety([target_file], project_root=repo_root)
+    if not patch_safety["ok"]:
+        return {
+            "success": False,
+            "message": "Patch blocked by safety gate: " + "; ".join(patch_safety["reasons"]),
+            "diff": "",
+            "validation": "",
+            "risk": None,
+            "validation_command": "",
+            "patch_safety": patch_safety,
+        }
+
     file_path = (repo_root / target_file).resolve()
     try:
         file_path.relative_to(repo_root)
@@ -336,6 +373,7 @@ def apply_patch():
         "message": "Unsafe patch target: file is outside repo.",
         "diff": "",
         "validation": "",
+        "patch_safety": patch_safety,
     }, 400
     safe_path = target_file.replace("/", "_").replace("\\", "_")
     backup_path = BACKUP_DIR / f"{safe_path}_{datetime.now().timestamp()}.bak"
@@ -377,6 +415,7 @@ def apply_patch():
         "success": result.success,
         "risk": risk_dict,
         "validation_command": validation_command or "",
+        "patch_safety": patch_safety,
     }
 
 @app.route("/test_patch_plan", methods=["POST"])
@@ -412,6 +451,25 @@ def test_patch_plan():
 
     if not repo_path or not Path(repo_path).is_dir():
         return {"error": f"repo_path is not a directory: {repo_path}"}
+
+    # Phase 5 Polish: same gate as /apply_patch_plan. Dry-run still copies
+    # files to a temp clone; rejecting forbidden ops up-front means the
+    # Patch card can show "would be blocked" before the user clicks Apply.
+    plan_files = [
+        (op.get("relative_path") or op.get("file") or "")
+        for op in plan if isinstance(op, dict)
+    ]
+    patch_safety = evaluate_patch_safety(plan_files, project_root=Path(repo_path).resolve())
+    if not patch_safety["ok"]:
+        return {
+            "success": False,
+            "message": "Patch plan blocked by safety gate: " + "; ".join(patch_safety["reasons"]),
+            "diff": "",
+            "validation": "",
+            "risk": None,
+            "validation_command": "",
+            "patch_safety": patch_safety,
+        }
 
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
         temp_repo = Path(temp_dir) / "repo"
@@ -492,6 +550,7 @@ def test_patch_plan():
             # validation_command is, so surface it for the Patch card.
             "risk": None,
             "validation_command": validation_command or "",
+            "patch_safety": patch_safety,
         }
 
 @app.route("/apply_patch_plan", methods=["POST"])
@@ -539,6 +598,23 @@ def apply_patch_plan_route():
         return {"error": f"repo_path is not a directory: {repo_path}"}
 
     repo_root = Path(repo_path).resolve()
+
+    # Phase 5 Polish: apply-time Patch Safety gate covers every op's target.
+    plan_files = [
+        (op.get("relative_path") or op.get("file") or "")
+        for op in plan if isinstance(op, dict)
+    ]
+    patch_safety = evaluate_patch_safety(plan_files, project_root=repo_root)
+    if not patch_safety["ok"]:
+        return {
+            "success": False,
+            "message": "Patch plan blocked by safety gate: " + "; ".join(patch_safety["reasons"]),
+            "diff": "",
+            "validation": "",
+            "risk": None,
+            "validation_command": "",
+            "patch_safety": patch_safety,
+        }
 
     # Simple repo-level language detection for validation.
     if (repo_root / "Cargo.toml").exists():
@@ -598,6 +674,7 @@ def apply_patch_plan_route():
         # validation_command is, so surface it for the Patch card.
         "risk": None,
         "validation_command": validation_command or "",
+        "patch_safety": patch_safety,
     }
 
 @app.route("/undo_patch", methods=["POST"])
@@ -1188,6 +1265,53 @@ def dream_seed_from_benchmark_route():
     return {"added": items, "count": len(items)}
 
 
+# ---------------------------------------------------------------------------
+# Phase 5 Polish: UI-driven patch proposal flow.
+# Three sibling routes turn the Phase 4.5 Level 3 proposal queue CLI into a
+# one-click button on the Dream tab. Approval is the click itself; the queue's
+# `human_approved_for_proposal=true` gate is satisfied per-call inside
+# core.proposal_runner — never on disk.
+# ---------------------------------------------------------------------------
+
+@app.route("/dream/plan/latest", methods=["GET"])
+def dream_plan_latest():
+    """Return latest background_dream_plan_*.json items so the UI can list them."""
+    from scripts.run_patch_proposal_queue import _latest_plan, _load_json
+    plan_path = _latest_plan()
+    if plan_path is None:
+        return {"items": [], "plan_path": None}
+    data = _load_json(plan_path) or {}
+    items = [item for item in (data.get("items") or []) if isinstance(item, dict)]
+    return {
+        "plan_path": str(plan_path),
+        "items": items,
+    }
+
+
+@app.route("/dream/proposals/make", methods=["POST"])
+def dream_proposals_make():
+    """Trigger a single-item proposal run from the UI."""
+    from core.proposal_runner import make_proposal_for_item
+    item_json = request.form.get("item", "")
+    try:
+        item = json.loads(item_json)
+    except Exception:
+        return {"ok": False, "error": "item must be valid JSON"}, 400
+    result = make_proposal_for_item(item)
+    if not result.get("ok"):
+        # 409 Conflict for busy lock, 400 for bad item.
+        status = 409 if "in progress" in (result.get("error") or "") else 400
+        return result, status
+    return result
+
+
+@app.route("/dream/proposals/status", methods=["GET"])
+def dream_proposals_status():
+    """Poll endpoint for the in-flight proposal run."""
+    from core.proposal_runner import get_status
+    return get_status()
+
+
 @app.route("/session/<session_id>")
 def load_session(session_id):
     sessions = load_sessions()
@@ -1218,22 +1342,24 @@ def generate_candidates():
 
     candidates = []
 
-    for name, prompt in prompts:
-        if name == "deepseek_review":
-            raw = run_deepseek_review(prompt)
-        else:
-            raw = run_gemini_request(prompt)
+    with ModelStatsScope() as model_calls:
+        for name, prompt in prompts:
+            if name == "deepseek_review":
+                raw = run_deepseek_review(prompt)
+            else:
+                raw = run_gemini_request(prompt)
 
-        patch = extract_json_block(raw)
-        if patch:
-            candidates.append({
-                "name": name,
-                "patch": patch,
-                "confidence": patch.get("confidence", 0.0),
-            })
+            patch = extract_json_block(raw)
+            if patch:
+                candidates.append({
+                    "name": name,
+                    "patch": patch,
+                    "confidence": patch.get("confidence", 0.0),
+                })
 
     return {
-        "candidates": candidates
+        "candidates": candidates,
+        "usage": format_usage_report(model_calls),
     }
 
 @app.route("/test_patch", methods=["POST"])
@@ -1261,6 +1387,23 @@ def test_patch():
 
     if not repo_path or not Path(repo_path).is_dir():
         return {"error": f"repo_path is not a directory: {repo_path}"}
+
+    # Phase 5 Polish: same Patch Safety gate as /apply_patch. Dry-run uses a
+    # temp clone so the real repo is untouched either way, but rejecting
+    # forbidden targets here means the Patch card shows "blocked" the moment
+    # the user clicks Test, not only when they later click Apply.
+    target_file = patch.get("relative_path") or patch.get("file") or ""
+    patch_safety = evaluate_patch_safety([target_file], project_root=Path(repo_path).resolve())
+    if not patch_safety["ok"]:
+        return {
+            "success": False,
+            "message": "Patch blocked by safety gate: " + "; ".join(patch_safety["reasons"]),
+            "diff": "",
+            "validation": "",
+            "risk": None,
+            "validation_command": "",
+            "patch_safety": patch_safety,
+        }
 
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
         temp_repo = Path(temp_dir) / "repo"
@@ -1315,6 +1458,7 @@ def test_patch():
             "success": result.success,
             "risk": risk_dict,
             "validation_command": validation_command or "",
+            "patch_safety": patch_safety,
         }
 
 @app.route("/render_graph", methods=["POST"])
@@ -1669,6 +1813,133 @@ def lessons_block_route():
     except Exception as e:
         return {"ok": False, "error": f"failed to block lesson: {type(e).__name__}"}, 500
     return {"ok": True, "lesson": record}
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 Polish — Proposal browser + promote-to-lesson surfaces.
+# Lifts scripts/create_lesson_from_proposal.py into a one-click button on the
+# Memory tab so users don't need a terminal to turn a validated proposal into
+# a lesson candidate. The lesson_quality gate is the only auto-promotion
+# decision; the user must still click "Promote" on the lesson card to move
+# the resulting candidate to active/.
+# ---------------------------------------------------------------------------
+
+@app.route("/proposals/view", methods=["GET"])
+def proposals_view_route():
+    """Read proposal.md for a proposal directory under .agent/proposals/.
+
+    Query param: proposal_dir — path under .agent/proposals/ (path-guarded).
+    """
+    from scripts.create_lesson_from_proposal import _resolve_proposal_dir
+    raw = (request.values.get("proposal_dir") or "").strip()
+    try:
+        proposal_dir = _resolve_proposal_dir(raw)
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    proposal_md = proposal_dir / "proposal.md"
+    if not proposal_md.is_file():
+        return {"ok": False, "error": "proposal.md not found"}, 404
+    # Cap to the same size limit as the lesson-side reader.
+    try:
+        if proposal_md.stat().st_size > 200_000:
+            return {"ok": False, "error": "proposal.md is too large to display"}, 413
+        content = proposal_md.read_text(encoding="utf-8", errors="replace")
+    except Exception as e:
+        return {"ok": False, "error": f"failed to read proposal: {type(e).__name__}"}, 500
+    return {
+        "ok": True,
+        "proposal_path": str(proposal_md),
+        "content": content,
+    }
+
+
+@app.route("/proposals/list", methods=["GET"])
+def proposals_list_route():
+    """List recent .agent/proposals/<run>/<item>/ artifacts (path-guarded)."""
+    from scripts.run_patch_proposal_queue import PROPOSAL_ROOT
+    if not PROPOSAL_ROOT.is_dir():
+        return {"runs": []}
+    runs = []
+    try:
+        run_dirs = [d for d in PROPOSAL_ROOT.iterdir() if d.is_dir()]
+    except OSError as e:
+        return {"runs": [], "error": f"could not read proposal root: {e}"}, 500
+    run_dirs.sort(reverse=True)
+    for run_dir in run_dirs[:20]:
+        items = []
+        try:
+            item_dirs = sorted(d for d in run_dir.iterdir() if d.is_dir())
+        except OSError:
+            continue
+        for item_dir in item_dirs:
+            item_json = item_dir / "item.json"
+            validation_json = item_dir / "validation.json"
+            apply_json = item_dir / "apply_result.json"
+            try:
+                item = json.loads(item_json.read_text(encoding="utf-8")) if item_json.is_file() else {}
+            except Exception:
+                item = {}
+            try:
+                validation = json.loads(validation_json.read_text(encoding="utf-8")) if validation_json.is_file() else {}
+            except Exception:
+                validation = {}
+            try:
+                apply_result = json.loads(apply_json.read_text(encoding="utf-8")) if apply_json.is_file() else {}
+            except Exception:
+                apply_result = {}
+            items.append({
+                "proposal_dir": str(item_dir),
+                "rel_dir": item_dir.relative_to(PROPOSAL_ROOT).as_posix(),
+                "case_name": item.get("case_name"),
+                "validation_ok": validation.get("validation_ok"),
+                "apply_success": apply_result.get("success"),
+                "has_proposal_md": (item_dir / "proposal.md").is_file(),
+            })
+        runs.append({"run_id": run_dir.name, "items": items})
+    return {"runs": runs}
+
+
+@app.route("/proposals/promote", methods=["POST"])
+def proposals_promote_route():
+    """Wrap scripts/create_lesson_from_proposal.create_lesson_from_proposal.
+
+    Form fields:
+      proposal_dir   — path under .agent/proposals/ (path-traversal guarded)
+      allow_failed   — "true" to override the validation/apply gate
+      repo_path      — optional, scopes the lesson to .agent/<project_tag>/lessons/
+    """
+    from scripts.create_lesson_from_proposal import (
+        _resolve_proposal_dir,
+        create_lesson_from_proposal,
+    )
+    raw = request.form.get("proposal_dir", "")
+    allow_failed = (request.form.get("allow_failed") or "").lower() == "true"
+    repo_path = (request.form.get("repo_path") or "").strip() or None
+    try:
+        proposal_dir = _resolve_proposal_dir(raw)
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    try:
+        lesson = create_lesson_from_proposal(
+            proposal_dir,
+            repo_path=repo_path,
+            allow_failed=allow_failed,
+        )
+    except RuntimeError as e:
+        # Refused because validation/apply failed and allow_failed=False.
+        return {"ok": False, "refused": True, "error": str(e)}, 200
+    except FileNotFoundError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    evaluation = lesson.get("evaluation") or {}
+    return {
+        "ok": True,
+        "lesson_id": lesson.get("id"),
+        "status": lesson.get("status"),
+        "active_knowledge_allowed": lesson.get("active_knowledge_allowed"),
+        "promotion": evaluation.get("promotion"),
+    }
 
 
 @app.route("/upload_folder", methods=["POST"])

@@ -133,6 +133,7 @@
             <button type="button" onclick="showTab('state')">State</button>
             <button type="button" onclick="showTab('patch')">Patch</button>
             <button type="button" onclick="showTab('validation')">Validation</button>
+            <button type="button" onclick="showTab('usage')">Cost</button>
             <button type="button" onclick="showTab('diff')">Diff</button>
             <button type="button" onclick="showTab('candidates')">Candidates</button>
           </div>
@@ -168,6 +169,7 @@
             </details>
           </div>
           <pre id="validation" class="tab-content">{{ result.validation if result else "" }}</pre>
+          <pre id="usage" class="tab-content">{{ result.usage if result else "" }}</pre>
           <pre id="diff" class="tab-content"></pre>
           <div id="candidates" class="tab-content"></div>
         </div>
@@ -278,6 +280,29 @@
             </div>
             <div id="dreamStatus" class="dream-status"></div>
           </div>
+
+          <!-- Phase 5 Polish: Plan items from the latest background_dream_plan_*.json.
+               Each item has a "Make proposal" button that triggers the same flow
+               as scripts/run_patch_proposal_queue.py, no terminal needed. -->
+          <div class="dream-section plan-items-section">
+            <div class="plan-items-header">
+              <strong>Plan items (latest background plan)</strong>
+              <button type="button" class="sidebar-refresh"
+                      onclick="loadPlanItems(true)"
+                      title="Re-read the newest .agent/reports/background_dream_plan_*.json">⟳ Refresh</button>
+            </div>
+            <div class="plan-items-note">
+              The "Make proposal" button runs the Phase 4.5 Level 3 queue for this
+              one item in a temp clone. Validation runs there too. Nothing is
+              applied to the real repo — proposals land in <code>.agent/proposals/</code>.
+              The button click itself counts as the human approval the CLI requires.
+            </div>
+            <div id="planItemsStatus" class="plan-items-status"></div>
+            <div id="planItemsList" class="plan-items-list">
+              <div class="health-empty">Click ⟳ Refresh to load plan items.</div>
+            </div>
+            <div id="proposalRunStatus" class="proposal-run-status" hidden></div>
+          </div>
         </div>
 
         <!-- Memory -->
@@ -295,6 +320,27 @@
               </button>
             </div>
             <div id="memoryStatus" class="memory-status"></div>
+          </div>
+
+          <!-- Phase 5 Polish: Proposals sub-section above Lessons.
+               Lists .agent/proposals/<run>/<item>/ artifacts; per-item promote
+               button wraps scripts/create_lesson_from_proposal.py. -->
+          <div class="memory-section proposals-section">
+            <div class="proposals-header">
+              <strong>Proposals</strong>
+              <button type="button" class="sidebar-refresh"
+                      onclick="loadProposalRuns(true)"
+                      title="Re-scan .agent/proposals/">⟳ Refresh</button>
+            </div>
+            <div class="proposals-note">
+              "Create candidate lesson" runs <code>create_lesson_from_proposal</code> and the
+              result lands in the lessons list below (as a <strong>candidate</strong>).
+              You still have to click Promote on the lesson card to move it to active.
+            </div>
+            <div id="proposalsStatus" class="proposals-status"></div>
+            <div id="proposalsList" class="proposals-list">
+              <div class="health-empty">Click ⟳ Refresh to load proposals.</div>
+            </div>
           </div>
 
           <!-- Phase 6.1: Lessons (Context Poisoning Guard storage) -->
@@ -675,11 +721,13 @@ function _renderPatchBlockerDetails(it) {
         const code = blocker && blocker.code ? String(blocker.code) : "unknown";
         const message = blocker && blocker.message ? String(blocker.message) : "";
         const evidence = blocker && blocker.evidence ? String(blocker.evidence) : "";
+        const overrideHint = blocker && blocker.override_hint ? String(blocker.override_hint) : "";
         return `
             <li>
                 <code>${_escapeHtml(code)}</code>
                 <span>${_escapeHtml(message)}</span>
                 ${evidence ? `<span class="dream-patch-blocker-evidence" title="${_escapeHtml(evidence)}">${_escapeHtml(evidence)}</span>` : ""}
+                ${overrideHint ? `<div class="dream-patch-blocker-override">${_escapeHtml(overrideHint)}</div>` : ""}
             </li>
         `;
     }).join("");
@@ -776,6 +824,7 @@ let _currentPatchState = {
     validation_command: null,   // string, set after test/apply
     last_action: null,          // "generated"|"tested"|"applied"|"undone"
     last_status: null,          // success/failed message from last test/apply
+    patch_safety: null,         // {ok, blocked_paths[], reasons[]} from apply/test routes
 };
 
 function _setPatchState(updates) {
@@ -851,6 +900,31 @@ function _renderPatchCard() {
         ? `<code>${_escapeHtml(s.validation_command)}</code>`
         : `<span class="patch-card__muted">not yet evaluated</span>`;
 
+    const safetyRow = (() => {
+        const ps = s.patch_safety;
+        if (!ps) {
+            return `<span class="patch-card__muted">not yet evaluated (run Test or Apply)</span>`;
+        }
+        if (ps.ok) {
+            return `<span class="patch-risk-badge patch-risk-badge--ok">&#10003; safe</span>`;
+        }
+        const items = (ps.blocked_paths || []).map(b => {
+            const why = b.why
+                ? `<div class="patch-card__safety-why">${_escapeHtml(b.why)}</div>`
+                : "";
+            const cat = b.category
+                ? `<span class="patch-card__safety-cat">${_escapeHtml(b.category)}</span>`
+                : "";
+            return `<li>
+                <code>${_escapeHtml(b.path)}</code> ${cat}
+                <div class="patch-card__safety-reason">${_escapeHtml(b.reason)}</div>
+                ${why}
+            </li>`;
+        }).join("");
+        return `<span class="patch-risk-badge patch-risk-badge--error">blocked</span>
+                <ul class="patch-card__safety-list">${items}</ul>`;
+    })();
+
     const lastActionRow = s.last_action
         ? `<div class="patch-card__last-action">Last action: <strong>${_escapeHtml(s.last_action)}</strong>${s.last_status ? ` — ${_escapeHtml(s.last_status)}` : ""}</div>`
         : "";
@@ -873,8 +947,8 @@ function _renderPatchCard() {
             <span class="patch-card__value">${validationRow}</span>
         </div>
         <div class="patch-card__row">
-            <span class="patch-card__label">Forbidden-file check</span>
-            <span class="patch-card__value patch-card__muted">not yet implemented (Phase 6)</span>
+            <span class="patch-card__label">Safety gate</span>
+            <span class="patch-card__value">${safetyRow}</span>
         </div>
         <div class="patch-card__row">
             <span class="patch-card__label">Changed files (${files.length})</span>
@@ -1137,6 +1211,183 @@ function stopOvernight() {
     })
     .catch(err => alert(`Stop failed: ${err}`));
 }
+
+// ============================================================
+// Phase 5 Polish — Plan items + Make proposal (Dream tab)
+// ============================================================
+let _planItemsLoaded = false;
+let _proposalPollTimer = null;
+
+function loadPlanItems(force) {
+    if (_planItemsLoaded && !force) return;
+    _planItemsLoaded = true;
+
+    const statusEl = document.getElementById("planItemsStatus");
+    const listEl = document.getElementById("planItemsList");
+    if (statusEl) {
+        statusEl.textContent = "Loading…";
+        statusEl.className = "plan-items-status plan-items-status--running";
+    }
+
+    fetch("/dream/plan/latest")
+        .then(r => r.json())
+        .then(data => {
+            const items = data.items || [];
+            const planPath = data.plan_path || "";
+            if (statusEl) {
+                if (planPath) {
+                    statusEl.textContent = `${items.length} item(s) from ${planPath.split(/[\\/]/).pop()}`;
+                    statusEl.className = "plan-items-status plan-items-status--done";
+                } else {
+                    statusEl.textContent = "No background_dream_plan_*.json found. Run scripts/run_background_dream_planner.py first.";
+                    statusEl.className = "plan-items-status plan-items-status--empty";
+                }
+            }
+            _renderPlanItems(items);
+        })
+        .catch(err => {
+            if (statusEl) {
+                statusEl.textContent = `❌ Network error: ${err}`;
+                statusEl.className = "plan-items-status plan-items-status--failed";
+            }
+        });
+}
+
+function _renderPlanItems(items) {
+    const listEl = document.getElementById("planItemsList");
+    if (!listEl) return;
+    if (!items.length) {
+        listEl.innerHTML = '<div class="health-empty">No plan items.</div>';
+        return;
+    }
+    listEl.innerHTML = items.map(_renderPlanItemCard).join("");
+}
+
+function _renderPlanItemCard(item) {
+    const caseName = _escapeHtml(item.case_name || "(unnamed)");
+    const kind = _escapeHtml(item.kind || "");
+    const reason = _escapeHtml(item.reason || "");
+    const mode = _escapeHtml(item.suggested_mode || "");
+    const approved = item.human_approved_for_proposal === true;
+    const itemJson = _escapeHtml(JSON.stringify(item));
+
+    return `
+        <div class="plan-item-card">
+            <div class="plan-item-card__head">
+                <strong>${caseName}</strong>
+                <span class="plan-item-card__tag">${kind || "?"}</span>
+                ${mode ? `<span class="plan-item-card__tag plan-item-card__tag--mode">${mode}</span>` : ""}
+            </div>
+            ${reason ? `<div class="plan-item-card__reason">${reason}</div>` : ""}
+            <div class="plan-item-card__meta">
+                approved flag in plan: <code>${approved ? "true" : "false"}</code>
+            </div>
+            <div class="plan-item-card__actions">
+                <button type="button"
+                        onclick='makeProposalForItem(${itemJson})'
+                        title="Run the proposal queue for this item in a temp clone. Nothing applied to real repo.">
+                    Make proposal
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function makeProposalForItem(item) {
+    if (!item || !item.case_name) {
+        alert("Plan item is missing case_name.");
+        return;
+    }
+    const msg = `This will generate a patch proposal for "${item.case_name}" in a temp clone.\n\n`
+              + `Artifacts will land in .agent/proposals/<timestamp>/.\n`
+              + `Your real repo is NOT modified.\n\n`
+              + `Continue?`;
+    if (!confirm(msg)) return;
+
+    const runStatusEl = document.getElementById("proposalRunStatus");
+    if (runStatusEl) {
+        runStatusEl.hidden = false;
+        runStatusEl.innerHTML = `<em>Starting proposal run for <code>${_escapeHtml(item.case_name)}</code>…</em>`;
+    }
+
+    fetch("/dream/proposals/make", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ item: JSON.stringify(item) }),
+    })
+    .then(async r => ({ status: r.status, data: await r.json().catch(() => ({})) }))
+    .then(({ status, data }) => {
+        if (!data.ok) {
+            if (runStatusEl) {
+                runStatusEl.innerHTML = `<span class="plan-items-status--failed">❌ ${_escapeHtml(data.error || `HTTP ${status}`)}</span>`;
+            }
+            return;
+        }
+        if (runStatusEl) {
+            runStatusEl.innerHTML = `<em>Proposal run started · run_id: <code>${_escapeHtml(data.run_id)}</code></em>`;
+        }
+        _startProposalPolling();
+    })
+    .catch(err => {
+        if (runStatusEl) {
+            runStatusEl.innerHTML = `<span class="plan-items-status--failed">❌ Network error: ${_escapeHtml(String(err))}</span>`;
+        }
+    });
+}
+
+function _startProposalPolling(intervalMs = 1500) {
+    if (_proposalPollTimer) return;
+    _proposalPollTimer = setInterval(async () => {
+        let state;
+        try {
+            const r = await fetch("/dream/proposals/status");
+            state = await r.json();
+        } catch (e) {
+            return;
+        }
+        const runStatusEl = document.getElementById("proposalRunStatus");
+        if (!runStatusEl) return;
+        if (state.running) {
+            runStatusEl.innerHTML = `<em>Proposal run in progress · run_id: <code>${_escapeHtml(state.run_id || "?")}</code></em>`;
+            return;
+        }
+        clearInterval(_proposalPollTimer);
+        _proposalPollTimer = null;
+        if (state.error) {
+            runStatusEl.innerHTML = `<span class="plan-items-status--failed">❌ ${_escapeHtml(state.error)}</span>`;
+            return;
+        }
+        const result = state.result || {};
+        const runId = state.run_id || "(unknown)";
+        const status = result.status || "unknown";
+        const artifactDir = result.artifact_dir || "";
+        const validationOk = result.validation_ok;
+        const summary = [
+            `Run <code>${_escapeHtml(runId)}</code>`,
+            `status <code>${_escapeHtml(status)}</code>`,
+        ];
+        if (validationOk === true) summary.push("validation_ok ✓");
+        if (validationOk === false) summary.push("validation_ok ✗");
+        if (artifactDir) {
+            summary.push(`<code>${_escapeHtml(artifactDir)}</code>`);
+        }
+        runStatusEl.innerHTML = `<span class="plan-items-status--done">${summary.join(" · ")}</span>`;
+        // Refresh the Memory tab's proposals section if it exists (Part 3).
+        if (typeof loadProposalRuns === "function") {
+            loadProposalRuns(true);
+        }
+    }, intervalMs);
+}
+
+// Auto-resume proposal-run polling if the page reloads while one is in flight.
+document.addEventListener("DOMContentLoaded", () => {
+    fetch("/dream/proposals/status")
+        .then(r => r.json())
+        .then(state => {
+            if (state && state.running) _startProposalPolling();
+        })
+        .catch(() => {});
+});
 
 // Auto-resume polling if a run is in flight when the page loads.
 document.addEventListener("DOMContentLoaded", () => {
@@ -1543,6 +1794,179 @@ function blockLessonById(lessonId) {
         .catch(err => alert(`Network error: ${err}`));
 }
 
+// ============================================================
+// Phase 5 Polish — Proposals sub-section (Memory tab)
+// ============================================================
+let _proposalRunsLoaded = false;
+
+function loadProposalRuns(force) {
+    if (_proposalRunsLoaded && !force) return;
+    _proposalRunsLoaded = true;
+
+    const statusEl = document.getElementById("proposalsStatus");
+    const listEl = document.getElementById("proposalsList");
+    if (statusEl) {
+        statusEl.textContent = "Loading…";
+        statusEl.className = "proposals-status proposals-status--running";
+    }
+
+    fetch("/proposals/list")
+        .then(r => r.json())
+        .then(data => {
+            const runs = data.runs || [];
+            const itemCount = runs.reduce((n, r) => n + (r.items ? r.items.length : 0), 0);
+            if (statusEl) {
+                statusEl.textContent = `${runs.length} run(s), ${itemCount} item(s)`;
+                statusEl.className = "proposals-status proposals-status--done";
+            }
+            _renderProposalRuns(runs);
+        })
+        .catch(err => {
+            if (statusEl) {
+                statusEl.textContent = `❌ Network error: ${err}`;
+                statusEl.className = "proposals-status proposals-status--failed";
+            }
+        });
+}
+
+function _renderProposalRuns(runs) {
+    const listEl = document.getElementById("proposalsList");
+    if (!listEl) return;
+    if (!runs.length) {
+        listEl.innerHTML = '<div class="health-empty">No proposals yet. Use "Make proposal" on a Dream plan item.</div>';
+        return;
+    }
+    listEl.innerHTML = runs.map(_renderProposalRunCard).join("");
+}
+
+function _renderProposalRunCard(run) {
+    const items = (run.items || []).map(_renderProposalItemRow).join("");
+    return `
+        <div class="proposal-run">
+            <div class="proposal-run__head">
+                <code>${_escapeHtml(run.run_id || "")}</code>
+                <span class="proposal-run__count">${(run.items || []).length} item(s)</span>
+            </div>
+            <div class="proposal-run__items">${items}</div>
+        </div>
+    `;
+}
+
+function _renderProposalItemRow(item) {
+    const dirAttr = _escapeHtml(item.proposal_dir || "");
+    const rel = _escapeHtml(item.rel_dir || "");
+    const caseName = _escapeHtml(item.case_name || "(unnamed)");
+    const validation = item.validation_ok;
+    const applyOk = item.apply_success;
+
+    const validationBadge = validation === true
+        ? `<span class="proposal-item__badge proposal-item__badge--ok">validation_ok</span>`
+        : validation === false
+            ? `<span class="proposal-item__badge proposal-item__badge--fail">validation_failed</span>`
+            : `<span class="proposal-item__badge proposal-item__badge--muted">no validation</span>`;
+    const applyBadge = applyOk === true
+        ? `<span class="proposal-item__badge proposal-item__badge--ok">apply_ok</span>`
+        : applyOk === false
+            ? `<span class="proposal-item__badge proposal-item__badge--fail">apply_failed</span>`
+            : "";
+
+    const buttons = [];
+    if (item.has_proposal_md) {
+        buttons.push(`<button type="button" class="lesson-btn--secondary" onclick='viewProposalMarkdown("${dirAttr}")' title="Open proposal.md">View proposal</button>`);
+    }
+    if (validation === true && applyOk === true) {
+        buttons.push(`<button type="button" onclick='promoteProposalToLesson("${dirAttr}", false)' title="Created lessons still require Promote in the Lessons section before retrieval can use them.">Create candidate lesson</button>`);
+    } else {
+        buttons.push(`<button type="button" class="lesson-btn--danger" onclick='promoteProposalToLesson("${dirAttr}", true)' title="Save anyway. lesson_quality will most likely mark it blocked.">Promote (allow failed)</button>`);
+    }
+
+    return `
+        <div class="proposal-item">
+            <div class="proposal-item__head">
+                <strong>${caseName}</strong>
+                <code class="proposal-item__rel">${rel}</code>
+            </div>
+            <div class="proposal-item__badges">${validationBadge}${applyBadge}</div>
+            <div class="proposal-item__actions">${buttons.join("")}</div>
+        </div>
+    `;
+}
+
+function viewProposalMarkdown(proposalDir) {
+    if (!proposalDir) return;
+    openAppModal("Proposal", `<div class="health-empty">Loading proposal.md...</div>`);
+    const params = new URLSearchParams({ proposal_dir: proposalDir });
+    fetch("/proposals/view?" + params.toString())
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                openAppModal("Proposal", `<div class="health-empty">Failed: ${_escapeHtml(data.error || "unknown error")}</div>`);
+                return;
+            }
+            const pathHtml = data.proposal_path
+                ? `<div class="lesson-proposal-path"><code>${_escapeHtml(data.proposal_path)}</code></div>`
+                : "";
+            const bodyHtml = `
+                <div class="lesson-proposal-view">
+                    ${pathHtml}
+                    <pre class="lesson-proposal-body">${_escapeHtml(data.content || "")}</pre>
+                </div>
+            `;
+            openAppModal("Proposal", bodyHtml);
+        })
+        .catch(err => openAppModal("Proposal", `<div class="health-empty">Network error: ${_escapeHtml(err)}</div>`));
+}
+
+function promoteProposalToLesson(proposalDir, allowFailed) {
+    if (!proposalDir) return;
+    const warn = allowFailed
+        ? `Promote this FAILED proposal to a lesson anyway?\n\nThe lesson_quality gate will most likely mark it blocked.\n\nContinue?`
+        : `Promote this proposal to a lesson candidate?\n\nIt will land in the Lessons list below as a candidate. You still need to click "Promote" on the lesson card to move it to active.`;
+    if (!confirm(warn)) return;
+
+    const statusEl = document.getElementById("proposalsStatus");
+    if (statusEl) {
+        statusEl.textContent = "Promoting…";
+        statusEl.className = "proposals-status proposals-status--running";
+    }
+
+    const body = new URLSearchParams({
+        proposal_dir: proposalDir,
+        allow_failed: allowFailed ? "true" : "false",
+    });
+    const repo = _lessonRepoPath();
+    if (repo) body.set("repo_path", repo);
+
+    fetch("/proposals/promote", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body,
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                if (statusEl) {
+                    const tag = data.refused ? "Refused" : "Failed";
+                    statusEl.textContent = `❌ ${tag}: ${data.error || "unknown error"}`;
+                    statusEl.className = "proposals-status proposals-status--failed";
+                }
+                return;
+            }
+            if (statusEl) {
+                statusEl.textContent = `✓ Lesson saved · promotion=${data.promotion} · status=${data.status}`;
+                statusEl.className = "proposals-status proposals-status--done";
+            }
+            // Refresh lessons so the new candidate appears below.
+            loadLessons(true);
+        })
+        .catch(err => {
+            if (statusEl) {
+                statusEl.textContent = `❌ Network error: ${err}`;
+                statusEl.className = "proposals-status proposals-status--failed";
+            }
+        });
+}
+
 function consolidateMemory() {
     const tagEl = document.querySelector("input[name='project_tag']");
     const tag = tagEl ? tagEl.value.trim() : "";
@@ -1633,7 +2057,13 @@ function showWorkspaceTab(id) {
         refreshBenchmarkStatus();
     }
     // Phase 6.1: lazy-load Lessons on first Memory-tab show.
-    if (id === "memory") loadLessons(false);
+    if (id === "memory") {
+        loadLessons(false);
+        // Phase 5 Polish: also lazy-load the Proposals sub-section (Part 3).
+        if (typeof loadProposalRuns === "function") loadProposalRuns(false);
+    }
+    // Phase 5 Polish: lazy-load Plan items on first Dream-tab show.
+    if (id === "dream") loadPlanItems(false);
 }
 
 // Phase 5 Slice 2: Health panel — fetches /health, renders status rows.
@@ -1719,6 +2149,14 @@ function _benchFmtDate(iso) {
 function _benchFmtRate(rate) {
     if (rate == null) return "—";
     return (rate * 100).toFixed(1) + "%";
+}
+
+function _benchFmtCost(value) {
+    const n = Number(value || 0);
+    if (!Number.isFinite(n)) return "n/a";
+    if (n === 0) return "$0.00";
+    if (Math.abs(n) < 0.01) return `$${n.toFixed(6)}`;
+    return `$${n.toFixed(4)}`;
 }
 
 let _benchStatusTimer = null;
@@ -2053,7 +2491,7 @@ function _renderBenchmarkList(reports) {
              onclick="viewBenchmarkReport('${_escapeHtml(r.filename)}')">
             <div class="bench-list-item-date">${_benchFmtDate(r.timestamp_iso)}</div>
             <div class="bench-list-item-summary">
-                ${r.passed}/${r.total} · ${_benchFmtRate(r.success_rate)} · ${(r.duration_sec || 0).toFixed(1)}s
+                ${r.passed}/${r.total} / ${_benchFmtRate(r.success_rate)} / ${(r.duration_sec || 0).toFixed(1)}s / ${_benchFmtCost(r.total_estimated_cost_usd)}
             </div>
         </div>
     `).join("");
@@ -2169,6 +2607,8 @@ function _renderBenchmarkDetail(report, filename) {
     const duration = report.duration_sec ?? 0;
     const rate = report.success_rate ?? 0;
     const flaky = _benchFlakyCount(report);
+    const totalTokens = report.total_tokens || 0;
+    const estimatedCost = report.total_estimated_cost_usd || 0;
 
     const totalsHtml = `
         <div class="bench-totals">
@@ -2177,7 +2617,9 @@ function _renderBenchmarkDetail(report, filename) {
             ${skipped > 0 ? `<span class="health-summary-pill health-badge--off">skipped: ${skipped}</span>` : ""}
             <span class="health-summary-pill health-badge--missing">flaky: ${flaky}</span>
             <span class="health-summary-pill health-badge--available">total: ${total}</span>
-            <span class="health-summary-pill health-badge--available">${(rate * 100).toFixed(1)}% · ${duration.toFixed(1)}s</span>
+            <span class="health-summary-pill health-badge--available">${(rate * 100).toFixed(1)}% / ${duration.toFixed(1)}s</span>
+            ${totalTokens ? `<span class="health-summary-pill health-badge--available">tokens: ${totalTokens}</span>` : ""}
+            ${totalTokens ? `<span class="health-summary-pill health-badge--available">cost: ${_benchFmtCost(estimatedCost)}</span>` : ""}
         </div>
     `;
 
@@ -2291,7 +2733,7 @@ function seedDreamFromReport(filename) {
 // Note: "graph" was removed from validTabs in Phase 5 Slice 1 — #graph is no
 // longer a result-tab, it lives in its own workspace tab now.
 const saved = localStorage.getItem("activeTab");
-const validTabs = ["answer","context","state","patch","validation","diff","candidates"];
+const validTabs = ["answer","context","state","patch","validation","usage","diff","candidates"];
 const initialTab = validTabs.includes(saved) ? saved : "answer";
 
 showTab(initialTab);
@@ -2367,9 +2809,11 @@ function applyPatch() {
         window.lastAction = "diff";
         showTab("diff");
         // Phase 5 Slice 5: feed the new risk + validation_command into the card.
+        // Phase 5 Polish: also feed patch_safety.
         _setPatchState({
             risk: data.risk || null,
             validation_command: data.validation_command || null,
+            patch_safety: data.patch_safety || null,
             last_action: data.success ? "applied" : "apply failed",
             last_status: data.message || (data.success ? "OK" : "failed"),
         });
@@ -2397,6 +2841,10 @@ function generatePatch() {
     })
     .then(res => res.json())
     .then(data => {
+        if (data.usage) {
+            const usageEl = document.getElementById("usage");
+            if (usageEl) usageEl.innerText = data.usage;
+        }
         if (data.patch) {
             // Phase 5 Slice 5: write raw JSON to #patchRawJson, then refresh card.
             document.getElementById("patchRawJson").innerText = data.patch;
@@ -2405,6 +2853,7 @@ function generatePatch() {
                     raw: JSON.parse(data.patch),
                     risk: null,
                     validation_command: null,
+                    patch_safety: null,
                     last_action: "generated",
                     last_status: null,
                 });
@@ -2493,6 +2942,10 @@ function generateCandidates() {
     })
     .then(res => res.json())
     .then(data => {
+        if (data.usage) {
+            const usageEl = document.getElementById("usage");
+            if (usageEl) usageEl.innerText = data.usage;
+        }
         const container = document.getElementById("candidates");
 
         if (!data.candidates) {
@@ -2584,9 +3037,11 @@ function testPatch() {
         window.lastAction = "diff";
         showTab("diff");
         // Phase 5 Slice 5: feed risk + validation_command into the card.
+        // Phase 5 Polish: also feed patch_safety.
         _setPatchState({
             risk: data.risk || null,
             validation_command: data.validation_command || null,
+            patch_safety: data.patch_safety || null,
             last_action: data.success ? "tested" : "test failed",
             last_status: data.message || (data.success ? "OK" : "failed"),
         });
@@ -2602,6 +3057,7 @@ function selectCandidate(idx) {
         raw: c.patch,
         risk: null,
         validation_command: null,
+        patch_safety: null,
         last_action: "candidate selected",
         last_status: c.name || `#${idx + 1}`,
     });

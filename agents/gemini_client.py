@@ -12,7 +12,7 @@ from config import GOOGLE_API_KEY, MODELS
 import google.genai as genai
 from google.genai import types as genai_types
 from core.security import is_safe_path
-from agents.model_stats import record_model_call
+from agents.model_stats import record_model_call, usage_from_gemini_response
 
 load_dotenv()
 
@@ -89,12 +89,24 @@ def run_gemini_request(prompt: str, file_paths: list[str] | None = None) -> str:
             )
 
             output = response.text if getattr(response, "text", None) else "Gemini returned no text."
-            record_model_call(model_name, success=True, role="draft")
+            record_model_call(
+                model_name,
+                success=True,
+                role="draft",
+                provider="google",
+                usage=usage_from_gemini_response(response),
+            )
             return output
 
         except Exception as e:
             last_error = e
-            record_model_call(model_name, success=False, role="draft", error=str(e))
+            record_model_call(
+                model_name,
+                success=False,
+                role="draft",
+                provider="google",
+                error=str(e),
+            )
             sys.stderr.write(f"\n⚠️ Warning: Model '{model_name}' failed. Error: {e}\n")
 
     # If all fail
@@ -166,11 +178,23 @@ def run_gemini_request_2(
                 contents=contents,
                 config=genai_types.GenerateContentConfig(temperature=0.0),
             )
-            record_model_call(model_name, success=True, role="reviewer")
+            record_model_call(
+                model_name,
+                success=True,
+                role="reviewer",
+                provider="google",
+                usage=usage_from_gemini_response(response),
+            )
             return response.text if getattr(response, "text", None) else "Gemini returned no text."
         except Exception as e:
             last_error = e
-            record_model_call(model_name, success=False, role="reviewer", error=str(e))
+            record_model_call(
+                model_name,
+                success=False,
+                role="reviewer",
+                provider="google",
+                error=str(e),
+            )
             sys.stderr.write(f"\n⚠️ Reviewer model '{model_name}' failed: {e}\n")
 
     return f"AGENT_ERROR: Gemini reviewer fallback failed. Last error: {last_error}"

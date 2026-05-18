@@ -612,11 +612,68 @@ def _has_patch_payload(item: dict, plan: dict | None) -> bool:
     return False
 
 
+_DREAM_BLOCKER_OVERRIDE_HINTS: dict[str, str] = {
+    "safe_to_patch_false": (
+        "Default policy holds the patch because the planner marked it unsafe. "
+        "Future override: re-run the Dream item with `patch_if_safe` after the "
+        "planner reclassifies, or open the patch manually with explicit human "
+        "approval."
+    ),
+    "missing_validation_command": (
+        "Default policy refuses to auto-patch without a validation command — "
+        "there would be no way to detect regressions. "
+        "Future override: attach a `validation_commands` entry to the plan and "
+        "re-run."
+    ),
+    "target_file_uncertain": (
+        "Default policy will not guess a target file. "
+        "Future override: pin `likely_files` in the plan item before retrying."
+    ),
+    "patch_style_none": (
+        "Default policy respects the planner's `patch_style_required=none` "
+        "verdict. Future override: change the required style in the plan item, "
+        "or apply the change manually."
+    ),
+    "needs_manual_review": (
+        "Item is paused for a human read. Future override: review the item, "
+        "set its status to a runnable value, and re-queue."
+    ),
+    "blocked_missing_context": (
+        "Default policy refuses to patch without the required context. "
+        "Future override: provide the missing context (Scout snippets, "
+        "validation evidence) and re-run."
+    ),
+    "vibe_required": (
+        "Default policy refuses vibe-style patches unless the user opts in. "
+        "Future override: switch the queue item's patch_style to `vibe` with "
+        "explicit human approval."
+    ),
+    "patch_generation_failed": (
+        "The model did not return a patch payload. "
+        "Future override: retry the item, refine the prompt, or hand-write a "
+        "proposal and use the manual lesson CLI."
+    ),
+}
+
+
+def dream_blocker_override_hint(code: str) -> str:
+    """Public lookup for the override hint attached to a blocker code.
+
+    Unknown codes return an empty string so the UI can simply omit the hint
+    block instead of fabricating one.
+    """
+    return _DREAM_BLOCKER_OVERRIDE_HINTS.get(code, "")
+
+
 def classify_patch_blockers(item: dict, plan: dict | None = None) -> list[dict]:
     """Explain why a Dream item is not currently ready_to_apply.
 
     Pure metadata: this helper never calls an LLM, edits artifacts, or changes
     whether a patch is generated/applied.
+
+    Each blocker carries the override_hint paired with its code so the Dream
+    UI / proposal.md can tell the human what the default-deny rule is and
+    what path (if any) would unlock it.
     """
     blockers: list[dict] = []
     status = str(item.get("status") or "")
@@ -633,6 +690,7 @@ def classify_patch_blockers(item: dict, plan: dict | None = None) -> list[dict]:
             "code": code,
             "message": message,
             "evidence": str(evidence)[:240],
+            "override_hint": dream_blocker_override_hint(code),
         })
 
     safe_value = _context_value(item, plan, "safe_to_patch_now")

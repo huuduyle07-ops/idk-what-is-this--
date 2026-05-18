@@ -14,7 +14,7 @@ _root = str(Path(__file__).parent.parent)
 if _root not in sys.path:
     sys.path.append(_root)
 
-from agents.model_stats import record_model_call
+from agents.model_stats import record_model_call, usage_from_ollama_response
 
 
 class OllamaClient:
@@ -57,10 +57,22 @@ class OllamaClient:
             response = requests.post(url, json=payload, timeout=self.timeout)
             response.raise_for_status()
             result = response.json()
-            record_model_call(self.model, success=True, role="local_critic")
+            record_model_call(
+                self.model,
+                success=True,
+                role="local_critic",
+                provider="local",
+                usage=usage_from_ollama_response(result),
+            )
             return result.get("response", "")
         except Exception as e:
-            record_model_call(self.model, success=False, role="local_critic", error=str(e))
+            record_model_call(
+                self.model,
+                success=False,
+                role="local_critic",
+                provider="local",
+                error=str(e),
+            )
             return f"AGENT_ERROR: Ollama request failed: {e}"
 
     def generate_with_thought(self, prompt: str, system_prompt: Optional[str] = None) -> Dict[str, str]:
