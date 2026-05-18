@@ -1,0 +1,17 @@
+{
+  "name": "js_async_missing_await",
+  "language": "javascript",
+  "category": "async_bug",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node main.js",
+  "expected_changed_files": [
+    "orderService.js"
+  ],
+  "forbidden_changed_files": [
+    "main.js",
+    "inventoryApi.js"
+  ],
+  "prompt": "Fix the JavaScript async checkout bug.\n\nRequirements:\n- Modify orderService.js only.\n- checkout must await the async hasEnoughStock result.\n- checkout must return ok=false for insufficient stock.\n- checkout must return ok=true for sufficient stock.\n- Do not modify main.js or inventoryApi.js.\n- Do not create new files.\n- Use patch_candidate if only checkout changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node main.js"
+}

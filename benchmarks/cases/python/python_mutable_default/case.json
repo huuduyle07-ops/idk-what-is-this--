@@ -1,0 +1,16 @@
+{
+  "name": "python_mutable_default",
+  "language": "python",
+  "category": "state_leak",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "task_manager.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py"
+  ],
+  "prompt": "Fix the Python mutable default argument bug.\n\nRequirements:\n- Modify task_manager.py only.\n- add_task must not share the same default list between calls.\n- If tasks is not provided, create a fresh list.\n- If tasks is provided, append to that provided list.\n- Do not modify main.py.\n- Do not create new files.\n- Use patch_candidate if only add_task changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

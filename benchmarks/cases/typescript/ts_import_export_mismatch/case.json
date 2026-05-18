@@ -1,0 +1,16 @@
+{
+  "name": "ts_import_export_mismatch",
+  "language": "typescript",
+  "category": "module_wiring",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node --experimental-strip-types main.ts",
+  "expected_changed_files": [
+    "slug.ts"
+  ],
+  "forbidden_changed_files": [
+    "main.ts"
+  ],
+  "prompt": "Fix the TypeScript import/export mismatch.\n\nRequirements:\n- Modify slug.ts only.\n- slug.ts must provide the named export makeSlug used by main.ts.\n- makeSlug must lowercase text, trim surrounding whitespace, collapse whitespace groups to hyphens, and remove non-alphanumeric hyphen characters.\n- Do not modify main.ts.\n- Do not create new files.\n- Use patch_candidate if only the function export changes.\n- Use patch_plan if export wiring in slug.ts must change.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node --experimental-strip-types main.ts"
+}

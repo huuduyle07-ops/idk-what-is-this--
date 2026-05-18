@@ -1,0 +1,16 @@
+{
+  "name": "python_exception_parse_config",
+  "language": "python",
+  "category": "error_handling",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "config_parser.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py"
+  ],
+  "prompt": "Fix the Python config parsing exception bug.\n\nRequirements:\n- Modify config_parser.py only.\n- parse_config must parse non-empty key=value lines into a dictionary.\n- parse_config must ignore blank lines and lines beginning with #.\n- parse_config must trim whitespace around keys and values.\n- parse_config must raise ValueError for malformed non-comment lines without '='.\n- parse_config must raise ValueError for empty keys.\n- Do not modify main.py.\n- Do not create new files.\n- Use patch_candidate if only parse_config changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

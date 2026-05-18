@@ -1,0 +1,16 @@
+{
+  "name": "js_null_user_profile",
+  "language": "javascript",
+  "category": "null_guard",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node main.js",
+  "expected_changed_files": [
+    "profile.js"
+  ],
+  "forbidden_changed_files": [
+    "main.js"
+  ],
+  "prompt": "Fix the JavaScript null user profile bug.\n\nRequirements:\n- Modify profile.js only.\n- getDisplayName must return the trimmed profile name when user.profile.name is present.\n- getDisplayName must return \"Guest\" when user is null or undefined.\n- getDisplayName must return \"Guest\" when profile is missing.\n- getDisplayName must return \"Guest\" when name is missing or blank.\n- Do not modify main.js.\n- Do not create new files.\n- Use patch_candidate if only getDisplayName changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node main.js"
+}

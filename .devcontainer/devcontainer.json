@@ -1,0 +1,38 @@
+{
+  "name": "AI Coding Mentor Dev",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "forwardPorts": [5000],
+  "remoteEnv": {
+    "ROUTER_USE_EMBEDDINGS": "false",
+    "INDEX_USE_EMBEDDINGS": "false",
+    "RETRIEVER_USE_EMBEDDINGS": "false",
+    "RETRIEVER_USE_DB": "false",
+    "DB_ENABLED": "false",
+    "MUTATION_ORACLE_ENABLED": "false",
+    "OLLAMA_ENABLED": "false"
+  },
+  "portsAttributes": {
+    "5000": {
+      "label": "Flask Web UI",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "python -m pip install --upgrade pip && pip install -r requirements.txt",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "golang.go",
+        "rust-lang.rust-analyzer"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "24"
+    }
+  }
+}

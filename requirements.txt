@@ -1,0 +1,29 @@
+# Web Framework
+flask>=2.3.0
+
+# Environment & Configuration
+python-dotenv>=1.0.0
+
+# Database & Vector Storage
+psycopg[binary]>=3.1.0
+psycopg-pool>=3.1.0
+pgvector>=0.2.0
+
+# Data & Machine Learning
+numpy>=1.24.0
+sentence-transformers>=2.2.0
+
+# AI/LLM Clients
+google-genai>=0.3.0
+
+# Code Parsing & Analysis
+tree-sitter>=0.20.0
+tree-sitter-language-pack>=0.20.0
+
+# Document Processing
+pypdf>=3.0.0
+python-docx>=0.8.11
+truststore>=0.1.0
+
+# Testing
+pytest>=7.3.0

@@ -1,0 +1,2 @@
+# Optional: Local LLM runtime (for Deepseek review fallback)
+ollama>=0.1.0

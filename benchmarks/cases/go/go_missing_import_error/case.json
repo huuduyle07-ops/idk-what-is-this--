@@ -1,0 +1,17 @@
+{
+  "name": "go_missing_import_error",
+  "language": "go",
+  "category": "missing_import",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "go run .",
+  "expected_changed_files": [
+    "parser.go"
+  ],
+  "forbidden_changed_files": [
+    "main.go",
+    "go.mod"
+  ],
+  "prompt": "Fix the Go missing import bug.\n\nRequirements:\n- Modify parser.go only.\n- NormalizeName must trim surrounding whitespace.\n- NormalizeName must lowercase the result.\n- Add only the necessary import.\n- Do not modify main.go or go.mod.\n- Do not create new files.\n- Use patch_candidate if only parser.go changes.\n- Use patch_plan if needed for import insertion.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: go run ."
+}

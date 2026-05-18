@@ -1,0 +1,121 @@
+# Docker Scout Security Scanning Setup
+
+This project is configured with Docker Scout vulnerability scanning across local, Codespace, and CI/CD environments.
+
+## 📊 Scanning Methods
+
+### 1. **GitHub Actions (Automated - CI/CD)**
+
+Scans run automatically on:
+- Push to `main` or `develop` branches
+- Pull requests
+- Weekly schedule (Sunday 2 AM UTC)
+
+**What it does:**
+- Builds your app image
+- Scans app, pgvector, and ollama images
+- Uploads SARIF reports to GitHub Security tab
+- Comments on PRs with results
+- Fails build if critical vulnerabilities found
+
+**View results:**
+- GitHub → Security → Code scanning alerts
+- Or check PR comments
+
+---
+
+### 2. **Local Machine**
+
+Run manual scans using the provided script:
+
+```bash
+# Basic scan (all images)
+./scan-images.sh
+
+# Fail build if critical vulnerabilities found
+./scan-images.sh --fail-on-critical
+
+# Generate HTML reports
+./scan-images.sh --html
+
+# Direct Docker Scout commands
+docker scout cves ai-mentor-app:latest
+docker scout cves pgvector/pgvector:pg16
+docker scout cves ollama/ollama
+```
+
+---
+
+### 3. **GitHub Codespaces**
+
+Option A: Run the local script (same as above)
+
+Option B: Use Codespace-specific Compose with monitoring:
+
+```bash
+# Build and start services with Scout monitoring
+docker compose -f docker-compose.yml -f docker-compose.codespace.yml up
+
+# Run scan in separate terminal
+docker compose -f docker-compose.codespace.yml --profile scan up scout-monitor
+
+# View results
+cat scout-report.txt
+```
+
+---
+
+## 🔍 Understanding the Reports
+
+**SARIF Format** (GitHub Security integration):
+- Automatically parsed by GitHub
+- Shows vulnerabilities in code scanning tab
+- Links to CVE details and fixes
+
+**CLI Output**:
+```
+x CRITICAL CVE-2025-XXXXX
+  Affected range: <version>
+  Fixed version: version
+  
+x HIGH CVE-2025-XXXXX
+```
+
+---
+
+## 🛠️ Remediation Workflow
+
+1. **Review Scout results** in GitHub Security tab or CLI output
+2. **Check fixed versions** - Scout shows "Fixed version: X.Y.Z"
+3. **Update** your docker-compose.yml or Dockerfile:
+   ```yaml
+   image: pgvector/pgvector:pg16  # Update to latest patched tag
+   ```
+4. **Rebuild** locally: `docker build -t ai-mentor-app:latest .`
+5. **Re-scan**: `./scan-images.sh --fail-on-critical`
+6. **Commit & push** - GitHub Actions re-scans automatically
+
+---
+
+## 📌 Current Vulnerabilities
+
+**pgvector:pg16** (100 total):
+- 1 CRITICAL (Golang stdlib)
+- 23 HIGH (mostly gnutls28, openssl)
+- 22 MEDIUM
+- 47 LOW
+
+**Status**: Some require patched base image tags; others awaiting upstream fixes.
+
+**Recommendation**: 
+- Monitor weekly scans for patch availability
+- Consider Docker Hardened Images (DHI) for pre-hardened base layers
+- Subscribe to CVE alerts in GitHub Security settings
+
+---
+
+## 🔗 Resources
+
+- [Docker Scout Docs](https://docs.docker.com/scout/)
+- [GitHub Code Scanning Setup](https://docs.github.com/en/code-security/code-scanning)
+- [SARIF Spec](https://sarifweb.azurewebsites.net/)

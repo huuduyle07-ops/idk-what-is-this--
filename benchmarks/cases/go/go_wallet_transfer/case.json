@@ -1,0 +1,19 @@
+{
+  "name": "go_wallet_transfer",
+  "language": "go",
+  "category": "logic_validation",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "go run .",
+  "expected_changed_files": [
+    "transfer.go"
+  ],
+  "forbidden_changed_files": [
+    "main.go",
+    "wallet.go",
+    "audit.go",
+    "go.mod"
+  ],
+  "prompt": "Fix the Go wallet transfer logic.\n\nRequirements:\n- Modify transfer.go only.\n- TransferMoney must reject amount <= 0.\n- TransferMoney must reject self-transfer.\n- TransferMoney must reject overdraft when amount > sender Balance.\n- Valid transfers must decrease sender balance and increase receiver balance.\n- Failed transfers must not change either wallet balance.\n- Failed transfers must not write to the audit log.\n- Successful transfers must be logged exactly once.\n- Do not modify main.go, wallet.go, audit.go, or go.mod.\n- Do not create new files.\n- Use patch_candidate if only the TransferMoney function changes.\n- Use patch_plan if an import must be added to transfer.go.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: go run ."
+}

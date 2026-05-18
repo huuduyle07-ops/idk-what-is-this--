@@ -1,0 +1,18 @@
+{
+  "name": "go_logging_side_effect",
+  "language": "go",
+  "category": "side_effect",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "go run .",
+  "expected_changed_files": [
+    "signup.go"
+  ],
+  "forbidden_changed_files": [
+    "main.go",
+    "logger.go",
+    "go.mod"
+  ],
+  "prompt": "Fix the Go logging side effect bug.\n\nRequirements:\n- Modify signup.go only.\n- ProcessSignup must reject blank email addresses.\n- ProcessSignup must reject email addresses without @.\n- Failed signups must not write to the logger.\n- Successful signups must write exactly one log entry.\n- Successful log entries must use the trimmed email address.\n- Do not modify main.go, logger.go, or go.mod.\n- Do not create new files.\n- Use patch_candidate if only ProcessSignup changes.\n- Use patch_plan if imports in signup.go must change.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: go run ."
+}

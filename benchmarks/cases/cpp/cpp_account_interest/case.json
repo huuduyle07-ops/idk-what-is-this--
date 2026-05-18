@@ -1,0 +1,18 @@
+{
+  "name": "cpp_account_interest",
+  "language": "cpp",
+  "category": "logic_validation",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python validate.py",
+  "expected_changed_files": [
+    "interest.cpp"
+  ],
+  "forbidden_changed_files": [
+    "main.cpp",
+    "interest.h",
+    "validate.py"
+  ],
+  "prompt": "Fix the C++ compound interest bug.\n\nRequirements:\n- Modify interest.cpp only.\n- compute_compound_interest must reject negative principal.\n- compute_compound_interest must reject negative rate.\n- compute_compound_interest must reject negative years.\n- A zero principal must return 0.\n- A zero rate must return 0.\n- A zero years must return 0.\n- Valid inputs must compute principal * ((1 + rate)^years - 1).\n- Rejected inputs must throw std::invalid_argument.\n- Do not modify main.cpp, interest.h, or validate.py.\n- Do not create new files.\n- Use patch_candidate if only compute_compound_interest changes.\n- Do not add or remove #include directives; <stdexcept> is already included.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python validate.py"
+}

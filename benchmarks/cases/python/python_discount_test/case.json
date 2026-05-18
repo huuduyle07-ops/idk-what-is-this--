@@ -1,0 +1,17 @@
+{
+  "name": "python_discount_validation",
+  "language": "python",
+  "category": "logic_validation",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "pricing.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py",
+    "product_catalog.py"
+  ],
+  "prompt": "Fix the Python discount validation bug.\n\nRequirements:\n- Modify pricing.py only.\n- calculate_final_price must reject discount_percent < 0.\n- calculate_final_price must reject discount_percent > 100.\n- calculate_final_price must reject negative base_price.\n- A 0% discount must return the original price.\n- A 100% discount must return 0.\n- Valid discounts must calculate the correct final price.\n- Do not modify main.py or product_catalog.py.\n- Do not create new files.\n- Use patch_candidate if only calculate_final_price changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}
