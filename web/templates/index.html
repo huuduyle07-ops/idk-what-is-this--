@@ -8,19 +8,45 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </head>
-<body>
+{% set page_web_mode = active_web_mode|default('instant') %}
+<body data-product-mode="{{ page_web_mode }}">
 
 <div class="layout">
 
     <aside class="sidebar">
-        <a class="new-chat" href="{{ url_for('new_session') }}">+ New Chat</a>
+        <div class="sidebar-brand">
+            <div class="sidebar-brand__mark">AI</div>
+            <div>
+                <div class="sidebar-brand__name">Coding Agent</div>
+                <div class="sidebar-brand__meta">Workspace</div>
+            </div>
+        </div>
+
+        <nav class="mode-switcher" aria-label="Workspace mode">
+            <button type="button" class="mode-switcher__item" data-product-mode="chat" onclick="setProductMode('chat')">
+                <span class="mode-switcher__icon">?</span>
+                <span class="mode-switcher__text">
+                    <strong>Chat</strong>
+                    <small>Understanding</small>
+                </span>
+            </button>
+            <button type="button" class="mode-switcher__item" data-product-mode="instant" onclick="setProductMode('instant')">
+                <span class="mode-switcher__icon">&gt;_</span>
+                <span class="mode-switcher__text">
+                    <strong>Instant Run</strong>
+                    <small>Execution</small>
+                </span>
+            </button>
+        </nav>
+
+        <a id="newSessionLink" class="new-chat" href="{{ url_for('new_session', web_mode=page_web_mode) }}">+ New Session</a>
 
         <h3>Recent</h3>
 
         {% for s in sessions %}
         <a class="session-item" href="{{ url_for('load_session', session_id=s.id) }}">
             <div class="session-title">{{ s.title }}</div>
-            <div class="session-meta">{{ s.mode }} · {{ s.created_at }}</div>
+            <div class="session-meta">{{ s.web_mode|default('instant') }} / {{ s.mode }} - {{ s.created_at }}</div>
         </a>
         {% endfor %}
 
@@ -35,9 +61,14 @@
     </aside>
 
     <main class="main">
-        <h1>AI Coding Agent</h1>
+        <header class="main-header">
+            <div class="main-header__eyebrow">AI Coding Agent</div>
+            <h1 id="modeTitle">{{ 'Chat' if page_web_mode == 'chat' else 'Instant Run' }}</h1>
+            <div id="modeSubtitle" class="mode-subtitle">{{ 'Understanding' if page_web_mode == 'chat' else 'Execution' }}</div>
+        </header>
 
-        <form method="POST">
+        <form method="POST" class="agent-form" id="agentForm">
+            <input type="hidden" id="webModeInput" name="web_mode" value="{{ page_web_mode }}">
             <input
                 id="repoPathInput"
                 type="text"
@@ -53,6 +84,7 @@
 
             <textarea name="query" placeholder="Enter your query..." required>{{ current.query if current else '' }}</textarea>
 
+            <div class="instant-run-controls" data-mode-panel="instant-controls">
             <label for="modeSelect">Mode:</label>
             <select id="modeSelect" name="mode">
                 <option value="retrieve" {% if current and current.mode == "retrieve" %}selected{% endif %}>Retrieve</option>
@@ -99,7 +131,9 @@
                 <option value="plan">Plan only</option>
             </select>
 
-            <button type="submit">Run</button>
+            </div>
+
+            <button type="submit" id="primarySubmit">Run</button>
         </form>
 
         <div class="margin-top-info">
@@ -115,6 +149,24 @@
         </div>
         {% endif %}
 
+        <section id="chatModePanel" class="chat-mode-panel" data-mode-panel="chat">
+            <div class="chat-thread">
+                {% if current and result and result.answer %}
+                <div class="chat-turn chat-turn--user">
+                    <div class="chat-role">You</div>
+                    <div class="chat-bubble">{{ current.query }}</div>
+                </div>
+                <div class="chat-turn chat-turn--agent">
+                    <div class="chat-role">Agent</div>
+                    <pre class="chat-bubble chat-answer">{{ result.answer }}</pre>
+                </div>
+                {% else %}
+                <div class="chat-empty">No answer yet.</div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section id="instantModePanel" class="instant-mode-panel" data-mode-panel="instant">
         <!-- Phase 5 Slice 1: workspace tabs (top-level). -->
         <div class="ws-tabs" role="tablist">
           <button type="button" id="ws-tab-chat"       role="tab" aria-controls="ws-chat"       class="ws-tab" data-ws="chat"       onclick="showWorkspaceTab('chat')">Chat / Patch</button>
@@ -416,6 +468,7 @@
             </div>
           </div>
         </div>
+        </section>
     </main>
 
 </div>
@@ -437,6 +490,67 @@
 <script>
 //Coding Agent That Trully Useful and Safe//
 window.lastAction = null;
+
+function normalizeProductMode(mode) {
+    return mode === "chat" ? "chat" : "instant";
+}
+
+function setProductMode(mode, options = {}) {
+    const nextMode = normalizeProductMode(mode);
+    const persist = options.persist !== false;
+    const webModeInput = document.getElementById("webModeInput");
+    const modeTitle = document.getElementById("modeTitle");
+    const modeSubtitle = document.getElementById("modeSubtitle");
+    const primarySubmit = document.getElementById("primarySubmit");
+    const queryInput = document.querySelector("textarea[name='query']");
+    const newSessionLink = document.getElementById("newSessionLink");
+
+    document.body.dataset.productMode = nextMode;
+    if (webModeInput) webModeInput.value = nextMode;
+    if (persist) localStorage.setItem("activeProductMode", nextMode);
+
+    document.querySelectorAll(".mode-switcher__item").forEach(btn => {
+        const isActive = btn.dataset.productMode === nextMode;
+        btn.classList.toggle("mode-switcher__item--active", isActive);
+        btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+
+    document.querySelectorAll("[data-mode-panel]").forEach(panel => {
+        const panelMode = panel.dataset.modePanel;
+        const shouldShow =
+            (nextMode === "chat" && panelMode === "chat") ||
+            (nextMode === "instant" && (panelMode === "instant" || panelMode === "instant-controls"));
+        panel.hidden = !shouldShow;
+    });
+
+    if (modeTitle) modeTitle.textContent = nextMode === "chat" ? "Chat" : "Instant Run";
+    if (modeSubtitle) modeSubtitle.textContent = nextMode === "chat" ? "Understanding" : "Execution";
+    if (primarySubmit) primarySubmit.textContent = nextMode === "chat" ? "Ask" : "Run";
+    if (newSessionLink) newSessionLink.href = `/new?web_mode=${encodeURIComponent(nextMode)}`;
+    if (queryInput) {
+        queryInput.placeholder = nextMode === "chat"
+            ? "Ask what this code does..."
+            : "Enter your query...";
+    }
+
+    if (nextMode === "chat") {
+        const modeSelect = document.getElementById("modeSelect");
+        const applyPolicy = document.getElementById("applyPolicy");
+        if (modeSelect) modeSelect.value = "retrieve";
+        if (applyPolicy) applyPolicy.value = "plan";
+    }
+}
+
+document.addEventListener("submit", event => {
+    if (event.target?.id !== "agentForm") return;
+    if (document.getElementById("webModeInput")?.value === "chat") {
+        const modeSelect = document.getElementById("modeSelect");
+        const applyPolicy = document.getElementById("applyPolicy");
+        if (modeSelect) modeSelect.value = "retrieve";
+        if (applyPolicy) applyPolicy.value = "plan";
+    }
+});
+
 document.querySelectorAll("pre").forEach(p => {
     try {
         const obj = JSON.parse(p.innerText);
@@ -2741,6 +2855,11 @@ showTab(initialTab);
 // Restore the last-active workspace tab (default: chat).
 const savedWs = localStorage.getItem("activeWorkspaceTab") || "chat";
 showWorkspaceTab(savedWs);
+
+const hasCurrentSession = "{{ 'true' if current else 'false' }}" === "true";
+const serverProductMode = normalizeProductMode(document.getElementById("webModeInput")?.value || "instant");
+const savedProductMode = normalizeProductMode(localStorage.getItem("activeProductMode") || serverProductMode);
+setProductMode(hasCurrentSession ? serverProductMode : savedProductMode, { persist: false });
 
 // Phase 5 Slice 5: hydrate the Patch card from server-rendered raw JSON.
 _initPatchCardFromRaw();

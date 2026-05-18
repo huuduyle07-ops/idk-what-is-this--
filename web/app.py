@@ -74,6 +74,7 @@ def save_session(
     project_tag: str,
     patch_style: str = "safe_minimal",
     ignore_repo_dna: bool = False,
+    web_mode: str = "instant",
 ) -> dict:
     sessions = load_sessions()
 
@@ -88,6 +89,7 @@ def save_session(
         "project_tag": project_tag,
         "patch_style": patch_style,
         "ignore_repo_dna": bool(ignore_repo_dna),
+        "web_mode": _normalize_web_mode(web_mode),
     }
 
     sessions.insert(0, session)
@@ -100,6 +102,10 @@ def find_session(session_id: str) -> dict | None:
         if s.get("id") == session_id:
             return s
     return None
+
+
+def _normalize_web_mode(value: str | None) -> str:
+    return "chat" if (value or "").strip().lower() == "chat" else "instant"
 
 def _empty_result(answer: str = "") -> dict:
     return {
@@ -224,11 +230,15 @@ def index():
     current = None
     result = {}
     error = None
+    active_web_mode = _normalize_web_mode(request.values.get("web_mode"))
 
     if request.method == "POST":
         query = request.form.get("query", "").strip()
         repo_path = request.form.get("repo_path", "").strip()
+        active_web_mode = _normalize_web_mode(request.form.get("web_mode"))
         mode = request.form.get("mode", "retrieve")
+        if active_web_mode == "chat":
+            mode = "retrieve"
         agent_mode = request.form.get("agent_mode", "reviewer")
         user_tag = request.form.get("project_tag")
         # Vibecoding style — picks how aggressive/creative patches may be.
@@ -269,7 +279,14 @@ def index():
                 _attach_model_usage(result, model_calls)
 
             current = save_session(
-                query, repo_path, mode, result, final_tag, patch_style, ignore_repo_dna
+                query,
+                repo_path,
+                mode,
+                result,
+                final_tag,
+                patch_style,
+                ignore_repo_dna,
+                active_web_mode,
             )
             sessions = load_sessions()
 
@@ -279,6 +296,7 @@ def index():
         current=current,
         result=result,
         error=error,
+        active_web_mode=active_web_mode,
     )
 
 @app.route("/generate_patch", methods=["POST"])
@@ -1316,12 +1334,14 @@ def dream_proposals_status():
 def load_session(session_id):
     sessions = load_sessions()
     current = find_session(session_id)
+    active_web_mode = _normalize_web_mode((current or {}).get("web_mode"))
 
     return render_template(
         "index.html",
         sessions=sessions,
         current=current,
         result=current.get("result", {}) if current else {},
+        active_web_mode=active_web_mode,
     )
 
 @app.route("/generate_candidates", methods=["POST"])
@@ -2055,7 +2075,7 @@ def local_critique():
 
 @app.route("/new")
 def new_session():
-    return redirect(url_for("index"))
+    return redirect(url_for("index", web_mode=_normalize_web_mode(request.values.get("web_mode"))))
 
 
 if __name__ == "__main__":
