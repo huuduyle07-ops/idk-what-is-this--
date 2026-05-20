@@ -260,9 +260,8 @@ def _main(argv: list[str]) -> int:
         "--repo-path",
         default=None,
         help=(
-            "Optional analyzed repo path; scopes the lesson to "
-            ".agent/<project_tag>/lessons/. Defaults to the global "
-            ".agent/lessons/ when omitted."
+            "Optional analyzed repo path accepted for backward compatibility; "
+            "lessons are global-only under .agent/lessons/."
         ),
     )
     parser.add_argument(
