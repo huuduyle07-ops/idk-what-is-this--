@@ -265,3 +265,93 @@ def create_handoff_note(
     path.write_text(_render_note_markdown(meta, context_summary, expected_output), encoding="utf-8")
 
     return {"path": str(path), "meta": meta, "slug": slug}
+
+
+def _resolve_note_path(raw: str | Path, handoff_root: Path | None) -> Path:
+    root = _resolve_handoff_root(handoff_root).resolve()
+    candidate = Path(raw).expanduser().resolve()
+    try:
+        candidate.relative_to(root)
+    except ValueError as e:
+        raise ValueError(f"handoff note path is outside {root}: {candidate}") from e
+    if not candidate.is_file():
+        raise FileNotFoundError(f"handoff note not found: {candidate}")
+    return candidate
+
+
+def _parse_meta_and_body(text: str) -> tuple[dict[str, Any], str]:
+    match = _HANDOFF_META_RE.search(text)
+    if not match:
+        raise ValueError("handoff note is missing HANDOFF_META block")
+    try:
+        meta = json.loads(match.group("json"))
+    except json.JSONDecodeError as e:
+        raise ValueError(f"handoff note HANDOFF_META is not valid JSON: {e}") from e
+    if not isinstance(meta, dict):
+        raise ValueError("handoff note HANDOFF_META must be a JSON object")
+    body = text[match.end():].lstrip("\n")
+    return meta, body
+
+
+def read_handoff_note(
+    path: str | Path,
+    handoff_root: Path | None = None,
+) -> dict[str, Any]:
+    resolved = _resolve_note_path(path, handoff_root)
+    text = resolved.read_text(encoding="utf-8")
+    meta, body = _parse_meta_and_body(text)
+    return {"path": str(resolved), "meta": meta, "body": body, "raw": text}
+
+
+def list_handoff_notes(
+    handoff_root: Path | None = None,
+    *,
+    limit: int = 50,
+    include_archived: bool = False,
+) -> list[dict[str, Any]]:
+    root = _resolve_handoff_root(handoff_root)
+    if not root.is_dir():
+        return []
+    notes: list[dict[str, Any]] = []
+    for path in sorted(root.glob("*.md"), reverse=True):
+        try:
+            text = path.read_text(encoding="utf-8")
+            meta, _body = _parse_meta_and_body(text)
+        except (OSError, ValueError):
+            continue
+        if not include_archived and meta.get("status") == "archived":
+            continue
+        notes.append(
+            {
+                "path": str(path),
+                "title": meta.get("title"),
+                "status": meta.get("status"),
+                "intended_worker": meta.get("intended_worker"),
+                "task_type": meta.get("task_type"),
+                "created_at": meta.get("created_at"),
+                "slug": meta.get("slug"),
+            }
+        )
+        if len(notes) >= max(1, limit):
+            break
+    return notes
+
+
+def update_handoff_status(
+    path: str | Path,
+    status: str,
+    handoff_root: Path | None = None,
+) -> dict[str, Any]:
+    if status not in VALID_STATUSES:
+        raise ValueError(f"status must be one of {sorted(VALID_STATUSES)}, got {status!r}")
+    resolved = _resolve_note_path(path, handoff_root)
+    text = resolved.read_text(encoding="utf-8")
+    meta, body = _parse_meta_and_body(text)
+    meta["status"] = status
+    meta["last_status_change_at"] = _now_iso()
+    new_meta_json = json.dumps(meta, indent=2, ensure_ascii=False, sort_keys=True)
+    new_text = (
+        f"<!--HANDOFF_META\n{new_meta_json}\nHANDOFF_META-->\n\n{body.lstrip()}"
+    )
+    resolved.write_text(new_text, encoding="utf-8")
+    return {"path": str(resolved), "meta": meta}

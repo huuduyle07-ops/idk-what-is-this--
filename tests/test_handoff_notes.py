@@ -177,3 +177,68 @@ def test_create_handoff_note_body_contains_context_summary(handoff_root):
     assert "A unique context phrase ABC123" in text
     assert "## Context summary" in text
     assert "HANDOFF_META" in text
+
+
+def _create(handoff_root, *, title="t", **kwargs):
+    return handoff_notes.create_handoff_note(
+        title=title,
+        intended_worker="codex",
+        task_type="proposal_only",
+        handoff_root=handoff_root,
+        **kwargs,
+    )
+
+
+def test_list_handoff_notes_returns_newest_first(handoff_root):
+    import time
+
+    a = _create(handoff_root, title="first")
+    time.sleep(1.1)  # ensure distinct YYYYMMDD_HHMMSS prefix
+    b = _create(handoff_root, title="second")
+    listing = handoff_notes.list_handoff_notes(handoff_root=handoff_root)
+    assert len(listing) == 2
+    assert listing[0]["path"] == b["path"]
+    assert listing[1]["path"] == a["path"]
+
+
+def test_list_handoff_notes_excludes_archived_by_default(handoff_root):
+    a = _create(handoff_root, title="keep")
+    b = _create(handoff_root, title="archived")
+    handoff_notes.update_handoff_status(b["path"], "archived", handoff_root=handoff_root)
+    visible = handoff_notes.list_handoff_notes(handoff_root=handoff_root)
+    paths = [item["path"] for item in visible]
+    assert a["path"] in paths
+    assert b["path"] not in paths
+
+    everything = handoff_notes.list_handoff_notes(
+        handoff_root=handoff_root, include_archived=True
+    )
+    paths = [item["path"] for item in everything]
+    assert b["path"] in paths
+
+
+def test_read_handoff_note_returns_meta_and_body(handoff_root):
+    result = _create(handoff_root, title="readme", context_summary="hello")
+    parsed = handoff_notes.read_handoff_note(result["path"], handoff_root=handoff_root)
+    assert parsed["meta"]["title"] == "readme"
+    assert "hello" in parsed["body"]
+
+
+def test_read_handoff_note_blocks_path_traversal(handoff_root, tmp_path):
+    outside = tmp_path / "outside.md"
+    outside.write_text("not a handoff", encoding="utf-8")
+    with pytest.raises(ValueError, match="outside"):
+        handoff_notes.read_handoff_note(str(outside), handoff_root=handoff_root)
+
+
+def test_update_handoff_status_writes_new_meta(handoff_root):
+    result = _create(handoff_root, title="status-test")
+    handoff_notes.update_handoff_status(result["path"], "ran", handoff_root=handoff_root)
+    parsed = handoff_notes.read_handoff_note(result["path"], handoff_root=handoff_root)
+    assert parsed["meta"]["status"] == "ran"
+
+
+def test_update_handoff_status_rejects_unknown_status(handoff_root):
+    result = _create(handoff_root, title="status-bad")
+    with pytest.raises(ValueError, match="status"):
+        handoff_notes.update_handoff_status(result["path"], "weird", handoff_root=handoff_root)
