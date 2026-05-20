@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json, sys, shutil, tempfile
+import json, sys, tempfile
 from datetime import datetime
 from pathlib import Path
 from flask import Flask, render_template, request, redirect, url_for
@@ -12,14 +12,13 @@ if str(PROJECT_ROOT) not in sys.path:
 from core.retriever import retrieve_context
 from reasoning.deep_project_understand import deep_project_understand
 from core.control_engine import run_control_structured, run_control, build_control_prompt
-from core.executor import Executor
 from agents.gemini_client import run_gemini_request
 from agents.model_stats import ModelStatsScope, format_usage_report
 from core.json_utils import extract_json_block
 from core.validation_command import get_default_validation_command
 from web.runner import run_agent_web
 from agents.deepseek_client import run_deepseek_review
-from config import LANGUAGE_MAP, get_agent_dir, FOLDER_BLACKLIST
+from config import get_agent_dir, FOLDER_BLACKLIST
 from core.project_tag import build_project_tag, fingerprint_repo  # re-exported for legacy callers
 from core.repo_librarian import inspect_repo_inventory
 from core.run_lifecycle import run_patch_plan_with_artifacts
@@ -35,15 +34,13 @@ from core import lesson_store
 from core.patch_safety import evaluate_patch_safety
 from database.memory_consolidator import consolidate_all
 from policy.decision_helper import normalize_patch_style
+from web.patch_helpers import patch_plan_files
+from web.routes.patch_routes import bp as patch_routes_bp
 from graph.builder import build_graph_from_repo
 from graph.exporter import safe_id, escape_mermaid_label
 
-def _detect_patch_language(patch: dict) -> str:
-    """Best-effort language inference from the target file extension."""
-    target = patch.get("relative_path") or patch.get("file") or ""
-    ext = Path(target).suffix.lower()
-    return LANGUAGE_MAP.get(ext, "unknown")
 app = Flask(__name__)
+app.register_blueprint(patch_routes_bp)
 
 WEB_DIR = Path(__file__).parent
 SESSION_FILE = WEB_DIR / "sessions.json"
@@ -325,377 +322,6 @@ def generate_patch():
     return {
         "patch": json.dumps(patch, indent=2, ensure_ascii=False),
         "usage": format_usage_report(model_calls),
-    }
-
-@app.route("/apply_patch", methods=["POST"])
-def apply_patch():
-    repo_path = request.form.get("repo_path", "")
-    patch_json = request.form["patch"]
-    apply_policy = request.form.get("apply_policy", "ask")
-    MAX_BACKUPS = 7
-
-    # Server-side enforcement of "plan only" — never apply.
-    if apply_policy == "plan":
-        return {
-            "success": False,
-            "message": "Plan-only policy: server refused to apply.",
-            "diff": "",
-            "validation": "",
-        }
-
-    try:
-        parsed = json.loads(patch_json)
-
-        if isinstance(parsed.get("patch_candidate"), dict):
-            patch = parsed["patch_candidate"]
-        else:
-            patch = parsed
-
-        if "patched_snippet" not in patch:
-            return {
-                "success": False,
-                "message": "No patch_candidate found. Expected top-level patch_candidate or direct patch object.",
-                "diff": "",
-                "validation": "",
-            }
-    except Exception:
-        return {"error": "Invalid patch JSON"}
-
-    target_file = patch.get("relative_path") or patch.get("file")
-    if not target_file:
-        return {"error": "Patch missing target file"}
-
-    repo_root = Path(repo_path).resolve()
-
-    # Phase 5 Polish: apply-time Patch Safety gate. Refuses forbidden paths
-    # (env / test / .agent / node_modules / target / benchmark validation)
-    # and path traversal before any disk write. The gate rules live in
-    # core.patch_safety alongside lesson_quality so the two cannot drift.
-    patch_safety = evaluate_patch_safety([target_file], project_root=repo_root)
-    if not patch_safety["ok"]:
-        return {
-            "success": False,
-            "message": "Patch blocked by safety gate: " + "; ".join(patch_safety["reasons"]),
-            "diff": "",
-            "validation": "",
-            "risk": None,
-            "validation_command": "",
-            "patch_safety": patch_safety,
-        }
-
-    file_path = (repo_root / target_file).resolve()
-    try:
-        file_path.relative_to(repo_root)
-    except ValueError:
-        return {
-            "success": False,
-        "message": "Unsafe patch target: file is outside repo.",
-        "diff": "",
-        "validation": "",
-        "patch_safety": patch_safety,
-    }, 400
-    safe_path = target_file.replace("/", "_").replace("\\", "_")
-    backup_path = BACKUP_DIR / f"{safe_path}_{datetime.now().timestamp()}.bak"
-
-    if file_path.exists():
-        backup_path.write_text(file_path.read_text(encoding="utf-8"), encoding="utf-8")
-
-    backups = sorted(BACKUP_DIR.glob(f"{safe_path}_*.bak"), reverse=True)
-    for old in backups[MAX_BACKUPS:]:
-        old.unlink()
-
-    executor = Executor(
-        project_root=repo_path,
-        rollback_on_validation_fail=True,
-    )
-
-    lang = _detect_patch_language(patch)
-    validation_command = get_default_validation_command(lang, repo_root)
-    
-    result = executor.run(
-        patch=patch,
-        language=lang,
-        validation_command=validation_command,
-    )
-
-    # Phase 5 Slice 5: surface risk + validation_command for the Patch card.
-    risk_dict = None
-    if getattr(result, "risk", None):
-        risk_dict = {
-            "level": result.risk.level,
-            "score": result.risk.score,
-            "reasons": list(result.risk.reasons or []),
-        }
-
-    return {
-        "message": result.message,
-        "diff": result.diff,
-        "validation": result.validation_output,
-        "success": result.success,
-        "risk": risk_dict,
-        "validation_command": validation_command or "",
-        "patch_safety": patch_safety,
-    }
-
-@app.route("/test_patch_plan", methods=["POST"])
-def test_patch_plan():
-    """Dry-run a multi-op patch_plan in a temp clone, then validate."""
-    repo_path = request.form.get("repo_path", "")
-    patch_json = request.form.get("patch", "")
-    patch_style = request.form.get("patch_style", "")
-
-    if patch_style == "safe_minimal":
-        return {
-            "success": False,
-            "message": "safe_minimal mode forbids patch_plan. Switch to balanced or vibe to test multi-file changes.",
-            "diff": "",
-            "validation": "",
-        }
-
-    try:
-        patch = json.loads(patch_json)
-    except Exception:
-        return {"error": "Invalid patch JSON"}
-
-    plan = patch.get("patch_plan")
-    if not isinstance(plan, list) or not plan:
-        return {
-            "success": False,
-            "message": "No patch_plan found in payload.",
-            "diff": "",
-            "validation": "",
-        }
-
-    if not repo_path or not Path(repo_path).is_dir():
-        return {"error": f"repo_path is not a directory: {repo_path}"}
-
-    # Phase 5 Polish: same gate as /apply_patch_plan. Dry-run still copies
-    # files to a temp clone; rejecting forbidden ops up-front means the
-    # Patch card can show "would be blocked" before the user clicks Apply.
-    plan_files = [
-        (op.get("relative_path") or op.get("file") or "")
-        for op in plan if isinstance(op, dict)
-    ]
-    patch_safety = evaluate_patch_safety(plan_files, project_root=Path(repo_path).resolve())
-    if not patch_safety["ok"]:
-        return {
-            "success": False,
-            "message": "Patch plan blocked by safety gate: " + "; ".join(patch_safety["reasons"]),
-            "diff": "",
-            "validation": "",
-            "risk": None,
-            "validation_command": "",
-            "patch_safety": patch_safety,
-        }
-
-    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
-        temp_repo = Path(temp_dir) / "repo"
-        shutil.copytree(
-            repo_path,
-            temp_repo,
-            ignore=shutil.ignore_patterns(
-                "target",
-                ".git",
-                ".agent",
-                "__pycache__",
-                ".pytest_cache",
-                ".mypy_cache",
-                "node_modules",
-                "dist",
-                "build",
-                ".venv",
-                "venv",
-                ".env",
-                ".env.*"
-            ),
-        )
-
-        if (temp_repo / "Cargo.toml").exists():
-            lang = "rust"
-        elif (temp_repo / "go.mod").exists():
-            lang = "go"
-        elif (temp_repo / "package.json").exists():
-            lang = "javascript"
-        elif any(temp_repo.glob("*.py")) or any(temp_repo.rglob("*.py")):
-            lang = "python"
-        elif (
-            any(temp_repo.rglob("*.cs"))
-            or any(temp_repo.rglob("*.sln"))
-            or any(temp_repo.rglob("*.csproj"))
-            ):
-            lang = "csharp"
-        elif (
-            any(temp_repo.rglob("*.cpp"))
-            or any(temp_repo.rglob("*.cc"))
-            or any(temp_repo.rglob("*.cxx"))
-            or any(temp_repo.rglob("*.hpp"))
-            or any(temp_repo.rglob("*.hxx"))
-        ):
-            lang = "cpp"
-        else:
-            lang = "unknown"
-
-        validation_command = get_default_validation_command(lang, temp_repo)
-
-        result = run_patch_plan_with_artifacts(
-            str(temp_repo),
-            plan,
-            validation_command=validation_command,
-            user_query=request.form.get("query", ""),
-            control_result={"route": "test_patch_plan"},
-            source="web_test_patch_plan",
-        )
-
-        combined_diff = "\n\n".join(d for d in result.get("diffs", []) if d)
-        summary = result.get("message") or ""
-
-        if not result.get("success"):
-            failed = result.get("failed_op") or {}
-            idx = result.get("failed_op_index")
-            err = result.get("error") or "unknown"
-            summary = (
-                f"Plan dry-run failed at op #{idx}: {err}\n"
-                f"Failed op: {json.dumps(failed, ensure_ascii=False)[:200]}\n"
-                f"Rollback performed: {result.get('rollback_performed')}"
-            )
-
-        return {
-            "success": result.get("success", False),
-            "message": summary,
-            "diff": combined_diff,
-            "validation": result.get("validation_output", ""),
-            "applied_ops": result.get("applied_ops", []),
-            "rollback_performed": result.get("rollback_performed", False),
-            # Phase 5 Slice 5: risk is not computed for patch_plan flows;
-            # validation_command is, so surface it for the Patch card.
-            "risk": None,
-            "validation_command": validation_command or "",
-            "patch_safety": patch_safety,
-        }
-
-@app.route("/apply_patch_plan", methods=["POST"])
-def apply_patch_plan_route():
-    """Apply a multi-op patch_plan (used by balanced/vibe styles)."""
-    repo_path = request.form.get("repo_path", "")
-    patch_json = request.form.get("patch", "")
-    apply_policy = request.form.get("apply_policy", "ask")
-    patch_style = request.form.get("patch_style", "")
-
-    if apply_policy == "plan":
-        return {
-            "success": False,
-            "message": "Plan-only policy: server refused to apply.",
-            "diff": "",
-            "validation": "",
-        }
-
-    # safe_minimal forbids patch_plan. Defense in depth on top of the prompt rule.
-    if patch_style == "safe_minimal":
-        return {
-            "success": False,
-            "message": "safe_minimal mode forbids patch_plan. Switch to balanced or vibe to apply multi-file changes.",
-            "diff": "",
-            "validation": "",
-        }
-
-    try:
-        patch = json.loads(patch_json)
-    except Exception:
-        return {"error": "Invalid patch JSON"}
-
-    plan = patch.get("patch_plan")
-    if not isinstance(plan, list) or not plan:
-        return {
-            "success": False,
-            "message": "No patch_plan found in payload. (Looking for top-level 'patch_plan': [...] )",
-            "diff": "",
-            "validation": "",
-        }
-
-    if not repo_path or not Path(repo_path).is_dir():
-        return {"error": f"repo_path is not a directory: {repo_path}"}
-
-    repo_root = Path(repo_path).resolve()
-
-    # Phase 5 Polish: apply-time Patch Safety gate covers every op's target.
-    plan_files = [
-        (op.get("relative_path") or op.get("file") or "")
-        for op in plan if isinstance(op, dict)
-    ]
-    patch_safety = evaluate_patch_safety(plan_files, project_root=repo_root)
-    if not patch_safety["ok"]:
-        return {
-            "success": False,
-            "message": "Patch plan blocked by safety gate: " + "; ".join(patch_safety["reasons"]),
-            "diff": "",
-            "validation": "",
-            "risk": None,
-            "validation_command": "",
-            "patch_safety": patch_safety,
-        }
-
-    # Simple repo-level language detection for validation.
-    if (repo_root / "Cargo.toml").exists():
-        lang = "rust"
-    elif (repo_root / "go.mod").exists():
-        lang = "go"
-    elif (repo_root / "package.json").exists():
-        lang = "javascript"
-    elif any(repo_root.glob("*.py")) or any(repo_root.rglob("*.py")):
-        lang = "python"
-    elif (
-        any(repo_root.rglob("*.cs"))
-        or any(repo_root.rglob("*.sln"))
-        or any(repo_root.rglob("*.csproj"))
-    ):
-        lang = "csharp"
-    elif (
-        any(repo_root.rglob("*.cpp"))
-        or any(repo_root.rglob("*.cc"))
-        or any(repo_root.rglob("*.cxx"))
-        or any(repo_root.rglob("*.hpp"))
-        or any(repo_root.rglob("*.hxx"))
-    ):
-        lang = "cpp"
-    else:
-        lang = "unknown"
-
-    validation_command = get_default_validation_command(lang, repo_root)
-
-    result = run_patch_plan_with_artifacts(
-        repo_path,
-        plan,
-        validation_command=validation_command,
-        user_query=request.form.get("query", ""),
-        control_result={"route": "apply_patch_plan"},
-        source="web_apply_patch_plan",
-    )
-
-    # Combine all per-op diffs into one block so the existing Diff tab can render it.
-    combined_diff = "\n\n".join(d for d in result.get("diffs", []) if d)
-    summary = result.get("message") or ""
-    if not result.get("success"):
-        failed = result.get("failed_op") or {}
-        idx = result.get("failed_op_index")
-        err = result.get("error") or "unknown"
-        summary = (
-            f"Plan failed at op #{idx}: {err}\n"
-            f"Failed op: {json.dumps(failed, ensure_ascii=False)[:200]}\n"
-            f"Rollback performed: {result.get('rollback_performed')}"
-        )
-
-    return {
-        "success": result.get("success", False),
-        "message": summary,
-        "diff": combined_diff,
-        "validation": result.get("validation_output", ""),
-        "applied_ops": result.get("applied_ops", []),
-        "rollback_performed": result.get("rollback_performed", False),
-        # Phase 5 Slice 5: risk is not computed for patch_plan flows;
-        # validation_command is, so surface it for the Patch card.
-        "risk": None,
-        "validation_command": validation_command or "",
-        "patch_safety": patch_safety,
     }
 
 @app.route("/undo_patch", methods=["POST"])
@@ -997,6 +623,24 @@ def dream_apply_route():
             })
             continue
 
+        touched = patch_plan_files(plan)
+        patch_safety = evaluate_patch_safety(
+            touched,
+            project_root=Path(repo_path).resolve(),
+        )
+        if not patch_safety["ok"]:
+            results.append({
+                "idx": idx,
+                "title": title,
+                "status": "blocked_by_safety",
+                "message": (
+                    "Dream apply blocked by safety gate: "
+                    + "; ".join(patch_safety["reasons"])
+                ),
+                "patch_safety": patch_safety,
+            })
+            continue
+
         # Apply to real repo and validate again, even though it passed in sandbox.
         language = inspect_repo_inventory(repo_path).get("primary_language", "unknown")
         validation_command = get_default_validation_command(language, Path(repo_path))
@@ -1018,11 +662,7 @@ def dream_apply_route():
             continue
 
         # Stage only the paths this plan touched, then commit.
-        touched = sorted({
-            (op.get("relative_path") or op.get("file") or "")
-            for op in plan
-            if isinstance(op, dict) and (op.get("relative_path") or op.get("file"))
-        })
+        touched = sorted({path for path in touched if path})
         commit_status = "applied (no commit — no touched paths)"
         if touched:
             try:
@@ -1387,105 +1027,6 @@ def generate_candidates():
         "usage": format_usage_report(model_calls),
     }
 
-@app.route("/test_patch", methods=["POST"])
-def test_patch():
-    repo_path = request.form.get("repo_path", "")
-    patch_json = request.form["patch"]
-
-    try:
-        parsed = json.loads(patch_json)
-
-        if isinstance(parsed.get("patch_candidate"), dict):
-            patch = parsed["patch_candidate"]
-        else:
-            patch = parsed
-
-        if "patched_snippet" not in patch:
-            return {
-                "success": False,
-                "message": "No patch_candidate found. Expected top-level patch_candidate or direct patch object.",
-                "diff": "",
-                "validation": "",
-            }
-    except Exception:
-        return {"error": "Invalid patch JSON"}
-
-    if not repo_path or not Path(repo_path).is_dir():
-        return {"error": f"repo_path is not a directory: {repo_path}"}
-
-    # Phase 5 Polish: same Patch Safety gate as /apply_patch. Dry-run uses a
-    # temp clone so the real repo is untouched either way, but rejecting
-    # forbidden targets here means the Patch card shows "blocked" the moment
-    # the user clicks Test, not only when they later click Apply.
-    target_file = patch.get("relative_path") or patch.get("file") or ""
-    patch_safety = evaluate_patch_safety([target_file], project_root=Path(repo_path).resolve())
-    if not patch_safety["ok"]:
-        return {
-            "success": False,
-            "message": "Patch blocked by safety gate: " + "; ".join(patch_safety["reasons"]),
-            "diff": "",
-            "validation": "",
-            "risk": None,
-            "validation_command": "",
-            "patch_safety": patch_safety,
-        }
-
-    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
-        temp_repo = Path(temp_dir) / "repo"
-        shutil.copytree(
-            repo_path,
-            temp_repo,
-            ignore=shutil.ignore_patterns(
-                "target",
-                ".git",
-                ".agent",
-                "__pycache__",
-                ".pytest_cache",
-                ".mypy_cache",
-                "node_modules",
-                "dist",
-                "build",
-                ".venv",
-                "venv",
-                ".env",
-                ".env.*",
-            ),
-        )
-
-        executor = Executor(
-            project_root=str(temp_repo),
-            rollback_on_validation_fail=True,
-        )
-
-        lang = _detect_patch_language(patch)
-        validation_command = get_default_validation_command(lang, temp_repo)
-
-        result = executor.run(
-            patch=patch,
-            language=lang,
-            validation_command=validation_command,
-            dry_run_only=False,
-        )
-
-        # Phase 5 Slice 5: surface risk + validation_command for the Patch card.
-        risk_dict = None
-        if getattr(result, "risk", None):
-            risk_dict = {
-                "level": result.risk.level,
-                "score": result.risk.score,
-                "reasons": list(result.risk.reasons or []),
-            }
-
-        return {
-            "message": result.message,
-            "diff": result.diff,
-            "validation": result.validation_output,
-            "success": result.success,
-            "risk": risk_dict,
-            "validation_command": validation_command or "",
-            "patch_safety": patch_safety,
-        }
-
 @app.route("/render_graph", methods=["POST"])
 def render_graph():
     """Return Mermaid source for the program graph of a repo.
@@ -1748,8 +1289,8 @@ def lessons_list_route():
     """List lessons for the Memory tab.
 
     Query params:
-      - repo_path (optional): scopes to .agent/<project_tag>/lessons/. Defaults
-        to the global .agent/lessons/ if omitted.
+      - repo_path (optional): accepted for backward compatibility; lessons are
+        global-only under .agent/lessons/.
       - status (optional): one of candidate | active | blocked.
     """
     repo_path = _lesson_repo_path(request.values.get("repo_path"))
@@ -1770,7 +1311,8 @@ def lessons_proposal_route():
     """Read proposal.md for a lesson created from proposal artifacts.
 
     Query params:
-      - repo_path (optional): same scope rules as /lessons/list.
+      - repo_path (optional): accepted for backward compatibility; lessons are
+        global-only under .agent/lessons/.
       - lesson_id: lesson record id.
     """
     repo_path = _lesson_repo_path(request.values.get("repo_path"))
@@ -1931,7 +1473,7 @@ def proposals_promote_route():
     Form fields:
       proposal_dir   — path under .agent/proposals/ (path-traversal guarded)
       allow_failed   — "true" to override the validation/apply gate
-      repo_path      — optional, scopes the lesson to .agent/<project_tag>/lessons/
+      repo_path      — optional backward-compat field; lessons are global-only
     """
     from scripts.create_lesson_from_proposal import (
         _resolve_proposal_dir,
