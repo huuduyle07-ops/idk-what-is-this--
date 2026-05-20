@@ -105,12 +105,9 @@ def _validate_forbidden_files(values: list[str] | None) -> list[str]:
     for v in values:
         s = _safe_rel_path(v)
         if s is None:
-            # forbidden_files can be path prefixes like ".agent" — preserve raw
-            text = str(v).strip().replace("\\", "/")
-            if text:
-                if text not in safe:
-                    safe.append(text)
-            continue
+            raise ValueError(
+                f"forbidden_files entry is not a safe relative path: {v!r}"
+            )
         if s not in safe:
             safe.append(s)
     return safe

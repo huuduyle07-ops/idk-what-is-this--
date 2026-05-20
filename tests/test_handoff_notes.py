@@ -109,9 +109,8 @@ def test_create_handoff_note_records_safety_override_when_allowed_overlaps(hando
         handoff_root=handoff_root,
     )
     assert "tests/test_foo.py" in result["meta"]["safety_overrides"]
-    assert "tests/test_foo.py" not in [
-        p for p in result["meta"]["forbidden_files"] if p == "tests/test_foo.py"
-    ]
+    assert "tests" in result["meta"]["safety_overrides"]
+    assert "tests" not in result["meta"]["forbidden_files"]
 
 
 def test_create_handoff_note_rejects_unknown_worker(handoff_root):
@@ -151,6 +150,17 @@ def test_create_handoff_note_rejects_unsafe_allowed_file(handoff_root):
             intended_worker="codex",
             task_type="proposal_only",
             allowed_files=["../escape.txt"],
+            handoff_root=handoff_root,
+        )
+
+
+def test_create_handoff_note_rejects_unsafe_forbidden_file(handoff_root):
+    with pytest.raises(ValueError, match="forbidden_files"):
+        handoff_notes.create_handoff_note(
+            title="t",
+            intended_worker="codex",
+            task_type="proposal_only",
+            forbidden_files=["../escape.txt"],
             handoff_root=handoff_root,
         )
 
