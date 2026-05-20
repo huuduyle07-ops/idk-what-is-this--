@@ -23,33 +23,35 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_HANDOFF_ROOT = PROJECT_ROOT / ".agent" / "handoffs"
 
 
-VALID_WORKERS = {"codex", "claude-code", "gemini", "other"}
-VALID_TASK_TYPES = {
+VALID_WORKERS: frozenset[str] = frozenset({"codex", "claude-code", "gemini", "other"})
+VALID_TASK_TYPES: frozenset[str] = frozenset({
     "proposal_only",
     "review_only",
     "explain_only",
     "benchmark_case",
     "research",
-}
-VALID_STATUSES = {"draft", "ran", "failed", "archived"}
+})
+VALID_STATUSES: frozenset[str] = frozenset({"draft", "ran", "failed", "archived"})
 
-DEFAULT_SAFETY_RULES: list[str] = [
+DEFAULT_SAFETY_RULES: tuple[str, ...] = (
     "proposal only",
     "do not apply patch",
     "do not commit",
     "do not push",
     "do not edit .env/.agent/.git/node_modules/target/tests unless explicitly allowed",
     "return proposal.md and patch_plan.json if possible",
-]
+)
 
-DEFAULT_FORBIDDEN_FILES: list[str] = [
+DEFAULT_FORBIDDEN_FILES: tuple[str, ...] = (
     ".env",
     ".agent",
     ".git",
     "node_modules",
     "target",
+    # blocks external agents from writing or editing test files by default;
+    # operators must list specific test paths in allowed_files to override
     "tests",
-]
+)
 
 
 def _slug(text: str, fallback: str = "handoff") -> str:
