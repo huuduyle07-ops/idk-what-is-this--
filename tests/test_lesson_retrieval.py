@@ -34,35 +34,6 @@ def lessons_repo(tmp_path, monkeypatch):
     return tmp_path
 
 
-@pytest.fixture
-def multi_scope_repo(tmp_path, monkeypatch):
-    """Like `lessons_repo` but maps each `repo_path` to a distinct agent dir,
-    so the scope-union code in `list_active_lessons` is actually exercised.
-
-    Layout:
-      <tmp>/.agent/                  ← global (repo_path falsy)
-      <tmp>/.agent/tag-<sanitized>/  ← per-repo bucket
-    """
-    def fake(repo_path=None):
-        if not repo_path:
-            d = tmp_path / ".agent"
-        else:
-            sanitized = (
-                str(repo_path)
-                .replace("/", "_")
-                .replace("\\", "_")
-                .replace(":", "_")
-            )
-            d = tmp_path / ".agent" / f"tag-{sanitized}"
-        d.mkdir(parents=True, exist_ok=True)
-        return d
-
-    monkeypatch.setattr(lesson_store, "get_agent_dir", fake)
-    monkeypatch.setattr(config_module, "get_agent_dir", fake)
-    monkeypatch.setattr(lesson_store.config, "LESSON_AUTO_ACTIVE", False)
-    return tmp_path
-
-
 def _save_active(
     *,
     case_name=None,
@@ -370,121 +341,6 @@ def test_format_caps_output_at_max_chars(lessons_repo):
     assert text.endswith("…")
 
 
-# --- scope union (global + per-repo) --------------------------------------
-# A lesson saved with no `repo_path` (global bucket) should be visible from
-# any per-repo retrieval call. Per-repo lessons stay isolated to their own
-# scope. Dedup by id; per-repo wins on collision.
-
-
-def _save_active_scoped(
-    *,
-    repo_path,
-    case_name=None,
-    title=None,
-    summary="",
-):
-    rec = lesson_store.save_candidate_lesson(
-        _candidate(),
-        source="manual",
-        case_name=case_name,
-        title=title,
-        summary=summary,
-        repo_path=repo_path,
-    )
-    return lesson_store.promote_lesson(rec["id"], repo_path=repo_path)
-
-
-def test_global_lesson_visible_from_per_repo_scope(multi_scope_repo):
-    """The user's reported case: lesson saved globally must surface when
-    retrieval is called with a specific repo_path."""
-    global_lesson = _save_active_scoped(
-        repo_path=None,
-        case_name="cpp_account_interest",
-        title="Global C++ interest lesson",
-    )
-
-    results = lesson_retrieval.list_active_lessons(repo_path="repoA")
-    ids = [r["id"] for r in results]
-    assert global_lesson["id"] in ids
-
-
-def test_per_repo_lesson_not_visible_from_other_repo(multi_scope_repo):
-    """A repo-scoped lesson must NOT leak into a different repo's scope."""
-    a_lesson = _save_active_scoped(
-        repo_path="repoA",
-        case_name="x",
-        title="Only-for-A lesson",
-    )
-
-    results = lesson_retrieval.list_active_lessons(repo_path="repoB")
-    ids = [r["id"] for r in results]
-    assert a_lesson["id"] not in ids
-
-
-def test_per_repo_lesson_visible_in_own_scope(multi_scope_repo):
-    a_lesson = _save_active_scoped(
-        repo_path="repoA",
-        case_name="x",
-        title="Only-for-A lesson",
-    )
-
-    results = lesson_retrieval.list_active_lessons(repo_path="repoA")
-    ids = [r["id"] for r in results]
-    assert a_lesson["id"] in ids
-
-
-def test_global_and_per_repo_lessons_both_returned(multi_scope_repo):
-    global_lesson = _save_active_scoped(
-        repo_path=None, case_name="global_case", title="Global"
-    )
-    repo_lesson = _save_active_scoped(
-        repo_path="repoX", case_name="repo_case", title="Repo X only"
-    )
-
-    results = lesson_retrieval.list_active_lessons(repo_path="repoX")
-    ids = {r["id"] for r in results}
-    assert global_lesson["id"] in ids
-    assert repo_lesson["id"] in ids
-
-
-def test_global_only_visible_when_no_repo_path(multi_scope_repo):
-    """Querying the global scope must NOT pick up per-repo lessons."""
-    global_lesson = _save_active_scoped(
-        repo_path=None, case_name="global_case", title="Global"
-    )
-    repo_lesson = _save_active_scoped(
-        repo_path="repoX", case_name="repo_case", title="Repo X only"
-    )
-
-    results = lesson_retrieval.list_active_lessons(repo_path=None)
-    ids = {r["id"] for r in results}
-    assert global_lesson["id"] in ids
-    assert repo_lesson["id"] not in ids
-
-
-def test_dedup_by_id_per_repo_wins_on_collision(multi_scope_repo):
-    """If the same id exists in both buckets (e.g., a synced copy), the
-    per-repo record is returned and the global one is dropped."""
-    # Save a global lesson, then write a tampered copy of the same id into
-    # the per-repo bucket with a different title to detect which won.
-    global_lesson = _save_active_scoped(
-        repo_path=None, case_name="dup_case", title="Global version"
-    )
-
-    repo_dir = multi_scope_repo / ".agent" / "tag-repoR" / "lessons" / "active"
-    repo_dir.mkdir(parents=True, exist_ok=True)
-    repo_copy = dict(global_lesson)
-    repo_copy["title"] = "Repo version"
-    (repo_dir / f"{global_lesson['id']}.json").write_text(
-        json.dumps(repo_copy), encoding="utf-8"
-    )
-
-    results = lesson_retrieval.list_active_lessons(repo_path="repoR")
-    matches = [r for r in results if r["id"] == global_lesson["id"]]
-    assert len(matches) == 1
-    assert matches[0]["title"] == "Repo version"
-
-
 # --- tag scoring (Phase 6.2.2) --------------------------------------------
 
 
@@ -602,20 +458,3 @@ def test_tag_score_below_case_name_score(lessons_repo):
     )
 
     assert results[0]["id"] == case_lesson["id"]
-
-
-def test_find_active_lessons_unions_scopes(multi_scope_repo):
-    """find_active_lessons inherits the union semantics from list_active_lessons."""
-    global_lesson = _save_active_scoped(
-        repo_path=None,
-        case_name="cpp_account_interest",
-        title="Patch proposal: cpp_account_interest",
-        summary="Fix the compound interest calculation by adding validation.",
-    )
-
-    results = lesson_retrieval.find_active_lessons(
-        repo_path="repoR",
-        query="Fix the C++ compound interest bug",
-    )
-    ids = [r["id"] for r in results]
-    assert global_lesson["id"] in ids

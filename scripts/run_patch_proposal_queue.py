@@ -577,9 +577,16 @@ def _process_item(
         if metadata_issue:
             return {"case_name": case_name, "status": "proposal_blocked", "reason": metadata_issue}
 
-        from patching.patch_plan_executor import apply_patch_plan
+        from core.run_lifecycle import run_patch_plan_with_artifacts
 
-        apply_result = apply_patch_plan(str(temp_repo), plan, validation_command=None)
+        apply_result = run_patch_plan_with_artifacts(
+            str(temp_repo),
+            plan,
+            validation_command=None,
+            user_query=str(item.get("title") or case.get("prompt") or case_name),
+            control_result={"item": item, "case": case, "proposal": payload},
+            source="proposal_queue",
+        )
         _write_json(item_dir / "apply_result.json", apply_result)
         diff_text = "\n\n".join(str(diff) for diff in (apply_result.get("diffs") or []) if diff)
         (item_dir / "diff.patch").write_text(diff_text, encoding="utf-8")

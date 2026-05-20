@@ -54,3 +54,4 @@ benchmarks/reports/
 benchmarks/tmp/
 .agent/benchmarks/
 .tmp
+.superpowers

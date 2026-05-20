@@ -22,6 +22,7 @@ from agents.deepseek_client import run_deepseek_review
 from config import LANGUAGE_MAP, get_agent_dir, FOLDER_BLACKLIST
 from core.project_tag import build_project_tag, fingerprint_repo  # re-exported for legacy callers
 from core.repo_librarian import inspect_repo_inventory
+from core.run_lifecycle import run_patch_plan_with_artifacts
 from core.sleeping_consultant import (
     run_overnight,
     start_overnight_async,
@@ -439,8 +440,6 @@ def apply_patch():
 @app.route("/test_patch_plan", methods=["POST"])
 def test_patch_plan():
     """Dry-run a multi-op patch_plan in a temp clone, then validate."""
-    from patching.patch_plan_executor import apply_patch_plan
-
     repo_path = request.form.get("repo_path", "")
     patch_json = request.form.get("patch", "")
     patch_style = request.form.get("patch_style", "")
@@ -538,10 +537,13 @@ def test_patch_plan():
 
         validation_command = get_default_validation_command(lang, temp_repo)
 
-        result = apply_patch_plan(
+        result = run_patch_plan_with_artifacts(
             str(temp_repo),
             plan,
             validation_command=validation_command,
+            user_query=request.form.get("query", ""),
+            control_result={"route": "test_patch_plan"},
+            source="web_test_patch_plan",
         )
 
         combined_diff = "\n\n".join(d for d in result.get("diffs", []) if d)
@@ -574,8 +576,6 @@ def test_patch_plan():
 @app.route("/apply_patch_plan", methods=["POST"])
 def apply_patch_plan_route():
     """Apply a multi-op patch_plan (used by balanced/vibe styles)."""
-    from patching.patch_plan_executor import apply_patch_plan
-
     repo_path = request.form.get("repo_path", "")
     patch_json = request.form.get("patch", "")
     apply_policy = request.form.get("apply_policy", "ask")
@@ -662,10 +662,13 @@ def apply_patch_plan_route():
 
     validation_command = get_default_validation_command(lang, repo_root)
 
-    result = apply_patch_plan(
+    result = run_patch_plan_with_artifacts(
         repo_path,
         plan,
         validation_command=validation_command,
+        user_query=request.form.get("query", ""),
+        control_result={"route": "apply_patch_plan"},
+        source="web_apply_patch_plan",
     )
 
     # Combine all per-op diffs into one block so the existing Diff tab can render it.
@@ -898,7 +901,6 @@ def dream_apply_route():
 
     `selection`: '1', '1,2', or 'all'.
     """
-    from patching.patch_plan_executor import apply_patch_plan
     import subprocess
 
     repo_path = request.form.get("repo_path", "").strip()
@@ -999,10 +1001,13 @@ def dream_apply_route():
         language = inspect_repo_inventory(repo_path).get("primary_language", "unknown")
         validation_command = get_default_validation_command(language, Path(repo_path))
 
-        result = apply_patch_plan(
+        result = run_patch_plan_with_artifacts(
             repo_path,
             plan,
             validation_command=validation_command or None,
+            user_query=title,
+            control_result={"route": "dream_apply", "idx": idx, "title": title},
+            source="web_dream_apply",
         )
         if not result.get("success"):
             results.append({

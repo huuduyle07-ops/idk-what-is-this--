@@ -1,7 +1,10 @@
 """Phase 6.0: persistent storage for lesson candidates.
 
-Saves lesson records as JSON under `.agent/<project_tag>/lessons/<bucket>/<id>.json`
-after running them through `core.lesson_quality.evaluate_lesson_candidate`.
+Saves lesson records as JSON under `.agent/lessons/<bucket>/<id>.json` in the
+AI project's own agent dir — never per-analyzed-repo — after running them
+through `core.lesson_quality.evaluate_lesson_candidate`. Lessons are
+org-wide knowledge; `repo_path` arguments are accepted for API stability
+but ignored when resolving the storage root.
 
 Storage is intentionally separate from retrieval. Phase 6.0 only persists records
 and exposes promote/block controls; 6.2 will add the read-only retrieval helper
@@ -62,7 +65,11 @@ def _now_iso() -> str:
 
 
 def _lessons_root(repo_path: str | None = None) -> Path:
-    root = get_agent_dir(repo_path) / "lessons"
+    # Lessons are always stored in the AI project's own .agent/lessons/,
+    # not under .agent/<target_tag>/, so indexing a target repo doesn't
+    # pollute its workspace. `repo_path` is accepted for API compatibility
+    # but intentionally ignored.
+    root = get_agent_dir(None) / "lessons"
     for bucket in _BUCKET_DIRS.values():
         (root / bucket).mkdir(parents=True, exist_ok=True)
     return root

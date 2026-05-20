@@ -32,6 +32,7 @@ from core.prompter import (
 )
 from core.retriever import retrieve_context
 from core.router import should_auto_patch, should_use_retriever
+from core.run_lifecycle import run_patch_plan_with_artifacts
 from core.security import is_safe_path
 from core.self_correct_loop import run_self_correct_loop
 from core.validation_command import (
@@ -51,7 +52,6 @@ from patching.patch_gates import (
     get_confidence_and_escalation,
     reject_schema_drift,
 )
-from patching.patch_plan_executor import apply_patch_plan
 from policy.decision_helper import build_patch_policy
 
 
@@ -622,10 +622,13 @@ def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
             or None
         )
         print("🧩 Grounded patch_plan detected → running patch_plan_executor")
-        result = apply_patch_plan(
+        result = run_patch_plan_with_artifacts(
             str(project_root),
             plan,
             validation_command=validation_command,
+            user_query=state.user_input,
+            control_result=state.control_result,
+            source="pipeline",
         )
         combined_diff = "\n\n".join(result.get("diffs", []) or [])
         try:

@@ -13,9 +13,9 @@ from core.feature_context import maybe_enrich_with_scout
 from core.json_utils import extract_json_block
 from core.lesson_quality import evaluate_lesson_candidate
 from core.repo_librarian import inspect_repo_inventory
+from core.run_lifecycle import run_patch_plan_with_artifacts
 from core.source_snippet_fallback import hydrate_control_source_from_scout
 from agents.gemini_client import run_gemini_request_2
-from patching.patch_plan_executor import apply_patch_plan
 from core import dream_artifacts
 
 
@@ -344,8 +344,13 @@ def _run_patch_item(
             shutil.copytree(repo_path, temp_repo, ignore=_IGNORE)
 
             validation = _validation_command(temp_repo)
-            result = apply_patch_plan(
-                str(temp_repo), plan, validation_command=validation,
+            result = run_patch_plan_with_artifacts(
+                str(temp_repo),
+                plan,
+                validation_command=validation,
+                user_query=str(item.get("title") or item.get("hint") or ""),
+                control_result={"dream_item": item, "patch": patch},
+                source="dream_patch_if_safe",
             )
 
         # Persist artifacts regardless of success
@@ -748,10 +753,13 @@ def _revalidate_ready_to_apply_item(
         shutil.copytree(repo_path, temp_repo, ignore=_IGNORE)
 
         validation = _validation_command(temp_repo)
-        result = apply_patch_plan(
+        result = run_patch_plan_with_artifacts(
             str(temp_repo),
             plan,
             validation_command=validation,
+            user_query=str(item.get("title") or item.get("summary") or ""),
+            control_result={"dream_item": item},
+            source="dream_revalidation",
         )
 
     changed_files = _changed_files_from_patch_plan(plan)

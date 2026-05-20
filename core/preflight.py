@@ -85,6 +85,11 @@ def detect_default_preflight_command(language: str, project_root: Path) -> str:
         if (project_root / "main.py").exists():
             return "python main.py"
 
+        # Web app entry point (Flask/FastAPI/etc.) — use import check so we
+        # validate module load without starting a server that would hang.
+        if (project_root / "app.py").exists():
+            return 'python -c "import app"'
+
         return "python -m unittest"
 
     return ""

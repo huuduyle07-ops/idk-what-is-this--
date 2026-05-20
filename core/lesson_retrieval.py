@@ -10,7 +10,6 @@ from __future__ import annotations
 import re
 from typing import Any
 
-import config
 from core.lesson_store import STATUS_ACTIVE, list_lessons
 
 
@@ -86,54 +85,30 @@ def _tokenize_query(query: str | None) -> list[str]:
 def list_active_lessons(repo_path: str | None = None) -> list[dict]:
     """Return active, retrieval-eligible lessons.
 
-    Scope union (Phase 6.2 extension): when `repo_path` is set and resolves
-    to a per-repo `.agent/<tag>/` directory, this also reads the global
-    `.agent/lessons/active/` bucket and unions the results (deduped by id,
-    per-repo wins on collision). Lessons saved without `--repo-path` are
-    treated as org-wide knowledge available from any repo. When `repo_path`
-    is None (or already maps to the global agent dir), only the global
-    bucket is read — no cross-repo leakage.
+    Lessons live in a single global bucket (`.agent/lessons/active/`) in the
+    AI project's own agent dir; `repo_path` is accepted for API stability
+    but does not change the read scope.
 
     Defensive double-check: filters anything where `status != "active"` or
     top-level `active_knowledge_allowed` is not True. The storage layer
     enforces the invariant, but a corrupted file or future bug must not
     leak a candidate or tampered record into context.
     """
-    primary_dir = _resolve_agent_dir(repo_path)
-    global_dir = _resolve_agent_dir(None)
-
-    sources: list[list[dict]] = [
-        list_lessons(status=STATUS_ACTIVE, repo_path=repo_path),
-    ]
-    if primary_dir != global_dir:
-        sources.append(list_lessons(status=STATUS_ACTIVE, repo_path=None))
-
-    seen_ids: set[str] = set()
     out: list[dict] = []
-    for source in sources:
-        for record in source:
-            if not isinstance(record, dict):
-                continue
-            if record.get("status") != STATUS_ACTIVE:
-                continue
-            if record.get("active_knowledge_allowed") is not True:
-                continue
-            lesson_id = record.get("id")
-            if not isinstance(lesson_id, str) or lesson_id in seen_ids:
-                continue
-            seen_ids.add(lesson_id)
-            out.append(record)
+    seen_ids: set[str] = set()
+    for record in list_lessons(status=STATUS_ACTIVE, repo_path=repo_path):
+        if not isinstance(record, dict):
+            continue
+        if record.get("status") != STATUS_ACTIVE:
+            continue
+        if record.get("active_knowledge_allowed") is not True:
+            continue
+        lesson_id = record.get("id")
+        if not isinstance(lesson_id, str) or lesson_id in seen_ids:
+            continue
+        seen_ids.add(lesson_id)
+        out.append(record)
     return out
-
-
-def _resolve_agent_dir(repo_path: str | None):
-    """Resolve to a comparable path. Falls back to a sentinel string if
-    config.get_agent_dir raises so a config failure doesn't bring down
-    retrieval."""
-    try:
-        return config.get_agent_dir(repo_path).resolve()
-    except Exception:
-        return f"<unresolved:{repo_path!r}>"
 
 
 def find_active_lessons(
