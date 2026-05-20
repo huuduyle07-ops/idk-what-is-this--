@@ -1056,13 +1056,15 @@ Brain Stamp plus Phase 4.5 Levels 1-3 CLI MVP shipped: reporter, Dream planner, 
 Phase 6 manual-safe memory loop shipped (2026-05-17): bucketed lesson storage, Memory tab promote/block UI,
   active-only retrieval with tags + per-repo/global scope union, CONTROL prompt injection behind
   LESSON_RETRIEVAL_ENABLED, manual proposal→lesson CLI. Auto-creation (Phase 6.4) still deferred.
+Phase 7.1 Mayor Mode handoff + optional subagent runner shipped (2026-05-21): pure storage handoff notes under .agent/handoffs/, temp-clone subprocess runner, memory-tab UI panel.
 Next: prompt-version quantifier / Patch Safety gate / held-out eval, then optionally Phase 6.4 auto-creation. Benchmark run buttons + Add Case clerk are now shipped; remaining Benchmark polish is category/language batch + report density.
 Do not add MCTS yet — require a 10-case mini-experiment first.
 ```
 
 ---
 
-## Phase 7.1 — Mayor Mode handoff + optional subagent runner (planned 2026-05-20)
+## Phase 7.1 — Mayor Mode handoff + optional subagent runner (shipped 2026-05-21)
+
 
 Spec: `docs/superpowers/specs/2026-05-20-phase-7-1-mayor-mode-design.md`
 Plan: `docs/superpowers/plans/2026-05-20-phase-7-1-mayor-mode.md`

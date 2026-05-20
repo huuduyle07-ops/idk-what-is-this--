@@ -520,12 +520,54 @@ def _write_json(path: Path, data: Any) -> None:
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def _maybe_create_lesson_candidate(
+    *,
+    item_dir: Path,
+    item: dict[str, Any],
+    apply_result: dict[str, Any],
+    validation: dict[str, Any],
+    create_lesson_candidates: bool,
+) -> dict[str, Any]:
+    if not create_lesson_candidates:
+        return {}
+    if item.get("human_approved_for_proposal") is not True:
+        return {}
+    if apply_result.get("success") is not True:
+        return {}
+    if validation.get("validation_ok") is not True:
+        return {}
+
+    source_report = str(item_dir)
+    from core.lesson_store import find_lesson_by_source_report
+
+    existing = find_lesson_by_source_report("patch_proposal", source_report)
+    if existing:
+        return {
+            "lesson_candidate_created": False,
+            "lesson_already_exists": True,
+            "lesson_message": "lesson already exists",
+            "lesson_id": existing.get("id"),
+            "lesson_status": existing.get("status"),
+        }
+
+    from scripts.create_lesson_from_proposal import create_lesson_from_proposal
+
+    lesson = create_lesson_from_proposal(item_dir)
+    return {
+        "lesson_candidate_created": True,
+        "lesson_already_exists": False,
+        "lesson_id": lesson.get("id"),
+        "lesson_status": lesson.get("status"),
+    }
+
+
 def _process_item(
     *,
     item: dict[str, Any],
     idx: int,
     run_dir: Path,
     validation_timeout_sec: int,
+    create_lesson_candidates: bool = False,
 ) -> dict[str, Any]:
     case_name = str(item.get("case_name") or "").strip()
     item_dir = run_dir / f"{idx:02d}-{_slug(case_name)}"
@@ -618,13 +660,32 @@ def _process_item(
         )
         (item_dir / "proposal.md").write_text(proposal_md, encoding="utf-8")
 
-        return {
+        result = {
             "case_name": case_name,
             "status": "proposal_validated" if validation.get("validation_ok") else "proposal_validation_failed",
             "validation_ok": validation.get("validation_ok"),
             "artifact_dir": str(item_dir),
             "changed_files": _plan_paths(plan),
         }
+        if validation.get("validation_ok") is True:
+            try:
+                result.update(
+                    _maybe_create_lesson_candidate(
+                        item_dir=item_dir,
+                        item=item,
+                        apply_result=apply_result,
+                        validation=validation,
+                        create_lesson_candidates=create_lesson_candidates,
+                    )
+                )
+            except Exception as exc:
+                result.update(
+                    {
+                        "lesson_candidate_created": False,
+                        "lesson_error": f"{type(exc).__name__}: {exc}",
+                    }
+                )
+        return result
 
 
 def _normalize_text(value: Any, fallback: str = "") -> str:
@@ -840,7 +901,20 @@ def render_summary_markdown(summary: dict[str, Any]) -> str:
         lines.append("- No items processed.")
     else:
         for item in processed:
-            lines.append(f"- `{item.get('case_name')}`: `{item.get('status')}`")
+            lesson_bits = ""
+            if item.get("lesson_already_exists"):
+                lesson_bits = (
+                    f" - lesson already exists: `{item.get('lesson_id')}` "
+                    f"({item.get('lesson_status')})"
+                )
+            elif item.get("lesson_candidate_created"):
+                lesson_bits = (
+                    f" - lesson created: `{item.get('lesson_id')}` "
+                    f"({item.get('lesson_status')})"
+                )
+            elif item.get("lesson_error"):
+                lesson_bits = f" - lesson error: `{item.get('lesson_error')}`"
+            lines.append(f"- `{item.get('case_name')}`: `{item.get('status')}`{lesson_bits}")
     lines.extend(["", "## Skipped", ""])
     skipped = summary.get("skipped") or []
     if not skipped:
@@ -871,6 +945,15 @@ def main() -> int:
     parser.add_argument("--max-items", type=int, default=1)
     parser.add_argument("--plan", help="Optional background_dream_plan_*.json path.")
     parser.add_argument("--validation-timeout-sec", type=int, default=60)
+    parser.add_argument(
+        "--create-lesson-candidates",
+        action="store_true",
+        help=(
+            "After a human-approved proposal applies and validates in the "
+            "isolated benchmark repo, create an idempotent candidate lesson "
+            "from its proposal artifacts."
+        ),
+    )
     args = parser.parse_args()
 
     plan_path = Path(args.plan).resolve() if args.plan else _latest_plan()
@@ -907,6 +990,7 @@ def main() -> int:
             "automatic_apply": False,
             "approval_required": True,
             "validation_source": "benchmark case metadata only",
+            "create_lesson_candidates": bool(args.create_lesson_candidates),
         },
     }
 
@@ -928,6 +1012,7 @@ def main() -> int:
                 idx=idx,
                 run_dir=run_dir,
                 validation_timeout_sec=args.validation_timeout_sec,
+                create_lesson_candidates=args.create_lesson_candidates,
             )
         except Exception as exc:
             result = {
@@ -936,6 +1021,19 @@ def main() -> int:
                 "reason": repr(exc),
             }
         summary["processed"].append(result)
+        print(f"{result.get('case_name')}: {result.get('status')}")
+        if result.get("lesson_already_exists"):
+            print(
+                "  lesson already exists: "
+                f"id={result.get('lesson_id')} status={result.get('lesson_status')}"
+            )
+        elif result.get("lesson_candidate_created"):
+            print(
+                "  created lesson: "
+                f"id={result.get('lesson_id')} status={result.get('lesson_status')}"
+            )
+        elif result.get("lesson_error"):
+            print(f"  lesson error: {result.get('lesson_error')}")
 
     if len(safe_items) > max_items:
         for item in safe_items[max_items:]:

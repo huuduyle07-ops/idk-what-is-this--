@@ -242,3 +242,29 @@ def test_update_handoff_status_rejects_unknown_status(handoff_root):
     result = _create(handoff_root, title="status-bad")
     with pytest.raises(ValueError, match="status"):
         handoff_notes.update_handoff_status(result["path"], "weird", handoff_root=handoff_root)
+
+def test_create_handoff_cli_writes_a_note(tmp_path, monkeypatch, capsys):
+    from scripts import create_handoff_note as cli
+
+    monkeypatch.setattr(handoff_notes, "DEFAULT_HANDOFF_ROOT", tmp_path / "handoffs")
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "create_handoff_note.py",
+            "--title", "CLI test",
+            "--worker", "codex",
+            "--task-type", "proposal_only",
+            "--context-summary", "from CLI",
+            "--validation-command", "echo ok",
+            "--allowed-file", "core/foo.py",
+            "--allowed-file", "tests/test_foo.py",
+        ],
+    )
+    rc = cli.main()
+    assert rc == 0
+
+    listing = handoff_notes.list_handoff_notes(handoff_root=tmp_path / "handoffs")
+    assert len(listing) == 1
+    assert listing[0]["title"] == "CLI test"
+    captured = capsys.readouterr()
+    assert "handoffs" in captured.out

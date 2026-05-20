@@ -2041,6 +2041,128 @@ def upload_folder():
         **inventory,
     }
 
+# --- Phase 7.1: Mayor Mode handoff routes ---------------------------------
+from core import handoff_notes as _handoff_notes
+from scripts import run_subagent_handoff as _handoff_runner
+
+
+def _split_csv(value: str | None) -> list[str]:
+    if not value:
+        return []
+    out: list[str] = []
+    for chunk in value.split(","):
+        s = chunk.strip()
+        if s and s not in out:
+            out.append(s)
+    return out
+
+
+@app.route("/handoffs/create", methods=["POST"])
+def handoffs_create_route():
+    try:
+        result = _handoff_notes.create_handoff_note(
+            title=request.form.get("title", ""),
+            intended_worker=request.form.get("intended_worker", ""),
+            task_type=request.form.get("task_type", ""),
+            repo_path=(request.form.get("repo_path") or "").strip() or None,
+            allowed_files=_split_csv(request.form.get("allowed_files")),
+            forbidden_files=_split_csv(request.form.get("forbidden_files")),
+            validation_command=(request.form.get("validation_command") or "").strip() or None,
+            context_summary=request.form.get("context_summary", ""),
+            expected_output=request.form.get("expected_output", ""),
+            extra_safety_rules=_split_csv(request.form.get("extra_safety_rules")),
+        )
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    return {
+        "ok": True,
+        "handoff_path": result["path"],
+        "slug": result["slug"],
+        "meta": result["meta"],
+    }
+
+
+@app.route("/handoffs/list", methods=["GET"])
+def handoffs_list_route():
+    include_archived = (request.values.get("include_archived") or "").lower() == "true"
+    try:
+        notes = _handoff_notes.list_handoff_notes(include_archived=include_archived)
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    return {"ok": True, "handoffs": notes}
+
+
+@app.route("/handoffs/run", methods=["POST"])
+def handoffs_run_route():
+    handoff_path = (request.form.get("handoff_path") or "").strip()
+    if not handoff_path:
+        return {"ok": False, "error": "handoff_path is required"}, 400
+    allow_run = (request.form.get("allow_run") or "").lower() == "true"
+    worker = (request.form.get("worker") or "").strip() or None
+    worker_command = (request.form.get("worker_command") or "").strip() or None
+    try:
+        timeout_sec = int(request.form.get("timeout_sec") or _handoff_runner.DEFAULT_TIMEOUT_SEC)
+    except ValueError:
+        return {"ok": False, "error": "timeout_sec must be an integer"}, 400
+    try:
+        result = _handoff_runner.run_handoff(
+            note_path=handoff_path,
+            allow_run=allow_run,
+            worker_override=worker,
+            worker_command_override=worker_command,
+            timeout_sec=timeout_sec,
+        )
+    except (ValueError, FileNotFoundError) as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    return {
+        "ok": True,
+        "dry_run": result.get("dry_run"),
+        "artifact_dir": result.get("artifact_dir"),
+        "exit_code": result.get("exit_code"),
+        "timed_out": result.get("timed_out"),
+        "error": result.get("error"),
+        "run": result,
+    }
+
+
+@app.route("/worker-runs/list", methods=["GET"])
+def worker_runs_list_route():
+    root = _handoff_runner.WORKER_RUNS_ROOT
+    if not root.is_dir():
+        return {"ok": True, "runs": []}
+    runs: list[dict] = []
+    try:
+        dirs = sorted([d for d in root.iterdir() if d.is_dir()], reverse=True)
+    except OSError as e:
+        return {"ok": False, "error": str(e)}, 500
+    for d in dirs[:50]:
+        record_path = d / "worker_run.json"
+        if not record_path.is_file():
+            continue
+        try:
+            record = json.loads(record_path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        runs.append({
+            "artifact_dir": str(d),
+            "name": d.name,
+            "dry_run": record.get("dry_run"),
+            "worker": record.get("worker"),
+            "exit_code": record.get("exit_code"),
+            "timed_out": record.get("timed_out"),
+            "duration_sec": record.get("duration_sec"),
+            "command": record.get("command"),
+            "handoff_path": record.get("handoff_path"),
+            "started_at": record.get("started_at"),
+            "finished_at": record.get("finished_at"),
+            "error": record.get("error"),
+        })
+    return {"ok": True, "runs": runs}
+
 @app.route("/local_critique", methods=["POST"])
 def local_critique():
     import os

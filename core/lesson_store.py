@@ -382,6 +382,30 @@ def list_lessons(
     return records
 
 
+def find_lesson_by_source_report(
+    source: str,
+    source_report: str,
+    repo_path: str | None = None,
+) -> dict | None:
+    """Return the newest lesson matching `source` and `source_report`.
+
+    Searches candidate, active, and blocked buckets via `list_lessons`, so it
+    can be used as an idempotency guard before creating source-derived lessons.
+    """
+    if not isinstance(source, str) or not source.strip():
+        return None
+    if not isinstance(source_report, str) or not source_report.strip():
+        return None
+
+    for lesson in list_lessons(repo_path=repo_path):
+        if (
+            lesson.get("source") == source
+            and lesson.get("source_report") == source_report
+        ):
+            return lesson
+    return None
+
+
 def promote_lesson(lesson_id: str, repo_path: str | None = None) -> dict:
     """Move a candidate lesson to active.
 

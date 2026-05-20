@@ -395,6 +395,79 @@
             </div>
           </div>
 
+          <!-- Phase 7.1: Mayor Mode handoff panel.
+               Default = create note only. Running a subagent requires explicit opt-in
+               via the "Allow running subagent in temp clone" checkbox. The real repo
+               is never modified. Artifacts land in .agent/worker_runs/<run>/. -->
+          <div class="memory-section handoffs-section">
+            <div class="proposals-header">
+              <h3>Mayor Mode (Handoffs)</h3>
+              <button type="button" class="memory-refresh" onclick="refreshHandoffs()"
+                      title="Re-scan .agent/handoffs/">⟳ Refresh</button>
+            </div>
+            <div class="proposals-note">
+              Create a bounded handoff note for an external coding agent.
+              <strong>Default = note only.</strong> Running the agent is opt-in,
+              happens in a temp clone, and never modifies the real repo.
+            </div>
+
+            <details class="handoff-create">
+              <summary>+ Create new handoff</summary>
+              <div class="handoff-create__body">
+                <label>Title
+                  <input type="text" id="handoffTitle" placeholder="Fix flaky fixtures in foo">
+                </label>
+                <label>Worker
+                  <select id="handoffWorker">
+                    <option value="codex">codex</option>
+                    <option value="claude-code">claude-code</option>
+                    <option value="gemini">gemini</option>
+                    <option value="other">other</option>
+                  </select>
+                </label>
+                <label>Task type
+                  <select id="handoffTaskType">
+                    <option value="proposal_only">proposal_only</option>
+                    <option value="review_only">review_only</option>
+                    <option value="explain_only">explain_only</option>
+                    <option value="benchmark_case">benchmark_case</option>
+                    <option value="research">research</option>
+                  </select>
+                </label>
+                <label>Allowed files (comma-separated, relative)
+                  <input type="text" id="handoffAllowed" placeholder="core/foo.py,tests/test_foo.py">
+                </label>
+                <label>Validation command (optional)
+                  <input type="text" id="handoffValidation" placeholder="python -m pytest tests/test_foo.py -v">
+                </label>
+                <label>Context summary
+                  <textarea id="handoffContext" rows="4" placeholder="What does the agent need to know?"></textarea>
+                </label>
+                <label>Expected output
+                  <textarea id="handoffExpected" rows="2" placeholder="proposal.md and patch_plan.json"></textarea>
+                </label>
+                <label class="handoff-allow-run">
+                  <input type="checkbox" id="handoffAllowRun">
+                  Allow running subagent in temp clone
+                </label>
+                <div class="handoff-warning">
+                  ⚠ Running may consume Claude/Codex quota. It will not apply changes
+                  to the real repo.
+                </div>
+                <div class="handoff-actions">
+                  <button type="button" onclick="createHandoff(false)">Create handoff</button>
+                  <button type="button" onclick="createHandoff(true)">Create + Run (in temp clone)</button>
+                </div>
+                <div id="handoffCreateStatus" class="proposals-status"></div>
+              </div>
+            </details>
+
+            <div id="handoffsStatus" class="proposals-status"></div>
+            <div id="handoffsList" class="proposals-list">
+              <div class="health-empty">Click ⟳ Refresh to load handoffs.</div>
+            </div>
+          </div>
+
           <!-- Phase 6.1: Lessons (Context Poisoning Guard storage) -->
           <div class="memory-section lessons-section">
             <div class="lessons-header">
@@ -2081,6 +2154,118 @@ function promoteProposalToLesson(proposalDir, allowFailed) {
         });
 }
 
+// Phase 7.1 — Handoffs (Mayor Mode)
+async function refreshHandoffs() {
+    const status = document.getElementById("handoffsStatus");
+    const list = document.getElementById("handoffsList");
+    if (status) status.textContent = "Loading handoffs...";
+    try {
+        const resp = await fetch("/handoffs/list");
+        const body = await resp.json();
+        if (!body.ok) {
+            if (status) status.textContent = "Error: " + (body.error || "unknown");
+            return;
+        }
+        if (!list) return;
+        if (!body.handoffs || body.handoffs.length === 0) {
+            list.innerHTML = '<div class="health-empty">No handoffs yet. Use the form above to create one.</div>';
+            if (status) status.textContent = "";
+            return;
+        }
+        list.innerHTML = body.handoffs.map(h => `
+            <div class="handoff-item" data-path="${_escapeHtml(h.path)}" style="margin-bottom: 12px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; background: #f8fafc;">
+                <div class="handoff-item__head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <strong>${_escapeHtml(h.title || "(untitled)")}</strong>
+                    <span class="handoff-item__status handoff-item__status--${_escapeHtml(h.status || "draft")}" style="padding:2px 6px; font-size:11px; border-radius:4px; font-weight:bold; background:#e2e8f0; color:#475569;">${_escapeHtml(h.status || "draft")}</span>
+                </div>
+                <div class="handoff-item__meta" style="font-size:12px; color:#64748b; margin-bottom:8px;">
+                    worker: <code>${_escapeHtml(h.intended_worker || "?")}</code>
+                    · task: <code>${_escapeHtml(h.task_type || "?")}</code>
+                    · ${_escapeHtml(h.created_at || "")}
+                </div>
+                <div class="handoff-item__actions" style="display:flex; gap:8px;">
+                    <button type="button" class="lesson-btn--secondary" onclick="runHandoff('${_escapeHtml(h.path).replace(/'/g, "\\'")}', false)">Show command (dry run)</button>
+                    <button type="button" onclick="runHandoff('${_escapeHtml(h.path).replace(/'/g, "\\'")}', true)">Run in temp clone</button>
+                </div>
+            </div>
+        `).join("");
+        if (status) status.textContent = `${body.handoffs.length} handoff(s).`;
+    } catch (e) {
+        if (status) status.textContent = "Error: " + e.message;
+    }
+}
+
+async function createHandoff(thenRun) {
+    const title = document.getElementById("handoffTitle").value.trim();
+    const worker = document.getElementById("handoffWorker").value;
+    const taskType = document.getElementById("handoffTaskType").value;
+    const allowed = document.getElementById("handoffAllowed").value.trim();
+    const validation = document.getElementById("handoffValidation").value.trim();
+    const context = document.getElementById("handoffContext").value;
+    const expected = document.getElementById("handoffExpected").value;
+    const allowRunChecked = document.getElementById("handoffAllowRun").checked;
+    const status = document.getElementById("handoffCreateStatus");
+
+    if (!title) { if (status) status.textContent = "Title is required."; return; }
+
+    if (thenRun && !allowRunChecked) {
+        if (status) status.textContent = "Refusing: tick \"Allow running subagent in temp clone\" first.";
+        return;
+    }
+
+    if (status) status.textContent = "Creating handoff...";
+    try {
+        const fd = new FormData();
+        fd.append("title", title);
+        fd.append("intended_worker", worker);
+        fd.append("task_type", taskType);
+        if (allowed) fd.append("allowed_files", allowed);
+        if (validation) fd.append("validation_command", validation);
+        if (context) fd.append("context_summary", context);
+        if (expected) fd.append("expected_output", expected);
+        const resp = await fetch("/handoffs/create", { method: "POST", body: fd });
+        const body = await resp.json();
+        if (!body.ok) {
+            if (status) status.textContent = "Error: " + (body.error || "unknown");
+            return;
+        }
+        if (status) status.textContent = "Created: " + body.handoff_path;
+
+        if (thenRun) {
+            await runHandoff(body.handoff_path, true);
+        }
+        refreshHandoffs();
+    } catch (e) {
+        if (status) status.textContent = "Error: " + e.message;
+    }
+}
+
+async function runHandoff(handoffPath, allowRun) {
+    const status = document.getElementById("handoffsStatus");
+    if (status) status.textContent = allowRun ? "Running in temp clone..." : "Resolving command...";
+    try {
+        const fd = new FormData();
+        fd.append("handoff_path", handoffPath);
+        fd.append("allow_run", allowRun ? "true" : "false");
+        const resp = await fetch("/handoffs/run", { method: "POST", body: fd });
+        const body = await resp.json();
+        if (!body.ok) {
+            if (status) status.textContent = "Error: " + (body.error || "unknown");
+            return;
+        }
+        const mode = body.dry_run ? "DRY RUN" : "RAN";
+        const cmd = body.run && body.run.command ? body.run.command : "(no command resolved)";
+        if (status) {
+            status.innerHTML =
+                `<strong>${mode}</strong> — artifact dir: <code>${_escapeHtml(body.artifact_dir || "")}</code>` +
+                `<br>command: <code>${_escapeHtml(cmd)}</code>`;
+        }
+        refreshHandoffs();
+    } catch (e) {
+        if (status) status.textContent = "Error: " + e.message;
+    }
+}
+
 function consolidateMemory() {
     const tagEl = document.querySelector("input[name='project_tag']");
     const tag = tagEl ? tagEl.value.trim() : "";
@@ -2175,6 +2360,8 @@ function showWorkspaceTab(id) {
         loadLessons(false);
         // Phase 5 Polish: also lazy-load the Proposals sub-section (Part 3).
         if (typeof loadProposalRuns === "function") loadProposalRuns(false);
+        // Phase 7.1: lazy-load Handoffs (Mayor Mode)
+        if (typeof refreshHandoffs === "function") refreshHandoffs();
     }
     // Phase 5 Polish: lazy-load Plan items on first Dream-tab show.
     if (id === "dream") loadPlanItems(false);
