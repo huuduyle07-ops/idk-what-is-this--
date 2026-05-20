@@ -1060,4 +1060,46 @@ Next: prompt-version quantifier / Patch Safety gate / held-out eval, then option
 Do not add MCTS yet — require a 10-case mini-experiment first.
 ```
 
+---
+
+## Phase 7.1 — Mayor Mode handoff + optional subagent runner (planned 2026-05-20)
+
+Spec: `docs/superpowers/specs/2026-05-20-phase-7-1-mayor-mode-design.md`
+Plan: `docs/superpowers/plans/2026-05-20-phase-7-1-mayor-mode.md`
+
+MVP for operator-driven external-agent handoffs. Sits next to the existing
+proposal queue / lesson loop, does not replace any of it.
+
+### What this phase adds
+
+- `core/handoff_notes.py` — pure storage for `.agent/handoffs/<YYYYMMDD_HHMMSS>_<slug>.md` notes with JSON frontmatter (HTML-comment-delimited so no new YAML dep), default safety rules, default forbidden files (`.env`, `.agent`, `.git`, `node_modules`, `target`, `tests`), brain stamp via `core.brain_stamp.collect_brain_stamp`, and a `safety_overrides` audit list when `allowed_files` overlaps a default-forbidden path.
+- `scripts/create_handoff_note.py` — CLI wrapper, no web required.
+- `scripts/run_subagent_handoff.py` — temp-clone runner. **Default: dry-run.** `--allow-run` is the only switch that actually executes a subprocess. Always `shutil.copytree`s the repo to a temp clone first; never writes back to the real repo (artifacts go under `.agent/worker_runs/<run>/`). 300s default timeout, overridable with `--timeout-sec`. Worker command map (`codex / claude-code / gemini / other`) is env-var overridable (`HANDOFF_<WORKER>_CMD`). Status transitions `draft → ran / failed` only on real runs; dry-run leaves the note as `draft`.
+- Web routes: `POST /handoffs/create`, `GET /handoffs/list`, `POST /handoffs/run`, `GET /worker-runs/list`.
+- Memory tab: new "Mayor Mode (Handoffs)" panel between the proposals and lessons sections, with the explicit "Allow running subagent in temp clone" checkbox. Clicking "Create + Run" without ticking it is refused client-side.
+- Tests: 25 covering core, runner script, and web routes. Real-repo byte-identical assertion in the temp-clone test (SHA-256 of every tracked file before/after).
+
+### Guardrails (verified by tests, not just claimed)
+
+- Subagents do not run by default.
+- Subagents never run in the real repo.
+- Patches are never applied to the real repo from a handoff run.
+- Nothing commits or pushes.
+- Lessons are not auto-promoted.
+- Patch Safety gate is unchanged.
+- Dream / proposal / lesson flow is unchanged.
+
+### 🤖 Claude-proposed Phase 7.1.1+ follow-ups (pending user decision)
+
+These are extensions Claude noticed while designing 7.1. They are **candidate
+scope, not yet sanctioned by the user**:
+
+1. **"Create handoff from this item" button** on proposal cards and Dream item cards. Pre-fills title, `repo_path`, `validation_command`, and `allowed_files` from the source artifact. Low cost, high UX value once the panel is in place. Deferred from MVP to keep the surface small.
+2. **Surface worker `proposal.md` back into the proposals queue.** If a temp-clone run produces a `proposal.md` and `patch_plan.json`, offer a one-click promotion path that materializes a normal `.agent/proposals/<run>/<item>/` so the Patch Safety gate + lesson flow runs on it like any other proposal. This is the natural bridge between Mayor Mode and the existing Phase 6.4 lesson loop.
+3. **Streaming worker output.** The current `/handoffs/run` route blocks until the subprocess exits, which can hit Flask's default request timeout for slow agents. Replace with an async runner + status polling, modeled on `core/proposal_runner.py`.
+4. **Worker-quota meter.** Show a small estimate of "this handoff has X allowed_files and ~Y context tokens" to help operators gauge cost before clicking Run. Cheap to add; high signal.
+5. **Replay-from-handoff.** Add `python scripts/run_subagent_handoff.py --note <path> --replay` that re-runs an existing handoff with the same command but a fresh temp clone. Useful for retrying after a flaky network error without re-typing context.
+6. **End-to-end env-var override test.** Today the env-var override is unit-tested at the resolver level only; an end-to-end test that actually shells out to a stub `HANDOFF_OTHER_CMD` script would catch shell-quoting bugs.
+7. **Handoff archival UI.** The data model already supports `status: archived`; expose an Archive button + filter on the panel so the active list stays readable past 20+ handoffs.
+
 
