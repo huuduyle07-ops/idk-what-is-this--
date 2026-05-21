@@ -524,6 +524,20 @@ def validate_imported_worker_proposal(
 
     _update_item_status(resolved, status)
 
+    # Phase 7.2.1.1: synthesize lesson artifacts (self-gates on success).
+    try:
+        lesson_artifacts = synthesize_lesson_artifacts_for_validated_worker_proposal(
+            resolved, validation_result=validation,
+            proposals_root=proposals_dst_root,
+        )
+    except Exception as exc:
+        lesson_artifacts = {
+            "ok": False,
+            "created": [],
+            "preserved": [],
+            "skipped_reason": f"synth error: {type(exc).__name__}: {exc}",
+        }
+
     return {
         "ok": True,
         "proposal_dir": str(resolved),
@@ -532,6 +546,7 @@ def validate_imported_worker_proposal(
         "message": message,
         "apply_result_path": str(resolved / "apply_result.json"),
         "validation_path": str(resolved / "validation.json"),
+        "lesson_artifacts": lesson_artifacts,
     }
 
 

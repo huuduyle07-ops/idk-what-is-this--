@@ -223,3 +223,53 @@ def test_validate_route_rejects_path_traversal(client, tmp_path):
     assert resp.status_code == 400
     body = resp.get_json()
     assert "outside" in body["error"]
+
+
+def test_validate_route_includes_lesson_artifacts_on_success(client, monkeypatch):
+    proposal_dir = _import_via_route(client, "20260521_012100_v1")
+
+    import core.worker_runs as _wr
+    monkeypatch.setattr(
+        _wr, "run_patch_plan_with_artifacts",
+        lambda project_root, plan, **kw: {
+            "success": True, "applied_ops": plan, "diffs": [], "error": None,
+        },
+    )
+    monkeypatch.setattr(_wr, "_inferred_validation_command", lambda repo: "echo OK")
+
+    resp = client.post("/proposals/validate", data={
+        "proposal_dir": proposal_dir,
+        "repo_path": str(client._fake_repo),
+    })
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert "lesson_artifacts" in body
+    la = body["lesson_artifacts"]
+    assert la["ok"] is True
+    assert set(la["created"]) == {"case.json", "patch_proposal.json"}
+
+
+def test_validate_route_includes_lesson_artifacts_skipped_on_failure(client, monkeypatch):
+    proposal_dir = _import_via_route(client, "20260521_012100_v2")
+
+    import core.worker_runs as _wr
+    monkeypatch.setattr(
+        _wr, "run_patch_plan_with_artifacts",
+        lambda project_root, plan, **kw: {
+            "success": False, "applied_ops": [], "diffs": [],
+            "error": "snippet not found",
+        },
+    )
+    monkeypatch.setattr(_wr, "_inferred_validation_command", lambda repo: "echo OK")
+
+    resp = client.post("/proposals/validate", data={
+        "proposal_dir": proposal_dir,
+        "repo_path": str(client._fake_repo),
+    })
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert body["apply_success"] is False
+    la = body["lesson_artifacts"]
+    assert la["ok"] is False
+    assert la["created"] == []
+    assert la["skipped_reason"]

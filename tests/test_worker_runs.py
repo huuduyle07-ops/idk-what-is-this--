@@ -641,3 +641,75 @@ def test_synthesize_reads_validation_from_disk_when_no_in_memory_result(env):
     )
     assert result["ok"] is True
     assert "case.json" in result["created"]
+
+
+# ---- validate_imported_worker_proposal: lesson_artifacts wiring (7.2.1.1) ---
+
+
+def test_validate_includes_lesson_artifacts_on_success(env, monkeypatch):
+    proposal_dir = _import(env, "20260521_012000_a")
+
+    import core.worker_runs as _wr
+    monkeypatch.setattr(
+        _wr, "run_patch_plan_with_artifacts",
+        lambda project_root, plan, **kw: {
+            "success": True, "applied_ops": plan,
+            "diffs": [], "error": None,
+        },
+    )
+    monkeypatch.setattr(_wr, "_inferred_validation_command", lambda repo: "echo OK")
+
+    result = worker_runs.validate_imported_worker_proposal(
+        proposal_dir, env["fake_repo"]
+    )
+
+    assert result["apply_success"] is True
+    assert result["validation_ok"] is True
+    assert "lesson_artifacts" in result
+    la = result["lesson_artifacts"]
+    assert la["ok"] is True
+    assert set(la["created"]) == {"case.json", "patch_proposal.json"}
+    assert la["skipped_reason"] is None
+
+
+def test_validate_lesson_artifacts_skipped_when_validation_failed(env, monkeypatch):
+    proposal_dir = _import(env, "20260521_012000_b")
+
+    import core.worker_runs as _wr
+
+    class FailValidation:
+        ok = False
+        validation_ok = False
+
+    monkeypatch.setattr(
+        _wr, "run_patch_plan_with_artifacts",
+        lambda project_root, plan, **kw: {
+            "success": True, "applied_ops": plan, "diffs": [], "error": None,
+        },
+    )
+    monkeypatch.setattr(_wr, "_inferred_validation_command", lambda repo: "echo OK")
+
+    # Make _run_validation_command return a failing record by monkeypatching
+    # the import inside validate_imported_worker_proposal. Easiest: patch the
+    # source module's function so the lazy import picks up our stub.
+    import scripts.run_patch_proposal_queue as _ppq
+    monkeypatch.setattr(_ppq, "_run_validation_command",
+                        lambda *a, **kw: {
+                            "ok": False, "validation_ok": False,
+                            "command": "echo OK", "duration_sec": 0.0,
+                            "segments": [], "output": "FAIL", "error": None,
+                        })
+
+    result = worker_runs.validate_imported_worker_proposal(
+        proposal_dir, env["fake_repo"]
+    )
+
+    assert result["apply_success"] is True
+    assert result["validation_ok"] is False
+    la = result["lesson_artifacts"]
+    assert la["ok"] is False
+    assert la["created"] == []
+    assert "validation" in (la["skipped_reason"] or "").lower()
+    # No case.json / patch_proposal.json should have been written.
+    assert not (proposal_dir / "case.json").exists()
+    assert not (proposal_dir / "patch_proposal.json").exists()

@@ -2438,11 +2438,24 @@ async function validateImportedProposalWith(proposalDir, repoPath, btn) {
         const valMark = body.validation_ok === true ? "✓"
             : (body.validation_ok === false ? "✗" : "·");
         if (resultEl) {
+            const la = body.lesson_artifacts || null;
+            let lessonLine = "";
+            if (la && la.ok === true) {
+                const created = (la.created || []).join(", ") || "all preserved";
+                lessonLine =
+                    `<div style="font-size:11px; color:#475569; margin-top:4px;">` +
+                    `Lesson artifacts ready (${_escapeHtml(created)})</div>`;
+            } else if (la && la.ok === false) {
+                lessonLine =
+                    `<div style="font-size:11px; color:#a16207; margin-top:4px;">` +
+                    `Lesson artifacts not created: ${_escapeHtml(la.skipped_reason || "unknown")}</div>`;
+            }
             resultEl.innerHTML =
                 `<div><strong>apply:</strong> ${applyMark} · ` +
                 `<strong>validation:</strong> ${valMark}</div>` +
                 `<div style="font-size:12px; color:#475569; margin-top:4px;">` +
                 `${_escapeHtml(body.message || "")}</div>` +
+                lessonLine +
                 `<div style="font-size:11px; color:#64748b; margin-top:4px;">` +
                 `apply_result: <code>${_escapeHtml(body.apply_result_path || "")}</code>` +
                 `<br>validation: <code>${_escapeHtml(body.validation_path || "")}</code></div>`;
