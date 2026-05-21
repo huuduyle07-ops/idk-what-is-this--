@@ -1673,36 +1673,19 @@ def handoffs_run_route():
 
 @app.route("/worker-runs/list", methods=["GET"])
 def worker_runs_list_route():
-    root = _handoff_runner.WORKER_RUNS_ROOT
-    if not root.is_dir():
-        return {"ok": True, "runs": []}
-    runs: list[dict] = []
+    """Phase 7.2: delegate to core.worker_runs.list_worker_runs.
+
+    The response shape is a strict superset of the Phase 7.1 listing
+    (legacy fields preserved + run_id, handoff_title, has_proposal_md,
+    has_patch_plan_json, has_handoff_md, has_worker_run_json added).
+    """
+    from core import worker_runs as _worker_runs
     try:
-        dirs = sorted([d for d in root.iterdir() if d.is_dir()], reverse=True)
-    except OSError as e:
-        return {"ok": False, "error": str(e)}, 500
-    for d in dirs[:50]:
-        record_path = d / "worker_run.json"
-        if not record_path.is_file():
-            continue
-        try:
-            record = json.loads(record_path.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-        runs.append({
-            "artifact_dir": str(d),
-            "name": d.name,
-            "dry_run": record.get("dry_run"),
-            "worker": record.get("worker"),
-            "exit_code": record.get("exit_code"),
-            "timed_out": record.get("timed_out"),
-            "duration_sec": record.get("duration_sec"),
-            "command": record.get("command"),
-            "handoff_path": record.get("handoff_path"),
-            "started_at": record.get("started_at"),
-            "finished_at": record.get("finished_at"),
-            "error": record.get("error"),
-        })
+        runs = _worker_runs.list_worker_runs(
+            worker_runs_root=_handoff_runner.WORKER_RUNS_ROOT,
+        )
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
     return {"ok": True, "runs": runs}
 
 @app.route("/local_critique", methods=["POST"])

@@ -128,3 +128,8 @@ def test_worker_runs_list_returns_recent_runs(client, monkeypatch):
     assert body["ok"] is True
     assert len(body["runs"]) >= 1
     assert "dry_run" in body["runs"][0]
+    # Legacy /worker-runs/list shape must remain intact after the Task B refactor.
+    for legacy_key in ("artifact_dir", "name", "worker", "exit_code",
+                       "timed_out", "duration_sec", "command",
+                       "started_at", "finished_at", "error"):
+        assert legacy_key in body["runs"][0], f"missing legacy key: {legacy_key}"
