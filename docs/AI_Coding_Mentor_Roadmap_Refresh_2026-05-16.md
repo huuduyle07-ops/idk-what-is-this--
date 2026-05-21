@@ -1057,6 +1057,7 @@ Phase 6 manual-safe memory loop shipped (2026-05-17): bucketed lesson storage, M
   active-only retrieval with tags + per-repo/global scope union, CONTROL prompt injection behind
   LESSON_RETRIEVAL_ENABLED, manual proposal→lesson CLI. Auto-creation (Phase 6.4) still deferred.
 Phase 7.1 Mayor Mode handoff + optional subagent runner shipped (2026-05-21): pure storage handoff notes under .agent/handoffs/, temp-clone subprocess runner, memory-tab UI panel.
+Phase 7.2 Worker Run Review / Import shipped (2026-05-21): core/worker_runs.py + /worker-runs/view + /worker-runs/import + Memory tab Worker Runs subsection. Bridges 7.1 outputs into the existing proposal -> lesson review path without bypassing safety gates.
 Next: prompt-version quantifier / Patch Safety gate / held-out eval, then optionally Phase 6.4 auto-creation. Benchmark run buttons + Add Case clerk are now shipped; remaining Benchmark polish is category/language batch + report density.
 Do not add MCTS yet — require a 10-case mini-experiment first.
 ```
@@ -1103,5 +1104,42 @@ scope, not yet sanctioned by the user**:
 5. **Replay-from-handoff.** Add `python scripts/run_subagent_handoff.py --note <path> --replay` that re-runs an existing handoff with the same command but a fresh temp clone. Useful for retrying after a flaky network error without re-typing context.
 6. **End-to-end env-var override test.** Today the env-var override is unit-tested at the resolver level only; an end-to-end test that actually shells out to a stub `HANDOFF_OTHER_CMD` script would catch shell-quoting bugs.
 7. **Handoff archival UI.** The data model already supports `status: archived`; expose an Archive button + filter on the panel so the active list stays readable past 20+ handoffs.
+
+---
+
+## Phase 7.2 — Worker Run Review / Import (shipped 2026-05-21)
+
+Spec: `docs/superpowers/specs/2026-05-21-phase-7-2-worker-run-review-design.md`
+Plan: `docs/superpowers/plans/2026-05-21-phase-7-2-worker-run-review.md`
+
+The bridge from Phase 7.1 worker outputs into the existing proposal review path. No execution, no validation, no apply.
+
+### What this phase adds
+
+- `core/worker_runs.py` — pure storage + validation. Public API: `list_worker_runs`, `read_worker_run`, `detect_worker_outputs`, `import_worker_run_as_proposal`. Path-traversal guarded against escaping `.agent/worker_runs/`. Never writes outside the new proposal dir.
+- Web routes:
+  - `GET /worker-runs/list` — refactored to delegate to `core.worker_runs.list_worker_runs`, **preserving the Phase 7.1 response shape** (additive new fields only: `run_id`, `handoff_title`, `has_proposal_md`, `has_patch_plan_json`, `has_handoff_md`, `has_worker_run_json`).
+  - `GET /worker-runs/view?run_id=...` (or `?path=...`) — full detail including `raw_output_preview` (capped at 2000 chars).
+  - `POST /worker-runs/import` — imports a complete, non-dry-run worker run.
+- Memory tab: new "Worker Runs" subsection under Mayor Mode with View details (inline raw output preview, command, started_at, duration) and Import as proposal (button disabled for dry-run / incomplete runs, with explicit tooltip).
+- Imported proposals land in `.agent/proposals/<YYYYMMDD_HHMMSS>/01-<slug>/` with a synthetic `item.json` (`kind=worker_run_import`, `source=worker_run`, `human_approved_for_proposal=false`, `needs_revalidation=true`) and a `source_metadata.json` pointing back to the original `worker_runs/` dir. The four required files (`handoff.md`, `worker_run.json`, `proposal.md`, `patch_plan.json`) plus optional `raw_output.txt` are copied across.
+- Tests: 25 new (17 in `tests/test_worker_runs.py` + 8 in `tests/test_worker_runs_routes.py`). Full suite at 274/274 passing. Real-repo SHA-256 byte-identical assertion in the import tests.
+
+### Guardrails (verified by tests, not just claimed)
+
+- Subagents do not run in this slice.
+- Worker output is never auto-applied to the real repo.
+- Imported proposals carry `human_approved_for_proposal=false`, so `scripts/run_patch_proposal_queue.py` will skip them by default.
+- The lesson-promotion path is unchanged: a worker-run import is intentionally NOT directly promotable because it lacks `apply_result.json` / `validation.json` / `case.json`. The operator must re-run through validation first (deferred to Phase 7.2.1).
+- Patch Safety gate is unchanged.
+- Path traversal: any `run_id` or `path` that escapes `.agent/worker_runs/` is rejected before any disk read of the content.
+
+### 🤖 Claude-proposed Phase 7.2.1+ follow-ups (pending user decision)
+
+1. **Re-validate worker patch_plan in a temp clone.** The natural next slice. Takes an imported worker-run proposal, applies the patch_plan in a temp clone, runs a user-supplied or detected validation command, and stamps the proposal with `apply_result.json` + `validation.json` — at which point it becomes lesson-promotable like any other proposal.
+2. **Diff preview against real repo.** Compute `git diff` between real repo state and the worker's patch_plan before import, so the operator can eyeball the change inline.
+3. **Idempotency / dedup.** Hash the worker run's `(handoff.md + patch_plan.json)` and refuse re-import if the same proposal already exists.
+4. **"Imported from worker_run" badge in the Proposals list.** The list view currently treats worker-run imports the same as normal proposals (because `item.json` is structurally compatible). A small visual badge would surface provenance.
+5. **Tail-streaming raw_output.** For long worker runs, the inline preview is capped at 2000 chars. A "show full output" toggle that fetches the file in chunks would help debug timeouts.
 
 
