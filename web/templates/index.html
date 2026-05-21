@@ -468,6 +468,29 @@
             </div>
           </div>
 
+          <!-- Phase 7.2: Worker Runs review/import.
+               Reads .agent/worker_runs/. Importing a complete run lands a
+               fresh artifact in .agent/proposals/<run>/01-<slug>/ which then
+               flows through the existing proposal -> lesson review. No
+               real-repo writes. -->
+          <div class="memory-section worker-runs-section">
+            <div class="proposals-header">
+              <h3>Worker Runs</h3>
+              <button type="button" class="memory-refresh" onclick="refreshWorkerRuns()"
+                      title="Re-scan .agent/worker_runs/">⟳ Refresh</button>
+            </div>
+            <div class="proposals-note">
+              Subagent runs from <code>.agent/worker_runs/</code>. Importing
+              a complete (non-dry-run) run surfaces it in the Proposals
+              section above so you can review the patch_plan.json before any
+              lesson promotion.
+            </div>
+            <div id="workerRunsStatus" class="proposals-status"></div>
+            <div id="workerRunsList" class="proposals-list">
+              <div class="health-empty">Click ⟳ Refresh to load worker runs.</div>
+            </div>
+          </div>
+
           <!-- Phase 6.1: Lessons (Context Poisoning Guard storage) -->
           <div class="memory-section lessons-section">
             <div class="lessons-header">
@@ -2263,6 +2286,113 @@ async function runHandoff(handoffPath, allowRun) {
         refreshHandoffs();
     } catch (e) {
         if (status) status.textContent = "Error: " + e.message;
+    }
+}
+
+// Phase 7.2 — Worker runs review/import
+async function refreshWorkerRuns() {
+    const status = document.getElementById("workerRunsStatus");
+    const list = document.getElementById("workerRunsList");
+    if (status) status.textContent = "Loading worker runs...";
+    try {
+        const resp = await fetch("/worker-runs/list");
+        const body = await resp.json();
+        if (!body.ok) {
+            if (status) status.textContent = "Error: " + (body.error || "unknown");
+            return;
+        }
+        if (!list) return;
+        if (!body.runs || body.runs.length === 0) {
+            list.innerHTML = '<div class="health-empty">No worker runs yet. Use Mayor Mode above to create + run a handoff.</div>';
+            if (status) status.textContent = "";
+            return;
+        }
+        list.innerHTML = body.runs.map(r => {
+            const importEnabled = (r.has_proposal_md && r.has_patch_plan_json && r.dry_run !== true);
+            const importBtn = importEnabled
+                ? `<button type="button" onclick="importWorkerRun('${_escapeHtml(r.run_id).replace(/'/g, "\\'")}', this)">Import as proposal</button>`
+                : `<button type="button" disabled title="Import disabled — missing proposal.md / patch_plan.json or run was dry-run">Import as proposal</button>`;
+            const dryBadge = r.dry_run ? ` · <strong style="color:#a16207">DRY RUN</strong>` : "";
+            const exitBadge = (r.exit_code !== null && r.exit_code !== undefined)
+                ? ` · exit ${_escapeHtml(String(r.exit_code))}`
+                : "";
+            const propBadge = r.has_proposal_md ? "proposal.md ✓" : "proposal.md ✗";
+            const planBadge = r.has_patch_plan_json ? "patch_plan.json ✓" : "patch_plan.json ✗";
+            return `
+                <div class="worker-run-item" data-run-id="${_escapeHtml(r.run_id)}" style="margin-bottom:12px; padding:12px; border:1px solid #e2e8f0; border-radius:6px; background:#f8fafc;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <strong>${_escapeHtml(r.handoff_title || r.run_id || "(unnamed)")}</strong>
+                        <span style="font-size:11px; color:#64748b;">${_escapeHtml(r.run_id || "")}</span>
+                    </div>
+                    <div style="font-size:12px; color:#64748b; margin-bottom:8px;">
+                        worker: <code>${_escapeHtml(r.worker || "?")}</code>${dryBadge}${exitBadge}
+                        · ${_escapeHtml(propBadge)} · ${_escapeHtml(planBadge)}
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button type="button" class="lesson-btn--secondary" onclick="viewWorkerRun('${_escapeHtml(r.run_id).replace(/'/g, "\\'")}', this)">View details</button>
+                        ${importBtn}
+                    </div>
+                    <div class="worker-run-detail" style="display:none; margin-top:10px; padding:8px; background:#fff; border:1px solid #e2e8f0; border-radius:4px; font-size:12px;"></div>
+                </div>
+            `;
+        }).join("");
+        if (status) status.textContent = `${body.runs.length} run(s).`;
+    } catch (e) {
+        if (status) status.textContent = "Error: " + e.message;
+    }
+}
+
+async function viewWorkerRun(runId, btn) {
+    const card = btn.closest(".worker-run-item");
+    const detail = card.querySelector(".worker-run-detail");
+    if (detail.style.display === "block") {
+        detail.style.display = "none";
+        return;
+    }
+    detail.textContent = "Loading...";
+    detail.style.display = "block";
+    try {
+        const resp = await fetch("/worker-runs/view?run_id=" + encodeURIComponent(runId));
+        const body = await resp.json();
+        if (!body.ok) {
+            detail.textContent = "Error: " + (body.error || "unknown");
+            return;
+        }
+        const r = body.run;
+        const preview = (r.raw_output_preview || "").substring(0, 1500);
+        detail.innerHTML = `
+            <div><strong>command:</strong> <code>${_escapeHtml(r.command || "")}</code></div>
+            <div><strong>started:</strong> ${_escapeHtml(r.started_at || "")} · <strong>duration:</strong> ${_escapeHtml(String(r.duration_sec || ""))}s</div>
+            <div style="margin-top:6px;"><strong>raw output (preview):</strong></div>
+            <pre style="max-height:240px; overflow:auto; background:#0f172a; color:#e2e8f0; padding:8px; border-radius:4px; font-size:11px; white-space:pre-wrap;">${_escapeHtml(preview)}</pre>
+        `;
+    } catch (e) {
+        detail.textContent = "Error: " + e.message;
+    }
+}
+
+async function importWorkerRun(runId, btn) {
+    const status = document.getElementById("workerRunsStatus");
+    btn.disabled = true;
+    if (status) status.textContent = "Importing " + runId + "...";
+    try {
+        const fd = new FormData();
+        fd.append("run_id", runId);
+        const resp = await fetch("/worker-runs/import", { method: "POST", body: fd });
+        const body = await resp.json();
+        if (!body.ok) {
+            if (status) status.textContent = "Import failed: " + (body.error || "unknown");
+            btn.disabled = false;
+            return;
+        }
+        if (status) {
+            status.innerHTML = `Imported to <code>${_escapeHtml(body.proposal_dir)}</code>. ` +
+                `Refresh the Proposals section above to review before any lesson promotion.`;
+        }
+        if (typeof refreshProposals === "function") refreshProposals();
+    } catch (e) {
+        if (status) status.textContent = "Error: " + e.message;
+        btn.disabled = false;
     }
 }
 
