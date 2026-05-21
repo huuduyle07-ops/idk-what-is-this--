@@ -1060,6 +1060,7 @@ Phase 7.1 Mayor Mode handoff + optional subagent runner shipped (2026-05-21): pu
 Phase 7.2 Worker Run Review / Import shipped (2026-05-21): core/worker_runs.py + /worker-runs/view + /worker-runs/import + Memory tab Worker Runs subsection. Bridges 7.1 outputs into the existing proposal -> lesson review path without bypassing safety gates.
 Phase 7.2.1 Validate Imported Worker Proposals shipped (2026-05-21): core.worker_runs.validate_imported_worker_proposal + POST /proposals/validate + UI Validate button. Applies worker patch_plan.json in a temp clone of repo_path, runs the inferred validation command, writes apply_result.json + validation.json + validation_output.txt into the proposal_dir. Real repo / repo_path byte-identical before/after.
 Phase 7.2.1.1 Make Validated Worker Imports Lesson-Promotable shipped (2026-05-21): synthesize_lesson_artifacts_for_validated_worker_proposal writes deterministic case.json + patch_proposal.json after a passing validate. End-to-end test proves scripts/create_lesson_from_proposal.py accepts the synthesized dir as a candidate lesson.
+Phase 8-prep Tool Registry MVP shipped (2026-05-21): core/tool_registry.py + GET /tools/registry. Metadata-only catalog of 18 operations (9 read + 3 artifact_write + 6 disabled-for-MCP) with four capability modes (read_only / artifact_write / operator / unsafe_dev). No MCP server, no network exposure, no behavior changes — just the source of truth for "what's safe to hand to an external agent."
 Next: prompt-version quantifier / Patch Safety gate / held-out eval, then optionally Phase 6.4 auto-creation. Benchmark run buttons + Add Case clerk are now shipped; remaining Benchmark polish is category/language batch + report density.
 Do not add MCTS yet — require a 10-case mini-experiment first.
 ```
@@ -1216,5 +1217,54 @@ Closes the last gap between Phase 7.1 handoff output and the lesson candidacy pa
 3. **Surface `expected_changed_files` from operator input.** The current empty default short-circuits the lesson promoter's set math; an operator-supplied expected list would make the resulting lesson stricter.
 4. **Re-synthesize on demand.** Today the helper preserves existing artifacts; a future `?regenerate=true` query param or `--force` flag would let the operator re-derive after editing `proposal.md`.
 5. **Async + progress polling for the whole validate+synth flow.** Same deferred follow-up as 7.2.1; not specific to synthesis.
+
+---
+
+## Phase 8-prep — Tool Registry MVP (shipped 2026-05-21)
+
+Spec: `docs/superpowers/specs/2026-05-21-phase-8-prep-tool-registry-design.md`
+
+Single source of truth describing which CATTUS operations are candidates for future MCP exposure. **Metadata only.** No MCP server, no network exposure, no SDK dependency, no behavior changes anywhere else.
+
+### What this phase adds
+
+- `core/tool_registry.py` — a constant tuple of 18 tool dicts. Public API: `list_tools()`, `get_tool(name)`, `tools_by_category(category)`, `is_tool_allowed(name, capability_mode="read_only")`. All accessors return deep copies; the registry itself is immutable from outside.
+- `GET /tools/registry` — read-only endpoint wrapping `list_tools()`. Intended for the future Settings/Health debug UI.
+- Module-import-time invariant assertions: a tool with `category="real_repo_write"` MUST have `can_touch_real_repo=True`; a `category="read"` tool MUST have `can_touch_real_repo=False` and `can_run_subprocess=False`. Malformed registry entries fail loudly the first time anyone imports the module.
+- Tests: 26 unit tests in `tests/test_tool_registry.py` + 3 Flask client tests in `tests/test_tool_registry_routes.py`. Full suite at **352/352** passing.
+
+### Initial roster (18 tools)
+
+- **Read (9):** `get_health`, `list_benchmark_reports`, `read_benchmark_report`, `list_dream_reports`, `read_dream_report`, `list_lessons`, `read_lesson_proposal`, `list_worker_runs`, `read_worker_run`.
+- **Artifact-write (3):** `create_handoff_note`, `import_worker_run_as_proposal`, `validate_imported_worker_proposal`. Only `validate_imported_worker_proposal` has `can_run_subprocess=True` (inside a temp clone) and `requires_human_approval=True`.
+- **Registered but disabled for MCP (6):** `apply_patch`, `apply_patch_plan`, `dream_apply` (all `real_repo_write`); `run_subagent_handoff` (`temp_clone_execute`, quota-spending); `promote_lesson`, `block_lesson` (`memory_write`). All carry `mcp_exposable=False` and `default_enabled=False`.
+
+### Capability mode semantics
+
+| Mode | Allowed categories | mcp_exposable kill switch? |
+|---|---|---|
+| `read_only` | `read` | yes |
+| `artifact_write` | `read` + `artifact_write` | yes |
+| `operator` | `read` + `artifact_write` + (`memory_write` / `temp_clone_execute` when `requires_human_approval=True`); **never** `real_repo_write` | yes |
+| `unsafe_dev` | everything | **no** (this mode is for internal dashboards only and must never reach a real MCP server) |
+
+`is_tool_allowed(unknown_name, "read_only")` returns `False`, not an exception. `is_tool_allowed("get_health", "bogus_mode")` raises `ValueError`.
+
+### Guardrails (verified by tests)
+
+- No MCP dependency added. `requirements.txt` is untouched.
+- No network server. The only new HTTP surface is `GET /tools/registry`, which reads in-process data.
+- No tool is wired to its underlying function in this slice — `route_or_function` is a string pointer that future code can resolve.
+- Disabled-for-MCP tools (`apply_patch`, `dream_apply`, etc.) are blocked in every mode except `unsafe_dev`.
+- `real_repo_write` is never allowed in `operator` mode, even if `requires_human_approval=True`. Real-repo writes from external agents remain out of scope until at least Phase 8.x.
+
+### 🤖 Claude-proposed Phase 8.0+ follow-ups (pending user decision)
+
+1. **MCP server scaffolding.** Add the SDK behind an optional extra (`pip install .[mcp]`), wire `read_only`-mode tools first, never expose `real_repo_write`.
+2. **Per-tool input schemas.** Each tool dict gets a `parameters` field (JSON-Schema). Required for MCP exposure; useful even before that for self-documenting routes.
+3. **Capability-mode persistence.** Read from `MCP_CAPABILITY_MODE` env var or `settings.json` at server start. Default to `read_only` so a misconfiguration fails closed.
+4. **Per-tool audit log.** Every invocation through MCP appends to `.agent/mcp_audit.jsonl` with timestamp, tool name, args hash, return shape. Useful for "what did the agent do last night?" forensics.
+5. **Registry-driven Settings/Health row.** The existing health panel can render the current registry alongside the API-key / DB / toolchain checks, so the operator sees at a glance which tools would be exposed under the configured mode.
+6. **`Validate that handler exists` smoke check.** Each tool's `route_or_function` is verified at startup to resolve to an actual Python callable or registered Flask route. Catches typo drift between the registry and the codebase.
 
 
