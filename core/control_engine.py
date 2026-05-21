@@ -12,6 +12,12 @@ from reasoning.deep_project_understand import deep_project_understand
 from reasoning.reasoning_engine import analyze_symbol_risk
 from core.retriever import trace_execution_flow
 from core.repo_librarian import load_phantom_limb_report
+from core.context_profiles import (
+    identity_answer_framing,
+    identity_prompt_hint,
+    infer_context_profile,
+    score_multiplier_for_path,
+)
 from config import LANGUAGE_MAP
 from policy.decision_helper import build_patch_policy, policy_to_prompt_block
 
@@ -446,28 +452,35 @@ def build_control_result(
     evidence: list[dict],
     execution_trace: str,
 ) -> dict:
+    context_profile = infer_context_profile(query)
     hypotheses = infer_hypotheses(query, evidence, execution_trace)
     top = hypotheses[0] if hypotheses else None
     phantom_limb = load_phantom_limb_report(repo_path)
     print("🐛 DEBUG top hypothesis:", top)
+    control_rules = [
+        "Use PROJECT_MAP only as navigation, not truth.",
+        "Prefer graph evidence before patching.",
+        "Prefer AST-based patching when possible.",
+        "If evidence is weak, do not auto-patch.",
+        "If graph/project_map/code disagree, trust code and graph first.",
+    ]
+    hint = identity_prompt_hint(query)
+    if hint:
+        control_rules.insert(0, hint)
+        control_rules.insert(1, identity_answer_framing(profile=context_profile))
 
     result = {
         "version": "control_v4",
         "query": query,
         "repo_path": repo_path,
+        "context_profile": context_profile,
         "entry_nodes": entry_nodes,
         "top_hypothesis": top,
         "hypotheses": hypotheses,
         "evidence": evidence[:12],
         "execution_trace": execution_trace[:4000] if execution_trace else "",
         "phantom_limb": phantom_limb,
-        "control_rules": [
-            "Use PROJECT_MAP only as navigation, not truth.",
-            "Prefer graph evidence before patching.",
-            "Prefer AST-based patching when possible.",
-            "If evidence is weak, do not auto-patch.",
-            "If graph/project_map/code disagree, trust code and graph first.",
-        ],
+        "control_rules": control_rules,
         "decision": {
             "symbol": top["symbol"] if top else None,
             "action": top["recommended_action"] if top else None,
@@ -646,6 +659,7 @@ def resolve_symbol_to_graph_nodes(graph, symbol: str, query: str = "", limit: in
 
 def fallback_entry_nodes_from_graph(graph, query: str, limit: int = 6) -> list[str]:
     words = query_words(query)
+    profile = infer_context_profile(query)
     candidates = []
 
     for node_id, node in graph.nodes.items():
@@ -669,6 +683,11 @@ def fallback_entry_nodes_from_graph(graph, query: str, limit: int = 6) -> list[s
 
         if getattr(node, "type", "") == "function":
             score += 1
+
+        multiplier = score_multiplier_for_path(node_id, profile)
+        if profile == "identity" and multiplier > 1.0:
+            score = max(score, 1.0)
+        score *= multiplier
 
         if score > 0:
             candidates.append((score, node_id))
@@ -871,6 +890,14 @@ def build_control_prompt(
     *,
     repo_path: str | None = None,
 ) -> str:
+    context_profile = (
+        control_result.get("context_profile")
+        or infer_context_profile(control_result.get("query") or user_query)
+    )
+    identity_framing = identity_answer_framing(
+        user_query,
+        profile=context_profile,
+    )
     top = control_result.get("top_hypothesis") or {}
     patch_intent = control_result.get("patch_intent") or {}
     preflight = control_result.get("preflight_validation") or {}
@@ -928,6 +955,35 @@ symbol={item.get("symbol", "")}
         )
 
     is_feature_extension = scout.get("request_type") == "feature_extension"
+
+    if identity_framing:
+        source_excerpt = patch_intent.get("source_snippet") or "No source excerpt."
+        return f"""\
+{identity_framing}
+
+[CONTROL CONTEXT]
+top_symbol={top.get("symbol")}
+confidence={top.get("confidence")}
+language={language}
+
+[SOURCE EXCERPT]
+{source_excerpt}
+
+[RELATED SOURCE CONTEXT]
+{related_block}
+
+[PHANTOM LIMB SUGGESTIONS - structural hints, not proof]
+{phantom_block}
+{lessons_block}
+[USER]
+{user_query}
+
+[RULES]
+- Answer in plain natural language, not JSON.
+- Explain the product/workspace identity before subsystem details.
+- Include repair, patching, and benchmarks as parts of the system when supported by context.
+- Do not invent features that are not present in provided context.
+""".strip()
 
     # ============================================================
     # 1. Feature-extension branch
@@ -1164,6 +1220,14 @@ def allow_create_file(patch_style: str) -> bool:
     return patch_style in {"balanced", "vibe"}
 
 def build_control_prompt_human(control_result: dict, user_query: str) -> str:
+    context_profile = (
+        control_result.get("context_profile")
+        or infer_context_profile(control_result.get("query") or user_query)
+    )
+    identity_framing = identity_answer_framing(
+        user_query,
+        profile=context_profile,
+    )
     top = control_result.get("top_hypothesis") or {}
     reasons_raw = top.get("reasons") or []
     reasons = "; ".join(
@@ -1171,6 +1235,42 @@ def build_control_prompt_human(control_result: dict, user_query: str) -> str:
     )
     patch_intent = control_result.get("patch_intent") or {}
     snippet = patch_intent.get("source_snippet") or ""
+    if identity_framing:
+        entry_nodes = "\n".join(
+            f"- {node}" for node in control_result.get("entry_nodes", [])[:8]
+        )
+        evidence = "\n".join(
+            f"- {item.get('symbol')}" for item in control_result.get("evidence", [])[:8]
+        )
+        return f"""\
+{identity_framing}
+
+[CONTROL]
+top_symbol={top.get("symbol")}
+confidence={top.get("confidence")}
+reasons: {reasons}
+
+[AUTHORITATIVE / SUPPORTING CONTEXT]
+entry_nodes:
+{entry_nodes or "- none"}
+
+evidence:
+{evidence or "- none"}
+
+[SOURCE EXCERPT]
+{snippet}
+
+[QUESTION]
+{user_query}
+
+Your job:
+1. Explain what C.A.T.T.U.S is as a product/workspace first.
+2. Then summarize the major subsystems supported by the context.
+3. Include repair, patching, and benchmarks as parts of the system, without making them the whole identity.
+4. Do not invent features that are not present in the provided context.
+
+Plain natural language. No JSON.
+"""
 
     return f"""\
 You are explaining a bug to a human learner.

@@ -55,3 +55,6 @@ benchmarks/tmp/
 .agent/benchmarks/
 .tmp
 .superpowers
+
+#tests
+#docs

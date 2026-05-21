@@ -692,6 +692,34 @@ button {
     border-radius: 4px;
 }
 
+.subagent-group {
+    border: 1px solid #475569;
+    background: rgba(30, 41, 59, 0.35);
+    padding: 12px;
+}
+
+.subagent-group__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 8px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #334155;
+}
+
+.subagent-group__title {
+    margin: 0;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #cbd5e1;
+}
+
+.subagent-group > .memory-section {
+    border-style: dashed;
+    border-color: #334155;
+}
+
 .memory-row {
     display: flex;
     flex-wrap: wrap;
