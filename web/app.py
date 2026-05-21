@@ -1688,6 +1688,65 @@ def worker_runs_list_route():
         return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
     return {"ok": True, "runs": runs}
 
+
+@app.route("/worker-runs/view", methods=["GET"])
+def worker_runs_view_route():
+    """Phase 7.2: full detail for a single worker run.
+
+    Accepts ?run_id=<dir name> (relative to .agent/worker_runs/) or
+    ?path=<absolute or relative path>. Path-traversal guarded.
+    """
+    from core import worker_runs as _worker_runs
+    run_id = (request.values.get("run_id") or "").strip()
+    path = (request.values.get("path") or "").strip()
+    if not run_id and not path:
+        return {"ok": False, "error": "run_id or path is required"}, 400
+    target = path or run_id
+    try:
+        run = _worker_runs.read_worker_run(
+            target,
+            worker_runs_root=_handoff_runner.WORKER_RUNS_ROOT,
+        )
+    except FileNotFoundError as e:
+        return {"ok": False, "error": str(e)}, 404
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    return {"ok": True, "run": run}
+
+
+@app.route("/worker-runs/import", methods=["POST"])
+def worker_runs_import_route():
+    """Phase 7.2: import a complete (non-dry-run) worker run as a proposal.
+
+    Refuses dry-run / incomplete runs and any path that escapes
+    .agent/worker_runs/. Never modifies the real repo.
+    """
+    from core import worker_runs as _worker_runs
+    run_id = (request.form.get("run_id") or "").strip()
+    path = (request.form.get("path") or "").strip()
+    if not run_id and not path:
+        return {"ok": False, "error": "run_id or path is required"}, 400
+    target = path or run_id
+    try:
+        result = _worker_runs.import_worker_run_as_proposal(
+            target,
+            worker_runs_root=_handoff_runner.WORKER_RUNS_ROOT,
+        )
+    except FileNotFoundError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    return {
+        "ok": True,
+        "proposal_dir": result["proposal_dir"],
+        "source_run_id": result["source_run_id"],
+        "item": result["item"],
+    }
+
 @app.route("/local_critique", methods=["POST"])
 def local_critique():
     import os
