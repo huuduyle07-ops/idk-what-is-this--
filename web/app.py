@@ -1716,6 +1716,39 @@ def worker_runs_view_route():
     return {"ok": True, "run": run}
 
 
+@app.route("/proposals/validate", methods=["POST"])
+def proposals_validate_route():
+    """Phase 7.2.1: revalidate an imported worker proposal's patch_plan.json
+    in a temp clone of repo_path. Writes apply_result.json +
+    validation.json + validation_output.txt into the proposal_dir. Never
+    modifies the real repo or repo_path.
+    """
+    from core import worker_runs as _worker_runs
+    proposal_dir = (request.form.get("proposal_dir") or "").strip()
+    repo_path = (request.form.get("repo_path") or "").strip()
+    if not proposal_dir:
+        return {"ok": False, "error": "proposal_dir is required"}, 400
+    if not repo_path:
+        return {"ok": False, "error": "repo_path is required"}, 400
+    try:
+        timeout_sec = int(request.form.get("validation_timeout_sec") or 60)
+    except ValueError:
+        return {"ok": False, "error": "validation_timeout_sec must be int"}, 400
+    try:
+        result = _worker_runs.validate_imported_worker_proposal(
+            proposal_dir,
+            repo_path,
+            validation_timeout_sec=timeout_sec,
+        )
+    except FileNotFoundError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    return result
+
+
 @app.route("/worker-runs/import", methods=["POST"])
 def worker_runs_import_route():
     """Phase 7.2: import a complete (non-dry-run) worker run as a proposal.

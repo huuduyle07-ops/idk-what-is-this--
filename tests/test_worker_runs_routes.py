@@ -165,3 +165,61 @@ def test_import_refuses_dry_run(client):
 def test_import_requires_run_id_or_path(client):
     resp = client.post("/worker-runs/import", data={})
     assert resp.status_code == 400
+
+
+# ---- /proposals/validate (Phase 7.2.1) --------------------------------------
+
+
+def _import_via_route(client, run_id="20260521_010001_v", title="V"):
+    _make_complete_run(client, run_id=run_id, title=title)
+    resp = client.post("/worker-runs/import", data={"run_id": run_id})
+    return resp.get_json()["proposal_dir"]
+
+
+def test_validate_route_happy_path(client, monkeypatch):
+    proposal_dir = _import_via_route(client, "20260521_010101_v1")
+
+    import core.worker_runs as _wr
+    monkeypatch.setattr(
+        _wr, "run_patch_plan_with_artifacts",
+        lambda project_root, plan, **kw: {
+            "success": True, "applied_ops": plan, "diffs": [], "error": None,
+        },
+    )
+    monkeypatch.setattr(_wr, "_inferred_validation_command", lambda repo: "echo OK")
+
+    resp = client.post("/proposals/validate", data={
+        "proposal_dir": proposal_dir,
+        "repo_path": str(client._fake_repo),
+    })
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert body["ok"] is True
+    assert body["apply_success"] is True
+    assert body["validation_ok"] is True
+    assert body["proposal_dir"] == proposal_dir
+
+
+def test_validate_route_requires_proposal_dir(client):
+    resp = client.post("/proposals/validate",
+                       data={"repo_path": str(client._fake_repo)})
+    assert resp.status_code == 400
+
+
+def test_validate_route_requires_repo_path(client):
+    proposal_dir = _import_via_route(client, "20260521_010102_v2")
+    resp = client.post("/proposals/validate", data={"proposal_dir": proposal_dir})
+    assert resp.status_code == 400
+
+
+def test_validate_route_rejects_path_traversal(client, tmp_path):
+    outside = tmp_path / "outside_proposal"
+    outside.mkdir()
+    (outside / "patch_plan.json").write_text("[]", encoding="utf-8")
+    resp = client.post("/proposals/validate", data={
+        "proposal_dir": str(outside),
+        "repo_path": str(client._fake_repo),
+    })
+    assert resp.status_code == 400
+    body = resp.get_json()
+    assert "outside" in body["error"]
