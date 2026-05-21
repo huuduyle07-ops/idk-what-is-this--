@@ -1058,6 +1058,7 @@ Phase 6 manual-safe memory loop shipped (2026-05-17): bucketed lesson storage, M
   LESSON_RETRIEVAL_ENABLED, manual proposal→lesson CLI. Auto-creation (Phase 6.4) still deferred.
 Phase 7.1 Mayor Mode handoff + optional subagent runner shipped (2026-05-21): pure storage handoff notes under .agent/handoffs/, temp-clone subprocess runner, memory-tab UI panel.
 Phase 7.2 Worker Run Review / Import shipped (2026-05-21): core/worker_runs.py + /worker-runs/view + /worker-runs/import + Memory tab Worker Runs subsection. Bridges 7.1 outputs into the existing proposal -> lesson review path without bypassing safety gates.
+Phase 7.2.1 Validate Imported Worker Proposals shipped (2026-05-21): core.worker_runs.validate_imported_worker_proposal + POST /proposals/validate + UI Validate button. Applies worker patch_plan.json in a temp clone of repo_path, runs the inferred validation command, writes apply_result.json + validation.json + validation_output.txt into the proposal_dir. Real repo / repo_path byte-identical before/after.
 Next: prompt-version quantifier / Patch Safety gate / held-out eval, then optionally Phase 6.4 auto-creation. Benchmark run buttons + Add Case clerk are now shipped; remaining Benchmark polish is category/language batch + report density.
 Do not add MCTS yet — require a 10-case mini-experiment first.
 ```
@@ -1141,5 +1142,38 @@ The bridge from Phase 7.1 worker outputs into the existing proposal review path.
 3. **Idempotency / dedup.** Hash the worker run's `(handoff.md + patch_plan.json)` and refuse re-import if the same proposal already exists.
 4. **"Imported from worker_run" badge in the Proposals list.** The list view currently treats worker-run imports the same as normal proposals (because `item.json` is structurally compatible). A small visual badge would surface provenance.
 5. **Tail-streaming raw_output.** For long worker runs, the inline preview is capped at 2000 chars. A "show full output" toggle that fetches the file in chunks would help debug timeouts.
+
+---
+
+## Phase 7.2.1 — Validate Imported Worker Proposals (shipped 2026-05-21)
+
+Spec: `docs/superpowers/specs/2026-05-21-phase-7-2-1-validate-imported-proposals-design.md`
+Plan: `docs/superpowers/plans/2026-05-21-phase-7-2-1-validate-imported-proposals.md`
+
+The validation half of the Phase 7.1 → 7.2 bridge. After 7.2.1, the operator can see whether the worker's `patch_plan.json` actually applies and validates without touching the real repo.
+
+### What this phase adds
+
+- `core.worker_runs.validate_imported_worker_proposal(proposal_dir, repo_path, *, proposals_root=None, validation_timeout_sec=60)` — copies `repo_path` to a temp clone with the standard ignore_patterns (`.git`, `.agent`, `node_modules`, `target`, `.venv`, `venv`, `__pycache__`, `.pytest_cache`, `dist`, `build`), applies the imported `patch_plan.json` via `run_patch_plan_with_artifacts(validation_command=None)`, then runs the inferred validation command via `scripts.run_patch_proposal_queue._run_validation_command` (same allow-list + segmented-timeout discipline as the existing proposal queue). Writes `apply_result.json`, `validation.json`, `validation_output.txt` into the proposal_dir. Updates `item.json` with `needs_revalidation=False` and `validation_status` (`passed` / `failed` / `no_command`) without rewriting any other fields.
+- Web route: `POST /proposals/validate` taking `proposal_dir` + `repo_path` + optional `validation_timeout_sec`. Maps `FileNotFoundError` / `ValueError` to 400, unexpected to 500.
+- UI: Worker Runs section's post-import status now offers a **Validate imported proposal** button. Reads `repo_path` from the existing input or via prompt, posts to `/proposals/validate`, and renders the result inline (apply ✓/✗, validation ✓/✗/·, message, artifact paths).
+- Tests: 7 new in `tests/test_worker_runs.py` (refuses missing `patch_plan.json`, rejects path traversal, rejects missing `repo_path`, writes all three artifact files on happy path, real-repo SHA-256 byte-identical before/after, failed apply doesn't crash, empty inferred command records `no_command`). 4 new in `tests/test_worker_runs_routes.py` (happy path, missing proposal_dir, missing repo_path, path-traversal rejection). Full suite at **285/285** passing.
+
+### Guardrails (verified by tests, not just claimed)
+
+- Real repo and `repo_path` are byte-identical before and after every validate call.
+- Subagents do not run in this slice.
+- Patch is never applied to the real repo or to `repo_path` directly — only to the temp clone.
+- `case.json` / `patch_proposal.json` are NOT synthesized — worker-run imports remain non-lesson-promotable via `scripts/create_lesson_from_proposal.py` until a follow-up slice handles their shape explicitly.
+- Path traversal: any `proposal_dir` that escapes `.agent/proposals/` is rejected before any file read.
+- Failed apply records `apply_success=False` and `validation_status="failed"` without raising; UI surfaces the error inline.
+
+### 🤖 Claude-proposed Phase 7.2.1.1+ follow-ups (pending user decision)
+
+1. **Worker-run lesson candidacy.** Synthesize a minimal `case.json` + `patch_proposal.json` from `handoff.md` + worker artifacts after a passing validate, so the existing `create_lesson_from_proposal.py` flow accepts the import. This closes the last gap between Phase 7.1 and lesson candidacy.
+2. **Validate button on every worker-run-import proposal card.** Today the button only appears in the Worker Runs section's post-import status. Adding it to each card in the Proposals list lets the operator re-validate later runs of the same import.
+3. **Custom validation_command override.** UI input to override the inferred command (useful when `inspect_repo_inventory` guesses wrong, or for ad-hoc smoke tests).
+4. **Explicit patch-safety call.** The validate step currently relies on `apply_patch_plan`'s per-op gates. Calling `evaluate_patch_safety` upfront would short-circuit clearly-unsafe plans with a 400 instead of an apply error.
+5. **Async + progress polling.** The route is synchronous; long validation can hit Flask's default timeout. Mirror `core/proposal_runner.py` for an async variant with state polling.
 
 
