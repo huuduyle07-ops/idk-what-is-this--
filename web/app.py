@@ -754,6 +754,19 @@ def health_route():
         )
 
 
+@app.route("/tools/registry", methods=["GET"])
+def tools_registry_route():
+    """Phase 8-prep: read-only listing of the tool registry. Metadata only;
+    this route never invokes any registered tool.
+    """
+    from core import tool_registry
+    try:
+        tools = tool_registry.list_tools()
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    return {"ok": True, "tools": tools}
+
+
 @app.route("/benchmarks/list", methods=["GET"])
 def benchmarks_list_route():
     """List past benchmark reports for the Benchmarks tab (Phase 5 Slice 3).
