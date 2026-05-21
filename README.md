@@ -529,6 +529,140 @@ This project is designed to avoid reckless code changes.
 - It ignores obviously destructive user-provided validation commands.
 - It tests web patches in temporary repository copies before touching the real project.
 
+## Operator Manual
+
+The system has grown past "run-and-hope". The pieces below are how to drive it on purpose — who's the boss, when to use which tab, and when to stop.
+
+### Mental model — four roles
+
+- **You (the operator / "Mayor")** — the only role that decides what becomes memory or touches the real repo.
+- **AI Coding Mentor (this project)** — workspace, evidence collection, safety layer. Not an authority.
+- **Subagent (Codex / Claude Code / Gemini / other)** — external worker. Only ever runs in a temp clone, never the real repo.
+- **Lessons** — promoted memory. Advisory hints to the prompt, never override the user, repo state, validation, or safety gate.
+
+Core rule:
+
+> **The subagent is not the boss. The Mentor is not certain. The human decides what becomes a lesson and what becomes active.**
+
+### Decision tree — which tab for which job
+
+| Goal | Use | Don't use |
+| --- | --- | --- |
+| Understand code, plan, ask questions | **Chat / Understanding mode** | Don't apply patches or run subagents from Chat |
+| Apply a single targeted patch | **Instant Run / Patch flow** | Don't use for exploration |
+| Generate proposals from benchmark gaps | **Dream tab → Make proposal** | Don't expect Dream to auto-apply |
+| Promote a validated proposal into prompt memory | **Memory tab → Lessons → Promote** | Don't promote without reading the proposal |
+| Send a bounded task to an external coding agent | **Memory tab → Mayor Mode (Handoffs)** | Don't tick "Allow run" without an exit plan |
+| Measure the whole system | **Benchmarks tab / `run_benchmarks.py`** | Don't run after every small change |
+
+### Patch flow safety gate
+
+The Patch Safety gate (`core/patch_safety.evaluate_patch_safety`) is wired into all patch execution routes, including both test/dry-run routes and real-apply routes:
+- `POST /test_patch` (in `web/routes/patch_routes.py`)
+- `POST /apply_patch`
+- `POST /test_patch_plan`
+- `POST /apply_patch_plan`
+- `POST /dream/apply` (still in `web/app.py`)
+
+A patch is blocked before it writes if it touches forbidden files (`.env`, `.agent`, `.git`, `node_modules`, `target`, tests/benchmark validation files), uses unsafe paths, or shows other safety reasons. Validation command safety is handled separately by the validation/runner layer. The web UI surfaces the block reason; the CLI propagates it through `apply_result`.
+
+Don't bypass the gate. If you find yourself wanting to, fix the patch instead.
+
+### Dream item statuses — what they mean
+
+When you open a Dream run, items carry one of:
+
+- `ready_to_apply` — has a `patch_plan.json`, passed sandbox revalidation. You may consider applying it.
+- `planned_no_patch` — plan only, no patch generated yet (often debt/research items, or a blocked patch). Check `patch_blockers` for why.
+- `needs_manual_review` — patch exists but the safety/quality grade said it needs a human.
+- `blocked_missing_context` — not enough information to plan safely.
+- `patch_skipped_needs_vibe` — `safe_minimal` couldn't fit; would need `balanced` or `vibe` style.
+- `research_note_created` — only a research/design note was produced.
+
+Dream produces **evidence**, not authority. Read the artifact before acting.
+
+### Proposal → lesson lifecycle
+
+Lessons live globally under `.agent/lessons/{candidate,active,blocked}/`. They are not per-analyzed-repo. The lifecycle:
+
+1. **Generate a proposal.** Web: Dream tab → Make proposal on a specific item. CLI: `python scripts/run_patch_proposal_queue.py --max-items 1`. Items must carry `human_approved_for_proposal=true` to be processed.
+2. **Inspect the proposal.** Memory tab → Proposals → View. Read `proposal.md` and `patch_plan.json`. The artifact lives under `.agent/proposals/<run>/<item>/`.
+3. **Create a lesson candidate.** Web: "Create candidate lesson" on the proposal card. CLI: `python scripts/create_lesson_from_proposal.py --proposal-dir .agent/proposals/<run>/<item>` (or add `--create-lesson-candidates` to the proposal queue command).
+4. **Promote candidate → active.** Memory tab → Lessons → Candidate filter → Promote. This is the only step that makes the lesson retrieval-eligible.
+
+A candidate lesson is **not** used by the prompt. Active is required.
+
+### When does a lesson reach the prompt?
+
+All three of:
+
+1. The lesson is in `.agent/lessons/active/`.
+2. The lesson record's `active_knowledge_allowed` is `true`.
+3. The env var `LESSON_RETRIEVAL_ENABLED=true` is set at process start.
+
+Verify by running a patch flow with retrieval on, then inspecting `.agent/debug_last_control_prompt.txt` for the block:
+
+```
+[ACTIVE LESSONS — advisory hints, lowest priority]
+```
+
+Active lessons are **advisory hints, lowest priority**. The user request, repo state, validation output, and Patch Safety gate all outrank them.
+
+### Mayor Mode (Phase 7.1) — handoffs to external agents
+
+A bounded way to ship a task to Codex / Claude Code / Gemini / other without ever modifying the real repo.
+
+**Default (note only):**
+
+1. Memory tab → Mayor Mode (Handoffs) → Create new handoff.
+2. Fill title, worker, task type, allowed files, validation command, context summary.
+3. Click **Create handoff**. A note lands under `.agent/handoffs/<YYYYMMDD_HHMMSS>_<slug>.md`. No subprocess runs.
+
+**With explicit opt-in:**
+
+1. Tick **"Allow running subagent in temp clone"**.
+2. Click **Create + Run (in temp clone)**.
+3. The system copies the repo to a temp directory (excluding `.git`, `.agent`, `node_modules`, etc.), writes `HANDOFF.md` into it, and runs the worker's command there. Output lands in `.agent/worker_runs/<run>/`.
+4. Real repo files are byte-identical before and after (verified by test).
+5. If the worker produced a `proposal.md` / `patch_plan.json`, it's copied to the artifact dir. To act on it, run it through the normal proposal → lesson flow — Phase 7.1 does not auto-promote anything.
+
+Worker commands default to `codex exec --full-auto`, `claude --print`, `gemini --prompt-file HANDOFF.md`. Override via env vars `HANDOFF_CODEX_CMD`, `HANDOFF_CLAUDE_CODE_CMD`, `HANDOFF_GEMINI_CMD`, `HANDOFF_OTHER_CMD`. Default timeout 300s, overridable.
+
+**When to opt in to Allow Run:** the task is narrow, the allowed/forbidden files are explicit, the validation command is clear, and you're prepared to spend the worker's API quota.
+
+**When not to:** the task is vague, the repo is in an odd state, or you only wanted to explain or understand something — use Chat instead.
+
+### Benchmarks — when to run
+
+| Situation | Command |
+| --- | --- |
+| Sanity-check that all 22 cases load | `python benchmarks/run_benchmarks.py --check --quiet` |
+| Iterate on one case | `python benchmarks/run_benchmarks.py --fast --summary --case cpp_account_interest` |
+| Full milestone confirmation | `python benchmarks/run_benchmarks.py --fast --summary --skip-toolchain-failures --markdown --retry-failed 1` |
+
+Rule of thumb: after a small code change, run the targeted unit tests. After a milestone, run the full benchmark. Don't claim "22/22" in a roadmap entry until a fresh full run has actually passed.
+
+### Daily workflow
+
+**Start of session:**
+
+```bash
+git status
+python -m compileall -q core web scripts tests
+python -m pytest --basetemp=.tmp/pytest -p no:cacheprovider
+```
+
+**Pick exactly one of:** fix a bug, create a proposal, create a lesson, run a subagent, refactor debt, update docs. Mixing two within one commit makes the git history harder to read later.
+
+**End of session:** same compileall + pytest, then `git status` and `git log --oneline -5`. Commit messages should name the kind of work (`Add ...`, `Extract ... into blueprint`, `Polish ...`).
+
+### Four sentences worth remembering
+
+- If it **writes to the real repo**, the Patch Safety gate runs first.
+- If it becomes **memory** (a lesson), evidence (a validated proposal) comes first.
+- If it **runs another agent**, an explicit human opt-in checkbox comes first.
+- If it becomes **active**, a human Promote step comes first.
+
 ## Current Project Status
 
 This is an active AI engineering project, not a tiny demo. The code already includes:
