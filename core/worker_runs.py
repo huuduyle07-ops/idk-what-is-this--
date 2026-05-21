@@ -533,3 +533,233 @@ def validate_imported_worker_proposal(
         "apply_result_path": str(resolved / "apply_result.json"),
         "validation_path": str(resolved / "validation.json"),
     }
+
+
+# --- Phase 7.2.1.1: synthesize lesson artifacts -----------------------------
+
+_LESSON_SYNTH_REQUIRED_FILES: tuple[str, ...] = (
+    "proposal.md",
+    "patch_plan.json",
+    "apply_result.json",
+    "validation.json",
+)
+
+
+def _infer_language_from_plan(plan: list[Any]) -> str:
+    """Map the first changed-file extension we recognize to a language.
+
+    Returns "unknown" when no op has a recognizable extension. Pure function;
+    isolated so tests can exercise it without touching the filesystem.
+    """
+    try:
+        from config import LANGUAGE_MAP
+    except Exception:
+        return "unknown"
+    for op in plan or []:
+        if not isinstance(op, dict):
+            continue
+        rel = op.get("relative_path") or op.get("file") or ""
+        if not isinstance(rel, str) or not rel:
+            continue
+        ext = Path(rel).suffix.lower()
+        lang = LANGUAGE_MAP.get(ext)
+        if lang and lang != "unknown":
+            return lang
+    return "unknown"
+
+
+def _extract_changed_files_from_plan(plan: list[Any]) -> list[str]:
+    """Order-preserving, deduplicated list of `relative_path`/`file` strings
+    from a patch_plan list. Non-string / blank entries are skipped.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for op in plan or []:
+        if not isinstance(op, dict):
+            continue
+        rel = op.get("relative_path") or op.get("file")
+        if isinstance(rel, str) and rel.strip() and rel not in seen:
+            seen.add(rel)
+            out.append(rel)
+    return out
+
+
+def _first_useful_line_of_markdown(text: str) -> str:
+    """Return the first non-blank line of `text` that is not a markdown
+    heading, code fence, or HTML comment. Empty string if none qualifies.
+    """
+    if not isinstance(text, str):
+        return ""
+    in_fence = False
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        if line.startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if line.startswith("#"):
+            continue
+        if line.startswith("<!--"):
+            continue
+        return line
+    return ""
+
+
+def _slug_from_proposal_dir(proposal_dir: Path) -> str:
+    """Derive a slug from item.json.title if available, else the directory
+    name with a leading numeric index stripped.
+    """
+    item_path = proposal_dir / "item.json"
+    if item_path.is_file():
+        try:
+            data = json.loads(item_path.read_text(encoding="utf-8"))
+            title = data.get("title") if isinstance(data, dict) else None
+            if isinstance(title, str) and title.strip():
+                return _slug(title)
+        except (OSError, json.JSONDecodeError):
+            pass
+    name = proposal_dir.name
+    # e.g. "01-fix-flaky-fixtures" -> "fix-flaky-fixtures"
+    if "-" in name:
+        head, _, tail = name.partition("-")
+        if head.isdigit() and tail:
+            return tail
+    return name or "worker-run-import"
+
+
+def _load_synth_inputs(proposal_dir: Path) -> dict[str, Any]:
+    """Read the four artifacts the synth helper needs.
+
+    Raises FileNotFoundError if any is missing. Returns a dict with parsed
+    apply_result, validation, patch_plan, plus the raw proposal.md text.
+    """
+    missing = [
+        name for name in _LESSON_SYNTH_REQUIRED_FILES
+        if not (proposal_dir / name).is_file()
+    ]
+    if missing:
+        raise FileNotFoundError(
+            f"lesson synthesis missing: {', '.join(missing)}"
+        )
+    apply_result = json.loads((proposal_dir / "apply_result.json").read_text(encoding="utf-8"))
+    validation = json.loads((proposal_dir / "validation.json").read_text(encoding="utf-8"))
+    plan = json.loads((proposal_dir / "patch_plan.json").read_text(encoding="utf-8"))
+    proposal_md = (proposal_dir / "proposal.md").read_text(encoding="utf-8")
+    return {
+        "apply_result": apply_result if isinstance(apply_result, dict) else {},
+        "validation": validation if isinstance(validation, dict) else {},
+        "patch_plan": plan if isinstance(plan, list) else [],
+        "proposal_md": proposal_md,
+    }
+
+
+def synthesize_lesson_artifacts_for_validated_worker_proposal(
+    proposal_dir: str | Path,
+    validation_result: dict[str, Any] | None = None,
+    *,
+    proposals_root: Path | None = None,
+) -> dict[str, Any]:
+    """Synthesize a minimal case.json + patch_proposal.json so the existing
+    `scripts/create_lesson_from_proposal.py` flow accepts a worker-run import.
+
+    Deterministic (no LLM). Self-gates on apply_success + validation_ok; if
+    either is false, returns {ok: False, skipped_reason: ...} without writing
+    anything. Preserves existing case.json / patch_proposal.json verbatim and
+    records them in `preserved`.
+
+    Returns: {"ok", "created", "preserved", "skipped_reason"}.
+    """
+    proposals_dst_root = _resolve_proposals_root(proposals_root)
+    resolved = _resolve_proposal_dir(proposal_dir, proposals_dst_root)
+
+    inputs = _load_synth_inputs(resolved)
+    apply_result = inputs["apply_result"]
+    validation = (
+        validation_result
+        if isinstance(validation_result, dict) and validation_result
+        else inputs["validation"]
+    )
+    plan = inputs["patch_plan"]
+    proposal_md_text = inputs["proposal_md"]
+
+    apply_success = bool(apply_result.get("success"))
+    val_ok = validation.get("validation_ok")
+
+    if not apply_success:
+        return {
+            "ok": False,
+            "created": [],
+            "preserved": [],
+            "skipped_reason": "apply did not succeed",
+        }
+    if val_ok is not True:
+        return {
+            "ok": False,
+            "created": [],
+            "preserved": [],
+            "skipped_reason": (
+                "validation did not pass" if val_ok is False
+                else "validation did not run; no command inferred"
+            ),
+        }
+
+    slug = _slug_from_proposal_dir(resolved)
+    language = _infer_language_from_plan(plan)
+    changed_files = _extract_changed_files_from_plan(plan)
+    summary_line = _first_useful_line_of_markdown(proposal_md_text)
+    summary = summary_line or f"Worker-run import: {slug}"
+
+    created: list[str] = []
+    preserved: list[str] = []
+
+    case_path = resolved / "case.json"
+    if case_path.is_file():
+        preserved.append("case.json")
+    else:
+        case = {
+            "name": slug,
+            "case_name": slug,
+            "language": language,
+            "category": "worker_import",
+            "difficulty": "unknown",
+            "validation_command": str(validation.get("command") or ""),
+            "source": "worker_run",
+            "expected_changed_files": [],
+            "forbidden_changed_files": [],
+        }
+        case_path.write_text(
+            json.dumps(case, indent=2, ensure_ascii=False, sort_keys=True),
+            encoding="utf-8",
+        )
+        created.append("case.json")
+
+    proposal_path = resolved / "patch_proposal.json"
+    if proposal_path.is_file():
+        preserved.append("patch_proposal.json")
+    else:
+        patch_proposal = {
+            "source": "worker_run",
+            "patch_kind": "patch_plan",
+            "summary": summary,
+            "changed_files": changed_files,
+            "validation_ok": True,
+            "apply_success": True,
+            "patch_plan": plan,
+            "patch_candidate": None,
+            "needs_human_review": False,
+        }
+        proposal_path.write_text(
+            json.dumps(patch_proposal, indent=2, ensure_ascii=False, sort_keys=True),
+            encoding="utf-8",
+        )
+        created.append("patch_proposal.json")
+
+    return {
+        "ok": True,
+        "created": created,
+        "preserved": preserved,
+        "skipped_reason": None,
+    }

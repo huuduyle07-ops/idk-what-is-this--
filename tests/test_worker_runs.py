@@ -413,3 +413,231 @@ def test_validate_no_command_inferred_records_no_command(env, monkeypatch):
     assert result["validation_ok"] is None
     item = json.loads((proposal_dir / "item.json").read_text(encoding="utf-8"))
     assert item["validation_status"] == "no_command"
+
+
+# ---- synthesize_lesson_artifacts_for_validated_worker_proposal (7.2.1.1) ----
+
+
+def _validated_proposal(env, run_id, *, apply_success=True, validation_ok=True,
+                       validation_command="echo OK"):
+    """Set up an imported worker proposal with the four artifacts the
+    synth helper requires. No actual subprocess work — we just lay the
+    files down so the helper can read them.
+    """
+    proposal_dir = _import(env, run_id)
+    apply_result = {
+        "success": apply_success,
+        "applied_ops": [
+            {"op": "replace_snippet", "relative_path": "src/foo.py",
+             "target_snippet": "x = 1", "patched_snippet": "x = 2"}
+        ],
+        "diffs": ["--- a/src/foo.py\n+++ b/src/foo.py\n@@\n-x = 1\n+x = 2\n"],
+        "rollback_performed": False,
+        "error": None,
+    }
+    validation = {
+        "ok": validation_ok,
+        "validation_ok": validation_ok,
+        "command": validation_command,
+        "duration_sec": 0.1,
+        "segments": [],
+        "output": "OK" if validation_ok else "AssertionError",
+        "error": None,
+    }
+    (proposal_dir / "apply_result.json").write_text(
+        json.dumps(apply_result, indent=2), encoding="utf-8"
+    )
+    (proposal_dir / "validation.json").write_text(
+        json.dumps(validation, indent=2), encoding="utf-8"
+    )
+    return proposal_dir, apply_result, validation
+
+
+def test_synthesize_creates_case_and_patch_proposal_after_passing_validation(env):
+    proposal_dir, _ap, val = _validated_proposal(env, "20260521_011000_a")
+    result = worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+        proposal_dir, validation_result=val
+    )
+
+    assert result["ok"] is True
+    assert set(result["created"]) == {"case.json", "patch_proposal.json"}
+    assert result["preserved"] == []
+    assert result["skipped_reason"] is None
+
+    case = json.loads((proposal_dir / "case.json").read_text(encoding="utf-8"))
+    assert case["category"] == "worker_import"
+    assert case["source"] == "worker_run"
+    assert case["difficulty"] == "unknown"
+    assert case["validation_command"] == "echo OK"
+    # Both name keys for compatibility:
+    assert case["name"] == case["case_name"]
+    assert isinstance(case["name"], str) and case["name"]
+    assert case["language"] == "python"  # inferred from .py extension
+
+    proposal = json.loads((proposal_dir / "patch_proposal.json").read_text(encoding="utf-8"))
+    assert proposal["source"] == "worker_run"
+    assert proposal["patch_kind"] == "patch_plan"
+    assert proposal["validation_ok"] is True
+    assert proposal["apply_success"] is True
+    assert proposal["changed_files"] == ["src/foo.py"]
+    # Full patch_plan embedded so _determine_patch_kind returns "patch_plan":
+    assert isinstance(proposal["patch_plan"], list) and proposal["patch_plan"]
+    assert proposal["patch_candidate"] is None
+    assert proposal["needs_human_review"] is False
+    # Summary picks up the first useful line of proposal.md
+    # (which our import writes as "# Worker proposal\n\nDo X.\n"):
+    assert proposal["summary"] == "Do X."
+
+
+def test_synthesize_skips_on_apply_failure(env):
+    proposal_dir, _ap, val = _validated_proposal(
+        env, "20260521_011000_b", apply_success=False
+    )
+    result = worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+        proposal_dir, validation_result=val
+    )
+    assert result["ok"] is False
+    assert result["created"] == []
+    assert "apply" in (result["skipped_reason"] or "").lower()
+    assert not (proposal_dir / "case.json").exists()
+    assert not (proposal_dir / "patch_proposal.json").exists()
+
+
+def test_synthesize_skips_on_validation_failure(env):
+    proposal_dir, _ap, val = _validated_proposal(
+        env, "20260521_011000_c", validation_ok=False
+    )
+    result = worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+        proposal_dir, validation_result=val
+    )
+    assert result["ok"] is False
+    assert result["created"] == []
+    assert "validation" in (result["skipped_reason"] or "").lower()
+    assert not (proposal_dir / "case.json").exists()
+
+
+def test_synthesize_preserves_existing_case_json(env):
+    proposal_dir, _ap, val = _validated_proposal(env, "20260521_011000_d")
+    existing = {"name": "preexisting", "language": "rust", "category": "manual"}
+    (proposal_dir / "case.json").write_text(
+        json.dumps(existing, indent=2), encoding="utf-8"
+    )
+    result = worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+        proposal_dir, validation_result=val
+    )
+    assert result["ok"] is True
+    assert "case.json" in result["preserved"]
+    assert "case.json" not in result["created"]
+    assert "patch_proposal.json" in result["created"]
+    # Existing content untouched:
+    case = json.loads((proposal_dir / "case.json").read_text(encoding="utf-8"))
+    assert case == existing
+
+
+def test_synthesize_preserves_existing_patch_proposal_json(env):
+    proposal_dir, _ap, val = _validated_proposal(env, "20260521_011000_e")
+    existing = {"summary": "previously authored", "patch_plan": [{"op": "noop"}]}
+    (proposal_dir / "patch_proposal.json").write_text(
+        json.dumps(existing, indent=2), encoding="utf-8"
+    )
+    result = worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+        proposal_dir, validation_result=val
+    )
+    assert result["ok"] is True
+    assert "patch_proposal.json" in result["preserved"]
+    assert "case.json" in result["created"]
+    proposal = json.loads((proposal_dir / "patch_proposal.json").read_text(encoding="utf-8"))
+    assert proposal == existing
+
+
+def test_synthesize_refuses_missing_proposal_md(env):
+    proposal_dir, _ap, val = _validated_proposal(env, "20260521_011000_f")
+    (proposal_dir / "proposal.md").unlink()
+    with pytest.raises(FileNotFoundError, match="proposal.md"):
+        worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+            proposal_dir, validation_result=val
+        )
+
+
+def test_synthesize_refuses_missing_patch_plan_json(env):
+    proposal_dir, _ap, val = _validated_proposal(env, "20260521_011000_g")
+    (proposal_dir / "patch_plan.json").unlink()
+    with pytest.raises(FileNotFoundError, match="patch_plan.json"):
+        worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+            proposal_dir, validation_result=val
+        )
+
+
+def test_synthesize_rejects_path_traversal(env, tmp_path):
+    outside = tmp_path / "outside_proposal"
+    outside.mkdir()
+    for f in ("proposal.md", "patch_plan.json", "apply_result.json", "validation.json"):
+        (outside / f).write_text("{}", encoding="utf-8")
+    with pytest.raises(ValueError, match="outside"):
+        worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(outside)
+
+
+def test_synthesize_infers_go_language_from_go_files(env):
+    proposal_dir, _ap, val = _validated_proposal(env, "20260521_011000_h")
+    # Overwrite patch_plan.json with go-only ops.
+    (proposal_dir / "patch_plan.json").write_text(
+        json.dumps([
+            {"op": "replace_snippet", "relative_path": "cmd/main.go",
+             "target_snippet": "a", "patched_snippet": "b"}
+        ], indent=2),
+        encoding="utf-8",
+    )
+    worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+        proposal_dir, validation_result=val
+    )
+    case = json.loads((proposal_dir / "case.json").read_text(encoding="utf-8"))
+    assert case["language"] == "go"
+
+
+def test_synthesize_summary_skips_headers_and_code_fences(env):
+    proposal_dir, _ap, val = _validated_proposal(env, "20260521_011000_i")
+    (proposal_dir / "proposal.md").write_text(
+        "# Header line\n"
+        "\n"
+        "```python\n"
+        "code = 1\n"
+        "```\n"
+        "<!-- hidden comment -->\n"
+        "Real summary first line.\n"
+        "Trailing line.\n",
+        encoding="utf-8",
+    )
+    worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+        proposal_dir, validation_result=val
+    )
+    proposal = json.loads((proposal_dir / "patch_proposal.json").read_text(encoding="utf-8"))
+    assert proposal["summary"] == "Real summary first line."
+
+
+def test_synthesize_summary_fallback_when_proposal_md_has_no_useful_line(env):
+    proposal_dir, _ap, val = _validated_proposal(env, "20260521_011000_j")
+    (proposal_dir / "proposal.md").write_text("# only header\n", encoding="utf-8")
+    worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+        proposal_dir, validation_result=val
+    )
+    proposal = json.loads((proposal_dir / "patch_proposal.json").read_text(encoding="utf-8"))
+    assert proposal["summary"].startswith("Worker-run import:")
+
+
+def test_synthesize_real_repo_byte_identical(env):
+    proposal_dir, _ap, val = _validated_proposal(env, "20260521_011000_k")
+    before = _real_repo_state(env["fake_repo"])
+    worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+        proposal_dir, validation_result=val
+    )
+    after = _real_repo_state(env["fake_repo"])
+    assert before == after, "synth must not modify the real repo"
+
+
+def test_synthesize_reads_validation_from_disk_when_no_in_memory_result(env):
+    proposal_dir, _ap, _val = _validated_proposal(env, "20260521_011000_l")
+    result = worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(
+        proposal_dir  # no validation_result kwarg → read from disk
+    )
+    assert result["ok"] is True
+    assert "case.json" in result["created"]
