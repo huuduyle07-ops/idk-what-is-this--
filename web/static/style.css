@@ -720,6 +720,97 @@ button {
     border-color: #334155;
 }
 
+/* Phase 8-prep.1: Tool Registry viewer (Settings/Health) */
+.tool-registry-section .health-header {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tool-registry__mode-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.tool-registry__mode {
+    background: #0f172a;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+.tool-registry__note {
+    font-size: 12px;
+    color: #94a3b8;
+    font-style: italic;
+    margin: 4px 0 8px 0;
+}
+
+.tool-registry__summary {
+    font-size: 12px;
+    color: #cbd5e1;
+    margin-bottom: 6px;
+}
+
+.tool-registry__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.tool-registry__table th,
+.tool-registry__table td {
+    text-align: left;
+    padding: 4px 6px;
+    border-bottom: 1px solid #1e293b;
+    vertical-align: top;
+}
+
+.tool-registry__table thead th {
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 10px;
+    border-bottom: 1px solid #334155;
+}
+
+.tool-row--blocked {
+    opacity: 0.55;
+}
+
+.tool-row--danger code {
+    color: #fca5a5;
+}
+
+.tool-row--mcp-off td {
+    background: rgba(127, 29, 29, 0.08);
+}
+
+.tool-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tool-badge--ok {
+    background: #064e3b;
+    color: #6ee7b7;
+    border: 1px solid #065f46;
+}
+
+.tool-badge--off {
+    background: #1e293b;
+    color: #94a3b8;
+    border: 1px solid #334155;
+}
+
 .memory-row {
     display: flex;
     flex-wrap: wrap;

@@ -56,5 +56,9 @@ benchmarks/tmp/
 .tmp
 .superpowers
 
+pytest.ini
+pytest_cache/
+.pytest_cache/
+pytest/
 #tests
 #docs

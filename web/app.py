@@ -756,15 +756,47 @@ def health_route():
 
 @app.route("/tools/registry", methods=["GET"])
 def tools_registry_route():
-    """Phase 8-prep: read-only listing of the tool registry. Metadata only;
-    this route never invokes any registered tool.
+    """Phase 8-prep.1: read-only, mode-aware listing of the tool registry.
+
+    Metadata only. Annotates each tool with an `allowed` boolean computed
+    via tool_registry.is_tool_allowed under the requested capability_mode
+    (default read_only). Never invokes any registered tool.
     """
     from core import tool_registry
+
+    mode = (request.values.get("mode") or "read_only").strip()
+    if mode not in tool_registry.VALID_CAPABILITY_MODES:
+        return (
+            {
+                "ok": False,
+                "error": (
+                    f"unknown mode {mode!r}; must be one of "
+                    f"{sorted(tool_registry.VALID_CAPABILITY_MODES)}"
+                ),
+            },
+            400,
+        )
+
     try:
         tools = tool_registry.list_tools()
     except Exception as e:
         return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
-    return {"ok": True, "tools": tools}
+
+    allowed_count = 0
+    for t in tools:
+        # list_tools returns deep copies — safe to annotate in place.
+        is_allowed = tool_registry.is_tool_allowed(t["name"], capability_mode=mode)
+        t["allowed"] = bool(is_allowed)
+        if is_allowed:
+            allowed_count += 1
+
+    return {
+        "ok": True,
+        "capability_mode": mode,
+        "tools": tools,
+        "allowed_count": allowed_count,
+        "total_count": len(tools),
+    }
 
 
 @app.route("/benchmarks/list", methods=["GET"])

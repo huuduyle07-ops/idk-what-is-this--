@@ -289,7 +289,7 @@ _TOOLS: tuple[dict[str, Any], ...] = (
         mcp_exposable=True,
         default_enabled=True,
         route_or_function="POST /proposals/validate",
-        notes="Real repo and repo_path are byte-identical before and after; subprocess runs only inside the temp clone. Synth step (7.2.1.1) lands case.json + patch_proposal.json on success.",
+        notes="Categorized as artifact_write because the deliverable is .agent/ JSON; subprocess risk is encoded via can_run_subprocess + requires_human_approval, not the category. Real repo and repo_path are byte-identical before and after; subprocess runs only inside the temp clone. Synth step (7.2.1.1) lands case.json + patch_proposal.json on success.",
     ),
 
     # --- Registered but disabled for MCP (6) -------------------------------

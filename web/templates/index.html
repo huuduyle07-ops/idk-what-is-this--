@@ -572,6 +572,34 @@
               <div class="health-empty">Loading…</div>
             </div>
           </div>
+
+          <!-- Phase 8-prep.1: Tool Registry viewer.
+               Metadata-only. Reads GET /tools/registry; never invokes a tool. -->
+          <div class="health-section tool-registry-section">
+            <div class="health-header">
+              <strong>Tool Registry</strong>
+              <span class="tool-registry__mode-wrap">
+                <label for="toolRegistryMode" class="tool-registry__mode-label">Mode</label>
+                <select id="toolRegistryMode" class="tool-registry__mode"
+                        onchange="loadToolRegistry(true)">
+                  <option value="read_only">read_only</option>
+                  <option value="artifact_write">artifact_write</option>
+                  <option value="operator">operator</option>
+                  <option value="unsafe_dev">unsafe_dev</option>
+                </select>
+              </span>
+              <button type="button" class="sidebar-refresh"
+                      onclick="loadToolRegistry(true)"
+                      title="Re-fetch /tools/registry">⟳ Refresh</button>
+            </div>
+            <div class="tool-registry__note">
+              Registry is metadata-only. This page does not execute tools.
+            </div>
+            <div id="toolRegistrySummary" class="tool-registry__summary"></div>
+            <div id="toolRegistryList" class="tool-registry__list">
+              <div class="health-empty">Loading…</div>
+            </div>
+          </div>
         </div>
         </section>
     </main>
@@ -2560,7 +2588,11 @@ function showWorkspaceTab(id) {
     });
 
     // Phase 5 Slice 2: lazy-load Health panel on first show.
-    if (id === "settings") loadHealthPanel(false);
+    if (id === "settings") {
+        loadHealthPanel(false);
+        // Phase 8-prep.1: lazy-load Tool Registry viewer.
+        if (typeof loadToolRegistry === "function") loadToolRegistry(false);
+    }
     // Phase 5 Slice 3: lazy-load Benchmarks panel on first show.
     if (id === "benchmarks") {
         loadBenchmarksPanel(false);
@@ -2639,6 +2671,94 @@ function loadHealthPanel(force = false) {
         })
         .catch(err => {
             if (list) list.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        });
+}
+
+// Phase 8-prep.1: Tool Registry viewer.
+// Read-only fetch of GET /tools/registry. Renders a table; no execution.
+let _toolRegistryLoaded = false;
+
+function _renderToolRegistry(data) {
+    const list = document.getElementById("toolRegistryList");
+    const summary = document.getElementById("toolRegistrySummary");
+    if (!list) return;
+
+    if (!data || data.ok === false) {
+        const err = (data && data.error) || "unknown error";
+        if (summary) summary.innerHTML = "";
+        list.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        return;
+    }
+
+    const mode = data.capability_mode || "read_only";
+    if (summary) {
+        summary.innerHTML =
+            `Mode <code>${_escapeHtml(mode)}</code> &middot; ` +
+            `<strong>${data.allowed_count}</strong> of ` +
+            `<strong>${data.total_count}</strong> tools allowed.`;
+    }
+
+    const rows = (data.tools || []).map(t => {
+        const isDanger = t.can_touch_real_repo === true;
+        const isDisabled = t.mcp_exposable === false;
+        const rowCls = [
+            "tool-row",
+            t.allowed ? "tool-row--allowed" : "tool-row--blocked",
+            isDanger ? "tool-row--danger" : "",
+            isDisabled ? "tool-row--mcp-off" : "",
+        ].filter(Boolean).join(" ");
+        const yes = v => v ? "yes" : "no";
+        const allowedBadge = t.allowed
+            ? `<span class="tool-badge tool-badge--ok">allowed</span>`
+            : `<span class="tool-badge tool-badge--off">blocked</span>`;
+        return `
+            <tr class="${rowCls}">
+                <td><code>${_escapeHtml(t.name)}</code></td>
+                <td>${_escapeHtml(t.category)}</td>
+                <td>${allowedBadge}</td>
+                <td>${yes(t.mcp_exposable)}</td>
+                <td>${yes(t.can_touch_real_repo)}</td>
+                <td>${yes(t.can_run_subprocess)}</td>
+                <td>${yes(t.requires_human_approval)}</td>
+            </tr>`;
+    }).join("");
+
+    list.innerHTML = `
+        <table class="tool-registry__table">
+            <thead>
+                <tr>
+                    <th>name</th>
+                    <th>category</th>
+                    <th>allowed</th>
+                    <th>mcp_exposable</th>
+                    <th>touches real repo</th>
+                    <th>subprocess</th>
+                    <th>requires approval</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>`;
+}
+
+function loadToolRegistry(force = false) {
+    if (_toolRegistryLoaded && !force) return;
+    const list = document.getElementById("toolRegistryList");
+    const select = document.getElementById("toolRegistryMode");
+    const mode = select ? select.value : "read_only";
+    if (list) list.innerHTML = `<div class="health-empty">Loading…</div>`;
+    fetch("/tools/registry?mode=" + encodeURIComponent(mode))
+        .then(r => r.json().then(body => ({ status: r.status, body })))
+        .then(({ status, body }) => {
+            if (status >= 400 && body && body.ok === false) {
+                _renderToolRegistry(body);
+                return;
+            }
+            _renderToolRegistry(body);
+            _toolRegistryLoaded = true;
+        })
+        .catch(err => {
+            if (list) list.innerHTML =
+                `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
         });
 }
 
