@@ -33,6 +33,7 @@ _EXPECTED_READ_TOOLS = {
     "read_lesson_proposal",
     "list_worker_runs",
     "read_worker_run",
+    "list_tool_registry",  # Phase 8.1
 }
 
 _EXPECTED_ARTIFACT_WRITE_TOOLS = {
@@ -58,7 +59,7 @@ def test_list_tools_returns_initial_set():
     tools = tool_registry.list_tools()
     names = {t["name"] for t in tools}
     assert names == _EXPECTED_READ_TOOLS | _EXPECTED_ARTIFACT_WRITE_TOOLS | _EXPECTED_DISABLED_TOOLS
-    assert len(tools) == 18
+    assert len(tools) == 19
 
     for t in tools:
         missing = _REQUIRED_KEYS - set(t.keys())
@@ -106,7 +107,7 @@ def test_get_tool_returns_copy():
 # ---- tools_by_category -----------------------------------------------------
 
 
-def test_tools_by_category_read_returns_nine():
+def test_tools_by_category_read_returns_ten():
     reads = tool_registry.tools_by_category("read")
     assert {t["name"] for t in reads} == _EXPECTED_READ_TOOLS
 

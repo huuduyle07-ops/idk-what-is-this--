@@ -645,27 +645,56 @@ Position: Browser agent is not core patching. It is a research/input tool for Dr
 
 ## Phase 8 — MCP sidecar
 
-**Status: DEFERRED**
+**Status: Phase 8-prep + Phase 8.1 SHIPPED; later sub-phases DEFERRED**
 
 MCP is an external safe API, not the brain.
 
-### Safe tools first
+### Phase 8.1 — read-only MCP server MVP (shipped)
 
-- `get_latest_benchmark_report`
-- `run_benchmark_case` with whitelist
-- `read_project_map`
-- `get_code_dna`
-- `get_phantom_limb_report`
-- `local_critique`
+Local MCP server (`scripts/mcp_readonly_server.py` / `mcp_server/read_only.py`)
+exposes a strict read-only subset of the C.A.T.T.U.S tool registry over stdio
+using the official `mcp` Python SDK (FastMCP).
+
+**What it CAN do:**
+- enumerate the tool registry (`list_tool_registry`)
+- read workspace health, benchmark reports, Dream reports, lessons,
+  lesson source proposals, and worker run artifacts
+- every wrapper is path-traversal guarded and reads metadata only
+
+**What it CANNOT do (enforced by `core.tool_registry`):**
+- write files, run subagents, apply patches, or promote/block lessons
+- create/import/validate proposals
+- expose any tool whose `mcp_exposable=False`
+- be reconfigured into `unsafe_dev` mode from outside
+
+The server is gated by `tool_registry.is_tool_allowed(name, "read_only")`
+on every startup — no hardcoded name lists. Importing the module does
+not start the server; the friendly missing-dep message
+`"MCP package not installed. Install optional MCP dependencies to run
+this server."` prints to stderr (exit 2) if `mcp` is not installed.
+
+### Safe tools (read-only baseline, exposed by 8.1)
+
+- `get_health`
+- `list_benchmark_reports`
+- `read_benchmark_report`
 - `list_dream_reports`
+- `read_dream_report`
+- `list_lessons`
+- `read_lesson_proposal`
+- `list_worker_runs`
+- `read_worker_run`
+- `list_tool_registry`
 
-### Avoid first
+### Avoid first (still deferred past 8.1)
 
 - arbitrary shell command
 - arbitrary file write
 - direct patch apply to real repo
 - delete/move files
 - DB writes
+- subagent execution / handoff runs
+- lesson promotion or blocking
 
 > 🤖 **Claude-proposed (2026-05-16):** Once Phases 4–6 are stable, MCP becomes very high-value because other Claude agents (or any MCP-aware AI tool) can query your benchmarks/dream/health directly instead of relying on the user pasting context. The whitelisted-tools approach in the current plan is correct — keep it.
 >

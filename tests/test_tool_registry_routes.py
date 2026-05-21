@@ -18,7 +18,7 @@ def test_tools_registry_route_returns_tool_list(client):
     body = resp.get_json()
     assert body["ok"] is True
     assert isinstance(body["tools"], list)
-    assert len(body["tools"]) == 18
+    assert len(body["tools"]) == 19
     names = {t["name"] for t in body["tools"]}
     assert "get_health" in names
     assert "apply_patch" in names  # registered but mcp_exposable=False
@@ -97,8 +97,9 @@ def test_tools_registry_response_includes_allowed_count_and_total_count(client):
     body = resp.get_json()
     assert body["total_count"] == len(body["tools"])
     assert body["allowed_count"] == sum(1 for t in body["tools"] if t["allowed"])
-    # In read_only every `read` category tool is exposable -> 9 allowed.
-    assert body["allowed_count"] == 9
+    # In read_only every `read` category tool is exposable -> 10 allowed
+    # (9 original read tools + list_tool_registry added in Phase 8.1).
+    assert body["allowed_count"] == 10
 
 
 def test_tools_registry_route_does_not_execute_tools(client):

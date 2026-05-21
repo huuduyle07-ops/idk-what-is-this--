@@ -237,6 +237,22 @@ _TOOLS: tuple[dict[str, Any], ...] = (
         route_or_function="GET /worker-runs/view",
         notes="raw_output_preview is capped at 2000 chars; full file lives on disk.",
     ),
+    _tool(
+        name="list_tool_registry",
+        title="List the C.A.T.T.U.S tool registry",
+        description="Return the full tool registry as metadata (every tool's category, flags, route, notes). Pure metadata — does not invoke any tool.",
+        category="read",
+        phase="8.1",
+        reads=["core.tool_registry (in-process)"],
+        writes=[],
+        can_touch_real_repo=False,
+        can_run_subprocess=False,
+        requires_human_approval=False,
+        mcp_exposable=True,
+        default_enabled=True,
+        route_or_function="GET /tools/registry",
+        notes="Self-describing endpoint for MCP clients. Mirrors the dict shape from tool_registry.list_tools().",
+    ),
 
     # --- Artifact-write (3) ------------------------------------------------
     _tool(
