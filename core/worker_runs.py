@@ -20,12 +20,14 @@ from __future__ import annotations
 
 import json
 import shutil
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from core import handoff_notes
 from core.handoff_notes import _slug  # type: ignore[attr-defined]
+from core.run_lifecycle import run_patch_plan_with_artifacts
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -298,4 +300,236 @@ def import_worker_run_as_proposal(
         "source_run_id": resolved.name,
         "item": item,
         "imported_at": now_iso,
+    }
+
+
+# --- Phase 7.2.1: validate imported worker proposal -------------------------
+
+_VALIDATE_COPY_IGNORE = shutil.ignore_patterns(
+    ".git", ".agent", "node_modules", "target",
+    ".venv", "venv", "__pycache__", ".pytest_cache",
+    "dist", "build",
+)
+
+
+def _inferred_validation_command(repo: Path) -> str:
+    """Best-effort inference: language from `inspect_repo_inventory`, command
+    from `get_default_validation_command`. Returns "" if no command applies.
+
+    Isolated in a thin helper so tests can monkeypatch it without spinning
+    up the full language detector for each fixture.
+    """
+    try:
+        from core.repo_librarian import inspect_repo_inventory
+        from core.validation_command import get_default_validation_command
+        language = inspect_repo_inventory(str(repo)).get(
+            "primary_language", "unknown"
+        )
+        return get_default_validation_command(language, repo) or ""
+    except Exception:
+        return ""
+
+
+def _resolve_proposal_dir(
+    path_or_id: str | Path, proposals_root: Path
+) -> Path:
+    """Path-traversal guard. Returns a directory strictly under proposals_root."""
+    raw = str(path_or_id).strip()
+    if not raw:
+        raise ValueError("proposal_dir is empty")
+    candidate = Path(raw)
+    if not candidate.is_absolute():
+        candidate = proposals_root / candidate
+    candidate = candidate.expanduser().resolve()
+    root_resolved = proposals_root.resolve()
+    try:
+        candidate.relative_to(root_resolved)
+    except ValueError as exc:
+        raise ValueError(
+            f"proposal_dir is outside {root_resolved}: {candidate}"
+        ) from exc
+    if not candidate.is_dir():
+        raise FileNotFoundError(f"proposal_dir not found: {candidate}")
+    return candidate
+
+
+def _read_proposal_title(proposal_dir: Path) -> str:
+    item_path = proposal_dir / "item.json"
+    if item_path.is_file():
+        try:
+            data = json.loads(item_path.read_text(encoding="utf-8"))
+            title = data.get("title") if isinstance(data, dict) else None
+            if isinstance(title, str) and title.strip():
+                return title.strip()
+        except (OSError, json.JSONDecodeError):
+            pass
+    return proposal_dir.name
+
+
+def _update_item_status(proposal_dir: Path, status: str) -> None:
+    item_path = proposal_dir / "item.json"
+    if not item_path.is_file():
+        return
+    try:
+        item = json.loads(item_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return
+    if not isinstance(item, dict):
+        return
+    item["needs_revalidation"] = False
+    item["validation_status"] = status
+    item["validation_status_at"] = _now_iso()
+    item_path.write_text(
+        json.dumps(item, indent=2, ensure_ascii=False, sort_keys=True),
+        encoding="utf-8",
+    )
+
+
+def validate_imported_worker_proposal(
+    proposal_dir: str | Path,
+    repo_path: str | Path,
+    *,
+    proposals_root: Path | None = None,
+    validation_timeout_sec: int = 60,
+) -> dict[str, Any]:
+    """Apply the worker proposal's patch_plan.json in a temp clone of
+    `repo_path` and run the inferred validation command. Writes
+    `apply_result.json`, `validation.json`, `validation_output.txt` into
+    proposal_dir. Never modifies the real repo or `repo_path`.
+
+    Returns dict: {ok, proposal_dir, apply_success, validation_ok,
+                   message, apply_result_path, validation_path}.
+    """
+    proposals_dst_root = _resolve_proposals_root(proposals_root)
+    resolved = _resolve_proposal_dir(proposal_dir, proposals_dst_root)
+
+    plan_path = resolved / "patch_plan.json"
+    if not plan_path.is_file():
+        raise FileNotFoundError(
+            f"proposal_dir missing patch_plan.json: {resolved}"
+        )
+    try:
+        plan = json.loads(plan_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"patch_plan.json is not valid JSON: {exc}") from exc
+    if not isinstance(plan, list) or not plan:
+        raise ValueError("patch_plan.json must be a non-empty JSON list")
+
+    repo_src = Path(repo_path).expanduser().resolve()
+    if not repo_src.is_dir():
+        raise FileNotFoundError(f"repo_path is not a directory: {repo_src}")
+
+    title = _read_proposal_title(resolved)
+    apply_result: dict[str, Any] = {}
+    validation: dict[str, Any] = {}
+    validation_output_text = ""
+
+    with tempfile.TemporaryDirectory(
+        prefix="worker-validate-", ignore_cleanup_errors=True
+    ) as tmp_dir:
+        temp_clone = Path(tmp_dir) / "repo"
+        shutil.copytree(repo_src, temp_clone, ignore=_VALIDATE_COPY_IGNORE)
+
+        try:
+            apply_result = run_patch_plan_with_artifacts(
+                str(temp_clone),
+                plan,
+                validation_command=None,
+                user_query=title,
+                control_result={
+                    "route": "worker_run_validate",
+                    "proposal_dir": str(resolved),
+                    "title": title,
+                },
+                source="worker_run_validate",
+            )
+        except Exception as exc:
+            apply_result = {
+                "success": False,
+                "error": f"{type(exc).__name__}: {exc}",
+                "applied_ops": [],
+                "diffs": [],
+            }
+
+        validation_command = _inferred_validation_command(temp_clone)
+
+        if apply_result.get("success") and validation_command:
+            try:
+                from scripts.run_patch_proposal_queue import _run_validation_command
+                validation = _run_validation_command(
+                    validation_command,
+                    cwd=temp_clone,
+                    timeout_sec=max(1, int(validation_timeout_sec)),
+                )
+            except Exception as exc:
+                validation = {
+                    "ok": False,
+                    "validation_ok": False,
+                    "command": validation_command,
+                    "error": f"validation runner error: {type(exc).__name__}: {exc}",
+                    "duration_sec": 0.0,
+                    "segments": [],
+                    "output": "",
+                }
+        elif not apply_result.get("success"):
+            validation = {
+                "ok": False,
+                "validation_ok": None,
+                "command": validation_command,
+                "error": "apply did not succeed; validation skipped",
+                "duration_sec": 0.0,
+                "segments": [],
+                "output": "",
+            }
+        else:
+            # apply succeeded but no command could be inferred
+            validation = {
+                "ok": True,
+                "validation_ok": None,
+                "command": "",
+                "error": "no validation command inferred",
+                "duration_sec": 0.0,
+                "segments": [],
+                "output": "",
+            }
+
+        validation_output_text = validation.get("output") or ""
+
+    (resolved / "apply_result.json").write_text(
+        json.dumps(apply_result, indent=2, ensure_ascii=False, default=str),
+        encoding="utf-8",
+    )
+    (resolved / "validation.json").write_text(
+        json.dumps(validation, indent=2, ensure_ascii=False, default=str),
+        encoding="utf-8",
+    )
+    (resolved / "validation_output.txt").write_text(
+        validation_output_text, encoding="utf-8"
+    )
+
+    apply_success = bool(apply_result.get("success"))
+    val_ok = validation.get("validation_ok")
+    if not apply_success:
+        status = "failed"
+        message = "Apply failed: " + str(apply_result.get("error") or "(no detail)")
+    elif val_ok is True:
+        status = "passed"
+        message = "Apply and validation passed."
+    elif val_ok is False:
+        status = "failed"
+        message = "Apply succeeded but validation failed."
+    else:
+        status = "no_command"
+        message = "Apply succeeded; no validation command inferred — record only."
+
+    _update_item_status(resolved, status)
+
+    return {
+        "ok": True,
+        "proposal_dir": str(resolved),
+        "apply_success": apply_success,
+        "validation_ok": val_ok,
+        "message": message,
+        "apply_result_path": str(resolved / "apply_result.json"),
+        "validation_path": str(resolved / "validation.json"),
     }

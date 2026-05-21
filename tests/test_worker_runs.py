@@ -273,3 +273,143 @@ def test_import_handles_directory_collision(env):
     assert first["proposal_dir"] != second["proposal_dir"]
     assert Path(first["proposal_dir"]).is_dir()
     assert Path(second["proposal_dir"]).is_dir()
+
+
+# ---- validate_imported_worker_proposal (Phase 7.2.1) ------------------------
+
+
+def _import(env, run_id):
+    """Import a complete worker run and return the resulting proposal_dir."""
+    run_dir = _make_run(env, run_id)
+    result = worker_runs.import_worker_run_as_proposal(run_dir)
+    return Path(result["proposal_dir"])
+
+
+def test_validate_refuses_missing_patch_plan_json(env):
+    proposal_dir = _import(env, "20260521_010000_a")
+    (proposal_dir / "patch_plan.json").unlink()
+    with pytest.raises(FileNotFoundError, match="patch_plan.json"):
+        worker_runs.validate_imported_worker_proposal(
+            proposal_dir, env["fake_repo"]
+        )
+
+
+def test_validate_rejects_proposal_path_traversal(env, tmp_path):
+    outside = tmp_path / "outside_proposal"
+    outside.mkdir()
+    (outside / "patch_plan.json").write_text("[]", encoding="utf-8")
+    with pytest.raises(ValueError, match="outside"):
+        worker_runs.validate_imported_worker_proposal(
+            outside, env["fake_repo"]
+        )
+
+
+def test_validate_rejects_missing_repo_path(env):
+    proposal_dir = _import(env, "20260521_010000_b")
+    with pytest.raises(FileNotFoundError):
+        worker_runs.validate_imported_worker_proposal(
+            proposal_dir, env["fake_repo"].parent / "does_not_exist"
+        )
+
+
+def test_validate_writes_apply_and_validation_artifacts(env, monkeypatch):
+    proposal_dir = _import(env, "20260521_010000_c")
+
+    import core.worker_runs as _wr
+
+    def fake_apply(project_root, plan, validation_command=None, user_query="",
+                   control_result=None, source="pipeline"):
+        return {
+            "success": True,
+            "applied_ops": plan,
+            "diffs": ["--- a\n+++ b\n@@\n-x = 1\n+x = 2\n"],
+            "error": None,
+            "rollback_performed": False,
+        }
+
+    monkeypatch.setattr(_wr, "run_patch_plan_with_artifacts", fake_apply)
+    monkeypatch.setattr(_wr, "_inferred_validation_command", lambda repo: "echo OK")
+
+    result = worker_runs.validate_imported_worker_proposal(
+        proposal_dir, env["fake_repo"]
+    )
+
+    assert result["ok"] is True
+    assert result["apply_success"] is True
+    assert result["validation_ok"] is True
+    assert (proposal_dir / "apply_result.json").is_file()
+    assert (proposal_dir / "validation.json").is_file()
+    assert (proposal_dir / "validation_output.txt").is_file()
+
+    item = json.loads((proposal_dir / "item.json").read_text(encoding="utf-8"))
+    assert item["needs_revalidation"] is False
+    assert item["validation_status"] == "passed"
+
+
+def test_validate_real_repo_byte_identical(env, monkeypatch):
+    proposal_dir = _import(env, "20260521_010000_d")
+    before = _real_repo_state(env["fake_repo"])
+
+    import core.worker_runs as _wr
+
+    def fake_apply(project_root, plan, **kw):
+        # Write a sentinel file inside the temp clone path to confirm
+        # the function passed the clone path (not the real repo).
+        Path(project_root, "EVIDENCE_FROM_APPLY.txt").write_text("ok", encoding="utf-8")
+        return {"success": True, "applied_ops": plan, "diffs": [], "error": None}
+
+    monkeypatch.setattr(_wr, "run_patch_plan_with_artifacts", fake_apply)
+    monkeypatch.setattr(_wr, "_inferred_validation_command", lambda repo: "echo OK")
+
+    worker_runs.validate_imported_worker_proposal(proposal_dir, env["fake_repo"])
+
+    after = _real_repo_state(env["fake_repo"])
+    assert before == after, "real repo unchanged after validate"
+    assert not (env["fake_repo"] / "EVIDENCE_FROM_APPLY.txt").exists()
+
+
+def test_validate_failed_apply_does_not_crash(env, monkeypatch):
+    proposal_dir = _import(env, "20260521_010000_e")
+
+    import core.worker_runs as _wr
+
+    def fake_apply(project_root, plan, **kw):
+        return {"success": False, "error": "snippet not found",
+                "applied_ops": [], "diffs": []}
+
+    monkeypatch.setattr(_wr, "run_patch_plan_with_artifacts", fake_apply)
+    monkeypatch.setattr(_wr, "_inferred_validation_command", lambda repo: "echo OK")
+
+    result = worker_runs.validate_imported_worker_proposal(
+        proposal_dir, env["fake_repo"]
+    )
+
+    assert result["ok"] is True
+    assert result["apply_success"] is False
+    assert result["validation_ok"] is None
+    assert (proposal_dir / "apply_result.json").is_file()
+    assert (proposal_dir / "validation.json").is_file()
+
+    item = json.loads((proposal_dir / "item.json").read_text(encoding="utf-8"))
+    assert item["validation_status"] == "failed"
+
+
+def test_validate_no_command_inferred_records_no_command(env, monkeypatch):
+    proposal_dir = _import(env, "20260521_010000_f")
+
+    import core.worker_runs as _wr
+
+    def fake_apply(project_root, plan, **kw):
+        return {"success": True, "applied_ops": plan, "diffs": [], "error": None}
+
+    monkeypatch.setattr(_wr, "run_patch_plan_with_artifacts", fake_apply)
+    monkeypatch.setattr(_wr, "_inferred_validation_command", lambda repo: "")
+
+    result = worker_runs.validate_imported_worker_proposal(
+        proposal_dir, env["fake_repo"]
+    )
+
+    assert result["apply_success"] is True
+    assert result["validation_ok"] is None
+    item = json.loads((proposal_dir / "item.json").read_text(encoding="utf-8"))
+    assert item["validation_status"] == "no_command"
