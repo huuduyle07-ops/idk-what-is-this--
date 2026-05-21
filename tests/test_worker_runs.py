@@ -672,6 +672,50 @@ def test_validate_includes_lesson_artifacts_on_success(env, monkeypatch):
     assert la["skipped_reason"] is None
 
 
+def test_create_lesson_from_proposal_works_after_validate(env, monkeypatch, tmp_path):
+    """End-to-end: a validated worker import goes all the way to a candidate
+    lesson via the existing scripts/create_lesson_from_proposal.py CLI helper.
+    This is the whole point of Phase 7.2.1.1.
+    """
+    proposal_dir = _import(env, "20260521_012050_e2e")
+
+    import core.worker_runs as _wr
+    monkeypatch.setattr(
+        _wr, "run_patch_plan_with_artifacts",
+        lambda project_root, plan, **kw: {
+            "success": True, "applied_ops": plan, "diffs": [], "error": None,
+        },
+    )
+    monkeypatch.setattr(_wr, "_inferred_validation_command", lambda repo: "echo OK")
+
+    # Run the validate step — synth happens inside on success.
+    result = worker_runs.validate_imported_worker_proposal(
+        proposal_dir, env["fake_repo"]
+    )
+    assert result["apply_success"] is True
+    assert result["lesson_artifacts"]["ok"] is True
+    assert (proposal_dir / "case.json").is_file()
+    assert (proposal_dir / "patch_proposal.json").is_file()
+
+    # Now the lesson promoter should accept the synthesized proposal_dir.
+    from core import lesson_store
+    lesson_agent_dir = tmp_path / "lessons_agent"
+    monkeypatch.setattr(
+        lesson_store, "get_agent_dir", lambda repo_path=None: lesson_agent_dir
+    )
+    monkeypatch.setattr(lesson_store.config, "LESSON_AUTO_ACTIVE", False)
+
+    from scripts.create_lesson_from_proposal import create_lesson_from_proposal
+    lesson = create_lesson_from_proposal(proposal_dir)
+
+    assert lesson["status"] == "candidate"
+    assert lesson["source"] == "patch_proposal"
+    assert lesson["active_knowledge_allowed"] is False  # candidate, not active
+    # The lesson summary picks up our synthesized patch_proposal.summary,
+    # which came from the first useful line of proposal.md ("Do X.").
+    assert "Do X" in (lesson.get("summary") or "")
+
+
 def test_validate_lesson_artifacts_skipped_when_validation_failed(env, monkeypatch):
     proposal_dir = _import(env, "20260521_012000_b")
 

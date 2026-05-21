@@ -1059,6 +1059,7 @@ Phase 6 manual-safe memory loop shipped (2026-05-17): bucketed lesson storage, M
 Phase 7.1 Mayor Mode handoff + optional subagent runner shipped (2026-05-21): pure storage handoff notes under .agent/handoffs/, temp-clone subprocess runner, memory-tab UI panel.
 Phase 7.2 Worker Run Review / Import shipped (2026-05-21): core/worker_runs.py + /worker-runs/view + /worker-runs/import + Memory tab Worker Runs subsection. Bridges 7.1 outputs into the existing proposal -> lesson review path without bypassing safety gates.
 Phase 7.2.1 Validate Imported Worker Proposals shipped (2026-05-21): core.worker_runs.validate_imported_worker_proposal + POST /proposals/validate + UI Validate button. Applies worker patch_plan.json in a temp clone of repo_path, runs the inferred validation command, writes apply_result.json + validation.json + validation_output.txt into the proposal_dir. Real repo / repo_path byte-identical before/after.
+Phase 7.2.1.1 Make Validated Worker Imports Lesson-Promotable shipped (2026-05-21): synthesize_lesson_artifacts_for_validated_worker_proposal writes deterministic case.json + patch_proposal.json after a passing validate. End-to-end test proves scripts/create_lesson_from_proposal.py accepts the synthesized dir as a candidate lesson.
 Next: prompt-version quantifier / Patch Safety gate / held-out eval, then optionally Phase 6.4 auto-creation. Benchmark run buttons + Add Case clerk are now shipped; remaining Benchmark polish is category/language batch + report density.
 Do not add MCTS yet — require a 10-case mini-experiment first.
 ```
@@ -1175,5 +1176,45 @@ The validation half of the Phase 7.1 → 7.2 bridge. After 7.2.1, the operator c
 3. **Custom validation_command override.** UI input to override the inferred command (useful when `inspect_repo_inventory` guesses wrong, or for ad-hoc smoke tests).
 4. **Explicit patch-safety call.** The validate step currently relies on `apply_patch_plan`'s per-op gates. Calling `evaluate_patch_safety` upfront would short-circuit clearly-unsafe plans with a 400 instead of an apply error.
 5. **Async + progress polling.** The route is synchronous; long validation can hit Flask's default timeout. Mirror `core/proposal_runner.py` for an async variant with state polling.
+
+---
+
+## Phase 7.2.1.1 — Make Validated Worker Imports Lesson-Promotable (shipped 2026-05-21)
+
+Spec: `docs/superpowers/specs/2026-05-21-phase-7-2-1-1-lesson-artifact-synthesis-design.md`
+Plan: `docs/superpowers/plans/2026-05-21-phase-7-2-1-1-lesson-artifact-synthesis.md`
+
+Closes the last gap between Phase 7.1 handoff output and the lesson candidacy path. After a passing validate, `scripts/create_lesson_from_proposal.py` now accepts a worker-run import end-to-end — without any change to the lesson promoter, `lesson_quality`, or any safety gate.
+
+### What this phase adds
+
+- `core.worker_runs.synthesize_lesson_artifacts_for_validated_worker_proposal(proposal_dir, validation_result=None, *, proposals_root=None)` — deterministic synth (no LLM) that writes a minimal `case.json` and `patch_proposal.json` into the proposal_dir. Self-gates on `apply_result.success=True` AND `validation.validation_ok=True`; returns `{ok=False, skipped_reason}` otherwise. Preserves any existing `case.json` / `patch_proposal.json` verbatim and records them in `preserved`.
+- `validate_imported_worker_proposal` now always calls the synth helper. The validate response carries a new `lesson_artifacts: {ok, created, preserved, skipped_reason}` field; existing keys unchanged.
+- UI: the validate-result panel renders one muted line — "Lesson artifacts ready (case.json, patch_proposal.json)" on success, "Lesson artifacts not created: \<reason\>" on skip.
+- Tests: 13 new helper tests (happy path, both failure gates, both preservation paths, both missing-file refusals, path traversal, language inference, summary extraction + fallback, real-repo SHA-256), 2 new wiring tests, 2 new route tests, and 1 end-to-end integration test that proves `create_lesson_from_proposal.create_lesson_from_proposal(proposal_dir)` returns `status="candidate"` after the synth. Full suite at **300+/300+** passing.
+
+### Synthesis details
+
+- **case.json:** carries both `name` and `case_name` (= slug from `item.json.title` or `proposal_dir` name minus numeric prefix), `language` (inferred from the first recognized changed-file extension via `config.LANGUAGE_MAP`, else `"unknown"`), `category="worker_import"`, `difficulty="unknown"`, `validation_command` from `validation.json.command`, `source="worker_run"`, and explicit empty `expected_changed_files` / `forbidden_changed_files` lists so the lesson promoter's set math short-circuits cleanly.
+- **patch_proposal.json:** carries `source="worker_run"`, `patch_kind="patch_plan"`, `summary` (first non-blank line of `proposal.md` that isn't a markdown header / code fence / HTML comment; falls back to `"Worker-run import: <slug>"`), `changed_files` (from plan ops), `validation_ok=True`, `apply_success=True`, the full `patch_plan` embedded verbatim (so `_determine_patch_kind` returns `"patch_plan"`), `patch_candidate=null`, and `needs_human_review=false`.
+
+### Guardrails (verified by tests)
+
+- No LLM call. Pure deterministic synth from existing artifacts.
+- No auto-creation of lessons. The CLI still runs.
+- No auto-promotion. The end-to-end test asserts `status="candidate"` and `active_knowledge_allowed=False`.
+- No real-repo writes. SHA-256 round-trip check in the synth tests.
+- No subagent re-runs.
+- `lesson_quality` behavior unchanged — it evaluates the synthesized artifacts the same way it evaluates queue-proposal artifacts.
+- `create_lesson_from_proposal.py` safety gate unchanged — it still refuses unless `apply_success` AND `validation_ok` are both True (which the synth guarantees by gating).
+- Patch Safety gate unchanged.
+
+### 🤖 Claude-proposed Phase 7.2.1.1+ follow-ups
+
+1. **"Create candidate lesson" button in the Worker Runs section.** Right after a passing validate with `lesson_artifacts.ok=True`, offer a one-click button that POSTs to a new `/proposals/promote` (existing) or a new `/proposals/lessonize` endpoint. Today the operator runs the CLI manually.
+2. **Custom `case_name` / `category` override on synth.** UI text inputs so the operator can label the worker-derived case more usefully than the auto-derived slug.
+3. **Surface `expected_changed_files` from operator input.** The current empty default short-circuits the lesson promoter's set math; an operator-supplied expected list would make the resulting lesson stricter.
+4. **Re-synthesize on demand.** Today the helper preserves existing artifacts; a future `?regenerate=true` query param or `--force` flag would let the operator re-derive after editing `proposal.md`.
+5. **Async + progress polling for the whole validate+synth flow.** Same deferred follow-up as 7.2.1; not specific to synthesis.
 
 
