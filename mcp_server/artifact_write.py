@@ -62,7 +62,7 @@ def list_exposed_tool_names() -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# Harness stub — real implementation lands in Task 2.
+# Harness — happy path (validation lands in Tasks 3-4).
 # ---------------------------------------------------------------------------
 
 def create_handoff_note_harness(
@@ -70,11 +70,39 @@ def create_handoff_note_harness(
     *,
     handoff_root: Path | None = None,
 ) -> dict:
-    """STUB — replaced in Task 2 by validated wrapper around
-    core.handoff_notes.create_handoff_note. Kept as a NotImplementedError
-    raiser so importers see the symbol but no callers succeed yet.
+    """Validated dict-in/dict-out wrapper around
+    core.handoff_notes.create_handoff_note.
+
+    `handoff_root` is keyword-only and used only by tests + internal callers
+    that want to redirect output to a tmp_path. It is NOT part of `input`
+    (which is the MCP-facing schema), so external MCP callers cannot
+    influence it.
+
+    Returns: {ok, handoff_path, status, message} on success.
+    Raises: ValueError on invalid input (validation lands in Tasks 3-4).
     """
-    raise NotImplementedError("create_handoff_note_harness not yet implemented")
+    from core.handoff_notes import create_handoff_note as _core_create
+
+    result = _core_create(
+        title=input["title"],
+        intended_worker=input["intended_worker"],
+        task_type=input["task_type"],
+        repo_path=input.get("repo_path"),
+        allowed_files=input.get("allowed_files"),
+        forbidden_files=input.get("forbidden_files"),
+        validation_command=input.get("validation_command"),
+        context_summary=input.get("context_summary", ""),
+        expected_output=input.get("expected_output", ""),
+        # extra_safety_rules intentionally NOT exposed via the harness:
+        # defaults from core.handoff_notes.DEFAULT_SAFETY_RULES always apply.
+        handoff_root=handoff_root,
+    )
+    return {
+        "ok": True,
+        "handoff_path": result["path"],
+        "status": "draft",
+        "message": "Handoff note created. This did not run a subagent.",
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -84,6 +112,14 @@ def create_handoff_note_harness(
 # Re-use the read-only impls verbatim by direct import (sibling module in
 # the same package — leading underscore signals "internal to mcp_server",
 # not "internal to read_only.py").
+
+
+def _impl_create_handoff_note(input: dict) -> dict:
+    """MCP-registered impl. Delegates to the harness without exposing
+    `handoff_root` so external clients cannot redirect output."""
+    return create_handoff_note_harness(input)
+
+
 _IMPLS: dict[str, Callable[..., Any]] = {
     "get_health": read_only._impl_get_health,
     "list_benchmark_reports": read_only._impl_list_benchmark_reports,
@@ -95,5 +131,5 @@ _IMPLS: dict[str, Callable[..., Any]] = {
     "list_worker_runs": read_only._impl_list_worker_runs,
     "read_worker_run": read_only._impl_read_worker_run,
     "list_tool_registry": read_only._impl_list_tool_registry,
-    # "create_handoff_note" wired in Task 2 after harness lands.
+    "create_handoff_note": _impl_create_handoff_note,
 }
