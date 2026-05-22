@@ -90,3 +90,54 @@ def test_read_only_server_still_omits_create_handoff_note():
     assert "create_handoff_note" not in read_only.list_exposed_tool_names()
     # And the read-only server should still expose exactly 10.
     assert len(read_only.list_exposed_tool_names()) == 10
+
+# ---- friendly missing-dep error -------------------------------------------
+
+
+def test_build_server_raises_friendly_error_when_mcp_missing(monkeypatch):
+    from mcp_server import artifact_write
+
+    def fake_import_mcp():
+        return None, ImportError("No module named 'mcp'")
+
+    monkeypatch.setattr(artifact_write, "_import_mcp", fake_import_mcp)
+
+    with pytest.raises(RuntimeError) as exc_info:
+        artifact_write.build_server()
+    assert "MCP package not installed" in str(exc_info.value)
+
+
+def test_main_exits_nonzero_with_friendly_stderr_when_mcp_missing(
+    monkeypatch, capsys
+):
+    from mcp_server import artifact_write
+
+    monkeypatch.setattr(
+        artifact_write,
+        "_import_mcp",
+        lambda: (None, ImportError("no mcp")),
+    )
+
+    exit_code = artifact_write.main([])
+    err = capsys.readouterr().err
+    assert exit_code == 2
+    assert "MCP package not installed" in err
+
+
+def test_main_does_not_run_server_when_dep_missing(monkeypatch):
+    from mcp_server import artifact_write
+
+    monkeypatch.setattr(
+        artifact_write,
+        "_import_mcp",
+        lambda: (None, ImportError("no mcp")),
+    )
+
+    called = {"run": False}
+
+    class _StubServer:
+        def run(self):
+            called["run"] = True
+
+    artifact_write.main([])
+    assert called["run"] is False

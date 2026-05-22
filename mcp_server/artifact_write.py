@@ -256,3 +256,68 @@ _IMPLS: dict[str, Callable[..., Any]] = {
     "list_tool_registry": read_only._impl_list_tool_registry,
     "create_handoff_note": _impl_create_handoff_note,
 }
+
+# ---------------------------------------------------------------------------
+# Lazy MCP import
+# ---------------------------------------------------------------------------
+
+def _import_mcp() -> tuple[Any | None, BaseException | None]:
+    """Try to import FastMCP. Returns (FastMCP_class_or_None, error_or_None).
+
+    Isolated as its own function so tests can monkeypatch the missing-dep
+    branch even on machines where `mcp` IS installed.
+    """
+    try:
+        from mcp.server.fastmcp import FastMCP  # type: ignore[import-not-found]
+        return FastMCP, None
+    except ImportError as e:
+        return None, e
+
+
+# ---------------------------------------------------------------------------
+# Server construction + CLI entrypoint
+# ---------------------------------------------------------------------------
+
+def build_server() -> Any:
+    """Construct (but do not run) a FastMCP server with allowed tools wired.
+
+    Raises RuntimeError with the friendly message if the `mcp` package is
+    not installed. Never starts a server or opens stdio.
+    """
+    FastMCP, err = _import_mcp()
+    if FastMCP is None:
+        raise RuntimeError(_FRIENDLY_MISSING_DEP_MSG) from err
+
+    server = FastMCP(_SERVER_NAME)
+    allowed = set(list_exposed_tool_names())
+
+    for name in list(_IMPLS.keys()):
+        if name not in allowed:
+            continue
+        impl = _IMPLS[name]
+        meta = tool_registry.get_tool(name) or {}
+        description = meta.get("description") or meta.get("title") or name
+        server.add_tool(impl, name=name, description=description)
+
+    return server
+
+
+def main(argv: list[str] | None = None) -> int:
+    """CLI entrypoint. Returns a process exit code.
+
+    --list-tools branch lands in Task 7. For now: try to build + run a
+    server; exit 2 with a friendly stderr if `mcp` is missing.
+    """
+    args = list(argv if argv is not None else sys.argv[1:])
+
+    try:
+        server = build_server()
+    except RuntimeError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    server.run()
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover — exercised via scripts/ shim
+    raise SystemExit(main(sys.argv[1:]))
