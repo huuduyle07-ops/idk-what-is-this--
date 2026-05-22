@@ -141,7 +141,7 @@ Run:
 python -m pytest tests/test_mcp_artifact_write_server.py -x --tb=short
 ```
 
-Expected: all 13 collected tests fail with `ModuleNotFoundError: No module named 'mcp_server.artifact_write'`.
+Expected: 14 collected tests, all fail with `ModuleNotFoundError: No module named 'mcp_server.artifact_write'`. (Collection count is 14 because `test_specific_forbidden_tool_not_exposed` is parametrized across 8 forbidden tools — 6 unique test functions + 8 parametrized instances = 14 collected.)
 
 - [ ] **Step 3: Create the module skeleton**
 
@@ -257,7 +257,7 @@ Run:
 python -m pytest tests/test_mcp_artifact_write_server.py -v
 ```
 
-Expected: 13 passed (7 unique names + the 6 forbidden-tool parametrizations of `test_specific_forbidden_tool_not_exposed`).
+Expected: 14 passed (6 unique test functions + 8 parametrized instances of `test_specific_forbidden_tool_not_exposed`).
 
 If the registry returns `is_tool_allowed("create_handoff_note", "artifact_write") == False` for any reason, `test_exposed_names_are_exactly_eleven` would fail with 10 names. Sanity-check by running:
 
@@ -882,7 +882,7 @@ with:
     )
 ```
 
-- [ ] **Step 4: Run the tests, expect all 20 (15 + 5 new) to pass**
+- [ ] **Step 4: Run the tests, expect all 23 (18 + 5 new) to pass**
 
 Run:
 
@@ -890,7 +890,7 @@ Run:
 python -m pytest tests/test_create_handoff_note_harness.py -v
 ```
 
-Expected: 20 passed.
+Expected: 23 passed. (18 from Task 3 with its fix-up commit + 5 new from this task.)
 
 - [ ] **Step 5: Commit**
 
@@ -1005,7 +1005,7 @@ python -m pytest tests/test_create_handoff_note_harness.py -v -k "subprocess or 
 
 Expected: 3 passed. (If any of these fail, the implementation from Tasks 2–4 is unsafe and must be fixed before continuing.)
 
-- [ ] **Step 3: Run the full harness file to confirm all 23 tests pass**
+- [ ] **Step 3: Run the full harness file to confirm all 30 tests pass**
 
 Run:
 
@@ -1013,7 +1013,7 @@ Run:
 python -m pytest tests/test_create_handoff_note_harness.py -v
 ```
 
-Expected: 23 passed.
+Expected: 30 passed.
 
 - [ ] **Step 4: Commit**
 
@@ -1200,7 +1200,7 @@ Run:
 python -m pytest tests/test_mcp_artifact_write_server.py -v
 ```
 
-Expected: 16 passed (13 from Task 1 + 3 new).
+Expected: 17 passed (14 from Task 1 + 3 new).
 
 - [ ] **Step 6: Commit**
 
@@ -1346,7 +1346,7 @@ Run:
 python -m pytest tests/test_mcp_artifact_write_server.py -v
 ```
 
-Expected: 19 collected, 19 passed. Counted as: Task 1 contributed 5 unique test functions + 8 parametrized instances of `test_specific_forbidden_tool_not_exposed` (one per forbidden tool) = 13 collected. Task 6 added 3 + Task 7 added 3 = 19 total collected items.
+Expected: 20 collected, 20 passed. Counted as: Task 1 contributed 6 unique test functions + 8 parametrized instances of `test_specific_forbidden_tool_not_exposed` (one per forbidden tool) = 14 collected. Task 6 added 3 + Task 7 added 3 = 20 total collected items.
 
 - [ ] **Step 6: Commit**
 
@@ -1445,7 +1445,7 @@ Run:
 python -m pytest tests/test_mcp_artifact_write_server.py tests/test_create_handoff_note_harness.py -v
 ```
 
-Expected: 42 collected, 42 passed (19 server + 23 harness). The spec's "36 tests" count refers to unique test functions; pytest's collected count is 42 because `test_specific_forbidden_tool_not_exposed` is parametrized across 8 forbidden tool names.
+Expected: 50 collected, 50 passed (20 server + 30 harness). The harness count grew from the spec's planned 23 to 30 because Task 3's code review added 3 type-guard coverage tests and Task 4's code review added 4 path-safety coverage tests. The parametrized server test still contributes 8 instances to the collected count.
 
 - [ ] **Step 4: Run the cross-server regression: read-only suite must still be clean**
 
@@ -1509,6 +1509,6 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 8. `create_handoff_note_harness({...valid...})` writes a markdown file under `.agent/handoffs/` (or the test-supplied `handoff_root`) and returns `{ok: True, handoff_path, status: "draft", message: "Handoff note created. This did not run a subagent."}`.
 9. `create_handoff_note_harness` raises `ValueError` for: empty title, oversize title, empty/oversize context_summary, unknown worker, unknown task_type, traversal in `allowed_files`, absolute path in `allowed_files`, Windows-style traversal in `allowed_files`, traversal/absolute in `forbidden_files`, oversize validation_command, oversize expected_output, unknown extra field.
 10. `create_handoff_note_harness` does NOT invoke any subprocess and does NOT write outside the configured handoff root. `repo_path` is accepted as input but never written to.
-11. `pytest tests/test_mcp_artifact_write_server.py tests/test_create_handoff_note_harness.py` shows 42 collected, 42 passed.
+11. `pytest tests/test_mcp_artifact_write_server.py tests/test_create_handoff_note_harness.py` shows 50 collected, 50 passed.
 12. `pytest tests/test_mcp_readonly_server.py` continues to pass unchanged.
 13. `pytest tests/test_tool_registry.py tests/test_tool_registry_routes.py` continues to pass unchanged.
