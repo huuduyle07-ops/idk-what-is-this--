@@ -43,6 +43,16 @@ from patching.patch_gates import (
     promote_go_missing_import_candidate_to_patch_plan,
 )
 from core.source_snippet_fallback import hydrate_control_source_from_scout
+from web.mcp_inspector_processes import stop_mcp_inspectors
+
+
+def run_web_app(flask_app, **run_kwargs) -> None:
+    try:
+        flask_app.run(**run_kwargs)
+    finally:
+        stopped = stop_mcp_inspectors()
+        if stopped:
+            print(f"Stopped {stopped} MCP Inspector process tree(s).")
 
 def launch_web(host: str | None = None, port: int = 5000, open_browser: bool = True) -> None:
     """Spin up the Flask UI (web/app.py). Imports lazily to avoid a hard
@@ -69,7 +79,7 @@ def launch_web(host: str | None = None, port: int = 5000, open_browser: bool = T
         except Exception:
             pass
 
-    app.run(host=host, port=port, debug=False, use_reloader=False)
+    run_web_app(app, host=host, port=port, debug=False, use_reloader=False)
 
 
 def run_agent_web(
