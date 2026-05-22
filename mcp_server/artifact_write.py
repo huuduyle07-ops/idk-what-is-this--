@@ -105,7 +105,12 @@ def create_handoff_note_harness(
     if unknown:
         raise ValueError(f"unknown field(s): {sorted(unknown)}")
 
-    title = str(input.get("title") or "").strip()
+    title_raw = input.get("title")
+    if title_raw is not None and not isinstance(title_raw, str):
+        raise ValueError(
+            f"title must be a string, got {type(title_raw).__name__}"
+        )
+    title = (title_raw or "").strip()
     if not title:
         raise ValueError("title is required and must be non-empty")
     if len(title) > MAX_TITLE_LEN:
@@ -125,7 +130,13 @@ def create_handoff_note_harness(
             f"got {task_type!r}"
         )
 
-    context_summary = str(input.get("context_summary") or "").strip()
+    context_summary_raw = input.get("context_summary")
+    if context_summary_raw is not None and not isinstance(context_summary_raw, str):
+        raise ValueError(
+            f"context_summary must be a string, "
+            f"got {type(context_summary_raw).__name__}"
+        )
+    context_summary = (context_summary_raw or "").strip()
     if not context_summary:
         raise ValueError("context_summary is required and must be non-empty")
     if len(context_summary) > MAX_CONTEXT_SUMMARY_LEN:

@@ -152,3 +152,22 @@ def test_expected_output_too_long_rejected(tmp_path: Path):
     inp["expected_output"] = "x" * 4001
     with pytest.raises(ValueError, match="expected_output.*4000"):
         create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_non_dict_input_rejected(tmp_path: Path):
+    with pytest.raises(ValueError, match="must be a dict"):
+        create_handoff_note_harness("not a dict", handoff_root=tmp_path)
+
+
+def test_non_string_title_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["title"] = 42
+    with pytest.raises(ValueError, match="title must be a string"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_non_string_context_summary_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["context_summary"] = ["a", "list"]
+    with pytest.raises(ValueError, match="context_summary must be a string"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
