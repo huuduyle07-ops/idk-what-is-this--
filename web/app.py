@@ -32,6 +32,7 @@ from core import dream_artifacts
 from core import benchmark_web
 from core import lesson_store
 from core.patch_safety import evaluate_patch_safety
+from core.mcp_audit import list_mcp_invocations
 from database.memory_consolidator import consolidate_all
 from policy.decision_helper import normalize_patch_style
 from web.patch_helpers import patch_plan_files
@@ -796,6 +797,42 @@ def tools_registry_route():
         "tools": tools,
         "allowed_count": allowed_count,
         "total_count": len(tools),
+    }
+
+
+_MCP_AUDIT_DEFAULT_LIMIT = 50
+_MCP_AUDIT_MAX_LIMIT = 200
+
+
+def _mcp_audit_limit(value: str | None) -> int:
+    try:
+        limit = int((value or "").strip())
+    except (AttributeError, TypeError, ValueError):
+        return _MCP_AUDIT_DEFAULT_LIMIT
+    if limit <= 0:
+        return _MCP_AUDIT_DEFAULT_LIMIT
+    return min(limit, _MCP_AUDIT_MAX_LIMIT)
+
+
+@app.route("/mcp/audit", methods=["GET"])
+def mcp_audit_route():
+    """Read recent MCP invocation audit events without executing tools."""
+    limit = _mcp_audit_limit(request.values.get("limit"))
+    try:
+        events = list_mcp_invocations(limit=limit)
+    except Exception as e:
+        return {
+            "ok": False,
+            "events": [],
+            "count": 0,
+            "limit": limit,
+            "error": f"{type(e).__name__}: {e}",
+        }, 500
+    return {
+        "ok": True,
+        "events": events,
+        "count": len(events),
+        "limit": limit,
     }
 
 

@@ -15,6 +15,19 @@ import pytest
 from mcp_server.artifact_write import create_handoff_note_harness
 
 
+@pytest.fixture(autouse=True)
+def _mute_audit_writes(monkeypatch):
+    """Harness tests should not write the real .agent audit ledger."""
+    from mcp_server import artifact_write
+
+    monkeypatch.setattr(
+        artifact_write,
+        "record_mcp_invocation",
+        lambda **_kwargs: None,
+        raising=False,
+    )
+
+
 def _valid_input() -> dict:
     """Returns a fresh dict of valid input for use as a baseline."""
     return {
@@ -79,6 +92,91 @@ def test_default_forbidden_files_applied(tmp_path: Path):
     forbidden = meta.get("forbidden_files", [])
     for required in (".env", ".git", ".agent"):
         assert required in forbidden, f"{required} should be in forbidden_files"
+
+
+# ---- audit ledger ----------------------------------------------------------
+
+
+def test_success_records_audit_event(tmp_path: Path, monkeypatch):
+    from mcp_server import artifact_write
+
+    events = []
+    monkeypatch.setattr(
+        artifact_write,
+        "record_mcp_invocation",
+        lambda **kwargs: events.append(kwargs),
+    )
+
+    result = artifact_write.create_handoff_note_harness(
+        _valid_input(),
+        handoff_root=tmp_path,
+    )
+
+    assert len(events) == 1
+    assert events[0]["tool_name"] == "create_handoff_note"
+    assert events[0]["capability_mode"] == "artifact_write"
+    assert events[0]["allowed"] is True
+    assert result["handoff_path"] in events[0]["artifacts"]
+
+
+def test_failed_validation_records_blocked_audit_event(tmp_path: Path, monkeypatch):
+    from mcp_server import artifact_write
+
+    events = []
+    monkeypatch.setattr(
+        artifact_write,
+        "record_mcp_invocation",
+        lambda **kwargs: events.append(kwargs),
+    )
+    inp = _valid_input()
+    inp["title"] = ""
+
+    with pytest.raises(ValueError, match="title"):
+        artifact_write.create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+    assert len(events) == 1
+    assert events[0]["allowed"] is False
+    assert events[0]["result_summary"] is None
+    assert events[0]["artifacts"] == []
+    assert "title" in events[0]["error"]
+
+
+def test_audit_write_failure_does_not_change_success(tmp_path: Path, monkeypatch):
+    from mcp_server import artifact_write
+
+    attempts = {"count": 0}
+
+    def _raise_audit_error(**_kwargs):
+        attempts["count"] += 1
+        raise OSError("audit offline")
+
+    monkeypatch.setattr(artifact_write, "record_mcp_invocation", _raise_audit_error)
+
+    result = artifact_write.create_handoff_note_harness(
+        _valid_input(),
+        handoff_root=tmp_path,
+    )
+
+    assert result["ok"] is True
+    assert attempts["count"] == 1
+
+
+def test_audit_write_failure_keeps_validation_error(tmp_path: Path, monkeypatch):
+    from mcp_server import artifact_write
+
+    attempts = {"count": 0}
+
+    def _raise_audit_error(**_kwargs):
+        attempts["count"] += 1
+        raise OSError("audit offline")
+
+    monkeypatch.setattr(artifact_write, "record_mcp_invocation", _raise_audit_error)
+    inp = _valid_input()
+    inp["title"] = ""
+
+    with pytest.raises(ValueError, match="title"):
+        artifact_write.create_handoff_note_harness(inp, handoff_root=tmp_path)
+    assert attempts["count"] == 1
 
 
 # ---- input validation: rejections ------------------------------------------

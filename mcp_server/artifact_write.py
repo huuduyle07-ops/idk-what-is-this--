@@ -15,6 +15,7 @@ Design constraints:
 """
 from __future__ import annotations
 
+import logging
 import sys
 from pathlib import Path
 from typing import Any, Callable
@@ -24,7 +25,11 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from core import tool_registry
+from core.mcp_audit import record_mcp_invocation
 from mcp_server import read_only
+
+
+logger = logging.getLogger(__name__)
 
 
 # Documentation-only label — see list_exposed_tool_names for the actual gate.
@@ -124,6 +129,59 @@ def _validate_rel_path_list(values: Any, field_name: str) -> list[str] | None:
     return list(values)
 
 
+def _handoff_input_summary(input: Any) -> dict:
+    if not isinstance(input, dict):
+        return {"input_type": type(input).__name__}
+
+    summary = {
+        field_name: input[field_name]
+        for field_name in (
+            "title",
+            "intended_worker",
+            "task_type",
+            "context_summary",
+            "repo_path",
+            "allowed_files",
+            "forbidden_files",
+        )
+        if field_name in input
+    }
+    if "validation_command" in input:
+        summary["validation_command_present"] = bool(input.get("validation_command"))
+    if "expected_output" in input:
+        summary["expected_output_present"] = bool(input.get("expected_output"))
+
+    unknown_fields = sorted(str(name) for name in set(input) - _ALLOWED_INPUT_FIELDS)
+    if unknown_fields:
+        summary["unknown_fields"] = unknown_fields
+    return summary
+
+
+def _record_handoff_audit(
+    input: Any,
+    *,
+    allowed: bool,
+    result_summary: dict | None = None,
+    artifacts: list[str] | None = None,
+    error: str | None = None,
+) -> None:
+    try:
+        record_mcp_invocation(
+            tool_name="create_handoff_note",
+            capability_mode=CAPABILITY_MODE,
+            allowed=allowed,
+            input_summary=_handoff_input_summary(input),
+            result_summary=result_summary,
+            artifacts=artifacts or [],
+            error=error,
+        )
+    except Exception:
+        logger.warning(
+            "failed to record create_handoff_note MCP audit event",
+            exc_info=True,
+        )
+
+
 def create_handoff_note_harness(
     input: dict,
     *,
@@ -139,93 +197,109 @@ def create_handoff_note_harness(
     Returns: {ok, handoff_path, status, message} on success.
     Raises: ValueError on invalid input.
     """
-    if not isinstance(input, dict):
-        raise ValueError(f"input must be a dict, got {type(input).__name__}")
+    try:
+        if not isinstance(input, dict):
+            raise ValueError(f"input must be a dict, got {type(input).__name__}")
 
-    unknown = set(input.keys()) - _ALLOWED_INPUT_FIELDS
-    if unknown:
-        raise ValueError(f"unknown field(s): {sorted(unknown)}")
+        unknown = set(input.keys()) - _ALLOWED_INPUT_FIELDS
+        if unknown:
+            raise ValueError(f"unknown field(s): {sorted(unknown)}")
 
-    title_raw = input.get("title")
-    if title_raw is not None and not isinstance(title_raw, str):
-        raise ValueError(
-            f"title must be a string, got {type(title_raw).__name__}"
-        )
-    title = (title_raw or "").strip()
-    if not title:
-        raise ValueError("title is required and must be non-empty")
-    if len(title) > MAX_TITLE_LEN:
-        raise ValueError(f"title must be <= {MAX_TITLE_LEN} chars")
-
-    intended_worker = input.get("intended_worker")
-    if intended_worker not in _VALID_WORKERS:
-        raise ValueError(
-            f"intended_worker must be one of {sorted(_VALID_WORKERS)}, "
-            f"got {intended_worker!r}"
-        )
-
-    task_type = input.get("task_type")
-    if task_type not in _VALID_TASK_TYPES:
-        raise ValueError(
-            f"task_type must be one of {sorted(_VALID_TASK_TYPES)}, "
-            f"got {task_type!r}"
-        )
-
-    context_summary_raw = input.get("context_summary")
-    if context_summary_raw is not None and not isinstance(context_summary_raw, str):
-        raise ValueError(
-            f"context_summary must be a string, "
-            f"got {type(context_summary_raw).__name__}"
-        )
-    context_summary = (context_summary_raw or "").strip()
-    if not context_summary:
-        raise ValueError("context_summary is required and must be non-empty")
-    if len(context_summary) > MAX_CONTEXT_SUMMARY_LEN:
-        raise ValueError(
-            f"context_summary must be <= {MAX_CONTEXT_SUMMARY_LEN} chars"
-        )
-
-    validation_command = input.get("validation_command")
-    if validation_command is not None:
-        validation_command = str(validation_command)
-        if len(validation_command) > MAX_VALIDATION_COMMAND_LEN:
+        title_raw = input.get("title")
+        if title_raw is not None and not isinstance(title_raw, str):
             raise ValueError(
-                f"validation_command must be <= {MAX_VALIDATION_COMMAND_LEN} chars"
+                f"title must be a string, got {type(title_raw).__name__}"
+            )
+        title = (title_raw or "").strip()
+        if not title:
+            raise ValueError("title is required and must be non-empty")
+        if len(title) > MAX_TITLE_LEN:
+            raise ValueError(f"title must be <= {MAX_TITLE_LEN} chars")
+
+        intended_worker = input.get("intended_worker")
+        if intended_worker not in _VALID_WORKERS:
+            raise ValueError(
+                f"intended_worker must be one of {sorted(_VALID_WORKERS)}, "
+                f"got {intended_worker!r}"
             )
 
-    expected_output = str(input.get("expected_output") or "")
-    if len(expected_output) > MAX_EXPECTED_OUTPUT_LEN:
-        raise ValueError(
-            f"expected_output must be <= {MAX_EXPECTED_OUTPUT_LEN} chars"
+        task_type = input.get("task_type")
+        if task_type not in _VALID_TASK_TYPES:
+            raise ValueError(
+                f"task_type must be one of {sorted(_VALID_TASK_TYPES)}, "
+                f"got {task_type!r}"
+            )
+
+        context_summary_raw = input.get("context_summary")
+        if context_summary_raw is not None and not isinstance(context_summary_raw, str):
+            raise ValueError(
+                f"context_summary must be a string, "
+                f"got {type(context_summary_raw).__name__}"
+            )
+        context_summary = (context_summary_raw or "").strip()
+        if not context_summary:
+            raise ValueError("context_summary is required and must be non-empty")
+        if len(context_summary) > MAX_CONTEXT_SUMMARY_LEN:
+            raise ValueError(
+                f"context_summary must be <= {MAX_CONTEXT_SUMMARY_LEN} chars"
+            )
+
+        validation_command = input.get("validation_command")
+        if validation_command is not None:
+            validation_command = str(validation_command)
+            if len(validation_command) > MAX_VALIDATION_COMMAND_LEN:
+                raise ValueError(
+                    f"validation_command must be <= {MAX_VALIDATION_COMMAND_LEN} chars"
+                )
+
+        expected_output = str(input.get("expected_output") or "")
+        if len(expected_output) > MAX_EXPECTED_OUTPUT_LEN:
+            raise ValueError(
+                f"expected_output must be <= {MAX_EXPECTED_OUTPUT_LEN} chars"
+            )
+
+        allowed_files = _validate_rel_path_list(
+            input.get("allowed_files"), "allowed_files"
+        )
+        forbidden_files = _validate_rel_path_list(
+            input.get("forbidden_files"), "forbidden_files"
         )
 
-    allowed_files = _validate_rel_path_list(
-        input.get("allowed_files"), "allowed_files"
-    )
-    forbidden_files = _validate_rel_path_list(
-        input.get("forbidden_files"), "forbidden_files"
-    )
+        from core.handoff_notes import create_handoff_note as _core_create
+        result = _core_create(
+            title=title,
+            intended_worker=intended_worker,
+            task_type=task_type,
+            repo_path=input.get("repo_path"),
+            allowed_files=allowed_files,
+            forbidden_files=forbidden_files,
+            validation_command=validation_command,
+            context_summary=context_summary,
+            expected_output=expected_output,
+            collect_brain_stamp=False,
+            handoff_root=handoff_root,
+        )
+    except ValueError as error:
+        _record_handoff_audit(input, allowed=False, error=str(error))
+        raise
 
-    from core.handoff_notes import create_handoff_note as _core_create
-    result = _core_create(
-        title=title,
-        intended_worker=intended_worker,
-        task_type=task_type,
-        repo_path=input.get("repo_path"),
-        allowed_files=allowed_files,
-        forbidden_files=forbidden_files,
-        validation_command=validation_command,
-        context_summary=context_summary,
-        expected_output=expected_output,
-        collect_brain_stamp=False,
-        handoff_root=handoff_root,
-    )
-    return {
+    response = {
         "ok": True,
         "handoff_path": result["path"],
         "status": "draft",
         "message": "Handoff note created. This did not run a subagent.",
     }
+    _record_handoff_audit(
+        input,
+        allowed=True,
+        result_summary={
+            "ok": response["ok"],
+            "status": response["status"],
+            "message": response["message"],
+        },
+        artifacts=[response["handoff_path"]],
+    )
+    return response
 
 
 # ---------------------------------------------------------------------------
