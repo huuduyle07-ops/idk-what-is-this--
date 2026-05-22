@@ -715,9 +715,133 @@ button {
     color: #cbd5e1;
 }
 
+.subagent-group__audit-link {
+    color: #93c5fd;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.subagent-group__audit-link:hover {
+    color: #bfdbfe;
+    text-decoration: underline;
+}
+
 .subagent-group > .memory-section {
     border-style: dashed;
     border-color: #334155;
+}
+
+.subagent-run-card {
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+.subagent-run-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.subagent-run-card__head strong {
+    min-width: 0;
+    color: #f8fafc;
+    overflow-wrap: anywhere;
+}
+
+.subagent-run-card__meta {
+    margin-bottom: 10px;
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.subagent-run-card__meta code {
+    color: #cbd5e1;
+}
+
+.subagent-run-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.handoff-item__status {
+    flex: 0 0 auto;
+    padding: 2px 6px;
+    border: 1px solid #475569;
+    border-radius: 4px;
+    background: #1e293b;
+    color: #cbd5e1;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.handoff-item__status--ran {
+    background: #052e16;
+    border-color: #166534;
+    color: #bbf7d0;
+}
+
+.handoff-item__status--failed {
+    background: #450a0a;
+    border-color: #7f1d1d;
+    color: #fecaca;
+}
+
+.worker-run-item__id {
+    flex: 0 0 auto;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.handoff-item__actions button,
+.worker-run-item__actions button {
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.handoff-item__actions .lesson-btn--secondary,
+.worker-run-item__actions .lesson-btn--secondary {
+    background: #1e293b;
+    border: 1px solid #475569;
+    color: #cbd5e1;
+}
+
+.handoff-item__actions .lesson-btn--secondary:hover,
+.worker-run-item__actions .lesson-btn--secondary:hover {
+    background: #334155;
+}
+
+.handoff-run-btn--warning-outline {
+    background: transparent;
+    border: 1px solid #f59e0b;
+    color: #fbbf24;
+}
+
+.handoff-run-btn--warning-outline:hover {
+    background: #422006;
+    color: #fde68a;
+}
+
+.worker-run-detail {
+    display: none;
+    margin-top: 10px;
+    padding: 8px;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    background: #020617;
+    color: #cbd5e1;
+    font-size: 12px;
 }
 
 /* Phase 8-prep.1: Tool Registry viewer (Settings/Health) */

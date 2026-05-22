@@ -400,6 +400,7 @@
           <div class="memory-section subagent-group">
             <div class="subagent-group__header">
               <h3 class="subagent-group__title">Sub-agent</h3>
+              <a class="subagent-group__audit-link" href="/mcp/audit?limit=10">View MCP audit</a>
             </div>
 
           <!-- Phase 7.1: Mayor Mode handoff panel.
@@ -2233,19 +2234,19 @@ async function refreshHandoffs() {
             return;
         }
         list.innerHTML = body.handoffs.map(h => `
-            <div class="handoff-item" data-path="${_escapeHtml(h.path)}" style="margin-bottom: 12px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; background: #f8fafc;">
-                <div class="handoff-item__head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <div class="handoff-item subagent-run-card" data-path="${_escapeHtml(h.path)}">
+                <div class="handoff-item__head subagent-run-card__head">
                     <strong>${_escapeHtml(h.title || "(untitled)")}</strong>
-                    <span class="handoff-item__status handoff-item__status--${_escapeHtml(h.status || "draft")}" style="padding:2px 6px; font-size:11px; border-radius:4px; font-weight:bold; background:#e2e8f0; color:#475569;">${_escapeHtml(h.status || "draft")}</span>
+                    <span class="handoff-item__status handoff-item__status--${_escapeHtml(h.status || "draft")}">${_escapeHtml(h.status || "draft")}</span>
                 </div>
-                <div class="handoff-item__meta" style="font-size:12px; color:#64748b; margin-bottom:8px;">
+                <div class="handoff-item__meta subagent-run-card__meta">
                     worker: <code>${_escapeHtml(h.intended_worker || "?")}</code>
                     · task: <code>${_escapeHtml(h.task_type || "?")}</code>
                     · ${_escapeHtml(h.created_at || "")}
                 </div>
-                <div class="handoff-item__actions" style="display:flex; gap:8px;">
-                    <button type="button" class="lesson-btn--secondary" onclick="runHandoff('${_escapeHtml(h.path).replace(/'/g, "\\'")}', false)">Show command (dry run)</button>
-                    <button type="button" onclick="runHandoff('${_escapeHtml(h.path).replace(/'/g, "\\'")}', true)">Run in temp clone</button>
+                <div class="handoff-item__actions subagent-run-card__actions">
+                    <button type="button" class="lesson-btn--secondary" onclick="runHandoff('${_escapeHtml(h.path).replace(/'/g, "\\'")}', false)">Copy command</button>
+                    <button type="button" class="handoff-run-btn--warning-outline" onclick="runHandoff('${_escapeHtml(h.path).replace(/'/g, "\\'")}', true)">Run subagent in temp clone</button>
                 </div>
             </div>
         `).join("");
@@ -2340,7 +2341,7 @@ async function refreshWorkerRuns() {
         }
         if (!list) return;
         if (!body.runs || body.runs.length === 0) {
-            list.innerHTML = '<div class="health-empty">No worker runs yet. Use Mayor Mode above to create + run a handoff.</div>';
+            list.innerHTML = '<div class="health-empty">No worker runs yet. Run a handoff in a temp clone to create .agent/worker_runs/.</div>';
             if (status) status.textContent = "";
             return;
         }
@@ -2356,20 +2357,20 @@ async function refreshWorkerRuns() {
             const propBadge = r.has_proposal_md ? "proposal.md ✓" : "proposal.md ✗";
             const planBadge = r.has_patch_plan_json ? "patch_plan.json ✓" : "patch_plan.json ✗";
             return `
-                <div class="worker-run-item" data-run-id="${_escapeHtml(r.run_id)}" style="margin-bottom:12px; padding:12px; border:1px solid #e2e8f0; border-radius:6px; background:#f8fafc;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <div class="worker-run-item subagent-run-card" data-run-id="${_escapeHtml(r.run_id)}">
+                    <div class="worker-run-item__head subagent-run-card__head">
                         <strong>${_escapeHtml(r.handoff_title || r.run_id || "(unnamed)")}</strong>
-                        <span style="font-size:11px; color:#64748b;">${_escapeHtml(r.run_id || "")}</span>
+                        <span class="worker-run-item__id">${_escapeHtml(r.run_id || "")}</span>
                     </div>
-                    <div style="font-size:12px; color:#64748b; margin-bottom:8px;">
+                    <div class="worker-run-item__meta subagent-run-card__meta">
                         worker: <code>${_escapeHtml(r.worker || "?")}</code>${dryBadge}${exitBadge}
                         · ${_escapeHtml(propBadge)} · ${_escapeHtml(planBadge)}
                     </div>
-                    <div style="display:flex; gap:8px;">
+                    <div class="worker-run-item__actions subagent-run-card__actions">
                         <button type="button" class="lesson-btn--secondary" onclick="viewWorkerRun('${_escapeHtml(r.run_id).replace(/'/g, "\\'")}', this)">View details</button>
                         ${importBtn}
                     </div>
-                    <div class="worker-run-detail" style="display:none; margin-top:10px; padding:8px; background:#fff; border:1px solid #e2e8f0; border-radius:4px; font-size:12px;"></div>
+                    <div class="worker-run-detail"></div>
                 </div>
             `;
         }).join("");
