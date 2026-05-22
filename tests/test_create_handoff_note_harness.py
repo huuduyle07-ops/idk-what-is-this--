@@ -79,3 +79,76 @@ def test_default_forbidden_files_applied(tmp_path: Path):
     forbidden = meta.get("forbidden_files", [])
     for required in (".env", ".git", ".agent"):
         assert required in forbidden, f"{required} should be in forbidden_files"
+
+
+# ---- input validation: rejections ------------------------------------------
+
+
+def test_title_empty_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["title"] = ""
+    with pytest.raises(ValueError, match="title"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_title_whitespace_only_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["title"] = "   \t  "
+    with pytest.raises(ValueError, match="title"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_title_too_long_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["title"] = "x" * 201
+    with pytest.raises(ValueError, match="title.*200"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_context_summary_empty_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["context_summary"] = ""
+    with pytest.raises(ValueError, match="context_summary"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_context_summary_too_long_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["context_summary"] = "x" * 8001
+    with pytest.raises(ValueError, match="context_summary.*8000"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_invalid_worker_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["intended_worker"] = "hacker"
+    with pytest.raises(ValueError, match="intended_worker"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_invalid_task_type_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["task_type"] = "rm-rf"
+    with pytest.raises(ValueError, match="task_type"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_unknown_field_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["shell"] = "rm -rf /"
+    with pytest.raises(ValueError, match="unknown field"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_validation_command_too_long_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["validation_command"] = "x" * 501
+    with pytest.raises(ValueError, match="validation_command.*500"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_expected_output_too_long_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["expected_output"] = "x" * 4001
+    with pytest.raises(ValueError, match="expected_output.*4000"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)

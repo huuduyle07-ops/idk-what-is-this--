@@ -41,6 +41,24 @@ _FRIENDLY_MISSING_DEP_MSG = (
     "Install optional MCP dependencies to run this server."
 )
 
+# Field length caps. These bound external agent input so a runaway prompt
+# can't write a 5MB handoff note.
+MAX_TITLE_LEN = 200
+MAX_CONTEXT_SUMMARY_LEN = 8000
+MAX_VALIDATION_COMMAND_LEN = 500
+MAX_EXPECTED_OUTPUT_LEN = 4000
+
+_VALID_WORKERS: frozenset[str] = frozenset({"codex", "claude-code", "gemini", "other"})
+_VALID_TASK_TYPES: frozenset[str] = frozenset({
+    "proposal_only", "review_only", "explain_only", "benchmark_case", "research",
+})
+
+_ALLOWED_INPUT_FIELDS: frozenset[str] = frozenset({
+    "title", "intended_worker", "task_type", "context_summary",
+    "repo_path", "allowed_files", "forbidden_files",
+    "validation_command", "expected_output",
+})
+
 
 # ---------------------------------------------------------------------------
 # Allowlist API (works without `mcp` installed)
@@ -62,7 +80,7 @@ def list_exposed_tool_names() -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# Harness — happy path (validation lands in Tasks 3-4).
+# Harness — validated (Task 3).
 # ---------------------------------------------------------------------------
 
 def create_handoff_note_harness(
@@ -73,28 +91,79 @@ def create_handoff_note_harness(
     """Validated dict-in/dict-out wrapper around
     core.handoff_notes.create_handoff_note.
 
-    `handoff_root` is keyword-only and used only by tests + internal callers
-    that want to redirect output to a tmp_path. It is NOT part of `input`
-    (which is the MCP-facing schema), so external MCP callers cannot
-    influence it.
+    `handoff_root` is keyword-only and used only by tests + internal callers.
+    External MCP callers cannot influence it (FastMCP introspects the
+    signature of `_impl_create_handoff_note`, not this function).
 
     Returns: {ok, handoff_path, status, message} on success.
-    Raises: ValueError on invalid input (validation lands in Tasks 3-4).
+    Raises: ValueError on invalid input.
     """
-    from core.handoff_notes import create_handoff_note as _core_create
+    if not isinstance(input, dict):
+        raise ValueError(f"input must be a dict, got {type(input).__name__}")
 
+    unknown = set(input.keys()) - _ALLOWED_INPUT_FIELDS
+    if unknown:
+        raise ValueError(f"unknown field(s): {sorted(unknown)}")
+
+    title = str(input.get("title") or "").strip()
+    if not title:
+        raise ValueError("title is required and must be non-empty")
+    if len(title) > MAX_TITLE_LEN:
+        raise ValueError(f"title must be <= {MAX_TITLE_LEN} chars")
+
+    intended_worker = input.get("intended_worker")
+    if intended_worker not in _VALID_WORKERS:
+        raise ValueError(
+            f"intended_worker must be one of {sorted(_VALID_WORKERS)}, "
+            f"got {intended_worker!r}"
+        )
+
+    task_type = input.get("task_type")
+    if task_type not in _VALID_TASK_TYPES:
+        raise ValueError(
+            f"task_type must be one of {sorted(_VALID_TASK_TYPES)}, "
+            f"got {task_type!r}"
+        )
+
+    context_summary = str(input.get("context_summary") or "").strip()
+    if not context_summary:
+        raise ValueError("context_summary is required and must be non-empty")
+    if len(context_summary) > MAX_CONTEXT_SUMMARY_LEN:
+        raise ValueError(
+            f"context_summary must be <= {MAX_CONTEXT_SUMMARY_LEN} chars"
+        )
+
+    validation_command = input.get("validation_command")
+    if validation_command is not None:
+        validation_command = str(validation_command)
+        if len(validation_command) > MAX_VALIDATION_COMMAND_LEN:
+            raise ValueError(
+                f"validation_command must be <= {MAX_VALIDATION_COMMAND_LEN} chars"
+            )
+
+    expected_output = str(input.get("expected_output") or "")
+    if len(expected_output) > MAX_EXPECTED_OUTPUT_LEN:
+        raise ValueError(
+            f"expected_output must be <= {MAX_EXPECTED_OUTPUT_LEN} chars"
+        )
+
+    # Path safety for allowed_files / forbidden_files lands in Task 4.
+    # Pass through as-is for now; core.handoff_notes does its own safety
+    # check as a backstop.
+    allowed_files = input.get("allowed_files")
+    forbidden_files = input.get("forbidden_files")
+
+    from core.handoff_notes import create_handoff_note as _core_create
     result = _core_create(
-        title=input["title"],
-        intended_worker=input["intended_worker"],
-        task_type=input["task_type"],
+        title=title,
+        intended_worker=intended_worker,
+        task_type=task_type,
         repo_path=input.get("repo_path"),
-        allowed_files=input.get("allowed_files"),
-        forbidden_files=input.get("forbidden_files"),
-        validation_command=input.get("validation_command"),
-        context_summary=input.get("context_summary", ""),
-        expected_output=input.get("expected_output", ""),
-        # extra_safety_rules intentionally NOT exposed via the harness:
-        # defaults from core.handoff_notes.DEFAULT_SAFETY_RULES always apply.
+        allowed_files=allowed_files,
+        forbidden_files=forbidden_files,
+        validation_command=validation_command,
+        context_summary=context_summary,
+        expected_output=expected_output,
         handoff_root=handoff_root,
     )
     return {
