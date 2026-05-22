@@ -41,6 +41,8 @@ def test_mcp_inspector_launch_uses_fixed_server_targets(
     assert body == {"ok": True, "target": target}
     assert "@modelcontextprotocol/inspector" in launched["command"]
     assert Path(launched["command"][-1]).name == script_name
+    assert launched["command"][-1] == f"scripts/{script_name}"
+    assert " " not in launched["command"][-1]
 
 
 def test_mcp_inspector_launch_rejects_unknown_target(client, monkeypatch):

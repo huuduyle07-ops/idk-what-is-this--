@@ -846,12 +846,13 @@ def _mcp_inspector_command(target: str) -> list[str] | None:
     script_path = _MCP_INSPECTOR_TARGETS.get(target)
     if script_path is None:
         return None
+    script_arg = script_path.relative_to(PROJECT_ROOT).as_posix()
     return [
         shutil.which("npx") or "npx",
         "-y",
         "@modelcontextprotocol/inspector",
         sys.executable,
-        str(script_path),
+        script_arg,
     ]
 
 
@@ -1952,4 +1953,6 @@ def new_session():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    from web.runner import run_web_app
+
+    run_web_app(app, debug=True)
