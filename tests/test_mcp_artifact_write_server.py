@@ -25,11 +25,11 @@ _EXPECTED_EXPOSED_TOOLS = {
     "read_worker_run",
     "list_tool_registry",
     "create_handoff_note",
+    "import_worker_run_as_proposal",
 }
 
 # Tools that must NEVER be exposed by the artifact-write MCP server.
 _FORBIDDEN_TOOLS = {
-    "import_worker_run_as_proposal",
     "validate_imported_worker_proposal",
     "run_subagent_handoff",
     "apply_patch",
@@ -66,15 +66,20 @@ def test_capability_mode_constant_is_artifact_write():
 # ---- allowlist contract ----------------------------------------------------
 
 
-def test_exposed_names_are_exactly_eleven():
+def test_exposed_names_are_exactly_twelve():
     from mcp_server import artifact_write
     assert set(artifact_write.list_exposed_tool_names()) == _EXPECTED_EXPOSED_TOOLS
-    assert len(artifact_write.list_exposed_tool_names()) == 11
+    assert len(artifact_write.list_exposed_tool_names()) == 12
 
 
 def test_create_handoff_note_is_exposed():
     from mcp_server import artifact_write
     assert "create_handoff_note" in artifact_write.list_exposed_tool_names()
+
+
+def test_import_worker_run_as_proposal_is_exposed():
+    from mcp_server import artifact_write
+    assert "import_worker_run_as_proposal" in artifact_write.list_exposed_tool_names()
 
 
 @pytest.mark.parametrize("forbidden", sorted(_FORBIDDEN_TOOLS))
@@ -83,11 +88,12 @@ def test_specific_forbidden_tool_not_exposed(forbidden):
     assert forbidden not in artifact_write.list_exposed_tool_names()
 
 
-def test_read_only_server_still_omits_create_handoff_note():
+def test_read_only_server_still_omits_artifact_write_tools():
     """Cross-server regression: the read-only server must not gain
-    create_handoff_note just because the artifact-write module exists."""
+    artifact-write tools just because the artifact-write module exists."""
     from mcp_server import read_only
     assert "create_handoff_note" not in read_only.list_exposed_tool_names()
+    assert "import_worker_run_as_proposal" not in read_only.list_exposed_tool_names()
     # And the read-only server should still expose exactly 10.
     assert len(read_only.list_exposed_tool_names()) == 10
 
@@ -145,7 +151,7 @@ def test_main_does_not_run_server_when_dep_missing(monkeypatch):
 # ---- --list-tools CLI flag -------------------------------------------------
 
 
-def test_list_tools_flag_prints_eleven_names(capsys):
+def test_list_tools_flag_prints_twelve_names(capsys):
     from mcp_server import artifact_write
 
     exit_code = artifact_write.main(["--list-tools"])

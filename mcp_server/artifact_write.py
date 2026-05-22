@@ -35,9 +35,12 @@ logger = logging.getLogger(__name__)
 # Documentation-only label — see list_exposed_tool_names for the actual gate.
 CAPABILITY_MODE = "artifact_write"
 
-# The *narrow* slice of artifact-write tools this server exposes. Phase 8.2a
-# ships with exactly one. Future phases may extend.
-_EXTRA_WRITE_TOOLS: tuple[str, ...] = ("create_handoff_note",)
+# The *narrow* slice of artifact-write tools this server exposes. This remains
+# stricter than the registry's artifact_write capability mode.
+_EXTRA_WRITE_TOOLS: tuple[str, ...] = (
+    "create_handoff_note",
+    "import_worker_run_as_proposal",
+)
 
 _SERVER_NAME = "cattus-artifact-write"
 
@@ -62,6 +65,9 @@ _ALLOWED_INPUT_FIELDS: frozenset[str] = frozenset({
     "title", "intended_worker", "task_type", "context_summary",
     "repo_path", "allowed_files", "forbidden_files",
     "validation_command", "expected_output",
+})
+_IMPORT_WORKER_RUN_ALLOWED_INPUT_FIELDS: frozenset[str] = frozenset({
+    "worker_run_id",
 })
 
 
@@ -302,6 +308,100 @@ def create_handoff_note_harness(
     return response
 
 
+def _validate_worker_run_import_input(input: Any) -> str:
+    if not isinstance(input, dict):
+        raise ValueError(f"input must be a dict, got {type(input).__name__}")
+
+    unknown = set(input) - _IMPORT_WORKER_RUN_ALLOWED_INPUT_FIELDS
+    if unknown:
+        raise ValueError(f"unknown field(s): {sorted(unknown)}")
+
+    worker_run_id_raw = input.get("worker_run_id")
+    if not isinstance(worker_run_id_raw, str):
+        raise ValueError("worker_run_id is required and must be a string")
+    worker_run_id = worker_run_id_raw.strip()
+    if not worker_run_id:
+        raise ValueError("worker_run_id is required and must be non-empty")
+    if Path(worker_run_id).is_absolute():
+        raise ValueError("worker_run_id must be a relative run id")
+    if "/" in worker_run_id or "\\" in worker_run_id:
+        raise ValueError("worker_run_id must not contain path separators")
+    if worker_run_id in {".", ".."}:
+        raise ValueError("worker_run_id is not a safe run id")
+    return worker_run_id
+
+
+def _worker_run_import_input_summary(input: Any) -> dict:
+    if not isinstance(input, dict):
+        return {"input_type": type(input).__name__}
+
+    summary = {}
+    if "worker_run_id" in input:
+        summary["worker_run_id"] = input["worker_run_id"]
+    unknown_fields = sorted(
+        str(name)
+        for name in set(input) - _IMPORT_WORKER_RUN_ALLOWED_INPUT_FIELDS
+    )
+    if unknown_fields:
+        summary["unknown_fields"] = unknown_fields
+    return summary
+
+
+def _record_worker_run_import_audit(
+    input: Any,
+    *,
+    allowed: bool,
+    result_summary: dict | None = None,
+    artifacts: list[str] | None = None,
+    error: str | None = None,
+) -> None:
+    try:
+        record_mcp_invocation(
+            tool_name="import_worker_run_as_proposal",
+            capability_mode=CAPABILITY_MODE,
+            allowed=allowed,
+            input_summary=_worker_run_import_input_summary(input),
+            result_summary=result_summary,
+            artifacts=artifacts or [],
+            error=error,
+        )
+    except Exception:
+        logger.warning(
+            "failed to record import_worker_run_as_proposal MCP audit event",
+            exc_info=True,
+        )
+
+
+def import_worker_run_as_proposal_harness(input: dict) -> dict:
+    """Import one complete worker run into proposals for operator review."""
+    try:
+        worker_run_id = _validate_worker_run_import_input(input)
+        from core.worker_runs import import_worker_run_as_proposal as _core_import
+        result = _core_import(worker_run_id)
+    except (FileNotFoundError, ValueError) as error:
+        _record_worker_run_import_audit(input, allowed=False, error=str(error))
+        raise
+
+    response = {
+        "ok": True,
+        "proposal_dir": result["proposal_dir"],
+        "message": (
+            "Worker run imported as proposal. "
+            "Review it before validation or lesson creation."
+        ),
+    }
+    _record_worker_run_import_audit(
+        input,
+        allowed=True,
+        result_summary={
+            "ok": response["ok"],
+            "message": response["message"],
+        },
+        artifacts=[response["proposal_dir"]],
+    )
+    return response
+
+
 # ---------------------------------------------------------------------------
 # Thin tool implementations
 # ---------------------------------------------------------------------------
@@ -317,6 +417,11 @@ def _impl_create_handoff_note(input: dict) -> dict:
     return create_handoff_note_harness(input)
 
 
+def _impl_import_worker_run_as_proposal(input: dict) -> dict:
+    """MCP-registered impl for the narrow worker-run import harness."""
+    return import_worker_run_as_proposal_harness(input)
+
+
 _IMPLS: dict[str, Callable[..., Any]] = {
     "get_health": read_only._impl_get_health,
     "list_benchmark_reports": read_only._impl_list_benchmark_reports,
@@ -329,6 +434,7 @@ _IMPLS: dict[str, Callable[..., Any]] = {
     "read_worker_run": read_only._impl_read_worker_run,
     "list_tool_registry": read_only._impl_list_tool_registry,
     "create_handoff_note": _impl_create_handoff_note,
+    "import_worker_run_as_proposal": _impl_import_worker_run_as_proposal,
 }
 
 # ---------------------------------------------------------------------------
