@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json, sys, tempfile
+import json, shutil, subprocess, sys, tempfile
 from datetime import datetime
 from pathlib import Path
 from flask import Flask, render_template, request, redirect, url_for
@@ -834,6 +834,53 @@ def mcp_audit_route():
         "count": len(events),
         "limit": limit,
     }
+
+
+_MCP_INSPECTOR_TARGETS = {
+    "read_only": PROJECT_ROOT / "scripts" / "mcp_readonly_server.py",
+    "artifact_write": PROJECT_ROOT / "scripts" / "mcp_artifact_write_server.py",
+}
+
+
+def _mcp_inspector_command(target: str) -> list[str] | None:
+    script_path = _MCP_INSPECTOR_TARGETS.get(target)
+    if script_path is None:
+        return None
+    return [
+        shutil.which("npx") or "npx",
+        "-y",
+        "@modelcontextprotocol/inspector",
+        sys.executable,
+        str(script_path),
+    ]
+
+
+def _launch_mcp_inspector(command: list[str]) -> None:
+    subprocess.Popen(
+        command,
+        cwd=PROJECT_ROOT,
+        creationflags=getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0),
+    )
+
+
+@app.route("/mcp/inspector/launch", methods=["POST"])
+def mcp_inspector_launch_route():
+    target = (request.form.get("target") or "").strip()
+    command = _mcp_inspector_command(target)
+    if command is None:
+        return {"ok": False, "error": "unknown MCP Inspector target"}, 400
+    try:
+        _launch_mcp_inspector(command)
+    except Exception as e:
+        return {
+            "ok": False,
+            "target": target,
+            "error": (
+                f"failed to launch MCP Inspector for {target}: "
+                f"{type(e).__name__}: {e}"
+            ),
+        }, 500
+    return {"ok": True, "target": target}
 
 
 @app.route("/benchmarks/list", methods=["GET"])
