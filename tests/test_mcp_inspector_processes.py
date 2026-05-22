@@ -27,6 +27,28 @@ def test_inspector_match_accepts_spawned_cli_package_path():
     assert inspector_processes.is_mcp_inspector_command(command_line) is True
 
 
+def test_inspector_match_accepts_current_spawned_cli_package_path():
+    command_line = (
+        r'"C:\Program Files\nodejs\node.exe" '
+        r"C:\Users\Admin\AppData\Local\npm-cache\_npx\abc\node_modules"
+        r"\@modelcontextprotocol\inspector\cli\build\cli.js "
+        "python scripts/mcp_readonly_server.py"
+    )
+
+    assert inspector_processes.is_mcp_inspector_command(command_line) is True
+
+
+def test_inspector_match_accepts_node_npx_wrapper_for_official_package_target():
+    command_line = (
+        r'"C:\Program Files\nodejs\node.exe" '
+        r'"C:\Program Files\nodejs\node_modules\npm\bin\npx-cli.js" '
+        "-y @modelcontextprotocol/inspector "
+        "python scripts/mcp_readonly_server.py"
+    )
+
+    assert inspector_processes.is_mcp_inspector_command(command_line) is True
+
+
 @pytest.mark.parametrize(
     "command_line",
     [
@@ -39,6 +61,13 @@ def test_inspector_match_accepts_spawned_cli_package_path():
         (
             r"node tools/scan.js C:\tmp\node_modules"
             r"\@modelcontextprotocol\inspector\dist\cli.js"
+        ),
+        (
+            r'node "C:\Program Files\nodejs\node_modules\npm\bin\npx-cli.js" '
+            "cowsay @modelcontextprotocol/inspector"
+        ),
+        (
+            r"node tools\npx-cli.js -y @modelcontextprotocol/inspector"
         ),
         "python tools/render_docs.py npx @modelcontextprotocol/inspector",
         (

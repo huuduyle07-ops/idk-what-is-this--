@@ -13,7 +13,11 @@ from typing import Iterable
 _INSPECTOR_TOKEN = "@modelcontextprotocol/inspector"
 _PROCESS_SNAPSHOT_TIMEOUT_SEC = 10
 _INSPECTOR_CLI_PATH_RE = re.compile(
-    r"(?:^|/)@modelcontextprotocol/inspector/dist/cli\.js$",
+    r"(?:^|/)@modelcontextprotocol/inspector/(?:dist|cli/build)/cli\.js$",
+    re.IGNORECASE,
+)
+_NPM_NPX_CLI_PATH_RE = re.compile(
+    r"(?:^|/)npm/bin/npx-cli\.js$",
     re.IGNORECASE,
 )
 _NODE_COMMAND_RE = re.compile(
@@ -51,7 +55,14 @@ def is_mcp_inspector_command(command_line: str | None) -> bool:
     normalized = command_line.replace("\\", "/")
     node_args = _command_args(normalized, _NODE_COMMAND_RE)
     if node_args is not None:
-        return bool(node_args and _INSPECTOR_CLI_PATH_RE.search(node_args[0]))
+        if not node_args:
+            return False
+        if _INSPECTOR_CLI_PATH_RE.search(node_args[0]):
+            return True
+        return bool(
+            _NPM_NPX_CLI_PATH_RE.search(node_args[0])
+            and _inspector_is_package_target(node_args[1:])
+        )
 
     npm_args = _command_args(normalized, _NPM_EXEC_COMMAND_RE)
     if npm_args is not None:
