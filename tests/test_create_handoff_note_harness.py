@@ -37,7 +37,7 @@ def test_valid_input_writes_file(tmp_path: Path):
     handoff_path = Path(result["handoff_path"])
     assert handoff_path.is_file()
     # File lives strictly under tmp_path.
-    handoff_path.resolve().relative_to(tmp_path.resolve())
+    assert handoff_path.resolve().is_relative_to(tmp_path.resolve())
     # Filename matches handoff_notes convention: YYYYMMDD_HHMMSS_<slug>.md.
     assert re.match(r"^\d{8}_\d{6}_.+\.md$", handoff_path.name)
 
@@ -74,6 +74,7 @@ def test_default_forbidden_files_applied(tmp_path: Path):
     match = re.search(
         r"<!--HANDOFF_META\s*(?P<json>\{.*?\})\s*HANDOFF_META-->", text, re.DOTALL
     )
+    assert match, "HANDOFF_META block missing"
     meta = json.loads(match.group("json"))
     forbidden = meta.get("forbidden_files", [])
     for required in (".env", ".git", ".agent"):
