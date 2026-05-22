@@ -213,6 +213,7 @@ def create_handoff_note(
     context_summary: str = "",
     expected_output: str = "",
     extra_safety_rules: list[str] | None = None,
+    collect_brain_stamp: bool = True,
     handoff_root: Path | None = None,
 ) -> dict[str, Any]:
     title_clean = (title or "").strip()
@@ -232,7 +233,7 @@ def create_handoff_note(
     final_forbidden, overrides = _merge_forbidden(user_forbidden, safe_allowed)
     safety_rules = _merge_safety_rules(extra_safety_rules)
     repo = _resolve_repo_path(repo_path)
-    brain_stamp = _try_collect_brain_stamp(repo)
+    brain_stamp = _try_collect_brain_stamp(repo) if collect_brain_stamp else {}
 
     now = datetime.now(timezone.utc)
     created_iso = now.isoformat(timespec="seconds")

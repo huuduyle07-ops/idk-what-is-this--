@@ -217,6 +217,7 @@ def create_handoff_note_harness(
         validation_command=validation_command,
         context_summary=context_summary,
         expected_output=expected_output,
+        collect_brain_stamp=False,
         handoff_root=handoff_root,
     )
     return {

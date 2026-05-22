@@ -237,3 +237,71 @@ def test_forbidden_files_windows_traversal_rejected(tmp_path: Path):
     inp["forbidden_files"] = ["..\\windows\\notepad.exe"]
     with pytest.raises(ValueError, match="safe relative path"):
         create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+# ---- isolation guarantees --------------------------------------------------
+
+
+def test_harness_does_not_invoke_subprocess(tmp_path: Path, monkeypatch):
+    """Tripwire: harness must never call subprocess.run / Popen / os.system."""
+    import os
+    import subprocess
+
+    tripped = {"hit": False}
+
+    def _trip(*_args, **_kwargs):
+        tripped["hit"] = True
+        raise AssertionError("harness must not invoke subprocess")
+
+    monkeypatch.setattr(subprocess, "run", _trip)
+    monkeypatch.setattr(subprocess, "Popen", _trip)
+    monkeypatch.setattr(os, "system", _trip)
+
+    result = create_handoff_note_harness(_valid_input(), handoff_root=tmp_path)
+    assert result["ok"] is True
+    assert tripped["hit"] is False
+
+
+def test_harness_does_not_write_outside_handoff_root(tmp_path: Path):
+    """After a valid call, exactly one new file exists under tmp_path and
+    nothing else on disk was touched (within the test's observable surface)."""
+    before = set(tmp_path.rglob("*"))
+    result = create_handoff_note_harness(_valid_input(), handoff_root=tmp_path)
+    after = set(tmp_path.rglob("*"))
+    new = after - before
+    # Exactly one new file (the .md note). No incidental dirs/files.
+    new_files = {p for p in new if p.is_file()}
+    assert len(new_files) == 1
+    written = next(iter(new_files))
+    assert written == Path(result["handoff_path"])
+    # And the file is strictly inside tmp_path.
+    written.resolve().relative_to(tmp_path.resolve())
+
+
+def test_repo_path_not_written_to(tmp_path: Path):
+    """repo_path is accepted as a string but the harness must never write
+    to it. We point repo_path at a sibling directory and snapshot it
+    before/after the call.
+    """
+    repo_dir = tmp_path / "fake_repo"
+    repo_dir.mkdir()
+    (repo_dir / "interest.cpp").write_text("// sentinel\n", encoding="utf-8")
+
+    handoff_dir = tmp_path / "handoffs"
+    handoff_dir.mkdir()
+
+    snapshot_before = {
+        p.relative_to(repo_dir): p.read_bytes()
+        for p in repo_dir.rglob("*") if p.is_file()
+    }
+
+    inp = _valid_input()
+    inp["repo_path"] = str(repo_dir)
+    result = create_handoff_note_harness(inp, handoff_root=handoff_dir)
+    assert result["ok"] is True
+
+    snapshot_after = {
+        p.relative_to(repo_dir): p.read_bytes()
+        for p in repo_dir.rglob("*") if p.is_file()
+    }
+    assert snapshot_before == snapshot_after, "harness wrote to repo_path"
