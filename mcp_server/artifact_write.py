@@ -305,10 +305,24 @@ def build_server() -> Any:
 def main(argv: list[str] | None = None) -> int:
     """CLI entrypoint. Returns a process exit code.
 
-    --list-tools branch lands in Task 7. For now: try to build + run a
-    server; exit 2 with a friendly stderr if `mcp` is missing.
+    Recognized flags:
+      --list-tools   Print the exposed tool names (one per line) and exit 0
+                     without constructing or starting a server. Does NOT
+                     require the `mcp` package to be installed.
+
+    Exit codes:
+      0 — server ran cleanly OR --list-tools printed successfully
+      2 — `mcp` package not installed; friendly message printed to stderr
     """
     args = list(argv if argv is not None else sys.argv[1:])
+
+    # --list-tools is a registry-only query. Handle it BEFORE any attempt
+    # to import `mcp` — operators must be able to inspect the surface even
+    # on machines without the optional dependency.
+    if "--list-tools" in args:
+        for name in list_exposed_tool_names():
+            print(name)
+        return 0
 
     try:
         server = build_server()

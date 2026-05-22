@@ -141,3 +141,47 @@ def test_main_does_not_run_server_when_dep_missing(monkeypatch):
 
     artifact_write.main([])
     assert called["run"] is False
+
+# ---- --list-tools CLI flag -------------------------------------------------
+
+
+def test_list_tools_flag_prints_eleven_names(capsys):
+    from mcp_server import artifact_write
+
+    exit_code = artifact_write.main(["--list-tools"])
+    assert exit_code == 0
+    out = capsys.readouterr().out.strip().splitlines()
+    assert set(out) == _EXPECTED_EXPOSED_TOOLS
+    # Order must match list_exposed_tool_names() for predictable scripting.
+    assert out == artifact_write.list_exposed_tool_names()
+
+
+def test_list_tools_flag_works_without_mcp_dep(monkeypatch, capsys):
+    from mcp_server import artifact_write
+
+    def fake_import_mcp():
+        raise AssertionError("--list-tools must NOT attempt to import mcp")
+
+    monkeypatch.setattr(artifact_write, "_import_mcp", fake_import_mcp)
+
+    exit_code = artifact_write.main(["--list-tools"])
+    assert exit_code == 0
+    out = capsys.readouterr().out.strip().splitlines()
+    assert set(out) == _EXPECTED_EXPOSED_TOOLS
+
+
+def test_list_tools_flag_does_not_build_or_run_server(monkeypatch):
+    from mcp_server import artifact_write
+
+    build_called = {"hit": False}
+    original_build = artifact_write.build_server
+
+    def tripwire_build_server(*args, **kwargs):
+        build_called["hit"] = True
+        return original_build(*args, **kwargs)
+
+    monkeypatch.setattr(artifact_write, "build_server", tripwire_build_server)
+
+    exit_code = artifact_write.main(["--list-tools"])
+    assert exit_code == 0
+    assert build_called["hit"] is False
