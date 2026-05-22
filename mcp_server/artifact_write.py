@@ -95,6 +95,10 @@ def _validate_rel_path_list(values: Any, field_name: str) -> list[str] | None:
     if not isinstance(values, list):
         raise ValueError(f"{field_name} must be a list of strings")
     for v in values:
+        # All four entry-level rejections (non-string, empty, absolute,
+        # traversal) intentionally share the same message — we do not
+        # leak which check fired. Add the reason only to internal logs,
+        # never to the user-facing error.
         if not isinstance(v, str):
             raise ValueError(
                 f"{field_name} entry is not a safe relative path: {v!r}"
@@ -108,11 +112,16 @@ def _validate_rel_path_list(values: Any, field_name: str) -> list[str] | None:
             raise ValueError(
                 f"{field_name} entry is not a safe relative path: {v!r}"
             )
-        if any(part == ".." for part in normalized.split("/")):
+        # Reject both ".." (parent) and "." (current-dir) segments. "."
+        # is technically legal as "no-op" but adds nothing and lets an
+        # attacker compose paths that look benign at a glance.
+        if any(part in ("..", ".") for part in normalized.split("/")):
             raise ValueError(
                 f"{field_name} entry is not a safe relative path: {v!r}"
             )
-    return values
+    # Return a fresh list so a future change in core that mutates the
+    # input doesn't silently alter the caller's dict.
+    return list(values)
 
 
 def create_handoff_note_harness(

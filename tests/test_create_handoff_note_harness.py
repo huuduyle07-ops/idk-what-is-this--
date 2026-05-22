@@ -209,3 +209,31 @@ def test_forbidden_files_absolute_rejected(tmp_path: Path):
     inp["forbidden_files"] = ["/etc/shadow"]
     with pytest.raises(ValueError, match="safe relative path"):
         create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_allowed_files_not_a_list_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["allowed_files"] = "src/main.py"  # string, not list
+    with pytest.raises(ValueError, match="must be a list"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_allowed_files_non_string_entry_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["allowed_files"] = [123]
+    with pytest.raises(ValueError, match="safe relative path"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_allowed_files_single_dot_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["allowed_files"] = ["."]
+    with pytest.raises(ValueError, match="safe relative path"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_forbidden_files_windows_traversal_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["forbidden_files"] = ["..\\windows\\notepad.exe"]
+    with pytest.raises(ValueError, match="safe relative path"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
