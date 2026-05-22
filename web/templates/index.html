@@ -400,8 +400,18 @@
           <div class="memory-section subagent-group">
             <div class="subagent-group__header">
               <h3 class="subagent-group__title">Sub-agent</h3>
-              <a class="subagent-group__audit-link" href="/mcp/audit?limit=10">View MCP audit</a>
+              <div class="subagent-group__links">
+                <a class="subagent-group__audit-link" href="/mcp/audit?limit=10">View MCP audit</a>
+                <details class="subagent-inspector">
+                  <summary>MCP Inspector</summary>
+                  <div class="subagent-inspector__menu">
+                    <button type="button" onclick="launchMcpInspector('read_only')">Inspect read-only MCP</button>
+                    <button type="button" onclick="launchMcpInspector('artifact_write')">Inspect artifact-write MCP</button>
+                  </div>
+                </details>
+              </div>
             </div>
+            <div id="mcpInspectorStatus" class="subagent-inspector__status"></div>
 
           <!-- Phase 7.1: Mayor Mode handoff panel.
                Default = create note only. Running a subagent requires explicit opt-in
@@ -2213,6 +2223,26 @@ function promoteProposalToLesson(proposalDir, allowFailed) {
                 statusEl.className = "proposals-status proposals-status--failed";
             }
         });
+}
+
+// Phase 8 — Local MCP Inspector shortcuts
+async function launchMcpInspector(target) {
+    const status = document.getElementById("mcpInspectorStatus");
+    const label = target === "artifact_write" ? "artifact-write" : "read-only";
+    if (status) status.textContent = `Launching MCP Inspector for ${label}...`;
+    try {
+        const fd = new FormData();
+        fd.append("target", target);
+        const resp = await fetch("/mcp/inspector/launch", { method: "POST", body: fd });
+        const body = await resp.json();
+        if (!body.ok) {
+            if (status) status.textContent = body.error || "MCP Inspector launch failed.";
+            return;
+        }
+        if (status) status.textContent = `MCP Inspector launch requested for ${label}.`;
+    } catch (e) {
+        if (status) status.textContent = "MCP Inspector launch failed: " + e.message;
+    }
 }
 
 // Phase 7.1 — Handoffs (Mayor Mode)

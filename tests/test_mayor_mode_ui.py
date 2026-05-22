@@ -15,6 +15,10 @@ def test_subagent_ui_copy_and_dark_surface_hooks():
 
     assert 'href="/mcp/audit?limit=10"' in template
     assert "View MCP audit" in template
+    assert "MCP Inspector" in template
+    assert "Inspect read-only MCP" in template
+    assert "Inspect artifact-write MCP" in template
+    assert '"/mcp/inspector/launch"' in template
     assert ">Copy command</button>" in template
     assert ">Run subagent in temp clone</button>" in template
     assert (

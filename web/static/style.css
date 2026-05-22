@@ -726,6 +726,64 @@ button {
     text-decoration: underline;
 }
 
+.subagent-group__links {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.subagent-inspector {
+    position: relative;
+    font-size: 12px;
+}
+
+.subagent-inspector summary {
+    color: #93c5fd;
+    cursor: pointer;
+    list-style: none;
+}
+
+.subagent-inspector summary::-webkit-details-marker {
+    display: none;
+}
+
+.subagent-inspector__menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 2;
+    display: grid;
+    gap: 4px;
+    min-width: 190px;
+    padding: 6px;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    background: #0f172a;
+}
+
+.subagent-inspector__menu button {
+    width: 100%;
+    padding: 5px 8px;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    background: #111827;
+    color: #cbd5e1;
+    cursor: pointer;
+    font-size: 12px;
+    text-align: left;
+}
+
+.subagent-inspector__menu button:hover {
+    background: #1e293b;
+}
+
+.subagent-inspector__status {
+    min-height: 16px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
 .subagent-group > .memory-section {
     border-style: dashed;
     border-color: #334155;
