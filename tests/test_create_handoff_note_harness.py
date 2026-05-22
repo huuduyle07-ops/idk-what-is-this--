@@ -171,3 +171,41 @@ def test_non_string_context_summary_rejected(tmp_path: Path):
     inp["context_summary"] = ["a", "list"]
     with pytest.raises(ValueError, match="context_summary must be a string"):
         create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+# ---- path safety: allowed_files / forbidden_files --------------------------
+
+
+def test_allowed_files_traversal_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["allowed_files"] = ["../../etc/passwd"]
+    with pytest.raises(ValueError, match="safe relative path"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_allowed_files_absolute_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["allowed_files"] = ["/etc/passwd"]
+    with pytest.raises(ValueError, match="safe relative path"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_allowed_files_windows_traversal_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["allowed_files"] = ["..\\windows\\system32"]
+    with pytest.raises(ValueError, match="safe relative path"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_forbidden_files_traversal_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["forbidden_files"] = ["../../secret"]
+    with pytest.raises(ValueError, match="safe relative path"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)
+
+
+def test_forbidden_files_absolute_rejected(tmp_path: Path):
+    inp = _valid_input()
+    inp["forbidden_files"] = ["/etc/shadow"]
+    with pytest.raises(ValueError, match="safe relative path"):
+        create_handoff_note_harness(inp, handoff_root=tmp_path)

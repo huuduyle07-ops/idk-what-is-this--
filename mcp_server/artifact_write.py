@@ -83,6 +83,38 @@ def list_exposed_tool_names() -> list[str]:
 # Harness — validated (Task 3).
 # ---------------------------------------------------------------------------
 
+def _validate_rel_path_list(values: Any, field_name: str) -> list[str] | None:
+    """Reject absolute paths and `..` traversal. Backslash is normalized to
+    `/` first so Windows-style traversal is caught the same way as POSIX.
+
+    Returns the original list unchanged on success (we don't mutate input).
+    Returns None if values is None.
+    """
+    if values is None:
+        return None
+    if not isinstance(values, list):
+        raise ValueError(f"{field_name} must be a list of strings")
+    for v in values:
+        if not isinstance(v, str):
+            raise ValueError(
+                f"{field_name} entry is not a safe relative path: {v!r}"
+            )
+        normalized = v.replace("\\", "/").strip()
+        if not normalized:
+            raise ValueError(
+                f"{field_name} entry is not a safe relative path: {v!r}"
+            )
+        if normalized.startswith("/"):
+            raise ValueError(
+                f"{field_name} entry is not a safe relative path: {v!r}"
+            )
+        if any(part == ".." for part in normalized.split("/")):
+            raise ValueError(
+                f"{field_name} entry is not a safe relative path: {v!r}"
+            )
+    return values
+
+
 def create_handoff_note_harness(
     input: dict,
     *,
@@ -158,11 +190,12 @@ def create_handoff_note_harness(
             f"expected_output must be <= {MAX_EXPECTED_OUTPUT_LEN} chars"
         )
 
-    # Path safety for allowed_files / forbidden_files lands in Task 4.
-    # Pass through as-is for now; core.handoff_notes does its own safety
-    # check as a backstop.
-    allowed_files = input.get("allowed_files")
-    forbidden_files = input.get("forbidden_files")
+    allowed_files = _validate_rel_path_list(
+        input.get("allowed_files"), "allowed_files"
+    )
+    forbidden_files = _validate_rel_path_list(
+        input.get("forbidden_files"), "forbidden_files"
+    )
 
     from core.handoff_notes import create_handoff_note as _core_create
     result = _core_create(
