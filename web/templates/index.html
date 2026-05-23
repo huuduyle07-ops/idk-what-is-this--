@@ -553,6 +553,9 @@
                    title="In Clean mode, also include test files (off by default)">
               <input type="checkbox" id="graphShowTests"> show tests
             </label>
+            <button type="button" onclick="openObsidian()" title="Open the generated vault in Obsidian — useful for large repos where the Mermaid graph gets unwieldy">
+              Open in Obsidian
+            </button>
 
           </div>
           <div id="graph">
@@ -854,6 +857,52 @@ function viewGraph(mode) {
     .catch(err => {
         canvas.innerHTML = `<pre>Network error: ${escapeHtml(String(err))}</pre>`;
     });
+}
+
+function openObsidian() {
+    const repo = document.querySelector("input[name='repo_path']").value.trim();
+    if (!repo) {
+        alert("Set a repo path first — Obsidian needs a generated graph to open.");
+        return;
+    }
+
+    fetch("/vault_path", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ repo_path: repo }),
+    })
+    .then(res => res.json().then(data => ({ status: res.status, data })))
+    .then(({ status, data }) => {
+        if (status !== 200 || !data.exists) {
+            alert(
+                "Vault not generated yet.\n\n" +
+                "Run an analysis (mode = Full Agent or Retrieve) first.\n\n" +
+                "Expected location:\n" + (data.expected_path || "(unknown)")
+            );
+            return;
+        }
+
+        const vaultName = data.vault_name;
+        const vaultPath = data.vault_path;
+
+        const opened = window.open(
+            `obsidian://open?vault=${encodeURIComponent(vaultName)}`,
+            "_blank"
+        );
+
+        // If Obsidian doesn't recognise the vault, show the path so the user
+        // can register it once via: Open another vault → Open folder as vault.
+        setTimeout(() => {
+            if (confirm(
+                `If Obsidian didn't open the vault, register this folder once:\n\n` +
+                `${vaultPath}\n\n` +
+                `Click OK to copy the path to your clipboard.`
+            )) {
+                navigator.clipboard.writeText(vaultPath).catch(() => {});
+            }
+        }, 1500);
+    })
+    .catch(err => alert(`Failed to resolve vault: ${err}`));
 }
 
 // Wheel-zoom + drag-to-pan on the graph container.
