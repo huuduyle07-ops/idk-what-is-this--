@@ -70,6 +70,10 @@ _ALLOWED_INPUT_FIELDS: frozenset[str] = frozenset({
 _IMPORT_WORKER_RUN_ALLOWED_INPUT_FIELDS: frozenset[str] = frozenset({
     "worker_run_id",
 })
+_VALIDATE_IMPORTED_PROPOSAL_ALLOWED_INPUT_FIELDS: frozenset[str] = frozenset({
+    "proposal_ref",
+    "repo_path",
+})
 
 
 # ---------------------------------------------------------------------------
@@ -403,9 +407,161 @@ def import_worker_run_as_proposal_harness(input: dict) -> dict:
     return response
 
 
+def _validate_imported_proposal_input(input: Any) -> tuple[str, str]:
+    """Validate MCP input for validate_imported_worker_proposal.
+
+    Returns (proposal_ref, repo_path) on success. Raises ValueError on any
+    shape problem so the harness can audit `allowed=False` and re-raise.
+    """
+    if not isinstance(input, dict):
+        raise ValueError(f"input must be a dict, got {type(input).__name__}")
+
+    unknown = set(input) - _VALIDATE_IMPORTED_PROPOSAL_ALLOWED_INPUT_FIELDS
+    if unknown:
+        raise ValueError(f"unknown field(s): {sorted(unknown)}")
+
+    proposal_ref_raw = input.get("proposal_ref")
+    if not isinstance(proposal_ref_raw, str):
+        raise ValueError("proposal_ref is required and must be a string")
+    proposal_ref = proposal_ref_raw.strip()
+    if not proposal_ref:
+        raise ValueError("proposal_ref is required and must be non-empty")
+    if Path(proposal_ref).is_absolute():
+        raise ValueError("proposal_ref must be a relative path")
+    normalized = proposal_ref.replace("\\", "/")
+    if normalized.startswith("/"):
+        raise ValueError("proposal_ref must be a relative path")
+    segments = normalized.split("/")
+    if not segments:
+        raise ValueError("proposal_ref must have at least one path segment")
+    for part in segments:
+        if part == "" or part == "." or part == "..":
+            raise ValueError(
+                f"proposal_ref must not contain empty, '.', or '..' segments: {proposal_ref!r}"
+            )
+
+    repo_path_raw = input.get("repo_path")
+    if not isinstance(repo_path_raw, str):
+        raise ValueError("repo_path is required and must be a string")
+    repo_path = repo_path_raw.strip()
+    if not repo_path:
+        raise ValueError("repo_path is required and must be non-empty")
+    repo_dir = Path(repo_path).expanduser().resolve()
+    if not repo_dir.is_dir():
+        raise ValueError(f"repo_path must be an existing directory: {repo_path!r}")
+
+    return proposal_ref, repo_path
+
+
+def _validate_imported_proposal_input_summary(input: Any) -> dict:
+    if not isinstance(input, dict):
+        return {"input_type": type(input).__name__}
+
+    summary: dict[str, Any] = {}
+    if "proposal_ref" in input:
+        summary["proposal_ref"] = input["proposal_ref"]
+    if "repo_path" in input:
+        rp = input["repo_path"]
+        if isinstance(rp, str):
+            summary["repo_path_basename"] = Path(rp).name
+        else:
+            summary["repo_path_type"] = type(rp).__name__
+    unknown_fields = sorted(
+        str(name)
+        for name in set(input)
+        - _VALIDATE_IMPORTED_PROPOSAL_ALLOWED_INPUT_FIELDS
+    )
+    if unknown_fields:
+        summary["unknown_fields"] = unknown_fields
+    return summary
+
+
+def _record_validate_imported_proposal_audit(
+    input: Any,
+    *,
+    allowed: bool,
+    result_summary: dict | None = None,
+    artifacts: list[str] | None = None,
+    error: str | None = None,
+) -> None:
+    try:
+        record_mcp_invocation(
+            tool_name="validate_imported_worker_proposal",
+            capability_mode=CAPABILITY_MODE,
+            allowed=allowed,
+            input_summary=_validate_imported_proposal_input_summary(input),
+            result_summary=result_summary,
+            artifacts=artifacts or [],
+            error=error,
+        )
+    except Exception:
+        logger.warning(
+            "failed to record validate_imported_worker_proposal MCP audit event",
+            exc_info=True,
+        )
+
+
 def validate_imported_worker_proposal_harness(input: dict) -> dict:
-    """Phase 8.2c placeholder — implemented in Task 2."""
-    raise NotImplementedError("validate_imported_worker_proposal_harness")
+    """Validate an already-imported worker proposal in a temp clone.
+
+    Delegates resolution to `core.worker_runs.validate_imported_worker_proposal`,
+    which resolves `proposal_ref` under `worker_runs.DEFAULT_PROPOSALS_ROOT` and
+    re-enforces the path-traversal guard. The harness never accepts an
+    absolute proposal directory.
+
+    Returns the narrow MCP response shape:
+      {ok, proposal_dir, apply_success, validation_ok, message, artifacts}
+
+    Raises:
+      ValueError on invalid input shape.
+      FileNotFoundError if the proposal directory or repo_path is missing.
+    """
+    try:
+        proposal_ref, repo_path = _validate_imported_proposal_input(input)
+        from core.worker_runs import validate_imported_worker_proposal as _core_validate
+        result = _core_validate(
+            proposal_dir=proposal_ref,
+            repo_path=repo_path,
+            proposals_root=None,
+        )
+    except (ValueError, FileNotFoundError) as error:
+        _record_validate_imported_proposal_audit(input, allowed=False, error=str(error))
+        raise
+
+    proposal_dir_str = result["proposal_dir"]
+    proposal_dir = Path(proposal_dir_str)
+    artifacts: list[str] = [proposal_dir_str]
+    for fname in (
+        "apply_result.json",
+        "validation.json",
+        "validation_output.txt",
+        "case.json",
+        "patch_proposal.json",
+    ):
+        candidate = proposal_dir / fname
+        if candidate.is_file():
+            artifacts.append(str(candidate))
+
+    response = {
+        "ok": True,
+        "proposal_dir": proposal_dir_str,
+        "apply_success": bool(result.get("apply_success")),
+        "validation_ok": result.get("validation_ok"),
+        "message": result.get("message") or "",
+        "artifacts": artifacts,
+    }
+    _record_validate_imported_proposal_audit(
+        input,
+        allowed=True,
+        result_summary={
+            "ok": response["ok"],
+            "apply_success": response["apply_success"],
+            "validation_ok": response["validation_ok"],
+            "message": response["message"],
+        },
+        artifacts=artifacts,
+    )
+    return response
 
 
 # ---------------------------------------------------------------------------
