@@ -118,6 +118,8 @@ It produces structured information such as:
 - related snippets
 - whether more evidence is needed
 
+The Control Engine's DFS sorts neighbors by `query_bonus * 2 + graph_weight`, where `graph_weight` is the universal node weight computed in `graph/weights.py`. That weight combines structural topology (in-degree, out-degree, complexity) with a history-driven **penalty** term: nodes that have failed before (blocked lessons or failed `patch_attempts` rows) sort to the top of any neighbor list. Each evidence row exposes `graph_weight` so debug context shows why a node ranked highly.
+
 Important file:
 
 - `core/control_engine.py`
@@ -189,11 +191,15 @@ This lets the agent remember:
 - which validation commands are useful
 - project-specific lessons
 
+Past failures also feed back into graph reasoning: a blocked lesson (in `.agent/lessons/blocked/`) adds +5.0 to the weight of the file it touched, and each failed row in the `patch_attempts` table adds +1.0 to the matching file or symbol node (`<rel_path>::<target_node_name>` when the patcher recorded a specific symbol). CONTROL DFS, the project map's Critical Symbols list, and the Obsidian `AI_READ_FIRST` ranking all see this boost automatically — files and symbols that have failed before bubble up. The signal is computed at graph-build time and is fail-soft: a missing DB or absent lesson dir degrades silently to zero.
+
 Important files:
 
 - `database/memory.py`
 - `database/schema.sql`
 - `database/memory_consolidator.py`
+- `graph/penalty.py`
+- `graph/penalty_constants.py`
 
 ### 10. Project Graph and Obsidian Export
 
@@ -205,6 +211,8 @@ Examples:
 - file imports another file
 - function calls another function
 
+Every node carries a universal weight (`graph/weights.py`) that combines structural topology (`α·in_degree + β·out_degree + γ·complexity`, defaults `α=2.0`, `β=1.0`, `γ=0.5`) with a lesson-derived penalty term. CONTROL DFS sorts neighbors by this weight, the project map's Critical Symbols section ranks by it, and the Obsidian export's `AI_READ_FIRST` block lists files in weight order — so prioritization stays consistent across every consumer.
+
 The web UI can render graph views, and the project can export graph notes for Obsidian.
 
 Important files:
@@ -212,6 +220,8 @@ Important files:
 - `graph/schema.py`
 - `graph/builder.py`
 - `graph/query.py`
+- `graph/weights.py`
+- `graph/penalty.py`
 - `graph/exporter.py`
 - `graph/obsidian_exporter.py`
 - `core/semantic_graph_pipeline.py`
@@ -798,6 +808,7 @@ This is an active AI engineering project, not a tiny demo. The code already incl
 - Mayor Mode handoffs, temp-clone worker runs, worker-run import, and temp-clone imported-proposal validation
 - read-only and artifact-write MCP servers with a narrow allowlist, including temp-clone imported-proposal validation
 - MCP audit route and local MCP Inspector shortcuts
+- universal node weights with a lesson-history penalty term that biases CONTROL DFS, project-map rankings, and Obsidian AI_READ_FIRST toward files and symbols with prior failures
 
 ## Short Summary
 

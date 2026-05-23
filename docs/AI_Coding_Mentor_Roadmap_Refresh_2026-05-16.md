@@ -4,6 +4,8 @@
 
 > **2026-05-23 refresh:** Phase 7.1 through 7.2.1.1 Mayor/workflow bridge slices are shipped. Phase 8 now includes the read-only MCP server, the artifact-write MCP server for `create_handoff_note`, `import_worker_run_as_proposal`, and `validate_imported_worker_proposal`, the MCP audit ledger, and local MCP Inspector shortcuts/cleanup.
 
+> **2026-05-24 refresh:** Universal graph node weights (design ba4ba93) shipped — single `weight = α·in_deg + β·out_deg + γ·complexity` model in `graph/weights.py` used by CONTROL DFS sort, project_map Critical Symbols, and Obsidian AI_READ_FIRST. Graph penalty term shipped on top — past failures (blocked lessons in `.agent/lessons/blocked/` + failed rows in the `patch_attempts` Postgres table) add `5.0·N_blocked + 1.0·N_transient` to the matching file/symbol node's weight at graph-build time. CONTROL DFS now prioritizes files and symbols that have failed before. Fail-soft throughout: missing DB / lesson dir / project_tag silently degrades the transient or blocked term to zero. All three consumers (CONTROL, project_map, Obsidian export) wired end-to-end with integration tests.
+
 > **Reading convention for other AI agents:** items prefixed with **🤖 Claude-proposed**, **🤖 Gemini-proposed**, or **🤖 GPT-proposed** are AI-generated suggestions, dated and **pending the user's accept/reject decision**. Treat them as candidate scope, NOT confirmed work. The user has consulted multiple AIs; provenance is shown so future readers (human or AI) can see who said what.
 
 ## Current checkpoint
@@ -38,6 +40,17 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
   - Phase 7.2 imports complete worker runs into the existing proposal review path without auto-apply.
   - Phase 7.2.1 validates imported worker proposals in a temp clone and writes apply/validation evidence into the proposal artifact.
   - Phase 7.2.1.1 deterministically synthesizes `case.json` and `patch_proposal.json` after passing validation so the existing manual lesson CLI can create a candidate lesson.
+- Graph universal weights + lesson penalty shipped 2026-05-24:
+  - `graph/weights.py` — `compute_node_weights(graph, repo_path=None)` returns `dict[str, NodeWeight]` with `weight = α·norm(in_deg) + β·norm(out_deg) + γ·norm(complexity) + penalty`, plus `penalty`, `reasons`, and per-source breakdown fields. Defaults: α=2.0, β=1.0, γ=0.5. Excludes call/expression noise nodes by default.
+  - `graph/penalty.py` + `graph/penalty_constants.py` — `build_penalty_map(graph, repo_path)` returns `PenaltyResult(penalty_map, unmatched_paths, blocked_counts, transient_counts)`. Two sources combined per file/symbol node:
+    - **Blocked lessons** via `core.lesson_store.list_lessons(status="blocked")` → `OMEGA_BLOCKED·N` where `OMEGA_BLOCKED = 5.0` per record touching the file.
+    - **Failed `patch_attempts` rows** via SQL on `codex_db` filtered by `project_tag` → `OMEGA_TRANSIENT·N` where `OMEGA_TRANSIENT = 1.0` per row with phase in (`validation_failed`, `apply_failed`, `dry_run_blocked`), `validation_ok IS FALSE`, or `rollback_performed IS TRUE`.
+    - Symbol-level routing: when `patch_attempts.target_node_name` is recorded and the symbol node exists (`<rel_path>::<symbol>`), penalty lands there; otherwise it rolls up to the file node. Missing symbols go to `unmatched_paths` — no silent rollup.
+    - Path matching: slash + `./` normalization, then exact match, then case-insensitive fallback against a case-folded file-node index (Windows-recorded paths can match canonical lowercase graph node ids).
+  - Fail-soft per spec table: `DB_ENABLED=false`, Postgres unreachable, `project_tag` underivable, missing `.agent/lessons/blocked/`, malformed JSON, or path/symbol mismatch all degrade to zero counts and never block weight computation. `unmatched_paths` is returned alongside the map for test/debug inspection — no global logger noise.
+  - Consumers threaded: `core/control_engine.run_control_structured` → `control_dfs_v2(repo_path=...)` → DFS sort sees the bumped weight. `graph/project_map.compute_symbol_hotspots(repo_path=...)` → Critical Symbols section. `graph/obsidian_exporter.export_graph_to_obsidian(repo_path=...)` → `write_summary` → AI_READ_FIRST ranking.
+  - 14 unit tests in `tests/test_graph_penalty.py` covering empty graph, blocked-only, transient-file/symbol/mixed, symbol-gone, combined sources, DB disabled, stale lesson, malformed records, path normalization, case-insensitive fallback, DB-failure fail-soft, and per-source breakdown. 2 DFS integration tests in `tests/test_control_graph_weights.py` (high-penalty file/symbol outranks tied sibling). 1 end-to-end Obsidian test verifying AI_READ_FIRST order flips with penalty.
+  - Out of scope for v1 (deferred to future work): time-based decay, penalty capping / sigmoid smoothing, symbol-level penalty for blocked lessons (their schema has no symbol info), container roll-up, avoid-mode (negative penalty), pruning, precomputed cache, global logger warnings on unmatched paths.
 - Phase 8 MCP foundations shipped through 2026-05-23:
   - Phase 8-prep tool registry and Phase 8.1 read-only MCP server expose safe evidence-reading tools.
   - Phase 8.2a artifact-write MCP exposes `create_handoff_note`; Phase 8.2b adds `import_worker_run_as_proposal`; Phase 8.2c adds temp-clone `validate_imported_worker_proposal`.
