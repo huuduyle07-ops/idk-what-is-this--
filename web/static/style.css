@@ -137,9 +137,32 @@ body {
     font-weight: 700;
 }
 
+.sidebar-brand__text { flex: 1; }
+
 .sidebar-brand__meta {
     color: var(--color-text-muted);
     font-size: 11px;
+}
+
+.sidebar-help-btn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+
+.sidebar-help-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .mode-switcher {
