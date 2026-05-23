@@ -365,7 +365,7 @@ textarea {
 }
 
 body[data-product-mode="chat"] .instant-run-controls,
-body[data-product-mode="chat"] .margin-top-info,
+body[data-product-mode="chat"] .status-chip,
 body[data-product-mode="chat"] #instantModePanel,
 body[data-product-mode="instant"] #chatModePanel {
     display: none;
@@ -505,9 +505,45 @@ button {
     white-space: pre-wrap;
 }
 
-.margin-top-info {
-    margin-top: 10px;
+.form-row {
+    display: flex;
+    gap: 8px;
+}
+
+.instant-run-controls {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.instant-run-summary {
+    cursor: pointer;
+    font-size: 12px;
     color: var(--color-text-muted);
+    margin: 8px 0 4px;
+    user-select: none;
+}
+
+.instant-run-summary:hover {
+    color: var(--color-text);
+}
+
+.status-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.status-chip__item strong {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.status-chip__sep {
+    opacity: 0.4;
 }
 
 .dream-section {

@@ -72,22 +72,27 @@
 
         <form method="POST" class="agent-form" id="agentForm">
             <input type="hidden" id="webModeInput" name="web_mode" value="{{ page_web_mode }}">
-            <input
-                id="repoPathInput"
-                type="text"
-                name="repo_path"
-                placeholder="Repo path or drag folder here"
-                value="{{ current.repo_path if current else '' }}"
-                required
-            >
-            <input name="project_tag"
-                   value="{{ current.project_tag if current else '' }}"
-                   placeholder="Project tag (auto)" />
+            <div class="form-row">
+                <input
+                    id="repoPathInput"
+                    type="text"
+                    name="repo_path"
+                    placeholder="Repo path or drag folder here"
+                    value="{{ current.repo_path if current else '' }}"
+                    required
+                    style="flex:2"
+                >
+                <input name="project_tag"
+                       value="{{ current.project_tag if current else '' }}"
+                       placeholder="Tag (auto)"
+                       style="flex:1" />
+            </div>
             <input type="file" id="folderInput" webkitdirectory multiple hidden>
 
             <textarea name="query" placeholder="Enter your query..." required>{{ current.query if current else '' }}</textarea>
 
-            <div class="instant-run-controls" data-mode-panel="instant-controls">
+            <details class="instant-run-controls" data-mode-panel="instant-controls" open>
+            <summary class="instant-run-summary">Options</summary>
             <label for="modeSelect">Mode:</label>
             <select id="modeSelect" name="mode">
                 <option value="retrieve" {% if current and current.mode == "retrieve" %}selected{% endif %}>Retrieve</option>
@@ -134,15 +139,17 @@
                 <option value="plan">Plan only</option>
             </select>
 
-            </div>
+            </details>
 
             <button type="submit" id="primarySubmit">Run</button>
         </form>
 
-        <div class="margin-top-info">
-            Current mode: {{ current.mode if current else 'none' }}
-            · Vibecoding: {{ current.patch_style if current and current.patch_style else 'safe_minimal' }}
-            · Code DNA: {{ 'ignored' if current and current.ignore_repo_dna else 'match repo' }}
+        <div class="status-chip">
+            <span class="status-chip__item">Mode: <strong>{{ current.mode if current else 'none' }}</strong></span>
+            <span class="status-chip__sep">·</span>
+            <span class="status-chip__item">Style: <strong>{{ current.patch_style if current and current.patch_style else 'safe_minimal' }}</strong></span>
+            <span class="status-chip__sep">·</span>
+            <span class="status-chip__item">DNA: <strong>{{ 'off' if current and current.ignore_repo_dna else 'on' }}</strong></span>
         </div>
 
         {% if error %}
