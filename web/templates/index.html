@@ -618,6 +618,17 @@
             </div>
           </div>
 
+          <!-- Help / README viewer -->
+          <div class="health-section">
+            <div class="health-header">
+              <strong>Help</strong>
+            </div>
+            <p style="font-size:13px;color:var(--color-text-muted);margin:6px 0 10px;">
+              Opens the project README with usage instructions.
+            </p>
+            <button type="button" onclick="openHelpModal()">Open README</button>
+          </div>
+
           <!-- Phase 8-prep.1: Tool Registry viewer.
                Metadata-only. Reads GET /tools/registry; never invokes a tool. -->
           <div class="health-section tool-registry-section">
@@ -3854,6 +3865,21 @@ async function uploadFolderFiles(files) {
     } else {
         alert(data.error || "Upload failed.");
     }
+}
+
+// ── README / Help viewer ───────────────────────────────────
+function openHelpModal() {
+  openAppModal('How to use C.A.T.T.U.S', '<em>Loading README…</em>');
+  fetch('/help')
+    .then(r => r.text())
+    .then(html => {
+      const body = document.getElementById('appModalBody');
+      if (body) body.innerHTML = `<div class="help-body">${html}</div>`;
+    })
+    .catch(err => {
+      const body = document.getElementById('appModalBody');
+      if (body) body.innerHTML = `<p style="color:var(--color-danger)">Failed to load README: ${escapeHtml(String(err))}</p>`;
+    });
 }
 
 // ── Keybinding editor ──────────────────────────────────────

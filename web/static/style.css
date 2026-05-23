@@ -2238,6 +2238,68 @@ button {
     border-left: 3px solid var(--color-warning);
 }
 
+/* ── Help / README modal content ────────────────────────── */
+.help-body {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--color-text);
+}
+
+.help-body h1, .help-body h2, .help-body h3 {
+    color: var(--color-text);
+    margin-top: 1.4em;
+    margin-bottom: 0.4em;
+}
+
+.help-body h1 { font-size: 1.4em; }
+.help-body h2 { font-size: 1.2em; border-bottom: 1px solid var(--color-border); padding-bottom: 4px; }
+.help-body h3 { font-size: 1em; }
+
+.help-body code {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 1px 5px;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+.help-body pre {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+.help-body pre code {
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.help-body a { color: var(--color-accent); }
+
+.help-body table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+}
+
+.help-body th, .help-body td {
+    border: 1px solid var(--color-border);
+    padding: 6px 10px;
+    text-align: left;
+}
+
+.help-body th {
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+
 .patch-raw-details {
     margin-top: 16px;
     background: var(--color-surface-2);
