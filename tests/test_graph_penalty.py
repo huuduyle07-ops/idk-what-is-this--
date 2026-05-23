@@ -190,6 +190,29 @@ def test_path_normalization_handles_dotslash_backslash_and_foreign_absolute(tmp_
     assert "/etc/passwd" in result.unmatched_paths
 
 
+def test_penalty_result_exposes_per_source_count_breakdown(tmp_path):
+    graph = ProgramGraph()
+    graph.add_node("foo.py", "file")
+    graph.add_node("foo.py::do_thing", "function")
+
+    fake_lessons = [
+        {"candidate": {"changed_files": ["foo.py"]}},
+        {"candidate": {"changed_files": ["foo.py"]}},
+    ]
+    fake_rows = [
+        ("foo.py", None, 3),
+        ("foo.py", "do_thing", 4),
+    ]
+    with patch("graph.penalty.list_lessons", return_value=fake_lessons), \
+         patch("graph.penalty.db_enabled", return_value=True), \
+         patch("graph.penalty.build_project_tag", return_value="test-tag"), \
+         patch("graph.penalty._fetch_patch_attempt_rows", return_value=fake_rows):
+        result = build_penalty_map(graph, repo_path=str(tmp_path))
+
+    assert result.blocked_counts == {"foo.py": 2}
+    assert result.transient_counts == {"foo.py": 3, "foo.py::do_thing": 4}
+
+
 def test_case_insensitive_fallback_matches_windows_style_path(tmp_path):
     graph = ProgramGraph()
     graph.add_node("src/foo.py", "file")

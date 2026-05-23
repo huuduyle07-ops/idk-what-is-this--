@@ -28,6 +28,8 @@ GROUP BY target_file, target_node_name;
 class PenaltyResult:
     penalty_map: dict[str, float] = field(default_factory=dict)
     unmatched_paths: list[str] = field(default_factory=list)
+    blocked_counts: dict[str, int] = field(default_factory=dict)
+    transient_counts: dict[str, int] = field(default_factory=dict)
 
 
 def _file_node_index(graph) -> tuple[set[str], dict[str, str]]:
@@ -147,4 +149,9 @@ def build_penalty_map(graph, repo_path: str) -> PenaltyResult:
         penalty_map[node_id] = penalty_map.get(node_id, 0.0) + OMEGA_TRANSIENT * count
 
     unmatched = blocked_unmatched + transient_unmatched
-    return PenaltyResult(penalty_map, unmatched)
+    return PenaltyResult(
+        penalty_map=penalty_map,
+        unmatched_paths=unmatched,
+        blocked_counts=blocked_counts,
+        transient_counts=transient_counts,
+    )

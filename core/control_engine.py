@@ -8,6 +8,7 @@ from typing import Any
 from graph.builder import build_graph_from_repo
 from graph.project_map import load_project_map
 from graph.query import explain_symbol, impact_analysis
+from graph.weights import NodeWeight, compute_node_weights, get_node_weight
 from reasoning.deep_project_understand import deep_project_understand
 from reasoning.reasoning_engine import analyze_symbol_risk
 from core.retriever import trace_execution_flow
@@ -267,6 +268,7 @@ def score_control_node(item: dict) -> float:
         + risk_score
         + level_bonus
         + item.get("query_bonus", 0) * 2
+        + item.get("graph_weight", 0)
         - item.get("depth", 0) * 0.5
     )
 
@@ -278,10 +280,12 @@ def control_dfs_v2(
     max_depth: int = 2,
     max_nodes: int = 20,
     neighbor_limit: int = 3,
+    node_metrics: dict[str, NodeWeight] | None = None,
 ) -> list[dict]:
     visited = set()
     evidence: list[dict] = []
     words = query_words(query)
+    metrics = node_metrics if node_metrics is not None else compute_node_weights(graph)
 
     def dfs(symbol: str, depth: int):
         if depth > max_depth:
@@ -305,6 +309,7 @@ def control_dfs_v2(
             "impact": impact,
             "risk": risk,
             "query_bonus": relevance_bonus(symbol, words),
+            "graph_weight": get_node_weight(metrics, symbol),
         }
         item["score"] = score_control_node(item)
         evidence.append(item)
@@ -315,8 +320,10 @@ def control_dfs_v2(
 
         ranked_neighbors = sorted(
             set(neighbors),
-            key=lambda n: relevance_bonus(n, words),
-            reverse=True,
+            key=lambda n: (
+                -(relevance_bonus(n, words) * 2 + get_node_weight(metrics, n)),
+                n,
+            ),
         )[:neighbor_limit]
 
         for n in ranked_neighbors:
@@ -538,6 +545,7 @@ def format_control_context(result: dict) -> str:
         lines.append(f"### {item['symbol']}")
         lines.append(f"- depth: {item['depth']}")
         lines.append(f"- score: {item.get('score', 0):.2f}")
+        lines.append(f"- graph_weight: {item.get('graph_weight', 0):.2f}")
         lines.append(f"- risk: {risk.get('risk_level')} ({risk.get('risk_score')})")
         lines.append(f"- called_by: {item.get('called_by', [])[:5]}")
         lines.append(f"- calls: {item.get('calls', [])[:5]}")

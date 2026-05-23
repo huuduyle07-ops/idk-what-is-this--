@@ -2,8 +2,22 @@ from pathlib import Path
 from collections import defaultdict
 from typing import Dict, List, Any, Optional
 from graph.compressor import compress_to_modules
+from graph.weights import rank_nodes_by_weight
 from config import get_agent_dir, BASE_DIR
 import re
+
+CRITICAL_SYMBOL_TYPES = {
+    "function",
+    "class",
+    "struct",
+    "interface",
+    "type",
+    "enum",
+    "trait",
+    "union",
+    "object",
+    "record",
+}
 
 def summarize_file(rel_path: str, language: str, symbols: list, imports: list, calls: list) -> dict:
     names = [s.get("name", "unknown") for s in symbols[:12]]
@@ -101,22 +115,12 @@ def compute_hotspots(graph):
     return [node for node, _ in ranked[:10]]
 
 def compute_symbol_hotspots(graph):
-    scores = {}
-
-    for edge in graph.edges:
-        if edge.type == "resolved_call":
-            scores[edge.target] = scores.get(edge.target, 0) + 2
-
-        if edge.type == "imports":
-            scores[edge.target] = scores.get(edge.target, 0) + 1
-
-    # bonus: nodes with many incoming edges
-    for node in graph.nodes:
-        degree = sum(1 for e in graph.edges if e.target == node)
-        scores[node] = scores.get(node, 0) + degree * 0.5
-
-    ranked = sorted(scores.items(), key=lambda x: (-x[1], x[0]))
-    return ranked[:10]
+    ranked = rank_nodes_by_weight(
+        graph,
+        limit=10,
+        node_types=CRITICAL_SYMBOL_TYPES,
+    )
+    return [(metric.node_id, metric.weight) for metric in ranked]
 
 def _is_self_analysis(repo_path: Optional[str]) -> bool:
     if not repo_path:

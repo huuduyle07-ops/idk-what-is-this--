@@ -2,6 +2,8 @@ from pathlib import Path
 from datetime import datetime
 import re
 
+from graph.weights import is_noise_node, rank_nodes_by_weight
+
 def make_obsidian_paths(base_path: str, snapshot: bool = False):
     base = Path(base_path)
 
@@ -17,10 +19,6 @@ def sanitize(name: str) -> str:
     name = name.replace(":", "_")
     name = re.sub(r"[^\w\-. ]+", "_", name)
     return name[:120]
-
-
-def is_noise_node(node_id: str, node_type: str) -> bool:
-    return node_type == "expression" or "::expr::" in node_id or node_id.startswith("call::")
 
 
 def export_graph_to_obsidian(graph, vault_path: str, include_noise: bool = False):
@@ -166,12 +164,10 @@ def add_section(lines: list[str], title: str, items: list[str]) -> None:
 def write_summary(vault: Path, graph, notes: dict) -> None:
     important = []
 
-    for node_id, info in notes.items():
-        score = len(info["called_by"]) * 2 + len(info["calls"])
-        if score > 0:
-            important.append((score, node_id, info))
-
-    important.sort(reverse=True)
+    for metric in rank_nodes_by_weight(graph, limit=len(graph.nodes)):
+        info = notes.get(metric.node_id)
+        if info is not None and metric.weight > 0:
+            important.append((metric.weight, metric.node_id, info))
 
     lines = [
         "# GRAPH SUMMARY",
@@ -187,7 +183,7 @@ def write_summary(vault: Path, graph, notes: dict) -> None:
     ]
 
     for score, node_id, info in important[:10]:
-        lines.append(f"- [[{sanitize(node_id)}]] score={score} type={info['type']}")
+        lines.append(f"- [[{sanitize(node_id)}]] score={score:.2f} type={info['type']}")
 
     lines.append("")
     lines.append("## Rule for small models")
