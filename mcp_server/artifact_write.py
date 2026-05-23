@@ -40,6 +40,7 @@ CAPABILITY_MODE = "artifact_write"
 _EXTRA_WRITE_TOOLS: tuple[str, ...] = (
     "create_handoff_note",
     "import_worker_run_as_proposal",
+    "validate_imported_worker_proposal",
 )
 
 _SERVER_NAME = "cattus-artifact-write"
@@ -402,6 +403,11 @@ def import_worker_run_as_proposal_harness(input: dict) -> dict:
     return response
 
 
+def validate_imported_worker_proposal_harness(input: dict) -> dict:
+    """Phase 8.2c placeholder — implemented in Task 2."""
+    raise NotImplementedError("validate_imported_worker_proposal_harness")
+
+
 # ---------------------------------------------------------------------------
 # Thin tool implementations
 # ---------------------------------------------------------------------------
@@ -422,6 +428,11 @@ def _impl_import_worker_run_as_proposal(input: dict) -> dict:
     return import_worker_run_as_proposal_harness(input)
 
 
+def _impl_validate_imported_worker_proposal(input: dict) -> dict:
+    """MCP-registered impl for the narrow worker-proposal validation harness."""
+    return validate_imported_worker_proposal_harness(input)
+
+
 _IMPLS: dict[str, Callable[..., Any]] = {
     "get_health": read_only._impl_get_health,
     "list_benchmark_reports": read_only._impl_list_benchmark_reports,
@@ -435,6 +446,7 @@ _IMPLS: dict[str, Callable[..., Any]] = {
     "list_tool_registry": read_only._impl_list_tool_registry,
     "create_handoff_note": _impl_create_handoff_note,
     "import_worker_run_as_proposal": _impl_import_worker_run_as_proposal,
+    "validate_imported_worker_proposal": _impl_validate_imported_worker_proposal,
 }
 
 # ---------------------------------------------------------------------------

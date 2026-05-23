@@ -26,11 +26,11 @@ _EXPECTED_EXPOSED_TOOLS = {
     "list_tool_registry",
     "create_handoff_note",
     "import_worker_run_as_proposal",
+    "validate_imported_worker_proposal",
 }
 
 # Tools that must NEVER be exposed by the artifact-write MCP server.
 _FORBIDDEN_TOOLS = {
-    "validate_imported_worker_proposal",
     "run_subagent_handoff",
     "apply_patch",
     "apply_patch_plan",
@@ -66,10 +66,10 @@ def test_capability_mode_constant_is_artifact_write():
 # ---- allowlist contract ----------------------------------------------------
 
 
-def test_exposed_names_are_exactly_twelve():
+def test_exposed_names_are_exactly_thirteen():
     from mcp_server import artifact_write
     assert set(artifact_write.list_exposed_tool_names()) == _EXPECTED_EXPOSED_TOOLS
-    assert len(artifact_write.list_exposed_tool_names()) == 12
+    assert len(artifact_write.list_exposed_tool_names()) == 13
 
 
 def test_create_handoff_note_is_exposed():
@@ -80,6 +80,11 @@ def test_create_handoff_note_is_exposed():
 def test_import_worker_run_as_proposal_is_exposed():
     from mcp_server import artifact_write
     assert "import_worker_run_as_proposal" in artifact_write.list_exposed_tool_names()
+
+
+def test_validate_imported_worker_proposal_is_exposed():
+    from mcp_server import artifact_write
+    assert "validate_imported_worker_proposal" in artifact_write.list_exposed_tool_names()
 
 
 @pytest.mark.parametrize("forbidden", sorted(_FORBIDDEN_TOOLS))
@@ -94,6 +99,7 @@ def test_read_only_server_still_omits_artifact_write_tools():
     from mcp_server import read_only
     assert "create_handoff_note" not in read_only.list_exposed_tool_names()
     assert "import_worker_run_as_proposal" not in read_only.list_exposed_tool_names()
+    assert "validate_imported_worker_proposal" not in read_only.list_exposed_tool_names()
     # And the read-only server should still expose exactly 10.
     assert len(read_only.list_exposed_tool_names()) == 10
 
@@ -151,7 +157,7 @@ def test_main_does_not_run_server_when_dep_missing(monkeypatch):
 # ---- --list-tools CLI flag -------------------------------------------------
 
 
-def test_list_tools_flag_prints_twelve_names(capsys):
+def test_list_tools_flag_prints_thirteen_names(capsys):
     from mcp_server import artifact_write
 
     exit_code = artifact_write.main(["--list-tools"])
