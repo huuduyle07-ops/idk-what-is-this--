@@ -36,7 +36,7 @@ Current web workspaces:
 - Chat / Patch: answer, context, state, patch card, validation, diff, and candidate views.
 - Benchmarks: browse past benchmark reports and inspect results.
 - Dream: queue overnight bug/debt/idea/research work.
-- Memory: run memory consolidation.
+- Memory: run memory consolidation, manage lessons/proposals, create handoffs, inspect worker runs, and launch MCP Inspector shortcuts.
 - Graph: render clean or debug program graphs.
 - Settings / Health: check API keys, DB, embeddings, Ollama, Tree-sitter, and local toolchains.
 
@@ -324,6 +324,48 @@ Important files:
 - `agents/model_stats.py`
 - `benchmarks/run_benchmarks.py`
 
+### 16. Mayor Mode and Worker Runs
+
+Mayor Mode is the operator workflow for sending a bounded task to an external coding agent without giving that agent the real repo.
+
+The flow is:
+
+1. Create a handoff note under `.agent/handoffs/`.
+2. Optionally run a worker in a temp clone with explicit operator approval.
+3. Inspect the worker run under `.agent/worker_runs/`.
+4. Import a complete worker run as a normal proposal under `.agent/proposals/`.
+5. Validate that imported proposal in a temp clone.
+6. If validation passes, synthesize lesson-ready proposal artifacts.
+7. Create and promote a lesson through the normal manual lesson flow.
+
+Important files:
+
+- `core/handoff_notes.py`
+- `core/worker_runs.py`
+- `scripts/create_handoff_note.py`
+- `scripts/run_subagent_handoff.py`
+
+### 17. MCP Servers and Inspector
+
+The project exposes a narrow MCP surface for external MCP-aware clients.
+
+- Read-only MCP server: 10 evidence-reading tools, no writes.
+- Artifact-write MCP server: the same read-only tools plus `create_handoff_note`, `import_worker_run_as_proposal`, and `validate_imported_worker_proposal`.
+- MCP audit ledger: bounded summaries of artifact-write calls under `.agent/mcp_audit/invocations.jsonl`.
+- MCP Inspector shortcuts: local web buttons that launch Inspector only for fixed read-only or artifact-write targets.
+
+`validate_imported_worker_proposal` is the only artifact-write MCP tool that runs a subprocess, and it does so through the existing temp-clone validation path. It must never apply patches to the real repo.
+
+Important files:
+
+- `core/tool_registry.py`
+- `core/mcp_audit.py`
+- `mcp_server/read_only.py`
+- `mcp_server/artifact_write.py`
+- `scripts/mcp_readonly_server.py`
+- `scripts/mcp_artifact_write_server.py`
+- `web/mcp_inspector_processes.py`
+
 ## Pipeline
 
 Here is the simple version:
@@ -374,7 +416,9 @@ Imagine your codebase is a big school notebook.
 | `reasoning/` | Risk analysis, state reasoning, and deeper project understanding. |
 | `policy/` | Patch style policy and auto-apply rules. |
 | `benchmarks/` | Small broken repos used to test whether the agent can fix bugs. |
-| `.agent/` | Generated project maps, debug files, benchmark reports, graph exports, and dream artifacts. |
+| `mcp_server/` | Local MCP server modules for read-only and narrow artifact-write access. |
+| `scripts/` | Operational scripts for background reports, proposal queues, handoffs, and MCP server shims. |
+| `.agent/` | Generated project maps, debug files, benchmark reports, graph exports, dream artifacts, handoffs, worker runs, proposals, lessons, and MCP audit logs. |
 
 ## How To Run
 
@@ -412,6 +456,8 @@ Or:
 python -m web.app
 ```
 
+`python main.py --web` and `python -m web.app` both route through the same web runner. When the Flask server exits from a normal terminal shutdown path such as `Ctrl+C`, it also attempts to stop matching local MCP Inspector process trees.
+
 Index a repository:
 
 ```bash
@@ -439,6 +485,28 @@ python benchmarks\run_benchmarks.py --latest
 python benchmarks\run_benchmarks.py --compare .agent\benchmarks\old.json .agent\benchmarks\new.json
 python benchmarks\run_benchmarks.py --fast --summary --skip-toolchain-failures
 ```
+
+Run MCP helper checks:
+
+```bash
+python scripts\mcp_readonly_server.py --list-tools
+python scripts\mcp_artifact_write_server.py --list-tools
+```
+
+Start MCP servers for an MCP client:
+
+```bash
+python scripts\mcp_readonly_server.py
+python scripts\mcp_artifact_write_server.py
+```
+
+The running MCP servers require the optional `mcp` Python SDK:
+
+```bash
+pip install mcp
+```
+
+The `--list-tools` commands work without importing `mcp`, so they are safe sanity checks before installing optional dependencies.
 
 View benchmark cases in the web UI:
 
@@ -553,6 +621,9 @@ Core rule:
 | Generate proposals from benchmark gaps | **Dream tab → Make proposal** | Don't expect Dream to auto-apply |
 | Promote a validated proposal into prompt memory | **Memory tab → Lessons → Promote** | Don't promote without reading the proposal |
 | Send a bounded task to an external coding agent | **Memory tab → Mayor Mode (Handoffs)** | Don't tick "Allow run" without an exit plan |
+| Inspect external-worker output | **Memory tab → Worker Runs** | Don't import incomplete or dry-run artifacts |
+| Let an MCP client inspect evidence | **Read-only MCP server** | Don't expose real-repo write tools |
+| Let an MCP client create safe artifacts | **Artifact-write MCP server** | Don't treat artifact creation as approval to run/apply |
 | Measure the whole system | **Benchmarks tab / `run_benchmarks.py`** | Don't run after every small change |
 
 ### Patch flow safety gate
@@ -632,6 +703,50 @@ Worker commands default to `codex exec --full-auto`, `claude --print`, `gemini -
 
 **When not to:** the task is vague, the repo is in an odd state, or you only wanted to explain or understand something — use Chat instead.
 
+### Worker run review and import
+
+Phase 7.2+ bridges a worker's temp-clone output back into the normal proposal and lesson path. It still does not make the worker authoritative.
+
+Use it from the web UI:
+
+1. Memory tab → Mayor Mode → Worker Runs.
+2. Click **View details** on a completed run.
+3. If the run is complete and produced `proposal.md` plus `patch_plan.json`, click **Import as proposal**.
+4. Validate the imported proposal from the UI. Validation applies the worker's `patch_plan.json` in a fresh temp clone and writes `apply_result.json`, `validation.json`, and `validation_output.txt` back into the proposal artifact.
+5. If validation passes, the system can synthesize `case.json` and `patch_proposal.json` for the existing lesson flow.
+6. Create a candidate lesson, read it, then promote it manually if it deserves to become active memory.
+
+The real repo should stay byte-identical during import and validation. Imported worker output is skipped by the proposal queue unless a human explicitly approves the next step.
+
+### MCP usage
+
+There are two MCP server entry points:
+
+```bash
+python scripts/mcp_readonly_server.py
+python scripts/mcp_artifact_write_server.py
+```
+
+Use `--list-tools` before connecting a client:
+
+```bash
+python scripts/mcp_readonly_server.py --list-tools
+python scripts/mcp_artifact_write_server.py --list-tools
+```
+
+Current surfaces:
+
+- `mcp_readonly_server.py`: 10 read-only tools for health, benchmark reports, Dream reports, lessons, worker runs, and the tool registry.
+- `mcp_artifact_write_server.py`: those same read-only tools plus `create_handoff_note`, `import_worker_run_as_proposal`, and `validate_imported_worker_proposal`.
+
+The artifact-write server does not expose real-repo patch application, Dream apply, subagent execution, or lesson promotion/blocking. MCP validation is limited to an already-imported worker proposal, applies the patch plan only in a temp clone, and writes evidence back to the proposal artifact directory.
+
+Audit and Inspector:
+
+- Web: open `/mcp/audit?limit=50` or use the **View MCP audit** link in the Sub-agent header.
+- Web: use **MCP Inspector** in the Sub-agent header to launch Inspector for either the read-only or artifact-write server.
+- Terminal: stopping the Flask web server also attempts to clean up matching local `@modelcontextprotocol/inspector` process trees.
+
 ### Benchmarks — when to run
 
 | Situation | Command |
@@ -680,7 +795,10 @@ This is an active AI engineering project, not a tiny demo. The code already incl
 - structured patch card showing confidence, risk, validation command, changed files, and last action
 - overnight planning through the Sleeping Consultant
 - health checks for API keys, optional services, and local toolchains
+- Mayor Mode handoffs, temp-clone worker runs, worker-run import, and temp-clone imported-proposal validation
+- read-only and artifact-write MCP servers with a narrow allowlist, including temp-clone imported-proposal validation
+- MCP audit route and local MCP Inspector shortcuts
 
 ## Short Summary
 
-C.A.T.T.U.S is a repo-aware AI coding agent. It reads a project, finds the important code, reasons about bugs or features, proposes safe patches, validates the result, reports what happened through a web workspace, and learns from each run.
+C.A.T.T.U.S is a repo-aware AI coding agent. It reads a project, finds the important code, reasons about bugs or features, proposes safe patches, validates the result, reports what happened through a web workspace, coordinates bounded external-worker handoffs, exposes safe MCP evidence tools, and learns from each run.

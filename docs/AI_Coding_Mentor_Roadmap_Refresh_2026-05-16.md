@@ -2,11 +2,13 @@
 
 > Updated after AgentBench 22-case expansion, Phase 2 reporting upgrades, Dream V2 benchmark seeding (with dedupe + flaky-case seeding), local DB recovery, **Phase 5 web workspace revamp completion (Slices 1-5 shipped 2026-05-16)**, flaky-case Benchmarks tab rendering, **Dream execution-quality Slices alpha/beta/gamma shipped (2026-05-16)** including ready-to-apply revalidation + lesson-quality badges, **Dream Slice γ3.3 shipped (2026-05-17)** explaining why planned items are not `ready_to_apply`, **Brain version stamp + Phase 4.5 Level 1 background reporter shipped (2026-05-17)**, **Phase 4.5 Levels 2-3 CLI MVP shipped (2026-05-17)**, and **Phase 6 manual-safe memory loop shipped (2026-05-17)** — bucketed lesson storage, Memory tab promote/block UI, active-only retrieval, CONTROL prompt injection behind `LESSON_RETRIEVAL_ENABLED`, manual proposal→lesson CLI, and lesson tags (auto-creation from benchmarks/Dream remains deferred).
 
+> **2026-05-23 refresh:** Phase 7.1 through 7.2.1.1 Mayor/workflow bridge slices are shipped. Phase 8 now includes the read-only MCP server, the artifact-write MCP server for `create_handoff_note`, `import_worker_run_as_proposal`, and `validate_imported_worker_proposal`, the MCP audit ledger, and local MCP Inspector shortcuts/cleanup.
+
 > **Reading convention for other AI agents:** items prefixed with **🤖 Claude-proposed**, **🤖 Gemini-proposed**, or **🤖 GPT-proposed** are AI-generated suggestions, dated and **pending the user's accept/reject decision**. Treat them as candidate scope, NOT confirmed work. The user has consulted multiple AIs; provenance is shown so future readers (human or AI) can see who said what.
 
 ## Current checkpoint
 
-The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web revamp is fully shipped.
+The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web revamp, Phase 7.1-7.2.1.1 Mayor/workflow bridge, and Phase 8.1/8.2a/8.2b/8.2c/8.3 MCP foundations are shipped.
 
 ### Stable / mostly working
 
@@ -31,6 +33,17 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
   - CONTROL prompt injection (`core/control_engine.py`) gated by `LESSON_RETRIEVAL_ENABLED` (default false), with `LESSON_RETRIEVAL_LIMIT` and `LESSON_RETRIEVAL_MAX_CHARS`; `[ACTIVE LESSONS — advisory hints, lowest priority]` block sits between `[PHANTOM LIMB SUGGESTIONS]` and `[USER]`; fail-closed (any error → empty block, prompt still builds); 4 production callers updated to pass `repo_path`
   - `scripts/create_lesson_from_proposal.py` — manual CLI that turns a validated `.agent/proposals/<run>/<item>/` artifact into a lesson candidate; explicitly populates tags; refuses by default if validation/apply failed (override with `--allow-failed`); path-traversal guarded; never modifies the real repo
   - Auto-creation from benchmark/Dream/proposal queues is **explicitly deferred** to Phase 6.4 — today only the manual CLI flow exists, keeping the loop "manual-safe"
+- Phase 7 Mayor/workflow bridge shipped 2026-05-21:
+  - Phase 7.1 creates handoff notes and can optionally run external workers in temp clones only.
+  - Phase 7.2 imports complete worker runs into the existing proposal review path without auto-apply.
+  - Phase 7.2.1 validates imported worker proposals in a temp clone and writes apply/validation evidence into the proposal artifact.
+  - Phase 7.2.1.1 deterministically synthesizes `case.json` and `patch_proposal.json` after passing validation so the existing manual lesson CLI can create a candidate lesson.
+- Phase 8 MCP foundations shipped through 2026-05-23:
+  - Phase 8-prep tool registry and Phase 8.1 read-only MCP server expose safe evidence-reading tools.
+  - Phase 8.2a artifact-write MCP exposes `create_handoff_note`; Phase 8.2b adds `import_worker_run_as_proposal`; Phase 8.2c adds temp-clone `validate_imported_worker_proposal`.
+  - Phase 8.3 records bounded MCP invocation summaries in `.agent/mcp_audit/invocations.jsonl` and exposes `GET /mcp/audit`.
+  - Local MCP Inspector shortcuts launch only fixed read-only/artifact-write targets, and web shutdown now cleans up matching Inspector process trees.
+  - MCP validation applies an already-imported worker proposal only in a temp clone and writes evidence under `.agent/proposals/`.
 - AgentBench:
   - recursive `case.json` discovery
   - `--check`, `--report`, `--latest`, `--compare`
@@ -220,11 +233,11 @@ This makes Phase 6 a precondition-design problem, not just a storage problem. **
 
 ### L. Suggested ordering when user picks next task
 
-> Historical note: A, G, H, Phase 4.5 Levels 1-3, and Phase 6 manual-safe loop have shipped. Current near-term ordering is tracked in **Near-term action list**.
+> Historical note: A, G, H, Patch Safety, Phase 4.5 Levels 1-3, and Phase 6 manual-safe loop have shipped. Current near-term ordering is tracked in **Near-term action list**.
 
 1. ~~Manual Level 3 trial on one reviewed `human_approved_for_proposal=true` item.~~ ✅
 2. Prompt-version quantifier panel, paired with Brain Stamp hashes.
-3. Patch Safety gate (forbidden-files + path-traversal at apply time).
+3. ~~Patch Safety gate (forbidden-files + path-traversal at apply time).~~ ✅
 4. Held-out eval set.
 5. Repeated-failure Dream seeding.
 6. ~~Phase 6 lessons — § M guard MVP is shipped; still wire `Candidate_Lesson` → `Active_Knowledge` storage, human approval, and retrieval that reads only active knowledge.~~ ✅ (manual-safe loop shipped; Phase 6.4 auto-creation is the remaining piece)
@@ -570,7 +583,7 @@ Turn benchmark and Dream outputs into useful knowledge the agent actually consul
 
 ## Phase 7 — Reference study loop
 
-**Status: DEFERRED**
+**Status: Reference-study loop DEFERRED; Mayor/operator bridge slices 7.1-7.2.1.1 SHIPPED.**
 
 > 🤖 **Claude-proposed (2026-05-16):** Defer harder. Most "learn from OpenHuman/Hermes" insight can be captured by the user reading them once and updating prompts. Heavy investment here pays low dividends compared to Phase 4.5 / lessons / cost tracking.
 
@@ -586,7 +599,13 @@ Gastown is a reference for the Mayor/operator pattern: a high-level coordinator 
 Apply to AI Coding Mentor:
 - Treat the human user as the first "Mayor".
 - Keep AI Coding Mentor as the workspace/evidence layer, not an autonomous boss.
-- Add lightweight operator artifacts before adding more autonomy:
+- Lightweight operator artifacts have now shipped through Phase 7.2.1.1:
+  - handoff notes under `.agent/handoffs/`
+  - temp-clone worker runs under `.agent/worker_runs/`
+  - worker-run import into `.agent/proposals/`
+  - temp-clone validation evidence for imported proposals
+  - deterministic lesson-artifact synthesis after passing validation
+- Remaining reference-study ideas should add evidence/workflow notes before adding more autonomy:
   - `WORK_STATE.md` or `.agent/work_state.json`
   - task owner / status / next safe action
   - handoff notes for Dream/proposal items
@@ -645,7 +664,7 @@ Position: Browser agent is not core patching. It is a research/input tool for Dr
 
 ## Phase 8 — MCP sidecar
 
-**Status: Phase 8-prep + Phase 8.1 SHIPPED; later sub-phases DEFERRED**
+**Status: Phase 8-prep + 8.1 + 8.2a + 8.2b + 8.2c + 8.3 SHIPPED**
 
 MCP is an external safe API, not the brain.
 
@@ -686,15 +705,39 @@ this server."` prints to stderr (exit 2) if `mcp` is not installed.
 - `read_worker_run`
 - `list_tool_registry`
 
-### Avoid first (still deferred past 8.1)
+### Phase 8.2 — artifact-write MCP server (partially shipped)
+
+`mcp_server.artifact_write` is the narrow write-capable MCP surface. It reuses the 10 read-only tools and adds only explicitly allowlisted artifact-write helpers.
+
+- **Phase 8.2a shipped 2026-05-22:** `create_handoff_note` harness + `scripts/mcp_artifact_write_server.py`. It writes only handoff notes under `.agent/handoffs/`, accepts strict dict input, keeps the default safety rules, runs no subprocess, and cannot launch a worker.
+- **Phase 8.2b shipped 2026-05-22:** `import_worker_run_as_proposal` harness. It accepts only a `worker_run_id`, copies an existing complete worker run into `.agent/proposals/`, writes no validation or lesson-ready artifacts, and runs no subprocess.
+- **Phase 8.2c shipped 2026-05-23:** `validate_imported_worker_proposal` harness. It accepts only a relative proposal ref plus an existing repo directory, runs validation through the existing temp-clone core helper, writes evidence artifacts under `.agent/proposals/`, and audits success/blocked calls.
+- **Current artifact-write MCP surface:** 13 tools total: 10 read-only tools + `create_handoff_note` + `import_worker_run_as_proposal` + `validate_imported_worker_proposal`.
+
+### Phase 8.3 — MCP invocation audit ledger (shipped)
+
+- `core/mcp_audit.py` writes bounded JSONL invocation summaries to `.agent/mcp_audit/invocations.jsonl`.
+- `create_handoff_note` and `import_worker_run_as_proposal` harness calls record allowed/blocked audit events at the artifact-write boundary.
+- `GET /mcp/audit?limit=50` lists recent valid events without adding any MCP write capability.
+- Audit failures are observational only; they are logged and do not turn a valid harness result into a failure or a blocked result into success.
+
+### MCP Inspector local operator tools (shipped)
+
+- `POST /mcp/inspector/launch` launches MCP Inspector only for fixed targets: the read-only server or the artifact-write server.
+- The Sub-agent header exposes compact Inspector shortcuts plus a link to recent MCP audit events.
+- `web/mcp_inspector_processes.py` and `web.runner` stop matching local MCP Inspector process trees on terminal shutdown paths such as `Ctrl+C`.
+- The browser route never accepts arbitrary Inspector commands from the web UI.
+
+### Avoid first (still deferred past the current MCP surface)
 
 - arbitrary shell command
-- arbitrary file write
+- arbitrary file write outside narrow `.agent` artifact helpers
 - direct patch apply to real repo
 - delete/move files
 - DB writes
-- subagent execution / handoff runs
-- lesson promotion or blocking
+- subagent execution / handoff runs over MCP
+- lesson promotion or blocking over MCP
+- real-repo validation or arbitrary proposal paths over MCP
 
 > 🤖 **Claude-proposed (2026-05-16):** Once Phases 4–6 are stable, MCP becomes very high-value because other Claude agents (or any MCP-aware AI tool) can query your benchmarks/dream/health directly instead of relying on the user pasting context. The whitelisted-tools approach in the current plan is correct — keep it.
 >
@@ -1035,14 +1078,22 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
 - [x] **Phase 4.5 Level 3 Patch Proposal Queue CLI MVP** shipped 2026-05-17: `scripts/run_patch_proposal_queue.py` processes only `human_approved_for_proposal=true` items, copies benchmark repos to temp, validates with benchmark-metadata commands only, and writes proposal artifacts under `.agent/proposals/` without touching the real repo.
 - [x] **Phase 6 manual-safe memory loop** shipped 2026-05-17: bucketed lesson storage (`core/lesson_store.py`), Memory tab promote/block UI + tag chips, `core/lesson_retrieval.py` reading only `active/` with per-repo+global scope union, deterministic keyword scoring (case_name +100 / tag +25 / language+category +10 / query +5) with tokenized free-form queries + stopword list, CONTROL prompt injection (`core/control_engine.py`) gated by `LESSON_RETRIEVAL_ENABLED` and fail-closed on errors, manual `scripts/create_lesson_from_proposal.py` CLI, and `derive_lesson_tags` helper. Auto-creation from benchmarks/Dream still deferred (Phase 6.4).
 - [x] **Web proposal/benchmark workflow adjustment** shipped 2026-05-17: lesson cards can open originating proposal.md; Benchmarks tab can run all or selected cases without terminal; Add Case can infer validation command + expected changed files from patch/git evidence and optionally use the LLM as a requirements clerk for category/difficulty/strict prompt generation.
+- [x] **Patch Safety gate** shipped: `core/patch_safety.py` blocks forbidden files and traversal at apply/test time; web apply routes surface `patch_safety` details instead of letting unsafe targets proceed.
+- [x] **Phase 7.1-7.2.1.1 Mayor/workflow bridge** shipped 2026-05-21: handoff notes, optional temp-clone subagent runs, worker-run review/import, imported-proposal temp-clone validation, and deterministic lesson-artifact synthesis after passing validation.
+- [x] **Phase 8-prep + Phase 8.1 MCP read-only foundation** shipped 2026-05-21: tool registry, `mcp_server.read_only`, and `scripts/mcp_readonly_server.py` expose 10 read-only evidence tools over stdio without write/apply/execute capabilities.
+- [x] **Phase 8.2a artifact-write MCP handoff harness** shipped 2026-05-22: `mcp_server.artifact_write` exposes the read-only tools plus `create_handoff_note`; no subagent run, patch apply, lesson write, or arbitrary file write.
+- [x] **Phase 8.2b MCP import-worker-run harness** shipped 2026-05-22: artifact-write MCP added `import_worker_run_as_proposal`, making the server 12 tools at that slice and leaving validation/lesson creation out of the import harness.
+- [x] **Phase 8.2c MCP validate-imported-worker-proposal harness** shipped 2026-05-23: artifact-write MCP now also exposes `validate_imported_worker_proposal`, keeping validation temp-clone-only and evidence-writing under the proposal artifact directory.
+- [x] **Phase 8.3 MCP audit ledger** shipped 2026-05-22: bounded invocation summaries in `.agent/mcp_audit/invocations.jsonl`, read-only `GET /mcp/audit`, and audit integration for artifact-write harness calls.
+- [x] **MCP Inspector operator shortcuts and shutdown cleanup** shipped 2026-05-23: fixed-target Inspector launch route/UI for read-only and artifact-write servers, plus terminal-shutdown cleanup of matching local Inspector process trees.
 
-### Do next (refreshed 2026-05-17 after Phase 4.5 Levels 1-3 CLI MVP shipped)
+### Do next (refreshed 2026-05-23 after Phase 8.2c/8.3 and MCP Inspector cleanup shipped)
 
 > 🤖 Order is **Claude-proposed**. User picks any in any order.
 
 - [x] **Manual Level 3 trial on one reviewed item** — mark a single plan item `human_approved_for_proposal=true`, run `python scripts/run_patch_proposal_queue.py --max-items 1`, inspect `.agent/proposals/...`, and keep apply approval manual.
 - [ ] **Prompt-version quantifier panel** in Settings/Health (Phase 5 Polish; Gemini-reframed performance panel) — pairs naturally with brain-stamp.
-- [ ] **Patch Safety gate** (forbidden-files + path-traversal, apply-time) — Phase 5 Polish, GPT-relocated from Phase 6.
+- [x] **Patch Safety gate** (forbidden-files + path-traversal, apply-time) — shipped; Phase 5 Polish, GPT-relocated from Phase 6.
 - [ ] **Held-out eval set** (AI Suggestions § B) — cheap now, hard to retrofit.
 - [ ] **Repeated-failure Dream seeding (deferred § D)** — still valid. Scans last N reports for cases failing >50% of the time.
 
@@ -1058,7 +1109,7 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
 - [ ] **Phase 6.4 full auto-creation** — wire benchmark/Dream/proposal queues to feed lesson candidates without manual CLI runs. Must still gate through `lesson_quality`; human promotion required by default.
 - [x] Phase 5 Polish: Benchmark run buttons shipped (`Run all` / `Run selected` / stop/status) plus Add Case clerk UI.
 - [ ] Phase 5 Polish: markdown rendering of Dream report + benchmark language/category batch polish.
-- [ ] Phase 8: MCP sidecar (after Phases 4–6 stable)
+- [ ] Phase 8 remaining MCP polish: registry-driven Settings/Health row, handler-resolution smoke checks, optional schema metadata, and capability-mode persistence. Do not expose real-repo writes.
 - [ ] Cost tracking (AI Suggestions § E)
 - [ ] Self-bench experiment (AI Suggestions § F)
 - [ ] Patch quality metrics (AI Suggestions § C) — diff size / files touched as quality signal
@@ -1090,7 +1141,11 @@ Phase 7.2 Worker Run Review / Import shipped (2026-05-21): core/worker_runs.py +
 Phase 7.2.1 Validate Imported Worker Proposals shipped (2026-05-21): core.worker_runs.validate_imported_worker_proposal + POST /proposals/validate + UI Validate button. Applies worker patch_plan.json in a temp clone of repo_path, runs the inferred validation command, writes apply_result.json + validation.json + validation_output.txt into the proposal_dir. Real repo / repo_path byte-identical before/after.
 Phase 7.2.1.1 Make Validated Worker Imports Lesson-Promotable shipped (2026-05-21): synthesize_lesson_artifacts_for_validated_worker_proposal writes deterministic case.json + patch_proposal.json after a passing validate. End-to-end test proves scripts/create_lesson_from_proposal.py accepts the synthesized dir as a candidate lesson.
 Phase 8-prep Tool Registry MVP shipped (2026-05-21): core/tool_registry.py + GET /tools/registry. Metadata-only catalog of 18 operations (9 read + 3 artifact_write + 6 disabled-for-MCP) with four capability modes (read_only / artifact_write / operator / unsafe_dev). No MCP server, no network exposure, no behavior changes — just the source of truth for "what's safe to hand to an external agent."
-Next: prompt-version quantifier / Patch Safety gate / held-out eval, then optionally Phase 6.4 auto-creation. Benchmark run buttons + Add Case clerk are now shipped; remaining Benchmark polish is category/language batch + report density.
+Phase 8.1 Read-only MCP server shipped (2026-05-21): mcp_server.read_only + scripts/mcp_readonly_server.py expose 10 evidence-reading tools over stdio; no writes, subprocesses, proposal creation, validation, apply, or lesson mutation.
+Phase 8.2a/8.2b/8.2c Artifact-write MCP shipped (2026-05-22/23): mcp_server.artifact_write exposes exactly 13 tools: the 10 read-only tools plus create_handoff_note, import_worker_run_as_proposal, and validate_imported_worker_proposal.
+Phase 8.3 MCP audit ledger shipped (2026-05-22): bounded invocation summaries under .agent/mcp_audit/invocations.jsonl plus GET /mcp/audit. Audit is observational, not an authorization gate.
+MCP Inspector operator shortcuts/cleanup shipped (2026-05-23): fixed-target launch route/UI for read-only and artifact-write servers, plus shutdown cleanup for matching local Inspector process trees.
+Next: prompt-version quantifier / held-out eval / repeated-failure Dream seeding, then optionally Phase 6.4 auto-creation. Benchmark run buttons + Add Case clerk are now shipped; remaining Benchmark polish is category/language batch + report density.
 Do not add MCTS yet — require a 10-case mini-experiment first.
 ```
 
@@ -1287,13 +1342,149 @@ Single source of truth describing which CATTUS operations are candidates for fut
 - Disabled-for-MCP tools (`apply_patch`, `dream_apply`, etc.) are blocked in every mode except `unsafe_dev`.
 - `real_repo_write` is never allowed in `operator` mode, even if `requires_human_approval=True`. Real-repo writes from external agents remain out of scope until at least Phase 8.x.
 
-### 🤖 Claude-proposed Phase 8.0+ follow-ups (pending user decision)
+### Phase 8 follow-up status (refreshed 2026-05-23)
 
-1. **MCP server scaffolding.** Add the SDK behind an optional extra (`pip install .[mcp]`), wire `read_only`-mode tools first, never expose `real_repo_write`.
-2. **Per-tool input schemas.** Each tool dict gets a `parameters` field (JSON-Schema). Required for MCP exposure; useful even before that for self-documenting routes.
-3. **Capability-mode persistence.** Read from `MCP_CAPABILITY_MODE` env var or `settings.json` at server start. Default to `read_only` so a misconfiguration fails closed.
-4. **Per-tool audit log.** Every invocation through MCP appends to `.agent/mcp_audit.jsonl` with timestamp, tool name, args hash, return shape. Useful for "what did the agent do last night?" forensics.
-5. **Registry-driven Settings/Health row.** The existing health panel can render the current registry alongside the API-key / DB / toolchain checks, so the operator sees at a glance which tools would be exposed under the configured mode.
-6. **`Validate that handler exists` smoke check.** Each tool's `route_or_function` is verified at startup to resolve to an actual Python callable or registered Flask route. Catches typo drift between the registry and the codebase.
+1. ~~**MCP server scaffolding.**~~ Shipped as Phase 8.1 read-only MCP and Phase 8.2 artifact-write MCP. Real-repo writes remain unexposed.
+2. **Per-tool input schemas.** Partially handled by strict dict-in/dict-out MCP harnesses, including validate-imported-proposal input validation; registry-level JSON Schema metadata is still deferred.
+3. **Capability-mode persistence.** Still deferred. Current MCP servers use fixed, narrow surfaces rather than a runtime mode selector.
+4. ~~**Per-tool audit log.**~~ Shipped as Phase 8.3 for artifact-write harness calls. A generic wrapper for every MCP tool remains future scope.
+5. **Registry-driven Settings/Health row.** Still deferred.
+6. **`Validate that handler exists` smoke check.** Still deferred.
+
+---
+
+## Phase 8.2a — Artifact-Write MCP Handoff Harness (shipped 2026-05-22)
+
+Spec: `docs/superpowers/specs/2026-05-22-phase-8-2a-artifact-write-mcp-design.md`
+Plan: `docs/superpowers/plans/2026-05-22-phase-8-2a-artifact-write-mcp.md`
+
+Second MCP server, still narrow by construction. It exposes all 10 read-only MCP tools plus exactly one write-capable helper in this slice: `create_handoff_note`.
+
+### What this phase adds
+
+- `mcp_server/artifact_write.py` — importable without `mcp`, fixed `CAPABILITY_MODE="artifact_write"`, and an explicit `_EXTRA_WRITE_TOOLS` allowlist stricter than the registry's whole artifact-write mode.
+- `create_handoff_note_harness(input)` — strict dict-in/dict-out boundary around `core.handoff_notes.create_handoff_note`.
+- `scripts/mcp_artifact_write_server.py` — stdio server shim mirroring the read-only MCP launcher.
+- Tests for the exposed surface, strict input validation, path safety, missing optional `mcp` dependency behavior, and subprocess tripwires.
+
+### Guardrails
+
+- Writes only handoff-note artifacts under `.agent/handoffs/`.
+- Does not run subagents, execute validation, apply patches, touch the real repo, promote lessons, or accept arbitrary paths.
+- Does not expose `import_worker_run_as_proposal` or `validate_imported_worker_proposal` in this slice.
+
+## Phase 8.2b — MCP Import Worker Run Harness (shipped 2026-05-22)
+
+Spec: `docs/superpowers/specs/2026-05-22-phase-8-2b-import-worker-run-mcp-design.md`
+Plan: `docs/superpowers/plans/2026-05-22-phase-8-2b-import-worker-run-mcp.md`
+
+Extends the artifact-write MCP server with one more narrow helper: `import_worker_run_as_proposal`.
+
+### What this phase adds
+
+- `_EXTRA_WRITE_TOOLS` now contains `create_handoff_note` and `import_worker_run_as_proposal`.
+- `import_worker_run_as_proposal_harness(input)` accepts exactly one field, `worker_run_id`, and rejects absolute paths, separators, traversal-shaped ids, empty ids, and unknown fields before core code runs.
+- The harness delegates to `core.worker_runs.import_worker_run_as_proposal(worker_run_id)` and returns only `{ok, proposal_dir, message}`.
+- At the end of this slice, artifact-write MCP exposed exactly 12 tools: 10 read-only tools plus the two artifact-write helpers.
+- Phase 8.3 audit events cover success and blocked import attempts.
+
+### Guardrails
+
+- The harness copies an existing complete worker-run artifact into `.agent/proposals/`; it does not run a worker.
+- It writes no `validation.json`, `apply_result.json`, `case.json`, or `patch_proposal.json`.
+- It does not validate, apply, create lessons, promote lessons, or mutate the real repo.
+- `mcp_server.read_only` remains exactly 10 tools and exposes no artifact-write helpers.
+
+---
+
+## Phase 8.2c — MCP Validate Imported Worker Proposal Harness (shipped 2026-05-23)
+
+Spec: `docs/superpowers/specs/2026-05-23-phase-8-2c-validate-imported-worker-proposal-mcp-design.md`
+Plan: `docs/superpowers/plans/2026-05-23-phase-8-2c-validate-imported-worker-proposal-mcp.md`
+
+Adds the third narrow artifact-write tool: `validate_imported_worker_proposal`. It wraps the existing Phase 7.2.1 core helper for MCP clients without opening a real-repo write path.
+
+### What this phase adds
+
+- Accept only `proposal_ref` under `.agent/proposals/` and an existing directory `repo_path`.
+- Apply the proposal's `patch_plan.json` only in a temp clone.
+- Run the inferred validation command only in that temp clone.
+- Write validation evidence back into the proposal artifact directory.
+- Preserve Phase 7.2.1.1's self-gated lesson-artifact synthesis behavior: `case.json` and `patch_proposal.json` appear only after apply and validation both pass.
+- Audit success and blocked calls through the Phase 8.3 ledger.
+- Artifact-write MCP now exposes exactly 13 tools.
+
+### Guardrails
+
+- No real-repo patch apply.
+- No subagent launch.
+- No arbitrary proposal path from MCP.
+- No lesson creation beyond existing synthesized proposal artifacts.
+- No lesson promotion/blocking.
+- No read-only MCP surface expansion.
+
+---
+
+## Phase 8.3 — MCP Invocation Audit Ledger (shipped 2026-05-22)
+
+Spec: `docs/superpowers/specs/2026-05-22-phase-8-3-mcp-invocation-audit-ledger-design.md`
+Plan: `docs/superpowers/plans/2026-05-22-phase-8-3-mcp-invocation-audit-ledger.md`
+
+Adds accountability for MCP artifact-write calls without expanding the MCP permission surface.
+
+### What this phase adds
+
+- `core/mcp_audit.py` — append-only, bounded JSONL ledger at `.agent/mcp_audit/invocations.jsonl`.
+- Sanitized event shape: id, timestamp, tool name, capability mode, allowed flag, bounded input/result summaries, artifact paths, and bounded error text.
+- Artifact-write harness integration for success and blocked validation paths.
+- `GET /mcp/audit?limit=50` — read-only route for recent valid events, with limits clamped to a maximum of 200.
+
+### Guardrails
+
+- Audit records summaries, not full prompts, secrets, environment variables, or validation output.
+- Corrupt JSONL lines are skipped on read instead of breaking the audit view.
+- Audit persistence failures are logged and swallowed; observability never changes authorization or harness success/failure behavior.
+
+---
+
+## MCP Inspector Operator Shortcuts (shipped 2026-05-23)
+
+Plan: `docs/superpowers/plans/2026-05-22-mcp-inspector-subagent-shortcut.md`
+
+Adds local operator convenience for inspecting the two MCP servers without turning the browser into an arbitrary command launcher.
+
+### What this phase adds
+
+- `POST /mcp/inspector/launch` — accepts only fixed targets: `read_only` or `artifact_write`.
+- Fixed command map to `scripts/mcp_readonly_server.py` and `scripts/mcp_artifact_write_server.py` through `npx -y @modelcontextprotocol/inspector python <script>`.
+- Sub-agent header UI controls for "Inspect read-only MCP" and "Inspect artifact-write MCP".
+- A compact link to `/mcp/audit?limit=10`.
+
+### Guardrails
+
+- The route does not accept arbitrary commands or script paths.
+- Unknown targets are rejected before process launch.
+- Launch failures return a bounded error to the UI.
+
+---
+
+## MCP Inspector Web Shutdown Cleanup (shipped 2026-05-23)
+
+Plan: `docs/superpowers/plans/2026-05-23-mcp-inspector-web-shutdown-cleanup.md`
+
+Stops local MCP Inspector process trees when the Flask web server exits from normal terminal shutdown paths.
+
+### What this phase adds
+
+- `web/mcp_inspector_processes.py` — standard-library process snapshot/matching/termination helper for Windows and POSIX.
+- `web.runner` — shared Flask run wrapper that calls `stop_mcp_inspectors()` after `app.run()` exits, including `KeyboardInterrupt`.
+- `web.app` direct entrypoint now uses the same runner wrapper.
+- Tests for command matching, cleanup selection, current-process protection, and runner shutdown behavior.
+
+### Guardrails
+
+- Matches only command lines containing the official `@modelcontextprotocol/inspector` package token.
+- Does not terminate unrelated `npx`, `node`, Python MCP server, or URL-only processes.
+- Skips process trees containing the current process.
 
 
