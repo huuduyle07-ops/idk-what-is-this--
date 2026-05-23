@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json, shutil, subprocess, sys, tempfile
+import markdown as _markdown_lib
 from datetime import datetime
 from pathlib import Path
 from flask import Flask, render_template, request, redirect, url_for
@@ -1955,6 +1956,24 @@ def local_critique():
 @app.route("/new")
 def new_session():
     return redirect(url_for("index", web_mode=_normalize_web_mode(request.values.get("web_mode"))))
+
+
+_help_cache: dict[str, str] = {}
+
+@app.route('/help')
+def help_route():
+    readme_path = PROJECT_ROOT / 'README.md'
+    cache_key = str(readme_path)
+    if cache_key not in _help_cache:
+        if readme_path.exists():
+            raw = readme_path.read_text(encoding='utf-8')
+            _help_cache[cache_key] = _markdown_lib.markdown(
+                raw,
+                extensions=['fenced_code', 'tables', 'toc'],
+            )
+        else:
+            _help_cache[cache_key] = '<p>README.md not found.</p>'
+    return _help_cache[cache_key], 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 
 if __name__ == "__main__":
