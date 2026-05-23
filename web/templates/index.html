@@ -571,6 +571,31 @@
 
         <!-- Settings / Health -->
         <div id="ws-settings" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-settings">
+
+          <!-- Appearance / Theme selector -->
+          <div class="health-section theme-section">
+            <div class="health-header">
+              <strong>Appearance</strong>
+            </div>
+            <div class="theme-picker" role="group" aria-label="Choose theme">
+              <button type="button" class="theme-chip" data-theme-pick="clean"
+                      onclick="setTheme('clean')">
+                <span class="theme-chip__swatch theme-chip__swatch--clean"></span>
+                Clean
+              </button>
+              <button type="button" class="theme-chip" data-theme-pick="modern"
+                      onclick="setTheme('modern')">
+                <span class="theme-chip__swatch theme-chip__swatch--modern"></span>
+                Modern
+              </button>
+              <button type="button" class="theme-chip" data-theme-pick="terminal"
+                      onclick="setTheme('terminal')">
+                <span class="theme-chip__swatch theme-chip__swatch--terminal"></span>
+                Terminal
+              </button>
+            </div>
+          </div>
+
           <div class="health-section">
             <div class="health-header">
               <strong>System health</strong>
@@ -634,6 +659,22 @@
 <script>
 //Coding Agent That Trully Useful and Safe//
 window.lastAction = null;
+
+// ── Theme persistence ──────────────────────────────────────
+const THEME_KEY = 'cattus_theme';
+
+function setTheme(name) {
+  document.documentElement.setAttribute('data-theme', name);
+  localStorage.setItem(THEME_KEY, name);
+  document.querySelectorAll('.theme-chip').forEach(btn => {
+    btn.classList.toggle('theme-chip--active', btn.dataset.themePick === name);
+  });
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || 'modern';
+  setTheme(saved);
+})();
 
 function normalizeProductMode(mode) {
     return mode === "chat" ? "chat" : "instant";

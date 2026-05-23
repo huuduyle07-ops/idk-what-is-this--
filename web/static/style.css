@@ -287,6 +287,52 @@ textarea {
     min-height: 80px;
 }
 
+/* ── Theme picker chips (Settings tab) ──────────────────────── */
+.theme-section { margin-bottom: 16px; }
+
+.theme-picker {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.theme-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.theme-chip:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.theme-chip--active {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  background: var(--color-surface-2);
+}
+
+.theme-chip__swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.theme-chip__swatch--clean    { background: #3b82f6; }
+.theme-chip__swatch--modern   { background: #6366f1; }
+.theme-chip__swatch--terminal { background: #10b981; }
+
 .agent-form {
     max-width: 100%;
 }
