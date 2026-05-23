@@ -594,6 +594,17 @@
             </div>
           </div>
 
+          <!-- Keyboard Shortcuts editor -->
+          <div class="health-section kb-section">
+            <div class="health-header">
+              <strong>Keyboard Shortcuts</strong>
+              <button type="button" class="sidebar-refresh"
+                      onclick="kbResetAll()">Reset all</button>
+            </div>
+            <div id="kbConflictBanner" class="kb-conflict-banner" hidden></div>
+            <div id="kbList" class="kb-list"></div>
+          </div>
+
           <div class="health-section">
             <div class="health-header">
               <strong>System health</strong>
@@ -3844,6 +3855,108 @@ async function uploadFolderFiles(files) {
         alert(data.error || "Upload failed.");
     }
 }
+
+// ── Keybinding editor ──────────────────────────────────────
+let _kbListeningAction = null;
+
+function _kbFormatCombo(binding) {
+  const parts = [];
+  if (binding.ctrl)  parts.push('Ctrl');
+  if (binding.shift) parts.push('Shift');
+  if (binding.alt)   parts.push('Alt');
+  parts.push(binding.key === ',' ? ',' : binding.key.toUpperCase());
+  return parts.join('+');
+}
+
+function renderKbList() {
+  const el = document.getElementById('kbList');
+  if (!el || !window.CATTUS_KB) return;
+  const map = CATTUS_KB.activeMap();
+  const overrides = CATTUS_KB.loadUserMap();
+
+  el.innerHTML = Object.entries(map).map(([action, binding]) => {
+    const isOverridden = !!overrides[action];
+    const isListening  = _kbListeningAction === action;
+    return `
+      <div class="kb-row" id="kb-row-${action}">
+        <span class="kb-label">${binding.label}</span>
+        <kbd class="kb-key ${isOverridden ? 'kb-key--custom' : ''} ${isListening ? 'kb-key--listening' : ''}"
+             id="kb-key-${action}">
+          ${isListening ? 'Press key…' : _kbFormatCombo(binding)}
+        </kbd>
+        <button type="button" class="kb-edit-btn"
+                onclick="kbStartListening('${action}')">edit</button>
+        ${isOverridden
+          ? `<button type="button" class="kb-reset-btn"
+                     onclick="kbResetOne('${action}')">↩</button>`
+          : '<span class="kb-reset-placeholder"></span>'}
+      </div>`;
+  }).join('');
+}
+
+function kbStartListening(action) {
+  _kbListeningAction = action;
+  renderKbList();
+
+  function onKey(e) {
+    if (['Control','Shift','Alt','Meta'].includes(e.key)) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const newBinding = {
+      key:   e.key === ',' ? ',' : e.key.toLowerCase(),
+      ctrl:  e.ctrlKey,
+      shift: e.shiftKey,
+      alt:   e.altKey,
+      label: CATTUS_KB.DEFAULT_MAP[action]?.label || action,
+    };
+
+    _kbListeningAction = null;
+    document.removeEventListener('keydown', onKey, true);
+
+    const map = CATTUS_KB.activeMap();
+    const combo = CATTUS_KB.comboKey(newBinding);
+    const reservedConflict = CATTUS_KB.isReserved(newBinding);
+    const existingConflict = Object.entries(map).find(
+      ([a, b]) => a !== action && CATTUS_KB.comboKey(b) === combo
+    );
+
+    const banner = document.getElementById('kbConflictBanner');
+    if (reservedConflict) {
+      banner.hidden = false;
+      banner.textContent = `⚠ ${combo} is reserved by the browser — binding saved but may not work reliably.`;
+    } else if (existingConflict) {
+      banner.hidden = false;
+      banner.textContent = `⚠ ${combo} is already used by "${existingConflict[1].label}" — choose a different key.`;
+      renderKbList();
+      return;
+    } else {
+      banner.hidden = true;
+    }
+
+    const overrides = CATTUS_KB.loadUserMap();
+    overrides[action] = newBinding;
+    CATTUS_KB.saveUserMap(overrides);
+    renderKbList();
+  }
+
+  document.addEventListener('keydown', onKey, true);
+}
+
+function kbResetOne(action) {
+  const overrides = CATTUS_KB.loadUserMap();
+  delete overrides[action];
+  CATTUS_KB.saveUserMap(overrides);
+  renderKbList();
+}
+
+function kbResetAll() {
+  if (!confirm('Reset all keyboard shortcuts to defaults?')) return;
+  CATTUS_KB.resetAll();
+  renderKbList();
+}
+
+document.addEventListener('DOMContentLoaded', renderKbList);
 
 </script>
 
