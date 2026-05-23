@@ -209,3 +209,110 @@ def test_non_directory_repo_path_rejected(env, tmp_path):
 def test_input_not_dict_rejected(env):
     with pytest.raises(ValueError, match="dict"):
         validate_imported_worker_proposal_harness("not a dict")  # type: ignore[arg-type]
+
+
+def test_real_repo_byte_identical_before_and_after_validation(env):
+    proposal_ref = _make_imported_proposal(env)
+    before = _repo_state(env["fake_repo"])
+
+    result = validate_imported_worker_proposal_harness({
+        "proposal_ref": proposal_ref,
+        "repo_path": str(env["fake_repo"]),
+    })
+
+    assert result["ok"] is True
+    assert _repo_state(env["fake_repo"]) == before
+
+
+def test_failed_apply_returns_failure_without_crashing(env, monkeypatch):
+    proposal_ref = _make_imported_proposal(env)
+    proposal_dir = env["proposals_root"] / proposal_ref
+    # Corrupt the patch_plan so apply cannot succeed.
+    _write_json(proposal_dir / "patch_plan.json", [{
+        "op": "replace_snippet",
+        "relative_path": "src/foo.py",
+        "target_snippet": "does-not-exist-in-source",
+        "patched_snippet": "anything",
+    }])
+
+    result = validate_imported_worker_proposal_harness({
+        "proposal_ref": proposal_ref,
+        "repo_path": str(env["fake_repo"]),
+    })
+
+    assert result["ok"] is True
+    assert result["apply_success"] is False
+    assert (proposal_dir / "apply_result.json").is_file()
+    # Validation must have been skipped (apply did not succeed).
+    assert (proposal_dir / "validation.json").is_file()
+    # No lesson synth on failure.
+    assert not (proposal_dir / "case.json").exists()
+    assert not (proposal_dir / "patch_proposal.json").exists()
+
+
+def test_harness_does_not_create_lesson_artifacts_when_validation_inconclusive(env):
+    """Per Phase 7.2.1.1 self-gate: no case.json / patch_proposal.json when
+    validation_ok is not True."""
+    proposal_ref = _make_imported_proposal(env)
+    proposal_dir = env["proposals_root"] / proposal_ref
+
+    result = validate_imported_worker_proposal_harness({
+        "proposal_ref": proposal_ref,
+        "repo_path": str(env["fake_repo"]),
+    })
+
+    assert result["ok"] is True
+    assert result["validation_ok"] is None
+    assert not (proposal_dir / "case.json").exists()
+    assert not (proposal_dir / "patch_proposal.json").exists()
+
+
+def test_harness_does_not_invoke_subagent_launcher(env, monkeypatch):
+    """The MCP harness must never reach into run_subagent_handoff."""
+    proposal_ref = _make_imported_proposal(env)
+    tripped = {"hit": False}
+
+    def _trip(*_args, **_kwargs):
+        tripped["hit"] = True
+        raise AssertionError(
+            "validate harness must not invoke run_subagent_handoff"
+        )
+
+    # The subagent launcher lives in scripts.run_subagent_handoff; tripwire
+    # both the module function and any direct import the harness might try.
+    import scripts.run_subagent_handoff as _subagent
+    monkeypatch.setattr(_subagent, "run_subagent_handoff", _trip, raising=False)
+
+    result = validate_imported_worker_proposal_harness({
+        "proposal_ref": proposal_ref,
+        "repo_path": str(env["fake_repo"]),
+    })
+
+    assert result["ok"] is True
+    assert tripped["hit"] is False
+
+
+def test_harness_does_not_invoke_lesson_store_writes(env, monkeypatch):
+    """Lesson store creation / promotion must not be triggered by the
+    validate harness, even when validation passes."""
+    proposal_ref = _make_imported_proposal(env)
+    tripped = {"hit": False}
+
+    def _trip(*_args, **_kwargs):
+        tripped["hit"] = True
+        raise AssertionError(
+            "validate harness must not write to the lesson store"
+        )
+
+    from core import lesson_store
+    for attr in ("create_lesson", "promote_lesson", "block_lesson"):
+        if hasattr(lesson_store, attr):
+            monkeypatch.setattr(lesson_store, attr, _trip, raising=False)
+
+    result = validate_imported_worker_proposal_harness({
+        "proposal_ref": proposal_ref,
+        "repo_path": str(env["fake_repo"]),
+    })
+
+    assert result["ok"] is True
+    assert tripped["hit"] is False
