@@ -21,7 +21,12 @@ def sanitize(name: str) -> str:
     return name[:120]
 
 
-def export_graph_to_obsidian(graph, vault_path: str, include_noise: bool = False):
+def export_graph_to_obsidian(
+    graph,
+    vault_path: str,
+    include_noise: bool = False,
+    repo_path: str | None = None,
+):
     vault = Path(vault_path)
     vault.mkdir(parents=True, exist_ok=True)
 
@@ -99,7 +104,7 @@ def export_graph_to_obsidian(graph, vault_path: str, include_noise: bool = False
 
         filepath.write_text("\n".join(lines), encoding="utf-8")
 
-    write_summary(vault, graph, notes)
+    write_summary(vault, graph, notes, repo_path=repo_path)
     return str(vault)
 
 
@@ -161,10 +166,15 @@ def add_section(lines: list[str], title: str, items: list[str]) -> None:
     lines.append("")
 
 
-def write_summary(vault: Path, graph, notes: dict) -> None:
+def write_summary(
+    vault: Path,
+    graph,
+    notes: dict,
+    repo_path: str | None = None,
+) -> None:
     important = []
 
-    for metric in rank_nodes_by_weight(graph, limit=len(graph.nodes)):
+    for metric in rank_nodes_by_weight(graph, limit=len(graph.nodes), repo_path=repo_path):
         info = notes.get(metric.node_id)
         if info is not None and metric.weight > 0:
             important.append((metric.weight, metric.node_id, info))

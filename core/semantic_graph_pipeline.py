@@ -23,7 +23,7 @@ def build_obsidian_semantic_context(
 ) -> str:
     graph = get_semantic_graph(repo_path)
 
-    export_graph_to_obsidian(graph, vault_path)
+    export_graph_to_obsidian(graph, vault_path, repo_path=repo_path)
 
     summary_path = Path(vault_path) / "GRAPH_SUMMARY.md"
 

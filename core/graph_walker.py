@@ -33,7 +33,7 @@ def walk_from_nodes(graph, start_nodes: list[str], max_depth=2):
 
 def get_ai_top_nodes(repo_path: str, vault_path: str, top_k: int = 3) -> list[str]:
     graph = get_semantic_graph(repo_path)
-    export_graph_to_obsidian(graph, vault_path)
+    export_graph_to_obsidian(graph, vault_path, repo_path=repo_path)
 
     summary_path = Path(vault_path) / "GRAPH_SUMMARY.md"
     if not summary_path.exists():
