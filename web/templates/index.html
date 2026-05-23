@@ -271,9 +271,6 @@
             <aside class="bench-sidebar">
               <div class="bench-sidebar-header">
                 <strong>Past runs</strong>
-                <button type="button" class="sidebar-refresh"
-                        onclick="loadBenchmarksPanel(true)"
-                        title="Re-scan .agent/benchmarks/">⟳</button>
               </div>
               <div id="benchList" class="bench-list">
                 <div class="health-empty">Loading…</div>
@@ -390,9 +387,6 @@
           <div class="memory-section proposals-section">
             <div class="proposals-header">
               <strong>Proposals</strong>
-              <button type="button" class="sidebar-refresh"
-                      onclick="loadProposalRuns(true)"
-                      title="Re-scan .agent/proposals/">⟳ Refresh</button>
             </div>
             <div class="proposals-note">
               "Create candidate lesson" runs <code>create_lesson_from_proposal</code> and the
@@ -430,8 +424,6 @@
           <div class="memory-section handoffs-section">
             <div class="proposals-header">
               <h3>Mayor Mode (Handoffs)</h3>
-              <button type="button" class="memory-refresh" onclick="refreshHandoffs()"
-                      title="Re-scan .agent/handoffs/">⟳ Refresh</button>
             </div>
             <div class="proposals-note">
               Create a bounded handoff note for an external coding agent.
@@ -504,8 +496,6 @@
           <div class="memory-section worker-runs-section">
             <div class="proposals-header">
               <h3>Worker Runs</h3>
-              <button type="button" class="memory-refresh" onclick="refreshWorkerRuns()"
-                      title="Re-scan .agent/worker_runs/">⟳ Refresh</button>
             </div>
             <div class="proposals-note">
               Subagent runs from <code>.agent/worker_runs/</code>. Importing
@@ -525,9 +515,6 @@
           <div class="memory-section lessons-section">
             <div class="lessons-header">
               <strong>Lessons</strong>
-              <button type="button" class="sidebar-refresh"
-                      onclick="loadLessons(true)"
-                      title="Re-scan .agent/<project_tag>/lessons/">⟳ Refresh</button>
             </div>
             <div class="lessons-note">
               Only <strong>Active</strong> lessons will be retrieval-eligible in future phases.
@@ -565,7 +552,7 @@
                    title="In Clean mode, also include test files (off by default)">
               <input type="checkbox" id="graphShowTests"> show tests
             </label>
-            <button type="button" onclick="openObsidian()">Open Obsidian Vault</button>
+
           </div>
           <div id="graph">
             <div class="graph-controls">
@@ -875,55 +862,6 @@ function viewGraph(mode) {
     });
 })();
 
-function openObsidian() {
-    const repo = document.querySelector("input[name='repo_path']").value.trim();
-    if (!repo) {
-        alert("Set a repo path first — Obsidian needs a generated graph to open.");
-        return;
-    }
-
-    fetch("/vault_path", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ repo_path: repo }),
-    })
-    .then(res => res.json().then(data => ({ status: res.status, data })))
-    .then(({ status, data }) => {
-        if (status !== 200 || !data.exists) {
-            alert(
-                "Vault not generated yet.\n\n" +
-                "Run an analysis (mode = Full Agent or Retrieve) first.\n\n" +
-                "Expected location:\n" + (data.expected_path || "(unknown)")
-            );
-            return;
-        }
-
-        // Try launching by registered vault name.
-        // If the user hasn't registered this folder in Obsidian yet,
-        // we show the path so they can add it once via:
-        //   Obsidian → Open another vault → Open folder as vault → paste path
-        const vaultName = data.vault_name;
-        const vaultPath = data.vault_path;
-
-        const opened = window.open(
-            `obsidian://open?vault=${encodeURIComponent(vaultName)}`,
-            "_blank"
-        );
-
-        // Fallback: if Obsidian doesn't recognize the vault, prompt the user
-        // with the path they need to register one-time.
-        setTimeout(() => {
-            if (confirm(
-                `If Obsidian didn't open the vault, register this folder once:\n\n` +
-                `${vaultPath}\n\n` +
-                `Click OK to copy the path to your clipboard.`
-            )) {
-                navigator.clipboard.writeText(vaultPath).catch(() => {});
-            }
-        }, 1500);
-    })
-    .catch(err => alert(`Failed to resolve vault: ${err}`));
-}
 
 // ============================================================
 // Phase 5 Slice 4: shared modal helpers (used by Dream UI; reusable for
@@ -2669,27 +2607,23 @@ function showWorkspaceTab(id) {
         btn.setAttribute("tabindex", isActive ? "0" : "-1");
     });
 
-    // Phase 5 Slice 2: lazy-load Health panel on first show.
-    if (id === "settings") {
-        loadHealthPanel(false);
-        // Phase 8-prep.1: lazy-load Tool Registry viewer.
-        if (typeof loadToolRegistry === "function") loadToolRegistry(false);
-    }
-    // Phase 5 Slice 3: lazy-load Benchmarks panel on first show.
-    if (id === "benchmarks") {
-        loadBenchmarksPanel(false);
-        refreshBenchmarkStatus();
-    }
-    // Phase 6.1: lazy-load Lessons on first Memory-tab show.
-    if (id === "memory") {
-        loadLessons(false);
-        // Phase 5 Polish: also lazy-load the Proposals sub-section (Part 3).
-        if (typeof loadProposalRuns === "function") loadProposalRuns(false);
-        // Phase 7.1: lazy-load Handoffs (Mayor Mode)
-        if (typeof refreshHandoffs === "function") refreshHandoffs();
-    }
-    // Phase 5 Polish: lazy-load Plan items on first Dream-tab show.
-    if (id === "dream") loadPlanItems(false);
+    // Auto-refresh data when tab becomes active (replaces per-section ⟳ buttons).
+    const autoLoad = {
+        benchmarks: () => { loadBenchmarksPanel(false); refreshBenchmarkStatus(); },
+        memory:     () => {
+            loadProposalRuns(false);
+            if (typeof refreshHandoffs === "function") refreshHandoffs();
+            if (typeof refreshWorkerRuns === "function") refreshWorkerRuns();
+            loadLessons(false);
+        },
+        dream:      () => { refreshDreamStatus(); loadPlanItems(false); },
+        settings:   () => {
+            loadHealthPanel(false);
+            if (typeof loadToolRegistry === "function") loadToolRegistry(false);
+        },
+        graph:      () => {},
+    };
+    if (autoLoad[id]) autoLoad[id]();
 }
 
 // Phase 5 Slice 2: Health panel — fetches /health, renders status rows.
