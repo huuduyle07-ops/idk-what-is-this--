@@ -39,7 +39,39 @@ DEFAULT_SAFETY_RULES: tuple[str, ...] = (
     "do not commit",
     "do not push",
     "do not edit .env/.agent/.git/node_modules/target/tests unless explicitly allowed",
-    "return proposal.md and patch_plan.json if possible",
+    "write proposal.md and patch_plan.json to the working-directory root; do not print proposal to stdout only",
+)
+
+# ---------------------------------------------------------------------------
+# Output-contract section injected into every handoff note.
+# ---------------------------------------------------------------------------
+_OUTPUT_CONTRACT_LINES: tuple[str, ...] = (
+    "## Output contract — REQUIRED",
+    "",
+    "You are running inside an isolated temporary clone of the repository.",
+    "Write the following two files to the **working-directory root**",
+    "(the directory where this process was started).",
+    "**Do NOT only print the proposal to stdout** — stdout is captured for",
+    "logging only; only files written to disk are imported as proposals.",
+    "",
+    "### `proposal.md` (required)",
+    "Plain Markdown.  Must contain:",
+    "- **Findings** — what you observed and why it matters",
+    "- **Proposed patch** — the exact change in unified-diff or labelled code-block form",
+    "- **Validation** — how to verify the fix (command and expected result)",
+    "",
+    "If no safe patch is possible, write `proposal.md` explaining why.",
+    "",
+    "### `patch_plan.json` (required)",
+    "A **JSON array** of patch-operation objects.  Minimum for a normal patch:",
+    "```json",
+    '[{"op": "replace", "relative_path": "path/to/file.ext", "content": "...new full content..."}]',
+    "```",
+    "If no safe patch is proposed, write a single status entry so the file is",
+    "never absent, and explain in `proposal.md`:",
+    "```json",
+    '[{"status": "needs_manual_review", "reason": "brief reason"}]',
+    "```",
 )
 
 DEFAULT_FORBIDDEN_FILES: tuple[str, ...] = (
@@ -178,6 +210,8 @@ def _render_note_markdown(meta: dict[str, Any], context_summary: str, expected_o
         "",
         expected_output.strip() or "_No expected output declared._",
         "",
+        *_OUTPUT_CONTRACT_LINES,
+        "",
         "## Safety rules (advisory — enforced by the runner script too)",
         "",
     ]
@@ -280,6 +314,43 @@ def _resolve_note_path(raw: str | Path, handoff_root: Path | None) -> Path:
     return candidate
 
 
+def resolve_handoff_note(ref: str, handoff_root: Path | None = None) -> Path:
+    """Resolve a handoff reference to an absolute Path inside the handoff root.
+
+    Accepts two forms:
+    - Plain filename (no directory separators): resolves under handoff_root.
+    - Absolute path: accepted only when it resolves inside handoff_root.
+
+    Raises ValueError for empty refs, traversal attempts, or paths outside
+    the handoff root. Raises FileNotFoundError when the file does not exist.
+    Never strips slashes manually — uses Path.resolve() for all normalization.
+    """
+    cleaned = (ref or "").strip()
+    if not cleaned:
+        raise ValueError("handoff ref must be a non-empty string")
+
+    root = _resolve_handoff_root(handoff_root).resolve()
+    p = Path(cleaned)
+    if p.is_absolute():
+        candidate = p.resolve()
+    else:
+        # Filename or relative path — join with root then resolve.
+        # relative_to check below will reject any traversal that escapes root.
+        candidate = (root / cleaned).resolve()
+
+    try:
+        candidate.relative_to(root)
+    except ValueError as exc:
+        raise ValueError(
+            f"handoff ref is outside {root}: {candidate}"
+        ) from exc
+
+    if not candidate.is_file():
+        raise FileNotFoundError(f"handoff note not found: {candidate}")
+
+    return candidate
+
+
 def _parse_meta_and_body(text: str) -> tuple[dict[str, Any], str]:
     match = _HANDOFF_META_RE.search(text)
     if not match:
@@ -324,6 +395,7 @@ def list_handoff_notes(
             continue
         notes.append(
             {
+                "handoff_id": path.name,
                 "path": str(path),
                 "title": meta.get("title"),
                 "status": meta.get("status"),

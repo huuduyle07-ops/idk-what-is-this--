@@ -2275,8 +2275,8 @@ async function refreshHandoffs() {
                     · ${_escapeHtml(h.created_at || "")}
                 </div>
                 <div class="handoff-item__actions subagent-run-card__actions">
-                    <button type="button" class="lesson-btn--secondary" onclick="runHandoff('${_escapeHtml(h.path).replace(/'/g, "\\'")}', false)">Copy command</button>
-                    <button type="button" class="handoff-run-btn--warning-outline" onclick="runHandoff('${_escapeHtml(h.path).replace(/'/g, "\\'")}', true)">Run subagent in temp clone</button>
+                    <button type="button" class="lesson-btn--secondary" onclick="runHandoff('${_escapeHtml(h.handoff_id)}', false)">Copy command</button>
+                    <button type="button" class="handoff-run-btn--warning-outline" onclick="runHandoff('${_escapeHtml(h.handoff_id)}', true)">Run subagent in temp clone</button>
                 </div>
             </div>
         `).join("");
@@ -2320,10 +2320,10 @@ async function createHandoff(thenRun) {
             if (status) status.textContent = "Error: " + (body.error || "unknown");
             return;
         }
-        if (status) status.textContent = "Created: " + body.handoff_path;
+        if (status) status.textContent = "Created: " + (body.handoff_id || body.handoff_path);
 
         if (thenRun) {
-            await runHandoff(body.handoff_path, true);
+            await runHandoff(body.handoff_id || body.handoff_path, true);
         }
         refreshHandoffs();
     } catch (e) {
@@ -2331,12 +2331,12 @@ async function createHandoff(thenRun) {
     }
 }
 
-async function runHandoff(handoffPath, allowRun) {
+async function runHandoff(handoffRef, allowRun) {
     const status = document.getElementById("handoffsStatus");
     if (status) status.textContent = allowRun ? "Running in temp clone..." : "Resolving command...";
     try {
         const fd = new FormData();
-        fd.append("handoff_path", handoffPath);
+        fd.append("handoff_id", handoffRef);
         fd.append("allow_run", allowRun ? "true" : "false");
         const resp = await fetch("/handoffs/run", { method: "POST", body: fd });
         const body = await resp.json();

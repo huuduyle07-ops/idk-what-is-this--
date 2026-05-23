@@ -243,6 +243,70 @@ def test_update_handoff_status_rejects_unknown_status(handoff_root):
     with pytest.raises(ValueError, match="status"):
         handoff_notes.update_handoff_status(result["path"], "weird", handoff_root=handoff_root)
 
+# ---------------------------------------------------------------------------
+# resolve_handoff_note tests
+# ---------------------------------------------------------------------------
+
+def test_resolve_handoff_note_filename(tmp_path):
+    root = tmp_path / "handoffs"
+    root.mkdir()
+    note = root / "20260522_183942_foo.md"
+    note.write_text("x", encoding="utf-8")
+    result = handoff_notes.resolve_handoff_note("20260522_183942_foo.md", handoff_root=root)
+    assert result == note.resolve()
+
+
+def test_resolve_handoff_note_absolute_inside(tmp_path):
+    root = tmp_path / "handoffs"
+    root.mkdir()
+    note = root / "foo.md"
+    note.write_text("x", encoding="utf-8")
+    result = handoff_notes.resolve_handoff_note(str(note), handoff_root=root)
+    assert result == note.resolve()
+
+
+def test_resolve_handoff_note_absolute_outside_rejected(tmp_path):
+    root = tmp_path / "handoffs"
+    root.mkdir()
+    outside = tmp_path / "outside.md"
+    outside.write_text("x", encoding="utf-8")
+    with pytest.raises(ValueError, match="outside"):
+        handoff_notes.resolve_handoff_note(str(outside), handoff_root=root)
+
+
+def test_resolve_handoff_note_traversal_rejected(tmp_path):
+    root = tmp_path / "handoffs"
+    root.mkdir()
+    with pytest.raises(ValueError):
+        handoff_notes.resolve_handoff_note("../../etc/passwd", handoff_root=root)
+
+
+def test_resolve_handoff_note_empty_rejected():
+    with pytest.raises(ValueError, match="non-empty"):
+        handoff_notes.resolve_handoff_note("")
+
+
+def test_resolve_handoff_note_not_found(tmp_path):
+    root = tmp_path / "handoffs"
+    root.mkdir()
+    with pytest.raises(FileNotFoundError):
+        handoff_notes.resolve_handoff_note("nonexistent.md", handoff_root=root)
+
+
+def test_list_handoff_notes_includes_handoff_id(tmp_path):
+    root = tmp_path / "handoffs"
+    result = _create(root, title="id-check")
+    listing = handoff_notes.list_handoff_notes(handoff_root=root)
+    assert len(listing) == 1
+    item = listing[0]
+    assert "handoff_id" in item
+    # handoff_id must be just the filename — no path separators
+    assert "/" not in item["handoff_id"]
+    assert "\\" not in item["handoff_id"]
+    assert item["handoff_id"].endswith(".md")
+    assert item["handoff_id"] == Path(result["path"]).name
+
+
 def test_create_handoff_cli_writes_a_note(tmp_path, monkeypatch, capsys):
     from scripts import create_handoff_note as cli
 
@@ -268,3 +332,31 @@ def test_create_handoff_cli_writes_a_note(tmp_path, monkeypatch, capsys):
     assert listing[0]["title"] == "CLI test"
     captured = capsys.readouterr()
     assert "handoffs" in captured.out
+
+
+# ---------------------------------------------------------------------------
+# Output-contract tests
+# ---------------------------------------------------------------------------
+
+def test_handoff_note_body_contains_proposal_md_requirement(handoff_root):
+    """The generated handoff note must mention proposal.md as a required file."""
+    result = _create(handoff_root, title="contract-test")
+    text = Path(result["path"]).read_text(encoding="utf-8")
+    assert "proposal.md" in text
+
+
+def test_handoff_note_body_contains_patch_plan_json_requirement(handoff_root):
+    """The generated handoff note must mention patch_plan.json as a required file."""
+    result = _create(handoff_root, title="contract-test-2")
+    text = Path(result["path"]).read_text(encoding="utf-8")
+    assert "patch_plan.json" in text
+
+
+def test_handoff_note_body_warns_against_stdout_only(handoff_root):
+    """The generated handoff note must explicitly instruct the worker not to
+    print the proposal to stdout only."""
+    result = _create(handoff_root, title="contract-test-3")
+    text = Path(result["path"]).read_text(encoding="utf-8")
+    # The exact phrasing lives in _OUTPUT_CONTRACT_LINES; check the key words.
+    assert "stdout" in text.lower()
+    assert "Do NOT only print" in text or "do not only print" in text.lower()

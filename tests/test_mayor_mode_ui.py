@@ -32,3 +32,22 @@ def test_subagent_ui_copy_and_dark_surface_hooks():
     assert 'class="handoff-run-btn--warning-outline"' in template
     assert ".subagent-run-card" in styles
     assert ".handoff-run-btn--warning-outline" in styles
+
+
+def test_handoff_buttons_use_handoff_id_not_path():
+    """Copy command and Run subagent buttons must use handoff_id (filename),
+    not the absolute h.path, to avoid Windows backslash JS-escape mangling."""
+    template = INDEX_TEMPLATE.read_text(encoding="utf-8")
+    # Both action buttons must reference handoff_id
+    assert "h.handoff_id" in template
+    # Neither action button may embed the absolute path in its onclick
+    import re
+    onclick_pattern = re.compile(
+        r"onclick=['\"]runHandoff\(['\"]?\$\{[^}]*h\.path[^}]*\}['\"]?",
+    )
+    assert not onclick_pattern.search(template), (
+        "runHandoff onclick must not interpolate h.path — use h.handoff_id instead"
+    )
+    # The runHandoff JS function must submit handoff_id, not handoff_path
+    assert 'fd.append("handoff_id"' in template
+    assert 'fd.append("handoff_path"' not in template

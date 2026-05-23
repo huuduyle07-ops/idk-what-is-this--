@@ -1750,6 +1750,7 @@ def handoffs_create_route():
         return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
     return {
         "ok": True,
+        "handoff_id": Path(result["path"]).name,
         "handoff_path": result["path"],
         "slug": result["slug"],
         "meta": result["meta"],
@@ -1768,9 +1769,12 @@ def handoffs_list_route():
 
 @app.route("/handoffs/run", methods=["POST"])
 def handoffs_run_route():
+    # Accept handoff_id (filename) or handoff_path (absolute) for backward compat.
+    handoff_id = (request.form.get("handoff_id") or "").strip()
     handoff_path = (request.form.get("handoff_path") or "").strip()
-    if not handoff_path:
-        return {"ok": False, "error": "handoff_path is required"}, 400
+    ref = handoff_id or handoff_path
+    if not ref:
+        return {"ok": False, "error": "handoff_id or handoff_path is required"}, 400
     allow_run = (request.form.get("allow_run") or "").lower() == "true"
     worker = (request.form.get("worker") or "").strip() or None
     worker_command = (request.form.get("worker_command") or "").strip() or None
@@ -1779,8 +1783,9 @@ def handoffs_run_route():
     except ValueError:
         return {"ok": False, "error": "timeout_sec must be an integer"}, 400
     try:
+        resolved = _handoff_notes.resolve_handoff_note(ref)
         result = _handoff_runner.run_handoff(
-            note_path=handoff_path,
+            note_path=str(resolved),
             allow_run=allow_run,
             worker_override=worker,
             worker_command_override=worker_command,

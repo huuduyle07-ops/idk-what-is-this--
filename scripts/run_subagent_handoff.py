@@ -38,11 +38,19 @@ WORKER_RUNS_ROOT = PROJECT_ROOT / ".agent" / "worker_runs"
 
 
 WORKER_COMMAND_MAP: dict[str, str | None] = {
-    "codex":       "codex exec --full-auto",
+    # --full-auto was deprecated; --sandbox workspace-write is the current flag.
+    # --skip-git-repo-check is required because the temp clone has no git history
+    # (we strip .git via _COPY_IGNORE), so codex would otherwise refuse to run.
+    # Prompt is fed via stdin (handoff_text is passed as input= to subprocess.run).
+    "codex":       "codex exec --sandbox workspace-write --skip-git-repo-check",
     "claude-code": "claude --print",
     "gemini":      "gemini --prompt-file HANDOFF.md",
     "other":       None,
 }
+
+# Workers that expect the handoff text on stdin instead of (or in addition to)
+# a file or CLI argument.
+_WORKER_NEEDS_STDIN: frozenset[str] = frozenset({"codex", "claude-code"})
 
 _ENV_OVERRIDE_FOR_WORKER = {
     "codex":       "HANDOFF_CODEX_CMD",
@@ -51,10 +59,37 @@ _ENV_OVERRIDE_FOR_WORKER = {
     "other":       "HANDOFF_OTHER_CMD",
 }
 
+# Appended to HANDOFF.md inside the temp clone so the worker receives an
+# unambiguous, runtime-specific reminder of exactly where to write artifacts.
+_RUNNER_HANDOFF_FOOTER = (
+    "\n"
+    "---\n"
+    "\n"
+    "## Runner directive\n"
+    "\n"
+    "You are inside an **isolated temporary clone** of the repository.\n"
+    "Your current working directory is the root of this clone.\n"
+    "\n"
+    "You MUST write these two files to the **current working directory**:\n"
+    "\n"
+    "- `proposal.md` — findings and proposed patch in Markdown\n"
+    "- `patch_plan.json` — a JSON array of patch operations\n"
+    "\n"
+    "**Do not only print to stdout.** Only files written to disk are captured"
+    " as proposals.\n"
+)
+
 _COPY_IGNORE = shutil.ignore_patterns(
-    ".git", ".agent", "node_modules", "target",
+    # Version-control / secrets
+    ".git",
+    # Agent-internal dirs (worker_runs, mcp_audit, handoffs, etc.)
+    ".agent",
+    # Package/build artifacts
+    "node_modules", "target", "dist", "build",
+    # Python virtualenvs and caches
     ".venv", "venv", "__pycache__", ".pytest_cache",
-    "dist", "build",
+    # Local test-artifact dirs (may contain access-denied OS temp files)
+    "tmp_tests", ".tmp",
 )
 
 DEFAULT_TIMEOUT_SEC = 300
@@ -103,6 +138,23 @@ def _write_artifacts(
         json.dumps(record, indent=2, ensure_ascii=False, sort_keys=True),
         encoding="utf-8",
     )
+
+
+def _format_copy_error(exc: Exception) -> str:
+    """Return a concise, human-readable summary of a shutil.copytree failure.
+
+    shutil.Error carries a list of (src, dst, msg) tuples; OSError has a
+    plain message. Both are reduced to a single line so the caller's record
+    never contains a giant raw dump.
+    """
+    if isinstance(exc, shutil.Error):
+        errors: list = exc.args[0] if exc.args and isinstance(exc.args[0], list) else []
+        if errors:
+            src, _dst, msg = errors[0]
+            tail = f" (and {len(errors) - 1} more)" if len(errors) > 1 else ""
+            return f"repo copy failed on {Path(src).name!r}: {msg}{tail}"
+        return f"repo copy failed: {exc}"
+    return f"repo copy failed: {exc}"
 
 
 def run_handoff(
@@ -179,15 +231,52 @@ def run_handoff(
     exit_code: int | None = None
     timed_out = False
 
-    with tempfile.TemporaryDirectory(prefix="handoff-clone-", ignore_cleanup_errors=True) as tmp_dir:
+    # Use mkdtemp + explicit try/finally instead of TemporaryDirectory so that
+    # cleanup goes through shutil.rmtree(ignore_errors=True), which is robust
+    # against locked .pyc files on Windows.  TemporaryDirectory.__exit__ on
+    # Python 3.12+ calls _resetperms() internally before suppressing errors,
+    # and that _resetperms call can itself raise — bypassing ignore_cleanup_errors.
+    tmp_dir = tempfile.mkdtemp(prefix="handoff-clone-")
+    try:
         temp_clone = Path(tmp_dir) / "repo"
-        shutil.copytree(repo_src, temp_clone, ignore=_COPY_IGNORE)
-        (temp_clone / "HANDOFF.md").write_text(handoff_text, encoding="utf-8")
+        try:
+            shutil.copytree(repo_src, temp_clone, ignore=_COPY_IGNORE)
+        except (shutil.Error, OSError) as copy_exc:
+            record["error"] = _format_copy_error(copy_exc)
+            record["finished_at"] = _now_iso()
+            _write_artifacts(
+                artifact_dir=artifact_dir,
+                handoff_text=handoff_text,
+                command=command,
+                record=record,
+                raw_output="",
+            )
+            handoff_notes.update_handoff_status(parsed["path"], "failed", handoff_root=root)
+            return record
+        # Append the runner directive so the worker sees exact output-file
+        # requirements even if the handoff note template changes.
+        (temp_clone / "HANDOFF.md").write_text(
+            handoff_text.rstrip("\n") + "\n" + _RUNNER_HANDOFF_FOOTER,
+            encoding="utf-8",
+        )
 
         try:
+            cmd_parts = shlex.split(command, posix=(os.name != "nt"))
+            # On Windows, .cmd/.bat files cannot be launched directly via
+            # subprocess list form — they require cmd /c to execute.
+            if cmd_parts and os.name == "nt":
+                resolved_exe = shutil.which(cmd_parts[0])
+                if resolved_exe and resolved_exe.lower().endswith((".cmd", ".bat")):
+                    cmd_parts = ["cmd", "/c", resolved_exe] + cmd_parts[1:]
+                elif resolved_exe:
+                    cmd_parts[0] = resolved_exe
+            # Some workers (codex, claude-code) read the prompt from stdin
+            # rather than a file argument.
+            stdin_text = handoff_text if worker in _WORKER_NEEDS_STDIN else None
             completed = subprocess.run(
-                shlex.split(command, posix=(os.name != "nt")),
+                cmd_parts,
                 cwd=str(temp_clone),
+                input=stdin_text,
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
@@ -212,7 +301,16 @@ def run_handoff(
         for filename in ("proposal.md", "patch_plan.json"):
             produced = temp_clone / filename
             if produced.is_file():
-                shutil.copy2(produced, artifact_dir / filename)
+                try:
+                    shutil.copy2(produced, artifact_dir / filename)
+                except OSError as cp_exc:
+                    if not record.get("error"):
+                        record["error"] = f"artifact copy failed: {cp_exc}"
+
+    finally:
+        # Always clean up the temp dir; ignore_errors=True silences PermissionError
+        # on locked .pyc files without the _resetperms edge case.
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
     finished = time.time()
     record.update(

@@ -220,3 +220,68 @@ def test_allow_run_skips_ignored_dirs_in_temp_clone(env, monkeypatch):
     assert seen["has_git"] is False
     assert seen["has_agent"] is False
     assert seen["has_src_foo"] is True
+
+
+# ---------------------------------------------------------------------------
+# Ignore-list coverage tests (WinError 5 regression)
+# ---------------------------------------------------------------------------
+
+def _run_with_dir_check(env, monkeypatch, dir_name: str) -> dict:
+    """Create dir_name inside fake_repo, run a real allow_run, return what was visible."""
+    target = env["fake_repo"] / dir_name
+    target.mkdir(parents=True, exist_ok=True)
+    (target / "sentinel.txt").write_text("should not appear in clone", encoding="utf-8")
+    note = _create_note(env)
+    seen: dict = {}
+
+    def fake_run(cmd, **kwargs):
+        cwd = Path(kwargs["cwd"])
+        seen["has_dir"] = (cwd / dir_name).exists()
+        class C:
+            returncode = 0; stdout = ""; stderr = ""
+        return C()
+
+    monkeypatch.setattr(runner.subprocess, "run", fake_run)
+    result = runner.run_handoff(note_path=note["path"], allow_run=True)
+    seen["result"] = result
+    return seen
+
+
+def test_allow_run_skips_tmp_tests_in_temp_clone(env, monkeypatch):
+    seen = _run_with_dir_check(env, monkeypatch, "tmp_tests")
+    assert seen["has_dir"] is False, "tmp_tests must not appear in temp clone"
+    assert seen["result"]["exit_code"] == 0
+
+
+def test_allow_run_skips_pytest_cache_in_temp_clone(env, monkeypatch):
+    seen = _run_with_dir_check(env, monkeypatch, ".pytest_cache")
+    assert seen["has_dir"] is False, ".pytest_cache must not appear in temp clone"
+    assert seen["result"]["exit_code"] == 0
+
+
+def test_allow_run_skips_dot_tmp_in_temp_clone(env, monkeypatch):
+    seen = _run_with_dir_check(env, monkeypatch, ".tmp")
+    assert seen["has_dir"] is False, ".tmp must not appear in temp clone"
+    assert seen["result"]["exit_code"] == 0
+
+
+def test_allow_run_copytree_error_returns_friendly_error(env, monkeypatch):
+    """A copytree failure must set record.error with a readable message, not raise."""
+    note = _create_note(env)
+
+    def boom(*args, **kwargs):
+        raise OSError("[WinError 5] Access is denied: 'tmp_tests\\\\pytest'")
+
+    monkeypatch.setattr(runner.shutil, "copytree", boom)
+
+    result = runner.run_handoff(note_path=note["path"], allow_run=True)
+
+    assert result["dry_run"] is False
+    assert result["error"] is not None
+    assert "repo copy failed" in result["error"]
+    # Status should be set to failed
+    parsed = handoff_notes.read_handoff_note(note["path"], handoff_root=env["handoff_root"])
+    assert parsed["meta"]["status"] == "failed"
+    # Artifacts must still be written
+    artifact_dir = Path(result["artifact_dir"])
+    assert (artifact_dir / "worker_run.json").is_file()
