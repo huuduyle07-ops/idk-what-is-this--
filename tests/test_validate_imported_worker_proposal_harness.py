@@ -126,3 +126,86 @@ def test_valid_proposal_validates_in_temp_clone_and_writes_artifacts(env):
     assert str(proposal_dir / "apply_result.json") in result["artifacts"]
     assert str(proposal_dir / "validation.json") in result["artifacts"]
     assert str(proposal_dir / "validation_output.txt") in result["artifacts"]
+
+
+def test_missing_proposal_ref_rejected(env):
+    with pytest.raises(ValueError, match="proposal_ref"):
+        validate_imported_worker_proposal_harness({
+            "repo_path": str(env["fake_repo"]),
+        })
+
+
+def test_empty_proposal_ref_rejected(env):
+    with pytest.raises(ValueError, match="proposal_ref"):
+        validate_imported_worker_proposal_harness({
+            "proposal_ref": "   ",
+            "repo_path": str(env["fake_repo"]),
+        })
+
+
+def test_absolute_proposal_ref_rejected(env):
+    with pytest.raises(ValueError, match="proposal_ref"):
+        validate_imported_worker_proposal_harness({
+            "proposal_ref": str((env["proposals_root"] / "abs").resolve()),
+            "repo_path": str(env["fake_repo"]),
+        })
+
+
+@pytest.mark.parametrize("proposal_ref", [
+    "../escape/01-foo",
+    "ts/../escape",
+    "../../etc",
+    "ts/./01-foo",
+    ".",
+    "..",
+    "ts//01-foo",
+    "..\\escape\\01-foo",
+])
+def test_traversal_proposal_ref_rejected(env, proposal_ref):
+    with pytest.raises(ValueError, match="proposal_ref"):
+        validate_imported_worker_proposal_harness({
+            "proposal_ref": proposal_ref,
+            "repo_path": str(env["fake_repo"]),
+        })
+
+
+def test_unknown_input_field_rejected(env):
+    proposal_ref = _make_imported_proposal(env)
+    with pytest.raises(ValueError, match="unknown field"):
+        validate_imported_worker_proposal_harness({
+            "proposal_ref": proposal_ref,
+            "repo_path": str(env["fake_repo"]),
+            "extra": "nope",
+        })
+
+
+def test_missing_repo_path_rejected(env):
+    proposal_ref = _make_imported_proposal(env)
+    with pytest.raises(ValueError, match="repo_path"):
+        validate_imported_worker_proposal_harness({
+            "proposal_ref": proposal_ref,
+        })
+
+
+def test_empty_repo_path_rejected(env):
+    proposal_ref = _make_imported_proposal(env)
+    with pytest.raises(ValueError, match="repo_path"):
+        validate_imported_worker_proposal_harness({
+            "proposal_ref": proposal_ref,
+            "repo_path": "   ",
+        })
+
+
+def test_non_directory_repo_path_rejected(env, tmp_path):
+    proposal_ref = _make_imported_proposal(env)
+    missing = tmp_path / "does-not-exist"
+    with pytest.raises(ValueError, match="repo_path"):
+        validate_imported_worker_proposal_harness({
+            "proposal_ref": proposal_ref,
+            "repo_path": str(missing),
+        })
+
+
+def test_input_not_dict_rejected(env):
+    with pytest.raises(ValueError, match="dict"):
+        validate_imported_worker_proposal_harness("not a dict")  # type: ignore[arg-type]
