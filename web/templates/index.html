@@ -7,6 +7,7 @@
     <title>C.A.T.T.U.S</title> 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="{{ url_for('static', filename='keybindings.js') }}" defer></script>
 </head>
 {% set page_web_mode = active_web_mode|default('instant') %}
 <body data-product-mode="{{ page_web_mode }}">
