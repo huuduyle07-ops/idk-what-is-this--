@@ -316,3 +316,98 @@ def test_harness_does_not_invoke_lesson_store_writes(env, monkeypatch):
 
     assert result["ok"] is True
     assert tripped["hit"] is False
+
+
+def test_success_records_audit_event(env, monkeypatch):
+    proposal_ref = _make_imported_proposal(env)
+    events: list[dict] = []
+    monkeypatch.setattr(
+        artifact_write,
+        "record_mcp_invocation",
+        lambda **kwargs: events.append(kwargs),
+    )
+
+    result = validate_imported_worker_proposal_harness({
+        "proposal_ref": proposal_ref,
+        "repo_path": str(env["fake_repo"]),
+    })
+
+    assert len(events) == 1
+    event = events[0]
+    assert event["tool_name"] == "validate_imported_worker_proposal"
+    assert event["capability_mode"] == "artifact_write"
+    assert event["allowed"] is True
+    assert event["input_summary"]["proposal_ref"] == proposal_ref
+    assert event["input_summary"]["repo_path_basename"] == Path(env["fake_repo"]).name
+    # Validation output text must not be logged.
+    summary_str = json.dumps(event["input_summary"], default=str)
+    assert "validation_output" not in summary_str
+    # Result summary mirrors the narrow response, not core's full dict.
+    assert set(event["result_summary"].keys()) == {
+        "ok", "apply_success", "validation_ok", "message",
+    }
+    # Artifacts include the existing on-disk evidence files.
+    assert result["proposal_dir"] in event["artifacts"]
+    proposal_dir = Path(result["proposal_dir"])
+    assert str(proposal_dir / "apply_result.json") in event["artifacts"]
+    assert str(proposal_dir / "validation.json") in event["artifacts"]
+    assert str(proposal_dir / "validation_output.txt") in event["artifacts"]
+
+
+def test_blocked_input_records_audit_event(env, monkeypatch):
+    events: list[dict] = []
+    monkeypatch.setattr(
+        artifact_write,
+        "record_mcp_invocation",
+        lambda **kwargs: events.append(kwargs),
+    )
+
+    with pytest.raises(ValueError, match="proposal_ref"):
+        validate_imported_worker_proposal_harness({
+            "proposal_ref": "../escape",
+            "repo_path": str(env["fake_repo"]),
+        })
+
+    assert len(events) == 1
+    event = events[0]
+    assert event["tool_name"] == "validate_imported_worker_proposal"
+    assert event["allowed"] is False
+    assert event["result_summary"] is None
+    assert event["artifacts"] == []
+    assert "proposal_ref" in (event["error"] or "")
+
+
+def test_audit_write_failure_keeps_harness_success(env, monkeypatch):
+    proposal_ref = _make_imported_proposal(env)
+    attempts = {"count": 0}
+
+    def _raise_audit_error(**_kwargs):
+        attempts["count"] += 1
+        raise OSError("audit offline")
+
+    monkeypatch.setattr(artifact_write, "record_mcp_invocation", _raise_audit_error)
+
+    result = validate_imported_worker_proposal_harness({
+        "proposal_ref": proposal_ref,
+        "repo_path": str(env["fake_repo"]),
+    })
+
+    assert result["ok"] is True
+    assert attempts["count"] == 1
+
+
+def test_audit_write_failure_keeps_harness_rejection(env, monkeypatch):
+    attempts = {"count": 0}
+
+    def _raise_audit_error(**_kwargs):
+        attempts["count"] += 1
+        raise OSError("audit offline")
+
+    monkeypatch.setattr(artifact_write, "record_mcp_invocation", _raise_audit_error)
+
+    with pytest.raises(ValueError, match="proposal_ref"):
+        validate_imported_worker_proposal_harness({
+            "proposal_ref": "../escape",
+            "repo_path": str(env["fake_repo"]),
+        })
+    assert attempts["count"] == 1
