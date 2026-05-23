@@ -129,18 +129,29 @@ def build_penalty_map(graph, repo_path: str) -> PenaltyResult:
         return PenaltyResult({}, [])
 
     file_nodes, lower_to_canonical = _file_node_index(graph)
-    blocked_counts, blocked_unmatched = _read_blocked_counts(
-        file_nodes, lower_to_canonical
-    )
+
+    blocked_counts: dict[str, int] = {}
+    blocked_unmatched: list[str] = []
+    try:
+        blocked_counts, blocked_unmatched = _read_blocked_counts(
+            file_nodes, lower_to_canonical
+        )
+    except Exception:
+        # Spec: metric computation never blocks the agent.
+        pass
 
     transient_counts: dict[str, int] = {}
     transient_unmatched: list[str] = []
     if db_enabled():
         project_tag = build_project_tag(repo_path)
         if project_tag:
-            transient_counts, transient_unmatched = _read_transient_counts(
-                graph, file_nodes, lower_to_canonical, project_tag
-            )
+            try:
+                transient_counts, transient_unmatched = _read_transient_counts(
+                    graph, file_nodes, lower_to_canonical, project_tag
+                )
+            except Exception:
+                # Spec: Postgres unreachable / query failure -> zero transient.
+                pass
 
     penalty_map: dict[str, float] = {}
     for node_id, count in blocked_counts.items():

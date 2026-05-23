@@ -114,11 +114,12 @@ def compute_hotspots(graph):
 
     return [node for node, _ in ranked[:10]]
 
-def compute_symbol_hotspots(graph):
+def compute_symbol_hotspots(graph, repo_path: str | None = None):
     ranked = rank_nodes_by_weight(
         graph,
         limit=10,
         node_types=CRITICAL_SYMBOL_TYPES,
+        repo_path=repo_path,
     )
     return [(metric.node_id, metric.weight) for metric in ranked]
 

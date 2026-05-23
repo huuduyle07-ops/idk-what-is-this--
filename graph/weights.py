@@ -174,9 +174,12 @@ def rank_nodes_by_weight(
     limit: int = 10,
     include_noise: bool = False,
     node_types: Iterable[str] | None = None,
+    repo_path: str | None = None,
 ) -> list[NodeWeight]:
     allowed_types = set(node_types or [])
-    metrics = compute_node_weights(graph, include_noise=include_noise)
+    metrics = compute_node_weights(
+        graph, include_noise=include_noise, repo_path=repo_path
+    )
     ranked = [
         metric
         for metric in metrics.values()

@@ -281,11 +281,16 @@ def control_dfs_v2(
     max_nodes: int = 20,
     neighbor_limit: int = 3,
     node_metrics: dict[str, NodeWeight] | None = None,
+    repo_path: str | None = None,
 ) -> list[dict]:
     visited = set()
     evidence: list[dict] = []
     words = query_words(query)
-    metrics = node_metrics if node_metrics is not None else compute_node_weights(graph)
+    metrics = (
+        node_metrics
+        if node_metrics is not None
+        else compute_node_weights(graph, repo_path=repo_path)
+    )
 
     def dfs(symbol: str, depth: int):
         if depth > max_depth:
@@ -608,6 +613,7 @@ def run_control_structured(query: str, repo_path: str) -> dict:
         max_depth=2,
         max_nodes=20,
         neighbor_limit=3,
+        repo_path=repo_path,
     )
 
     execution_trace = trace_execution_flow(

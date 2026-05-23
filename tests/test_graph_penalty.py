@@ -213,6 +213,26 @@ def test_penalty_result_exposes_per_source_count_breakdown(tmp_path):
     assert result.transient_counts == {"foo.py": 3, "foo.py::do_thing": 4}
 
 
+def test_db_connection_failure_is_fail_soft_not_propagated(tmp_path):
+    graph = ProgramGraph()
+    graph.add_node("foo.py", "file")
+
+    fake_lessons = [{"candidate": {"changed_files": ["foo.py"]}}]
+
+    def boom(*_args, **_kwargs):
+        raise RuntimeError("libpq missing / DB unreachable")
+
+    with patch("graph.penalty.list_lessons", return_value=fake_lessons), \
+         patch("graph.penalty.db_enabled", return_value=True), \
+         patch("graph.penalty.build_project_tag", return_value="test-tag"), \
+         patch("graph.penalty._fetch_patch_attempt_rows", side_effect=boom):
+        result = build_penalty_map(graph, repo_path=str(tmp_path))
+
+    # Blocked side still contributes; transient side degrades to 0.
+    assert result.penalty_map == {"foo.py": 5.0}
+    assert result.transient_counts == {}
+
+
 def test_case_insensitive_fallback_matches_windows_style_path(tmp_path):
     graph = ProgramGraph()
     graph.add_node("src/foo.py", "file")

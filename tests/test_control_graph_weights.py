@@ -4,8 +4,22 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from core import control_engine
+from graph import weights as weights_module
+from graph.penalty import PenaltyResult
 from graph.schema import ProgramGraph
 from graph.weights import NodeWeight
+
+
+def _stub_explain_helpers(monkeypatch, calls_map):
+    def explain(graph, symbol):
+        return {"symbol": symbol, "called_by": [], "calls": calls_map.get(symbol, [])}
+    monkeypatch.setattr(control_engine, "explain_symbol", explain)
+    monkeypatch.setattr(control_engine, "impact_analysis", lambda graph, symbol: [])
+    monkeypatch.setattr(
+        control_engine,
+        "analyze_symbol_risk",
+        lambda graph, symbol: {"risk_level": "low", "risk_score": 0},
+    )
 
 
 def _metric(node_id: str, weight: float) -> NodeWeight:
@@ -107,6 +121,70 @@ def test_control_dfs_prioritizes_graph_weight_when_query_relevance_is_tied(monke
     symbols = {item["symbol"] for item in evidence}
     assert "app.py::z_high" in symbols
     assert "app.py::a_low" not in symbols
+
+
+def test_control_dfs_visits_high_penalty_file_neighbor_first(monkeypatch, tmp_path):
+    graph = ProgramGraph()
+    graph.add_node("entry.py::start", "function")
+    graph.add_node("low.py", "file")
+    graph.add_node("high.py", "file")
+    graph.add_edge("entry.py::start", "low.py", "resolved_call")
+    graph.add_edge("entry.py::start", "high.py", "resolved_call")
+
+    fake = PenaltyResult(
+        penalty_map={"high.py": 10.0},
+        unmatched_paths=[],
+        blocked_counts={"high.py": 2},
+        transient_counts={},
+    )
+    monkeypatch.setattr(weights_module, "build_penalty_map", lambda g, rp: fake)
+    _stub_explain_helpers(monkeypatch, {
+        "entry.py::start": ["high.py", "low.py"],
+    })
+
+    evidence = control_engine.control_dfs_v2(
+        graph,
+        ["entry.py::start"],
+        repo_path=str(tmp_path),
+        neighbor_limit=1,
+    )
+
+    symbols = {item["symbol"] for item in evidence}
+    assert "high.py" in symbols
+    assert "low.py" not in symbols
+    high_row = next(item for item in evidence if item["symbol"] == "high.py")
+    assert high_row["graph_weight"] >= 10.0  # penalty boost is in evidence
+
+
+def test_control_dfs_visits_high_penalty_symbol_over_tied_sibling(monkeypatch, tmp_path):
+    graph = ProgramGraph()
+    graph.add_node("entry.py::start", "function")
+    graph.add_node("mod.py::quiet_func", "function")
+    graph.add_node("mod.py::risky_func", "function")
+    graph.add_edge("entry.py::start", "mod.py::quiet_func", "resolved_call")
+    graph.add_edge("entry.py::start", "mod.py::risky_func", "resolved_call")
+
+    fake = PenaltyResult(
+        penalty_map={"mod.py::risky_func": 4.0},
+        unmatched_paths=[],
+        blocked_counts={},
+        transient_counts={"mod.py::risky_func": 4},
+    )
+    monkeypatch.setattr(weights_module, "build_penalty_map", lambda g, rp: fake)
+    _stub_explain_helpers(monkeypatch, {
+        "entry.py::start": ["mod.py::quiet_func", "mod.py::risky_func"],
+    })
+
+    evidence = control_engine.control_dfs_v2(
+        graph,
+        ["entry.py::start"],
+        repo_path=str(tmp_path),
+        neighbor_limit=1,
+    )
+
+    symbols = {item["symbol"] for item in evidence}
+    assert "mod.py::risky_func" in symbols
+    assert "mod.py::quiet_func" not in symbols
 
 
 def test_format_control_context_prints_graph_weight():
