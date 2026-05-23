@@ -79,12 +79,17 @@ graph/obsidian_exporter.py [MINOR: 1-line]
   Same pattern: thread repo_path through to compute_node_weights / rank_nodes_by_weight.
 ```
 
-Constants at the top of `graph/weights.py`:
+Constants live in a tiny dedicated module `graph/penalty_constants.py`:
 
 ```python
 OMEGA_BLOCKED = 5.0       # heavy: lesson that was promoted to blocked bucket
 OMEGA_TRANSIENT = 1.0     # light: individual failed patch_attempts row
 ```
+
+Both `graph/penalty.py` and `graph/weights.py` import from this module.
+Keeping the constants out of `weights.py` avoids a circular import (weights →
+penalty → would-need-weights for the constants) and gives them a stable home
+that doesn't need either consumer to be loaded first.
 
 ## Scoring Model
 
