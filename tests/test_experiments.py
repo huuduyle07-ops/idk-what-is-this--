@@ -510,3 +510,161 @@ def test_export_cli_fail_soft_for_unsafe_output(tmp_path, capsys, monkeypatch):
     assert exit_code == 2
     assert "error:" in captured.err
     assert "Traceback" not in captured.err
+
+
+def test_list_experiments_skips_markdown_and_malformed_json_newest_first(tmp_path):
+    _benchmark_root, experiments_root = _roots(tmp_path)
+    experiments_root.mkdir(parents=True, exist_ok=True)
+    (experiments_root / "alpha.json").write_text(
+        json.dumps(
+            {
+                "experiment_id": "alpha",
+                "title": "Alpha",
+                "status": "created",
+                "created_at": "2026-05-24T01:00:00+00:00",
+                "baseline_report": ".agent/benchmarks/a.json",
+                "variant_report": ".agent/benchmarks/b.json",
+            }
+        ),
+        encoding="utf-8",
+    )
+    (experiments_root / "bravo.json").write_text(
+        json.dumps(
+            {
+                "experiment_id": "bravo",
+                "title": "Bravo",
+                "status": "compared",
+                "created_at": "2026-05-24T02:00:00+00:00",
+                "baseline_report": ".agent/benchmarks/c.json",
+                "variant_report": ".agent/benchmarks/d.json",
+            }
+        ),
+        encoding="utf-8",
+    )
+    (experiments_root / "charlie.json").write_text(
+        json.dumps(
+            {
+                "experiment_id": "charlie",
+                "title": "Charlie",
+                "status": "created",
+                "created_at": "",
+                "baseline_report": ".agent/benchmarks/e.json",
+                "variant_report": ".agent/benchmarks/f.json",
+            }
+        ),
+        encoding="utf-8",
+    )
+    (experiments_root / "notes.md").write_text("# ignore me\n", encoding="utf-8")
+    (experiments_root / "broken.json").write_text("{not json", encoding="utf-8")
+
+    rows = experiments.list_experiments(experiments_root=experiments_root)
+
+    assert [row["experiment_id"] for row in rows] == ["bravo", "alpha", "charlie"]
+    assert all(set(experiments.EXPERIMENT_LIST_COLUMNS) <= set(row) for row in rows)
+
+
+def test_list_experiments_filters_status_and_limit(tmp_path):
+    _benchmark_root, experiments_root = _roots(tmp_path)
+    experiments_root.mkdir(parents=True, exist_ok=True)
+    for idx, status in enumerate(["created", "compared", "compared"], start=1):
+        (experiments_root / f"exp-{idx}.json").write_text(
+            json.dumps(
+                {
+                    "experiment_id": f"exp-{idx}",
+                    "title": f"Experiment {idx}",
+                    "status": status,
+                    "created_at": f"2026-05-24T0{idx}:00:00+00:00",
+                    "baseline_report": f".agent/benchmarks/base-{idx}.json",
+                    "variant_report": f".agent/benchmarks/variant-{idx}.json",
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    rows = experiments.list_experiments(
+        status="compared",
+        limit=1,
+        experiments_root=experiments_root,
+    )
+
+    assert len(rows) == 1
+    assert rows[0]["experiment_id"] == "exp-3"
+    assert rows[0]["status"] == "compared"
+
+
+def test_list_experiments_rejects_negative_limit(tmp_path):
+    _benchmark_root, experiments_root = _roots(tmp_path)
+
+    with pytest.raises(experiments.ExperimentError, match="limit"):
+        experiments.list_experiments(limit=-1, experiments_root=experiments_root)
+
+
+def test_list_cli_prints_stdlib_table_without_pandas(tmp_path, capsys, monkeypatch):
+    from scripts import list_experiments as list_cli
+
+    _benchmark_root, experiments_root = _roots(tmp_path)
+    monkeypatch.setattr(list_cli.experiments, "default_experiments_root", lambda: experiments_root)
+    monkeypatch.setattr(list_cli, "_try_format_with_pandas", lambda rows: None)
+    experiments_root.mkdir(parents=True, exist_ok=True)
+    (experiments_root / "table.json").write_text(
+        json.dumps(
+            {
+                "experiment_id": "table",
+                "title": "Table Output",
+                "status": "created",
+                "created_at": "2026-05-24T01:00:00+00:00",
+                "baseline_report": ".agent/benchmarks/base.json",
+                "variant_report": ".agent/benchmarks/variant.json",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    exit_code = list_cli.main([])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "created_at" in captured.out
+    assert "Table Output" in captured.out
+    assert "table" in captured.out
+    assert "Traceback" not in captured.err
+
+
+def test_list_cli_prints_json(tmp_path, capsys, monkeypatch):
+    from scripts import list_experiments as list_cli
+
+    _benchmark_root, experiments_root = _roots(tmp_path)
+    monkeypatch.setattr(list_cli.experiments, "default_experiments_root", lambda: experiments_root)
+    experiments_root.mkdir(parents=True, exist_ok=True)
+    (experiments_root / "json-output.json").write_text(
+        json.dumps(
+            {
+                "experiment_id": "json-output",
+                "title": "JSON Output",
+                "status": "compared",
+                "created_at": "2026-05-24T01:00:00+00:00",
+                "baseline_report": ".agent/benchmarks/base.json",
+                "variant_report": ".agent/benchmarks/variant.json",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    exit_code = list_cli.main(["--status", "compared", "--limit", "20", "--json"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    rows = json.loads(captured.out)
+    assert rows[0]["experiment_id"] == "json-output"
+    assert rows[0]["status"] == "compared"
+
+
+def test_list_cli_fail_soft_for_invalid_limit(capsys):
+    from scripts import list_experiments as list_cli
+
+    exit_code = list_cli.main(["--limit", "-1"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 2
+    assert "error:" in captured.err
+    assert "Traceback" not in captured.err

@@ -20,6 +20,14 @@ SUPPORTED_METRICS: tuple[str, ...] = (
     "model_calls",
     "fallback_count",
 )
+EXPERIMENT_LIST_COLUMNS: tuple[str, ...] = (
+    "created_at",
+    "status",
+    "title",
+    "experiment_id",
+    "baseline_report",
+    "variant_report",
+)
 
 _EXPERIMENT_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
 _METRIC_ALIASES: dict[str, tuple[str, ...]] = {
@@ -196,6 +204,62 @@ def _write_record(path: Path, record: dict[str, Any]) -> None:
         json.dumps(record, indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
+
+
+def _created_at_sort_value(value: Any) -> float | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        return datetime.fromisoformat(text.replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        return None
+
+
+def list_experiments(
+    *,
+    status: str | None = None,
+    limit: int | None = None,
+    experiments_root: str | Path | None = None,
+) -> list[dict[str, Any]]:
+    if limit is not None and limit < 0:
+        raise ExperimentError("limit must be greater than or equal to 0")
+
+    root = _root(experiments_root, default_experiments_root).resolve()
+    if not root.is_dir():
+        return []
+
+    status_filter = str(status or "").strip() or None
+    items: list[tuple[int, float | str, dict[str, Any]]] = []
+    for path in root.glob("*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(data, dict):
+            continue
+        if status_filter and data.get("status") != status_filter:
+            continue
+
+        row = {
+            "created_at": data.get("created_at"),
+            "status": data.get("status"),
+            "title": data.get("title"),
+            "experiment_id": data.get("experiment_id") or path.stem,
+            "baseline_report": data.get("baseline_report"),
+            "variant_report": data.get("variant_report"),
+        }
+        created_sort = _created_at_sort_value(row["created_at"])
+        if created_sort is None:
+            items.append((0, path.name, row))
+        else:
+            items.append((1, created_sort, row))
+
+    items.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    rows = [row for _has_created_at, _sort_value, row in items]
+    if limit is not None:
+        rows = rows[:limit]
+    return rows
 
 
 def create_experiment(
