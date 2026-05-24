@@ -968,6 +968,34 @@ symbol={item.get("symbol", "")}
             for item in phantom_findings[:12]
         )
 
+    # Phase 12.5k: pull a budgeted [LINTER HINTS] block from the fused
+    # phantom + linter evidence. Empty when no relevant findings exist —
+    # we never inject the full findings.json into a prompt.
+    linter_hints_block = ""
+    if repo_path:
+        try:
+            from core.linter_fusion import fuse_for_repo
+
+            fusion = fuse_for_repo(repo_path, phantom_findings)
+            if fusion.get("prompt_block"):
+                linter_hints_block = "\n" + fusion["prompt_block"] + "\n"
+            # Mutate the in-memory control_result so downstream consumers can
+            # see linter_evidence per phantom candidate. PHANTOM_LIMB.json on
+            # disk is left alone (write-side belongs to the scanner).
+            if isinstance(phantom, dict):
+                phantom["findings"] = fusion["findings"]
+                phantom["linter_summary"] = fusion["linter_summary"]
+        except Exception as exc:
+            try:
+                import sys
+                sys.stderr.write(
+                    f"[control_engine] linter fusion skipped: "
+                    f"{type(exc).__name__}: {exc}\n"
+                )
+            except Exception:
+                pass
+            linter_hints_block = ""
+
     is_feature_extension = scout.get("request_type") == "feature_extension"
 
     if identity_framing:
@@ -988,7 +1016,7 @@ language={language}
 
 [PHANTOM LIMB SUGGESTIONS - structural hints, not proof]
 {phantom_block}
-{lessons_block}
+{linter_hints_block}{lessons_block}
 [USER]
 {user_query}
 
@@ -1063,7 +1091,7 @@ Do not use the top hypothesis as the patch target unless it is directly relevant
 
 [PHANTOM LIMB SUGGESTIONS - structural hints, not proof]
 {phantom_block}
-{lessons_block}
+{linter_hints_block}{lessons_block}
 [USER]
 {user_query}
 
@@ -1204,7 +1232,7 @@ source_snippet:
 
 [PHANTOM LIMB SUGGESTIONS - structural hints, not proof]
 {phantom_block}
-{lessons_block}
+{linter_hints_block}{lessons_block}
 [USER]
 {user_query}
 
