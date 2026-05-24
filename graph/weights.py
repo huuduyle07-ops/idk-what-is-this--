@@ -189,6 +189,54 @@ def rank_nodes_by_weight(
     return ranked[:limit]
 
 
+def explain_node_weights(
+    graph,
+    *,
+    alpha: float = 2.0,
+    beta: float = 1.0,
+    gamma: float = 0.5,
+    include_noise: bool = False,
+    repo_path: str | None = None,
+) -> list[dict]:
+    metrics = compute_node_weights(
+        graph,
+        alpha=alpha,
+        beta=beta,
+        gamma=gamma,
+        include_noise=include_noise,
+        repo_path=repo_path,
+    )
+    if not metrics:
+        return []
+
+    max_in = max((m.in_degree for m in metrics.values()), default=0)
+    max_out = max((m.out_degree for m in metrics.values()), default=0)
+    max_complexity = max((m.complexity for m in metrics.values()), default=0)
+
+    rows: list[dict] = []
+    for metric in metrics.values():
+        topology = (
+            alpha * _normalize(metric.in_degree, max_in)
+            + beta * _normalize(metric.out_degree, max_out)
+        )
+        complexity_contrib = gamma * _normalize(metric.complexity, max_complexity)
+        rows.append(
+            {
+                "node_id": metric.node_id,
+                "node_kind": metric.node_type,
+                "total_weight": metric.weight,
+                "topology_contribution": round(topology, 4),
+                "complexity_contribution": round(complexity_contrib, 4),
+                "failure_penalty": metric.penalty,
+                "in_degree": metric.in_degree,
+                "out_degree": metric.out_degree,
+                "complexity": metric.complexity,
+                "reasons": list(metric.reasons),
+            }
+        )
+    return rows
+
+
 def _node_type(nodes, node_id: str) -> str:
     node = nodes.get(node_id)
     if node is None:
