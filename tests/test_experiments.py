@@ -294,3 +294,219 @@ def test_compare_cli_accepts_agent_experiments_path(tmp_path, capsys, monkeypatc
     assert exit_code == 0
     assert "Experiment: CLI agent path" in captured.out
     assert "Traceback" not in captured.err
+
+
+def test_export_experiment_markdown_writes_not_compared_lab_note(tmp_path):
+    benchmark_root, experiments_root = _roots(tmp_path)
+    _write_report(benchmark_root / "baseline.json", {"passed": 1})
+    _write_report(benchmark_root / "variant.json", {"passed": 1})
+    experiments.create_experiment(
+        title="Markdown note",
+        hypothesis="The note is readable without opening JSON.",
+        baseline_report="baseline.json",
+        variant_report="variant.json",
+        subset="python smoke",
+        metric_names=["passed"],
+        greenlight_rule="passed must not drop",
+        experiment_id="markdown-note",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+
+    result = experiments.export_experiment_markdown(
+        "markdown-note",
+        experiments_root=experiments_root,
+    )
+
+    path = experiments_root / "markdown-note.md"
+    assert result["path"] == str(path)
+    text = path.read_text(encoding="utf-8")
+    assert "# Markdown note" in text
+    assert "- Experiment ID: `markdown-note`" in text
+    assert "- Status: `created`" in text
+    assert "- Hypothesis: The note is readable without opening JSON." in text
+    assert "- Subset: python smoke" in text
+    assert "- Baseline report: `.agent/benchmarks/baseline.json`" in text
+    assert "- Variant report: `.agent/benchmarks/variant.json`" in text
+    assert "- Greenlight rule: passed must not drop" in text
+    assert "| metric | baseline | variant | delta | status |" in text
+    assert "| passed | unknown | unknown | unknown | unknown |" in text
+    assert "Conclusion: Not compared yet." in text
+
+
+def test_export_experiment_markdown_includes_metric_table_and_conclusion(tmp_path):
+    benchmark_root, experiments_root = _roots(tmp_path)
+    _write_report(
+        benchmark_root / "baseline.json",
+        {"total": 2, "passed": 1, "failed": 1, "fallback_count": 3},
+    )
+    _write_report(
+        benchmark_root / "variant.json",
+        {"total": 2, "passed": 2, "failed": 0},
+    )
+    experiments.create_experiment(
+        title="Compared note",
+        hypothesis="The variant improves the smoke run.",
+        baseline_report="baseline.json",
+        variant_report="variant.json",
+        metric_names=["total", "passed", "failed", "fallback_count"],
+        experiment_id="compared-note",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+    compared = experiments.compare_experiment(
+        "compared-note",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+
+    result = experiments.export_experiment_markdown(
+        ".agent/experiments/compared-note.json",
+        experiments_root=experiments_root,
+    )
+
+    text = Path(result["path"]).read_text(encoding="utf-8")
+    assert f"- Compared at: {compared['result']['compared_at']}" in text
+    assert "| total | 2 | 2 | 0 | unchanged |" in text
+    assert "| passed | 1 | 2 | +1 | increased |" in text
+    assert "| failed | 1 | 0 | -1 | decreased |" in text
+    assert "| fallback_count | 3 | unknown | unknown | unknown |" in text
+    assert "Conclusion: 2 improved, 0 regressed, 1 unchanged, 1 unknown." in text
+
+
+@pytest.mark.parametrize(
+    ("label", "ref_factory"),
+    [
+        ("experiment id", lambda root, path: "export-forms"),
+        ("filename", lambda root, path: "export-forms.json"),
+        (".agent path", lambda root, path: ".agent/experiments/export-forms.json"),
+        ("absolute path", lambda root, path: str(path)),
+    ],
+)
+def test_export_experiment_markdown_accepts_supported_reference_forms(
+    tmp_path,
+    label,
+    ref_factory,
+):
+    benchmark_root, experiments_root = _roots(tmp_path)
+    _write_report(benchmark_root / "baseline.json", {"passed": 1})
+    _write_report(benchmark_root / "variant.json", {"passed": 1})
+    experiments.create_experiment(
+        title=f"Export form: {label}",
+        hypothesis="All supported refs can export Markdown.",
+        baseline_report="baseline.json",
+        variant_report="variant.json",
+        metric_names=["passed"],
+        experiment_id="export-forms",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+
+    ref = ref_factory(experiments_root, experiments_root / "export-forms.json")
+    result = experiments.export_experiment_markdown(
+        ref,
+        experiments_root=experiments_root,
+    )
+
+    assert Path(result["path"]).is_file()
+
+
+def test_export_experiment_markdown_supports_guarded_custom_output(tmp_path):
+    benchmark_root, experiments_root = _roots(tmp_path)
+    _write_report(benchmark_root / "baseline.json", {"passed": 1})
+    _write_report(benchmark_root / "variant.json", {"passed": 1})
+    experiments.create_experiment(
+        title="Custom output",
+        hypothesis="Reports can be grouped under the experiments root.",
+        baseline_report="baseline.json",
+        variant_report="variant.json",
+        experiment_id="custom-output",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+
+    result = experiments.export_experiment_markdown(
+        "custom-output",
+        output="reports/custom-output.md",
+        experiments_root=experiments_root,
+    )
+
+    assert result["path"] == str(experiments_root / "reports" / "custom-output.md")
+    assert (experiments_root / "reports" / "custom-output.md").is_file()
+
+
+def test_export_experiment_markdown_rejects_output_traversal(tmp_path):
+    benchmark_root, experiments_root = _roots(tmp_path)
+    _write_report(benchmark_root / "baseline.json", {"passed": 1})
+    _write_report(benchmark_root / "variant.json", {"passed": 1})
+    experiments.create_experiment(
+        title="Unsafe output",
+        hypothesis="Output must stay in the experiments root.",
+        baseline_report="baseline.json",
+        variant_report="variant.json",
+        experiment_id="unsafe-output",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+
+    with pytest.raises(experiments.ExperimentError, match="output"):
+        experiments.export_experiment_markdown(
+            "unsafe-output",
+            output="../outside.md",
+            experiments_root=experiments_root,
+        )
+
+
+def test_export_cli_writes_report_for_agent_experiments_path(
+    tmp_path,
+    capsys,
+    monkeypatch,
+):
+    from scripts import export_experiment_report as export_cli
+
+    benchmark_root, experiments_root = _roots(tmp_path)
+    monkeypatch.setattr(export_cli.experiments, "default_experiments_root", lambda: experiments_root)
+    _write_report(benchmark_root / "baseline.json", {"passed": 1})
+    _write_report(benchmark_root / "variant.json", {"passed": 1})
+    experiments.create_experiment(
+        title="CLI export",
+        hypothesis="The CLI writes a Markdown report.",
+        baseline_report="baseline.json",
+        variant_report="variant.json",
+        experiment_id="cli-export",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+
+    exit_code = export_cli.main([".agent/experiments/cli-export.json"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "exported experiment report:" in captured.out
+    assert (experiments_root / "cli-export.md").is_file()
+    assert "Traceback" not in captured.err
+
+
+def test_export_cli_fail_soft_for_unsafe_output(tmp_path, capsys, monkeypatch):
+    from scripts import export_experiment_report as export_cli
+
+    benchmark_root, experiments_root = _roots(tmp_path)
+    monkeypatch.setattr(export_cli.experiments, "default_experiments_root", lambda: experiments_root)
+    _write_report(benchmark_root / "baseline.json", {"passed": 1})
+    _write_report(benchmark_root / "variant.json", {"passed": 1})
+    experiments.create_experiment(
+        title="CLI unsafe output",
+        hypothesis="Unsafe output fails cleanly.",
+        baseline_report="baseline.json",
+        variant_report="variant.json",
+        experiment_id="cli-unsafe-output",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+
+    exit_code = export_cli.main(["cli-unsafe-output", "--output", "../outside.md"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 2
+    assert "error:" in captured.err
+    assert "Traceback" not in captured.err

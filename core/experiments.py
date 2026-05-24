@@ -26,6 +26,10 @@ _METRIC_ALIASES: dict[str, tuple[str, ...]] = {
     "average_duration": ("average_duration", "avg_duration_sec"),
     "fallback_count": ("fallback_count", "total_fallbacks"),
 }
+_HIGHER_IS_BETTER: frozenset[str] = frozenset({"passed"})
+_LOWER_IS_BETTER: frozenset[str] = frozenset(
+    {"failed", "flaky", "average_duration", "model_calls", "fallback_count"}
+)
 
 
 class ExperimentError(ValueError):
@@ -368,6 +372,174 @@ def _format_delta(value: int | float | None) -> str:
         return "unknown"
     prefix = "+" if value > 0 else ""
     return f"{prefix}{_format_number(value)}"
+
+
+def _md_cell(value: Any) -> str:
+    text = str(value if value is not None and value != "" else "unknown")
+    return text.replace("|", "\\|").replace("\r", " ").replace("\n", " ")
+
+
+def _resolve_markdown_output_path(
+    output_ref: str | Path | None,
+    *,
+    default_path: Path,
+    experiments_root: Path,
+) -> Path:
+    root = experiments_root.resolve()
+    if output_ref is None:
+        path = default_path.resolve()
+    else:
+        text = str(output_ref or "").strip()
+        if not text:
+            raise ExperimentError("output path must be non-empty")
+        if _has_parent_reference(text):
+            raise ExperimentError("output path must not contain '..'")
+
+        ref = Path(text).expanduser()
+        normalized = text.replace("\\", "/")
+        project_root = _project_root_for_agent_child(root)
+        if ref.is_absolute():
+            candidate = ref
+        elif normalized.startswith(".agent/experiments/") and project_root is not None:
+            candidate = project_root / normalized
+        else:
+            candidate = root / text
+        path = candidate.resolve()
+
+    try:
+        path.relative_to(root)
+    except ValueError as exc:
+        raise ExperimentError(f"output path must live inside {root}: {path}") from exc
+    if path.suffix.lower() != ".md":
+        raise ExperimentError("output path must point to a Markdown .md file")
+    return path
+
+
+def _metric_entries_for_markdown(record: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    result = record.get("result")
+    metrics = result.get("metrics") if isinstance(result, dict) else None
+    if isinstance(metrics, dict):
+        return metrics
+    return {
+        name: {
+            "baseline": None,
+            "variant": None,
+            "delta": None,
+            "status": "unknown",
+        }
+        for name in _metric_names(record.get("metric_names"))
+    }
+
+
+def _metric_outcome(metric: str, entry: dict[str, Any]) -> str:
+    status = entry.get("status")
+    delta = _number_or_none(entry.get("delta"))
+    if status == "unknown" or delta is None:
+        return "unknown"
+    if delta == 0:
+        return "unchanged"
+    if metric in _LOWER_IS_BETTER:
+        return "improved" if delta < 0 else "regressed"
+    if metric in _HIGHER_IS_BETTER:
+        return "improved" if delta > 0 else "regressed"
+    return "improved" if delta > 0 else "regressed"
+
+
+def _conclusion(record: dict[str, Any], metrics: dict[str, dict[str, Any]]) -> str:
+    if record.get("result") is None:
+        return "Not compared yet."
+    counts = {"improved": 0, "regressed": 0, "unchanged": 0, "unknown": 0}
+    for metric, entry in metrics.items():
+        outcome = _metric_outcome(metric, entry)
+        counts[outcome] = counts.get(outcome, 0) + 1
+    return (
+        f"{counts['improved']} improved, {counts['regressed']} regressed, "
+        f"{counts['unchanged']} unchanged, {counts['unknown']} unknown."
+    )
+
+
+def _render_experiment_markdown(record: dict[str, Any]) -> str:
+    title = record.get("title") or record.get("experiment_id") or "Experiment"
+    result = record.get("result") if isinstance(record.get("result"), dict) else {}
+    compared_at = result.get("compared_at") if isinstance(result, dict) else None
+    metrics = _metric_entries_for_markdown(record)
+    metric_order = record.get("metric_names") or list(metrics)
+
+    lines = [
+        f"# {_md_cell(title)}",
+        "",
+        "## Summary",
+        "",
+        f"- Experiment ID: `{_md_cell(record.get('experiment_id'))}`",
+        f"- Status: `{_md_cell(record.get('status'))}`",
+        f"- Hypothesis: {_md_cell(record.get('hypothesis'))}",
+        f"- Subset: {_md_cell(record.get('subset'))}",
+        f"- Baseline report: `{_md_cell(record.get('baseline_report'))}`",
+        f"- Variant report: `{_md_cell(record.get('variant_report'))}`",
+        f"- Greenlight rule: {_md_cell(record.get('greenlight_rule'))}",
+        f"- Created at: {_md_cell(record.get('created_at'))}",
+    ]
+    if compared_at:
+        lines.append(f"- Compared at: {_md_cell(compared_at)}")
+
+    lines += [
+        "",
+        "## Metrics",
+        "",
+        "| metric | baseline | variant | delta | status |",
+        "|---|---:|---:|---:|---|",
+    ]
+    for metric in metric_order:
+        entry = metrics.get(metric) or {}
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    _md_cell(metric),
+                    _format_number(entry.get("baseline")),
+                    _format_number(entry.get("variant")),
+                    _format_delta(entry.get("delta")),
+                    _md_cell(entry.get("status")),
+                ]
+            )
+            + " |"
+        )
+
+    lines += [
+        "",
+        "## Conclusion",
+        "",
+        f"Conclusion: {_conclusion(record, metrics)}",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def export_experiment_markdown(
+    experiment_ref: str | Path,
+    *,
+    output: str | Path | None = None,
+    experiments_root: str | Path | None = None,
+) -> dict[str, Any]:
+    exp_root = _root(experiments_root, default_experiments_root).resolve()
+    experiment_path = resolve_experiment_path(
+        experiment_ref,
+        experiments_root=exp_root,
+        must_exist=True,
+    )
+    record = _read_json_object(experiment_path, "experiment record")
+    output_path = _resolve_markdown_output_path(
+        output,
+        default_path=experiment_path.with_suffix(".md"),
+        experiments_root=exp_root,
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    markdown = _render_experiment_markdown(record)
+    output_path.write_text(markdown, encoding="utf-8")
+    return {
+        "path": str(output_path),
+        "experiment_path": str(experiment_path),
+    }
 
 
 def format_comparison_summary(record: dict[str, Any]) -> str:
