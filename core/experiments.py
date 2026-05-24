@@ -45,6 +45,22 @@ _REVIEW_ON_CHANGE: frozenset[str] = frozenset({"total"})
 _REVIEW_ON_INCREASE: frozenset[str] = frozenset(
     {"average_duration", "fallback_count", "model_calls"}
 )
+_BENCHMARK_TIMESTAMP_FIELDS: tuple[str, ...] = (
+    "created_at",
+    "timestamp",
+    "timestamp_iso",
+    "started_at",
+    "finished_at",
+    "run_started_at",
+    "generated_at",
+    "completed_at",
+)
+_BENCHMARK_EPOCH_FIELDS: tuple[str, ...] = (
+    "timestamp_epoch",
+    "created_at_epoch",
+    "started_at_epoch",
+    "finished_at_epoch",
+)
 
 
 class ExperimentError(ValueError):
@@ -267,6 +283,98 @@ def list_experiments(
     if limit is not None:
         rows = rows[:limit]
     return rows
+
+
+def _numeric_value(value: Any) -> int | float | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return value
+    return None
+
+
+def _timestamp_value(value: Any) -> float | None:
+    numeric = _numeric_value(value)
+    if numeric is not None:
+        return float(numeric)
+
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        return float(text)
+    except ValueError:
+        pass
+    try:
+        return datetime.fromisoformat(text.replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        return None
+
+
+def _benchmark_report_timestamp(report: dict[str, Any]) -> tuple[float, str] | None:
+    for field in _BENCHMARK_EPOCH_FIELDS:
+        value = _timestamp_value(report.get(field))
+        if value is not None:
+            return value, field
+    for field in _BENCHMARK_TIMESTAMP_FIELDS:
+        value = _timestamp_value(report.get(field))
+        if value is not None:
+            return value, field
+    return None
+
+
+def list_benchmark_reports(
+    *,
+    min_total: int = 5,
+    benchmark_root: str | Path | None = None,
+) -> list[dict[str, Any]]:
+    if min_total < 0:
+        raise ExperimentError("min_total must be greater than or equal to 0")
+
+    root = _root(benchmark_root, default_benchmark_root).resolve()
+    if not root.is_dir():
+        return []
+
+    items: list[tuple[tuple[int, float | str, str], dict[str, Any]]] = []
+    for path in root.glob("*.json"):
+        try:
+            report = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(report, dict):
+            continue
+
+        total = _numeric_value(report.get("total"))
+        if total is None or total < min_total:
+            continue
+
+        timestamp_info = _benchmark_report_timestamp(report)
+        if timestamp_info is not None:
+            sort_value, sort_source = timestamp_info
+            sort_key: tuple[int, float | str, str] = (2, sort_value, path.name)
+        else:
+            sort_source = "mtime"
+            try:
+                sort_key = (1, path.stat().st_mtime, path.name)
+            except OSError:
+                sort_source = "filename"
+                sort_key = (0, path.name, path.name)
+
+        row = {
+            "path": str(path.resolve()),
+            "filename": path.name,
+            "total": total,
+            "passed": report.get("passed"),
+            "failed": report.get("failed"),
+            "flaky": report.get("flaky"),
+            "created_at": report.get("created_at"),
+            "timestamp": report.get("timestamp"),
+            "sort_source": sort_source,
+        }
+        items.append((sort_key, row))
+
+    items.sort(key=lambda item: item[0], reverse=True)
+    return [row for _sort_key, row in items]
 
 
 def create_experiment(

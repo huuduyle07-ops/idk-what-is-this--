@@ -901,3 +901,212 @@ def test_list_cli_fail_soft_for_invalid_limit(capsys):
     assert exit_code == 2
     assert "error:" in captured.err
     assert "Traceback" not in captured.err
+
+
+def test_list_benchmark_reports_filters_min_total_and_sorts_by_timestamp(tmp_path):
+    benchmark_root, _experiments_root = _roots(tmp_path)
+    _write_report(
+        benchmark_root / "old.json",
+        {
+            "total": 10,
+            "passed": 8,
+            "failed": 2,
+            "created_at": "2026-05-24T01:00:00+00:00",
+        },
+    )
+    _write_report(
+        benchmark_root / "new.json",
+        {
+            "total": 10,
+            "passed": 9,
+            "failed": 1,
+            "timestamp": "2026-05-24T03:00:00+00:00",
+        },
+    )
+    _write_report(
+        benchmark_root / "tiny.json",
+        {
+            "total": 1,
+            "passed": 1,
+            "failed": 0,
+            "created_at": "2026-05-24T04:00:00+00:00",
+        },
+    )
+    (benchmark_root / "broken.json").write_text("{not json", encoding="utf-8")
+
+    rows = experiments.list_benchmark_reports(
+        min_total=5,
+        benchmark_root=benchmark_root,
+    )
+
+    assert [Path(row["path"]).name for row in rows] == ["new.json", "old.json"]
+    assert rows[0]["total"] == 10
+    assert rows[0]["passed"] == 9
+    assert rows[0]["failed"] == 1
+
+
+def test_create_experiment_from_latest_creates_record_without_compare_by_default(
+    tmp_path,
+    capsys,
+    monkeypatch,
+):
+    from scripts import create_experiment_from_latest as latest_cli
+
+    benchmark_root, experiments_root = _roots(tmp_path)
+    monkeypatch.setattr(latest_cli.experiments, "default_benchmark_root", lambda: benchmark_root)
+    monkeypatch.setattr(latest_cli.experiments, "default_experiments_root", lambda: experiments_root)
+    baseline = _write_report(
+        benchmark_root / "baseline.json",
+        {
+            "total": 8,
+            "passed": 7,
+            "failed": 1,
+            "flaky": 0,
+            "average_duration": 1.0,
+            "fallback_count": 0,
+            "created_at": "2026-05-24T01:00:00+00:00",
+        },
+    )
+    variant = _write_report(
+        benchmark_root / "variant.json",
+        {
+            "total": 8,
+            "passed": 8,
+            "failed": 0,
+            "flaky": 0,
+            "average_duration": 1.0,
+            "fallback_count": 0,
+            "created_at": "2026-05-24T02:00:00+00:00",
+        },
+    )
+    _write_report(
+        benchmark_root / "tiny.json",
+        {
+            "total": 1,
+            "passed": 1,
+            "failed": 0,
+            "created_at": "2026-05-24T03:00:00+00:00",
+        },
+    )
+    before_baseline = baseline.read_text(encoding="utf-8")
+    before_variant = variant.read_text(encoding="utf-8")
+
+    exit_code = latest_cli.main(
+        [
+            "--title",
+            "Recent benchmark dogfood",
+            "--hypothesis",
+            "Recent changes should not reduce benchmark quality.",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "created experiment:" in captured.out
+    records = list(experiments_root.glob("*.json"))
+    assert len(records) == 1
+    record = json.loads(records[0].read_text(encoding="utf-8"))
+    assert record["title"] == "Recent benchmark dogfood"
+    assert record["subset"] == "full-fast"
+    assert record["greenlight_rule"] == (
+        "No correctness regression; review cost or speed increases."
+    )
+    assert record["baseline_report"] == ".agent/benchmarks/baseline.json"
+    assert record["variant_report"] == ".agent/benchmarks/variant.json"
+    assert record["result"] is None
+    assert baseline.read_text(encoding="utf-8") == before_baseline
+    assert variant.read_text(encoding="utf-8") == before_variant
+
+
+def test_create_experiment_from_latest_can_compare_and_export_markdown(
+    tmp_path,
+    capsys,
+    monkeypatch,
+):
+    from scripts import create_experiment_from_latest as latest_cli
+
+    benchmark_root, experiments_root = _roots(tmp_path)
+    monkeypatch.setattr(latest_cli.experiments, "default_benchmark_root", lambda: benchmark_root)
+    monkeypatch.setattr(latest_cli.experiments, "default_experiments_root", lambda: experiments_root)
+    _write_report(
+        benchmark_root / "baseline.json",
+        {
+            "total": 8,
+            "passed": 7,
+            "failed": 1,
+            "flaky": 0,
+            "average_duration": 1.0,
+            "fallback_count": 0,
+            "created_at": "2026-05-24T01:00:00+00:00",
+        },
+    )
+    _write_report(
+        benchmark_root / "variant.json",
+        {
+            "total": 8,
+            "passed": 8,
+            "failed": 0,
+            "flaky": 0,
+            "average_duration": 1.0,
+            "fallback_count": 0,
+            "created_at": "2026-05-24T02:00:00+00:00",
+        },
+    )
+
+    exit_code = latest_cli.main(
+        [
+            "--title",
+            "Compared latest",
+            "--hypothesis",
+            "Latest run should improve quality.",
+            "--compare",
+            "--export-md",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "compared experiment:" in captured.out
+    assert "markdown report:" in captured.out
+    records = list(experiments_root.glob("*.json"))
+    assert len(records) == 1
+    record = json.loads(records[0].read_text(encoding="utf-8"))
+    assert record["status"] == "compared"
+    assert record["result"]["decision"]["status"] == "greenlight"
+    assert records[0].with_suffix(".md").is_file()
+
+
+def test_create_experiment_from_latest_fail_soft_when_reports_missing(
+    tmp_path,
+    capsys,
+    monkeypatch,
+):
+    from scripts import create_experiment_from_latest as latest_cli
+
+    benchmark_root, experiments_root = _roots(tmp_path)
+    monkeypatch.setattr(latest_cli.experiments, "default_benchmark_root", lambda: benchmark_root)
+    monkeypatch.setattr(latest_cli.experiments, "default_experiments_root", lambda: experiments_root)
+    _write_report(
+        benchmark_root / "only.json",
+        {
+            "total": 8,
+            "passed": 8,
+            "failed": 0,
+            "created_at": "2026-05-24T01:00:00+00:00",
+        },
+    )
+
+    exit_code = latest_cli.main(
+        [
+            "--title",
+            "Not enough",
+            "--hypothesis",
+            "Should fail cleanly.",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 2
+    assert "error:" in captured.err
+    assert "at least two" in captured.err
+    assert "Traceback" not in captured.err
