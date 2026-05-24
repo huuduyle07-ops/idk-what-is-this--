@@ -165,6 +165,169 @@ def test_compare_experiment_updates_result_with_deltas_and_unknowns(tmp_path):
     assert saved["result"] == updated["result"]
 
 
+def test_decide_experiment_result_greenlight_with_noncritical_unknown_warning():
+    metrics = {
+        "total": {"baseline": 4, "variant": 4, "delta": 0, "status": "unchanged"},
+        "passed": {"baseline": 4, "variant": 4, "delta": 0, "status": "unchanged"},
+        "failed": {"baseline": 0, "variant": 0, "delta": 0, "status": "unchanged"},
+        "flaky": {"baseline": 0, "variant": 0, "delta": 0, "status": "unchanged"},
+        "average_duration": {
+            "baseline": 1.0,
+            "variant": 1.0,
+            "delta": 0,
+            "status": "unchanged",
+        },
+        "fallback_count": {"baseline": 0, "variant": 0, "delta": 0, "status": "unchanged"},
+        "model_calls": {
+            "baseline": None,
+            "variant": None,
+            "delta": None,
+            "status": "unknown",
+        },
+    }
+
+    decision = experiments.decide_experiment_result(metrics)
+
+    assert decision["status"] == "greenlight"
+    assert decision["human_review_required"] is False
+    assert decision["reasons"] == ["no critical regressions or review triggers"]
+    assert decision["warnings"] == ["model_calls unknown"]
+    assert decision["critical_regressions"] == []
+
+
+def test_decide_experiment_result_rejects_critical_regressions():
+    decision = experiments.decide_experiment_result(
+        {
+            "passed": {"baseline": 5, "variant": 4, "delta": -1, "status": "decreased"},
+            "failed": {"baseline": 0, "variant": 1, "delta": 1, "status": "increased"},
+            "flaky": {"baseline": 0, "variant": 1, "delta": 1, "status": "increased"},
+        }
+    )
+
+    assert decision["status"] == "reject"
+    assert decision["human_review_required"] is True
+    assert decision["critical_regressions"] == [
+        "passed decreased",
+        "failed increased",
+        "flaky increased",
+    ]
+    assert decision["reasons"] == [
+        "passed decreased",
+        "failed increased",
+        "flaky increased",
+    ]
+
+
+def test_decide_experiment_result_needs_review_for_total_and_cost_increases():
+    decision = experiments.decide_experiment_result(
+        {
+            "total": {"baseline": 4, "variant": 5, "delta": 1, "status": "increased"},
+            "average_duration": {
+                "baseline": 1.0,
+                "variant": 1.2,
+                "delta": 0.2,
+                "status": "increased",
+            },
+            "fallback_count": {"baseline": 1, "variant": 2, "delta": 1, "status": "increased"},
+            "model_calls": {"baseline": 4, "variant": 5, "delta": 1, "status": "increased"},
+        }
+    )
+
+    assert decision["status"] == "needs_review"
+    assert decision["human_review_required"] is True
+    assert decision["reasons"] == [
+        "total changed",
+        "average_duration increased",
+        "fallback_count increased",
+        "model_calls increased",
+    ]
+
+
+def test_decide_experiment_result_tracks_improvements():
+    decision = experiments.decide_experiment_result(
+        {
+            "passed": {"baseline": 3, "variant": 4, "delta": 1, "status": "increased"},
+            "failed": {"baseline": 1, "variant": 0, "delta": -1, "status": "decreased"},
+            "flaky": {"baseline": 1, "variant": 0, "delta": -1, "status": "decreased"},
+            "average_duration": {
+                "baseline": 2.0,
+                "variant": 1.5,
+                "delta": -0.5,
+                "status": "decreased",
+            },
+            "fallback_count": {"baseline": 2, "variant": 1, "delta": -1, "status": "decreased"},
+            "model_calls": {"baseline": 5, "variant": 4, "delta": -1, "status": "decreased"},
+        }
+    )
+
+    assert decision["status"] == "greenlight"
+    assert decision["improvements"] == [
+        "passed increased",
+        "failed decreased",
+        "flaky decreased",
+        "average_duration decreased",
+        "fallback_count decreased",
+        "model_calls decreased",
+    ]
+
+
+def test_compare_experiment_writes_advisory_decision(tmp_path):
+    benchmark_root, experiments_root = _roots(tmp_path)
+    _write_report(
+        benchmark_root / "baseline.json",
+        {
+            "total": 1,
+            "passed": 1,
+            "failed": 0,
+            "flaky": 0,
+            "average_duration": 1.0,
+            "fallback_count": 0,
+        },
+    )
+    _write_report(
+        benchmark_root / "variant.json",
+        {
+            "total": 1,
+            "passed": 1,
+            "failed": 0,
+            "flaky": 0,
+            "average_duration": 1.0,
+            "fallback_count": 0,
+        },
+    )
+    experiments.create_experiment(
+        title="Decision smoke",
+        hypothesis="Same reports should greenlight with model call warning.",
+        baseline_report="baseline.json",
+        variant_report="variant.json",
+        metric_names=[
+            "total",
+            "passed",
+            "failed",
+            "flaky",
+            "average_duration",
+            "fallback_count",
+            "model_calls",
+        ],
+        experiment_id="decision-smoke",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+
+    updated = experiments.compare_experiment(
+        "decision-smoke",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+
+    decision = updated["result"]["decision"]
+    assert decision["status"] == "greenlight"
+    assert decision["human_review_required"] is False
+    assert decision["warnings"] == ["model_calls unknown"]
+    saved = json.loads((experiments_root / "decision-smoke.json").read_text(encoding="utf-8"))
+    assert saved["result"]["decision"] == decision
+
+
 @pytest.mark.parametrize(
     ("label", "ref_factory"),
     [
@@ -372,6 +535,69 @@ def test_export_experiment_markdown_includes_metric_table_and_conclusion(tmp_pat
     assert "| failed | 1 | 0 | -1 | decreased |" in text
     assert "| fallback_count | 3 | unknown | unknown | unknown |" in text
     assert "Conclusion: 2 improved, 0 regressed, 1 unchanged, 1 unknown." in text
+
+
+def test_export_experiment_markdown_includes_decision_block(tmp_path):
+    benchmark_root, experiments_root = _roots(tmp_path)
+    _write_report(
+        benchmark_root / "baseline.json",
+        {
+            "total": 1,
+            "passed": 1,
+            "failed": 0,
+            "flaky": 0,
+            "average_duration": 1.0,
+            "fallback_count": 0,
+        },
+    )
+    _write_report(
+        benchmark_root / "variant.json",
+        {
+            "total": 1,
+            "passed": 1,
+            "failed": 0,
+            "flaky": 0,
+            "average_duration": 1.0,
+            "fallback_count": 0,
+        },
+    )
+    experiments.create_experiment(
+        title="Decision Markdown",
+        hypothesis="Markdown should surface advisory decision.",
+        baseline_report="baseline.json",
+        variant_report="variant.json",
+        metric_names=[
+            "total",
+            "passed",
+            "failed",
+            "flaky",
+            "average_duration",
+            "fallback_count",
+            "model_calls",
+        ],
+        experiment_id="decision-markdown",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+    experiments.compare_experiment(
+        "decision-markdown",
+        benchmark_root=benchmark_root,
+        experiments_root=experiments_root,
+    )
+
+    result = experiments.export_experiment_markdown(
+        "decision-markdown",
+        experiments_root=experiments_root,
+    )
+
+    text = Path(result["path"]).read_text(encoding="utf-8")
+    assert "## Decision" in text
+    assert "- Status: `greenlight`" in text
+    assert "- Human review required: `false`" in text
+    assert "- Reasons:" in text
+    assert "  - no critical regressions or review triggers" in text
+    assert "- Warnings:" in text
+    assert "  - model_calls unknown" in text
 
 
 @pytest.mark.parametrize(

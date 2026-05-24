@@ -38,6 +38,13 @@ _HIGHER_IS_BETTER: frozenset[str] = frozenset({"passed"})
 _LOWER_IS_BETTER: frozenset[str] = frozenset(
     {"failed", "flaky", "average_duration", "model_calls", "fallback_count"}
 )
+_CORRECTNESS_METRICS: frozenset[str] = frozenset({"passed", "failed", "flaky"})
+_CRITICAL_REGRESSION_INCREASES: frozenset[str] = frozenset({"failed", "flaky"})
+_CRITICAL_REGRESSION_DECREASES: frozenset[str] = frozenset({"passed"})
+_REVIEW_ON_CHANGE: frozenset[str] = frozenset({"total"})
+_REVIEW_ON_INCREASE: frozenset[str] = frozenset(
+    {"average_duration", "fallback_count", "model_calls"}
+)
 
 
 class ExperimentError(ValueError):
@@ -371,6 +378,73 @@ def _metric_status(
     return delta, "unchanged"
 
 
+def _metric_delta(entry: dict[str, Any]) -> int | float | None:
+    return _number_or_none(entry.get("delta"))
+
+
+def _metric_is_unknown(entry: dict[str, Any]) -> bool:
+    return entry.get("status") == "unknown" or _metric_delta(entry) is None
+
+
+def decide_experiment_result(metrics: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    critical_regressions: list[str] = []
+    review_triggers: list[str] = []
+    warnings: list[str] = []
+    improvements: list[str] = []
+
+    for metric, entry in metrics.items():
+        metric_name = str(metric)
+        metric_entry = entry if isinstance(entry, dict) else {}
+        if _metric_is_unknown(metric_entry):
+            message = f"{metric_name} unknown"
+            if metric_name in _CORRECTNESS_METRICS:
+                review_triggers.append(message)
+            else:
+                warnings.append(message)
+            continue
+
+        delta = _metric_delta(metric_entry)
+        if delta is None or delta == 0:
+            continue
+
+        if metric_name in _CRITICAL_REGRESSION_DECREASES and delta < 0:
+            critical_regressions.append(f"{metric_name} decreased")
+            continue
+        if metric_name in _CRITICAL_REGRESSION_INCREASES and delta > 0:
+            critical_regressions.append(f"{metric_name} increased")
+            continue
+        if metric_name in _REVIEW_ON_CHANGE:
+            review_triggers.append(f"{metric_name} changed")
+            continue
+        if metric_name in _REVIEW_ON_INCREASE and delta > 0:
+            review_triggers.append(f"{metric_name} increased")
+            continue
+
+        outcome = _metric_outcome(metric_name, metric_entry)
+        if outcome == "improved":
+            direction = "increased" if delta > 0 else "decreased"
+            improvements.append(f"{metric_name} {direction}")
+
+    if critical_regressions:
+        status = "reject"
+        reasons = list(critical_regressions)
+    elif review_triggers:
+        status = "needs_review"
+        reasons = list(review_triggers)
+    else:
+        status = "greenlight"
+        reasons = ["no critical regressions or review triggers"]
+
+    return {
+        "status": status,
+        "human_review_required": status != "greenlight",
+        "reasons": reasons,
+        "warnings": warnings,
+        "critical_regressions": critical_regressions,
+        "improvements": improvements,
+    }
+
+
 def compare_experiment(
     experiment_ref: str | Path,
     *,
@@ -418,6 +492,7 @@ def compare_experiment(
         "baseline_report": record.get("baseline_report"),
         "variant_report": record.get("variant_report"),
         "metrics": metrics,
+        "decision": decide_experiment_result(metrics),
     }
     _write_record(experiment_path, record)
     return record
@@ -522,10 +597,24 @@ def _conclusion(record: dict[str, Any], metrics: dict[str, dict[str, Any]]) -> s
     )
 
 
+def _append_decision_list(
+    lines: list[str],
+    label: str,
+    values: list[Any],
+) -> None:
+    lines.append(f"- {label}:")
+    if not values:
+        lines.append("  - none")
+        return
+    for value in values:
+        lines.append(f"  - {_md_cell(value)}")
+
+
 def _render_experiment_markdown(record: dict[str, Any]) -> str:
     title = record.get("title") or record.get("experiment_id") or "Experiment"
     result = record.get("result") if isinstance(record.get("result"), dict) else {}
     compared_at = result.get("compared_at") if isinstance(result, dict) else None
+    decision = result.get("decision") if isinstance(result, dict) else None
     metrics = _metric_entries_for_markdown(record)
     metric_order = record.get("metric_names") or list(metrics)
 
@@ -545,6 +634,28 @@ def _render_experiment_markdown(record: dict[str, Any]) -> str:
     ]
     if compared_at:
         lines.append(f"- Compared at: {_md_cell(compared_at)}")
+
+    if isinstance(decision, dict):
+        human_review_required = str(bool(decision.get("human_review_required"))).lower()
+        lines += [
+            "",
+            "## Decision",
+            "",
+            f"- Status: `{_md_cell(decision.get('status'))}`",
+            f"- Human review required: `{human_review_required}`",
+        ]
+        _append_decision_list(lines, "Reasons", list(decision.get("reasons") or []))
+        _append_decision_list(lines, "Warnings", list(decision.get("warnings") or []))
+        _append_decision_list(
+            lines,
+            "Critical regressions",
+            list(decision.get("critical_regressions") or []),
+        )
+        _append_decision_list(
+            lines,
+            "Improvements",
+            list(decision.get("improvements") or []),
+        )
 
     lines += [
         "",
