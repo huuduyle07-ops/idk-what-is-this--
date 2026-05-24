@@ -61,6 +61,14 @@ _BENCHMARK_EPOCH_FIELDS: tuple[str, ...] = (
     "started_at_epoch",
     "finished_at_epoch",
 )
+_SELECTED_REPORT_SUMMARY_FIELDS: tuple[str, ...] = (
+    "total",
+    "passed",
+    "failed",
+    "flaky",
+    "average_duration",
+    "fallback_count",
+)
 
 
 class ExperimentError(ValueError):
@@ -360,21 +368,75 @@ def list_benchmark_reports(
                 sort_source = "filename"
                 sort_key = (0, path.name, path.name)
 
+        metrics = extract_benchmark_metrics(report, SUPPORTED_METRICS)
         row = {
             "path": str(path.resolve()),
             "filename": path.name,
-            "total": total,
-            "passed": report.get("passed"),
-            "failed": report.get("failed"),
-            "flaky": report.get("flaky"),
             "created_at": report.get("created_at"),
             "timestamp": report.get("timestamp"),
             "sort_source": sort_source,
+            **metrics,
         }
         items.append((sort_key, row))
 
     items.sort(key=lambda item: item[0], reverse=True)
     return [row for _sort_key, row in items]
+
+
+def _summary_value(value: Any) -> str:
+    if value is None or value == "":
+        return "unknown"
+    return str(value)
+
+
+def _benchmark_report_summary_path(
+    row: dict[str, Any],
+    *,
+    benchmark_root: str | Path | None = None,
+) -> str:
+    raw = row.get("path") or row.get("filename")
+    if raw is None or raw == "":
+        return "unknown"
+
+    root = _root(benchmark_root, default_benchmark_root).resolve()
+    try:
+        path = resolve_benchmark_report_path(raw, benchmark_root=root)
+    except ExperimentError:
+        return str(raw)
+    return _stored_report_ref(path, root)
+
+
+def _selected_report_metric_summary(row: dict[str, Any]) -> str:
+    metrics = extract_benchmark_metrics(row, _SELECTED_REPORT_SUMMARY_FIELDS)
+    return ", ".join(
+        f"{name}: {_summary_value(metrics.get(name))}"
+        for name in _SELECTED_REPORT_SUMMARY_FIELDS
+    )
+
+
+def format_selected_benchmark_reports_summary(
+    baseline_report: dict[str, Any],
+    variant_report: dict[str, Any],
+    *,
+    benchmark_root: str | Path | None = None,
+) -> str:
+    baseline_path = _benchmark_report_summary_path(
+        baseline_report,
+        benchmark_root=benchmark_root,
+    )
+    variant_path = _benchmark_report_summary_path(
+        variant_report,
+        benchmark_root=benchmark_root,
+    )
+    return "\n".join(
+        [
+            "Selected reports:",
+            f"  Baseline: {baseline_path}",
+            f"    {_selected_report_metric_summary(baseline_report)}",
+            f"  Variant: {variant_path}",
+            f"    {_selected_report_metric_summary(variant_report)}",
+        ]
+    )
 
 
 def create_experiment(
@@ -470,6 +532,13 @@ def _metric_value(report: dict[str, Any], metric: str) -> int | float | None:
         if field in report:
             return _number_or_none(report.get(field))
     return None
+
+
+def extract_benchmark_metrics(
+    report: dict[str, Any],
+    metric_names: list[str] | tuple[str, ...],
+) -> dict[str, int | float | None]:
+    return {metric: _metric_value(report, metric) for metric in metric_names}
 
 
 def _metric_status(
@@ -582,10 +651,12 @@ def compare_experiment(
     variant_report = _read_json_object(variant_path, "variant report")
 
     metric_names = _metric_names(record.get("metric_names"))
+    baseline_values = extract_benchmark_metrics(baseline_report, metric_names)
+    variant_values = extract_benchmark_metrics(variant_report, metric_names)
     metrics: dict[str, dict[str, Any]] = {}
     for metric in metric_names:
-        baseline_value = _metric_value(baseline_report, metric)
-        variant_value = _metric_value(variant_report, metric)
+        baseline_value = baseline_values.get(metric)
+        variant_value = variant_values.get(metric)
         delta, status = _metric_status(baseline_value, variant_value)
         metrics[metric] = {
             "baseline": baseline_value,

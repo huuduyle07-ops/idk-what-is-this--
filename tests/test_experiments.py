@@ -1002,6 +1002,17 @@ def test_create_experiment_from_latest_creates_record_without_compare_by_default
 
     captured = capsys.readouterr()
     assert exit_code == 0
+    assert "Selected reports:" in captured.out
+    assert "  Baseline: .agent/benchmarks/baseline.json" in captured.out
+    assert (
+        "    total: 8, passed: 7, failed: 1, flaky: 0, "
+        "average_duration: 1.0, fallback_count: 0"
+    ) in captured.out
+    assert "  Variant: .agent/benchmarks/variant.json" in captured.out
+    assert (
+        "    total: 8, passed: 8, failed: 0, flaky: 0, "
+        "average_duration: 1.0, fallback_count: 0"
+    ) in captured.out
     assert "created experiment:" in captured.out
     records = list(experiments_root.glob("*.json"))
     assert len(records) == 1
@@ -1016,6 +1027,69 @@ def test_create_experiment_from_latest_creates_record_without_compare_by_default
     assert record["result"] is None
     assert baseline.read_text(encoding="utf-8") == before_baseline
     assert variant.read_text(encoding="utf-8") == before_variant
+
+
+def test_format_selected_benchmark_reports_summary_uses_unknown_for_missing_fields(
+    tmp_path,
+):
+    benchmark_root, _experiments_root = _roots(tmp_path)
+    baseline = benchmark_root / "baseline.json"
+    variant = benchmark_root / "variant.json"
+
+    summary = experiments.format_selected_benchmark_reports_summary(
+        {"path": str(baseline), "total": 8, "passed": 7, "failed": 1},
+        {"path": str(variant), "total": 8, "passed": 8},
+        benchmark_root=benchmark_root,
+    )
+
+    assert "Selected reports:" in summary
+    assert "  Baseline: .agent/benchmarks/baseline.json" in summary
+    assert (
+        "    total: 8, passed: 7, failed: 1, flaky: unknown, "
+        "average_duration: unknown, fallback_count: unknown"
+    ) in summary
+    assert "  Variant: .agent/benchmarks/variant.json" in summary
+    assert (
+        "    total: 8, passed: 8, failed: unknown, flaky: unknown, "
+        "average_duration: unknown, fallback_count: unknown"
+    ) in summary
+
+
+def test_format_selected_benchmark_reports_summary_uses_metric_aliases(tmp_path):
+    benchmark_root, _experiments_root = _roots(tmp_path)
+    baseline = benchmark_root / "baseline.json"
+    variant = benchmark_root / "variant.json"
+
+    summary = experiments.format_selected_benchmark_reports_summary(
+        {
+            "path": str(baseline),
+            "total": 22,
+            "passed": 22,
+            "failed": 0,
+            "flaky": 0,
+            "avg_duration_sec": 39.98,
+            "total_fallbacks": 7,
+        },
+        {
+            "path": str(variant),
+            "total": 22,
+            "passed": 22,
+            "failed": 0,
+            "flaky": 0,
+            "avg_duration_sec": 48.18,
+            "total_fallbacks": 14,
+        },
+        benchmark_root=benchmark_root,
+    )
+
+    assert (
+        "    total: 22, passed: 22, failed: 0, flaky: 0, "
+        "average_duration: 39.98, fallback_count: 7"
+    ) in summary
+    assert (
+        "    total: 22, passed: 22, failed: 0, flaky: 0, "
+        "average_duration: 48.18, fallback_count: 14"
+    ) in summary
 
 
 def test_create_experiment_from_latest_can_compare_and_export_markdown(

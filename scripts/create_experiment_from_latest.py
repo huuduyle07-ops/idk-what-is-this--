@@ -58,6 +58,7 @@ def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     try:
         variant, baseline = _latest_pair(args.min_total)
+        print(experiments.format_selected_benchmark_reports_summary(baseline, variant))
         record = experiments.create_experiment(
             title=args.title,
             hypothesis=args.hypothesis,
