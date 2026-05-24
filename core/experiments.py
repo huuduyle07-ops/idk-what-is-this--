@@ -720,6 +720,7 @@ def export_experiment_markdown(
 def format_comparison_summary(record: dict[str, Any]) -> str:
     result = record.get("result") or {}
     metrics = result.get("metrics") or {}
+    decision = result.get("decision") if isinstance(result, dict) else None
     lines = [
         f"Experiment: {record.get('title') or record.get('experiment_id')}",
         f"ID: {record.get('experiment_id')}",
@@ -744,4 +745,20 @@ def format_comparison_summary(record: dict[str, Any]) -> str:
                 f"  {name}: {_format_number(baseline)} -> {_format_number(variant)} "
                 f"(delta {_format_delta(delta)})"
             )
+    if isinstance(decision, dict):
+        human_review_required = str(bool(decision.get("human_review_required"))).lower()
+        lines.extend(
+            [
+                "",
+                "Decision:",
+                f"  status: {decision.get('status') or 'unknown'}",
+                f"  human_review_required: {human_review_required}",
+                "  reasons:",
+            ]
+        )
+        for reason in decision.get("reasons") or ["none"]:
+            lines.append(f"    - {reason}")
+        lines.append("  warnings:")
+        for warning in decision.get("warnings") or ["none"]:
+            lines.append(f"    - {warning}")
     return "\n".join(lines)

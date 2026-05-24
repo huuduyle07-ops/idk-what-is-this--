@@ -416,7 +416,7 @@ def test_compare_cli_prints_summary_and_updates_record(tmp_path, capsys, monkeyp
         hypothesis="Variant should improve pass count.",
         baseline_report="baseline.json",
         variant_report="variant.json",
-        metric_names=["passed", "failed"],
+        metric_names=["passed", "failed", "model_calls"],
         experiment_id="cli-summary",
         benchmark_root=benchmark_root,
         experiments_root=experiments_root,
@@ -429,6 +429,13 @@ def test_compare_cli_prints_summary_and_updates_record(tmp_path, capsys, monkeyp
     assert "Experiment: CLI summary" in captured.out
     assert "passed: 1 -> 2 (delta +1)" in captured.out
     assert "failed: 1 -> 0 (delta -1)" in captured.out
+    assert "Decision:" in captured.out
+    assert "  status: greenlight" in captured.out
+    assert "  human_review_required: false" in captured.out
+    assert "  reasons:" in captured.out
+    assert "    - no critical regressions or review triggers" in captured.out
+    assert "  warnings:" in captured.out
+    assert "    - model_calls unknown" in captured.out
     assert json.loads((experiments_root / "cli-summary.json").read_text(encoding="utf-8"))[
         "status"
     ] == "compared"
