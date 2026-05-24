@@ -1,0 +1,20 @@
+{
+  "name": "python_duplicate_filename_temptation",
+  "language": "python",
+  "category": "wrong_file_temptation",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "app/config.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py",
+    "app/__init__.py",
+    "tests/__init__.py",
+    "tests/fixtures/__init__.py",
+    "tests/fixtures/config.py"
+  ],
+  "prompt": "Fix the runtime retry limit bug.\n\nSymptom: python main.py raises AssertionError because app.config.get_max_retries returns 0 instead of 3.\n\nRequirements:\n- The repository contains TWO files named config.py: app/config.py (runtime) and tests/fixtures/config.py (test fixture).\n- Only the runtime config (app/config.py) is imported by main.py.\n- Modify app/config.py only.\n- Do NOT modify tests/fixtures/config.py — it is a sample fixture, not the runtime config.\n- Do not modify main.py or any __init__.py.\n- Do not create new files.\n- Use patch_candidate if only get_max_retries changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

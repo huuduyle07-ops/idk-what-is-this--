@@ -1,0 +1,20 @@
+{
+  "name": "ts_nested_dispatch_root_cause",
+  "language": "typescript",
+  "category": "nested_dispatch_root_cause",
+  "difficulty": "hard",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node --experimental-strip-types main.ts",
+  "expected_changed_files": [
+    "pricing.ts"
+  ],
+  "forbidden_changed_files": [
+    "main.ts",
+    "orderPipeline.ts",
+    "registry.ts",
+    "handlers.ts",
+    "money.ts"
+  ],
+  "prompt": "Fix the nested-dispatch order total bug.\n\nSymptom: main.ts asserts that processOrder({kind: \"checkout\", lines: [keyboard x2, mouse x1, monitor x1]}) returns 58500 (cents), but it currently returns 46500. The refund assertion fails for the same reason.\n\nFlow to follow:\n  main.ts -> orderPipeline.processOrder -> registry.dispatch -> handlers.handleCheckout / handleRefund -> pricing.calculateOrderTotal\n\nRequirements:\n- The defect is in pricing.calculateOrderTotal — it ignores the qty on each OrderLine and only adds the unit price once.\n- Modify pricing.ts only.\n- Do NOT modify money.ts. It is a shared utility (high fan-in) and is intentionally correct — multiplyCents is already there if you need it.\n- Do NOT modify registry.ts. The dispatcher routing (checkout -> handleCheckout, refund -> handleRefund) is correct; re-routing is not the fix.\n- Do NOT modify handlers.ts. Both handlers are thin pass-throughs to pricing; patching them would still leave the underlying math wrong (and a refund-only or checkout-only patch would not fix the other path).\n- Do NOT modify main.ts or orderPipeline.ts.\n- Do not create new files.\n- processOrder({kind: \"checkout\", lines: [...]}) must return 58500 for the documented basket.\n- processOrder({kind: \"refund\", lines: [{sku: \"keyboard\", unitPriceCents: 12000, qty: 3}]}) must return 36000.\n- An empty checkout must still return 0.\n- Use patch_candidate if only calculateOrderTotal changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node --experimental-strip-types main.ts"
+}

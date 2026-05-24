@@ -1,0 +1,18 @@
+{
+  "name": "python_central_node_temptation",
+  "language": "python",
+  "category": "central_node_temptation",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "report.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py",
+    "tracker.py",
+    "utils.py"
+  ],
+  "prompt": "Fix the report summary bug.\n\nSymptom: main.py asserts generate_summary([10, 20, 30]) == 60, but the current implementation drops the last item and returns 30.\n\nRequirements:\n- utils.py is a shared helper module imported by tracker.py, report.py and main.py. It looks central by graph weight (high fan-in), but utils.log_action and the other utils are CORRECT — do not modify utils.py.\n- The arithmetic defect is in the leaf caller, report.generate_summary.\n- Modify report.py only.\n- Do not modify utils.py, tracker.py, or main.py.\n- generate_summary([10, 20, 30]) must return 60.\n- generate_summary([7]) must return 7.\n- generate_summary([]) must return 0.\n- Do not create new files.\n- Use patch_candidate if only generate_summary changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

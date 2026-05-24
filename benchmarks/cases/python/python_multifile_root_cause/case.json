@@ -1,0 +1,17 @@
+{
+  "name": "python_multifile_root_cause",
+  "language": "python",
+  "category": "multi_file_root_cause",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "pricing.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py",
+    "checkout.py"
+  ],
+  "prompt": "Fix the order total bug.\n\nSymptom: main.py asserts process_order([10, 20, 30]) == 60.0 but the current code drops the last line item.\n\nRequirements:\n- The symptom surfaces in main.py and the call goes through checkout.process_order, but the actual arithmetic bug is in pricing.calculate_subtotal.\n- Modify pricing.py only.\n- Do NOT patch checkout.py as a workaround (e.g. summing items yourself there).\n- Do not modify main.py.\n- Do not create new files.\n- process_order([10, 20, 30]) must return 60.0.\n- process_order([5]) must return 5.0.\n- process_order([]) must return 0.0.\n- Use patch_candidate if only calculate_subtotal changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

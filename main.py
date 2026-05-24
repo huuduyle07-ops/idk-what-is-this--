@@ -28,6 +28,7 @@ from patching.patch_gates import (
     retry_structured_patch_json,
     normalize_patch_plan_schema,
     promote_go_missing_import_candidate_to_patch_plan,
+    promote_ts_duplicate_import_candidate_to_patch_plan,
 )
 if sys.platform == "win32":
     try:
@@ -89,6 +90,7 @@ def main() -> None:
 
     finalize_answer(state, reviewed)
     promote_go_missing_import_candidate_to_patch_plan(state)
+    promote_ts_duplicate_import_candidate_to_patch_plan(state)
     repair_reasons = collect_patch_repair_reasons(state)
     if repair_reasons:
         print("🔁 Patch issue detected → retrying JSON repair once:")
@@ -101,12 +103,14 @@ def main() -> None:
         )
         finalize_answer(state, repaired)
         promote_go_missing_import_candidate_to_patch_plan(state)
+    promote_ts_duplicate_import_candidate_to_patch_plan(state)
 
     if state.mode == "reviewer" and not state.json_block:
         print("🔁 No JSON found → retrying structured JSON repair once...")
         repaired = retry_structured_patch_json(state, reviewed)
         finalize_answer(state, repaired)
         promote_go_missing_import_candidate_to_patch_plan(state)
+    promote_ts_duplicate_import_candidate_to_patch_plan(state)
 
     normalize_patch_plan_schema(state)
     reject_ungrounded_patch(state)

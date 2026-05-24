@@ -189,7 +189,176 @@ def promote_go_missing_import_candidate_to_patch_plan(state: AgentState) -> None
     )
 
     state.json_block = block
-    
+
+
+# --- Phase 12.5h: TS/JS duplicate-import promotion ---
+
+_TS_JS_SUFFIXES = {".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"}
+
+_TS_NAMED_IMPORT_RE = re.compile(
+    r'^[ \t]*import\s*\{\s*(?P<named>[^}]+?)\s*\}\s*from\s*[\'"](?P<module>[^\'"]+)[\'"]\s*;?\s*$',
+    re.MULTILINE,
+)
+
+
+def _ts_extract_named_imports(text: str) -> list[dict]:
+    """Return all `import { ... } from "M"` statements found in text.
+
+    Each entry has: line (full source line, no trailing newline), module,
+    named (list of imported specifier names).
+    """
+    results: list[dict] = []
+    for match in _TS_NAMED_IMPORT_RE.finditer(text or ""):
+        named_raw = match.group("named") or ""
+        named = [n.strip() for n in named_raw.split(",") if n.strip()]
+        if not named:
+            continue
+        results.append({
+            "line": match.group(0).rstrip(),
+            "module": match.group("module"),
+            "named": named,
+        })
+    return results
+
+
+def _remove_import_line(snippet: str, line: str) -> str:
+    """Remove the import line plus its trailing newline; idempotent.
+
+    Conservative: only removes byte-exact occurrences so we never corrupt
+    surrounding code that incidentally shares text.
+    """
+    if not line or not snippet:
+        return snippet
+    cleaned = snippet.replace(line + "\n", "")
+    if cleaned == snippet:
+        cleaned = snippet.replace(line, "")
+    return cleaned
+
+
+def promote_ts_duplicate_import_candidate_to_patch_plan(state: AgentState) -> None:
+    """Repair TS/JS patch_candidates that would create duplicate imports.
+
+    Symptom this fixes: model emits a patched_snippet that begins with
+    `import { addCents, multiplyCents } from "./money.ts"` but the target
+    file already has `import { addCents } from "./money.ts"`. Applying the
+    snippet verbatim would yield two import statements binding the same
+    name (`addCents`) and Node would refuse the file with
+    "Identifier 'X' has already been declared".
+
+    Mirror of `promote_go_missing_import_candidate_to_patch_plan` for the
+    opposite failure mode: instead of adding a missing import, we merge a
+    duplicate one. Output is a 2+ op patch_plan that:
+      - replaces the existing file-level import line with a merged version
+        containing the union of specifiers, and
+      - replaces the function with the patched_snippet minus the now-redundant
+        import line.
+
+    Safety: read-only inspection of the file the patch already targets; no
+    new paths accepted; respects an existing patch_plan (caller wins);
+    leaves drifted target_snippet alone for the grounding-recovery path.
+    """
+    block = state.json_block or {}
+
+    # Do not touch real patch plans the model produced itself.
+    if isinstance(block.get("patch_plan"), list) and block["patch_plan"]:
+        return
+
+    patch = block.get("patch_candidate")
+    if not isinstance(patch, dict):
+        return
+
+    rel = patch.get("relative_path") or patch.get("file") or ""
+    if Path(rel).suffix.lower() not in _TS_JS_SUFFIXES:
+        return
+
+    if not state.repo_path:
+        return
+
+    path = Path(state.repo_path) / rel
+    if not path.exists():
+        return
+
+    target_snippet = patch.get("target_snippet") or ""
+    patched_snippet = patch.get("patched_snippet") or ""
+    if not target_snippet or not patched_snippet:
+        return
+
+    text = path.read_text(encoding="utf-8", errors="replace")
+    if target_snippet not in text:
+        # Let reject_ungrounded_patch (and the Phase 12.5g grounding
+        # recovery) handle drift before we promote anything.
+        return
+
+    snippet_imports = _ts_extract_named_imports(patched_snippet)
+    if not snippet_imports:
+        return
+
+    file_imports_by_module: dict[str, dict] = {}
+    for imp in _ts_extract_named_imports(text):
+        # First occurrence per module wins — that's the line we'd merge into.
+        file_imports_by_module.setdefault(imp["module"], imp)
+
+    plan_ops: list[dict] = []
+    cleaned_snippet = patched_snippet
+    affected_modules: list[str] = []
+
+    for snippet_imp in snippet_imports:
+        module = snippet_imp["module"]
+        existing = file_imports_by_module.get(module)
+        if existing is None:
+            # Snippet imports a module the file does not yet import — no
+            # duplicate risk. Leave it for the normal apply path.
+            continue
+
+        existing_named = list(dict.fromkeys(existing["named"]))
+        snippet_named = list(dict.fromkeys(snippet_imp["named"]))
+        new_specifiers = [n for n in snippet_named if n not in existing_named]
+
+        if not new_specifiers:
+            # Pure duplicate (snippet redeclares only names already imported).
+            # Strip the redundant import line; no import-edit op needed.
+            cleaned_snippet = _remove_import_line(cleaned_snippet, snippet_imp["line"])
+            affected_modules.append(module)
+            continue
+
+        merged_named = existing_named + new_specifiers
+        new_import_line = (
+            "import { " + ", ".join(merged_named) + f' }} from "{module}";'
+        )
+        plan_ops.append({
+            "op": "replace_snippet",
+            "relative_path": rel,
+            "target_snippet": existing["line"],
+            "patched_snippet": new_import_line,
+        })
+        cleaned_snippet = _remove_import_line(cleaned_snippet, snippet_imp["line"])
+        affected_modules.append(module)
+
+    if not affected_modules:
+        return
+
+    cleaned_snippet = cleaned_snippet.lstrip("\n")
+
+    function_op = {
+        "op": "replace_snippet",
+        "relative_path": rel,
+        "target_snippet": target_snippet,
+        "patched_snippet": cleaned_snippet,
+    }
+
+    block["patch_candidate"] = None
+    block["patch_plan"] = plan_ops + [function_op]
+    block["confidence"] = min(float(block.get("confidence", 0.85) or 0.85), 0.85)
+    block["needs_escalation"] = False
+
+    print(
+        "🧩 Promoted TS/JS patch_candidate to patch_plan: deduplicated import(s) "
+        + f"from {', '.join(affected_modules)} to avoid duplicate-binding SyntaxError."
+    )
+
+    state.json_block = block
+
+
 def retry_structured_patch_json(state: AgentState, bad_answer: str) -> str:
     control = state.control_result or {}
     patch_intent = control.get("patch_intent") or {}
@@ -396,6 +565,152 @@ def get_confidence_and_escalation(json_block: dict | None) -> tuple[float, bool]
     return confidence, needs_escalation
 
 
+def _language_for_relpath(rel: str) -> str:
+    """Map a repo-relative file path to a TREESITTER_LANG_MAP key.
+
+    Returns "" for unknown extensions so the caller can short-circuit.
+    """
+    suffix = Path(rel).suffix.lower()
+    if not suffix:
+        return ""
+    from config import LANGUAGE_MAP
+
+    return LANGUAGE_MAP.get(suffix, "") or ""
+
+
+def _ground_target_via_symbol_lookup(*, rel: str, text: str, target_node_name: str) -> str:
+    """Re-ground target_snippet using symbol lookup.
+
+    Read-only. Only inspects `text`, which is the already-validated content
+    of the file the patch targets — no new paths are accepted, so the
+    repo-traversal guard upstream still applies.
+
+    Tries tree-sitter first (precise, language-aware) and falls back to a
+    conservative regex matcher when tree-sitter is unavailable for the
+    language. Returns the symbol's actual body if found *and* present
+    verbatim in `text`, otherwise the empty string.
+    """
+    if not target_node_name or not text:
+        return ""
+    body = _ground_via_treesitter(rel, text, target_node_name)
+    if body:
+        return body
+    return _ground_via_regex(rel, text, target_node_name)
+
+
+def _ground_via_treesitter(rel: str, text: str, target_node_name: str) -> str:
+    language = _language_for_relpath(rel)
+    if not language:
+        return ""
+    try:
+        from core.treesitter_parse import parse_code_with_treesitter
+
+        parsed = parse_code_with_treesitter(text, language)
+    except Exception:
+        return ""
+    for sym in parsed.get("symbols") or []:
+        if sym.get("name") != target_node_name:
+            continue
+        content = sym.get("content") or ""
+        if content and content in text:
+            return content
+    return ""
+
+
+_BRACE_SUFFIXES = {
+    ".js", ".jsx", ".mjs", ".cjs",
+    ".ts", ".tsx",
+    ".go",
+    ".rs",
+    ".c", ".h", ".cpp", ".cxx", ".cc", ".hpp", ".hxx",
+    ".cs", ".java", ".kt",
+}
+
+
+def _ground_via_regex(rel: str, text: str, target_node_name: str) -> str:
+    suffix = Path(rel).suffix.lower()
+    if suffix == ".py":
+        return _extract_python_def(text, target_node_name)
+    if suffix in _BRACE_SUFFIXES:
+        return _extract_brace_function(text, target_node_name)
+    return ""
+
+
+def _extract_brace_function(text: str, name: str) -> str:
+    """Find a brace-delimited function/method by name and return its full span.
+
+    Conservative: requires the name to appear immediately followed by `(` on
+    exactly one declaration-shaped line. Returns "" on ambiguity so the
+    recovery falls through cleanly to grounding_error.
+    """
+    pattern = re.compile(
+        r"(?m)^([ \t]*)\S[^\n]*\b" + re.escape(name) + r"\s*\([^\n]*$"
+    )
+    matches = list(pattern.finditer(text))
+    if len(matches) != 1:
+        return ""
+    match = matches[0]
+    decl_start = match.start()
+    brace_idx = text.find("{", match.end())
+    if brace_idx == -1:
+        return ""
+    depth = 0
+    i = brace_idx
+    while i < len(text):
+        ch = text[i]
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return text[decl_start : i + 1]
+        i += 1
+    return ""
+
+
+def _extract_python_def(text: str, name: str) -> str:
+    """Find a top-level `def NAME(` block and return its full source span."""
+    pattern = re.compile(
+        r"(?m)^(?P<indent>[ \t]*)def\s+" + re.escape(name) + r"\s*\("
+    )
+    matches = list(pattern.finditer(text))
+    if len(matches) != 1:
+        return ""
+    match = matches[0]
+    decl_start = match.start()
+    indent_len = len(match.group("indent"))
+    nl = text.find("\n", match.end())
+    pos = len(text) if nl == -1 else nl + 1
+    while pos < len(text):
+        line_end = text.find("\n", pos)
+        if line_end == -1:
+            line_end = len(text)
+        line = text[pos:line_end]
+        if line.strip():
+            leading = len(line) - len(line.lstrip(" \t"))
+            if leading <= indent_len:
+                return text[decl_start:pos].rstrip("\n")
+        pos = line_end + 1 if line_end < len(text) else len(text)
+    return text[decl_start:].rstrip("\n")
+
+
+def _grounding_excerpt(text: str, target_node_name: str, *, context_lines: int = 4) -> str:
+    """Return a short excerpt around the first occurrence of target_node_name.
+
+    Used in grounding_error so escalation has a useful diagnostic instead of
+    just "snippet not found". Empty string when nothing matches.
+    """
+    if not target_node_name or not text or target_node_name not in text:
+        return ""
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        if target_node_name in line:
+            start = max(0, index - context_lines)
+            end = min(len(lines), index + context_lines + 1)
+            return "\n".join(lines[start:end])
+    return ""
+
+
 def reject_ungrounded_patch(state: AgentState) -> None:
     if not state.json_block or not state.repo_path:
         return
@@ -469,25 +784,58 @@ def reject_ungrounded_patch(state: AgentState) -> None:
     text = path.read_text(encoding="utf-8", errors="replace")
 
     if target not in text:
-        recovered = ""
+        # Recovery 1 (existing): replace target_snippet with CONTROL's exact
+        # source_snippet if it actually appears in the target file.
         control = state.control_result or {}
         patch_intent = control.get("patch_intent") or {}
-
         candidate_source = patch_intent.get("source_snippet") or ""
         if candidate_source and candidate_source in text:
-            recovered = candidate_source
-
-        if recovered:
             print("⚠️ target_snippet drift detected; recovered exact source_snippet from CONTROL.")
-            patch["target_snippet"] = recovered
+            patch["target_snippet"] = candidate_source
             state.json_block["confidence"] = min(
                 float(state.json_block.get("confidence", 0.0) or 0.0),
                 0.85,
             )
             return
 
+        # Recovery 2 (Phase 12.5g): re-ground via tree-sitter symbol lookup.
+        # If the model gave us a real target_node_name and that symbol exists
+        # in the actual target file, replace target_snippet with the symbol's
+        # actual body. Read-only and only consults the file the patch already
+        # targets (no new paths accepted), so traversal safety is unchanged.
+        target_node_name = (patch.get("target_node_name") or "").strip()
+        recovered_body = ""
+        if target_node_name:
+            recovered_body = _ground_target_via_symbol_lookup(
+                rel=rel,
+                text=text,
+                target_node_name=target_node_name,
+            )
+        if recovered_body:
+            print(
+                f"🩹 target_snippet drift recovered via symbol lookup "
+                f"for {target_node_name!r} in {rel}."
+            )
+            patch["target_snippet"] = recovered_body
+            state.json_block["confidence"] = min(
+                float(state.json_block.get("confidence", 0.0) or 0.0),
+                0.75,
+            )
+            return
+
+        # Both recoveries failed — emit an explicit grounding_error so the
+        # escalation step has something to act on instead of a silent reject.
+        tried = ["control_source_snippet"]
+        if target_node_name:
+            tried.append("symbol_lookup")
         patch["rejected"] = True
         patch["reject_reason"] = "target_snippet does not exist in target file."
+        patch["grounding_error"] = {
+            "kind": "snippet_drift_unresolved",
+            "tried": tried,
+            "target_node_name": target_node_name,
+            "file_excerpt": _grounding_excerpt(text, target_node_name),
+        }
         state.json_block["needs_escalation"] = True
         state.json_block["confidence"] = 0.0
 

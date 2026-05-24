@@ -1,0 +1,18 @@
+{
+  "name": "go_multifile_root_cause",
+  "language": "go",
+  "category": "multi_file_root_cause",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "go run .",
+  "expected_changed_files": [
+    "pricing.go"
+  ],
+  "forbidden_changed_files": [
+    "main.go",
+    "service.go",
+    "go.mod"
+  ],
+  "prompt": "Fix the Go order total bug.\n\nSymptom: main.go asserts ProcessOrder([10, 20, 30]) == 60, but it currently returns 30 because the last line item is dropped.\n\nRequirements:\n- The symptom surfaces in main.go and the call goes through service.ProcessOrder, but the actual arithmetic bug is in pricing.CalculateSubtotal.\n- Modify pricing.go only.\n- Do NOT patch service.go as a workaround (e.g. summing items yourself there).\n- Do not modify main.go or go.mod.\n- ProcessOrder([10, 20, 30]) must return 60.\n- ProcessOrder([5]) must return 5.\n- ProcessOrder([]) must return 0.\n- Do not create new files.\n- Use patch_candidate if only CalculateSubtotal changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: go run ."
+}

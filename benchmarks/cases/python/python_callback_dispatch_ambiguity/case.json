@@ -1,0 +1,17 @@
+{
+  "name": "python_callback_dispatch_ambiguity",
+  "language": "python",
+  "category": "callback_dispatch_ambiguity",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "handlers.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py",
+    "dispatcher.py"
+  ],
+  "prompt": "Fix the refund handling bug.\n\nSymptom: dispatch(\"refund\", {balance: 70, amount: 25, ...}) returns 45.0 instead of 95.0. main.py asserts the refund should leave the user with 95.0 — refunds must add the amount back to the balance.\n\nRequirements:\n- Events are routed through dispatcher.HANDLERS, a name -> callable map. The dispatcher routing is correct; the defect is inside the registered refund handler.\n- Modify handlers.py only.\n- Do NOT modify dispatcher.py (rerouting refund to a different handler is not the right fix).\n- Do not modify main.py.\n- handle_order_placed and handle_cancel must keep their current behavior.\n- handle_refund must return balance + amount.\n- Do not create new files.\n- Use patch_candidate if only handle_refund changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "ts_callback_dispatch_ambiguity",
+  "language": "typescript",
+  "category": "callback_dispatch_ambiguity",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node --experimental-strip-types main.ts",
+  "expected_changed_files": [
+    "handlers.ts"
+  ],
+  "forbidden_changed_files": [
+    "main.ts",
+    "dispatcher.ts"
+  ],
+  "prompt": "Fix the refund handling bug.\n\nSymptom: dispatch(\"refund\", {balance: 70, amount: 25}) returns 45 instead of 95. main.ts asserts the refund should leave the user with 95 — refunds must add the amount back to the balance.\n\nRequirements:\n- Events are routed through dispatcher.HANDLERS, a name -> callable map. The dispatcher routing is correct; the defect is inside the registered refund handler.\n- Modify handlers.ts only.\n- Do NOT modify dispatcher.ts (rerouting refund to a different handler is not the right fix).\n- Do not modify main.ts.\n- handleOrderPlaced and handleCancel must keep their current behavior.\n- handleRefund must return balance + amount.\n- Do not create new files.\n- Use patch_candidate if only handleRefund changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node --experimental-strip-types main.ts"
+}

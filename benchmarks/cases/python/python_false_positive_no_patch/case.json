@@ -1,0 +1,15 @@
+{
+  "name": "python_false_positive_no_patch",
+  "language": "python",
+  "category": "false_positive_do_not_patch",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [],
+  "forbidden_changed_files": [
+    "main.py",
+    "shopping.py"
+  ],
+  "prompt": "A teammate reported that the cart total calculator in shopping.py may be wrong. Please investigate and fix any bug you find.\n\nThe validation command is: python main.py\n\nRequirements:\n- If, and only if, you find a real bug, propose a minimal patch.\n- If the code is already correct and validation already passes, do NOT modify any file — patching working code is itself a bug.\n- Do not modify main.py or shopping.py unless a defect is actually present.\n- Do not create new files.\n- Use the validation command to confirm baseline behavior before deciding to patch.\n\nValidation command: python main.py"
+}
