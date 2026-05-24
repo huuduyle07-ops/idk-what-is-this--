@@ -111,7 +111,7 @@ def _format_reasons(reasons: list[str]) -> str:
 
 def _format_table(rows: list[dict[str, Any]]) -> str:
     if not rows:
-        return "No nodes to display."
+        return "No nodes to display. Current filters may hide all zero-penalty nodes; try --include-zero-penalty or loosen --exclude-path/--path-prefix."
     display_rows = []
     for row in rows:
         display_rows.append(
