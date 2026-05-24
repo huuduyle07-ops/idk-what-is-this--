@@ -51,3 +51,13 @@ def test_handoff_buttons_use_handoff_id_not_path():
     # The runHandoff JS function must submit handoff_id, not handoff_path
     assert 'fd.append("handoff_id"' in template
     assert 'fd.append("handoff_path"' not in template
+
+
+def test_recent_mcp_audit_panel_contract():
+    template = INDEX_TEMPLATE.read_text(encoding="utf-8")
+
+    assert "Recent MCP Audit" in template
+    assert "No MCP audit events yet." in template
+    assert "Audit is read-only. This panel does not execute MCP tools." in template
+    assert 'fetch("/mcp/audit?limit=20")' in template
+    assert 'onclick="loadMcpAudit(true)"' in template

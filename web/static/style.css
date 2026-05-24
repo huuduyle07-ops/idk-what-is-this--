@@ -521,7 +521,7 @@ button {
     font-size: 12px;
     color: var(--color-text-muted);
     margin: 8px 0 4px;
-    user-select: none;
+    -user-select: none;
 }
 
 .instant-run-summary:hover {
@@ -1162,6 +1162,85 @@ button {
     background: var(--color-surface);
     color: var(--color-text-muted);
     border: 1px solid var(--color-border);
+}
+
+/* Phase 8.3.1: Recent MCP Audit viewer (Settings/Health) */
+.mcp-audit__note {
+    margin: 4px 0 10px 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    font-style: italic;
+}
+
+.mcp-audit__list {
+    display: grid;
+    gap: 8px;
+}
+
+.mcp-audit-event {
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface-2);
+}
+
+.mcp-audit-event--blocked {
+    border-color: #92400e;
+    background: rgba(245, 158, 11, 0.08);
+}
+
+.mcp-audit-event__main {
+    display: grid;
+    grid-template-columns: minmax(150px, 190px) minmax(140px, 1fr) auto minmax(100px, 140px) minmax(76px, auto);
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+}
+
+.mcp-audit-event__time,
+.mcp-audit-event__mode,
+.mcp-audit-event__count {
+    color: var(--color-text-muted);
+}
+
+.mcp-audit-event__tool {
+    overflow-wrap: anywhere;
+}
+
+.mcp-audit-event__error {
+    margin-top: 6px;
+    padding: 6px 8px;
+    border-left: 3px solid var(--color-warning);
+    background: var(--color-warning-bg);
+    color: #fde68a;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.mcp-audit-event__artifacts {
+    margin-top: 6px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.mcp-audit-event__artifacts summary {
+    cursor: pointer;
+}
+
+.mcp-audit-event__artifacts ul {
+    margin: 6px 0 0 18px;
+    padding: 0;
+}
+
+.mcp-audit-event__artifacts li {
+    margin-bottom: 3px;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+    .mcp-audit-event__main {
+        grid-template-columns: 1fr;
+    }
 }
 
 .memory-row {

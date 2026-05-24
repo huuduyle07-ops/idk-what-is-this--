@@ -659,6 +659,22 @@
               <div class="health-empty">Loading…</div>
             </div>
           </div>
+          <!-- Phase 8.3.1: Recent MCP Audit.
+               Read-only view of GET /mcp/audit; this panel never invokes tools. -->
+          <div class="health-section mcp-audit-section">
+            <div class="health-header">
+              <strong>Recent MCP Audit</strong>
+              <button type="button" class="sidebar-refresh"
+                      onclick="loadMcpAudit(true)"
+                      title="Re-fetch /mcp/audit?limit=20">Refresh</button>
+            </div>
+            <div class="mcp-audit__note">
+              Audit is read-only. This panel does not execute MCP tools.
+            </div>
+            <div id="mcpAuditList" class="mcp-audit__list">
+              <div class="health-empty">No MCP audit events yet.</div>
+            </div>
+          </div>
         </div>
         </section>
     </main>
@@ -2692,6 +2708,7 @@ function showWorkspaceTab(id) {
         settings:   () => {
             loadHealthPanel(false);
             if (typeof loadToolRegistry === "function") loadToolRegistry(false);
+            if (typeof loadMcpAudit === "function") loadMcpAudit(false);
         },
         graph:      () => {},
     };
@@ -2843,6 +2860,74 @@ function loadToolRegistry(force = false) {
             }
             _renderToolRegistry(body);
             _toolRegistryLoaded = true;
+        })
+        .catch(err => {
+            if (list) list.innerHTML =
+                `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        });
+}
+
+// Phase 8.3.1: Recent MCP Audit panel.
+// Read-only fetch of GET /mcp/audit; renders recent invocation summaries only.
+let _mcpAuditLoaded = false;
+
+function _renderMcpAudit(data) {
+    const list = document.getElementById("mcpAuditList");
+    if (!list) return;
+
+    if (!data || data.ok === false) {
+        const err = (data && data.error) || "unknown error";
+        list.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        return;
+    }
+
+    const events = Array.isArray(data.events) ? data.events : [];
+    if (events.length === 0) {
+        list.innerHTML = '<div class="health-empty">No MCP audit events yet.</div>';
+        return;
+    }
+
+    list.innerHTML = events.map(event => {
+        const allowed = event.allowed === true;
+        const artifacts = Array.isArray(event.artifacts) ? event.artifacts : [];
+        const error = event.error || "";
+        const rowClass = allowed ? "mcp-audit-event" : "mcp-audit-event mcp-audit-event--blocked";
+        const badgeClass = allowed ? "tool-badge tool-badge--ok" : "tool-badge tool-badge--off";
+        const artifactLabel = `${artifacts.length} artifact${artifacts.length === 1 ? "" : "s"}`;
+        const artifactDetails = allowed && !error && artifacts.length > 0
+            ? `<details class="mcp-audit-event__artifacts">
+                   <summary>Artifact paths</summary>
+                   <ul>${artifacts.map(path => `<li><code>${_escapeHtml(path)}</code></li>`).join("")}</ul>
+               </details>`
+            : "";
+        const errorHtml = error
+            ? `<div class="mcp-audit-event__error">${_escapeHtml(error)}</div>`
+            : "";
+
+        return `
+            <div class="${rowClass}">
+                <div class="mcp-audit-event__main">
+                    <span class="mcp-audit-event__time">${_escapeHtml(event.created_at || "")}</span>
+                    <code class="mcp-audit-event__tool">${_escapeHtml(event.tool_name || "(unknown)")}</code>
+                    <span class="${badgeClass}">${allowed ? "allowed" : "blocked"}</span>
+                    <span class="mcp-audit-event__mode">${_escapeHtml(event.capability_mode || "")}</span>
+                    <span class="mcp-audit-event__count">${artifactLabel}</span>
+                </div>
+                ${errorHtml}
+                ${artifactDetails}
+            </div>`;
+    }).join("");
+}
+
+function loadMcpAudit(force = false) {
+    if (_mcpAuditLoaded && !force) return;
+    const list = document.getElementById("mcpAuditList");
+    if (list) list.innerHTML = `<div class="health-empty">Loading...</div>`;
+    fetch("/mcp/audit?limit=20")
+        .then(r => r.json())
+        .then(data => {
+            _renderMcpAudit(data);
+            _mcpAuditLoaded = true;
         })
         .catch(err => {
             if (list) list.innerHTML =
