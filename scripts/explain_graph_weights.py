@@ -65,6 +65,31 @@ def _build_parser() -> argparse.ArgumentParser:
             "(e.g. file, function, class, symbol)."
         ),
     )
+    parser.add_argument(
+        "--exclude-path",
+        action="append",
+        default=[],
+        metavar="PREFIX",
+        help=(
+            "Exclude nodes whose file path starts with PREFIX "
+            "(e.g. tests, benchmarks). May be repeated."
+        ),
+    )
+    parser.add_argument(
+        "--path-prefix",
+        action="append",
+        default=[],
+        metavar="PREFIX",
+        help=(
+            "Only include nodes whose file path starts with PREFIX "
+            "(e.g. core, graph, patching). May be repeated; treated as union."
+        ),
+    )
+    parser.add_argument(
+        "--hide-empty-symbols",
+        action="store_true",
+        help="Hide nodes whose symbol name after '::' is empty or whitespace.",
+    )
     return parser
 
 
@@ -117,13 +142,60 @@ def _format_table(rows: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+def _node_path(node_id: str) -> str:
+    return node_id.split("::", 1)[0]
+
+
+def _normalize_prefix(prefix: str) -> str:
+    return prefix.replace("\\", "/").rstrip("/")
+
+
+def _matches_prefix(path: str, prefix: str) -> bool:
+    if not prefix:
+        return True
+    return path == prefix or path.startswith(prefix + "/")
+
+
+def _is_empty_symbol_node(node_id: str) -> bool:
+    if "::" not in node_id:
+        return False
+    tail = node_id.rsplit("::", 1)[-1].strip()
+    return not tail
+
+
 def _rank_and_filter(
     rows: list[dict[str, Any]],
     *,
     top: int,
     kind_filter: str | None,
     include_zero_penalty: bool,
+    path_prefixes: list[str] | None = None,
+    exclude_paths: list[str] | None = None,
+    hide_empty_symbols: bool = False,
 ) -> list[dict[str, Any]]:
+    normalized_prefixes = [_normalize_prefix(p) for p in (path_prefixes or []) if p]
+    normalized_excludes = [_normalize_prefix(p) for p in (exclude_paths or []) if p]
+
+    if normalized_prefixes:
+        rows = [
+            r
+            for r in rows
+            if any(
+                _matches_prefix(_node_path(str(r["node_id"])), prefix)
+                for prefix in normalized_prefixes
+            )
+        ]
+    if normalized_excludes:
+        rows = [
+            r
+            for r in rows
+            if not any(
+                _matches_prefix(_node_path(str(r["node_id"])), prefix)
+                for prefix in normalized_excludes
+            )
+        ]
+    if hide_empty_symbols:
+        rows = [r for r in rows if not _is_empty_symbol_node(str(r["node_id"]))]
     if kind_filter:
         rows = [r for r in rows if r.get("node_kind") == kind_filter]
     if not include_zero_penalty:
@@ -183,6 +255,9 @@ def main(argv: list[str] | None = None) -> int:
         top=args.top,
         kind_filter=args.filter,
         include_zero_penalty=args.include_zero_penalty,
+        path_prefixes=args.path_prefix,
+        exclude_paths=args.exclude_path,
+        hide_empty_symbols=args.hide_empty_symbols,
     )
 
     if args.json:

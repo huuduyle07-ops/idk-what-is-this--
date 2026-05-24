@@ -252,3 +252,251 @@ def test_cli_invalid_top_value_fails_friendly(tmp_path, capsys, monkeypatch):
     assert exit_code == 2
     assert "error:" in captured.err
     assert "Traceback" not in captured.err
+
+
+# --- Phase 12.5b path/symbol filter tests ---
+
+
+def _build_mixed_path_graph() -> ProgramGraph:
+    graph = ProgramGraph()
+    graph.add_node("core/engine.py", "file")
+    graph.add_node("core/engine.py::run", "function")
+    graph.add_node("graph/weights.py", "file")
+    graph.add_node("graph/weights.py::compute", "function")
+    graph.add_node("patching/patch_engine.py", "file")
+    graph.add_node("patching/patch_engine.py::apply", "function")
+    graph.add_node("tests/test_engine.py", "file")
+    graph.add_node("tests/test_engine.py::test_run", "function")
+    graph.add_node("benchmarks/run.py", "file")
+    graph.add_node("benchmarks/run.py::main", "function")
+    graph.add_node("core/broken.py::", "function")  # malformed empty symbol
+    graph.add_node("core/broken.py::\n  ", "function")  # whitespace symbol
+    graph.add_node("tests_helper/util.py", "file")  # near-miss for tests prefix
+    graph.add_node("tests_helper/util.py::helper", "function")
+
+    # add edges so weights aren't all zero
+    graph.add_edge("core/engine.py", "core/engine.py::run", "contains")
+    graph.add_edge("graph/weights.py", "graph/weights.py::compute", "contains")
+    graph.add_edge("patching/patch_engine.py", "patching/patch_engine.py::apply", "contains")
+    graph.add_edge("tests/test_engine.py", "tests/test_engine.py::test_run", "contains")
+    graph.add_edge("benchmarks/run.py", "benchmarks/run.py::main", "contains")
+    graph.add_edge("tests_helper/util.py", "tests_helper/util.py::helper", "contains")
+    graph.add_edge("core/engine.py::run", "graph/weights.py::compute", "resolved_call")
+    graph.add_edge("tests/test_engine.py::test_run", "core/engine.py::run", "resolved_call")
+    return graph
+
+
+def test_cli_exclude_path_removes_matching_nodes(tmp_path, capsys, monkeypatch):
+    graph = _build_mixed_path_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--json",
+            "--include-zero-penalty",
+            "--top",
+            "100",
+            "--exclude-path",
+            "tests",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    ids = {row["node_id"] for row in payload}
+    assert not any(nid.startswith("tests/") for nid in ids)
+    # tests_helper/ must NOT be matched by the "tests" prefix
+    assert any(nid.startswith("tests_helper/") for nid in ids)
+
+
+def test_cli_exclude_path_accepts_repeated_flag(tmp_path, capsys, monkeypatch):
+    graph = _build_mixed_path_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--json",
+            "--include-zero-penalty",
+            "--top",
+            "100",
+            "--exclude-path",
+            "tests",
+            "--exclude-path",
+            "benchmarks",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    ids = {row["node_id"] for row in payload}
+    assert not any(nid.startswith("tests/") for nid in ids)
+    assert not any(nid.startswith("benchmarks/") for nid in ids)
+
+
+def test_cli_path_prefix_keeps_only_matching_nodes(tmp_path, capsys, monkeypatch):
+    graph = _build_mixed_path_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--json",
+            "--include-zero-penalty",
+            "--top",
+            "100",
+            "--path-prefix",
+            "core",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    assert payload
+    assert all(row["node_id"].startswith("core/") for row in payload)
+
+
+def test_cli_path_prefix_repeated_acts_as_union(tmp_path, capsys, monkeypatch):
+    graph = _build_mixed_path_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--json",
+            "--include-zero-penalty",
+            "--top",
+            "100",
+            "--path-prefix",
+            "core",
+            "--path-prefix",
+            "graph",
+            "--path-prefix",
+            "patching",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    assert payload
+    ids = [row["node_id"] for row in payload]
+    assert all(
+        nid.startswith("core/") or nid.startswith("graph/") or nid.startswith("patching/")
+        for nid in ids
+    )
+    # union must contain at least one from each prefix
+    assert any(nid.startswith("core/") for nid in ids)
+    assert any(nid.startswith("graph/") for nid in ids)
+    assert any(nid.startswith("patching/") for nid in ids)
+
+
+def test_cli_path_prefix_does_not_match_substring(tmp_path, capsys, monkeypatch):
+    graph = _build_mixed_path_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--json",
+            "--include-zero-penalty",
+            "--top",
+            "100",
+            "--path-prefix",
+            "tests",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    ids = {row["node_id"] for row in payload}
+    # Only "tests/" entries, NOT "tests_helper/"
+    assert all(nid.startswith("tests/") for nid in ids)
+    assert not any(nid.startswith("tests_helper/") for nid in ids)
+
+
+def test_cli_hide_empty_symbols_drops_malformed_nodes(tmp_path, capsys, monkeypatch):
+    graph = _build_mixed_path_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--json",
+            "--include-zero-penalty",
+            "--top",
+            "100",
+            "--hide-empty-symbols",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    ids = {row["node_id"] for row in payload}
+    assert "core/broken.py::" not in ids
+    # whitespace-only symbol tail also drops
+    assert not any(nid.startswith("core/broken.py::") for nid in ids)
+    # normal nodes still present
+    assert "core/engine.py::run" in ids
+
+
+def test_cli_default_behavior_keeps_all_paths_when_no_flags_given(
+    tmp_path, capsys, monkeypatch
+):
+    graph = _build_mixed_path_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--json",
+            "--include-zero-penalty",
+            "--top",
+            "100",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    ids = {row["node_id"] for row in payload}
+    # No filter flags -> tests/, benchmarks/, malformed all still appear.
+    assert any(nid.startswith("tests/") for nid in ids)
+    assert any(nid.startswith("benchmarks/") for nid in ids)
+    assert "core/broken.py::" in ids
+
+
+def test_cli_table_output_respects_path_prefix(tmp_path, capsys, monkeypatch):
+    graph = _build_mixed_path_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--include-zero-penalty",
+            "--top",
+            "100",
+            "--path-prefix",
+            "core",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "core/engine.py" in captured.out
+    assert "graph/weights.py" not in captured.out
+    assert "tests/test_engine.py" not in captured.out
