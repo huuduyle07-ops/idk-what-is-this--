@@ -359,6 +359,307 @@ def promote_ts_duplicate_import_candidate_to_patch_plan(state: AgentState) -> No
     state.json_block = block
 
 
+# --- Phase 12.5i: TS/JS missing-import repair ---
+
+_TS_EXPORT_DECL_RE = re.compile(
+    r"(?m)^[ \t]*export\s+"
+    r"(?:async\s+)?"
+    r"(?:abstract\s+)?"
+    r"(?:function|const|class|type|interface|enum|let|var)\s+"
+    r"(?P<name>[A-Za-z_$][\w$]*)"
+)
+
+_TS_EXPORT_LIST_RE = re.compile(
+    r"(?m)^[ \t]*export\s*\{(?P<body>[^}]+)\}"
+)
+
+
+def _ts_extract_named_exports(text: str) -> set[str]:
+    """Return the set of names exported by `text` via named-export syntax.
+
+    Handles:
+      - export function/const/class/type/interface/enum/let/var NAME
+      - export async function NAME
+      - export abstract class NAME
+      - export { A, B, C }
+      - export { A as B }            (public name is B)
+      - export { A } from "./mod"    (re-export)
+
+    Skips `export default` because it has no named-import surface, and skips
+    `export *` because it is an opaque passthrough.
+    """
+    if not text:
+        return set()
+    exports: set[str] = set()
+    for match in _TS_EXPORT_DECL_RE.finditer(text):
+        exports.add(match.group("name"))
+    for match in _TS_EXPORT_LIST_RE.finditer(text):
+        for raw in match.group("body").split(","):
+            item = raw.strip()
+            if not item:
+                continue
+            if " as " in item:
+                _, alias = item.rsplit(" as ", 1)
+                alias = alias.strip()
+                if alias:
+                    exports.add(alias)
+            else:
+                exports.add(item)
+    return exports
+
+
+def _resolve_inside_repo(repo_root: Path, rel: str) -> Path | None:
+    """Resolve `rel` against `repo_root`. Returns None if it escapes the repo
+    or the input is malformed. Required by the path-traversal rule.
+    """
+    if not rel:
+        return None
+    raw = Path(rel)
+    if raw.is_absolute():
+        return None
+    try:
+        resolved = (repo_root / rel).resolve()
+    except Exception:
+        return None
+    try:
+        resolved.relative_to(repo_root)
+    except ValueError:
+        return None
+    return resolved
+
+
+def _compute_ts_module_specifier(target_file: Path, sibling_file: Path) -> str | None:
+    """Build a `./...`-style ES module specifier that points from
+    `target_file` at `sibling_file`. Only handles same-directory siblings
+    (deliberately conservative — matches the "local sibling modules" scope).
+
+    Preserves the sibling's actual file extension so the result matches the
+    repo's existing import style (e.g. `./money.ts` rather than `./money`).
+    """
+    try:
+        rel = sibling_file.relative_to(target_file.parent)
+    except ValueError:
+        return None
+    parts = rel.as_posix()
+    if not parts or parts.startswith(".."):
+        return None
+    return "./" + parts
+
+
+def _first_nonblank_line(text: str) -> str:
+    for line in (text or "").splitlines():
+        if line.strip():
+            return line
+    return ""
+
+
+def _strip_import_alias(name: str) -> str:
+    """`foo as bar` → `bar`; `foo` → `foo`. The local binding is what matters."""
+    if " as " in name:
+        _, alias = name.rsplit(" as ", 1)
+        return alias.strip()
+    return name.strip()
+
+
+def promote_ts_missing_import_candidate_to_patch_plan(state: AgentState) -> None:
+    """Repair TS/JS patch_candidates that use a name they did not import.
+
+    Symptom this fixes: model returns a clean function-only patched_snippet
+    (no top-of-file import line) that references e.g. `multiplyCents`, but
+    the target file's existing imports only cover `addCents`. Applying the
+    snippet verbatim crashes Node at runtime with
+    "ReferenceError: multiplyCents is not defined".
+
+    Mirror of `promote_ts_duplicate_import_candidate_to_patch_plan` for the
+    opposite failure mode: instead of merging a colliding import, we add a
+    missing one when a sibling module actually exports the new name. Output
+    is a 2+ op patch_plan that:
+      - merges the missing specifier into the existing import line when the
+        file already imports something from the same module, OR
+      - inserts a fresh top-level named import when the file has no import
+        from that module yet, AND
+      - replaces the function with the unchanged patched_snippet.
+
+    Safety:
+      - read-only inspection of files inside repo_path,
+      - refuses paths that resolve outside repo_root (path-traversal guard),
+      - respects an existing patch_plan (caller wins),
+      - leaves drifted target_snippet alone for the grounding-recovery path,
+      - never invents an import for a name no local module exports.
+    """
+    block = state.json_block or {}
+
+    if isinstance(block.get("patch_plan"), list) and block["patch_plan"]:
+        return
+
+    patch = block.get("patch_candidate")
+    if not isinstance(patch, dict):
+        return
+
+    rel = patch.get("relative_path") or patch.get("file") or ""
+    if Path(rel).suffix.lower() not in _TS_JS_SUFFIXES:
+        return
+
+    if not state.repo_path:
+        return
+
+    repo_root = Path(state.repo_path).resolve()
+    target_path = _resolve_inside_repo(repo_root, rel)
+    if target_path is None or not target_path.is_file():
+        return
+
+    target_snippet = patch.get("target_snippet") or ""
+    patched_snippet = patch.get("patched_snippet") or ""
+    if not target_snippet or not patched_snippet:
+        return
+
+    try:
+        file_text = target_path.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        return
+
+    if target_snippet not in file_text:
+        return
+
+    target_idents = _identifiers_in(target_snippet)
+    patched_idents = _identifiers_in(patched_snippet)
+    js_builtins = _LANGUAGE_BUILTINS.get("javascript", set())
+    new_idents = patched_idents - target_idents - _LANGUAGE_KEYWORDS - js_builtins
+    if not new_idents:
+        return
+
+    snippet_imports = _ts_extract_named_imports(patched_snippet)
+    for imp in snippet_imports:
+        for raw_name in imp["named"]:
+            new_idents.discard(_strip_import_alias(raw_name))
+
+    file_imports = _ts_extract_named_imports(file_text)
+    for imp in file_imports:
+        for raw_name in imp["named"]:
+            new_idents.discard(_strip_import_alias(raw_name))
+
+    if not new_idents:
+        return
+
+    target_dir = target_path.parent
+    try:
+        target_dir.relative_to(repo_root)
+    except ValueError:
+        return
+
+    siblings: list[Path] = []
+    for ext in _TS_JS_SUFFIXES:
+        try:
+            siblings.extend(target_dir.glob(f"*{ext}"))
+        except Exception:
+            continue
+
+    exports_by_module: dict[str, set[str]] = {}
+    for sibling in siblings:
+        try:
+            sib_resolved = sibling.resolve()
+        except Exception:
+            continue
+        if sib_resolved == target_path:
+            continue
+        try:
+            sib_resolved.relative_to(repo_root)
+        except ValueError:
+            continue
+        if not sib_resolved.is_file():
+            continue
+        try:
+            sib_text = sib_resolved.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            continue
+        exports = _ts_extract_named_exports(sib_text)
+        if not exports:
+            continue
+        module = _compute_ts_module_specifier(target_path, sib_resolved)
+        if module is None:
+            continue
+        exports_by_module[module] = exports
+
+    if not exports_by_module:
+        return
+
+    module_to_new_names: dict[str, list[str]] = {}
+    for ident in sorted(new_idents):
+        for module in sorted(exports_by_module.keys()):
+            if ident in exports_by_module[module]:
+                module_to_new_names.setdefault(module, []).append(ident)
+                break
+
+    if not module_to_new_names:
+        return
+
+    file_imports_by_module: dict[str, dict] = {}
+    for imp in file_imports:
+        file_imports_by_module.setdefault(imp["module"], imp)
+
+    plan_ops: list[dict] = []
+    matched_idents: list[str] = []
+
+    for module in sorted(module_to_new_names.keys()):
+        names = module_to_new_names[module]
+        if not names:
+            continue
+        existing = file_imports_by_module.get(module)
+        if existing is not None:
+            existing_named = list(dict.fromkeys(existing["named"]))
+            additions = [n for n in names if n not in existing_named]
+            if not additions:
+                continue
+            merged_named = existing_named + additions
+            new_line = (
+                "import { " + ", ".join(merged_named) + f' }} from "{module}";'
+            )
+            plan_ops.append({
+                "op": "replace_snippet",
+                "relative_path": rel,
+                "target_snippet": existing["line"],
+                "patched_snippet": new_line,
+            })
+            matched_idents.extend(additions)
+        else:
+            anchor = _first_nonblank_line(file_text)
+            if not anchor or anchor not in file_text:
+                continue
+            new_line = (
+                "import { " + ", ".join(names) + f' }} from "{module}";'
+            )
+            plan_ops.append({
+                "op": "replace_snippet",
+                "relative_path": rel,
+                "target_snippet": anchor,
+                "patched_snippet": new_line + "\n" + anchor,
+            })
+            matched_idents.extend(names)
+
+    if not plan_ops:
+        return
+
+    function_op = {
+        "op": "replace_snippet",
+        "relative_path": rel,
+        "target_snippet": target_snippet,
+        "patched_snippet": patched_snippet,
+    }
+
+    block["patch_candidate"] = None
+    block["patch_plan"] = plan_ops + [function_op]
+    block["confidence"] = min(float(block.get("confidence", 0.85) or 0.85), 0.85)
+    block["needs_escalation"] = False
+
+    print(
+        "🧩 Promoted TS/JS patch_candidate to patch_plan: added missing import(s) for "
+        + ", ".join(sorted(set(matched_idents)))
+        + "."
+    )
+
+    state.json_block = block
+
+
 def retry_structured_patch_json(state: AgentState, bad_answer: str) -> str:
     control = state.control_result or {}
     patch_intent = control.get("patch_intent") or {}

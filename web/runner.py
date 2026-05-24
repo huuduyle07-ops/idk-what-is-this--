@@ -42,6 +42,7 @@ from patching.patch_gates import (
     normalize_patch_plan_schema,
     promote_go_missing_import_candidate_to_patch_plan,
     promote_ts_duplicate_import_candidate_to_patch_plan,
+    promote_ts_missing_import_candidate_to_patch_plan,
 )
 from core.source_snippet_fallback import hydrate_control_source_from_scout
 from web.mcp_inspector_processes import stop_mcp_inspectors
@@ -267,6 +268,7 @@ def run_agent_web(
         finalize_answer(state, reviewed)
         promote_go_missing_import_candidate_to_patch_plan(state)
         promote_ts_duplicate_import_candidate_to_patch_plan(state)
+        promote_ts_missing_import_candidate_to_patch_plan(state)
 
         repair_reasons = collect_patch_repair_reasons(state)
         if repair_reasons:
@@ -281,6 +283,7 @@ def run_agent_web(
             finalize_answer(state, repaired)
             promote_go_missing_import_candidate_to_patch_plan(state)
         promote_ts_duplicate_import_candidate_to_patch_plan(state)
+        promote_ts_missing_import_candidate_to_patch_plan(state)
 
         if state.mode == "reviewer" and not state.json_block:
             print("🔁 No JSON found → retrying structured JSON repair once...")
@@ -288,6 +291,7 @@ def run_agent_web(
             finalize_answer(state, repaired)
             promote_go_missing_import_candidate_to_patch_plan(state)
         promote_ts_duplicate_import_candidate_to_patch_plan(state)
+        promote_ts_missing_import_candidate_to_patch_plan(state)
 
         if not state.json_block:
             debug_dir = Path(".agent")
