@@ -68,10 +68,12 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
   - slowest-case and average-duration summaries
   - temp repo cleanup with retry on Windows
 - Benchmark suite:
-  - 22 cases exist
-  - `--check`: 22 cases, 0 errors
-  - Official clean full fast run achieved:
-    - 22/22 passed, flaky: 0, with --retry-failed 1 enabled.
+  - 31 cases exist across C++, Go, HTML, JavaScript, Python, Rust, and TypeScript.
+  - `--check`: 31 cases, 0 errors.
+  - Latest full fast run after Phase 12.5k:
+    - 31/31 passed, 100% success rate.
+    - Hard TypeScript nested-dispatch case passed.
+    - Linter fusion preserved correctness but increased fallback pressure, so it is marked cost-sensitive.
 - Phase 4.5 CLI background/proposal MVP:
   - Level 1 reporter: `scripts/run_background_reporter.py` runs benchmark checks/runs, writes `.agent/reports/background_report_*.md/json`, includes Brain Stamp, and emits regression alerts.
   - Level 2 planner: `scripts/run_background_dream_planner.py` reads the latest meaningful benchmark report and writes `.agent/reports/background_dream_plan_*.md/json` with failed, flaky, and slow-passing cases.
@@ -903,49 +905,71 @@ Either outcome is valuable: shipping it OR proving positive-only memory is enoug
 
 ## Phase 12 — Experiment Lab / Evaluation Governance
 
-**Status: 🤖 GPT-proposed brainstorm (2026-05-17) + Claude-condensed (2026-05-17), pending user scheduling**
+**Status: Shipped through Phase 12.5k on 2026-05-24**
 
-> Hard prerequisite for Phase 11 (anti-lessons experiment), Phase 10 (MCTS greenlight), and any "did this prompt change help?" question. Without it, every "did X help?" call is settled by vibes.
+Phase 12 upgraded AgentBench from a pass/fail runner into an experiment governance layer: runs can now be registered, compared, explained, reported, and reviewed against explicit decision rules.
 
-### Goal
+### Shipped
 
-Brain Stamp already captures *what version* of the agent ran (`git_sha`, `prompt_hash`, dirty state, etc.). Phase 12 adds the **comparison layer** on top — register paired runs as experiments with explicit hypotheses, dependent variables, and greenlight rules.
+- **12.1 — Experiment Registry MVP**  
+  Added experiment records, create/compare CLI, and metric tracking from existing benchmark reports.
 
-> **Frame:** Brain Stamp = "what version ran this benchmark report." Phase 12 = "which two versions am I comparing, on which subset, with what success rule." It does NOT duplicate Brain Stamp metadata; it references it by hash.
+- **12.2 — Markdown Experiment Report Export**  
+  Added Markdown reports with summary, metrics, comparison result, and decision block.
 
-### What it adds
+- **12.3 — Experiment List CLI**  
+  Added filtered, limited, JSON-capable experiment listing with newest-first sorting.
 
-- `.agent/experiments/exp_<id>.json` registry. Each entry:
-  ```json
-  {
-    "experiment_id": "exp_anti_lessons_001",
-    "hypothesis": "anti-lessons reduce patch size without lowering pass rate",
-    "baseline_brain_stamp_hash": "<sha>",
-    "variant_brain_stamp_hash": "<sha>",
-    "subset": "held_out_v1",
-    "dependent_vars": ["pass_rate", "minimality", "needs_escalation_rate", "cost_usd"],
-    "greenlight_rule": "minimality >= +15% AND pass_rate >= -5pp",
-    "result": { "...filled after both runs..." },
-    "notes": "..."
-  }
-  ```
-- CLI wrapper (`scripts/run_experiment.py`) that runs the benchmark twice (baseline / variant), diffs the metrics using existing `benchmarks.report_compare`, and writes the experiment file
-- Pre-registered experiment templates for the current open questions:
-  - `exp_anti_lessons` — Phase 11 prerequisite
-  - `exp_mcts_vs_self_correct` — Phase 10 greenlight
-  - `exp_council_vs_mcts` — alternative to Phase 10 (see absorption log below)
+- **12.4 — Experiment Decision Helper**  
+  Added decision policy for regressions, unknowns, suite changes, cost/speed changes, and warnings.
 
-### Do not do
+- **12.4a — Compare Summary Decision Display**  
+  Added decision status, review requirement, reasons, and warnings to CLI comparison output.
 
-- Do not duplicate Brain Stamp metadata; reference by hash only
-- Do not run experiments inline with normal benchmark runs; they're separate CLI invocations with explicit variant config
-- Do not greenlight any speculative phase (11, 10, council-mode) without registering the experiment first
+- **12.5 — Latest Benchmark Report Picker**  
+  Added latest meaningful report selection and create-from-latest workflow.
 
-### Prerequisites
+- **12.5b — Graph Weight Explainability CLI**  
+  Added read-only node weight explanations for topology, complexity, failure penalty, degree, and reasons.
 
-- Brain Stamp ✅ (shipped 2026-05-17)
-- AI Suggestion § B (held-out eval set) — strongly recommended for non-trivial experiments
-- AI Suggestion § C (patch minimality metric) — required for any experiment whose hypothesis is about patch size/quality
+- **12.5c — Graph Explainability Presentation Filters**  
+  Added filters to make graph explanations easier to present and review.
+
+- **12.5d — Hard/Wrong Python Benchmark Cases**  
+  Added adversarial Python cases for duplicate files, multi-file root cause, no-patch false positives, callback ambiguity, and central-node temptation.
+
+- **12.5e — Cross-language Medium Adversarial Cases**  
+  Added TypeScript and Go adversarial cases for no-patch, multi-file, and callback-dispatch scenarios.
+
+- **12.5f — First Hard Benchmark Case**  
+  Added hard TypeScript nested-dispatch root-cause benchmark with a 5-hop flow.
+
+> Note: 12.5g was investigated as grounding recovery but superseded by 12.5h/12.5i after benchmark evidence showed the real issue was TS/JS import handling, not snippet grounding.
+
+- **12.5h — TS/JS Import-Aware Patch Candidate Promotion**  
+  Improved handling for model snippets that place imports inside function-level replacements.
+
+- **12.5i — TS/JS Missing Import Repair**  
+  Added repair for TS/JS patch candidates that introduce local exported identifiers needing imports.
+
+- **12.5j — Linter Adapter for Phantom Limb**  
+  Added read-only ESLint/Pylint JSON normalization into `.agent/linter/findings.json`.
+
+- **12.5k — Budgeted Linter Fusion for Phantom Limb**  
+  Added strict-budget linter hints into Phantom Limb / CONTROL prompts.
+
+### Validation Checkpoint
+
+- Unit tests: **714 passed**
+- AgentBench: **31/31 passed**
+- Hard TypeScript nested-dispatch case: **passed**
+- Linter fusion preserved **31/31 correctness**, but increased fallback count.
+
+### Current Tradeoffs
+
+- Graph weights can over-rank utility hubs.
+- Linter fusion is correctness-safe but cost-sensitive.
+- MCTS remains research-only and experiment-gated.
 
 ---
 
@@ -1099,6 +1123,9 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
 - [x] **Phase 8.2c MCP validate-imported-worker-proposal harness** shipped 2026-05-23: artifact-write MCP now also exposes `validate_imported_worker_proposal`, keeping validation temp-clone-only and evidence-writing under the proposal artifact directory.
 - [x] **Phase 8.3 MCP audit ledger** shipped 2026-05-22: bounded invocation summaries in `.agent/mcp_audit/invocations.jsonl`, read-only `GET /mcp/audit`, and audit integration for artifact-write harness calls.
 - [x] **MCP Inspector operator shortcuts and shutdown cleanup** shipped 2026-05-23: fixed-target Inspector launch route/UI for read-only and artifact-write servers, plus terminal-shutdown cleanup of matching local Inspector process trees.
+- [x] **Phase 12.5i TS/JS Missing-Import Repair** shipped 2026-05-25: new `promote_ts_missing_import_candidate_to_patch_plan` in `patching/patch_gates.py` mirrors the Phase 12.5h dedup helper for the opposite failure mode. When a TS/JS `patch_candidate` uses an identifier exported by a same-directory sibling module but missing from both the snippet's own imports and the target file's imports, it gets promoted to a `patch_plan` that merges the missing specifier into an existing import line or inserts a fresh top-level named import, then runs the function replacement. New regexes capture `export function/const/class/type/interface/enum/let/var/async/abstract` declarations and `export { A, B as C }` lists; `export default` and `export *` are deliberately skipped. Path-traversal guarded via `_resolve_inside_repo` (rejects absolute paths and `..` escapes, every sibling read is `relative_to(repo_root)`-checked after `.resolve()`). Wired into `main.py` and `web/runner.py` alongside the dedup helper. The ts_nested_dispatch_root_cause benchmark now passes 1/1 on first attempt with no retries. Tests: `tests/test_ts_missing_import_promotion.py` — 13 cases covering merge-into-existing, fresh-insert, no-duplicate, no-export, no-new-identifier, the actual fixture end-to-end, non-TS/JS skip, existing-patch_plan respect, drift bailout, missing-file safety, path traversal refusal, and main/web wire-up checks.
+- [x] **Phase 12.5j Linter Adapter for Phantom Limb** shipped 2026-05-25: new `core/linter_adapter.py` provides a read-only adapter that normalizes ESLint and Pylint JSON reports into a uniform finding shape (`tool`, `file`, `line`, `column`, `severity`, `rule_id`, `message`, `symbol`, `source`) and writes them to `<repo>/.agent/linter/findings.json`. Severity normalization: ESLint `1`→warning, `2`→error; Pylint `error`/`fatal`→error, `warning`→warning, `convention`/`refactor`/`info`→info. Path normalization runs every `filePath` through `_normalize_path`: converts `\` → `/`, resolves the path, refuses anything that lands outside `repo_root` (path-traversal guard), and emits POSIX-relative paths via `as_posix()`. Malformed entries are silently skipped with a `skipped_count`. CLI: `scripts/import_linter_findings.py --repo-path . --eslint-json eslint.json --pylint-json pylint.json` — argparse front-end with friendly exit-2 errors for missing reports, invalid JSON, and bad `--repo-path`. Console summary matches spec: `imported: N` / `skipped: M` / `output: .agent/linter/findings.json`. No linter execution, no npm/pip install, no model calls, no patch apply. Tests: `tests/test_linter_adapter.py` — 15 cases including ESLint/Pylint normalization, backslash → forward-slash conversion at adapter and unit-helper level, paths outside repo skipped + counted, malformed entries skipped (bad top-level, bad message dicts, unknown severity codes, non-string message fields, broken `messages` types, unknown Pylint types), output directory created on demand, and CLI happy/error paths including combined ESLint+Pylint runs.
+- [x] **Phase 12.5k Budgeted Linter Fusion for Phantom Limb** shipped 2026-05-25: new `core/linter_fusion.py` lets Phantom Limb consume the normalized linter findings from `.agent/linter/findings.json` as read-only evidence. `load_linter_findings(repo_path)` is a path-traversal-guarded loader that returns `[]` on missing/malformed/non-list input. `fuse_into_phantom(phantom_findings, linter_findings)` is a pure fusion that annotates each phantom finding with `linter_evidence` (severity/line-sorted) and `linter_suspicion_boost` (cumulative: error +0.25, warning +0.10, info +0.05, capped at +0.40), and builds a prompt block from linter findings whose file matches a phantom candidate — irrelevant files are never injected. Strict prompt budget: `MAX_LINTER_FINDINGS_IN_PROMPT = 5`, `MAX_LINTER_PROMPT_CHARS = 800`. Prompt format matches the spec: `[LINTER HINTS — relevant static-analysis evidence]` header + bullets like `- pricing.ts:12 eslint/no-undef error: multiplyCents is not defined`, sorted by severity → file → line → rule_id. Header-only blocks are never emitted. Wired into `core/control_engine.py` `build_control_prompt` — one fusion call computes a `linter_hints_block` and is injected after each `[PHANTOM LIMB SUGGESTIONS …]` section (three identical templates updated via `replace_all`); on exception the fusion is skipped silently. Input dicts are never mutated by `fuse_into_phantom`; the control-engine wrapper does update `control_result["phantom_limb"]["findings"]` in place so downstream consumers can see the per-candidate evidence. PHANTOM_LIMB.json on disk is left alone — write-side belongs to the scanner. Tests: `tests/test_linter_fusion.py` — 26 cases covering loader robustness, severity boost differentiation, cap-at-0.40, mixed-severity sum-then-cap, no-match no-boost, input-immutability, prompt block size/char/relevance budgets, sort ordering, irrelevant-file exclusion, missing/malformed file no-ops via `fuse_for_repo`, existing Phantom Limb scan regression, and end-to-end `build_control_prompt` injection.
 
 ### Do next (refreshed 2026-05-23 after Phase 8.2c/8.3 and MCP Inspector cleanup shipped)
 
