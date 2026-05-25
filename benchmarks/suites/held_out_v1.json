@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "suite_id": "held_out_v1",
+  "description": "Held-out AgentBench v1 split for harder or adversarial cases.",
+  "case_names": [
+    "ts_nested_dispatch_root_cause",
+    "python_multifile_root_cause",
+    "python_callback_dispatch_ambiguity",
+    "python_false_positive_no_patch",
+    "go_multifile_root_cause",
+    "ts_callback_dispatch_ambiguity",
+    "ts_false_positive_no_patch"
+  ]
+}

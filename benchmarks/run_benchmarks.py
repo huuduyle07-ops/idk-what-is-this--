@@ -42,6 +42,7 @@ except ImportError:
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+SUITES_ROOT = PROJECT_ROOT / "benchmarks" / "suites"
 
 from benchmarks.fast_env import apply_fast_env, apply_turbo_env
 from core.brain_stamp import collect_brain_stamp, format_brain_stamp_markdown
@@ -92,6 +93,127 @@ def load_case(case_file: Path) -> dict:
     case["_case_dir"] = str(case_file.parent)
 
     return case
+
+
+class SuiteManifestError(ValueError):
+    """Friendly suite manifest validation error for CLI and tests."""
+
+
+def suite_fingerprint(case_names: list[str]) -> str:
+    payload = json.dumps(
+        sorted(case_names),
+        ensure_ascii=True,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+
+
+def _resolve_suite_manifest_path(path_or_name: str | Path) -> Path:
+    raw = Path(path_or_name)
+    if raw.is_absolute() or len(raw.parts) > 1 or raw.suffix:
+        return raw if raw.suffix else raw.with_suffix(".json")
+    return SUITES_ROOT / f"{raw.name}.json"
+
+
+def load_suite_manifest(path_or_name: str | Path) -> dict[str, Any]:
+    path = _resolve_suite_manifest_path(path_or_name)
+    if not path.exists():
+        raise SuiteManifestError(f"Suite manifest not found: {path}")
+
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        raise SuiteManifestError(f"Suite manifest is not valid JSON: {path}") from e
+    except OSError as e:
+        raise SuiteManifestError(f"Suite manifest could not be read: {path}") from e
+
+    if not isinstance(data, dict):
+        raise SuiteManifestError(f"Suite manifest must be a JSON object: {path}")
+
+    suite_id = str(data.get("suite_id") or "").strip()
+    if not suite_id:
+        raise SuiteManifestError(f"Suite manifest missing suite_id: {path}")
+
+    case_names = data.get("case_names")
+    if not isinstance(case_names, list):
+        raise SuiteManifestError(f"Suite {suite_id} case_names must be a list")
+
+    normalized: list[str] = []
+    for entry in case_names:
+        if not isinstance(entry, str) or not entry.strip():
+            raise SuiteManifestError(
+                f"Suite {suite_id} case_names must contain non-empty strings"
+            )
+        normalized.append(entry.strip())
+
+    seen: set[str] = set()
+    duplicates: list[str] = []
+    for name in normalized:
+        if name in seen and name not in duplicates:
+            duplicates.append(name)
+        seen.add(name)
+    if duplicates:
+        joined = ", ".join(duplicates)
+        raise SuiteManifestError(
+            f"Suite {suite_id} has duplicate case names: {joined}"
+        )
+
+    return {
+        "schema_version": data.get("schema_version"),
+        "suite_id": suite_id,
+        "description": data.get("description") or "",
+        "case_names": normalized,
+        "suite_fingerprint": suite_fingerprint(normalized),
+        "manifest_path": str(path),
+    }
+
+
+def _case_name_for_suite_filter(case_file: Path) -> str:
+    try:
+        case = load_case(case_file)
+        return str(case.get("name") or case_file.parent.name)
+    except Exception:
+        return case_file.parent.name
+
+
+def filter_cases_by_suite(
+    cases: list[Path],
+    suite_manifest: dict[str, Any],
+) -> list[Path]:
+    by_name: dict[str, Path] = {}
+    duplicate_cases: list[str] = []
+    for case_file in cases:
+        name = _case_name_for_suite_filter(case_file)
+        if name in by_name and name not in duplicate_cases:
+            duplicate_cases.append(name)
+        by_name[name] = case_file
+
+    if duplicate_cases:
+        joined = ", ".join(sorted(duplicate_cases))
+        raise SuiteManifestError(f"Duplicate benchmark case name(s): {joined}")
+
+    wanted = list(suite_manifest.get("case_names") or [])
+    missing = [name for name in wanted if name not in by_name]
+    if missing:
+        joined = ", ".join(missing)
+        suite_id = suite_manifest.get("suite_id") or "unknown"
+        raise SuiteManifestError(
+            f"Suite {suite_id} references missing case name(s): {joined}"
+        )
+
+    return [by_name[name] for name in wanted]
+
+
+def suite_report_metadata(suite_manifest: dict[str, Any] | None) -> dict[str, Any]:
+    if not suite_manifest:
+        return {}
+    case_names = list(suite_manifest.get("case_names") or [])
+    return {
+        "suite_id": suite_manifest.get("suite_id"),
+        "suite_fingerprint": suite_manifest.get("suite_fingerprint")
+        or suite_fingerprint(case_names),
+        "suite_case_count": len(case_names),
+    }
 
 def _ignore_patterns(dir_path: str, names: list[str]):
     ignored = []
@@ -1316,9 +1438,16 @@ def compare_reports(
             print(f"  {name} {dur:.2f}s")
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--case", help="Run one case by folder name")
+    parser.add_argument(
+        "--suite",
+        help=(
+            "Run a suite manifest by name (e.g. held_out_v1) or path. "
+            "Suite filtering happens before other case filters."
+        ),
+    )
     parser.add_argument("--json", action="store_true", help="Print full JSON report")
     parser.add_argument(
         "--check",
@@ -1394,7 +1523,7 @@ def main() -> int:
             "Costs ~N× tokens per flaky case; default 0 = no retries."
         ),
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.fast:
         apply_fast_env()
@@ -1473,6 +1602,15 @@ def main() -> int:
 
     root = Path(__file__).resolve().parent
     cases = discover_cases(root)
+    suite_manifest: dict[str, Any] | None = None
+    if args.suite:
+        try:
+            suite_manifest = load_suite_manifest(args.suite)
+            cases = filter_cases_by_suite(cases, suite_manifest)
+        except SuiteManifestError as e:
+            print(f"Suite error: {e}")
+            return 2
+
     cases = filter_cases(cases, args)
     if args.limit is not None:
         cases = cases[: args.limit]
@@ -1668,6 +1806,7 @@ def main() -> int:
         "success_rate": (passed / (total - skipped)) if (total - skipped) else 0,
         "duration_sec": run_duration,
         "filters": {
+            "suite": args.suite,
             "case": args.case,
             "language": args.language,
             "category": args.category,
@@ -1691,6 +1830,7 @@ def main() -> int:
         ),
         **_duration_aggregates(results),
         **patch_minimality_aggregates(results),
+        **suite_report_metadata(suite_manifest),
         "results": results,
     }
     report["brain_stamp"] = collect_brain_stamp(PROJECT_ROOT)
