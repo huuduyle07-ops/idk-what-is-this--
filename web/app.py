@@ -32,6 +32,7 @@ from core.sleeping_consultant import (
 from core import dream_artifacts
 from core import benchmark_web
 from core import lesson_store
+from core import goal_brief as goal_brief_core
 from core.patch_safety import evaluate_patch_safety
 from core.mcp_audit import list_mcp_invocations
 from database.memory_consolidator import consolidate_all
@@ -758,6 +759,50 @@ def dream_promote_artifact_route():
         return {"ok": False, "error": str(e)}, 404
     except Exception as e:
         return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+
+
+def _goal_brief_payload() -> dict:
+    if request.is_json:
+        data = request.get_json(silent=True)
+        return data if isinstance(data, dict) else {}
+    return request.form.to_dict()
+
+
+def _truthy_form_value(value: object) -> bool:
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+@app.route("/goal-brief/start", methods=["POST"])
+def goal_brief_start_route():
+    payload = _goal_brief_payload()
+    try:
+        result = goal_brief_core.create_goal_brief(
+            goal=str(payload.get("goal") or ""),
+            repo_path=(str(payload.get("repo_path") or "").strip() or None),
+            export_md=_truthy_form_value(payload.get("export_md")),
+        )
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    return result
+
+
+@app.route("/goal-brief/update", methods=["POST"])
+def goal_brief_update_route():
+    payload = _goal_brief_payload()
+    try:
+        result = goal_brief_core.update_goal_brief(
+            str(payload.get("brief_ref") or ""),
+            answer=str(payload.get("answer") or ""),
+            repo_path=(str(payload.get("repo_path") or "").strip() or None),
+            export_md=_truthy_form_value(payload.get("export_md")),
+        )
+    except (ValueError, FileNotFoundError) as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    return result
 
 
 @app.route("/health", methods=["GET"])

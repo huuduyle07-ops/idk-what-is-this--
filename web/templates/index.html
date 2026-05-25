@@ -181,6 +181,7 @@
         <!-- Phase 5 Slice 1: workspace tabs (top-level). -->
         <div class="ws-tabs" role="tablist">
           <button type="button" id="ws-tab-chat"       role="tab" aria-controls="ws-chat"       class="ws-tab" data-ws="chat"       onclick="showWorkspaceTab('chat')">Chat / Patch</button>
+          <button type="button" id="ws-tab-goal-brief" role="tab" aria-controls="ws-goal-brief" class="ws-tab" data-ws="goal-brief" onclick="showWorkspaceTab('goal-brief')">Goal Brief</button>
           <button type="button" id="ws-tab-benchmarks" role="tab" aria-controls="ws-benchmarks" class="ws-tab" data-ws="benchmarks" onclick="showWorkspaceTab('benchmarks')">Benchmarks</button>
           <button type="button" id="ws-tab-dream"      role="tab" aria-controls="ws-dream"      class="ws-tab" data-ws="dream"      onclick="showWorkspaceTab('dream')">Dream</button>
           <button type="button" id="ws-tab-memory"     role="tab" aria-controls="ws-memory"     class="ws-tab" data-ws="memory"     onclick="showWorkspaceTab('memory')">Memory</button>
@@ -235,6 +236,51 @@
           <pre id="usage" class="tab-content">{{ result.usage if result else "" }}</pre>
           <pre id="diff" class="tab-content"></pre>
           <div id="candidates" class="tab-content"></div>
+        </div>
+
+        <!-- Goal Brief Builder -->
+        <div id="ws-goal-brief" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-goal-brief">
+          <section class="goal-brief-panel">
+            <div class="goal-brief-header">
+              <strong>Goal Brief Builder</strong>
+              <span id="goalBriefStatus" class="goal-brief-status">No brief started.</span>
+            </div>
+
+            <input type="hidden" id="goalBriefRef" value="">
+            <textarea id="goalBriefGoal" class="goal-brief-goal" placeholder="Vague goal"></textarea>
+
+            <div class="goal-brief-actions">
+              <button type="button" onclick="startGoalBrief()">Start brief</button>
+              <button type="button" onclick="updateGoalBrief()">Update brief</button>
+              <button type="button" onclick="copyGoalBriefFinalPrompt()">Copy final prompt</button>
+              <button type="button" disabled title="Placeholder for a later gated handoff.">Send to Dream later</button>
+            </div>
+
+            <div id="goalBriefChat" class="goal-brief-chat">
+              <div class="goal-brief-message goal-brief-message--assistant">Draft not started.</div>
+            </div>
+
+            <textarea id="goalBriefAnswer" class="goal-brief-answer" placeholder="Paste answer or terminal result"></textarea>
+
+            <div class="goal-brief-grid">
+              <section>
+                <h3>Known Evidence</h3>
+                <pre id="goalBriefEvidence" class="goal-brief-pre">No evidence yet.</pre>
+              </section>
+              <section>
+                <h3>Missing Information</h3>
+                <div id="goalBriefMissing" class="goal-brief-list">None</div>
+              </section>
+              <section>
+                <h3>Suggested Commands</h3>
+                <div id="goalBriefCommands" class="goal-brief-list">None</div>
+              </section>
+              <section>
+                <h3>Final Prompt</h3>
+                <pre id="goalBriefFinalPrompt" class="goal-brief-pre">Not ready.</pre>
+              </section>
+            </div>
+          </section>
         </div>
 
         <!-- Benchmarks -->
@@ -2765,7 +2811,7 @@ function showTab(id) {
 // Memory, Graph, Settings/Health). Mirrors the showTab() pattern but operates
 // on .ws-content / .ws-tab. Persistence key: activeWorkspaceTab.
 function showWorkspaceTab(id) {
-    const valid = ["chat", "benchmarks", "dream", "memory", "graph", "settings"];
+    const valid = ["chat", "goal-brief", "benchmarks", "dream", "memory", "graph", "settings"];
     if (!valid.includes(id)) id = "chat";
     localStorage.setItem("activeWorkspaceTab", id);
 
@@ -2819,6 +2865,136 @@ function _escapeHtml(s) {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
+}
+
+let _goalBriefCurrent = null;
+
+function _goalBriefStatus(text, kind = "") {
+    const el = document.getElementById("goalBriefStatus");
+    if (!el) return;
+    el.textContent = text;
+    el.className = `goal-brief-status ${kind ? "goal-brief-status--" + kind : ""}`;
+}
+
+function _goalBriefList(items) {
+    const values = Array.isArray(items) ? items : [];
+    if (!values.length) return "<span class=\"goal-brief-muted\">None</span>";
+    return `<ul>${values.map(item => `<li>${_escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+function _goalBriefCommandList(items) {
+    const values = Array.isArray(items) ? items : [];
+    if (!values.length) return "<span class=\"goal-brief-muted\">None</span>";
+    return `<ul>${values.map(item => `<li><code>${_escapeHtml(item)}</code></li>`).join("")}</ul>`;
+}
+
+function _appendGoalBriefMessage(kind, text) {
+    const chat = document.getElementById("goalBriefChat");
+    if (!chat) return;
+    const cls = kind === "user" ? "goal-brief-message--user" : "goal-brief-message--assistant";
+    const label = kind === "user" ? "You" : "Interviewer";
+    chat.insertAdjacentHTML(
+        "beforeend",
+        `<div class="goal-brief-message ${cls}"><strong>${label}</strong><br>${_escapeHtml(text)}</div>`
+    );
+    chat.scrollTop = chat.scrollHeight;
+}
+
+function _renderGoalBriefResponse(data, userText = "") {
+    if (!data || !data.ok) {
+        _goalBriefStatus(data?.error || "Goal brief request failed.", "failed");
+        return;
+    }
+
+    _goalBriefCurrent = data.brief || null;
+    const brief = data.brief || {};
+    document.getElementById("goalBriefRef").value = data.brief_path || "";
+    if (brief.goal) document.getElementById("goalBriefGoal").value = brief.goal;
+
+    if (userText) _appendGoalBriefMessage("user", userText);
+    if (data.assistant_message) _appendGoalBriefMessage("assistant", data.assistant_message);
+
+    const evidenceEl = document.getElementById("goalBriefEvidence");
+    const missingEl = document.getElementById("goalBriefMissing");
+    const commandsEl = document.getElementById("goalBriefCommands");
+    const finalEl = document.getElementById("goalBriefFinalPrompt");
+
+    if (evidenceEl) evidenceEl.textContent = JSON.stringify(brief.evidence || {}, null, 2);
+    if (missingEl) missingEl.innerHTML = _goalBriefList(brief.missing_information || []);
+    if (commandsEl) commandsEl.innerHTML = _goalBriefCommandList(brief.suggested_terminal_commands || []);
+    if (finalEl) finalEl.textContent = brief.final_prompt || "Not ready.";
+
+    const status = brief.status === "ready" ? "Ready" : "Draft";
+    _goalBriefStatus(`${status} - ${data.brief_path || "dry run"}`, brief.status === "ready" ? "ready" : "draft");
+}
+
+function startGoalBrief() {
+    const goalEl = document.getElementById("goalBriefGoal");
+    const chat = document.getElementById("goalBriefChat");
+    const goal = goalEl ? goalEl.value.trim() : "";
+    if (!goal) {
+        _goalBriefStatus("Enter a goal first.", "failed");
+        return;
+    }
+    if (chat) chat.innerHTML = "";
+    _goalBriefStatus("Starting brief...", "draft");
+    const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
+    fetch("/goal-brief/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ goal, repo_path: repo }),
+    })
+        .then(r => r.json().then(data => ({ status: r.status, data })))
+        .then(({ status, data }) => {
+            if (status >= 400 || !data.ok) {
+                _goalBriefStatus(data.error || "Could not start brief.", "failed");
+                return;
+            }
+            _renderGoalBriefResponse(data, goal);
+        })
+        .catch(err => _goalBriefStatus(`Network error: ${err}`, "failed"));
+}
+
+function updateGoalBrief() {
+    const briefRef = document.getElementById("goalBriefRef")?.value.trim() || "";
+    const answerEl = document.getElementById("goalBriefAnswer");
+    const answer = answerEl ? answerEl.value.trim() : "";
+    if (!briefRef) {
+        _goalBriefStatus("Start a brief first.", "failed");
+        return;
+    }
+    if (!answer) {
+        _goalBriefStatus("Paste an answer first.", "failed");
+        return;
+    }
+    _goalBriefStatus("Updating brief...", "draft");
+    const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
+    fetch("/goal-brief/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ brief_ref: briefRef, answer, repo_path: repo }),
+    })
+        .then(r => r.json().then(data => ({ status: r.status, data })))
+        .then(({ status, data }) => {
+            if (status >= 400 || !data.ok) {
+                _goalBriefStatus(data.error || "Could not update brief.", "failed");
+                return;
+            }
+            _renderGoalBriefResponse(data, answer);
+            if (answerEl) answerEl.value = "";
+        })
+        .catch(err => _goalBriefStatus(`Network error: ${err}`, "failed"));
+}
+
+function copyGoalBriefFinalPrompt() {
+    const text = document.getElementById("goalBriefFinalPrompt")?.textContent || "";
+    if (!text.trim() || text.trim() === "Not ready.") {
+        _goalBriefStatus("Final prompt is not ready.", "failed");
+        return;
+    }
+    navigator.clipboard.writeText(text)
+        .then(() => _goalBriefStatus("Final prompt copied.", "ready"))
+        .catch(err => _goalBriefStatus(`Copy failed: ${err}`, "failed"));
 }
 
 function _renderHealth(data) {

@@ -8,9 +8,11 @@
 
 > **Reading convention for other AI agents:** items prefixed with **🤖 Claude-proposed**, **🤖 Gemini-proposed**, or **🤖 GPT-proposed** are AI-generated suggestions, dated and **pending the user's accept/reject decision**. Treat them as candidate scope, NOT confirmed work. The user has consulted multiple AIs; provenance is shown so future readers (human or AI) can see who said what.
 
+> **2026-05-26 refresh:** Phase 5.6 Goal Brief Builder shipped. It adds a fixed-schema, evidence-first intake layer before Dream, CONTROL, Claude, ChatGPT, or the full agent acts. The builder can ask clarifying questions, suggest safe manual terminal commands, accept pasted user evidence, write `.agent/goal_briefs/<timestamp>/goal_brief.json` and optional Markdown exports, and generate a final task prompt only after enough evidence exists. Guardrails: it does not run terminal commands, apply patches, run benchmarks, create benchmark cases, seed/promote lessons, promote memory, or mutate proposal artifacts.
+
 ## Current checkpoint
 
-The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web revamp, Phase 7.1-7.2.1.1 Mayor/workflow bridge, and Phase 8.1/8.2a/8.2b/8.2c/8.3 MCP foundations are shipped.
+The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web revamp plus Phase 5.6 Goal Brief Builder, Phase 7.1-7.2.1.1 Mayor/workflow bridge, and Phase 8.1/8.2a/8.2b/8.2c/8.3 MCP foundations are shipped.
 
 ### Stable / mostly working
 
@@ -82,12 +84,13 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
   - Level 3 proposal queue: `scripts/run_patch_proposal_queue.py` reads Level 2 plan JSON and processes only items explicitly marked `human_approved_for_proposal=true`; default `--max-items 1`.
   - Guardrails: CLI-only; no Flask background thread; no automatic schedule; no benchmark runner changes; no Dream queue format changes; no real-repo patch/apply/commit/push.
 - **Web workspace (Phase 5 complete — 2026-05-16):**
-  - 6 workspace tabs: Chat/Patch, Benchmarks, Dream, Memory, Graph, Settings/Health
+  - 7 workspace tabs: Chat/Patch, Goal Brief, Benchmarks, Dream, Memory, Graph, Settings/Health
   - ARIA-correct workspace tablist (role=tablist/tab/tabpanel, aria-controls/labelledby/selected)
   - Settings/Health panel: 15 checks (API keys, Postgres, embeddings, Ollama, Tree-sitter, Python/Node/Go/Rust/g++ toolchain)
   - Benchmarks tab: sidebar of past runs (newest first), structured detail panel (totals/groups/flaky/slowest/failed cases), flaky count + Flaky Cases table, "Seed Dream queue from this report" button
   - Dream tab: modal-based queue view, modal-based past-report viewer with collapsible morning report, per-item status cards rendered live during runs, checkbox-based apply UI (no more `prompt()`)
   - Patch tab: structured patch card (type badge, confidence bar, risk badge, validation command, changed files); raw JSON in collapsed `<details>`
+  - Goal Brief tab: guided fixed-schema intake flow that collects evidence before agent action and writes `.agent/goal_briefs/<timestamp>/goal_brief.json`
 - Local infrastructure:
   - Flask runs locally at `127.0.0.1:5000`
   - Postgres/pgvector DB container is recreated and host connection works
@@ -466,6 +469,7 @@ The web UI is now a real workspace (one-shot form → tabbed workspace milestone
 - **Slice 3:** Benchmarks tab — sidebar of past runs, structured detail panel (totals/groups/flaky/slowest/failed), flaky count + Flaky Cases table, seed-from-this-report button
 - **Slice 4:** Dream UI cleanup — reusable modal singleton, per-item status cards, checkbox apply UI (replaces alert/prompt hell)
 - **Slice 5:** Patch card — type/confidence/risk/validation/changed-files/forbidden-check structured view; raw JSON in collapsed details
+- **Phase 5.6 shipped 2026-05-26:** Goal Brief Builder adds `core/goal_brief.py`, `scripts/create_goal_brief.py`, `/goal-brief/start`, `/goal-brief/update`, and a Goal Brief workspace tab. The schema is fixed; interviewer guidance is model-optional and cannot invent evidence; user-pasted answers are the only source for command output. Final prompts include goal, evidence, constraints, validation command, and success criteria.
 - Backend additions: `/health`, `/benchmarks/list`, `/benchmarks/report`, `risk` + `validation_command` in `/test_patch` and `/apply_patch` (and `_plan` variants)
 - Tab patterns: workspace tabs + result tabs both have active-state styling; lazy-load panels (health/benchmarks) on first show; ESC-to-close modal
 - **Web benchmark execution + Add Case clerk shipped 2026-05-17:** Benchmarks tab now has `Run all`, `Run selected`, stop/status polling, and an `Add case` modal. Add Case can copy a source repo into `benchmarks/cases/<language>/<case>/buggy_repo`, infer default validation command via existing repo/language rules, infer expected/allowed changed files from current patch state or repo `git diff`/staged/untracked evidence, and optionally ask the LLM to classify category/difficulty plus rewrite rough human intent into strict benchmark requirements. Guardrail: generated lessons still do not auto-promote; proposal -> lesson remains evidence-gated/manual-safe.
@@ -480,6 +484,7 @@ The web UI is now a real workspace (one-shot form → tabbed workspace milestone
   > **🤖 Gemini-proposed reframe (2026-05-16):** scope this as a "prompt-version quantifier" instead of a generic stats table. Group by prompt-file hash (paired with the brain version stamp from § G), show columns: `runs · avg model_calls · avg duration · est cost`. Lets you spot regressions like "I changed the system prompt and tokens silently 2×ed." Start with table; add line chart only if patterns aren't obvious from numbers.
 - [x] **Patch Safety gate** (forbidden files + path-traversal). Runs at **apply-time**, not memory-time. Sits naturally alongside the existing Patch card from Slice 5 (visual surface for "this patch was blocked because…"). Replaces the current "Forbidden-file check: not yet implemented" placeholder row in the Patch card.
 - [x] **Post-patch explanation card (for the human user)** — after a successful patch, render a small card with: (1) what was wrong, (2) why the patch works, (3) concept the user should learn, (4) similar bug pattern to watch for. Pulls from existing `patch_proposal.summary` + lesson record + `validation_output`; no new LLM calls. **🤖 GPT-proposed brainstorm (2026-05-17) "Tutor Mode" + Claude-condensed:** kept the lightweight explanation card piece; full Tutor/Curriculum phase deferred (would pivot the product from patcher → mentor).
+- [x] **Goal Brief Builder (Phase 5.6) shipped 2026-05-26:** fixed-schema draft/update/final-prompt workflow with CLI and web UI. Writes only goal-brief artifacts; no patch execution, no benchmark execution/case creation, no lesson seeding, no memory promotion, and no proposal artifact mutation.
 - [x] **Dream Slice gamma guardrails shipped 2026-05-16**
   - `max_refine_rounds` clamped to [1, 3], and 0 disables refinement
   - does not refine error/blocked/skipped statuses
