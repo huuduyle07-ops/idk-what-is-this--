@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import difflib
 import hashlib
 import io
 import json
@@ -12,6 +13,21 @@ import tempfile
 import time
 from pathlib import Path
 from typing import Any
+
+
+def configure_console_encoding(stdout=None, stderr=None) -> None:
+    """Keep benchmark CLI glyphs from crashing on cp1252 Windows consoles."""
+    for stream in (stdout or sys.stdout, stderr or sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if not callable(reconfigure):
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
+
+configure_console_encoding()
 
 # Use the Windows trust store for SSL verification. The default certifi
 # bundle won't include locally-installed CAs (e.g. AVG/Kaspersky/corporate
@@ -157,12 +173,265 @@ def snapshot_files(repo: Path) -> dict[str, str]:
     return out
 
 
+def snapshot_file_texts(repo: Path) -> dict[str, str | None]:
+    out: dict[str, str | None] = {}
+
+    for p in repo.rglob("*"):
+        if not p.is_file():
+            continue
+
+        rel = p.relative_to(repo).as_posix()
+        parts = set(rel.split("/"))
+
+        if parts & IGNORE_DIRS or p.name in IGNORE_FILES:
+            continue
+
+        if p.name.endswith(".exe"):
+            continue
+
+        try:
+            out[rel] = p.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            out[rel] = None
+        except Exception:
+            pass
+
+    return out
+
+
 def changed_files(before: dict[str, str], after: dict[str, str]) -> list[str]:
     keys = set(before) | set(after)
     return sorted(
         k for k in keys
         if before.get(k) != after.get(k)
     )
+
+
+PATCH_MINIMALITY_FIELDS = (
+    "files_touched",
+    "added_lines",
+    "removed_lines",
+    "net_changed_lines",
+    "total_changed_lines",
+    "touched_test_files",
+    "patch_size_score",
+)
+
+_TEST_DIRS = {"test", "tests", "__test__", "__tests__", "spec", "specs"}
+_TEST_FILE_NAMES = {
+    "test.py",
+    "tests.py",
+    "test.js",
+    "tests.js",
+    "test.ts",
+    "tests.ts",
+}
+_TEST_SUFFIXES = (
+    "_test.py",
+    "_tests.py",
+    "_test.go",
+    "_test.rs",
+    "_test.c",
+    "_test.cpp",
+    "_test.cc",
+    ".test.js",
+    ".test.jsx",
+    ".test.ts",
+    ".test.tsx",
+    ".spec.js",
+    ".spec.jsx",
+    ".spec.ts",
+    ".spec.tsx",
+)
+
+
+def _is_test_file_path(path: str) -> bool:
+    normalized = str(path).strip().replace("\\", "/")
+    while normalized.startswith("./"):
+        normalized = normalized[2:]
+    parts = [part.lower() for part in normalized.split("/") if part]
+    name = parts[-1] if parts else ""
+
+    if any(part in _TEST_DIRS for part in parts[:-1]):
+        return True
+    if name in _TEST_FILE_NAMES:
+        return True
+    if name.startswith("test_"):
+        return True
+    return any(name.endswith(suffix) for suffix in _TEST_SUFFIXES)
+
+
+def _unknown_patch_minimality(
+    reason: str,
+    *,
+    touched_forbidden_files: list[str] | None = None,
+    files_touched: int | None = None,
+    touched_test_files: int | None = None,
+) -> dict[str, Any]:
+    return {
+        "status": "unknown",
+        "reason": reason,
+        "files_touched": files_touched,
+        "added_lines": None,
+        "removed_lines": None,
+        "net_changed_lines": None,
+        "total_changed_lines": None,
+        "touched_test_files": touched_test_files,
+        "touched_forbidden_files": list(touched_forbidden_files or []),
+        "patch_size_score": None,
+    }
+
+
+def _line_change_counts(before_text: str, after_text: str) -> tuple[int, int]:
+    added = 0
+    removed = 0
+    for line in difflib.ndiff(before_text.splitlines(), after_text.splitlines()):
+        if line.startswith("+ "):
+            added += 1
+        elif line.startswith("- "):
+            removed += 1
+    return added, removed
+
+
+def compute_patch_minimality(
+    before_texts: dict[str, str | None] | None,
+    after_texts: dict[str, str | None] | None,
+    changed: list[str] | None,
+    *,
+    touched_forbidden_files: list[str] | None = None,
+) -> dict[str, Any]:
+    changed_paths = list(changed or [])
+    touched_tests = sum(1 for path in changed_paths if _is_test_file_path(path))
+
+    if not changed_paths:
+        return _unknown_patch_minimality(
+            "no_patch",
+            touched_forbidden_files=touched_forbidden_files,
+        )
+
+    if before_texts is None or after_texts is None:
+        return _unknown_patch_minimality(
+            "missing_diff_data",
+            touched_forbidden_files=touched_forbidden_files,
+            files_touched=len(changed_paths),
+            touched_test_files=touched_tests,
+        )
+
+    added_lines = 0
+    removed_lines = 0
+    for rel in changed_paths:
+        before_exists = rel in before_texts
+        after_exists = rel in after_texts
+        if not before_exists and not after_exists:
+            return _unknown_patch_minimality(
+                "missing_diff_data",
+                touched_forbidden_files=touched_forbidden_files,
+                files_touched=len(changed_paths),
+                touched_test_files=touched_tests,
+            )
+
+        before_text = before_texts.get(rel) if before_exists else ""
+        after_text = after_texts.get(rel) if after_exists else ""
+        if before_text is None or after_text is None:
+            return _unknown_patch_minimality(
+                "missing_diff_data",
+                touched_forbidden_files=touched_forbidden_files,
+                files_touched=len(changed_paths),
+                touched_test_files=touched_tests,
+            )
+
+        added, removed = _line_change_counts(before_text, after_text)
+        added_lines += added
+        removed_lines += removed
+
+    total_changed = added_lines + removed_lines
+    files_touched = len(changed_paths)
+    return {
+        "status": "known",
+        "reason": None,
+        "files_touched": files_touched,
+        "added_lines": added_lines,
+        "removed_lines": removed_lines,
+        "net_changed_lines": added_lines - removed_lines,
+        "total_changed_lines": total_changed,
+        "touched_test_files": touched_tests,
+        "touched_forbidden_files": list(touched_forbidden_files or []),
+        "patch_size_score": total_changed + files_touched * 5 + touched_tests * 20,
+    }
+
+
+def with_patch_minimality_fields(
+    result: dict[str, Any],
+    minimality: dict[str, Any],
+) -> dict[str, Any]:
+    result = dict(result)
+    result["patch_minimality"] = dict(minimality)
+    for field in PATCH_MINIMALITY_FIELDS:
+        result[field] = minimality.get(field)
+    result.setdefault(
+        "touched_forbidden_files",
+        list(minimality.get("touched_forbidden_files") or []),
+    )
+    return result
+
+
+def _minimality_case_summary(
+    result: dict[str, Any],
+    minimality: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "name": str(result.get("name") or "(unknown)"),
+        "patch_size_score": minimality.get("patch_size_score"),
+        "total_changed_lines": minimality.get("total_changed_lines"),
+        "files_touched": minimality.get("files_touched"),
+        "touched_test_files": minimality.get("touched_test_files"),
+    }
+
+
+def patch_minimality_aggregates(results: list[dict[str, Any]]) -> dict[str, Any]:
+    known: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    for result in results:
+        minimality = result.get("patch_minimality")
+        if not isinstance(minimality, dict):
+            minimality = {field: result.get(field) for field in PATCH_MINIMALITY_FIELDS}
+
+        if not isinstance(minimality.get("total_changed_lines"), (int, float)):
+            continue
+        if not isinstance(minimality.get("files_touched"), (int, float)):
+            continue
+        if not isinstance(minimality.get("patch_size_score"), (int, float)):
+            continue
+        known.append((result, minimality))
+
+    if not known:
+        return {
+            "average_total_changed_lines": None,
+            "average_files_touched": None,
+            "largest_patch_case": None,
+            "smallest_patch_case": None,
+        }
+
+    average_total = sum(
+        float(minimality["total_changed_lines"]) for _, minimality in known
+    ) / len(known)
+    average_files = sum(
+        float(minimality["files_touched"]) for _, minimality in known
+    ) / len(known)
+    by_score = sorted(
+        known,
+        key=lambda item: (
+            float(item[1]["patch_size_score"]),
+            float(item[1]["total_changed_lines"]),
+            str(item[0].get("name") or ""),
+        ),
+    )
+
+    return {
+        "average_total_changed_lines": round(average_total, 2),
+        "average_files_touched": round(average_files, 2),
+        "largest_patch_case": _minimality_case_summary(*by_score[-1]),
+        "smallest_patch_case": _minimality_case_summary(*by_score[0]),
+    }
 
 
 def classify_toolchain_issue(output: str) -> str | None:
@@ -295,6 +564,7 @@ def run_case(case_file: Path) -> dict[str, Any]:
         )
 
         before = snapshot_files(temp_repo)
+        before_texts = snapshot_file_texts(temp_repo)
 
         with ModelStatsScope() as model_calls:
             result = run_agent_web(
@@ -308,6 +578,7 @@ def run_case(case_file: Path) -> dict[str, Any]:
         model_stats = summarize_model_stats(model_calls)
 
         after = snapshot_files(temp_repo)
+        after_texts = snapshot_file_texts(temp_repo)
         changed = changed_files(before, after)
 
         ok = None
@@ -330,43 +601,53 @@ def run_case(case_file: Path) -> dict[str, Any]:
         if touched_forbidden:
             success = False
 
-        case_result = {
-            "name": name,
-            "success": success,
-            "validation_ok": ok,
-            "patch_style": patch_style,
-            "language": case.get("language"),
-            "case_file": str(case_file),            
-            "duration_sec": round(time.time() - started, 2),
-            "difficulty": case.get("difficulty"),
-            "category": case.get("category", "uncategorized"),
-            "changed_files": changed,
-            "missing_expected_files": missing_expected,
-            "touched_forbidden_files": touched_forbidden,
-            "validation_output": validation_output[-4000:],
-            "toolchain_issue": classify_toolchain_issue(validation_output),
-            "patch_kind": classify_patch_kind(result.get("answer", "")),
-            "rollback_happened": detect_rollback(
-                result.get("validation", ""),
-                validation_output,
-            ),
-            "agent_answer": result.get("answer", ""),
-            "agent_validation": result.get("validation", ""),
-            "model_calls": list(model_calls),
-            "selected_model": model_stats["selected_model"],
-            "model_attempts": model_stats["attempts"],
-            "fallback_count": model_stats["fallback_count"],
-            "models_by_role": model_stats["models_by_role"],
-            "input_tokens": model_stats["input_tokens"],
-            "output_tokens": model_stats["output_tokens"],
-            "total_tokens": model_stats["total_tokens"],
-            "estimated_cost_usd": model_stats["estimated_cost_usd"],
-            "unknown_cost_calls": model_stats["unknown_cost_calls"],
-            "patch_loop_attempts": result.get("patch_loop_attempts", 0),
-            "patch_loop_stop_reason": result.get("patch_loop_stop_reason"),
-            "self_corrected": (result.get("patch_loop_attempts") or 0) > 1,
-            "temp_dir": str(tmp_path),
-        }
+        patch_minimality = compute_patch_minimality(
+            before_texts,
+            after_texts,
+            changed,
+            touched_forbidden_files=touched_forbidden,
+        )
+
+        case_result = with_patch_minimality_fields(
+            {
+                "name": name,
+                "success": success,
+                "validation_ok": ok,
+                "patch_style": patch_style,
+                "language": case.get("language"),
+                "case_file": str(case_file),
+                "duration_sec": round(time.time() - started, 2),
+                "difficulty": case.get("difficulty"),
+                "category": case.get("category", "uncategorized"),
+                "changed_files": changed,
+                "missing_expected_files": missing_expected,
+                "touched_forbidden_files": touched_forbidden,
+                "validation_output": validation_output[-4000:],
+                "toolchain_issue": classify_toolchain_issue(validation_output),
+                "patch_kind": classify_patch_kind(result.get("answer", "")),
+                "rollback_happened": detect_rollback(
+                    result.get("validation", ""),
+                    validation_output,
+                ),
+                "agent_answer": result.get("answer", ""),
+                "agent_validation": result.get("validation", ""),
+                "model_calls": list(model_calls),
+                "selected_model": model_stats["selected_model"],
+                "model_attempts": model_stats["attempts"],
+                "fallback_count": model_stats["fallback_count"],
+                "models_by_role": model_stats["models_by_role"],
+                "input_tokens": model_stats["input_tokens"],
+                "output_tokens": model_stats["output_tokens"],
+                "total_tokens": model_stats["total_tokens"],
+                "estimated_cost_usd": model_stats["estimated_cost_usd"],
+                "unknown_cost_calls": model_stats["unknown_cost_calls"],
+                "patch_loop_attempts": result.get("patch_loop_attempts", 0),
+                "patch_loop_stop_reason": result.get("patch_loop_stop_reason"),
+                "self_corrected": (result.get("patch_loop_attempts") or 0) > 1,
+                "temp_dir": str(tmp_path),
+            },
+            patch_minimality,
+        )
     finally:
         cleanup_ok, cleanup_error = cleanup_temp_dir(tmp_path)
 
@@ -455,11 +736,19 @@ def _run_case_with_capture(case_file: Path, capture: bool) -> dict[str, Any]:
         try:
             res = run_case(case_file)
         except Exception as e:
-            res = {
-                "name": case_file.parent.name,
-                "success": False,
-                "error": repr(e),
-            }
+            res = with_patch_minimality_fields(
+                {
+                    "name": case_file.parent.name,
+                    "success": False,
+                    "error": repr(e),
+                },
+                compute_patch_minimality(
+                    None,
+                    None,
+                    [],
+                    touched_forbidden_files=[],
+                ),
+            )
     res["runner_log_tail"] = buf.getvalue()[-4000:]
     return res
 
@@ -708,6 +997,22 @@ def summarize_report(report: dict[str, Any], top_slowest: int = 3) -> None:
     if avg:
         print(f"Average per case: {avg:.2f}s")
 
+    minimality_aggregates = patch_minimality_aggregates(results)
+    avg_changed = report.get(
+        "average_total_changed_lines",
+        minimality_aggregates.get("average_total_changed_lines"),
+    )
+    avg_files = report.get(
+        "average_files_touched",
+        minimality_aggregates.get("average_files_touched"),
+    )
+    if isinstance(avg_changed, (int, float)) or isinstance(avg_files, (int, float)):
+        print("Patch minimality:")
+        if isinstance(avg_changed, (int, float)):
+            print(f"  Average total changed lines: {avg_changed:.2f}")
+        if isinstance(avg_files, (int, float)):
+            print(f"  Average files touched: {avg_files:.2f}")
+
     total_tokens = report.get("total_tokens")
     if total_tokens:
         from agents.model_stats import format_usd
@@ -745,6 +1050,30 @@ def summarize_report(report: dict[str, Any], top_slowest: int = 3) -> None:
 
 def _md_cell(s: Any) -> str:
     return str(s).replace("|", "\\|")
+
+
+def _format_patch_minimality_case(entry: dict[str, Any] | None) -> str:
+    if not entry:
+        return "unknown"
+
+    name = entry.get("name") or "(unknown)"
+    score = entry.get("patch_size_score")
+    changed = entry.get("total_changed_lines")
+    files = entry.get("files_touched")
+    tests = entry.get("touched_test_files")
+    parts = []
+    if isinstance(score, (int, float)):
+        parts.append(f"score {score:g}")
+    if isinstance(changed, (int, float)):
+        parts.append(f"{changed:g} changed lines")
+    if isinstance(files, (int, float)):
+        parts.append(f"{files:g} files")
+    if isinstance(tests, (int, float)) and tests:
+        parts.append(f"{tests:g} test files")
+
+    if not parts:
+        return f"`{_md_cell(name)}`"
+    return f"`{_md_cell(name)}` ({', '.join(parts)})"
 
 
 def write_markdown_report(report: dict[str, Any], path: Path) -> None:
@@ -830,6 +1159,45 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
         lines.append("|---|---|")
         for name, dur in durations[:5]:
             lines.append(f"| `{_md_cell(name)}` | {dur:.2f}s |")
+        lines.append("")
+
+    minimality_aggregates = patch_minimality_aggregates(results)
+    avg_changed = report.get(
+        "average_total_changed_lines",
+        minimality_aggregates.get("average_total_changed_lines"),
+    )
+    avg_files = report.get(
+        "average_files_touched",
+        minimality_aggregates.get("average_files_touched"),
+    )
+    largest_patch = report.get(
+        "largest_patch_case",
+        minimality_aggregates.get("largest_patch_case"),
+    )
+    smallest_patch = report.get(
+        "smallest_patch_case",
+        minimality_aggregates.get("smallest_patch_case"),
+    )
+    unknown_minimality = sum(
+        1
+        for r in results
+        if not isinstance((r.get("patch_minimality") or {}).get("patch_size_score"), (int, float))
+    )
+    if results:
+        lines.append("## Patch Minimality")
+        lines.append("")
+        if isinstance(avg_changed, (int, float)):
+            lines.append(f"- Average total changed lines: {avg_changed:.2f}")
+        else:
+            lines.append("- Average total changed lines: unknown")
+        if isinstance(avg_files, (int, float)):
+            lines.append(f"- Average files touched: {avg_files:.2f}")
+        else:
+            lines.append("- Average files touched: unknown")
+        lines.append(f"- Smallest patch: {_format_patch_minimality_case(smallest_patch)}")
+        lines.append(f"- Largest patch: {_format_patch_minimality_case(largest_patch)}")
+        if unknown_minimality:
+            lines.append(f"- Unknown minimality: {unknown_minimality}")
         lines.append("")
 
     flaky_results = [r for r in results if r.get("flaky")]
@@ -1165,36 +1533,52 @@ def main() -> int:
                         f"\n⏭️ Skipping benchmark: {case_name} "
                         f"(missing tools: {', '.join(missing)})"
                     )
-                res = {
-                    "name": case_name,
-                    "success": False,
-                    "skipped": True,
-                    "skip_reason": "toolchain",
-                    "toolchain_issue": f"missing tools: {', '.join(missing)}",
-                    "case_file": str(case_file),
-                    "language": case.get("language"),
-                    "difficulty": case.get("difficulty"),
-                    "category": case.get("category", "uncategorized"),
-                    "duration_sec": 0.0,
-                    "changed_files": [],
-                    "missing_expected_files": [],
-                    "touched_forbidden_files": [],
-                    "validation_output": "",
-                    "patch_kind": "skipped",
-                    "rollback_happened": False,
-                    "agent_answer": "",
-                    "agent_validation": "",
-                }
+                res = with_patch_minimality_fields(
+                    {
+                        "name": case_name,
+                        "success": False,
+                        "skipped": True,
+                        "skip_reason": "toolchain",
+                        "toolchain_issue": f"missing tools: {', '.join(missing)}",
+                        "case_file": str(case_file),
+                        "language": case.get("language"),
+                        "difficulty": case.get("difficulty"),
+                        "category": case.get("category", "uncategorized"),
+                        "duration_sec": 0.0,
+                        "changed_files": [],
+                        "missing_expected_files": [],
+                        "touched_forbidden_files": [],
+                        "validation_output": "",
+                        "patch_kind": "skipped",
+                        "rollback_happened": False,
+                        "agent_answer": "",
+                        "agent_validation": "",
+                    },
+                    compute_patch_minimality(
+                        None,
+                        None,
+                        [],
+                        touched_forbidden_files=[],
+                    ),
+                )
             else:
                 if not quiet:
                     print(f"\n🧪 Running benchmark: {case_name}")
                 res = _run_case_with_capture(case_file, capture=capture)
         except Exception as e:
-            res = {
-                "name": case_file.parent.name,
-                "success": False,
-                "error": repr(e),
-            }
+            res = with_patch_minimality_fields(
+                {
+                    "name": case_file.parent.name,
+                    "success": False,
+                    "error": repr(e),
+                },
+                compute_patch_minimality(
+                    None,
+                    None,
+                    [],
+                    touched_forbidden_files=[],
+                ),
+            )
 
         # Retry-on-failure (AI Suggestion § A + Gemini's per-attempt context
         # capture). Toolchain failures, forbidden-file touches, and structural
@@ -1306,6 +1690,7 @@ def main() -> int:
             1 for r in results if not r.get("skipped") and r.get("self_corrected")
         ),
         **_duration_aggregates(results),
+        **patch_minimality_aggregates(results),
         "results": results,
     }
     report["brain_stamp"] = collect_brain_stamp(PROJECT_ROOT)

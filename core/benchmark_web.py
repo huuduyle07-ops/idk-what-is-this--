@@ -264,37 +264,53 @@ def _run_one_case(
             else []
         )
         if missing:
-            return {
-                "name": case_name,
-                "success": False,
-                "skipped": True,
-                "skip_reason": "toolchain",
-                "toolchain_issue": f"missing tools: {', '.join(missing)}",
-                "case_file": str(case_file),
-                "language": case.get("language"),
-                "difficulty": case.get("difficulty"),
-                "category": case.get("category", "uncategorized"),
-                "duration_sec": 0.0,
-                "changed_files": [],
-                "missing_expected_files": [],
-                "touched_forbidden_files": [],
-                "validation_output": "",
-                "patch_kind": "skipped",
-                "rollback_happened": False,
-                "agent_answer": "",
-                "agent_validation": "",
-                "attempts": 1,
-                "flaky": False,
-                "retry_results": [],
-            }
+            return benchmark_runner.with_patch_minimality_fields(
+                {
+                    "name": case_name,
+                    "success": False,
+                    "skipped": True,
+                    "skip_reason": "toolchain",
+                    "toolchain_issue": f"missing tools: {', '.join(missing)}",
+                    "case_file": str(case_file),
+                    "language": case.get("language"),
+                    "difficulty": case.get("difficulty"),
+                    "category": case.get("category", "uncategorized"),
+                    "duration_sec": 0.0,
+                    "changed_files": [],
+                    "missing_expected_files": [],
+                    "touched_forbidden_files": [],
+                    "validation_output": "",
+                    "patch_kind": "skipped",
+                    "rollback_happened": False,
+                    "agent_answer": "",
+                    "agent_validation": "",
+                    "attempts": 1,
+                    "flaky": False,
+                    "retry_results": [],
+                },
+                benchmark_runner.compute_patch_minimality(
+                    None,
+                    None,
+                    [],
+                    touched_forbidden_files=[],
+                ),
+            )
         result = benchmark_runner._run_case_with_capture(case_file, capture=True)
     except Exception as e:
-        result = {
-            "name": case_label,
-            "success": False,
-            "error": repr(e),
-            "case_file": str(case_file),
-        }
+        result = benchmark_runner.with_patch_minimality_fields(
+            {
+                "name": case_label,
+                "success": False,
+                "error": repr(e),
+                "case_file": str(case_file),
+            },
+            benchmark_runner.compute_patch_minimality(
+                None,
+                None,
+                [],
+                touched_forbidden_files=[],
+            ),
+        )
 
     if retry_failed > 0 and benchmark_runner._should_retry(result):
         attempts_log = [benchmark_runner._retry_attempt_snapshot(result, attempt=1)]
@@ -365,6 +381,7 @@ def _build_report(
             1 for item in results if not item.get("skipped") and item.get("self_corrected")
         ),
         **benchmark_runner._duration_aggregates(results),
+        **benchmark_runner.patch_minimality_aggregates(results),
         "results": results,
         "brain_stamp": collect_brain_stamp(benchmark_runner.PROJECT_ROOT),
     }
