@@ -205,6 +205,7 @@ def read_report(report_dir: Path) -> dict:
     """Full content of one dream run for the report viewer."""
     morning_path = report_dir / "morning_report.txt"
     list_path = report_dir / "list.json"
+    case_ideas_path = report_dir / "case_ideas.json"
 
     morning = ""
     if morning_path.exists():
@@ -228,6 +229,14 @@ def read_report(report_dir: Path) -> dict:
             pass
 
     items = enrich_report_patch_blockers(report_dir, items, dream_mode)
+    case_ideas_payload: dict = {}
+    if case_ideas_path.exists():
+        try:
+            parsed_case_ideas = json.loads(case_ideas_path.read_text(encoding="utf-8"))
+            if isinstance(parsed_case_ideas, dict):
+                case_ideas_payload = parsed_case_ideas
+        except Exception:
+            case_ideas_payload = {}
 
     return {
         "report_dir": str(report_dir),
@@ -236,6 +245,9 @@ def read_report(report_dir: Path) -> dict:
         "patch_style": patch_style,
         "dream_mode": dream_mode,
         "completed_at": completed_at,
+        "case_ideas": case_ideas_payload.get("case_ideas", []),
+        "case_ideas_message": case_ideas_payload.get("message", ""),
+        "lesson_notes": case_ideas_payload.get("lesson_notes", []),
     }
 
 
@@ -800,6 +812,9 @@ STATUS_LEGEND: dict[str, str] = {
     "needs_manual_review": "Planner is unsure; human review needed.",
     "blocked_missing_context": "Plan blocked because grounding context is missing.",
     "idea_written": "Free-form design note written (legacy idea-flow).",
+    "case_ideas_created": "Reference-study case idea candidates written.",
+    "case_idea_no_input": "No reference-study notes were provided.",
+    "case_idea_no_ideas": "Reference-study notes produced no case ideas.",
     "rejected": "Patch failed validation after all attempts.",
     "error": "Item crashed during processing.",
     "skipped_time_budget": "Time budget exhausted before reaching this item.",
@@ -807,10 +822,117 @@ STATUS_LEGEND: dict[str, str] = {
 }
 
 
+def _md_cell(value) -> str:
+    text = str(value if value is not None else "").replace("\n", " ").strip()
+    return text.replace("|", "\\|")
+
+
+def render_case_ideas_markdown(
+    case_ideas: list[dict],
+    *,
+    message: str = "",
+) -> str:
+    lines: list[str] = ["# Case Idea Candidates", ""]
+    if message:
+        lines.extend([message.strip(), ""])
+    if not case_ideas:
+        lines.append("No case ideas were generated from the provided reference notes.")
+        return "\n".join(lines)
+
+    lines.extend([
+        "| Pattern | Suggested case | Language | Category | Difficulty | Approved? |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ])
+    for idea in case_ideas:
+        approved = "yes" if idea.get("human_approved_for_case_creation") is True else "no"
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    _md_cell(idea.get("pattern")),
+                    _md_cell(idea.get("suggested_case_name")),
+                    _md_cell(idea.get("language")),
+                    _md_cell(idea.get("category")),
+                    _md_cell(idea.get("difficulty")),
+                    approved,
+                ]
+            )
+            + " |"
+        )
+
+    lines.append("")
+    lines.append("## Details")
+    lines.append("")
+    for idea in case_ideas:
+        name = _md_cell(idea.get("suggested_case_name") or "unnamed_case")
+        lines.append(f"### {name}")
+        for label, key in (
+            ("Pattern", "pattern"),
+            ("Why it matters", "why_it_matters"),
+            ("Minimal experiment", "minimal_experiment"),
+            ("Expected wrong agent behavior", "expected_wrong_agent_behavior"),
+        ):
+            value = str(idea.get(key) or "").strip()
+            if value:
+                lines.append(f"- **{label}:** {value}")
+        lines.append("- **Human approved for case creation:** false")
+        lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def write_case_idea_artifacts(
+    report_dir: Path,
+    case_ideas: list[dict],
+    *,
+    lesson_notes: list[str] | None = None,
+    message: str = "",
+) -> dict:
+    report_dir.mkdir(parents=True, exist_ok=True)
+    notes = [str(note).strip() for note in (lesson_notes or []) if str(note).strip()]
+    payload = {
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "source": "dream_reference_study",
+        "message": message,
+        "case_ideas": case_ideas,
+        "lesson_notes": notes,
+    }
+    json_path = report_dir / "case_ideas.json"
+    json_path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    md_path = report_dir / "case_ideas.md"
+    md_path.write_text(
+        render_case_ideas_markdown(case_ideas, message=message),
+        encoding="utf-8",
+    )
+
+    lessons_path = None
+    if notes:
+        lessons_path = report_dir / "LESSONS_LEARNED.md"
+        lines = [
+            "# Lessons Learned Draft",
+            "",
+            "Draft notes from reference-study case-idea mode. These are not seeded lessons.",
+            "",
+        ]
+        for note in notes:
+            lines.append(f"- {note}")
+        lessons_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    return {
+        "json": str(json_path),
+        "markdown": str(md_path),
+        "lessons": str(lessons_path) if lessons_path else None,
+    }
+
+
 def write_report_markdown(
     report_dir: Path,
     items: list[dict],
     dream_mode: str | None = None,
+    case_ideas: list[dict] | None = None,
 ) -> Path:
     lines: list[str] = [
         f"# Morning report — {datetime.now():%Y-%m-%d %H:%M}",
@@ -834,6 +956,32 @@ def write_report_markdown(
                 lines.append(f"- **{st}** ({count}) — {descr}")
             else:
                 lines.append(f"- **{st}** ({count})")
+        lines.append("")
+
+    if case_ideas is not None:
+        lines.append("## Case idea candidates")
+        lines.append("")
+        if case_ideas:
+            lines.append("| Pattern | Suggested case | Language | Category | Difficulty | Approved? |")
+            lines.append("| --- | --- | --- | --- | --- | --- |")
+            for idea in case_ideas:
+                approved = "yes" if idea.get("human_approved_for_case_creation") is True else "no"
+                lines.append(
+                    "| "
+                    + " | ".join(
+                        [
+                            _md_cell(idea.get("pattern")),
+                            _md_cell(idea.get("suggested_case_name")),
+                            _md_cell(idea.get("language")),
+                            _md_cell(idea.get("category")),
+                            _md_cell(idea.get("difficulty")),
+                            approved,
+                        ]
+                    )
+                    + " |"
+                )
+        else:
+            lines.append("No case ideas were generated from the provided reference notes.")
         lines.append("")
 
     lines.append("## Items")

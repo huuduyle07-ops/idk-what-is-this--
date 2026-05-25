@@ -1,6 +1,6 @@
 # AI Coding Mentor — Roadmap Refresh
 
-> Updated after AgentBench 22-case expansion, Phase 2 reporting upgrades, Dream V2 benchmark seeding (with dedupe + flaky-case seeding), local DB recovery, **Phase 5 web workspace revamp completion (Slices 1-5 shipped 2026-05-16)**, flaky-case Benchmarks tab rendering, **Dream execution-quality Slices alpha/beta/gamma shipped (2026-05-16)** including ready-to-apply revalidation + lesson-quality badges, **Dream Slice γ3.3 shipped (2026-05-17)** explaining why planned items are not `ready_to_apply`, **Brain version stamp + Phase 4.5 Level 1 background reporter shipped (2026-05-17)**, **Phase 4.5 Levels 2-3 CLI MVP shipped (2026-05-17)**, and **Phase 6 manual-safe memory loop shipped (2026-05-17)** — bucketed lesson storage, Memory tab promote/block UI, active-only retrieval, CONTROL prompt injection behind `LESSON_RETRIEVAL_ENABLED`, manual proposal→lesson CLI, and lesson tags (auto-creation from benchmarks/Dream remains deferred).
+> Updated after AgentBench 22-case expansion, Phase 2 reporting upgrades, Dream V2 benchmark seeding (with dedupe + flaky-case seeding), local DB recovery, **Phase 5 web workspace revamp completion (Slices 1-5 shipped 2026-05-16)**, flaky-case Benchmarks tab rendering, **Dream execution-quality Slices alpha/beta/gamma shipped (2026-05-16)** including ready-to-apply revalidation + lesson-quality badges, **Dream Slice γ3.3 shipped (2026-05-17)** explaining why planned items are not `ready_to_apply`, **Phase 4.6 Dream reference-study case-idea mode shipped (2026-05-25)**, **Brain version stamp + Phase 4.5 Level 1 background reporter shipped (2026-05-17)**, **Phase 4.5 Levels 2-3 CLI MVP shipped (2026-05-17)**, and **Phase 6 manual-safe memory loop shipped (2026-05-17)** — bucketed lesson storage, Memory tab promote/block UI, active-only retrieval, CONTROL prompt injection behind `LESSON_RETRIEVAL_ENABLED`, manual proposal→lesson CLI, lesson tags, the Phase 6.4b benchmark-report lesson seeder, and the Phase 6.4c proposal-artifact lesson seeder (automatic Dream queue lessonization remains deferred).
 
 > **2026-05-23 refresh:** Phase 7.1 through 7.2.1.1 Mayor/workflow bridge slices are shipped. Phase 8 now includes the read-only MCP server, the artifact-write MCP server for `create_handoff_note`, `import_worker_run_as_proposal`, and `validate_imported_worker_proposal`, the MCP audit ledger, and local MCP Inspector shortcuts/cleanup.
 
@@ -28,13 +28,15 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
   - keeps missing/malformed data and oversized diffs in human review
   - now wired into `lesson_store` routing (candidate/active/blocked buckets) and `lesson_retrieval` (only active reads); still not wired into benchmark runner behavior
 - Phase 6 manual-safe memory loop shipped 2026-05-17:
-  - `core/lesson_store.py` — bucketed `.agent/<project_tag>/lessons/{candidate,active,blocked}/<id>.json` storage with atomic moves, path-traversal guards, optional `LESSON_AUTO_ACTIVE` flag (default false → human must promote), and `derive_lesson_tags()` helper
+  - `core/lesson_store.py` — bucketed `.agent/lessons/{candidate,active,blocked}/<id>.json` storage with atomic moves, path-traversal guards, optional `LESSON_AUTO_ACTIVE` flag (default false → human must promote), and `derive_lesson_tags()` helper. Current storage is global-only; repo-scoped candidate defaults are a follow-up before worker/Dream auto-lessonization.
   - Memory tab — filter buttons (All/Candidate/Active/Blocked), promote/block actions, lesson cards with tag chips, safety copy explaining advisory-only status
-  - `core/lesson_retrieval.py` — `list_active_lessons` / `find_active_lessons` / `format_lessons_for_prompt`; reads ONLY `active/`; defensive double-filter on the top-level `active_knowledge_allowed` flag; per-repo + global scope union so lessons saved without `--repo-path` are visible everywhere; per-repo lessons stay isolated
+  - `core/lesson_retrieval.py` — `list_active_lessons` / `find_active_lessons` / `format_lessons_for_prompt`; reads ONLY `active/`; defensive double-filter on the top-level `active_knowledge_allowed` flag. Retrieval should eventually union repo-scoped active lessons with explicitly global active lessons; current implementation reads the global bucket only.
   - Deterministic keyword scoring: case_name +100, tag +25, language/category +10, query-token +5 (all binary); tokenized free-form queries with English + generic-action-word stopword list (`fix`, `bug`, `patch`, `issue`, `problem`) to prevent cross-language false positives; limit clamped to [1, 20]
   - CONTROL prompt injection (`core/control_engine.py`) gated by `LESSON_RETRIEVAL_ENABLED` (default false), with `LESSON_RETRIEVAL_LIMIT` and `LESSON_RETRIEVAL_MAX_CHARS`; `[ACTIVE LESSONS — advisory hints, lowest priority]` block sits between `[PHANTOM LIMB SUGGESTIONS]` and `[USER]`; fail-closed (any error → empty block, prompt still builds); 4 production callers updated to pass `repo_path`
   - `scripts/create_lesson_from_proposal.py` — manual CLI that turns a validated `.agent/proposals/<run>/<item>/` artifact into a lesson candidate; explicitly populates tags; refuses by default if validation/apply failed (override with `--allow-failed`); path-traversal guarded; never modifies the real repo
-  - Auto-creation from benchmark/Dream/proposal queues is **explicitly deferred** to Phase 6.4 — today only the manual CLI flow exists, keeping the loop "manual-safe"
+  - `scripts/seed_lessons_from_benchmark.py` — Phase 6.4b CLI seeder that reads existing `.agent/benchmarks/benchmark_report_*.json` evidence and creates global lesson candidates only through `lesson_store` / `lesson_quality`; dry-run and report summaries supported; no benchmark runs, model calls, patch application, report mutation, active auto-promotion, or retrieval enablement
+  - `scripts/seed_lessons_from_proposals.py` — Phase 6.4c CLI seeder that batches existing validated `.agent/proposals/<run>/<item>/` artifacts into repo-scoped lesson candidates by default; `--global-candidate` is explicit; failed evidence is skipped unless `--include-failed` and `lesson_quality` keeps it blocked or human-review only
+  - Dream queue auto-creation remains **explicitly deferred** after 6.4c; current-repo Dream/proposal artifacts should remain repo-scoped by default, and human promotion is still required before any seeded lesson becomes retrieval-eligible
 - Phase 7 Mayor/workflow bridge shipped 2026-05-21:
   - Phase 7.1 creates handoff notes and can optionally run external workers in temp clones only.
   - Phase 7.2 imports complete worker runs into the existing proposal review path without auto-apply.
@@ -93,6 +95,7 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
   - Docker app image / Ollama-in-Docker paused (see Phase 9)
 - Dream V2:
   - All 3 modes work: `plan_only`, `patch_if_safe`, `research`
+  - **Phase 4.6 shipped (2026-05-25):** `reference_study` / `case_idea_research` turns pasted notes, repo-local markdown files, and snippet fields into `.agent/dreams/.../case_ideas.json`, `case_ideas.md`, and optional `LESSONS_LEARNED.md` drafts. It never creates benchmark folders, runs benchmarks, applies patches, seeds lessons, or promotes memory.
   - Queue/status/report routes, artifacts produced (plan_analysis.json, proposal.md, morning_report.txt)
   - `patch_if_safe` uses temp clone (success criterion met)
   - `patch_if_safe` now attempts patch generation for narrow `bug` **and `debt`** items when the planner marks them safe
@@ -232,7 +235,7 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
 
 > **MVP (2026-05-16):** standalone evaluator in `core/lesson_quality.py` with smoke tests in `tests/test_lesson_quality.py`. Quality classification primitive only.
 >
-> **Wired (2026-05-17):** the guard now drives `lesson_store` bucket routing (auto_approved/needs_review/blocked → candidate/active/blocked), feeds `lesson_retrieval`'s active-only reads, and gates `control_engine`'s `[ACTIVE LESSONS]` block. Auto-creation from benchmark/Dream runs is the only piece still deferred (Phase 6.4).
+> **Wired (2026-05-17):** the guard now drives `lesson_store` bucket routing (auto_approved/needs_review/blocked → candidate/active/blocked), feeds `lesson_retrieval`'s active-only reads, and gates `control_engine`'s `[ACTIVE LESSONS]` block. Phase 6.4b/6.4c now seed candidates from existing benchmark reports and proposal artifacts through the same guard; Dream queue auto-creation remains deferred.
 
 **Why:** If the agent solves a case by deleting tests or nuke-and-rewrite, and that "solution" gets auto-promoted to a lesson card, the agent will look up that lesson next time it sees a similar failure type and reinforce the bad pattern. Lesson storage without quality gating poisons your knowledge base over time. This is a real architectural risk that Claude's original Phase 6 design missed.
 
@@ -255,7 +258,7 @@ This makes Phase 6 a precondition-design problem, not just a storage problem. **
 3. ~~Patch Safety gate (forbidden-files + path-traversal at apply time).~~ ✅
 4. Held-out eval set.
 5. Repeated-failure Dream seeding.
-6. ~~Phase 6 lessons — § M guard MVP is shipped; still wire `Candidate_Lesson` → `Active_Knowledge` storage, human approval, and retrieval that reads only active knowledge.~~ ✅ (manual-safe loop shipped; Phase 6.4 auto-creation is the remaining piece)
+6. ~~Phase 6 lessons — § M guard MVP is shipped; still wire `Candidate_Lesson` → `Active_Knowledge` storage, human approval, and retrieval that reads only active knowledge.~~ ✅ (manual-safe loop shipped; benchmark-report seeding shipped as 6.4b; proposal-artifact seeding shipped as 6.4c; Dream queue auto-creation remains)
 
 ---
 
@@ -340,7 +343,7 @@ A "true 22/22" passing run will look like one of:
 
 **Status: MOSTLY DONE**
 
-Dream is the planning/research layer; benchmark seeding is shipped with dedupe. Execution-quality Slices alpha/beta/gamma are now shipped.
+Dream is the planning/research layer; benchmark seeding is shipped with dedupe. Execution-quality Slices alpha/beta/gamma and Phase 4.6 reference-study case-idea mode are now shipped.
 
 ### Completed (2026-05-16)
 
@@ -358,6 +361,7 @@ Dream is the planning/research layer; benchmark seeding is shipped with dedupe. 
 - **Specific-report seeding** via `report_filename` — used by Benchmarks tab "Seed from this report" button
 - **Dedupe** by `(source, benchmark_report, case_name, kind)` — re-clicking seed is idempotent; manual non-benchmark items preserved
 - **`min_total=5` filter** — skips one-off rerun reports (e.g., single-case retries); falls back to newest report only if no larger report exists
+- **Phase 4.6 shipped** - `reference_study` item / `case_idea_research` mode writes case idea candidates from reference notes to `case_ideas.json` and `case_ideas.md`, with `human_approved_for_case_creation=false` by default and a Dream-tab "Case idea candidates" report table
 - Phase 5 Slice 4 closed the Dream UI alert-hell: modal queue view, modal report viewer, per-item status cards, checkbox apply UI
 
 ### Remaining (manual / by-running)
@@ -373,6 +377,7 @@ Dream can turn benchmark reports into useful queue items.   [met]
 Dream can produce readable plans without patching.           [met]
 Patch_if_safe does not touch the real repo directly.         [met - uses temp clone]
 Ready_to_apply items can be revalidated and lesson-graded.   [met - gamma.2]
+Reference notes can become case idea candidates only.          [met - 4.6]
 No-patch Dream items explain why no patch is ready.           [met - γ3.3]
 ```
 
@@ -534,20 +539,27 @@ Rules:
 
 ## Phase 6 — Memory, lessons, and compression
 
-**Status: MANUAL-SAFE LOOP SHIPPED 2026-05-17 · auto-creation deferred to 6.4**
+**Status: MANUAL-SAFE LOOP SHIPPED 2026-05-17 · benchmark/proposal evidence seeders shipped 2026-05-25 · Dream auto-creation deferred**
 
 > 🤖 **Claude-proposed (2026-05-16):** Anchor "lessons cards" to a specific consumer: *"the agent looks up past lessons before drafting a patch for similar failure type."* Without the lookup-integration in the patch flow, lesson cards become a museum nobody reads. First Phase 6 iteration should include the **retrieval call site**, not just the storage.
 >
-> **🤖 Gemini-proposed HARD PREREQUISITE (2026-05-16) — see AI Suggestions § M:** Context Poisoning Guard MVP shipped 2026-05-16 as a standalone evaluator (`core/lesson_quality.py`). The two-tier `Candidate_Lesson` → `Active_Knowledge` gate is **now wired** into storage (6.0) and retrieval (6.2/6.3); auto-creation from benchmarks/Dream remains deferred (6.4).
+> **🤖 Gemini-proposed HARD PREREQUISITE (2026-05-16) — see AI Suggestions § M:** Context Poisoning Guard MVP shipped 2026-05-16 as a standalone evaluator (`core/lesson_quality.py`). The two-tier `Candidate_Lesson` → `Active_Knowledge` gate is **now wired** into storage (6.0) and retrieval (6.2/6.3); benchmark-report seeding is shipped as 6.4b and proposal-artifact seeding is shipped as 6.4c, while Dream queue auto-creation remains deferred.
 
 ### Goal
 
 Turn benchmark and Dream outputs into useful knowledge the agent actually consults — safely, behind a quality gate, with human approval before anything becomes retrieval-eligible.
 
+### Scope policy
+
+- Benchmark reports produce **global lesson candidates** by default because AgentBench cases are generic bug patterns.
+- Phase 7 worker proposals from a real repo should produce **repo-scoped lesson candidates** by default because the evidence may be project-specific.
+- Dream/proposal artifacts from the current repo should also produce **repo-scoped lesson candidates** by default.
+- A lesson becomes **global active knowledge** only after a human clicks Promote or an operator uses an explicit CLI flag. Auto-approved quality evidence may create a candidate, but it must not silently become global retrieval context.
+
 ### Shipped 2026-05-17 (manual-safe loop)
 
 - **6.0 — Candidate Lesson Store** (`core/lesson_store.py`):
-  - bucketed storage under `.agent/<project_tag>/lessons/{candidate,active,blocked}/<id>.json`
+  - bucketed storage under `.agent/lessons/{candidate,active,blocked}/<id>.json`; current implementation is global-only even when callers pass `repo_path`
   - `save_candidate_lesson()` routes by `lesson_quality.promotion` (blocked → `blocked/`; auto_approved → `candidate/` by default, `active/` only if `LESSON_AUTO_ACTIVE=true`)
   - `list_lessons`, `promote_lesson`, `block_lesson` with atomic moves + path-traversal guard
   - 13-field lesson record; top-level `active_knowledge_allowed` strictly mirrors the bucket (file-in-active iff field-true) — belt-and-suspenders against retrieval bugs reading the field instead of the folder
@@ -560,7 +572,7 @@ Turn benchmark and Dream outputs into useful knowledge the agent actually consul
   - tokenized free-form queries with English + generic-action-word stopword list (`fix`, `bug`, `patch`, `issue`, `problem`) to prevent cross-language false positives
   - `format_lessons_for_prompt()` — compact text (title/case/source/summary/top reasons), never embeds raw `candidate` payload, capped at `max_chars`
   - limit clamped to [1, 20]
-  - **6.2.1:** scope union — lessons saved without `--repo-path` (global bucket) are visible from any per-repo retrieval call; per-repo lessons stay isolated
+  - **6.2.1:** retrieval scope contract — once repo-scoped storage lands, current-repo active lessons should union with explicitly global active lessons; today the implementation reads the global bucket only
   - **6.2.2:** lesson `tags` field with `derive_lesson_tags()` (language / category / case_name slug / file basenames / distinctive content tokens); tag matches outrank summary-only matches
 - **6.3 — CONTROL prompt injection** (`core/control_engine.py`):
   - `[ACTIVE LESSONS — advisory hints, lowest priority]` block injected between `[PHANTOM LIMB SUGGESTIONS]` and `[USER]` in both feature-extension and normal bug-fix branches
@@ -573,10 +585,25 @@ Turn benchmark and Dream outputs into useful knowledge the agent actually consul
   - explicitly populates tags via `derive_lesson_tags`
   - refuses by default if `validation_ok` or `apply_success` is false; `--allow-failed` opt-in (lesson_quality will then mark it blocked)
   - path-traversal guarded; summary truncated; never modifies the real repo
+- **6.4b — Benchmark report lesson candidate seeder** (`scripts/seed_lessons_from_benchmark.py`):
+  - reads existing `.agent/benchmarks/benchmark_report_*.json` reports via `--latest` or `--report`, with optional `--case`, `--limit`, and `--dry-run`
+  - creates global lesson candidates only through `core.lesson_store.save_candidate_lesson()` and `core.lesson_quality.evaluate_lesson_candidate()`
+  - never writes directly to `active/`, never flips `LESSON_RETRIEVAL_ENABLED`, never runs benchmarks, never calls models, never applies patches, and never modifies benchmark reports
+  - prefers passed `validation_ok=true` cases; flaky cases are saved as human-review candidates; failed/unsafe cases are saved only when `lesson_quality` routes them to `blocked/`
+  - skips missing patch evidence, path-traversal report names, and duplicate source keys based on `benchmark_report + case_name + patch_hash/changed_files_hash`
+  - can write optional `.agent/reports/lesson_seed_report_*.json` / `.md` summaries
+- **6.4c — Proposal evidence lesson candidate seeder** (`scripts/seed_lessons_from_proposals.py`):
+  - reads existing `.agent/proposals/<run>/<item>/` artifacts via `--latest`, `--run`, or `--proposal-ref`, with optional `--limit`, `--repo-path`, and `--dry-run`
+  - creates repo-scoped candidates by default from validated proposal evidence (`patch_proposal`, `apply_result`, validation, `apply_success=true`, `validation_ok=true`); `--global-candidate` is the explicit operator escape hatch
+  - skips failed or incomplete proposals by default; `--include-failed` still routes through `lesson_quality` and never writes failed evidence directly to `active/`
+  - never writes directly to `active/`, never flips `LESSON_RETRIEVAL_ENABLED`, never runs benchmarks, never calls models, never applies patches, and never modifies proposal artifacts
+  - dedupes with stable source keys based on `proposal_ref + patch_hash` or `proposal_ref + changed_files_hash + validation_hash`
+  - can write optional `.agent/reports/proposal_lesson_seed_report_*.json` / `.md` summaries
 
-### Deferred (Phase 6.4 full auto-creation, Phase 6.5+)
+### Deferred (Phase 6.4 follow-ups, Phase 6.5+)
 
-- [ ] **6.4 full auto-creation** — wire benchmark/Dream/proposal queues to feed lesson candidates without manual CLI runs. Still must go through `lesson_quality` gate; promotion must remain human-approved by default.
+- [ ] **6.4 follow-up auto-creation** — wire Dream/proposal queues to feed repo-scoped lesson candidates without manual CLI runs. Benchmark-report seeding exists as an explicit global-candidate CLI, and proposal-artifact seeding exists as an explicit repo-scoped CLI. All paths still must go through `lesson_quality`; promotion must remain human-approved by default.
+- [ ] **6.4d scoped lesson storage/runtime isolation** — make `repo_path` meaningful in `lesson_store` and retrieval, preserve benchmark report seeding as global, preserve worker/current-repo Dream/proposal candidates as repo-scoped by default, and keep global active promotion explicit.
 - [ ] "Save this session to memory" button
 - [ ] Log compression in lesson body (validation summary, patch summary, failure category — no raw dumps)
 - [ ] Smarter scoring beyond binary token substring (bigram phrase boosts, embeddings) — only after AgentBench proves it improves results
@@ -589,7 +616,8 @@ Turn benchmark and Dream outputs into useful knowledge the agent actually consul
 - [x] Wire the guard into Phase 6 lesson storage/promotion (`Candidate_Lesson` → `Active_Knowledge`, auto-criteria OR human approval, retrieval reads ONLY active/)
 - [x] **🤖 Claude-proposed:** Wire lesson lookup into the patch pipeline (`core/control_engine.py`) — **shipped via 6.3 behind `LESSON_RETRIEVAL_ENABLED`**
 - [x] "Consolidate memory" button (already exists in Memory tab)
-- [ ] Convert benchmark reports into lesson cards (auto-flow — deferred to 6.4)
+- [x] Convert benchmark reports into lesson candidates — shipped as explicit 6.4b CLI seeder, not an automatic benchmark-run side effect
+- [x] Convert proposal artifacts into repo-scoped lesson candidates — shipped as explicit 6.4c CLI seeder, not an automatic worker/Dream side effect
 - [ ] Save Dream plans as knowledge entries (auto-flow — deferred to 6.4)
 - [ ] "Save this session to memory" button
 - [ ] Log compression: validation summary, patch summary, failure category
@@ -970,7 +998,11 @@ Phase 12 upgraded AgentBench from a pass/fail runner into an experiment governan
 - Graph weights can over-rank utility hubs.
 - Linter fusion is correctness-safe but cost-sensitive.
 - MCTS remains research-only and experiment-gated.
-
+---
+## Phase 12.8 - Web UI for seeing presentation proofs
+### Shipped 
+- Added markdown folders in benchmark specifically for for seeing proofs
+- Make a HTML rendering for showing tables
 ---
 
 ## Phase 13 — Replay Debugger + Artifact Janitor
@@ -1077,7 +1109,7 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
 | **PromptOps / Prompt Version Control** | folded into **Phase 5 Polish** (Prompt-version quantifier panel, already scheduled) + **Phase 12** (A/B comparison layer) |
 | **Trust Dashboard** | folded into **Phase 5 Polish** — Settings/Health panel evolves into Trust Dashboard via composition of existing signals (latest benchmark, flaky count, dirty tree, prompt hash changed, lesson retrieval enabled, regression alerts). No rewrite. |
 | **Skill / Tool Registry** | demoted to **Phase 8 prep** — MCP needs the registry to expose tools safely; everyone else can hardcode for now |
-| **Multi-Repo / Workspace Memory** | folded into **Phase 6 as 6.2.3 increment** (priority chain: current repo → language/category → benchmark-derived → reference). Phase 6.2.1 already shipped the scope union foundation. |
+| **Multi-Repo / Workspace Memory** | folded into **Phase 6 as 6.4d scoped lesson storage/runtime isolation** (priority chain: current repo → explicitly global benchmark-derived → reference). Phase 6.4b ships global benchmark candidates and 6.4c ships repo-scoped proposal candidates; physical repo-scoped storage/retrieval isolation still needs storage support. |
 | **Permission & Capability System** | start as **docs-only "Capability Map"** (single `docs/capability_map.md` listing every gate with its current default). Programmatic enforcer deferred until MCP / browser-agent / Docker app mode actually make it necessary. |
 | **Tutor Mode / Curriculum** | reduced to a single **Phase 5 Polish item**: "Post-patch explanation card." Full curriculum/exercise scope deferred — it would pivot the product from "patcher named mentor" to "actual mentor," which is a different roadmap. |
 | **Multi-Agent Council Mode** | reframed as **Phase 10 alternative to MCTS**, decided by head-to-head experiment (Phase 12 `exp_council_vs_mcts`), not built in parallel. Both are "more compute → better patches" bets; pick one based on data. |
@@ -1109,11 +1141,14 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
 - [x] γ3.1 Timestamped run artifact isolation — shipped.
 - [x] γ3.2 Preferred refined artifact promotion — shipped.
 - [x] **Dream Slice γ3.3 — why no patch** shipped 2026-05-17: `classify_patch_blockers()` attaches `patch_blockers[]` / `patch_blocker_summary`; Dream cards and reports show collapsed `why no patch` details. Tests cover blocker classification and UI renderer output.
+- [x] **Phase 4.6 Dream reference-study case-idea mode** shipped 2026-05-25: `reference_study` / `case_idea_research` accepts pasted notes, repo-local markdown files, and snippets, writes `.agent/dreams/.../case_ideas.json` + `.md` and optional `LESSONS_LEARNED.md` drafts, and never creates benchmark cases, runs benchmarks, applies patches, seeds lessons, or promotes memory.
 - [x] **Brain version stamp in benchmark reports** shipped 2026-05-17: reports include git SHA, branch, dirty state/summary, capped diff stat, prompt/config hash, and prompt/config file hashes.
 - [x] **Phase 4.5 Level 1 background reporter + regression alert** shipped 2026-05-17: `scripts/run_background_reporter.py` runs checks/benchmarks, writes `.agent/reports/background_report_*.md/json`, includes Brain Stamp, compares previous reports, and emits `regression_alert` when needed.
 - [x] **Phase 4.5 Level 2 Background Dream Planner** shipped 2026-05-17: `scripts/run_background_dream_planner.py` creates report-only `.agent/reports/background_dream_plan_*.md/json` from the latest meaningful benchmark report, including failed, flaky, and slow-passing cases.
 - [x] **Phase 4.5 Level 3 Patch Proposal Queue CLI MVP** shipped 2026-05-17: `scripts/run_patch_proposal_queue.py` processes only `human_approved_for_proposal=true` items, copies benchmark repos to temp, validates with benchmark-metadata commands only, and writes proposal artifacts under `.agent/proposals/` without touching the real repo.
-- [x] **Phase 6 manual-safe memory loop** shipped 2026-05-17: bucketed lesson storage (`core/lesson_store.py`), Memory tab promote/block UI + tag chips, `core/lesson_retrieval.py` reading only `active/` with per-repo+global scope union, deterministic keyword scoring (case_name +100 / tag +25 / language+category +10 / query +5) with tokenized free-form queries + stopword list, CONTROL prompt injection (`core/control_engine.py`) gated by `LESSON_RETRIEVAL_ENABLED` and fail-closed on errors, manual `scripts/create_lesson_from_proposal.py` CLI, and `derive_lesson_tags` helper. Auto-creation from benchmarks/Dream still deferred (Phase 6.4).
+- [x] **Phase 6 manual-safe memory loop** shipped 2026-05-17: bucketed global lesson storage (`core/lesson_store.py`), Memory tab promote/block UI + tag chips, `core/lesson_retrieval.py` reading only `active/`, deterministic keyword scoring (case_name +100 / tag +25 / language+category +10 / query +5) with tokenized free-form queries + stopword list, CONTROL prompt injection (`core/control_engine.py`) gated by `LESSON_RETRIEVAL_ENABLED` and fail-closed on errors, manual `scripts/create_lesson_from_proposal.py` CLI, and `derive_lesson_tags` helper. Repo-scoped candidate defaults are still a follow-up.
+- [x] **Phase 6.4b benchmark-report lesson seeder** shipped 2026-05-25: `scripts/seed_lessons_from_benchmark.py` reads existing `.agent/benchmarks/benchmark_report_*.json` evidence and creates global candidate/blocked lessons only through `lesson_store` + `lesson_quality`; no active auto-promotion, no retrieval enablement, no benchmark run, no model call, no patch application, and no benchmark-report mutation.
+- [x] **Phase 6.4c proposal-artifact lesson seeder** shipped 2026-05-25: `scripts/seed_lessons_from_proposals.py` reads existing validated `.agent/proposals/` evidence and creates repo-scoped candidate/blocked lessons only through `lesson_store` + `lesson_quality`; `--global-candidate` is explicit, failed evidence requires `--include-failed`, and it does not run workers, benchmarks, models, validation, patch application, or mutate proposal artifacts.
 - [x] **Web proposal/benchmark workflow adjustment** shipped 2026-05-17: lesson cards can open originating proposal.md; Benchmarks tab can run all or selected cases without terminal; Add Case can infer validation command + expected changed files from patch/git evidence and optionally use the LLM as a requirements clerk for category/difficulty/strict prompt generation.
 - [x] **Patch Safety gate** shipped: `core/patch_safety.py` blocks forbidden files and traversal at apply/test time; web apply routes surface `patch_safety` details instead of letting unsafe targets proceed.
 - [x] **Phase 7.1-7.2.1.1 Mayor/workflow bridge** shipped 2026-05-21: handoff notes, optional temp-clone subagent runs, worker-run review/import, imported-proposal temp-clone validation, and deterministic lesson-artifact synthesis after passing validation.
@@ -1145,8 +1180,8 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
   - [x] **gamma. Iterative self-improvement within budget** - shipped 2026-05-16. gamma.1 refines `planned_no_patch` and `research_note_created`; gamma.2 revalidates `ready_to_apply` via temp-clone patch-plan apply + validation + `lesson_quality` grading. UI now surfaces `auto_approved`, `needs_human_review`, or `blocked` lesson badges.
   - [x] **γ3.3. Explain why no `ready_to_apply`** - shipped 2026-05-17. Adds `patch_blockers[]` / `patch_blocker_summary`, detects common blockers (`safe_to_patch_false`, missing validation, uncertain files, vibe/manual/context restrictions, no generated patch), and renders a collapsed `why no patch` UI/report section.
 - [x] **Context Poisoning Guard MVP** (AI Suggestions § M — Gemini-proposed PREREQUISITE for Phase 6 lessons). Standalone evaluator shipped 2026-05-16; wired into lesson storage + retrieval + CONTROL prompt 2026-05-17.
-- [x] **Phase 6 lesson cards anchored to retrieval call site + behind § M promotion gate** — shipped 2026-05-17 as the manual-safe loop (6.0–6.3 + 6.4a manual CLI). Auto-creation (6.4 full) deferred.
-- [ ] **Phase 6.4 full auto-creation** — wire benchmark/Dream/proposal queues to feed lesson candidates without manual CLI runs. Must still gate through `lesson_quality`; human promotion required by default.
+- [x] **Phase 6 lesson cards anchored to retrieval call site + behind § M promotion gate** — shipped 2026-05-17 as the manual-safe loop (6.0–6.3 + 6.4a manual CLI), with benchmark-report seeding shipped 2026-05-25 as 6.4b and proposal-artifact seeding shipped as 6.4c.
+- [ ] **Phase 6.4 follow-up auto-creation** — wire Dream/proposal queues to feed repo-scoped lesson candidates without manual CLI runs. Must still gate through `lesson_quality`; human promotion or explicit CLI/operator intent required before anything becomes global active knowledge.
 - [x] Phase 5 Polish: Benchmark run buttons shipped (`Run all` / `Run selected` / stop/status) plus Add Case clerk UI.
 - [ ] Phase 5 Polish: markdown rendering of Dream report + benchmark language/category batch polish.
 - [ ] Phase 8 remaining MCP polish: registry-driven Settings/Health row, handler-resolution smoke checks, optional schema metadata, and capability-mode persistence. Do not expose real-repo writes.
@@ -1174,8 +1209,10 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
 Phase 5 Core done. AgentBench --retry-failed shipped and the clean 22/22 fast run exists.
 Brain Stamp plus Phase 4.5 Levels 1-3 CLI MVP shipped: reporter, Dream planner, and gated patch proposal queue.
 Phase 6 manual-safe memory loop shipped (2026-05-17): bucketed lesson storage, Memory tab promote/block UI,
-  active-only retrieval with tags + per-repo/global scope union, CONTROL prompt injection behind
-  LESSON_RETRIEVAL_ENABLED, manual proposal→lesson CLI. Auto-creation (Phase 6.4) still deferred.
+  active-only retrieval with tags, CONTROL prompt injection behind
+  LESSON_RETRIEVAL_ENABLED, manual proposal→lesson CLI. Phase 6.4b benchmark-report lesson seeder
+  shipped 2026-05-25 as global-candidate-only; Phase 6.4c proposal-artifact seeder shipped
+  as repo-scoped-by-default with explicit global opt-in. Dream auto-lessonization remains deferred.
 Phase 7.1 Mayor Mode handoff + optional subagent runner shipped (2026-05-21): pure storage handoff notes under .agent/handoffs/, temp-clone subprocess runner, memory-tab UI panel.
 Phase 7.2 Worker Run Review / Import shipped (2026-05-21): core/worker_runs.py + /worker-runs/view + /worker-runs/import + Memory tab Worker Runs subsection. Bridges 7.1 outputs into the existing proposal -> lesson review path without bypassing safety gates.
 Phase 7.2.1 Validate Imported Worker Proposals shipped (2026-05-21): core.worker_runs.validate_imported_worker_proposal + POST /proposals/validate + UI Validate button. Applies worker patch_plan.json in a temp clone of repo_path, runs the inferred validation command, writes apply_result.json + validation.json + validation_output.txt into the proposal_dir. Real repo / repo_path byte-identical before/after.
@@ -1185,7 +1222,7 @@ Phase 8.1 Read-only MCP server shipped (2026-05-21): mcp_server.read_only + scri
 Phase 8.2a/8.2b/8.2c Artifact-write MCP shipped (2026-05-22/23): mcp_server.artifact_write exposes exactly 13 tools: the 10 read-only tools plus create_handoff_note, import_worker_run_as_proposal, and validate_imported_worker_proposal.
 Phase 8.3 MCP audit ledger shipped (2026-05-22): bounded invocation summaries under .agent/mcp_audit/invocations.jsonl plus GET /mcp/audit. Audit is observational, not an authorization gate.
 MCP Inspector operator shortcuts/cleanup shipped (2026-05-23): fixed-target launch route/UI for read-only and artifact-write servers, plus shutdown cleanup for matching local Inspector process trees.
-Next: prompt-version quantifier / held-out eval / repeated-failure Dream seeding, then optionally Phase 6.4 auto-creation. Benchmark run buttons + Add Case clerk are now shipped; remaining Benchmark polish is category/language batch + report density.
+Next: prompt-version quantifier / held-out eval / repeated-failure Dream seeding, then optionally Dream lesson auto-creation and 6.4d scoped lesson storage. Benchmark run buttons + Add Case clerk are now shipped; remaining Benchmark polish is category/language batch + report density.
 Do not add MCTS yet — require a 10-case mini-experiment first.
 ```
 

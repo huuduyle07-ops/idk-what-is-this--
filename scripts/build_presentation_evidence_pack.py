@@ -2,12 +2,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# Ensure imports like `graph.builder` resolve when this file is invoked as
+# `python scripts/build_presentation_evidence_pack.py` (in that case
+# sys.path[0] would be the scripts/ directory, not the project root).
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 UNKNOWN = "unknown"
 
 GRAPH_EXPLAIN_COMMAND = (
@@ -135,6 +142,60 @@ def _find_graph_artifact(project_root: Path) -> tuple[str | None, Path | None]:
             except OSError:
                 continue
     return None, None
+
+
+GRAPH_AUTORUN_TOP = 15
+GRAPH_AUTORUN_PATH_PREFIXES = ("core", "graph", "patching")
+GRAPH_AUTORUN_INCLUDE_ZERO_PENALTY = True
+GRAPH_AUTORUN_HIDE_EMPTY_SYMBOLS = True
+
+
+def _try_build_graph_explanation(
+    project_root: Path,
+) -> dict[str, Any] | None:
+    """Attempt to run the graph explainer for this project.
+
+    Returns a dict with `rows` (ranked node entries) on success or None on
+    any failure. The caller falls back to a placeholder when None is returned
+    so a single bad import or a graph-build edge case never breaks the
+    evidence pack."""
+    try:
+        from graph.builder import build_graph_from_repo
+        from graph.weights import explain_node_weights
+        from scripts.explain_graph_weights import _rank_and_filter
+    except Exception:
+        return None
+
+    try:
+        graph = build_graph_from_repo(str(project_root))
+    except Exception:
+        return None
+
+    try:
+        rows = explain_node_weights(graph, repo_path=str(project_root))
+    except Exception:
+        return None
+
+    try:
+        ranked = _rank_and_filter(
+            rows,
+            top=GRAPH_AUTORUN_TOP,
+            kind_filter=None,
+            include_zero_penalty=GRAPH_AUTORUN_INCLUDE_ZERO_PENALTY,
+            path_prefixes=list(GRAPH_AUTORUN_PATH_PREFIXES),
+            exclude_paths=None,
+            hide_empty_symbols=GRAPH_AUTORUN_HIDE_EMPTY_SYMBOLS,
+        )
+    except Exception:
+        return None
+
+    return {
+        "rows": ranked,
+        "top": GRAPH_AUTORUN_TOP,
+        "path_prefixes": list(GRAPH_AUTORUN_PATH_PREFIXES),
+        "include_zero_penalty": GRAPH_AUTORUN_INCLUDE_ZERO_PENALTY,
+        "hide_empty_symbols": GRAPH_AUTORUN_HIDE_EMPTY_SYMBOLS,
+    }
 
 
 def _format_full_suite(
@@ -409,11 +470,36 @@ def _format_trends(
     return "\n".join(lines) + "\n"
 
 
+def _format_graph_rows_md(rows: list[dict[str, Any]]) -> list[str]:
+    if not rows:
+        return ["_No graph nodes matched the configured filters._"]
+    lines = [
+        "| rank | node | kind | weight | topology | complexity | penalty | reasons |",
+        "|---:|---|---|---:|---:|---:|---:|---|",
+    ]
+    for row in rows:
+        reasons = " + ".join(row.get("reasons") or []) or "-"
+        lines.append(
+            "| "
+            f"{row.get('rank', UNKNOWN)} | "
+            f"`{row.get('node_id', UNKNOWN)}` | "
+            f"{row.get('node_kind') or UNKNOWN} | "
+            f"{row.get('total_weight', UNKNOWN)} | "
+            f"{row.get('topology_contribution', UNKNOWN)} | "
+            f"{row.get('complexity_contribution', UNKNOWN)} | "
+            f"{row.get('failure_penalty', UNKNOWN)} | "
+            f"{reasons} |"
+        )
+    return lines
+
+
 def _format_graph(
     artifact_text: str | None,
     source_path: Path | None,
+    auto_explanation: dict[str, Any] | None,
     include_raw_paths: bool,
 ) -> str:
+    # Prefer a prebuilt artifact if the project ships one.
     if artifact_text is not None:
         lines = [
             "# 06 Graph Weight Explainability",
@@ -433,10 +519,45 @@ def _format_graph(
         )
         return "\n".join(lines)
 
+    # Otherwise embed the auto-run result if we got one.
+    if auto_explanation is not None:
+        prefixes = ", ".join(
+            f"`{p}`" for p in auto_explanation.get("path_prefixes") or []
+        ) or "_(none)_"
+        lines = [
+            "# 06 Graph Weight Explainability",
+            "",
+            "Graph explainer ran automatically when this evidence pack was built.",
+            "",
+            f"- Top: {auto_explanation.get('top', UNKNOWN)}",
+            f"- Path prefixes: {prefixes}",
+            f"- Include zero-penalty nodes: {auto_explanation.get('include_zero_penalty', UNKNOWN)}",
+            f"- Hide empty symbols: {auto_explanation.get('hide_empty_symbols', UNKNOWN)}",
+            "",
+            "## Top-ranked nodes",
+            "",
+        ]
+        lines.extend(_format_graph_rows_md(auto_explanation.get("rows") or []))
+        lines.extend(
+            [
+                "",
+                "> Each row shows *why* the weighted graph promoted a node:",
+                "> topology (in/out degree), complexity, and failure penalty",
+                "> contributions. The same data is also available on the CLI:",
+                "",
+                "```",
+                GRAPH_EXPLAIN_COMMAND,
+                "```",
+                "",
+            ]
+        )
+        return "\n".join(lines)
+
+    # Fallback: graph build was unavailable or failed.
     return (
         "# 06 Graph Weight Explainability\n\n"
-        "_No prebuilt graph explainability artifact was found in `.agent/`._\n\n"
-        "Run the read-only explainer to generate one:\n\n"
+        "_The graph explainer could not be auto-run for this evidence pack._\n\n"
+        "Run the read-only explainer manually to inspect node rankings:\n\n"
         "```\n"
         f"{GRAPH_EXPLAIN_COMMAND}\n"
         "```\n\n"
@@ -514,6 +635,9 @@ def build_evidence_pack(
 
     minimality_data, minimality_path = _pick_minimality_experiment(exp_dir)
     graph_text, graph_path = _find_graph_artifact(project_root)
+    graph_auto = (
+        _try_build_graph_explanation(project_root) if graph_text is None else None
+    )
 
     written: dict[str, Path] = {}
 
@@ -549,7 +673,7 @@ def build_evidence_pack(
     )
     _write(
         "06_graph_weight_explainability.md",
-        _format_graph(graph_text, graph_path, include_raw_paths),
+        _format_graph(graph_text, graph_path, graph_auto, include_raw_paths),
     )
     _write("00_evidence_index.md", _format_index())
 
@@ -562,6 +686,7 @@ def build_evidence_pack(
         "trend_index_path": trend_index_path if trend_index_data is not None else None,
         "minimality_path": minimality_path,
         "graph_artifact_path": graph_path,
+        "graph_auto_explanation": graph_auto,
     }
 
 

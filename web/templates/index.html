@@ -281,6 +281,30 @@
               <div class="health-empty">Pick a run from the left to see details.</div>
             </section>
           </div>
+
+          <!-- Phase 12.8a: presentation evidence pack helper -->
+          <div class="bench-runner" id="evidencePackSection" style="margin-top:1em;">
+            <div class="bench-runner-header">
+              <strong>Presentation evidence pack</strong>
+              <span class="bench-runner-note">Bundles existing benchmark, experiment, trend, watchlist, and graph evidence into .agent/presentation_evidence/. Read-only: never runs benchmarks or calls models.</span>
+            </div>
+            <div class="bench-runner-actions">
+              <button type="button" onclick="buildPresentationEvidence()"
+                      title="Generate or refresh .agent/presentation_evidence/ from existing artifacts.">
+                Build presentation evidence pack
+              </button>
+              <button type="button" onclick="openPresentationEvidenceIndex()"
+                      title="Open 00_evidence_index.md from the latest build.">
+                Open evidence index
+              </button>
+              <button type="button" onclick="refreshPresentationEvidence()" title="Refresh the file list.">
+                Refresh list
+              </button>
+            </div>
+            <div id="evidencePackStatus" class="bench-run-status"></div>
+            <div id="evidencePackFiles" class="health-empty">Click <em>Build presentation evidence pack</em> to generate it.</div>
+            <div id="evidencePackViewer" class="evidence-viewer" hidden></div>
+          </div>
         </div>
 
         <!-- Dream -->
@@ -293,17 +317,25 @@
                 <option value="debt">debt</option>
                 <option value="idea">idea (vibe only)</option>
                 <option value="research">research</option>
+                <option value="reference_study">reference study</option>
               </select>
               <select id="dreamMode" title="Dream V2 mode: plan-only is safest; patch_if_safe lets narrow bug fixes auto-patch; research writes proposals only.">
                 <option value="plan_only" selected>plan_only</option>
                 <option value="patch_if_safe">patch_if_safe</option>
                 <option value="research">research</option>
+                <option value="case_idea_research">case_idea_research</option>
               </select>
               <input id="dreamTitle" class="dream-title" type="text" placeholder="title">
               <input id="dreamHint" class="dream-hint" type="text" placeholder="hint (optional)">
               <button type="button" onclick="addDreamItem()">Add to queue</button>
               <button type="button" onclick="viewDreamQueue()">View queue</button>
               <button type="button" onclick="clearDreamQueue()">Clear queue</button>
+            </div>
+            <div class="dream-reference-row">
+              <textarea id="dreamReferenceNotes" class="dream-reference-notes"
+                        placeholder="reference notes for case ideas (optional)"></textarea>
+              <input id="dreamReferenceFiles" class="dream-reference-files" type="text"
+                     placeholder="markdown files, comma-separated (optional)">
             </div>
             <div class="dream-buttons">
               <label class="dream-budget-label" title="How long Dream can run before it stops accepting new items (Slice α).">
@@ -992,6 +1024,9 @@ function _dreamStatusClass(s) {
         ready_to_apply:           "dream-item-badge--ready",
         research_note_created:    "dream-item-badge--research",
         idea_written:             "dream-item-badge--research",
+        case_ideas_created:       "dream-item-badge--research",
+        case_idea_no_input:       "dream-item-badge--off",
+        case_idea_no_ideas:       "dream-item-badge--off",
         planned_no_patch:         "dream-item-badge--off",
         patch_skipped_needs_vibe: "dream-item-badge--off",
         needs_manual_review:      "dream-item-badge--missing",
@@ -1146,6 +1181,44 @@ function _renderDreamItemCard(it, opts = {}) {
                 ${promoteBtn ? `<div class="dream-item-card__actions">${promoteBtn}</div>` : ""}
             </div>
         </div>
+    `;
+}
+
+function _renderCaseIdeaCandidates(caseIdeas) {
+    const ideas = Array.isArray(caseIdeas) ? caseIdeas : [];
+    if (ideas.length === 0) return "";
+    const rows = ideas.map(idea => {
+        const approved = idea.human_approved_for_case_creation === true ? "yes" : "no";
+        return `
+            <tr>
+                <td>${_escapeHtml(idea.pattern || "")}</td>
+                <td><code>${_escapeHtml(idea.suggested_case_name || "")}</code></td>
+                <td>${_escapeHtml(idea.language || "")}</td>
+                <td>${_escapeHtml(idea.category || "")}</td>
+                <td>${_escapeHtml(idea.difficulty || "")}</td>
+                <td>${_escapeHtml(approved)}</td>
+            </tr>
+        `;
+    }).join("");
+    return `
+        <section class="dream-case-ideas">
+            <div class="dream-section-heading">Case idea candidates (${ideas.length})</div>
+            <div class="dream-case-ideas__scroll">
+                <table class="dream-case-ideas__table">
+                    <thead>
+                        <tr>
+                            <th>Pattern</th>
+                            <th>Suggested case</th>
+                            <th>Language</th>
+                            <th>Category</th>
+                            <th>Difficulty</th>
+                            <th>Approved?</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        </section>
     `;
 }
 
@@ -1330,18 +1403,28 @@ function addDreamItem() {
     const kind  = document.getElementById("dreamKind").value;
     const title = document.getElementById("dreamTitle").value.trim();
     const hint  = document.getElementById("dreamHint").value.trim();
+    const notes = document.getElementById("dreamReferenceNotes")?.value.trim() || "";
+    const reference_files = document.getElementById("dreamReferenceFiles")?.value.trim() || "";
     if (!title) { alert("Title is required."); return; }
+
+    const payload = { repo_path: repo, action: "add", kind, title, hint };
+    if (notes) payload.notes = notes;
+    if (reference_files) payload.reference_files = reference_files;
 
     fetch("/dream/queue", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ repo_path: repo, action: "add", kind, title, hint }),
+        body: new URLSearchParams(payload),
     })
     .then(r => r.json())
     .then(data => {
         if (data.error) { alert(`Queue: ${data.error}`); return; }
         document.getElementById("dreamTitle").value = "";
         document.getElementById("dreamHint").value = "";
+        const notesEl = document.getElementById("dreamReferenceNotes");
+        const filesEl = document.getElementById("dreamReferenceFiles");
+        if (notesEl) notesEl.value = "";
+        if (filesEl) filesEl.value = "";
         alert(`Added. Queue size: ${(data.queue || []).length}`);
     })
     .catch(err => alert(`Queue add failed: ${err}`));
@@ -1808,12 +1891,14 @@ function viewDreamRun(date, runId) {
             return;
         }
         const items = data.items || [];
+        const caseIdeas = data.case_ideas || [];
         const morning = data.morning_report || "(no morning_report.txt)";
         const body = `
             <details class="dream-report-summary" open>
                 <summary>Morning report</summary>
                 <pre class="dream-report-pre">${_escapeHtml(morning)}</pre>
             </details>
+            ${_renderCaseIdeaCandidates(caseIdeas)}
             <div class="dream-section-heading">Items (${items.length})</div>
             ${items.map(it => _renderDreamItemCard(it, { date, runId })).join("")}
             <div class="dream-report-meta">
@@ -3302,6 +3387,117 @@ function _renderBenchmarkList(reports) {
     `).join("");
 }
 
+// Phase 12.8a: presentation evidence pack helpers.
+function _evidenceRepo() {
+    return document.querySelector("input[name='repo_path']")?.value.trim() || "";
+}
+
+function _renderEvidenceFiles(files) {
+    const container = document.getElementById("evidencePackFiles");
+    if (!container) return;
+    if (!files || files.length === 0) {
+        container.innerHTML = `<div class="health-empty">No evidence pack found yet. Click <em>Build presentation evidence pack</em> to generate it.</div>`;
+        return;
+    }
+    const rows = files.map(f => `
+        <li>
+            <button type="button" class="evidence-file-link" onclick="openPresentationEvidenceFile('${_escapeHtml(f.name)}')">${_escapeHtml(f.name)}</button>
+            <span class="evidence-file-size">${_benchInt(f.size, 0)} bytes</span>
+        </li>
+    `).join("");
+    container.innerHTML = `<ul class="evidence-file-list">${rows}</ul>`;
+}
+
+function refreshPresentationEvidence() {
+    const repo = _evidenceRepo();
+    const status = document.getElementById("evidencePackStatus");
+    if (!repo) {
+        if (status) status.textContent = "Set a repo path in the form above first.";
+        _renderEvidenceFiles([]);
+        return;
+    }
+    if (status) status.textContent = "Loading…";
+    fetch(`/presentation/evidence/list?repo_path=${encodeURIComponent(repo)}`)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                if (status) status.textContent = `Error: ${data.error || "list failed"}`;
+                _renderEvidenceFiles([]);
+                return;
+            }
+            if (status) {
+                status.textContent = data.exists
+                    ? `${data.files.length} evidence file(s) in ${data.output_dir}`
+                    : `No evidence pack yet at ${data.output_dir}`;
+            }
+            _renderEvidenceFiles(data.files || []);
+        })
+        .catch(err => {
+            if (status) status.textContent = `Failed: ${err}`;
+            _renderEvidenceFiles([]);
+        });
+}
+
+function buildPresentationEvidence() {
+    const repo = _evidenceRepo();
+    const status = document.getElementById("evidencePackStatus");
+    if (!repo) {
+        if (status) status.textContent = "Set a repo path in the form above first.";
+        return;
+    }
+    if (status) status.textContent = "Building evidence pack…";
+    const form = new FormData();
+    form.append("repo_path", repo);
+    fetch("/presentation/evidence/build", { method: "POST", body: form })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                if (status) status.textContent = `Build failed: ${data.error || "unknown"}`;
+                return;
+            }
+            if (status) status.textContent = `Built ${data.files.length} evidence file(s) in ${data.output_dir}`;
+            _renderEvidenceFiles((data.files || []).map(name => ({ name, size: 0 })));
+            refreshPresentationEvidence();
+        })
+        .catch(err => {
+            if (status) status.textContent = `Failed: ${err}`;
+        });
+}
+
+function openPresentationEvidenceFile(name) {
+    const repo = _evidenceRepo();
+    const viewer = document.getElementById("evidencePackViewer");
+    const status = document.getElementById("evidencePackStatus");
+    if (!repo || !viewer) return;
+    fetch(`/presentation/evidence/file?repo_path=${encodeURIComponent(repo)}&name=${encodeURIComponent(name)}&as=html`)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                if (status) status.textContent = `Open failed: ${data.error || "unknown"}`;
+                viewer.hidden = true;
+                return;
+            }
+            viewer.hidden = false;
+            // The server renders the Markdown to HTML (with the `tables`
+            // extension), so pipe tables become real <table> elements that
+            // the .evidence-viewer CSS can style.
+            if (typeof data.html === "string" && data.html.length > 0) {
+                viewer.innerHTML = `<div class="evidence-markdown">${data.html}</div>`;
+            } else {
+                // Fallback: server didn't render HTML; show raw text safely.
+                viewer.innerHTML = `<pre class="evidence-raw">${_escapeHtml(data.content)}</pre>`;
+            }
+            if (status) status.textContent = `Showing ${data.name} (${data.size} bytes)`;
+        })
+        .catch(err => {
+            if (status) status.textContent = `Failed: ${err}`;
+        });
+}
+
+function openPresentationEvidenceIndex() {
+    openPresentationEvidenceFile("00_evidence_index.md");
+}
+
 function loadBenchmarksPanel(force = false) {
     if (_benchLoaded && !force) return;
     const list = document.getElementById("benchList");
@@ -3311,6 +3507,7 @@ function loadBenchmarksPanel(force = false) {
         if (list) list.innerHTML = `<div class="health-empty">Set a repo path in the form above first.</div>`;
         return;
     }
+    refreshPresentationEvidence();
     fetch(`/benchmarks/list?repo_path=${encodeURIComponent(repo)}`)
         .then(r => r.json())
         .then(data => {

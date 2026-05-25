@@ -353,3 +353,63 @@ def test_index_links_all_generated_files(tmp_path):
     assert "Watchlist tracks instability" in index
     assert "Patch minimality" in index
     assert "Same-suite trends prevent fake comparisons" in index
+
+
+def test_graph_section_auto_embeds_ranked_table_when_available(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    fake_rows = [
+        {
+            "node_id": "core/foo.py::do_thing",
+            "node_kind": "function",
+            "total_weight": 0.91,
+            "topology_contribution": 0.42,
+            "complexity_contribution": 0.12,
+            "failure_penalty": 0.0,
+            "reasons": ["in_degree=4", "out_degree=2"],
+            "in_degree": 4,
+            "out_degree": 2,
+            "complexity": 3,
+        },
+    ]
+
+    from graph import builder as graph_builder
+    from graph import weights as graph_weights
+
+    monkeypatch.setattr(graph_builder, "build_graph_from_repo", lambda repo_path: "GRAPH_SENTINEL")
+    monkeypatch.setattr(
+        graph_weights,
+        "explain_node_weights",
+        lambda graph, **kwargs: fake_rows,
+    )
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / "06_graph_weight_explainability.md").read_text(encoding="utf-8")
+
+    assert "Graph explainer ran automatically" in md
+    assert "## Top-ranked nodes" in md
+    assert "`core/foo.py::do_thing`" in md
+    assert "in_degree=4" in md
+    assert result["graph_auto_explanation"] is not None
+    assert result["graph_auto_explanation"]["rows"]
+
+
+def test_graph_section_falls_back_to_placeholder_when_build_fails(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    from graph import builder as graph_builder
+
+    def _boom(repo_path):
+        raise RuntimeError("simulated graph build failure")
+
+    monkeypatch.setattr(graph_builder, "build_graph_from_repo", _boom)
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / "06_graph_weight_explainability.md").read_text(encoding="utf-8")
+
+    assert "could not be auto-run" in md
+    assert "explain_graph_weights.py" in md
+    assert "--top 15" in md
+    assert result["graph_auto_explanation"] is None

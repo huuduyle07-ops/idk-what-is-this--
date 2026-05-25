@@ -59,6 +59,13 @@ def evaluate_lesson_candidate(candidate: dict) -> dict:
     if missing:
         review_reasons.append("missing required fields: " + ", ".join(missing))
 
+    if candidate.get("needs_human_review") is True:
+        evidence = candidate.get("review_evidence")
+        reason = "needs_human_review is true"
+        if isinstance(evidence, str) and evidence.strip():
+            reason = f"{reason}: {evidence.strip()}"
+        review_reasons.append(reason)
+
     validation_ok = candidate.get("validation_ok")
     if "validation_ok" in candidate:
         if validation_ok is True:

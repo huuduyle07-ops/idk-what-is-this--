@@ -32,7 +32,7 @@ _RUN_STATE: dict = {
     "completed_at": None,      # iso timestamp
     "report_dir": None,        # str path
     "patch_style": None,
-    "dream_mode": None,        # plan_only | patch_if_safe | research
+    "dream_mode": None,        # plan_only | patch_if_safe | research | case_idea_research
     "total_items": 0,
     "current_idx": 0,          # 1-based; 0 = nothing in flight
     "current_kind": "",
@@ -268,6 +268,260 @@ Rules:
     return parsed, (raw or "")
 
 
+_REFERENCE_STUDY_KINDS = frozenset({"reference_study", "case_idea_research"})
+_REFERENCE_NOTE_FIELDS = (
+    "notes",
+    "reference_notes",
+    "webbridge_notes",
+    "hint",
+)
+_REFERENCE_FILE_FIELDS = (
+    "markdown_files",
+    "reference_files",
+    "files",
+)
+_MAX_REFERENCE_NOTES_CHARS = 16000
+
+
+def _as_text_list(value) -> list[str]:
+    if isinstance(value, str):
+        return [value] if value.strip() else []
+    if isinstance(value, dict):
+        text = value.get("text") or value.get("content") or value.get("note")
+        title = value.get("title") or value.get("source") or ""
+        if isinstance(text, str) and text.strip():
+            prefix = f"{title}\n" if isinstance(title, str) and title.strip() else ""
+            return [prefix + text]
+        return []
+    if isinstance(value, (list, tuple)):
+        out: list[str] = []
+        for item in value:
+            out.extend(_as_text_list(item))
+        return out
+    return []
+
+
+def _as_path_list(value) -> list[str]:
+    if isinstance(value, str):
+        raw_parts = []
+        for line in value.splitlines():
+            raw_parts.extend(line.split(","))
+        return [part.strip() for part in raw_parts if part.strip()]
+    if isinstance(value, (list, tuple)):
+        return [str(item).strip() for item in value if str(item).strip()]
+    return []
+
+
+def _read_reference_markdown_file(repo_root: Path, raw_path: str) -> tuple[str | None, str]:
+    path_text = str(raw_path or "").strip()
+    if not path_text:
+        return None, "empty reference file path"
+    candidate = Path(path_text).expanduser()
+    if candidate.is_absolute():
+        resolved = candidate.resolve()
+    else:
+        resolved = (repo_root / candidate).resolve()
+    try:
+        resolved.relative_to(repo_root.resolve())
+    except ValueError:
+        return None, f"reference file outside repo skipped: {path_text}"
+    if resolved.suffix.lower() not in {".md", ".markdown"}:
+        return None, f"non-markdown reference file skipped: {path_text}"
+    if not resolved.is_file():
+        return None, f"reference file missing: {path_text}"
+    try:
+        text = resolved.read_text(encoding="utf-8")
+    except OSError as e:
+        return None, f"reference file unreadable: {path_text}: {e}"
+    return f"## File: {resolved.relative_to(repo_root.resolve()).as_posix()}\n{text}", ""
+
+
+def _reference_notes_from_item(repo_path: str, item: dict) -> tuple[str, list[str], list[str]]:
+    repo_root = Path(repo_path).resolve()
+    parts: list[str] = []
+    sources: list[str] = []
+    warnings: list[str] = []
+
+    for field in _REFERENCE_NOTE_FIELDS:
+        for text in _as_text_list(item.get(field)):
+            stripped = text.strip()
+            if stripped:
+                parts.append(f"## {field}\n{stripped}")
+                sources.append(field)
+
+    for text in _as_text_list(item.get("snippets")):
+        stripped = text.strip()
+        if stripped:
+            parts.append(f"## snippet\n{stripped}")
+            sources.append("snippet")
+
+    for field in _REFERENCE_FILE_FIELDS:
+        for file_ref in _as_path_list(item.get(field)):
+            text, warning = _read_reference_markdown_file(repo_root, file_ref)
+            if text:
+                parts.append(text.strip())
+                sources.append(file_ref)
+            elif warning:
+                warnings.append(warning)
+
+    combined = "\n\n".join(parts).strip()
+    if len(combined) > _MAX_REFERENCE_NOTES_CHARS:
+        combined = combined[: _MAX_REFERENCE_NOTES_CHARS - 3].rstrip() + "..."
+    return combined, sources, warnings
+
+
+def _default_case_name(pattern: str, idx: int) -> str:
+    base = dream_artifacts.slugify(pattern or f"reference_case_{idx}", max_len=60)
+    return base.replace("-", "_") or f"reference_case_{idx}"
+
+
+def _normalize_case_idea(raw: dict, *, item: dict, item_idx: int, idea_idx: int) -> dict:
+    pattern = str(raw.get("pattern") or raw.get("title") or raw.get("name") or "").strip()
+    idea = {
+        "pattern": pattern or f"Reference pattern {idea_idx}",
+        "why_it_matters": str(raw.get("why_it_matters") or "").strip(),
+        "suggested_case_name": str(raw.get("suggested_case_name") or "").strip(),
+        "language": str(raw.get("language") or item.get("language") or "unknown").strip() or "unknown",
+        "category": str(raw.get("category") or "reference_study").strip() or "reference_study",
+        "difficulty": str(raw.get("difficulty") or "unknown").strip() or "unknown",
+        "minimal_experiment": str(raw.get("minimal_experiment") or "").strip(),
+        "expected_wrong_agent_behavior": str(raw.get("expected_wrong_agent_behavior") or "").strip(),
+        "human_approved_for_case_creation": False,
+        "source": "dream_reference_study",
+        "source_item_idx": item_idx,
+        "source_item_title": str(item.get("title") or "").strip(),
+    }
+    if not idea["suggested_case_name"]:
+        idea["suggested_case_name"] = _default_case_name(idea["pattern"], idea_idx)
+    return idea
+
+
+def _extract_case_idea_payload(parsed) -> tuple[list[dict], list[str]]:
+    if isinstance(parsed, list):
+        raw_ideas = parsed
+        lesson_notes = []
+    elif isinstance(parsed, dict):
+        raw_ideas = parsed.get("case_ideas") or parsed.get("ideas") or []
+        lesson_notes = _as_text_list(parsed.get("lesson_notes"))
+    else:
+        return [], []
+    if not isinstance(raw_ideas, list):
+        return [], lesson_notes
+    return [idea for idea in raw_ideas if isinstance(idea, dict)], lesson_notes
+
+
+def _generate_case_ideas(
+    repo_path: str,
+    item: dict,
+    notes_text: str,
+    sources: list[str],
+) -> tuple[list[dict], list[str], str]:
+    title = item.get("title", "reference study")
+    prompt = f"""Dream reference study case-idea mode.
+
+Turn the reference-study notes into benchmark case ideas and short lesson notes.
+Do not write code patches. Do not create files. Do not propose active lessons.
+
+Topic: {title}
+Sources: {", ".join(sources) if sources else "pasted notes"}
+
+Reference notes:
+{notes_text}
+
+Return ONLY valid JSON:
+{{
+  "case_ideas": [
+    {{
+      "pattern": "bug or agent-failure pattern",
+      "why_it_matters": "why this benchmark would improve the agent",
+      "suggested_case_name": "language_short_pattern_name",
+      "language": "python|javascript|typescript|go|rust|cpp|...",
+      "category": "logic_validation|wrong_file|safety|...",
+      "difficulty": "easy|medium|hard",
+      "minimal_experiment": "small benchmark shape, no full implementation",
+      "expected_wrong_agent_behavior": "what a weaker agent would do wrong",
+      "human_approved_for_case_creation": false
+    }}
+  ],
+  "lesson_notes": ["short reusable observation, not an active lesson"]
+}}
+
+Rules:
+- Produce at most 5 case ideas.
+- Keep every human_approved_for_case_creation value false.
+- Prefer small, generic bug patterns over project-specific feature requests.
+- If the notes do not contain enough signal, return an empty case_ideas list.
+"""
+    raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path) or ""
+    parsed = extract_json_block(raw)
+    raw_ideas, lesson_notes = _extract_case_idea_payload(parsed)
+    ideas = [
+        _normalize_case_idea(raw_idea, item=item, item_idx=int(item.get("idx") or 0), idea_idx=i)
+        for i, raw_idea in enumerate(raw_ideas[:5], start=1)
+    ]
+    return ideas, lesson_notes, raw
+
+
+def _run_case_idea_research_item(
+    repo_path: str,
+    item: dict,
+    idx: int,
+    item_dir_path: Path,
+) -> dict:
+    """Reference-study mode: write case ideas only, no benchmark or patch work."""
+    item_dir_path.mkdir(parents=True, exist_ok=True)
+    item_with_idx = {**item, "idx": idx}
+    notes_text, sources, warnings = _reference_notes_from_item(repo_path, item)
+
+    if not notes_text.strip():
+        message = "No reference notes were provided; no case ideas generated."
+        (item_dir_path / "case_idea_notes.txt").write_text(message, encoding="utf-8")
+        return {
+            **item_with_idx,
+            "status": "case_idea_no_input",
+            "summary": message,
+            "item_dir_name": item_dir_path.name,
+            "case_ideas": [],
+            "lesson_notes": [],
+            "reference_warnings": warnings,
+        }
+
+    (item_dir_path / "reference_notes.txt").write_text(notes_text, encoding="utf-8")
+    ideas, lesson_notes, raw = _generate_case_ideas(
+        repo_path,
+        item_with_idx,
+        notes_text,
+        sources,
+    )
+    (item_dir_path / "case_ideas_raw.txt").write_text(raw, encoding="utf-8")
+    (item_dir_path / "case_ideas.json").write_text(
+        json.dumps(
+            {"case_ideas": ideas, "lesson_notes": lesson_notes},
+            indent=2,
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    if ideas:
+        status = "case_ideas_created"
+        summary = f"{len(ideas)} case idea candidate(s) written."
+    else:
+        status = "case_idea_no_ideas"
+        summary = "Reference notes produced no case ideas."
+
+    return {
+        **item_with_idx,
+        "status": status,
+        "summary": summary,
+        "item_dir_name": item_dir_path.name,
+        "case_ideas": ideas,
+        "lesson_notes": lesson_notes,
+        "reference_sources": sources,
+        "reference_warnings": warnings,
+    }
+
+
 def _normalize_dream_mode(value: str | None) -> str:
     """Map UI/string aliases to Dream V2 modes. Default = plan_only."""
     v = (value or "").strip().lower()
@@ -282,6 +536,9 @@ def _normalize_dream_mode(value: str | None) -> str:
         "research": "research",
         "design": "research",
         "proposal": "research",
+        "reference_study": "case_idea_research",
+        "case_idea": "case_idea_research",
+        "case_idea_research": "case_idea_research",
     }
     return aliases.get(v, "plan_only")
 
@@ -952,6 +1209,8 @@ def run_overnight(
       - "patch_if_safe": bug/debt items may patch when the planner marks them
         safe; ideas still require vibe and research stays plan-only.
       - "research": every item becomes a written proposal (no patch).
+      - "case_idea_research": reference-study items become benchmark case
+        idea candidates and lesson-note drafts (no benchmark creation).
 
     `max_refine_rounds` (Slice γ.2) controls iterative self-improvement.
     After the main pass, eligible items are processed round-robin up to
@@ -1041,7 +1300,15 @@ def run_overnight(
         item_started = time.time()
 
         try:
-            if mode == "plan_only":
+            if mode == "case_idea_research" or kind in _REFERENCE_STUDY_KINDS:
+                print(
+                    f"DREAM: [{idx}/{len(queue)}] case_idea_research -> {kind}",
+                    flush=True,
+                )
+                results.append(_run_case_idea_research_item(
+                    repo_path, item, idx, item_path,
+                ))
+            elif mode == "plan_only":
                 print(
                     f"💤 DREAM: [{idx}/{len(queue)}] plan_only → {kind}",
                     flush=True,
@@ -1142,14 +1409,46 @@ def run_overnight(
         flush=True,
     )
 
+    case_idea_run = (
+        mode == "case_idea_research"
+        or any((it.get("kind") or "").lower() in _REFERENCE_STUDY_KINDS for it in results)
+    )
+    case_ideas: list[dict] = []
+    lesson_notes: list[str] = []
+    for result_item in results:
+        for idea in result_item.get("case_ideas") or []:
+            if isinstance(idea, dict):
+                case_ideas.append(idea)
+        for note in _as_text_list(result_item.get("lesson_notes")):
+            lesson_notes.append(note)
+    if case_idea_run:
+        message = ""
+        if not case_ideas:
+            if any(item.get("status") == "case_idea_no_input" for item in results):
+                message = "No reference notes were provided; no case ideas generated."
+            else:
+                message = "No case ideas were generated from the provided reference notes."
+        dream_artifacts.write_case_idea_artifacts(
+            report_dir,
+            case_ideas,
+            lesson_notes=lesson_notes,
+            message=message,
+        )
+
     # Write outputs
-    dream_artifacts.write_report_markdown(report_dir, results, dream_mode=mode)
+    dream_artifacts.write_report_markdown(
+        report_dir,
+        results,
+        dream_mode=mode,
+        case_ideas=case_ideas if case_idea_run else None,
+    )
     (report_dir / "list.json").write_text(
         json.dumps({
             "items": results,
             "patch_style": patch_style,
             "dream_mode": mode,
             "completed_at": datetime.now().isoformat(timespec="seconds"),
+            "case_ideas_count": len(case_ideas) if case_idea_run else 0,
         }, indent=2, ensure_ascii=False),
         encoding="utf-8",
     )

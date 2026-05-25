@@ -379,15 +379,34 @@ def dream_queue_route():
 
     if action == "add":
         kind = request.form.get("kind", "bug").strip().lower()
-        if kind not in {"bug", "debt", "idea", "research"}:
+        if kind not in {"bug", "debt", "idea", "research", "reference_study"}:
             return {"error": f"unknown kind: {kind}"}
         title = request.form.get("title", "").strip()
         hint = request.form.get("hint", "").strip()
+        notes = request.form.get("notes", "").strip()
+        reference_files_raw = request.form.get("reference_files", "").strip()
+        snippets_raw = request.form.get("snippets", "").strip()
         if not title:
             return {"error": "title is required"}
-        items = dream_artifacts.append_to_queue(repo_path, {
+        item = {
             "kind": kind, "title": title, "hint": hint,
-        })
+        }
+        if notes:
+            item["notes"] = notes
+        if reference_files_raw:
+            item["reference_files"] = [
+                part.strip()
+                for line in reference_files_raw.splitlines()
+                for part in line.split(",")
+                if part.strip()
+            ]
+        if snippets_raw:
+            try:
+                parsed_snippets = json.loads(snippets_raw)
+                item["snippets"] = parsed_snippets
+            except Exception:
+                item["snippets"] = [snippets_raw]
+        items = dream_artifacts.append_to_queue(repo_path, item)
         return {"queue": items}
 
     return {"error": f"unknown action: {action}"}
@@ -1057,6 +1076,166 @@ def dream_seed_from_benchmark_route():
     # exist yet, OR the chosen report had no failures/slow cases). Caller's JS
     # distinguishes count=0 from count>0 to show a friendly message.
     return {"added": items, "count": len(items)}
+
+
+# ---------------------------------------------------------------------------
+# Phase 12.8a — Presentation evidence pack helpers. Read-only routes that
+# wrap scripts/build_presentation_evidence_pack.py so the existing builder
+# can be invoked from the Benchmarks tab without running benchmarks or
+# calling models.
+# ---------------------------------------------------------------------------
+
+_EVIDENCE_SUBDIR = Path(".agent") / "presentation_evidence"
+
+
+def _evidence_output_dir(repo_path: str) -> Path:
+    return Path(repo_path) / _EVIDENCE_SUBDIR
+
+
+def _is_safe_evidence_name(name: str) -> bool:
+    if not name or not name.endswith(".md"):
+        return False
+    if any(sep in name for sep in ("/", "\\")):
+        return False
+    if name in (".", "..") or name.startswith(".."):
+        return False
+    return True
+
+
+@app.route("/presentation/evidence/build", methods=["POST"])
+def presentation_evidence_build_route():
+    """Build the presentation evidence pack under
+    <repo_path>/.agent/presentation_evidence/.
+
+    Read-only with respect to benchmark, experiment, trend, and watchlist
+    source reports — only writes to the output folder."""
+    repo_path = request.form.get("repo_path", "").strip() or request.values.get(
+        "repo_path", ""
+    ).strip()
+    if not repo_path or not Path(repo_path).is_dir():
+        return {
+            "ok": False,
+            "error": f"repo_path is not a directory: {repo_path}",
+        }, 400
+
+    try:
+        from scripts import build_presentation_evidence_pack as evidence_pack
+
+        result = evidence_pack.build_evidence_pack(repo_path)
+    except Exception as exc:  # noqa: BLE001 - reported to client verbatim
+        return {
+            "ok": False,
+            "error": f"failed to build evidence pack: {type(exc).__name__}: {exc}",
+        }, 500
+
+    output_dir = Path(result["output_dir"])
+    return {
+        "ok": True,
+        "output_dir": str(output_dir),
+        "files": sorted(p.name for p in output_dir.glob("*.md")),
+    }
+
+
+@app.route("/presentation/evidence/list", methods=["GET"])
+def presentation_evidence_list_route():
+    """List Markdown files inside <repo_path>/.agent/presentation_evidence/.
+
+    Returns an empty list (with `exists=false`) when the folder is missing,
+    so the UI can show a friendly call-to-build state."""
+    repo_path = request.values.get("repo_path", "").strip()
+    if not repo_path or not Path(repo_path).is_dir():
+        return {
+            "ok": False,
+            "error": f"repo_path is not a directory: {repo_path}",
+        }, 400
+
+    output_dir = _evidence_output_dir(repo_path)
+    if not output_dir.is_dir():
+        return {
+            "ok": True,
+            "output_dir": str(output_dir),
+            "exists": False,
+            "files": [],
+        }
+
+    files = []
+    for path in sorted(output_dir.glob("*.md")):
+        try:
+            size = path.stat().st_size
+        except OSError:
+            size = 0
+        files.append({"name": path.name, "size": size})
+    return {
+        "ok": True,
+        "output_dir": str(output_dir),
+        "exists": True,
+        "files": files,
+    }
+
+
+@app.route("/presentation/evidence/file", methods=["GET"])
+def presentation_evidence_file_route():
+    """Read one evidence Markdown file by name.
+
+    Path guard rejects path traversal, non-`.md` suffixes, and any name
+    containing a path separator. Resolved path is confirmed to be inside
+    the evidence output directory."""
+    repo_path = request.values.get("repo_path", "").strip()
+    if not repo_path or not Path(repo_path).is_dir():
+        return {
+            "ok": False,
+            "error": f"repo_path is not a directory: {repo_path}",
+        }, 400
+
+    name = request.values.get("name", "").strip()
+    if not _is_safe_evidence_name(name):
+        return {
+            "ok": False,
+            "error": f"invalid evidence file name: {name!r}",
+        }, 400
+
+    output_dir = _evidence_output_dir(repo_path).resolve()
+    target = (output_dir / name).resolve()
+    try:
+        target.relative_to(output_dir)
+    except ValueError:
+        return {
+            "ok": False,
+            "error": "evidence path escapes presentation_evidence directory",
+        }, 400
+
+    if not target.is_file():
+        return {
+            "ok": False,
+            "error": f"evidence file not found: {name}",
+        }, 404
+
+    try:
+        content = target.read_text(encoding="utf-8")
+    except OSError as exc:
+        return {
+            "ok": False,
+            "error": f"failed to read evidence file: {type(exc).__name__}: {exc}",
+        }, 500
+
+    response = {
+        "ok": True,
+        "name": name,
+        "content": content,
+        "size": len(content),
+    }
+    if request.values.get("as", "").strip().lower() == "html":
+        try:
+            response["html"] = _markdown_lib.markdown(
+                content,
+                extensions=["fenced_code", "tables", "toc"],
+            )
+        except Exception as exc:  # noqa: BLE001
+            response["html"] = ""
+            response["html_error"] = (
+                f"markdown render failed: {type(exc).__name__}: {exc}"
+            )
+    return response
 
 
 # ---------------------------------------------------------------------------
