@@ -187,11 +187,23 @@ def _generate_title(case_name: str, summary: str) -> str:
     return _truncate(head, 80) or "Patch proposal lesson"
 
 
+def _project_tag_for_repo(repo_path: str | None) -> str | None:
+    if not repo_path:
+        return None
+    try:
+        from core.project_tag import build_project_tag
+
+        return build_project_tag(repo_path)
+    except Exception:
+        return None
+
+
 def create_lesson_from_proposal(
     proposal_dir: Path,
     *,
     repo_path: str | None = None,
     allow_failed: bool = False,
+    global_candidate: bool = False,
 ) -> dict:
     """Build a lesson candidate from a proposal directory and persist it.
 
@@ -204,6 +216,26 @@ def create_lesson_from_proposal(
     """
     artifacts = _load_artifacts(proposal_dir)
     candidate = _build_candidate(artifacts)
+    if global_candidate:
+        scope = "global"
+        lesson_repo_path = None
+        candidate.update({"scope": "global", "repo_path": None, "project_tag": None})
+    elif repo_path:
+        scope = "repo"
+        lesson_repo_path = repo_path
+        candidate.update(
+            {
+                "scope": "repo",
+                "repo_path": repo_path,
+                "project_tag": _project_tag_for_repo(repo_path),
+            }
+        )
+    else:
+        # Legacy CLI/API callers that never supplied a repo path keep writing
+        # global candidates. New repo-aware callers should pass repo_path.
+        scope = "global"
+        lesson_repo_path = None
+        candidate.update({"scope": "global", "repo_path": None, "project_tag": None})
 
     apply_success = bool(artifacts["apply_result.json"].get("success"))
     validation_ok = candidate["validation_ok"]
@@ -243,7 +275,8 @@ def create_lesson_from_proposal(
         title=title,
         summary=summary,
         tags=tags,
-        repo_path=repo_path,
+        repo_path=lesson_repo_path,
+        scope=scope,
     )
 
 
@@ -260,9 +293,14 @@ def _main(argv: list[str]) -> int:
         "--repo-path",
         default=None,
         help=(
-            "Optional analyzed repo path accepted for backward compatibility; "
-            "lessons are global-only under .agent/lessons/."
+            "Analyzed repo path. When provided, the lesson candidate is "
+            "repo-scoped by default."
         ),
+    )
+    parser.add_argument(
+        "--global-candidate",
+        action="store_true",
+        help="Create a global candidate instead of a repo-scoped candidate.",
     )
     parser.add_argument(
         "--allow-failed",
@@ -285,6 +323,7 @@ def _main(argv: list[str]) -> int:
             proposal_dir,
             repo_path=args.repo_path,
             allow_failed=args.allow_failed,
+            global_candidate=args.global_candidate,
         )
     except FileNotFoundError as e:
         print(f"[create_lesson] error: {e}", file=sys.stderr)

@@ -15,7 +15,7 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 ENV PATH="/home/vscode/.cargo/bin:${PATH}"
 
-WORKDIR /app
+WORKDIR /workspace
 
 COPY --chown=vscode:vscode requirements.txt requirements_optional.txt ./
 RUN pip install --no-cache-dir -r requirements.txt

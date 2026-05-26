@@ -42,6 +42,8 @@ def _save_active(
     title=None,
     summary="",
     candidate_overrides=None,
+    repo_path=None,
+    scope=None,
 ):
     cand = _candidate(**(candidate_overrides or {}))
     saved = lesson_store.save_candidate_lesson(
@@ -51,8 +53,15 @@ def _save_active(
         case_name=case_name,
         title=title,
         summary=summary,
+        repo_path=repo_path,
+        scope=scope,
     )
-    return lesson_store.promote_lesson(saved["id"])
+    return lesson_store.promote_lesson(
+        saved["id"],
+        repo_path=repo_path,
+        scope=scope,
+        repo_scope_id=saved.get("repo_scope_id"),
+    )
 
 
 def _save_candidate_only(*, case_name=None, title=None, summary=""):
@@ -272,6 +281,54 @@ def test_no_filter_returns_recent_active_lessons(lessons_repo):
 
     assert len(results) == 3
     assert {r["id"] for r in results} == set(saved_ids)
+
+
+def test_find_active_lessons_with_repo_path_uses_repo_and_global_only(
+    lessons_repo, tmp_path
+):
+    repo_a = tmp_path / "repo-a"
+    repo_b = tmp_path / "repo-b"
+    repo_a.mkdir()
+    repo_b.mkdir()
+
+    global_lesson = _save_active(case_name="global_case", scope="global")
+    repo_a_lesson = _save_active(
+        case_name="repo_a_case",
+        repo_path=str(repo_a),
+        scope="repo",
+    )
+    repo_b_lesson = _save_active(
+        case_name="repo_b_case",
+        repo_path=str(repo_b),
+        scope="repo",
+    )
+
+    results = lesson_retrieval.find_active_lessons(repo_path=str(repo_a))
+    ids = {r["id"] for r in results}
+
+    assert global_lesson["id"] in ids
+    assert repo_a_lesson["id"] in ids
+    assert repo_b_lesson["id"] not in ids
+
+
+def test_find_active_lessons_without_repo_path_preserves_global_only_behavior(
+    lessons_repo, tmp_path
+):
+    repo_a = tmp_path / "repo-a"
+    repo_a.mkdir()
+
+    global_lesson = _save_active(case_name="global_case", scope="global")
+    repo_a_lesson = _save_active(
+        case_name="repo_a_case",
+        repo_path=str(repo_a),
+        scope="repo",
+    )
+
+    results = lesson_retrieval.find_active_lessons()
+    ids = {r["id"] for r in results}
+
+    assert global_lesson["id"] in ids
+    assert repo_a_lesson["id"] not in ids
 
 
 # --- find_active_lessons: clamping ----------------------------------------

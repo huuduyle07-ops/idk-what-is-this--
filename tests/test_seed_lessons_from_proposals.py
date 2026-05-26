@@ -161,11 +161,18 @@ def test_validated_proposal_creates_repo_scoped_candidate(tmp_path, monkeypatch)
     summary = seeder.seed_lessons_from_proposals(proposal_refs=[item_dir])
 
     assert summary["counts"]["created"] == 1
-    lessons = lesson_store.list_lessons(status="candidate")
+    lessons = lesson_store.list_lessons(
+        status="candidate",
+        repo_path=str(repo),
+        include_global=False,
+    )
     assert len(lessons) == 1
     lesson = lessons[0]
     candidate = lesson["candidate"]
     assert lesson["source"] == "proposal_artifact"
+    assert lesson["scope"] == "repo"
+    assert lesson["repo_scope_id"]
+    assert lesson["repo_path_hint"] == "repo"
     assert candidate["source"] == "proposal_artifact"
     assert candidate["scope"] == "repo"
     assert candidate["repo_path"] == str(repo)
@@ -220,7 +227,11 @@ def test_include_failed_goes_through_lesson_quality_never_active(tmp_path, monke
 
     assert summary["counts"]["blocked"] == 1
     assert lesson_store.list_lessons(status="active") == []
-    blocked = lesson_store.list_lessons(status="blocked")
+    blocked = lesson_store.list_lessons(
+        status="blocked",
+        repo_path=str(repo),
+        include_global=False,
+    )
     assert len(blocked) == 1
     assert blocked[0]["evaluation"]["promotion"] == "blocked"
     assert blocked[0]["candidate"]["validation_ok"] is False
@@ -238,7 +249,12 @@ def test_duplicate_source_key_prevents_repeated_candidate_spam(tmp_path, monkeyp
 
     assert first["counts"]["created"] == 1
     assert second["counts"]["duplicates"] == 1
-    assert len(lesson_store.list_lessons()) == 1
+    assert len(
+        lesson_store.list_lessons(
+            repo_path=str(repo),
+            include_global=False,
+        )
+    ) == 1
 
 
 def test_global_candidate_requires_explicit_flag(tmp_path, monkeypatch):
@@ -253,11 +269,30 @@ def test_global_candidate_requires_explicit_flag(tmp_path, monkeypatch):
     )
 
     assert default_summary["counts"]["skipped"] == 1
-    assert default_summary["skipped"][0]["reason"] == "missing_repo_scope"
+    assert default_summary["skipped"][0]["reason"] in {
+        "missing_repo_path",
+        "missing_repo_scope",
+    }
     assert global_summary["counts"]["created"] == 1
-    lesson = lesson_store.list_lessons()[0]
+    lesson = lesson_store.list_lessons(scope="global")[0]
+    assert lesson["scope"] == "global"
+    assert lesson["repo_scope_id"] is None
     assert lesson["candidate"]["scope"] == "global"
     assert lesson["candidate"].get("repo_path") is None
+
+
+def test_repo_scoped_proposal_without_repo_path_is_friendly_error(
+    tmp_path, monkeypatch
+):
+    proposals_root, _reports_root = _configure_env(tmp_path, monkeypatch)
+    item_dir = _proposal_dir(proposals_root)
+    _write_proposal(item_dir, repo_path=None, project_tag="project-x")
+
+    summary = seeder.seed_lessons_from_proposals(proposal_refs=[item_dir])
+
+    assert summary["counts"]["skipped"] == 1
+    assert summary["skipped"][0]["reason"] == "missing_repo_path"
+    assert lesson_store.list_lessons() == []
 
 
 def test_path_traversal_in_proposal_ref_is_blocked(tmp_path, monkeypatch, capsys):

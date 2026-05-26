@@ -1,6 +1,6 @@
 # AI Coding Mentor — Roadmap Refresh
 
-> Updated after AgentBench 22-case expansion, Phase 2 reporting upgrades, Dream V2 benchmark seeding (with dedupe + flaky-case seeding), local DB recovery, **Phase 5 web workspace revamp completion (Slices 1-5 shipped 2026-05-16)**, flaky-case Benchmarks tab rendering, **Dream execution-quality Slices alpha/beta/gamma shipped (2026-05-16)** including ready-to-apply revalidation + lesson-quality badges, **Dream Slice γ3.3 shipped (2026-05-17)** explaining why planned items are not `ready_to_apply`, **Phase 4.6 Dream reference-study case-idea mode shipped (2026-05-25)**, **Brain version stamp + Phase 4.5 Level 1 background reporter shipped (2026-05-17)**, **Phase 4.5 Levels 2-3 CLI MVP shipped (2026-05-17)**, and **Phase 6 manual-safe memory loop shipped (2026-05-17)** — bucketed lesson storage, Memory tab promote/block UI, active-only retrieval, CONTROL prompt injection behind `LESSON_RETRIEVAL_ENABLED`, manual proposal→lesson CLI, lesson tags, the Phase 6.4b benchmark-report lesson seeder, and the Phase 6.4c proposal-artifact lesson seeder (automatic Dream queue lessonization remains deferred).
+> Updated after AgentBench 31-case suite expansion, Phase 2 reporting upgrades, Dream V2 benchmark seeding (with dedupe + flaky-case seeding), local DB recovery, **Phase 5 web workspace revamp completion (Slices 1-5 shipped 2026-05-16)**, flaky-case Benchmarks tab rendering, **Dream execution-quality Slices alpha/beta/gamma shipped (2026-05-16)** including ready-to-apply revalidation + lesson-quality badges, **Dream Slice γ3.3 shipped (2026-05-17)** explaining why planned items are not `ready_to_apply`, **Phase 4.6 Dream reference-study case-idea mode shipped (2026-05-25)**, **Brain version stamp + Phase 4.5 Level 1 background reporter shipped (2026-05-17)**, **Phase 4.5 Levels 2-3 CLI MVP shipped (2026-05-17)**, and **Phase 6 manual-safe memory loop shipped (2026-05-17)** — bucketed lesson storage, Memory tab promote/block UI, active-only retrieval, CONTROL prompt injection behind `LESSON_RETRIEVAL_ENABLED`, manual proposal→lesson CLI, lesson tags, the Phase 6.4b benchmark-report lesson seeder, and the Phase 6.4c proposal-artifact lesson seeder (automatic Dream queue lessonization remains deferred).
 
 > **2026-05-23 refresh:** Phase 7.1 through 7.2.1.1 Mayor/workflow bridge slices are shipped. Phase 8 now includes the read-only MCP server, the artifact-write MCP server for `create_handoff_note`, `import_worker_run_as_proposal`, and `validate_imported_worker_proposal`, the MCP audit ledger, and local MCP Inspector shortcuts/cleanup.
 
@@ -10,9 +10,11 @@
 
 > **2026-05-26 refresh:** Phase 5.6 Goal Brief Builder shipped. It adds a fixed-schema, evidence-first intake layer before Dream, CONTROL, Claude, ChatGPT, or the full agent acts. The builder can ask clarifying questions, suggest safe manual terminal commands, accept pasted user evidence, write `.agent/goal_briefs/<timestamp>/goal_brief.json` and optional Markdown exports, and generate a final task prompt only after enough evidence exists. Guardrails: it does not run terminal commands, apply patches, run benchmarks, create benchmark cases, seed/promote lessons, promote memory, or mutate proposal artifacts.
 
+> **2026-05-26 refresh:** Phase 5.7 Prompt-Version & Cost Quantifier panel shipped. `core/prompt_cost_quantifier.py` groups existing `.agent/benchmarks/benchmark_report_*.json` files by `brain_stamp.prompt_config_hash` (unknown bucket when missing) and computes per-group averages (success rate, duration, fallbacks, model_calls, input/output/total tokens, estimated cost, unknown-cost calls, dirty-run count) plus first_seen, last_seen, latest_report. `scripts/build_prompt_cost_report.py` is the CLI (`--repo-path`, `--output-json`, `--output-md`) writing `.agent/benchmarks/prompt_cost/prompt_cost_report.{json,md}`. `GET /benchmarks/prompt-cost` feeds a new compact Benchmarks-tab panel (prompt hash · runs · avg success · avg duration · avg fallbacks · avg tokens · avg cost · latest report). Guardrails: read-only, no benchmark execution, no model calls, no patch execution, no lesson seeding, no roadmap mutation; source benchmark reports are never modified; malformed reports are skipped with structured warnings.
+
 ## Current checkpoint
 
-The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web revamp plus Phase 5.6 Goal Brief Builder, Phase 7.1-7.2.1.1 Mayor/workflow bridge, and Phase 8.1/8.2a/8.2b/8.2c/8.3 MCP foundations are shipped.
+The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web revamp plus Phase 5.6 Goal Brief Builder, Phase 5.7 Prompt-Version & Cost Quantifier, Phase 7.1-7.2.1.1 Mayor/workflow bridge, and Phase 8.1/8.2a/8.2b/8.2c/8.3 MCP foundations are shipped.
 
 ### Stable / mostly working
 
@@ -30,9 +32,9 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
   - keeps missing/malformed data and oversized diffs in human review
   - now wired into `lesson_store` routing (candidate/active/blocked buckets) and `lesson_retrieval` (only active reads); still not wired into benchmark runner behavior
 - Phase 6 manual-safe memory loop shipped 2026-05-17:
-  - `core/lesson_store.py` — bucketed `.agent/lessons/{candidate,active,blocked}/<id>.json` storage with atomic moves, path-traversal guards, optional `LESSON_AUTO_ACTIVE` flag (default false → human must promote), and `derive_lesson_tags()` helper. Current storage is global-only; repo-scoped candidate defaults are a follow-up before worker/Dream auto-lessonization.
+  - `core/lesson_store.py` — bucketed `.agent/lessons/{candidate,active,blocked}/<id>.json` storage plus repo-scoped `.agent/lessons/repos/<repo_scope_id>/{candidate,active,blocked}/<id>.json` storage with atomic moves, path-traversal guards, optional `LESSON_AUTO_ACTIVE` flag (default false → human must promote), and `derive_lesson_tags()` helper.
   - Memory tab — filter buttons (All/Candidate/Active/Blocked), promote/block actions, lesson cards with tag chips, safety copy explaining advisory-only status
-  - `core/lesson_retrieval.py` — `list_active_lessons` / `find_active_lessons` / `format_lessons_for_prompt`; reads ONLY `active/`; defensive double-filter on the top-level `active_knowledge_allowed` flag. Retrieval should eventually union repo-scoped active lessons with explicitly global active lessons; current implementation reads the global bucket only.
+  - `core/lesson_retrieval.py` — `list_active_lessons` / `find_active_lessons` / `format_lessons_for_prompt`; reads ONLY `active/`; defensive double-filter on the top-level `active_knowledge_allowed` flag. With `repo_path`, retrieval uses current repo-scoped active lessons plus explicitly global active lessons; without `repo_path`, it preserves legacy global-only behavior.
   - Deterministic keyword scoring: case_name +100, tag +25, language/category +10, query-token +5 (all binary); tokenized free-form queries with English + generic-action-word stopword list (`fix`, `bug`, `patch`, `issue`, `problem`) to prevent cross-language false positives; limit clamped to [1, 20]
   - CONTROL prompt injection (`core/control_engine.py`) gated by `LESSON_RETRIEVAL_ENABLED` (default false), with `LESSON_RETRIEVAL_LIMIT` and `LESSON_RETRIEVAL_MAX_CHARS`; `[ACTIVE LESSONS — advisory hints, lowest priority]` block sits between `[PHANTOM LIMB SUGGESTIONS]` and `[USER]`; fail-closed (any error → empty block, prompt still builds); 4 production callers updated to pass `repo_path`
   - `scripts/create_lesson_from_proposal.py` — manual CLI that turns a validated `.agent/proposals/<run>/<item>/` artifact into a lesson candidate; explicitly populates tags; refuses by default if validation/apply failed (override with `--allow-failed`); path-traversal guarded; never modifies the real repo
@@ -119,7 +121,7 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
 
 ### Main caveats
 
-- Do not claim a future clean `22/22` after code changes until a fresh full fast run passes.
+- Do not claim a future clean `31/31` after code changes until a fresh full fast run passes.
 - Level 3 proposal queue is gated: items without `human_approved_for_proposal=true` must skip, even if they look obvious.
 - Docker should remain optional. Current local workflow should not depend on app containers.
 - MCTS / branched repair should wait until Dream V2 and report flow are stable.
@@ -134,7 +136,7 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
 
 ### A. Promote `--retry-failed 1` from optional → critical-path · **✅ SHIPPED 2026-05-16**
 
-**Why:** With LLM-dependent tests, single-attempt suites are permanently flaky. The "official 22/22" milestone is unreachable without retry. Currently sitting as "remaining optional" in Phase 2; recommend moving to "Do now."
+**Why:** With LLM-dependent tests, single-attempt suites are permanently flaky. The "official 31/31" milestone is unreachable without retry. Currently sitting as "remaining optional" in Phase 2; recommend moving to "Do now."
 
 **Effort:** Small. ~50 lines in `benchmarks/run_benchmarks.py`. Add `--retry-failed N` flag, on failure rerun N times, mark `flaky=true` in report if any retry passes.
 
@@ -154,9 +156,9 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
 
 ### B. Held-out eval set
 
-**Why:** Your 22 benchmark cases are both dev signal AND test bed. You'll inevitably overfit prompts/heuristics to them.
+**Why:** Your 31 benchmark cases are both dev signal AND test bed. You'll inevitably overfit prompts/heuristics to them.
 
-**Suggested:** Split ~15 dev cases (run often, tune freely) + ~7 held-out (run only at milestones, never tune to). When held-out scores diverge from dev, you're overfitting. Cheap to add now, hard to retrofit later (you have to remember which cases you've been "tuning to").
+**Suggested:** Split ~23 dev cases (run often, tune freely) + ~8 held-out (run only at milestones, never tune to). When held-out scores diverge from dev, you're overfitting. Cheap to add now, hard to retrofit later (you have to remember which cases you've been "tuning to").
 
 ### C. Patch quality beyond pass/fail
 
@@ -196,7 +198,7 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
 
 > **Shipped:** `scripts/run_background_reporter.py` writes `.agent/reports/background_report_*.md/json`, includes Brain Stamp, compares to the previous benchmark report, and emits `regression_alert` when the success-rate drop crosses the configured threshold.
 
-**Why:** If a benchmark goes from 22/22 to 20/22 after a code change, you should be told without having to look.
+**Why:** If a benchmark goes from 31/31 to 29/31 after a code change, you should be told without having to look.
 
 **Suggested:** When you ship Phase 4.5 Level 1 (background reporter), have it compare `--latest` to the previous report and flag if `success_rate` dropped >5pp. Could append a short "⚠ Regression detected" block to the morning report. Combines well with **G** (brain version stamp) — alert can say "regression after agent SHA <X> → <Y>."
 
@@ -257,7 +259,7 @@ This makes Phase 6 a precondition-design problem, not just a storage problem. **
 > Historical note: A, G, H, Patch Safety, Phase 4.5 Levels 1-3, and Phase 6 manual-safe loop have shipped. Current near-term ordering is tracked in **Near-term action list**.
 
 1. ~~Manual Level 3 trial on one reviewed `human_approved_for_proposal=true` item.~~ ✅
-2. Prompt-version quantifier panel, paired with Brain Stamp hashes.
+2. ~~Prompt-version quantifier panel, paired with Brain Stamp hashes.~~ ✅ (Phase 5.7, shipped 2026-05-26)
 3. ~~Patch Safety gate (forbidden-files + path-traversal at apply time).~~ ✅
 4. Held-out eval set.
 5. Repeated-failure Dream seeding.
@@ -296,7 +298,7 @@ This makes Phase 6 a precondition-design problem, not just a storage problem. **
 
 - [x] **`--retry-failed N`** — **shipped 2026-05-16**. CLI flag in `benchmarks/run_benchmarks.py`. Reruns failed cases up to N times; marks `flaky=true` if a retry passes (still counts as passed). Toolchain failures, forbidden-file touches, and structural errors are excluded from retry. Per-case `attempts`, `flaky`, `retry_results[]` fields added with Gemini's failure/success log diff capture per attempt + GPT's JSON shape. Top-level `flaky` counter + Markdown "Flaky Cases" table.
 
-> 🤖 **Claude-proposed (2026-05-16) — RESOLVED ✅:** Promoted from optional → shipped. With `--retry-failed`, "official 22/22" is now reachable honestly: passes-with-flake are visible (`flaky=true`), not hidden. Three-AI consensus (Claude/Gemini/GPT) on prioritization. See **AI Suggestions § A**.
+> 🤖 **Claude-proposed (2026-05-16) — RESOLVED ✅:** Promoted from optional → shipped. With `--retry-failed`, "official 31/31" is now reachable honestly: passes-with-flake are visible (`flaky=true`), not hidden. Three-AI consensus (Claude/Gemini/GPT) on prioritization. See **AI Suggestions § A**.
 
 ---
 
@@ -304,27 +306,27 @@ This makes Phase 6 a precondition-design problem, not just a storage problem. **
 
 **Status: DONE**
 
-Current suite has 22 cases:
+Current suite has 31 cases:
 
 - C++: `cpp_account_interest`, `cpp_boundary_check`
-- Go: `go_logging_side_effect`, `go_missing_import_error`, `go_wallet_transfer`, `go_wrong_file_temptation`
+- Go: `go_logging_side_effect`, `go_missing_import_error`, `go_multifile_root_cause`, `go_wallet_transfer`, `go_wrong_file_temptation`
 - HTML: `html_signup_form_accessibility`
 - JavaScript: `js_array_mutation_side_effect`, `js_async_missing_await`, `js_null_user_profile`, `js_temperature_converter`
-- Python: `python_discount_validation`, `python_exception_parse_config`, `python_mutable_default`, `python_off_by_one_pagination`, `python_sql_account_transfer`, `python_sql_join_filter`
+- Python: `python_callback_dispatch_ambiguity`, `python_central_node_temptation`, `python_discount_test`, `python_duplicate_filename_temptation`, `python_exception_parse_config`, `python_false_positive_no_patch`, `python_multifile_root_cause`, `python_mutable_default`, `python_off_by_one_pagination`, `python_sql_account_transfer`, `python_sql_join_filter`
 - Rust: `rust_cart_reservation`, `rust_result_error_handling`
-- TypeScript: `ts_import_export_mismatch`, `ts_inventory_restock`, `ts_optional_property_guard`
+- TypeScript: `ts_callback_dispatch_ambiguity`, `ts_false_positive_no_patch`, `ts_import_export_mismatch`, `ts_inventory_restock`, `ts_nested_dispatch_root_cause`, `ts_optional_property_guard`
 
 ### Current benchmark status
 
 ```text
---check: 22 cases, 0 errors
-official clean full fast run achieved: 22/22 passed, flaky: 0, with --retry-failed 1
+--check: 31 cases, 0 errors
+official clean full fast run achieved: 31/31 passed, flaky: 0, with --retry-failed 1
 ```
 
 ### Next benchmark goal
 
 ```text
-official full fast run: 22/22 passed (with --retry-failed 1 — flaky-pass counts but is visible)
+official full fast run: 31/31 passed (with --retry-failed 1 — flaky-pass counts but is visible)
 ```
 
 Use:
@@ -333,12 +335,12 @@ Use:
 python benchmarks/run_benchmarks.py --fast --summary --skip-toolchain-failures --markdown --retry-failed 1
 ```
 
-A "true 22/22" passing run will look like one of:
-- `Passed: 22 · Flaky: 0` → real clean run, no flake
-- `Passed: 22 · Flaky: 2` → 22/22 but 2 cases needed a retry (failure-vs-success log diff captured in `retry_results[]` per case)
-- `Passed: 20 · Failed: 2 · Flaky: 0` → real regression, no flake to blame
+A "true 31/31" passing run will look like one of:
+- `Passed: 31 · Flaky: 0` → real clean run, no flake
+- `Passed: 31 · Flaky: 2` → 31/31 but 2 cases needed a retry (failure-vs-success log diff captured in `retry_results[]` per case)
+- `Passed: 29 · Failed: 2 · Flaky: 0` → real regression, no flake to blame
 
-> 🤖 **Claude-proposed (2026-05-16):** Once the 22 cases are stable, split into ~15 dev + ~7 held-out to avoid overfitting. See **AI Suggestions § B**.
+> 🤖 **Claude-proposed (2026-05-16):** Once the 31 cases are stable, split into ~23 dev + ~8 held-out to avoid overfitting. See **AI Suggestions § B**.
 
 ---
 
@@ -480,8 +482,8 @@ The web UI is now a real workspace (one-shot form → tabbed workspace milestone
 - [ ] **Render Dream report markdown properly** (currently `<pre>` — works but not pretty). Would need a small markdown lib (~10KB) or simple inline parser.
 - [x] **Improve Benchmark tab - execution controls shipped 2026-05-17:** `Run all`, `Run selected`, stop/status polling, and Add Case UI are now available from the web tab.
 - [ ] **Improve Benchmark tab - remaining polish:** run language/category batch trigger, show model usage/fallbacks per case, and improve report drill-down density.
-- [ ] **Prompt-version quantifier panel** (Settings/Health subsection or its own tab). Was originally framed as a generic "performance/model usage panel."
-  > **🤖 Gemini-proposed reframe (2026-05-16):** scope this as a "prompt-version quantifier" instead of a generic stats table. Group by prompt-file hash (paired with the brain version stamp from § G), show columns: `runs · avg model_calls · avg duration · est cost`. Lets you spot regressions like "I changed the system prompt and tokens silently 2×ed." Start with table; add line chart only if patterns aren't obvious from numbers.
+- [x] **Prompt-version quantifier panel (Phase 5.7) shipped 2026-05-26:** lives as a "Prompt / Cost Quantifier" panel inside the Benchmarks tab. `core/prompt_cost_quantifier.py` reads existing `.agent/benchmarks/benchmark_report_*.json` only, groups runs by `brain_stamp.prompt_config_hash` (falling back to an explicit `unknown` bucket so malformed/missing stamps don't crash), and computes per-group averages (`avg_success_rate`, `avg_total/passed/failed/flaky`, `avg_duration`, `avg_fallback_count`, `avg_model_calls`, `avg_input/output/total_tokens`, `avg_estimated_cost`) plus `unknown_cost_call_count`, `dirty_run_count`, `first_seen`, `last_seen`, and `latest_report`. Default sort is newest `last_seen` first; the summary surfaces the highest avg-cost and highest avg-fallback groups so regressions like "I changed the system prompt and tokens silently 2×ed" jump out. `scripts/build_prompt_cost_report.py` is the CLI (`--repo-path`, `--output-json`, `--output-md`) and writes `.agent/benchmarks/prompt_cost/prompt_cost_report.{json,md}`. `GET /benchmarks/prompt-cost?repo_path=…` feeds the web table (prompt hash · runs · avg success · avg duration · avg fallbacks · avg tokens · avg cost · latest report). Guardrails: read-only, no benchmark execution, no model calls, no patch execution, no lesson seeding, no roadmap mutation, malformed reports are skipped with structured warnings, and source benchmark reports are never modified (asserted in tests).
+  > **🤖 Gemini-proposed reframe (2026-05-16, accepted):** scope this as a "prompt-version quantifier" instead of a generic stats table. Group by prompt-file hash (paired with the brain version stamp from § G), show columns: `runs · avg model_calls · avg duration · est cost`. Lets you spot regressions like "I changed the system prompt and tokens silently 2×ed." Start with table; add line chart only if patterns aren't obvious from numbers.
 - [x] **Patch Safety gate** (forbidden files + path-traversal). Runs at **apply-time**, not memory-time. Sits naturally alongside the existing Patch card from Slice 5 (visual surface for "this patch was blocked because…"). Replaces the current "Forbidden-file check: not yet implemented" placeholder row in the Patch card.
 - [x] **Post-patch explanation card (for the human user)** — after a successful patch, render a small card with: (1) what was wrong, (2) why the patch works, (3) concept the user should learn, (4) similar bug pattern to watch for. Pulls from existing `patch_proposal.summary` + lesson record + `validation_output`; no new LLM calls. **🤖 GPT-proposed brainstorm (2026-05-17) "Tutor Mode" + Claude-condensed:** kept the lightweight explanation card piece; full Tutor/Curriculum phase deferred (would pivot the product from patcher → mentor).
 - [x] **Goal Brief Builder (Phase 5.6) shipped 2026-05-26:** fixed-schema draft/update/final-prompt workflow with CLI and web UI. Writes only goal-brief artifacts; no patch execution, no benchmark execution/case creation, no lesson seeding, no memory promotion, and no proposal artifact mutation.
@@ -564,7 +566,7 @@ Turn benchmark and Dream outputs into useful knowledge the agent actually consul
 ### Shipped 2026-05-17 (manual-safe loop)
 
 - **6.0 — Candidate Lesson Store** (`core/lesson_store.py`):
-  - bucketed storage under `.agent/lessons/{candidate,active,blocked}/<id>.json`; current implementation is global-only even when callers pass `repo_path`
+  - bucketed global storage under `.agent/lessons/{candidate,active,blocked}/<id>.json`; Phase 6.4d adds repo-scoped storage under `.agent/lessons/repos/<repo_scope_id>/{candidate,active,blocked}/<id>.json`
   - `save_candidate_lesson()` routes by `lesson_quality.promotion` (blocked → `blocked/`; auto_approved → `candidate/` by default, `active/` only if `LESSON_AUTO_ACTIVE=true`)
   - `list_lessons`, `promote_lesson`, `block_lesson` with atomic moves + path-traversal guard
   - 13-field lesson record; top-level `active_knowledge_allowed` strictly mirrors the bucket (file-in-active iff field-true) — belt-and-suspenders against retrieval bugs reading the field instead of the folder
@@ -577,7 +579,7 @@ Turn benchmark and Dream outputs into useful knowledge the agent actually consul
   - tokenized free-form queries with English + generic-action-word stopword list (`fix`, `bug`, `patch`, `issue`, `problem`) to prevent cross-language false positives
   - `format_lessons_for_prompt()` — compact text (title/case/source/summary/top reasons), never embeds raw `candidate` payload, capped at `max_chars`
   - limit clamped to [1, 20]
-  - **6.2.1:** retrieval scope contract — once repo-scoped storage lands, current-repo active lessons should union with explicitly global active lessons; today the implementation reads the global bucket only
+  - **6.2.1 / 6.4d:** retrieval scope contract — with `repo_path`, current-repo active lessons union with explicitly global active lessons; without `repo_path`, retrieval stays global-only for backward compatibility
   - **6.2.2:** lesson `tags` field with `derive_lesson_tags()` (language / category / case_name slug / file basenames / distinctive content tokens); tag matches outrank summary-only matches
 - **6.3 — CONTROL prompt injection** (`core/control_engine.py`):
   - `[ACTIVE LESSONS — advisory hints, lowest priority]` block injected between `[PHANTOM LIMB SUGGESTIONS]` and `[USER]` in both feature-extension and normal bug-fix branches
@@ -604,11 +606,16 @@ Turn benchmark and Dream outputs into useful knowledge the agent actually consul
   - never writes directly to `active/`, never flips `LESSON_RETRIEVAL_ENABLED`, never runs benchmarks, never calls models, never applies patches, and never modifies proposal artifacts
   - dedupes with stable source keys based on `proposal_ref + patch_hash` or `proposal_ref + changed_files_hash + validation_hash`
   - can write optional `.agent/reports/proposal_lesson_seed_report_*.json` / `.md` summaries
+- **6.4d — Scoped lesson storage/runtime isolation**:
+  - `save_candidate_lesson()` stores benchmark-report lessons globally by default and repo/current-proposal lessons under safe `repos/<repo_scope_id>/` buckets when `repo_path` is available
+  - `list_lessons(repo_path=...)` includes current repo-scoped lessons plus global lessons by default, can exclude global lessons, and never reads other repo scopes
+  - `promote_lesson()` / `block_lesson()` accept scope identity and preserve `active_knowledge_allowed` invariants across global and repo buckets
+  - Memory tab shows `global` / `repo:<repo_scope_id>` badges and passes scope identity for promote/block actions
 
 ### Deferred (Phase 6.4 follow-ups, Phase 6.5+)
 
 - [ ] **6.4 follow-up auto-creation** — wire Dream/proposal queues to feed repo-scoped lesson candidates without manual CLI runs. Benchmark-report seeding exists as an explicit global-candidate CLI, and proposal-artifact seeding exists as an explicit repo-scoped CLI. All paths still must go through `lesson_quality`; promotion must remain human-approved by default.
-- [ ] **6.4d scoped lesson storage/runtime isolation** — make `repo_path` meaningful in `lesson_store` and retrieval, preserve benchmark report seeding as global, preserve worker/current-repo Dream/proposal candidates as repo-scoped by default, and keep global active promotion explicit.
+- [x] **6.4d scoped lesson storage/runtime isolation** — make `repo_path` meaningful in `lesson_store` and retrieval, preserve benchmark report seeding as global, preserve worker/current-repo Dream/proposal candidates as repo-scoped by default, and keep global active promotion explicit.
 - [ ] "Save this session to memory" button
 - [ ] Log compression in lesson body (validation summary, patch summary, failure category — no raw dumps)
 - [ ] Smarter scoring beyond binary token substring (bigram phrase boosts, embeddings) — only after AgentBench proves it improves results
@@ -769,6 +776,10 @@ this server."` prints to stderr (exit 2) if `mcp` is not installed.
 - `GET /mcp/audit?limit=50` lists recent valid events without adding any MCP write capability.
 - Audit failures are observational only; they are logged and do not turn a valid harness result into a failure or a blocked result into success.
 
+### Future Phase 8.4 — Gemini Managed Agent Worker Adapter
+
+- Use Gemini Managed Agents as an optional cloud worker backend for bounded handoff tasks. Managed Agent outputs must be imported as worker_run/proposal artifacts and validated locally in temp clones before any lesson seeding or user approval. No direct real-repo patching, no automatic promotion, and no broad credentials.
+
 ### MCP Inspector local operator tools (shipped)
 
 - `POST /mcp/inspector/launch` launches MCP Inspector only for fixed targets: the read-only server or the artifact-write server.
@@ -895,7 +906,7 @@ Concrete delta: ~30 lines retrieval + ~50 lines new Dream mode + 1 config flag `
 **For:**
 - Goodhart's law: if validation defines success, the agent will overfit to validation. Anti-lessons attack the validator itself.
 - Real engineering memory is asymmetric (we remember pain longer than success).
-- Keeps the agent humble — counteracts the "22/22 yesterday, ship it" overconfidence.
+- Keeps the agent humble — counteracts the "31/31 yesterday, ship it" overconfidence.
 
 **Against:**
 - Context tokens are finite; anti-lessons compete with positive lessons for the same budget. Net effect could be *worse* prompts.
@@ -1114,7 +1125,7 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
 | **PromptOps / Prompt Version Control** | folded into **Phase 5 Polish** (Prompt-version quantifier panel, already scheduled) + **Phase 12** (A/B comparison layer) |
 | **Trust Dashboard** | folded into **Phase 5 Polish** — Settings/Health panel evolves into Trust Dashboard via composition of existing signals (latest benchmark, flaky count, dirty tree, prompt hash changed, lesson retrieval enabled, regression alerts). No rewrite. |
 | **Skill / Tool Registry** | demoted to **Phase 8 prep** — MCP needs the registry to expose tools safely; everyone else can hardcode for now |
-| **Multi-Repo / Workspace Memory** | folded into **Phase 6 as 6.4d scoped lesson storage/runtime isolation** (priority chain: current repo → explicitly global benchmark-derived → reference). Phase 6.4b ships global benchmark candidates and 6.4c ships repo-scoped proposal candidates; physical repo-scoped storage/retrieval isolation still needs storage support. |
+| **Multi-Repo / Workspace Memory** | folded into **Phase 6 as 6.4d scoped lesson storage/runtime isolation** (priority chain: current repo → explicitly global benchmark-derived → reference). Phase 6.4b ships global benchmark candidates, 6.4c ships repo-scoped proposal candidates, and 6.4d ships physical repo-scoped storage/retrieval isolation. |
 | **Permission & Capability System** | start as **docs-only "Capability Map"** (single `docs/capability_map.md` listing every gate with its current default). Programmatic enforcer deferred until MCP / browser-agent / Docker app mode actually make it necessary. |
 | **Tutor Mode / Curriculum** | reduced to a single **Phase 5 Polish item**: "Post-patch explanation card." Full curriculum/exercise scope deferred — it would pivot the product from "patcher named mentor" to "actual mentor," which is a different roadmap. |
 | **Multi-Agent Council Mode** | reframed as **Phase 10 alternative to MCTS**, decided by head-to-head experiment (Phase 12 `exp_council_vs_mcts`), not built in parallel. Both are "more compute → better patches" bets; pick one based on data. |
@@ -1129,7 +1140,7 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
 
 ### Done since last roadmap refresh
 
-- [x] AgentBench 22 cases stable
+- [x] AgentBench 31 cases stable
 - [x] Dream seed button + backend with dedupe shipped
 - [x] Web workspace Phase 5 Slices 1–5 shipped (tabs, health, benchmarks, dream modal, patch card)
 - [x] Local DB recovery confirmed working
@@ -1172,7 +1183,7 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
 > 🤖 Order is **Claude-proposed**. User picks any in any order.
 
 - [x] **Manual Level 3 trial on one reviewed item** — mark a single plan item `human_approved_for_proposal=true`, run `python scripts/run_patch_proposal_queue.py --max-items 1`, inspect `.agent/proposals/...`, and keep apply approval manual.
-- [ ] **Prompt-version quantifier panel** in Settings/Health (Phase 5 Polish; Gemini-reframed performance panel) — pairs naturally with brain-stamp.
+- [x] **Prompt-version quantifier panel (Phase 5.7) shipped 2026-05-26** — lives in the Benchmarks tab as "Prompt / Cost Quantifier". Reads `.agent/benchmarks/benchmark_report_*.json` only, groups by `brain_stamp.prompt_config_hash` (unknown bucket when missing), and shows runs · avg success · avg duration · avg fallbacks · avg tokens · avg cost · latest report. CLI: `scripts/build_prompt_cost_report.py`. Web route: `GET /benchmarks/prompt-cost`. Read-only — no benchmark execution, no model calls, no patch execution, no lesson seeding.
 - [x] **Patch Safety gate** (forbidden-files + path-traversal, apply-time) — shipped; Phase 5 Polish, GPT-relocated from Phase 6.
 - [ ] **Held-out eval set** (AI Suggestions § B) — cheap now, hard to retrofit.
 - [ ] **Repeated-failure Dream seeding (deferred § D)** — still valid. Scans last N reports for cases failing >50% of the time.
@@ -1211,7 +1222,7 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
 ## One-line focus
 
 ```text
-Phase 5 Core done. AgentBench --retry-failed shipped and the clean 22/22 fast run exists.
+Phase 5 Core done. AgentBench --retry-failed shipped and the clean 31/31 fast run exists.
 Brain Stamp plus Phase 4.5 Levels 1-3 CLI MVP shipped: reporter, Dream planner, and gated patch proposal queue.
 Phase 6 manual-safe memory loop shipped (2026-05-17): bucketed lesson storage, Memory tab promote/block UI,
   active-only retrieval with tags, CONTROL prompt injection behind
@@ -1227,7 +1238,7 @@ Phase 8.1 Read-only MCP server shipped (2026-05-21): mcp_server.read_only + scri
 Phase 8.2a/8.2b/8.2c Artifact-write MCP shipped (2026-05-22/23): mcp_server.artifact_write exposes exactly 13 tools: the 10 read-only tools plus create_handoff_note, import_worker_run_as_proposal, and validate_imported_worker_proposal.
 Phase 8.3 MCP audit ledger shipped (2026-05-22): bounded invocation summaries under .agent/mcp_audit/invocations.jsonl plus GET /mcp/audit. Audit is observational, not an authorization gate.
 MCP Inspector operator shortcuts/cleanup shipped (2026-05-23): fixed-target launch route/UI for read-only and artifact-write servers, plus shutdown cleanup for matching local Inspector process trees.
-Next: prompt-version quantifier / held-out eval / repeated-failure Dream seeding, then optionally Dream lesson auto-creation and 6.4d scoped lesson storage. Benchmark run buttons + Add Case clerk are now shipped; remaining Benchmark polish is category/language batch + report density.
+Next: prompt-version quantifier / held-out eval / repeated-failure Dream seeding, then optionally Dream lesson auto-creation. Benchmark run buttons + Add Case clerk are now shipped; remaining Benchmark polish is category/language batch + report density.
 Do not add MCTS yet — require a 10-case mini-experiment first.
 ```
 

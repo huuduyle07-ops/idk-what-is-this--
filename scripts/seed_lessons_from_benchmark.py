@@ -184,7 +184,7 @@ def _existing_source_keys(repo_path: str | None = None) -> set[str]:
     from core.lesson_store import list_lessons
 
     keys: set[str] = set()
-    for lesson in list_lessons(repo_path=repo_path):
+    for lesson in list_lessons(scope="global"):
         candidate = lesson.get("candidate")
         if isinstance(candidate, dict):
             key = candidate.get("source_key")
@@ -420,7 +420,8 @@ def _save_lesson_candidate(
             title=title,
             summary=summary,
             tags=tags,
-            repo_path=repo_path,
+            repo_path=None,
+            scope="global",
         )
     finally:
         lesson_store.config.LESSON_AUTO_ACTIVE = previous_auto_active

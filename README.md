@@ -18,7 +18,7 @@ This project is an AI coding mentor and repair system. It supports two main ways
 - Human learning mode: explains code, teaches step by step, and helps the user understand bugs or design choices.
 - Agent mode: reviews code, plans changes, generates structured patch JSON, applies safe edits, validates them, and logs the result.
 
-The system can run from the terminal or from a Flask web interface. The web interface has grown into a workspace-style dashboard with separate areas for chat/patching, benchmarks, dream runs, memory, graphs, and system health.
+The system can run from the terminal or from a Flask web interface. The web interface has grown into a workspace-style dashboard with separate areas for goal-brief intake, chat/patching, benchmarks, dream runs, memory, graphs, and system health.
 
 ## Main Features
 
@@ -29,11 +29,12 @@ The project starts from `main.py`.
 You can use:
 
 - Terminal mode for interactive prompts.
-- Web mode for a browser workspace with repo path input, patch controls, benchmark history, graph views, health checks, dream queue controls, and session history.
+- Web mode for a browser workspace with repo path input, goal brief building, patch controls, benchmark history, graph views, health checks, dream queue controls, and session history.
 
 Current web workspaces:
 
 - Chat / Patch: answer, context, state, patch card, validation, diff, and candidate views.
+- Goal Brief: turn a vague goal into a structured, evidence-based task prompt before an agent acts.
 - Benchmarks: browse past benchmark reports and inspect results.
 - Dream: queue overnight bug/debt/idea/research work.
 - Memory: run memory consolidation, manage lessons/proposals, create handoffs, inspect worker runs, and launch MCP Inspector shortcuts.
@@ -41,6 +42,39 @@ Current web workspaces:
 - Settings / Health: check API keys, DB, embeddings, Ollama, Tree-sitter, and local toolchains.
 
 The Patch tab now shows a structured patch card instead of only raw JSON. It summarizes patch type, confidence, risk, validation command, changed files, and last action, while keeping raw JSON available for debugging.
+
+### 1.5. Goal Brief Builder
+
+Goal Brief Builder is a prompt-assisting intake flow for vague or risky goals. Use it before Dream, CONTROL, Claude, ChatGPT, or the full agent when the request is not yet concrete enough to act on safely.
+
+It keeps a fixed `GoalBrief` schema and uses model guidance only for interviewing:
+
+- ask at most a couple of focused clarifying questions
+- summarize what is known
+- identify missing evidence
+- suggest safe terminal commands for the user to run manually
+- accept pasted command output or manual observations
+- generate a final high-quality task prompt once enough evidence exists
+
+It writes artifacts under `.agent/goal_briefs/<timestamp>/`:
+
+- `goal_brief.json`
+- optional `goal_brief.md`
+
+Important guardrail: Goal Brief Builder is a collector, not a solver. It does not run terminal commands, apply patches, run benchmarks, create benchmark cases, seed or promote lessons, promote memory, mutate proposals, or edit source files.
+
+CLI:
+
+```bash
+python scripts/create_goal_brief.py --goal "Fix the weird checkout failure"
+python scripts/create_goal_brief.py --brief-ref .agent/goal_briefs/<timestamp>/goal_brief.json --answer "<pasted result>" --export-md
+```
+
+Important files:
+
+- `core/goal_brief.py`
+- `scripts/create_goal_brief.py`
+- `web/app.py`
 
 Important files:
 
@@ -627,6 +661,7 @@ Core rule:
 | Goal | Use | Don't use |
 | --- | --- | --- |
 | Understand code, plan, ask questions | **Chat / Understanding mode** | Don't apply patches or run subagents from Chat |
+| Turn a vague goal into an actionable task | **Goal Brief tab / `create_goal_brief.py`** | Don't let an agent act before evidence exists |
 | Apply a single targeted patch | **Instant Run / Patch flow** | Don't use for exploration |
 | Generate proposals from benchmark gaps | **Dream tab → Make proposal** | Don't expect Dream to auto-apply |
 | Promote a validated proposal into prompt memory | **Memory tab → Lessons → Promote** | Don't promote without reading the proposal |
@@ -635,6 +670,20 @@ Core rule:
 | Let an MCP client inspect evidence | **Read-only MCP server** | Don't expose real-repo write tools |
 | Let an MCP client create safe artifacts | **Artifact-write MCP server** | Don't treat artifact creation as approval to run/apply |
 | Measure the whole system | **Benchmarks tab / `run_benchmarks.py`** | Don't run after every small change |
+
+### Goal Brief Builder
+
+Use Goal Brief Builder when the user goal is vague, evidence is missing, or the next agent should not act yet. The output is a structured task brief and final prompt, not a patch.
+
+Recommended flow:
+
+1. Open **Goal Brief** in the web workspace, or run `python scripts/create_goal_brief.py --goal "<goal>"`.
+2. Answer the interviewer questions.
+3. If it suggests a terminal command, run that command yourself and paste the result back.
+4. Review known evidence, missing information, suggested commands, and final prompt.
+5. Copy the final prompt into Dream, CONTROL, ChatGPT, Claude, or a full agent run only after the brief is ready.
+
+The model may guide the next question, but it must not invent command output. Missing evidence stays listed as missing information until the user provides it.
 
 ### Patch flow safety gate
 
@@ -761,11 +810,11 @@ Audit and Inspector:
 
 | Situation | Command |
 | --- | --- |
-| Sanity-check that all 22 cases load | `python benchmarks/run_benchmarks.py --check --quiet` |
+| Sanity-check that all 31 cases load | `python benchmarks/run_benchmarks.py --check --quiet` |
 | Iterate on one case | `python benchmarks/run_benchmarks.py --fast --summary --case cpp_account_interest` |
 | Full milestone confirmation | `python benchmarks/run_benchmarks.py --fast --summary --skip-toolchain-failures --markdown --retry-failed 1` |
 
-Rule of thumb: after a small code change, run the targeted unit tests. After a milestone, run the full benchmark. Don't claim "22/22" in a roadmap entry until a fresh full run has actually passed.
+Rule of thumb: after a small code change, run the targeted unit tests. After a milestone, run the full benchmark. Don't claim "31/31" in a roadmap entry until a fresh full run has actually passed.
 
 ### Daily workflow
 
@@ -798,17 +847,22 @@ This is an active AI engineering project, not a tiny demo. The code already incl
 - automatic patch execution
 - validation and rollback
 - memory storage
-- 22 benchmark cases across several languages
+- 31 benchmark cases across several languages, all passing (report `benchmark_report_1779784439`: 31/31, avg 42.27 s, fallback count 12, ~181 K tokens, ~$0.22 per full run)
+- held-out evaluation split (`held_out_v1`): 7 adversarial cases (multi-file root cause, callback dispatch ambiguity, false-positive suppression) kept separate from the main benchmark — latest result 7/7 passed, avg 50.31 s, fallback count 5
+- watchlist tracking for held-out instability: `go_multifile_root_cause` flagged at 0.50 historical failure rate; currently passing; watchlist is observational only and does not affect pass/fail scoring
+- patch minimality experiment (greenlighted): variant pipeline matched 31/31 correctness, ran 5.6 s faster per run, and used 2 fewer fallbacks versus baseline
+- same-suite trend tracking: benchmark comparisons are grouped by case-set fingerprint so same-total / different-case reports are never compared against each other
 - benchmark reports with summary, latest, compare, markdown, and web viewing support
 - model-call statistics for benchmark runs
-- web UI workspace tabs for chat/patch, benchmarks, dream, memory, graph, and health
+- web UI workspace tabs for chat/patch, goal brief intake, benchmarks, dream, memory, graph, and health
+- Goal Brief Builder for prompt-assisted, evidence-first task briefs before agent action
 - structured patch card showing confidence, risk, validation command, changed files, and last action
 - overnight planning through the Sleeping Consultant
 - health checks for API keys, optional services, and local toolchains
 - Mayor Mode handoffs, temp-clone worker runs, worker-run import, and temp-clone imported-proposal validation
 - read-only and artifact-write MCP servers with a narrow allowlist, including temp-clone imported-proposal validation
 - MCP audit route and local MCP Inspector shortcuts
-- universal node weights with a lesson-history penalty term that biases CONTROL DFS, project-map rankings, and Obsidian AI_READ_FIRST toward files and symbols with prior failures
+- universal node weights with a lesson-history penalty term that biases CONTROL DFS, project-map rankings, and Obsidian AI_READ_FIRST toward files and symbols with prior failures; explainability CLI (`scripts/explain_graph_weights.py`) audits each node's topology, complexity, and penalty contributions
 
 ## Short Summary
 

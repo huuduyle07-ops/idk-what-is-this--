@@ -135,6 +135,8 @@ def test_passed_case_creates_candidate_lesson(tmp_path, monkeypatch):
     assert len(lessons) == 1
     lesson = lessons[0]
     assert lesson["source"] == "benchmark_report"
+    assert lesson["scope"] == "global"
+    assert lesson["repo_scope_id"] is None
     assert lesson["source_report"] == "benchmark_report_1.json"
     assert lesson["case_name"] == "python_discount_validation"
     assert lesson["active_knowledge_allowed"] is False
@@ -151,6 +153,31 @@ def test_passed_case_creates_candidate_lesson(tmp_path, monkeypatch):
     assert candidate["changed_files"] == ["app.py"]
     assert candidate["diff_stats"]["added"] == 2
     assert candidate["diff_stats"]["removed"] == 1
+
+
+def test_benchmark_report_seeder_writes_global_even_with_repo_path(
+    tmp_path, monkeypatch
+):
+    benchmarks_root, _reports_root = _configure_tmp_roots(tmp_path, monkeypatch)
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    report = _write_report(
+        benchmarks_root,
+        "benchmark_report_1.json",
+        [_case_result("python_discount_validation")],
+    )
+
+    seeder.seed_lessons_from_report(report, repo_path=str(repo))
+
+    global_lessons = lesson_store.list_lessons(status="candidate", scope="global")
+    repo_lessons = lesson_store.list_lessons(
+        status="candidate",
+        repo_path=str(repo),
+        include_global=False,
+    )
+    assert len(global_lessons) == 1
+    assert global_lessons[0]["scope"] == "global"
+    assert repo_lessons == []
 
 
 def test_failed_case_is_blocked_or_skipped_never_active(tmp_path, monkeypatch):

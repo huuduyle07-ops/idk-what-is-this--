@@ -18,6 +18,7 @@ from __future__ import annotations
 import importlib.util
 import os
 import shutil
+import subprocess
 from typing import Literal
 
 Status = Literal["ok", "available", "off", "missing", "error"]
@@ -158,6 +159,107 @@ def check_tree_sitter() -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Docker sandbox backend (Phase 7.3a)
+# ---------------------------------------------------------------------------
+def _docker_image_pulled(docker: str, image: str, timeout_sec: int = 2) -> bool:
+    """Return True if ``image`` is present in the local Docker image store.
+
+    ``docker image inspect`` is local-only — it never touches the network, so
+    the probe stays cheap even when many images are listed.
+    """
+    try:
+        inspected = subprocess.run(
+            [docker, "image", "inspect", image],
+            capture_output=True,
+            text=True,
+            timeout=timeout_sec,
+            check=False,
+        )
+    except Exception:
+        return False
+    return inspected.returncode == 0
+
+
+def check_docker_sandbox() -> dict:
+    """Probe the ``docker_ubuntu`` sandbox backend.
+
+    Three outcomes:
+      - ``missing``  → ``docker`` CLI not on PATH; backend unavailable.
+      - ``error``    → CLI present but ``docker info`` failed (engine off, no
+                       permission, daemon socket missing, etc.).
+      - ``ok``       → engine responding; detail enumerates which
+                       per-language sandbox images are pulled locally so the
+                       user can see whether the next run triggers a fetch.
+
+    The probe is intentionally cheap (≤ ~6 s worst case): one ``docker info``
+    call plus one local ``docker image inspect`` per language image. No
+    containers are started, no images are pulled.
+    """
+    label = "Docker sandbox (docker_ubuntu backend)"
+    docker = shutil.which("docker")
+    if not docker:
+        return _check(
+            label,
+            "missing",
+            "`docker` not on PATH (docker_ubuntu sandbox backend unavailable; temp_clone still works)",
+        )
+
+    try:
+        info = subprocess.run(
+            [docker, "info", "--format", "{{.ServerVersion}}"],
+            capture_output=True,
+            text=True,
+            timeout=3,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return _check(label, "error", "`docker info` timed out (engine not responding)")
+    except Exception as e:
+        return _check(label, "error", f"`docker info` failed: {str(e)[:120]}")
+
+    if info.returncode != 0:
+        stderr_first = (info.stderr or "").strip().splitlines()
+        msg = stderr_first[0] if stderr_first else "non-zero exit"
+        return _check(label, "error", f"docker engine unreachable: {msg[:120]}")
+
+    server_version = (info.stdout or "").strip() or "unknown"
+
+    # Walk the per-language image inventory. Fail-soft on import so a missing
+    # ``core.sandbox_runner`` doesn't break the health endpoint.
+    try:
+        from core.sandbox_runner import (
+            DEFAULT_DOCKER_IMAGE,
+            SANDBOX_LANGUAGE_IMAGES,
+        )
+    except Exception:
+        DEFAULT_DOCKER_IMAGE = "python:3.12-slim"
+        SANDBOX_LANGUAGE_IMAGES = (("python", DEFAULT_DOCKER_IMAGE),)
+
+    pulled: list[str] = []
+    missing: list[str] = []
+    for tool_label, image in SANDBOX_LANGUAGE_IMAGES:
+        if _docker_image_pulled(docker, image):
+            pulled.append(f"{tool_label} ({image})")
+        else:
+            missing.append(f"{tool_label} ({image})")
+
+    detail_parts = [f"engine v{server_version}"]
+    if pulled:
+        detail_parts.append("pulled: " + ", ".join(pulled))
+    if missing:
+        detail_parts.append("not pulled: " + ", ".join(missing))
+    # Highlight the default image so users see at a glance whether the most
+    # common path (``python -m pytest``) needs a fetch on first run.
+    default_ready = _docker_image_pulled(docker, DEFAULT_DOCKER_IMAGE)
+    if not default_ready:
+        detail_parts.append(
+            f"default {DEFAULT_DOCKER_IMAGE} not pulled (first run will fetch)"
+        )
+
+    return _check(label, "ok", " · ".join(detail_parts))
+
+
+# ---------------------------------------------------------------------------
 # Toolchain binaries
 # ---------------------------------------------------------------------------
 def check_toolchain(tool: str, label: str | None = None) -> dict:
@@ -174,8 +276,9 @@ def check_toolchain(tool: str, label: str | None = None) -> dict:
 def get_system_health() -> dict:
     """Run all health checks and return a structured report.
 
-    Worst-case duration: ~5s (DB connect_timeout=3s + Ollama timeout=2s,
-    sequential). Most checks complete in microseconds.
+    Worst-case duration: ~11s (DB connect_timeout=3s + Ollama timeout=2s +
+    Docker info+inspect ≤6s, sequential). Most checks complete in
+    microseconds.
     """
     checks: list[dict] = [
         check_google_api(),
@@ -188,6 +291,7 @@ def get_system_health() -> dict:
         check_embeddings(),
         check_ollama(),
         check_tree_sitter(),
+        check_docker_sandbox(),
         check_toolchain("python"),
         check_toolchain("node"),
         check_toolchain("go"),

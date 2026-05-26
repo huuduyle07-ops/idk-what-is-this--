@@ -36,10 +36,16 @@ def _bucket_dir(tmp_path: Path, bucket: str) -> Path:
     return tmp_path / ".agent" / "lessons" / bucket
 
 
+def _repo_bucket_dir(tmp_path: Path, repo_scope_id: str, bucket: str) -> Path:
+    return tmp_path / ".agent" / "lessons" / "repos" / repo_scope_id / bucket
+
+
 def test_save_auto_approved_lands_in_candidate_by_default(lessons_repo):
     saved = lesson_store.save_candidate_lesson(_valid_candidate())
 
     assert saved["status"] == "candidate"
+    assert saved["scope"] == "global"
+    assert saved["repo_scope_id"] is None
     # Top-level mirrors the bucket: candidate => false, even though the guard
     # would auto-approve. Guard verdict is preserved in `evaluation`.
     assert saved["active_knowledge_allowed"] is False
@@ -98,6 +104,9 @@ def test_lesson_record_has_all_13_fields(lessons_repo):
     expected_keys = {
         "id",
         "status",
+        "scope",
+        "repo_scope_id",
+        "repo_path_hint",
         "created_at",
         "updated_at",
         "source",
@@ -223,6 +232,120 @@ def test_list_lessons_filters_by_status(lessons_repo):
     assert actives == []
 
 
+def test_repo_scoped_lesson_save_and_list_isolated(lessons_repo, tmp_path):
+    repo_a = tmp_path / "repo-a"
+    repo_b = tmp_path / "repo-b"
+    repo_a.mkdir()
+    repo_b.mkdir()
+
+    lesson_a = lesson_store.save_candidate_lesson(
+        _valid_candidate(changed_files=["a.py"]),
+        repo_path=str(repo_a),
+    )
+    lesson_b = lesson_store.save_candidate_lesson(
+        _valid_candidate(changed_files=["b.py"]),
+        repo_path=str(repo_b),
+    )
+
+    assert lesson_a["scope"] == "repo"
+    assert lesson_a["repo_scope_id"]
+    assert lesson_a["repo_path_hint"] == "repo-a"
+    assert lesson_b["scope"] == "repo"
+    assert lesson_b["repo_scope_id"] != lesson_a["repo_scope_id"]
+
+    path_a = _repo_bucket_dir(
+        lessons_repo, lesson_a["repo_scope_id"], "candidate"
+    ) / f"{lesson_a['id']}.json"
+    assert path_a.is_file()
+
+    listed_a = lesson_store.list_lessons(
+        status="candidate",
+        repo_path=str(repo_a),
+        include_global=False,
+    )
+    listed_b = lesson_store.list_lessons(
+        status="candidate",
+        repo_path=str(repo_b),
+        include_global=False,
+    )
+
+    assert {r["id"] for r in listed_a} == {lesson_a["id"]}
+    assert {r["id"] for r in listed_b} == {lesson_b["id"]}
+
+
+def test_list_repo_scope_can_include_or_exclude_global(lessons_repo, tmp_path):
+    repo_a = tmp_path / "repo-a"
+    repo_a.mkdir()
+    global_lesson = lesson_store.save_candidate_lesson(
+        _valid_candidate(changed_files=["global.py"]),
+        scope="global",
+    )
+    repo_lesson = lesson_store.save_candidate_lesson(
+        _valid_candidate(changed_files=["repo.py"]),
+        repo_path=str(repo_a),
+        scope="repo",
+    )
+
+    with_global = lesson_store.list_lessons(
+        status="candidate",
+        repo_path=str(repo_a),
+        include_global=True,
+    )
+    repo_only = lesson_store.list_lessons(
+        status="candidate",
+        repo_path=str(repo_a),
+        include_global=False,
+    )
+    global_only = lesson_store.list_lessons(status="candidate", scope="global")
+
+    assert {r["id"] for r in with_global} == {global_lesson["id"], repo_lesson["id"]}
+    assert {r["id"] for r in repo_only} == {repo_lesson["id"]}
+    assert {r["id"] for r in global_only} == {global_lesson["id"]}
+
+
+def test_promote_and_block_repo_scoped_lessons_preserve_invariant(
+    lessons_repo, tmp_path
+):
+    repo_a = tmp_path / "repo-a"
+    repo_b = tmp_path / "repo-b"
+    repo_a.mkdir()
+    repo_b.mkdir()
+    saved = lesson_store.save_candidate_lesson(
+        _valid_candidate(),
+        repo_path=str(repo_a),
+        scope="repo",
+    )
+
+    with pytest.raises(LookupError):
+        lesson_store.promote_lesson(
+            saved["id"],
+            repo_path=str(repo_b),
+            scope="repo",
+        )
+
+    promoted = lesson_store.promote_lesson(
+        saved["id"],
+        repo_path=str(repo_a),
+        scope="repo",
+        repo_scope_id=saved["repo_scope_id"],
+    )
+    assert promoted["status"] == "active"
+    assert promoted["scope"] == "repo"
+    assert promoted["repo_scope_id"] == saved["repo_scope_id"]
+    assert promoted["active_knowledge_allowed"] is True
+
+    blocked = lesson_store.block_lesson(
+        saved["id"],
+        repo_path=str(repo_a),
+        scope="repo",
+        repo_scope_id=saved["repo_scope_id"],
+    )
+    assert blocked["status"] == "blocked"
+    assert blocked["scope"] == "repo"
+    assert blocked["repo_scope_id"] == saved["repo_scope_id"]
+    assert blocked["active_knowledge_allowed"] is False
+
+
 def test_promote_lesson_moves_candidate_to_active(lessons_repo):
     saved = lesson_store.save_candidate_lesson(_valid_candidate())
     candidate_path = _bucket_dir(lessons_repo, "candidate") / f"{saved['id']}.json"
@@ -324,3 +447,28 @@ def test_lesson_id_path_traversal_rejected(lessons_repo):
             lesson_store.promote_lesson(bad_id)
         with pytest.raises(ValueError):
             lesson_store.block_lesson(bad_id)
+
+
+def test_repo_scope_id_path_traversal_rejected(lessons_repo, tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    saved = lesson_store.save_candidate_lesson(
+        _valid_candidate(),
+        repo_path=str(repo),
+        scope="repo",
+    )
+
+    for bad_scope in ("../other", "..\\other", "not valid", "."):
+        with pytest.raises(ValueError):
+            lesson_store.list_lessons(
+                repo_path=str(repo),
+                scope="repo",
+                repo_scope_id=bad_scope,
+            )
+        with pytest.raises(ValueError):
+            lesson_store.promote_lesson(
+                saved["id"],
+                repo_path=str(repo),
+                scope="repo",
+                repo_scope_id=bad_scope,
+            )

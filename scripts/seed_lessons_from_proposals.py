@@ -254,6 +254,8 @@ def _resolve_scope(
         project_tag = _project_tag_for_repo(repo_path)
 
     if repo_path or project_tag:
+        if not repo_path:
+            return None, "missing_repo_path"
         return {
             "scope": "repo",
             "repo_path": repo_path or None,
@@ -298,11 +300,23 @@ def _apply_summary(apply_result: dict[str, Any]) -> dict[str, Any]:
     return summary
 
 
-def _existing_source_keys(repo_path: str | None = None) -> set[str]:
+def _existing_source_keys(
+    *,
+    repo_path: str | None = None,
+    scope: str = "global",
+) -> set[str]:
     from core.lesson_store import list_lessons
 
     keys: set[str] = set()
-    for lesson in list_lessons(repo_path=repo_path):
+    if scope == "repo":
+        lessons = list_lessons(
+            repo_path=repo_path,
+            include_global=False,
+            scope="repo",
+        )
+    else:
+        lessons = list_lessons(scope="global")
+    for lesson in lessons:
         candidate = lesson.get("candidate")
         if isinstance(candidate, dict):
             key = candidate.get("source_key")
@@ -441,6 +455,7 @@ def _save_candidate(
             summary=summary,
             tags=tags,
             repo_path=repo_path,
+            scope=candidate.get("scope"),
         )
     finally:
         lesson_store.config.LESSON_AUTO_ACTIVE = previous_auto_active
@@ -480,7 +495,8 @@ def _append_lesson_summary(summary: dict[str, Any], lesson: dict[str, Any]) -> N
         "status": lesson.get("status"),
         "promotion": (lesson.get("evaluation") or {}).get("promotion"),
         "source_key": candidate.get("source_key"),
-        "scope": candidate.get("scope"),
+        "scope": lesson.get("scope") or candidate.get("scope"),
+        "repo_scope_id": lesson.get("repo_scope_id"),
     }
     if lesson.get("status") == "blocked":
         summary["counts"]["blocked"] += 1
@@ -512,7 +528,7 @@ def seed_lessons_from_proposals(
         dirs = dirs[:limit]
 
     summary = _new_summary(dry_run=dry_run)
-    existing_keys = _existing_source_keys(repo_path=repo_path)
+    existing_keys_by_scope: dict[tuple[str, str | None], set[str]] = {}
 
     for proposal_dir in dirs:
         proposal_ref = _safe_relative(proposal_dir, root)
@@ -526,6 +542,16 @@ def seed_lessons_from_proposals(
         if candidate is None:
             _skip(summary, proposal_ref, skip_reason or "invalid_candidate")
             continue
+
+        lesson_repo_path = candidate.get("repo_path") if candidate.get("scope") == "repo" else None
+        cache_key = (str(candidate.get("scope") or "global"), lesson_repo_path)
+        existing_keys = existing_keys_by_scope.get(cache_key)
+        if existing_keys is None:
+            existing_keys = _existing_source_keys(
+                repo_path=lesson_repo_path,
+                scope=str(candidate.get("scope") or "global"),
+            )
+            existing_keys_by_scope[cache_key] = existing_keys
 
         source_key = candidate.get("source_key")
         if isinstance(source_key, str) and source_key in existing_keys:
@@ -562,7 +588,6 @@ def seed_lessons_from_proposals(
             )
             continue
 
-        lesson_repo_path = candidate.get("repo_path") if candidate.get("scope") == "repo" else None
         lesson = _save_candidate(candidate, repo_path=lesson_repo_path)
         _append_lesson_summary(summary, lesson)
         if isinstance(source_key, str):

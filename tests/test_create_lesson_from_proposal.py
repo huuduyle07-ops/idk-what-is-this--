@@ -179,6 +179,41 @@ def test_validated_proposal_creates_lesson_candidate(proposals_repo):
     assert candidate["diff_stats"]["removed"] == 1
 
 
+def test_validated_proposal_with_repo_path_creates_repo_scoped_candidate(
+    proposals_repo, tmp_path
+):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    item_dir = _item_dir(proposals_repo)
+    _write_artifacts(item_dir)
+
+    lesson = cl.create_lesson_from_proposal(item_dir, repo_path=str(repo))
+
+    assert lesson["status"] == "candidate"
+    assert lesson["scope"] == "repo"
+    assert lesson["repo_scope_id"]
+    assert lesson["repo_path_hint"] == "repo"
+    repo_lessons = lesson_store.list_lessons(
+        status="candidate",
+        repo_path=str(repo),
+        include_global=False,
+    )
+    assert [rec["id"] for rec in repo_lessons] == [lesson["id"]]
+
+
+def test_global_candidate_flag_keeps_proposal_lesson_global(proposals_repo):
+    item_dir = _item_dir(proposals_repo)
+    _write_artifacts(item_dir)
+
+    lesson = cl.create_lesson_from_proposal(item_dir, global_candidate=True)
+
+    assert lesson["scope"] == "global"
+    assert lesson["repo_scope_id"] is None
+    assert [rec["id"] for rec in lesson_store.list_lessons(scope="global")] == [
+        lesson["id"]
+    ]
+
+
 # --- failure-mode refusal -------------------------------------------------
 
 
