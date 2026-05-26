@@ -84,29 +84,103 @@ def check_db() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Embeddings
+# Embeddings — Phase 9.1b pluggable provider awareness
 # ---------------------------------------------------------------------------
 def check_embeddings() -> dict:
+    """Surface the configured embedding provider, its model, dimension, and
+    whether the provider is actually ready to call.
+
+    Three signals matter to the user:
+      * the legacy ``*_USE_EMBEDDINGS`` flags — kept for backward compat,
+      * ``EMBEDDING_PROVIDER`` (off / local_minilm / gemini),
+      * whether the chosen provider's dependency / credential is present.
+    """
     enabled_vars = [
         "RETRIEVER_USE_EMBEDDINGS",
         "INDEX_USE_EMBEDDINGS",
         "ROUTER_USE_EMBEDDINGS",
     ]
-    enabled = [v for v in enabled_vars if os.getenv(v, "false").strip().lower() == "true"]
-    if not enabled:
-        return _check("Embeddings", "off", "all *_USE_EMBEDDINGS=false")
+    enabled = [
+        v for v in enabled_vars
+        if os.getenv(v, "false").strip().lower() == "true"
+    ]
+    raw_provider = (os.getenv("EMBEDDING_PROVIDER") or "").strip().lower()
 
-    if importlib.util.find_spec("sentence_transformers") is None:
-        return _check("Embeddings", "error", "sentence_transformers not installed")
+    # Lazy import so the health endpoint stays usable even if the new module
+    # ever fails to import.
+    try:
+        from core import embedding_providers as ep
+    except Exception as exc:
+        return _check(
+            "Embeddings",
+            "error",
+            f"embedding_providers import failed: {type(exc).__name__}: {exc}",
+        )
 
-    model = os.getenv("EMBEDDING_MODEL", "")
-    if _is_placeholder(model):
-        return _check("Embeddings", "missing", "EMBEDDING_MODEL not set")
+    # Normalize EMBEDDING_PROVIDER. Unknown values are surfaced as errors so
+    # the panel doesn't silently swallow a typo.
+    try:
+        provider_id = ep._normalize_provider_id(raw_provider)
+    except ep.EmbeddingProviderError as exc:
+        return _check("Embeddings", "error", str(exc))
 
+    if provider_id == ep.OFF_PROVIDER_ID:
+        legacy_note = (
+            f" (legacy *_USE_EMBEDDINGS still on: {','.join(enabled)})"
+            if enabled else ""
+        )
+        return _check(
+            "Embeddings",
+            "off",
+            f"EMBEDDING_PROVIDER=off — vector retrieval disabled{legacy_note}",
+        )
+
+    if provider_id == ep.LOCAL_MINILM_PROVIDER_ID:
+        provider = ep.LocalMiniLMProvider()
+        if importlib.util.find_spec("sentence_transformers") is None:
+            return _check(
+                "Embeddings",
+                "error",
+                "EMBEDDING_PROVIDER=local_minilm but `sentence_transformers` "
+                "is not installed (run `pip install -r requirements_embeddings.txt`)",
+            )
+        return _check(
+            "Embeddings",
+            "available",
+            f"provider={provider.provider_id} · model={provider.model} · "
+            f"dimension={provider.dimension}",
+        )
+
+    if provider_id == ep.GEMINI_PROVIDER_ID:
+        provider = ep.GeminiProvider()
+        api_key = (
+            os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or ""
+        ).strip()
+        if _is_placeholder(api_key):
+            return _check(
+                "Embeddings",
+                "missing",
+                "EMBEDDING_PROVIDER=gemini but GOOGLE_API_KEY is not set",
+            )
+        if importlib.util.find_spec("google.genai") is None:
+            return _check(
+                "Embeddings",
+                "error",
+                "EMBEDDING_PROVIDER=gemini but `google-genai` is not installed",
+            )
+        return _check(
+            "Embeddings",
+            "available",
+            f"provider={provider.provider_id} · model={provider.model} · "
+            f"dimension={provider.dimension} · GOOGLE_API_KEY present "
+            f"(len={len(api_key)})",
+        )
+
+    # Shouldn't happen — _normalize_provider_id already validated.
     return _check(
         "Embeddings",
-        "available",
-        f"enabled by: {','.join(enabled)} · model={model.strip()}",
+        "error",
+        f"unhandled provider id {provider_id!r}",
     )
 
 
@@ -152,7 +226,13 @@ def check_tree_sitter() -> dict:
     try:
         from tree_sitter_language_pack import get_parser
         parser = get_parser("python")
-        parser.parse(b"x = 1")
+        # language-pack >=1.8 ships a native Parser whose parse() is str-only;
+        # bytes go through parse_bytes(). Older releases wrap tree_sitter.Parser
+        # whose parse() takes bytes directly.
+        if hasattr(parser, "parse_bytes"):
+            parser.parse_bytes(b"x = 1")
+        else:
+            parser.parse(b"x = 1")
         return _check("Tree-sitter", "ok", "python parser loaded + parsed sample")
     except Exception as e:
         return _check("Tree-sitter", "error", str(e)[:160])

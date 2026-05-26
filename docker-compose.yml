@@ -19,6 +19,13 @@ services:
       ROUTER_USE_EMBEDDINGS: "false"
       INDEX_USE_EMBEDDINGS: "false"
       RETRIEVER_USE_EMBEDDINGS: "false"
+      # Phase 9.1b — pluggable embedding provider.
+      # Default "off" keeps the image lean: no sentence-transformers / Torch
+      # in Docker Compose by default. Set to "gemini" (remote, no install) or
+      # "local_minilm" (rebuild with INSTALL_EMBEDDINGS=true) to enable vector
+      # retrieval. Provider+model+dimension are persisted to the index
+      # metadata; changing them requires a re-index.
+      EMBEDDING_PROVIDER: "off"
       OLLAMA_ENABLED: "false"
       SANDBOX_BACKEND: "temp_clone"
 
