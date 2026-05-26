@@ -11,7 +11,6 @@ pgvector>=0.2.0
 
 # Data & Machine Learning
 numpy>=1.24.0
-sentence-transformers>=2.2.0
 
 # AI/LLM Clients
 google-genai>=0.3.0

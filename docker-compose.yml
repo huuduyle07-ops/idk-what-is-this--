@@ -1,34 +1,41 @@
 services:
   cattus-web:
-    build: .
+    build:
+      context: .
+      args:
+        INSTALL_EMBEDDINGS: "false"
+        INSTALL_OLLAMA_CLIENT: "false"
     ports:
-      - "5000:5000"
-    env_file:
-      - .env
+      - "5056:5000"
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - .:/workspace
     environment:
+      WEB_HOST: "0.0.0.0"
       DATABASE_URL: postgresql://myuser:mypassword@db:5432/codex_db
+      DB_ENABLED: "true"
+      ROUTER_USE_EMBEDDINGS: "false"
+      INDEX_USE_EMBEDDINGS: "false"
+      RETRIEVER_USE_EMBEDDINGS: "false"
       OLLAMA_ENABLED: "false"
       SANDBOX_BACKEND: "temp_clone"
 
   db:
     image: pgvector/pgvector:pg16
     container_name: mini-codex-db
-    restart: always
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-myuser}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mypassword}
-      POSTGRES_DB: ${POSTGRES_DB:-codex_db}
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: codex_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U myuser -d codex_db"]
       interval: 5s
       timeout: 3s
       retries: 10
