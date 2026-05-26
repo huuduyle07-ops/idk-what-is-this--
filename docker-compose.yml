@@ -47,6 +47,23 @@ services:
       timeout: 3s
       retries: 10
 
+  ubuntu-sandbox:
+    image: ubuntu:24.04
+    profiles: ["sandbox"]
+    command: ["sleep", "infinity"]
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    network_mode: "none"
+
+  python-sandbox:
+    image: python:3.12-slim
+    profiles: ["sandbox"]
+    command: ["sleep", "infinity"]
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    network_mode: "none"
   ollama:
     image: ollama/ollama
     profiles: ["ollama"]
