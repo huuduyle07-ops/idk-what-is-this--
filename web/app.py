@@ -1091,6 +1091,30 @@ def benchmarks_case_defaults_route():
     return result, 200 if result.get("ok") else 400
 
 
+@app.route("/benchmarks/prompt-cost", methods=["GET"])
+def benchmarks_prompt_cost_route():
+    """Phase 5.7: read-only Prompt / Cost Quantifier panel data.
+
+    Groups existing ``benchmark_report_*.json`` files by
+    ``brain_stamp.prompt_config_hash``. Never runs benchmarks, never calls a
+    model, never executes a patch, and never touches the source reports.
+    """
+    repo_path = request.values.get("repo_path", "").strip()
+    if not repo_path or not Path(repo_path).is_dir():
+        return {"ok": False, "error": f"repo_path is not a directory: {repo_path}"}, 400
+
+    from core.prompt_cost_quantifier import build_prompt_cost_report  # lazy import
+    benchmark_root = Path(repo_path).resolve() / ".agent" / "benchmarks"
+    try:
+        report = build_prompt_cost_report(benchmark_root)
+    except Exception as e:
+        return (
+            {"ok": False, "error": f"prompt cost report failed: {type(e).__name__}: {e}"},
+            500,
+        )
+    return {"ok": True, "report": report}
+
+
 @app.route("/dream/seed-from-benchmark", methods=["POST"])
 def dream_seed_from_benchmark_route():
     """Append items to the dream queue based on a benchmark report.
@@ -1607,11 +1631,31 @@ def _lesson_proposal_roots(repo_path: str | None) -> list[Path]:
     return out
 
 
-def _find_lesson_record(lesson_id: str, repo_path: str | None) -> dict:
-    for record in lesson_store.list_lessons(repo_path=repo_path):
+def _find_lesson_record(
+    lesson_id: str,
+    repo_path: str | None,
+    *,
+    scope: str | None = None,
+    repo_scope_id: str | None = None,
+) -> dict:
+    for record in lesson_store.list_lessons(
+        repo_path=repo_path,
+        scope=scope,
+        repo_scope_id=repo_scope_id,
+    ):
         if record.get("id") == lesson_id:
             return record
     raise LookupError(f"lesson not found: {lesson_id}")
+
+
+def _lesson_scope_arg(raw: str | None) -> str | None:
+    value = (raw or "").strip()
+    return value or None
+
+
+def _lesson_repo_scope_id_arg(raw: str | None) -> str | None:
+    value = (raw or "").strip()
+    return value or None
 
 
 def _resolve_lesson_proposal_md(record: dict, repo_path: str | None) -> Path:
@@ -1644,16 +1688,24 @@ def lessons_list_route():
     """List lessons for the Memory tab.
 
     Query params:
-      - repo_path (optional): accepted for backward compatibility; lessons are
-        global-only under .agent/lessons/.
+      - repo_path (optional): includes current repo-scoped lessons plus global.
       - status (optional): one of candidate | active | blocked.
     """
     repo_path = _lesson_repo_path(request.values.get("repo_path"))
     status = (request.values.get("status") or "").strip() or None
+    scope = _lesson_scope_arg(request.values.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(request.values.get("repo_scope_id"))
+    include_global = (request.values.get("include_global") or "true").lower() != "false"
     if status is not None and status not in lesson_store.LESSON_STATUSES:
         return {"ok": False, "error": f"invalid status: {status!r}"}, 400
     try:
-        lessons = lesson_store.list_lessons(status=status, repo_path=repo_path)
+        lessons = lesson_store.list_lessons(
+            status=status,
+            repo_path=repo_path,
+            include_global=include_global,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+        )
     except ValueError as e:
         return {"ok": False, "error": str(e)}, 400
     except Exception as e:
@@ -1666,17 +1718,23 @@ def lessons_proposal_route():
     """Read proposal.md for a lesson created from proposal artifacts.
 
     Query params:
-      - repo_path (optional): accepted for backward compatibility; lessons are
-        global-only under .agent/lessons/.
+      - repo_path (optional): current repo scope for repo lessons.
       - lesson_id: lesson record id.
     """
     repo_path = _lesson_repo_path(request.values.get("repo_path"))
+    scope = _lesson_scope_arg(request.values.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(request.values.get("repo_scope_id"))
     lesson_id = (request.values.get("lesson_id") or "").strip()
     if not lesson_id:
         return {"ok": False, "error": "lesson_id is required"}, 400
 
     try:
-        record = _find_lesson_record(lesson_id, repo_path)
+        record = _find_lesson_record(
+            lesson_id,
+            repo_path,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+        )
         proposal_md = _resolve_lesson_proposal_md(record, repo_path)
         if proposal_md.stat().st_size > _MAX_LESSON_PROPOSAL_BYTES:
             return {"ok": False, "error": "proposal.md is too large to display"}, 413
@@ -1701,14 +1759,21 @@ def lessons_proposal_route():
 
 @app.route("/lessons/promote", methods=["POST"])
 def lessons_promote_route():
-    """Move a candidate lesson to active. JSON body: {repo_path?, lesson_id}."""
+    """Move a candidate lesson to active. JSON body: {repo_path?, lesson_id, scope?, repo_scope_id?}."""
     payload = request.get_json(silent=True) or {}
     repo_path = _lesson_repo_path(payload.get("repo_path"))
+    scope = _lesson_scope_arg(payload.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(payload.get("repo_scope_id"))
     lesson_id = (payload.get("lesson_id") or "").strip()
     if not lesson_id:
         return {"ok": False, "error": "lesson_id is required"}, 400
     try:
-        record = lesson_store.promote_lesson(lesson_id, repo_path=repo_path)
+        record = lesson_store.promote_lesson(
+            lesson_id,
+            repo_path=repo_path,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+        )
     except LookupError as e:
         return {"ok": False, "error": str(e)}, 404
     except ValueError as e:
@@ -1720,14 +1785,21 @@ def lessons_promote_route():
 
 @app.route("/lessons/block", methods=["POST"])
 def lessons_block_route():
-    """Move any lesson to blocked. JSON body: {repo_path?, lesson_id}."""
+    """Move any lesson to blocked. JSON body: {repo_path?, lesson_id, scope?, repo_scope_id?}."""
     payload = request.get_json(silent=True) or {}
     repo_path = _lesson_repo_path(payload.get("repo_path"))
+    scope = _lesson_scope_arg(payload.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(payload.get("repo_scope_id"))
     lesson_id = (payload.get("lesson_id") or "").strip()
     if not lesson_id:
         return {"ok": False, "error": "lesson_id is required"}, 400
     try:
-        record = lesson_store.block_lesson(lesson_id, repo_path=repo_path)
+        record = lesson_store.block_lesson(
+            lesson_id,
+            repo_path=repo_path,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+        )
     except LookupError as e:
         return {"ok": False, "error": str(e)}, 404
     except ValueError as e:
@@ -1828,7 +1900,7 @@ def proposals_promote_route():
     Form fields:
       proposal_dir   — path under .agent/proposals/ (path-traversal guarded)
       allow_failed   — "true" to override the validation/apply gate
-      repo_path      — optional backward-compat field; lessons are global-only
+      repo_path      — optional analyzed repo path; repo-scopes when supplied
     """
     from scripts.create_lesson_from_proposal import (
         _resolve_proposal_dir,
@@ -1859,6 +1931,8 @@ def proposals_promote_route():
         "ok": True,
         "lesson_id": lesson.get("id"),
         "status": lesson.get("status"),
+        "scope": lesson.get("scope"),
+        "repo_scope_id": lesson.get("repo_scope_id"),
         "active_knowledge_allowed": lesson.get("active_knowledge_allowed"),
         "promotion": evaluation.get("promotion"),
     }

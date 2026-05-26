@@ -351,6 +351,25 @@
             <div id="evidencePackFiles" class="health-empty">Click <em>Build presentation evidence pack</em> to generate it.</div>
             <div id="evidencePackViewer" class="evidence-viewer" hidden></div>
           </div>
+
+          <!-- Phase 5.7: Prompt / Cost Quantifier panel. Read-only — never
+               runs benchmarks, never calls a model, never executes a patch.
+               Source benchmark_report_*.json files are never modified. -->
+          <div class="bench-runner" id="promptCostSection" style="margin-top:1em;">
+            <div class="bench-runner-header">
+              <strong>Prompt / Cost Quantifier</strong>
+              <span class="bench-runner-note">Groups existing benchmark reports by <code>prompt_config_hash</code> so you can see if a prompt/config version is more expensive, slower, or fallback-heavy. Read-only.</span>
+            </div>
+            <div class="bench-runner-actions">
+              <button type="button" onclick="refreshPromptCost()"
+                      title="Re-read existing benchmark reports and recompute averages.">
+                Refresh prompt/cost
+              </button>
+            </div>
+            <div id="promptCostStatus" class="bench-run-status"></div>
+            <div id="promptCostSummary" class="health-empty">Click <em>Refresh prompt/cost</em> to compute.</div>
+            <div id="promptCostTable" class="health-empty" hidden></div>
+          </div>
         </div>
 
         <!-- Dream -->
@@ -2139,17 +2158,23 @@ function _renderLessonCard(lesson) {
     const allowed = lesson.active_knowledge_allowed === true;
     const reasons = Array.isArray(evaluation.reasons) ? evaluation.reasons : [];
     const tags = Array.isArray(lesson.tags) ? lesson.tags.filter(t => typeof t === "string" && t) : [];
+    const lessonScope = lesson.scope === "repo" ? "repo" : "global";
+    const repoScopeId = typeof lesson.repo_scope_id === "string" ? lesson.repo_scope_id : "";
+    const scopeLabel = lessonScope === "repo" && repoScopeId ? `repo:${repoScopeId}` : "global";
+    const scopeClass = lessonScope === "repo" ? "lesson-scope-badge--repo" : "lesson-scope-badge--global";
 
     const idAttr = _escapeHtml(lesson.id || "");
+    const scopeAttr = _escapeHtml(lessonScope);
+    const repoScopeAttr = _escapeHtml(repoScopeId);
     const buttons = [];
     if (lesson.source === "patch_proposal" && lesson.source_report) {
-        buttons.push(`<button type="button" class="lesson-btn--secondary" onclick="viewLessonProposal('${idAttr}')" title="Open proposal.md for this lesson">View proposal</button>`);
+        buttons.push(`<button type="button" class="lesson-btn--secondary" onclick="viewLessonProposal('${idAttr}', '${scopeAttr}', '${repoScopeAttr}')" title="Open proposal.md for this lesson">View proposal</button>`);
     }
     if (status === "candidate") {
-        buttons.push(`<button type="button" onclick="promoteLessonById('${idAttr}')" title="Move to active">Promote</button>`);
-        buttons.push(`<button type="button" class="lesson-btn--danger" onclick="blockLessonById('${idAttr}')" title="Move to blocked">Block</button>`);
+        buttons.push(`<button type="button" onclick="promoteLessonById('${idAttr}', '${scopeAttr}', '${repoScopeAttr}')" title="Move to active">Promote</button>`);
+        buttons.push(`<button type="button" class="lesson-btn--danger" onclick="blockLessonById('${idAttr}', '${scopeAttr}', '${repoScopeAttr}')" title="Move to blocked">Block</button>`);
     } else if (status === "active") {
-        buttons.push(`<button type="button" class="lesson-btn--danger" onclick="blockLessonById('${idAttr}')" title="Move to blocked">Block</button>`);
+        buttons.push(`<button type="button" class="lesson-btn--danger" onclick="blockLessonById('${idAttr}', '${scopeAttr}', '${repoScopeAttr}')" title="Move to blocked">Block</button>`);
     }
 
     const metaRows = [];
@@ -2179,7 +2204,10 @@ function _renderLessonCard(lesson) {
       <div class="lesson-card lesson-card--${_escapeHtml(status)}">
         <div class="lesson-card-header">
           <span class="lesson-title">${_escapeHtml(lesson.title || "Untitled lesson")}</span>
-          <span class="lesson-badge lesson-badge--${_escapeHtml(status)}">${_escapeHtml(status)}</span>
+          <span class="lesson-badges">
+            <span class="lesson-scope-badge ${scopeClass}" title="${_escapeHtml(scopeLabel)}">${_escapeHtml(scopeLabel)}</span>
+            <span class="lesson-badge lesson-badge--${_escapeHtml(status)}">${_escapeHtml(status)}</span>
+          </span>
         </div>
         ${tagsHtml}
         <div class="lesson-meta">${metaRows.join("")}</div>
@@ -2191,12 +2219,14 @@ function _renderLessonCard(lesson) {
     `;
 }
 
-function viewLessonProposal(lessonId) {
+function viewLessonProposal(lessonId, scope, repoScopeId) {
     if (!lessonId) return;
     openAppModal("Proposal idea", `<div class="health-empty">Loading proposal.md...</div>`);
 
     const params = new URLSearchParams();
     params.set("lesson_id", lessonId);
+    if (scope) params.set("scope", scope);
+    if (repoScopeId) params.set("repo_scope_id", repoScopeId);
     const repo = _lessonRepoPath();
     if (repo) params.set("repo_path", repo);
 
@@ -2223,12 +2253,19 @@ function viewLessonProposal(lessonId) {
         });
 }
 
-function promoteLessonById(lessonId) {
+function _lessonActionPayload(lessonId, scope, repoScopeId) {
+    const payload = { repo_path: _lessonRepoPath(), lesson_id: lessonId };
+    if (scope) payload.scope = scope;
+    if (repoScopeId) payload.repo_scope_id = repoScopeId;
+    return payload;
+}
+
+function promoteLessonById(lessonId, scope, repoScopeId) {
     if (!lessonId) return;
     fetch("/lessons/promote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ repo_path: _lessonRepoPath(), lesson_id: lessonId }),
+        body: JSON.stringify(_lessonActionPayload(lessonId, scope, repoScopeId)),
     })
         .then(r => r.json())
         .then(data => {
@@ -2241,13 +2278,13 @@ function promoteLessonById(lessonId) {
         .catch(err => alert(`Network error: ${err}`));
 }
 
-function blockLessonById(lessonId) {
+function blockLessonById(lessonId, scope, repoScopeId) {
     if (!lessonId) return;
     if (!confirm("Block this lesson? It will not be retrieval-eligible (now or later).")) return;
     fetch("/lessons/block", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ repo_path: _lessonRepoPath(), lesson_id: lessonId }),
+        body: JSON.stringify(_lessonActionPayload(lessonId, scope, repoScopeId)),
     })
         .then(r => r.json())
         .then(data => {
@@ -3674,6 +3711,124 @@ function openPresentationEvidenceIndex() {
     openPresentationEvidenceFile("00_evidence_index.md");
 }
 
+// Phase 5.7: Prompt / Cost Quantifier panel.
+function _promptCostShortHash(value) {
+    const text = String(value ?? "unknown");
+    if (text === "unknown" || text.length <= 12) return text;
+    return text.slice(0, 12);
+}
+
+function _promptCostCell(value) {
+    if (value === null || value === undefined) return "unknown";
+    if (typeof value === "number") {
+        if (!Number.isFinite(value)) return "unknown";
+        return Math.abs(value) >= 1 || value === 0
+            ? value.toFixed(2)
+            : value.toPrecision(3);
+    }
+    return _escapeHtml(String(value));
+}
+
+function _renderPromptCostTable(report) {
+    const summary = report.summary || {};
+    const summaryEl = document.getElementById("promptCostSummary");
+    const tableEl = document.getElementById("promptCostTable");
+    if (!summaryEl || !tableEl) return;
+
+    const highCost = summary.highest_avg_cost;
+    const highFb = summary.highest_avg_fallback_count;
+    const summaryBits = [
+        `<strong>${summary.group_count || 0}</strong> group(s)`,
+        `<strong>${summary.report_count || 0}</strong> report(s)`,
+    ];
+    if (summary.skipped_count) {
+        summaryBits.push(`<span class="prompt-cost-warn">${summary.skipped_count} skipped</span>`);
+    }
+    if (highCost) {
+        summaryBits.push(
+            `highest avg cost <code>${_escapeHtml(_promptCostShortHash(highCost.prompt_config_hash))}</code> (${_promptCostCell(highCost.value)})`
+        );
+    }
+    if (highFb) {
+        summaryBits.push(
+            `highest avg fallbacks <code>${_escapeHtml(_promptCostShortHash(highFb.prompt_config_hash))}</code> (${_promptCostCell(highFb.value)})`
+        );
+    }
+    summaryEl.classList.remove("health-empty");
+    summaryEl.innerHTML = summaryBits.join(" · ");
+
+    const groups = report.groups || [];
+    if (groups.length === 0) {
+        tableEl.hidden = false;
+        tableEl.classList.add("health-empty");
+        tableEl.innerHTML = "No benchmark reports found yet.";
+        return;
+    }
+    tableEl.classList.remove("health-empty");
+    tableEl.hidden = false;
+
+    const rows = groups.map(group => `
+        <tr>
+            <td><code>${_escapeHtml(_promptCostShortHash(group.prompt_config_hash))}</code></td>
+            <td class="right">${_promptCostCell(group.runs)}</td>
+            <td class="right">${_promptCostCell(group.avg_success_rate)}</td>
+            <td class="right">${_promptCostCell(group.avg_duration)}</td>
+            <td class="right">${_promptCostCell(group.avg_fallback_count)}</td>
+            <td class="right">${_promptCostCell(group.avg_total_tokens)}</td>
+            <td class="right">${_promptCostCell(group.avg_estimated_cost)}</td>
+            <td><code>${_escapeHtml(String(group.latest_report ?? "unknown"))}</code></td>
+        </tr>
+    `).join("");
+    tableEl.innerHTML = `
+        <table class="bench-table prompt-cost-table">
+            <thead>
+                <tr>
+                    <th>Prompt hash</th>
+                    <th class="right">Runs</th>
+                    <th class="right">Avg success</th>
+                    <th class="right">Avg duration</th>
+                    <th class="right">Avg fallbacks</th>
+                    <th class="right">Avg tokens</th>
+                    <th class="right">Avg cost</th>
+                    <th>Latest report</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+    `;
+}
+
+function refreshPromptCost() {
+    const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
+    const status = document.getElementById("promptCostStatus");
+    const summaryEl = document.getElementById("promptCostSummary");
+    const tableEl = document.getElementById("promptCostTable");
+    if (!repo) {
+        if (status) status.textContent = "Set a repo path in the form above first.";
+        if (summaryEl) {
+            summaryEl.classList.add("health-empty");
+            summaryEl.textContent = "Set a repo path to compute.";
+        }
+        if (tableEl) tableEl.hidden = true;
+        return;
+    }
+    if (status) status.textContent = "Loading…";
+    fetch(`/benchmarks/prompt-cost?repo_path=${encodeURIComponent(repo)}`)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                if (status) status.textContent = `Error: ${data.error || "request failed"}`;
+                if (tableEl) tableEl.hidden = true;
+                return;
+            }
+            if (status) status.textContent = `Generated at ${data.report.generated_at}`;
+            _renderPromptCostTable(data.report);
+        })
+        .catch(err => {
+            if (status) status.textContent = `Failed: ${err}`;
+        });
+}
+
 function loadBenchmarksPanel(force = false) {
     if (_benchLoaded && !force) return;
     const list = document.getElementById("benchList");
@@ -3684,6 +3839,7 @@ function loadBenchmarksPanel(force = false) {
         return;
     }
     refreshPresentationEvidence();
+    refreshPromptCost();
     fetch(`/benchmarks/list?repo_path=${encodeURIComponent(repo)}`)
         .then(r => r.json())
         .then(data => {
