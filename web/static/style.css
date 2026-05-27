@@ -603,6 +603,123 @@ button {
     padding: 4px 8px;
 }
 
+/* Phase 4.7c — Structured Trial Reports (Dream tab) */
+.dream-trials-section {
+    margin-top: 12px;
+}
+
+.dream-trials-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dream-trials-note {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 4px 0 8px;
+}
+
+.dream-trials-unavailable {
+    font-size: 12px;
+    color: var(--color-warning, #b88600);
+    background: var(--color-warning-bg, rgba(255, 192, 0, 0.08));
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.dream-trials-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.dream-trials-status {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    min-height: 14px;
+    margin-bottom: 6px;
+}
+
+.dream-trials-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dream-trial-card {
+    border: 1px solid var(--color-border, #d0d0d0);
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: var(--color-card-bg, transparent);
+}
+
+.dream-trial-card__title {
+    font-weight: 600;
+}
+
+.dream-trial-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 2px 0 4px;
+}
+
+.dream-trial-card__id {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+}
+
+.dream-trial-card__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.dream-trial-file-btn {
+    font-size: 11px;
+    padding: 2px 8px;
+}
+
+.dream-trial-viewer {
+    margin-top: 10px;
+    border: 1px solid var(--color-border, #d0d0d0);
+    border-radius: 6px;
+    background: var(--color-card-bg, transparent);
+}
+
+.dream-trial-viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--color-border, #d0d0d0);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.dream-trial-viewer-header button {
+    font-size: 14px;
+    padding: 0 6px;
+    line-height: 1;
+}
+
+.dream-trial-viewer-body {
+    margin: 0;
+    padding: 10px;
+    max-height: 480px;
+    overflow: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
 /* Phase 5 Polish — Plan items + proposal-run status (Dream tab) */
 .plan-items-section {
     margin-top: 12px;

@@ -438,6 +438,48 @@
             <div id="dreamStatus" class="dream-status"></div>
           </div>
 
+          <!-- Phase 4.7c: Structured Trial Reports.
+               Report-only artifacts for idea / research / reference work types.
+               Reuses the Work type, Action level, title, hint, reference notes,
+               and markdown files fields above; never patches, never commits. -->
+          <div class="dream-section dream-trials-section">
+            <div class="dream-trials-header">
+              <strong>Structured Trial Reports</strong>
+            </div>
+            <div class="dream-trials-note">
+              Creates seven structured markdown files plus a <code>trial.json</code> under
+              <code>.agent/dream_trials/</code> for the selected repo. Report-only —
+              no patches, no commits, no model calls. Allowed only when
+              <em>Work type</em> is idea / research / reference and <em>Action
+              level</em> is <code>report_only</code>.
+            </div>
+            <div id="dreamTrialsUnavailableNote" class="dream-trials-unavailable" hidden>
+              Structured trials are only for idea/research/reference report-only work.
+            </div>
+            <div class="dream-trials-buttons">
+              <button type="button" id="dreamTrialCreateBtn"
+                      onclick="createDreamTrial()"
+                      title="Build a structured report from the form above. No code changes are produced.">
+                Create Trial Report
+              </button>
+              <button type="button" onclick="refreshDreamTrials()"
+                      title="Reload the list of past trials for this repo.">
+                Refresh Trials
+              </button>
+            </div>
+            <div id="dreamTrialsStatus" class="dream-trials-status"></div>
+            <div id="dreamTrialsList" class="dream-trials-list">
+              <div class="health-empty">Click "Refresh Trials" to load past trials.</div>
+            </div>
+            <div id="dreamTrialViewer" class="dream-trial-viewer" hidden>
+              <div class="dream-trial-viewer-header">
+                <span id="dreamTrialViewerTitle"></span>
+                <button type="button" onclick="closeDreamTrialViewer()" title="Close viewer">×</button>
+              </div>
+              <pre id="dreamTrialViewerBody" class="dream-trial-viewer-body"></pre>
+            </div>
+          </div>
+
           <!-- Phase 5 Polish: Plan items from the latest background_dream_plan_*.json.
                Each item has a "Make proposal" button that triggers the same flow
                as scripts/run_patch_proposal_queue.py, no terminal needed. -->
@@ -1770,6 +1812,177 @@ function stopOvernight() {
 }
 
 // ============================================================
+// Phase 4.7c — Structured Trial Reports (Dream tab)
+// ============================================================
+
+const _TRIAL_FILE_BUTTONS = [
+    { label: "Reference",  file: "01_reference_study.md" },
+    { label: "Baseline",   file: "02_baseline_answer.md" },
+    { label: "Reasoning",  file: "03_reasoning_chunks.md" },
+    { label: "Evaluation", file: "04_multi_perspective_evaluation.md" },
+    { label: "Refutation", file: "05_refutation.md" },
+    { label: "Judge",      file: "06_judge_report.md" },
+    { label: "Final",      file: "07_final_decision.md" },
+    { label: "JSON",       file: "trial.json" },
+];
+
+// Mirrors core.dream_trials.ALLOWED_DREAM_TYPES — kept in lockstep so the
+// frontend can disable Create Trial Report before the user clicks.
+const _TRIAL_ALLOWED_DREAM_TYPES = new Set([
+    "idea_trial", "research_study", "reference_study", "case_idea_research",
+]);
+
+function _trialCreateAllowed() {
+    return _TRIAL_ALLOWED_DREAM_TYPES.has(_dreamType())
+        && _dreamActionLevel() === "report_only";
+}
+
+function _updateTrialCreateAvailability() {
+    const btn = document.getElementById("dreamTrialCreateBtn");
+    const note = document.getElementById("dreamTrialsUnavailableNote");
+    const allowed = _trialCreateAllowed();
+    if (btn) btn.disabled = !allowed;
+    if (note) note.hidden = allowed;
+}
+
+function createDreamTrial() {
+    const repo = _dreamRepo(); if (!repo) return;
+    if (!_trialCreateAllowed()) {
+        alert("Structured trials are only available for idea / research / reference work types at action_level=report_only.");
+        return;
+    }
+    const title = document.getElementById("dreamTitle").value.trim();
+    if (!title) { alert("Title is required."); return; }
+    const hint  = document.getElementById("dreamHint").value.trim();
+    const notes = document.getElementById("dreamReferenceNotes")?.value.trim() || "";
+    const mdFiles = document.getElementById("dreamReferenceFiles")?.value.trim() || "";
+
+    const status = document.getElementById("dreamTrialsStatus");
+    if (status) status.textContent = "Creating trial…";
+
+    fetch("/dream/trials/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            repo_path: repo,
+            dream_type: _dreamType(),
+            action_level: _dreamActionLevel(),
+            title, hint,
+            reference_notes: notes,
+            markdown_files: mdFiles,
+        }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.ok) {
+            if (status) status.textContent = `Error: ${data.error || "unknown"}`;
+            alert(`Create trial: ${data.error || "unknown"}`);
+            return;
+        }
+        if (status) {
+            status.textContent =
+                `Created ${data.trial_id} — decision: ${data.status} · ` +
+                `allowed: ${(data.allowed_actions || []).join(", ")}`;
+        }
+        refreshDreamTrials();
+    })
+    .catch(err => {
+        if (status) status.textContent = `Error: ${err}`;
+        alert(`Create trial failed: ${err}`);
+    });
+}
+
+function refreshDreamTrials() {
+    const repo = _dreamRepo(); if (!repo) return;
+    const listEl = document.getElementById("dreamTrialsList");
+    if (listEl) listEl.innerHTML = `<div class="health-empty">Loading…</div>`;
+    fetch(`/dream/trials/list?repo_path=${encodeURIComponent(repo)}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                if (listEl) listEl.innerHTML =
+                    `<div class="health-empty">${_escapeHtml(data.error)}</div>`;
+                return;
+            }
+            _renderTrialList(data.trials || []);
+        })
+        .catch(err => {
+            if (listEl) listEl.innerHTML =
+                `<div class="health-empty">Load failed: ${_escapeHtml(String(err))}</div>`;
+        });
+}
+
+function _renderTrialList(trials) {
+    const listEl = document.getElementById("dreamTrialsList");
+    if (!listEl) return;
+    if (trials.length === 0) {
+        listEl.innerHTML = `<div class="health-empty">No trials yet for this repo.</div>`;
+        return;
+    }
+    listEl.innerHTML = trials.map(t => {
+        const tid = _escapeHtml(t.trial_id || "");
+        const title = _escapeHtml(t.title || "(untitled)");
+        const dreamType = _escapeHtml(t.dream_type || "?");
+        const status = _escapeHtml(t.status || "?");
+        const created = _escapeHtml(t.created_at || "");
+        const risk = _escapeHtml(t.risk || "");
+        const conf = (t.confidence === "" || t.confidence == null)
+            ? "" : `${_escapeHtml(String(t.confidence))}/100`;
+        const buttons = _TRIAL_FILE_BUTTONS.map(b =>
+            `<button type="button" class="dream-trial-file-btn"
+                     onclick="viewDreamTrialFile('${tid}','${_escapeHtml(b.file)}','${_escapeHtml(b.label)}')">${_escapeHtml(b.label)}</button>`
+        ).join("");
+        return `
+            <div class="dream-trial-card">
+                <div class="dream-trial-card__title">${title}</div>
+                <div class="dream-trial-card__meta">
+                    <span class="dream-trial-card__type">${dreamType}</span>
+                    <span class="dream-trial-card__status">${status}</span>
+                    ${risk ? `<span class="dream-trial-card__risk">risk: ${risk}</span>` : ""}
+                    ${conf ? `<span class="dream-trial-card__conf">conf: ${conf}</span>` : ""}
+                    <span class="dream-trial-card__created">${created}</span>
+                </div>
+                <div class="dream-trial-card__id"><code>${tid}</code></div>
+                <div class="dream-trial-card__buttons">${buttons}</div>
+            </div>
+        `;
+    }).join("");
+}
+
+function viewDreamTrialFile(trialId, fileName, label) {
+    const repo = _dreamRepo(); if (!repo) return;
+    const viewer = document.getElementById("dreamTrialViewer");
+    const titleEl = document.getElementById("dreamTrialViewerTitle");
+    const bodyEl = document.getElementById("dreamTrialViewerBody");
+    if (titleEl) titleEl.textContent = `${trialId} — ${label || fileName}`;
+    if (bodyEl) bodyEl.textContent = "Loading…";
+    if (viewer) viewer.hidden = false;
+
+    const qs = new URLSearchParams({
+        repo_path: repo,
+        trial_id: trialId,
+        file: fileName,
+    });
+    fetch(`/dream/trials/file?${qs.toString()}`)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                if (bodyEl) bodyEl.textContent = `Error: ${data.error || "unknown"}`;
+                return;
+            }
+            if (bodyEl) bodyEl.textContent = data.content;
+        })
+        .catch(err => {
+            if (bodyEl) bodyEl.textContent = `Error: ${err}`;
+        });
+}
+
+function closeDreamTrialViewer() {
+    const viewer = document.getElementById("dreamTrialViewer");
+    if (viewer) viewer.hidden = true;
+}
+
+// ============================================================
 // Phase 5 Polish — Plan items + Make proposal (Dream tab)
 // ============================================================
 let _planItemsLoaded = false;
@@ -1963,12 +2176,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // The Work type select drives Action level visibility — changing it
     // re-renders the Action level options from the cached matrix so the user
     // can only pick a combination the backend accepts.
-    fetchDreamTaxonomy();
+    // Phase 4.7c: the same Work type / Action level controls also gate the
+    // Create Trial Report button — update it whenever either changes.
+    fetchDreamTaxonomy().then(() => _updateTrialCreateAvailability());
     const dreamTypeEl = document.getElementById("dreamType");
     if (dreamTypeEl) {
         dreamTypeEl.addEventListener("change", () => {
             _renderActionLevelOptions(_dreamType());
+            _updateTrialCreateAvailability();
         });
+    }
+    const dreamLevelEl = document.getElementById("dreamActionLevel");
+    if (dreamLevelEl) {
+        dreamLevelEl.addEventListener("change", _updateTrialCreateAvailability);
     }
 });
 
