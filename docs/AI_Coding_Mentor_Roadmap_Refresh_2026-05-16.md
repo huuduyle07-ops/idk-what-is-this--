@@ -905,6 +905,104 @@ Do not put MCTS into synchronous web patch flow.
 
 ---
 
+## Phase 10.5 - — Graph Role Classification:
+
+### Add labels like:
+- utility_hub
+- architecture_hub
+- bug_prone_hub
+- query_relevant_hub
+
+#### 1. Utility hub
+
+**Example:**
+
+write_text()
+read_json()
+save_artifact()
+format_summary()
+
+**Meaning:**
+
+Many files use it, but it is probably not the root cause.
+
+**Graph behavior:**
+
+inspect: yes
+blame/root-cause rank: lower
+edit risk: medium/high
+#### 2. Architecture hub:
+
+**Example:**
+
+control_engine.py
+patch_gates.py
+sandbox_runner.py
+graph/schema.py
+
+**Meaning:**
+
+This coordinates system behavior.
+
+**Graph behavior:**
+
+inspect: high
+root-cause rank: high
+edit risk: high
+require stronger validation
+#### 3. Bug-prone hub
+
+**Example:**
+
+files with failed patches
+blocked lessons
+flaky benchmark history
+many recent fixes
+
+**Meaning:**
+
+This area has caused trouble before.
+
+**Graph behavior:**
+
+inspect: high
+root-cause rank: boosted
+edit risk: boosted
+ask for extra tests
+#### 4. Query-relevant hub
+
+**Example user asks:**
+
+Docker sandbox not working
+
+Then:
+
+sandbox_runner.py
+health.py
+docker-compose.yml
+
+should outrank a generic utility with more calls.
+
+**Graph behavior:**
+
+temporary boost only for this query
+Better formula later
+
+Instead of one weight:
+
+weight = in_degree + out_degree + complexity + penalty
+
+Use multiple scores:
+
+inspect_score
+root_cause_score
+edit_risk_score
+utility_suppression_score
+query_relevance_score
+
+That is much closer to how a real reviewer thinks.
+---
+
 ## Phase 11 — Adversarial Self-Play (Counter-Knowledge + Reverse Dream)
 
 **Status: 🤖 Claude-proposed (2026-05-17), user-accepted as a research thread, not yet scheduled**
