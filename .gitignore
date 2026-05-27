@@ -60,6 +60,7 @@ pytest.ini
 pytest_cache/
 .pytest_cache/
 pytest/
+.pytest_tmp/
 test.py
 #tests
 #docs

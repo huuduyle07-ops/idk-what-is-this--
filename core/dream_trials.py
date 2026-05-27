@@ -94,6 +94,18 @@ def _trials_root(repo_path: str) -> Path:
     return get_agent_dir(repo_path) / "dream_trials"
 
 
+def _uploads_root(repo_path: str) -> Path:
+    """Phase 4.7e-c: sandbox for markdown files uploaded from the browser.
+
+    Browsers don't expose absolute filesystem paths from a file picker, so the
+    Dream UI uploads picked / dropped markdown files via
+    `POST /dream/trials/upload-markdown` and stores them under this dir.
+    `_read_markdown_files` allows this dir as a valid root in addition to the
+    repo itself and the `dream_references/` import root.
+    """
+    return get_agent_dir(repo_path) / "dream_trials_uploads"
+
+
 def _slugify(text: str, max_len: int = 40) -> str:
     s = re.sub(r"[^a-zA-Z0-9]+", "-", text or "").strip("-").lower()
     return s[:max_len] or "trial"
@@ -125,6 +137,10 @@ def _read_markdown_files(
     missing: list[str] = []
     details: list[dict] = []
     repo_resolved = repo_root.resolve()
+    imported_references_root = (get_agent_dir(str(repo_resolved)) / "dream_references").resolve()
+    # Phase 4.7e-c: also allow files the user uploaded via the browser. The
+    # uploads dir is sandboxed under `.agent/<tag>/dream_trials_uploads/`.
+    trials_uploads_root = _uploads_root(str(repo_resolved)).resolve()
 
     for raw_path in markdown_files:
         path_text = str(raw_path or "").strip()
@@ -132,9 +148,15 @@ def _read_markdown_files(
             continue
         candidate = Path(path_text).expanduser()
         resolved = candidate.resolve() if candidate.is_absolute() else (repo_root / candidate).resolve()
-        try:
-            resolved.relative_to(repo_resolved)
-        except ValueError:
+        allowed = False
+        for allowed_root in (repo_resolved, imported_references_root, trials_uploads_root):
+            try:
+                resolved.relative_to(allowed_root)
+                allowed = True
+                break
+            except ValueError:
+                continue
+        if not allowed:
             missing.append(path_text)
             details.append({"path": path_text, "status": "outside_repo"})
             continue

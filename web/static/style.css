@@ -603,6 +603,92 @@ button {
     padding: 4px 8px;
 }
 
+/* Phase 4.7e - Research References (Dream tab) */
+.dream-references-section {
+    margin-top: 12px;
+}
+
+.dream-references-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.dream-references-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.dream-section input.dream-research-topic {
+    flex: 1;
+    min-width: 220px;
+}
+
+.dream-research-raw {
+    min-height: 100px;
+    margin-top: 8px;
+}
+
+.dream-references-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.dream-references-status {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    min-height: 14px;
+    margin: 6px 0;
+}
+
+.dream-references-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dream-reference-card {
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: var(--color-surface-2);
+}
+
+.dream-reference-card__title {
+    font-weight: 600;
+}
+
+.dream-reference-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 2px 0 4px;
+}
+
+.dream-reference-card__summary {
+    font-size: 12px;
+    color: var(--color-text);
+    margin-bottom: 6px;
+}
+
+.dream-reference-card__id {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+}
+
+.dream-reference-use-btn {
+    font-size: 11px;
+    padding: 3px 8px;
+}
+
 /* Phase 4.7c — Structured Trial Reports (Dream tab) */
 .dream-trials-section {
     margin-top: 12px;

@@ -438,6 +438,50 @@
             <div id="dreamStatus" class="dream-status"></div>
           </div>
 
+          <!-- Phase 4.7e: Research References.
+               Import-only local references for pasted external research.
+               Writes .agent/dream_references/<reference_id>/reference.md and
+               reference.json; no browsing, model calls, or command execution. -->
+          <div class="dream-section dream-references-section">
+            <div class="dream-references-header">
+              <strong>Research References</strong>
+            </div>
+            <div class="dream-references-row">
+              <input id="dreamResearchTopic" class="dream-research-topic" type="text"
+                     placeholder="topic">
+              <label class="dream-field-label" for="dreamResearchSourceType">Source type:
+                <select id="dreamResearchSourceType">
+                  <option value="manual_paste">manual_paste</option>
+                  <option value="zapier_discord">zapier_discord</option>
+                  <option value="paper_notes">paper_notes</option>
+                  <option value="web_summary">web_summary</option>
+                  <option value="other">other</option>
+                </select>
+              </label>
+            </div>
+            <textarea id="dreamResearchRawInput" class="dream-research-raw"
+                      placeholder="raw research notes to import"></textarea>
+            <label class="dream-field-label dream-references-normalize-loose"
+                   title="Parse Zapier/Discord-style Summary, Key Papers, Key Insights, Risks, etc. and fill missing fields automatically. Existing explicit fields still win.">
+              <input type="checkbox" id="dreamReferenceNormalizeLoose">
+              Normalize loose Zapier/Discord research
+            </label>
+            <div class="dream-references-buttons">
+              <button type="button" onclick="importDreamReference()"
+                      title="Create reference.json and reference.md under .agent/dream_references/.">
+                Import Reference
+              </button>
+              <button type="button" onclick="refreshDreamReferences(true)"
+                      title="Reload imported references for this repo.">
+                Refresh References
+              </button>
+            </div>
+            <div id="dreamReferencesStatus" class="dream-references-status"></div>
+            <div id="dreamReferencesList" class="dream-references-list">
+              <div class="health-empty">Click "Refresh References" to load imports.</div>
+            </div>
+          </div>
+
           <!-- Phase 4.7c: Structured Trial Reports.
                Report-only artifacts for idea / research / reference work types.
                Reuses the Work type, Action level, title, hint, reference notes,
@@ -1983,6 +2027,131 @@ function closeDreamTrialViewer() {
 }
 
 // ============================================================
+// Phase 4.7e - Research References (Dream tab)
+// ============================================================
+let _dreamReferencesLoaded = false;
+
+function importDreamReference() {
+    const repo = _dreamRepo(); if (!repo) return;
+    const topicEl = document.getElementById("dreamResearchTopic");
+    const rawEl = document.getElementById("dreamResearchRawInput");
+    const sourceEl = document.getElementById("dreamResearchSourceType");
+    const normalizeEl = document.getElementById("dreamReferenceNormalizeLoose");
+    const status = document.getElementById("dreamReferencesStatus");
+
+    const topic = (topicEl?.value || "").trim();
+    const rawInput = (rawEl?.value || "").trim();
+    const sourceType = (sourceEl?.value || "manual_paste").trim();
+    const normalizeLoose = !!(normalizeEl && normalizeEl.checked);
+    if (!topic) { alert("Topic is required."); return; }
+    if (!rawInput) { alert("Raw research notes are required for this form."); return; }
+    if (status) status.textContent = "Importing reference...";
+
+    fetch("/dream/references/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            repo_path: repo,
+            topic,
+            raw_input: rawInput,
+            source_type: sourceType,
+            normalize_loose: normalizeLoose,
+        }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.ok) {
+            if (status) status.textContent = `Error: ${data.error || "unknown"}`;
+            alert(`Import reference: ${data.error || "unknown"}`);
+            return;
+        }
+        if (status) {
+            status.textContent = `Imported ${data.reference_id}: ${data.summary || ""}`;
+        }
+        refreshDreamReferences(true);
+    })
+    .catch(err => {
+        if (status) status.textContent = `Error: ${err}`;
+        alert(`Import reference failed: ${err}`);
+    });
+}
+
+function refreshDreamReferences(force) {
+    if (_dreamReferencesLoaded && !force) return;
+    _dreamReferencesLoaded = true;
+    const repo = _dreamRepo(); if (!repo) return;
+    const listEl = document.getElementById("dreamReferencesList");
+    if (listEl) listEl.innerHTML = `<div class="health-empty">Loading...</div>`;
+
+    fetch(`/dream/references/list?repo_path=${encodeURIComponent(repo)}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                if (listEl) listEl.innerHTML =
+                    `<div class="health-empty">${_escapeHtml(data.error)}</div>`;
+                return;
+            }
+            _renderDreamReferences(data.references || []);
+        })
+        .catch(err => {
+            if (listEl) listEl.innerHTML =
+                `<div class="health-empty">Load failed: ${_escapeHtml(String(err))}</div>`;
+        });
+}
+
+function _renderDreamReferences(references) {
+    const listEl = document.getElementById("dreamReferencesList");
+    if (!listEl) return;
+    if (references.length === 0) {
+        listEl.innerHTML = `<div class="health-empty">No imported references yet for this repo.</div>`;
+        return;
+    }
+    listEl.innerHTML = references.map(ref => {
+        const topic = _escapeHtml(ref.topic || "(untitled)");
+        const sourceType = _escapeHtml(ref.source_type || "unknown");
+        const created = _escapeHtml(ref.created_at || "");
+        const summary = _escapeHtml(ref.summary || "");
+        const id = _escapeHtml(ref.reference_id || "");
+        const markdownPath = ref.markdown_path || "";
+        return `
+            <div class="dream-reference-card">
+                <div class="dream-reference-card__title">${topic}</div>
+                <div class="dream-reference-card__meta">
+                    <span>${sourceType}</span>
+                    <span>${created}</span>
+                </div>
+                <div class="dream-reference-card__summary">${summary}</div>
+                <div class="dream-reference-card__id"><code>${id}</code></div>
+                <button type="button" class="dream-reference-use-btn"
+                        onclick="useDreamReferenceMarkdown(${JSON.stringify(markdownPath)})">
+                    Use in markdown files field
+                </button>
+            </div>
+        `;
+    }).join("");
+}
+
+function useDreamReferenceMarkdown(markdownPath) {
+    const input = document.getElementById("dreamReferenceFiles");
+    if (!input || !markdownPath) return;
+    const existing = input.value
+        .split(/[,\n]/)
+        .map(part => part.trim())
+        .filter(Boolean);
+    const seen = new Set(existing.map(part => normalizePathForCompare(part).toLowerCase()));
+    const key = normalizePathForCompare(markdownPath).toLowerCase();
+    if (!seen.has(key)) {
+        existing.push(markdownPath);
+    }
+    input.value = existing.join(", ");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+
+    const status = document.getElementById("dreamReferencesStatus");
+    if (status) status.textContent = "Reference markdown path added to markdown files.";
+}
+
+// ============================================================
 // Phase 5 Polish — Plan items + Make proposal (Dream tab)
 // ============================================================
 let _planItemsLoaded = false;
@@ -3178,7 +3347,7 @@ function showWorkspaceTab(id) {
             if (typeof refreshWorkerRuns === "function") refreshWorkerRuns();
             loadLessons(false);
         },
-        dream:      () => { refreshDreamStatus(); loadPlanItems(false); },
+        dream:      () => { refreshDreamStatus(); refreshDreamReferences(false); loadPlanItems(false); },
         settings:   () => {
             loadHealthPanel(false);
             if (typeof loadToolRegistry === "function") loadToolRegistry(false);
@@ -4827,7 +4996,22 @@ function dreamReferencePathFromFile(file) {
     return toRepoRelativePath(rawPath);
 }
 
-function appendDreamReferenceFilePaths(files) {
+// Phase 4.7e-c: browser file pickers only expose `file.name` (no path), so
+// we upload each picked / dropped markdown file to the server and use the
+// returned sandboxed path instead of a bare filename that the backend can't
+// resolve. Falls back gracefully when no repo path is set.
+async function _uploadDreamReferenceMarkdownFile(file, repoPath) {
+    const formData = new FormData();
+    formData.append("repo_path", repoPath);
+    formData.append("file", file, file.name);
+    const resp = await fetch("/dream/trials/upload-markdown", {
+        method: "POST",
+        body: formData,
+    });
+    return resp.json();
+}
+
+async function appendDreamReferenceFilePaths(files) {
     if (!dreamReferenceFiles || !files?.length) return;
 
     const existing = dreamReferenceFiles.value
@@ -4837,19 +5021,51 @@ function appendDreamReferenceFilePaths(files) {
     const seen = new Set(existing.map(part => normalizePathForCompare(part).toLowerCase()));
     const next = [...existing];
 
-    for (const file of files) {
-        const path = dreamReferencePathFromFile(file).trim();
-        if (!/\.(md|markdown)$/i.test(path)) continue;
+    const repoPath = repoInput?.value?.trim() || "";
+    const skipped = [];
 
-        const key = normalizePathForCompare(path).toLowerCase();
+    for (const file of files) {
+        if (!/\.(md|markdown)$/i.test(file.name || "")) continue;
+
+        // If we have a repo path, upload the file's content so the backend
+        // can read it from a sandboxed location. If no repo is set, fall
+        // back to the bare filename — the user will fix the repo path
+        // before clicking Create Trial Report.
+        let resolvedPath = "";
+        if (repoPath) {
+            try {
+                const data = await _uploadDreamReferenceMarkdownFile(file, repoPath);
+                if (data && data.ok && data.path) {
+                    resolvedPath = data.path;
+                } else {
+                    skipped.push({ name: file.name, error: data?.error || "upload failed" });
+                    continue;
+                }
+            } catch (err) {
+                skipped.push({ name: file.name, error: String(err) });
+                continue;
+            }
+        } else {
+            // Legacy fallback: no repo set yet, use whatever path heuristic
+            // the file object exposes. Almost always just the bare filename.
+            resolvedPath = dreamReferencePathFromFile(file).trim();
+        }
+
+        if (!resolvedPath) continue;
+        const key = normalizePathForCompare(resolvedPath).toLowerCase();
         if (!key || seen.has(key)) continue;
         seen.add(key);
-        next.push(path);
+        next.push(resolvedPath);
     }
 
     dreamReferenceFiles.value = next.join(", ");
     dreamReferenceFiles.dispatchEvent(new Event("input", { bubbles: true }));
     dreamReferenceFiles.dispatchEvent(new Event("change", { bubbles: true }));
+
+    if (skipped.length) {
+        const lines = skipped.map(s => `- ${s.name}: ${s.error}`).join("\n");
+        alert(`Some markdown uploads failed:\n${lines}`);
+    }
 }
 
 if (dreamReferenceFiles && dreamReferenceFileInput) {

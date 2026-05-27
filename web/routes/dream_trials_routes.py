@@ -1,10 +1,11 @@
 """Phase 4.7c — web routes for structured Dream trial reports.
 
-Three Flask routes back the Dream tab's Structured Trial Reports section:
+Four Flask routes back the Dream tab's Structured Trial Reports section:
 
     POST /dream/trials/create
     GET  /dream/trials/list
     GET  /dream/trials/file
+    POST /dream/trials/upload-markdown   (Phase 4.7e-c)
 
 Hard rules for this module:
 - No patch executor calls.
@@ -12,6 +13,7 @@ Hard rules for this module:
 - No shell-out (no os-level command execution).
 - No model / API clients.
 - Read-only file access stays inside the repo's `.agent/dream_trials/` dir.
+- Markdown uploads are sandboxed under `.agent/<tag>/dream_trials_uploads/`.
 
 The creation route delegates to `core.dream_trials.create_structured_dream_trial`,
 which is already report-only (Phase 4.7b). The list and file routes are
@@ -21,6 +23,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import datetime
 from pathlib import Path
 
 from flask import Blueprint, request
@@ -226,3 +229,90 @@ def dream_trials_file():
         return {"ok": False, "error": f"unreadable: {e}"}
 
     return {"ok": True, "trial_id": trial_id, "file": file_name, "content": content}
+
+
+# ---------------------------------------------------------------------------
+# Phase 4.7e-c — markdown file upload
+# ---------------------------------------------------------------------------
+
+_UPLOAD_MAX_BYTES = 5 * 1024 * 1024  # 5 MiB
+_UPLOAD_SAFE_STEM_RE = re.compile(r"[^a-zA-Z0-9._-]+")
+
+
+def _safe_upload_stem(stem: str) -> str:
+    """Lowercase, replace non-safe chars with `-`, cap to 60 chars."""
+    cleaned = _UPLOAD_SAFE_STEM_RE.sub("-", stem or "").strip("-").lower()
+    return (cleaned[:60] or "upload")
+
+
+@bp.route("/dream/trials/upload-markdown", methods=["POST"])
+def dream_trials_upload_markdown():
+    """Save a markdown file the browser couldn't otherwise expose by path.
+
+    Browsers only give us `file.name` (no directory), so the file picker in
+    the Dream tab was effectively broken for files outside the repo. This
+    route accepts the raw file content via multipart, sanitizes the filename,
+    enforces a 5 MiB cap and `.md` / `.markdown` extension, and stores it
+    under `.agent/<tag>/dream_trials_uploads/<timestamp>-<safe-stem>.md`.
+    The trial creator allows this dir as a valid markdown root, so the
+    returned path can flow straight into a subsequent create call.
+    """
+    repo_path = str(request.form.get("repo_path") or "").strip()
+    if not _valid_repo(repo_path):
+        return {"ok": False, "error": f"repo_path is not a directory: {repo_path}"}
+
+    file_storage = request.files.get("file")
+    if file_storage is None or not (file_storage.filename or "").strip():
+        return {"ok": False, "error": "file is required"}
+
+    # Strip any directory components from the filename — clients shouldn't be
+    # able to influence the saved path.
+    raw_name = (file_storage.filename or "").replace("\\", "/")
+    bare_name = Path(raw_name).name
+    if not bare_name or bare_name in {".", ".."}:
+        return {"ok": False, "error": "invalid filename"}
+
+    suffix = Path(bare_name).suffix.lower()
+    if suffix not in {".md", ".markdown"}:
+        return {"ok": False, "error": "only .md / .markdown files are accepted"}
+
+    # Read body once so we can size-check before writing anything to disk.
+    content = file_storage.read()
+    if len(content) > _UPLOAD_MAX_BYTES:
+        return {
+            "ok": False,
+            "error": f"file too large (size {len(content)} > cap {_UPLOAD_MAX_BYTES} bytes)",
+        }
+
+    uploads_root = dream_trials._uploads_root(repo_path)
+    uploads_root.mkdir(parents=True, exist_ok=True)
+
+    stem = _safe_upload_stem(Path(bare_name).stem)
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    saved_name = f"{timestamp}-{stem}{suffix}"
+    saved_path = (uploads_root / saved_name).resolve()
+
+    # Containment check. resolve() collapses `..`; relative_to() raises if
+    # the saved path escapes the uploads root.
+    try:
+        saved_path.relative_to(uploads_root.resolve())
+    except ValueError:
+        return {"ok": False, "error": "saved path escapes uploads root"}
+
+    counter = 0
+    while saved_path.exists():
+        counter += 1
+        saved_name = f"{timestamp}-{stem}-{counter}{suffix}"
+        saved_path = (uploads_root / saved_name).resolve()
+
+    try:
+        saved_path.write_bytes(content)
+    except OSError as e:
+        return {"ok": False, "error": f"write failed: {e}"}
+
+    return {
+        "ok": True,
+        "path": str(saved_path),
+        "name": saved_name,
+        "size": len(content),
+    }

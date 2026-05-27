@@ -12,9 +12,11 @@
 
 > **2026-05-26 refresh:** Phase 5.7 Prompt-Version & Cost Quantifier panel shipped. `core/prompt_cost_quantifier.py` groups existing `.agent/benchmarks/benchmark_report_*.json` files by `brain_stamp.prompt_config_hash` (unknown bucket when missing) and computes per-group averages (success rate, duration, fallbacks, model_calls, input/output/total tokens, estimated cost, unknown-cost calls, dirty-run count) plus first_seen, last_seen, latest_report. `scripts/build_prompt_cost_report.py` is the CLI (`--repo-path`, `--output-json`, `--output-md`) writing `.agent/benchmarks/prompt_cost/prompt_cost_report.{json,md}`. `GET /benchmarks/prompt-cost` feeds a new compact Benchmarks-tab panel (prompt hash · runs · avg success · avg duration · avg fallbacks · avg tokens · avg cost · latest report). Guardrails: read-only, no benchmark execution, no model calls, no patch execution, no lesson seeding, no roadmap mutation; source benchmark reports are never modified; malformed reports are skipped with structured warnings.
 
+> **2026-05-27 refresh:** Phase 4.7a-e Dream taxonomy, structured trial reports, enriched trial content, and external research reference import are shipped. Dream can now import pasted outside research into `.agent/dream_references/<reference_id>/reference.{json,md}` and pass the generated `reference.md` into report-only structured trials. Guardrails: no autonomous browsing, no search, no model/API calls, no subprocesses, no benchmarks, no patch creation, and no decision-policy relaxation beyond consuming imported local markdown references.
+
 ## Current checkpoint
 
-The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web revamp plus Phase 5.6 Goal Brief Builder, Phase 5.7 Prompt-Version & Cost Quantifier, Phase 7.1-7.2.1.1 Mayor/workflow bridge, and Phase 8.1/8.2a/8.2b/8.2c/8.3 MCP foundations are shipped.
+The project is a coding-agent workspace, not a Gemini patch script. Phase 4.7a-e Dream report-only trial/reference import, Phase 5 web revamp plus Phase 5.6 Goal Brief Builder, Phase 5.7 Prompt-Version & Cost Quantifier, Phase 7.1-7.2.1.1 Mayor/workflow bridge, and Phase 8.1/8.2a/8.2b/8.2c/8.3 MCP foundations are shipped.
 
 ### Stable / mostly working
 
@@ -101,6 +103,7 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 5 web 
 - Dream V2:
   - All 3 modes work: `plan_only`, `patch_if_safe`, `research`
   - **Phase 4.6 shipped (2026-05-25):** `reference_study` / `case_idea_research` turns pasted notes, repo-local markdown files, and snippet fields into `.agent/dreams/.../case_ideas.json`, `case_ideas.md`, and optional `LESSONS_LEARNED.md` drafts. It never creates benchmark folders, runs benchmarks, applies patches, seeds lessons, or promotes memory.
+  - **Phase 4.7a-e shipped (2026-05-27):** Dream has explicit `dream_type` / `action_level` taxonomy, deterministic structured trial reports, enriched report sections, and safe external research import under `.agent/dream_references/`. Imported reference markdown can feed `create_structured_dream_trial(markdown_files=...)`; imported claims remain notes, not truth.
   - Queue/status/report routes, artifacts produced (plan_analysis.json, proposal.md, morning_report.txt)
   - `patch_if_safe` uses temp clone (success criterion met)
   - `patch_if_safe` now attempts patch generation for narrow `bug` **and `debt`** items when the planner marks them safe
@@ -453,6 +456,149 @@ Level 3 requires explicit human_approved_for_proposal=true per item
 Validation commands come from benchmark metadata allowlist only
 No Flask background thread or automatic scheduler in CLI MVP
 ```
+
+---
+
+## Phase 4.7 — Dream Taxonomy + Structured Trial Reports
+
+**Status: a / b / c / d / e all shipped 2026-05-27**
+
+Five small slices that retire the confusing `kind` + `mode` overlap, replace the free-form Dream "idea / research / reference" flow with a structured report-only trial, and add a safe import layer for pasted external research. Patch / proposal execution for `bug_investigation` / `debt_cleanup` is unchanged.
+
+### Phase 4.7a — Dream Type / Mode Cleanup (shipped 2026-05-27)
+
+- `core/dream_taxonomy.py` (new): `DREAM_TYPES` (6), `ACTION_LEVELS` (4 base + `case_idea_research` specialty), `ALLOWED_COMBINATIONS` matrix, `validate()`, `normalize_legacy(kind, mode)`, `legacy_kind_for_dream_type()`
+- `/dream/queue` POST accepts new `dream_type` + `action_level` AND legacy `kind` + `mode`; invalid combos rejected with a friendly error (no silent coercion)
+- New `/dream/taxonomy` GET route exposes the matrix to the UI
+- `core/sleeping_consultant.py::_normalize_dream_mode` extended with `proposal_draft → plan_only` and `report_only → research` aliases (no behavior change)
+- UI: dropdowns relabeled **Work type** / **Action level**, populated dynamically from `/dream/taxonomy`; changing Work type re-renders Action level so only valid combos are selectable; all existing buttons preserved
+- Tests: `tests/test_dream_taxonomy.py` (30) + `tests/test_dream_taxonomy_routes.py` (9)
+
+### Phase 4.7b — Structured Idea Trial Report (shipped 2026-05-27)
+
+- `core/dream_trials.py` (new): `create_structured_dream_trial()` writes `trial.json` + 7 numbered markdown files into `.agent/dream_trials/<trial_id>/`. Pure-Python, deterministic, **no model calls, no benchmarks, no patch executor, no subprocess**
+- `DECISION_POLICY` data table: every decision (including `recommend_human_approval`) lists `patch` / `apply` / `commit` in `blocked_actions` and never in `allowed_actions`
+- `_compute_decision()` is pure: (proposal_score, refutation_strength, confidence, risk, has_evidence) → one of `greenlight_report_only` / `recommend_human_approval` / `needs_human_review` / `needs_more_evidence` / `rework` / `rejected`
+- Heuristic `_compute_judge_scores()` over title / hint / notes / loaded-files / missing-files
+- `_read_markdown_files()` records out-of-repo / non-markdown / unreadable / missing files as `unknowns` rather than crashing
+- `scripts/create_dream_trial.py` (new): argparse CLI with friendly `ValueError → stderr + exit 2` handling
+- Tests: `tests/test_dream_trials.py` (31)
+
+### Phase 4.7c — Dream Trial Web Integration (shipped 2026-05-27)
+
+- `web/routes/dream_trials_routes.py` (new): Flask Blueprint with three routes
+  - `POST /dream/trials/create` — delegates to Phase 4.7b core; returns `{ok, trial_id, status, decision, artifact_dir, files, allowed_actions, blocked_actions}` or `{ok:false, error}`
+  - `GET /dream/trials/list?repo_path=…` — newest-first; malformed folders / bad JSON / missing `trial.json` are skipped silently (never 500)
+  - `GET /dream/trials/file?repo_path=…&trial_id=…&file=…` — filename allowlist (the 7 .md files + `trial.json`), strict trial_id regex, `relative_to()` containment check; blocks path traversal and arbitrary file access
+- UI: new "Structured Trial Reports" section in the Dream tab between queue/run controls and Plan items
+  - Create Trial Report + Refresh Trials buttons; Create is auto-disabled (with a small note) unless Work type ∈ {idea_trial, research_study, reference_study, case_idea_research} AND Action level = report_only
+  - Trial list with title / type / status / risk / confidence / created_at + 8 per-trial file buttons (Reference / Baseline / Reasoning / Evaluation / Refutation / Judge / Final / JSON)
+  - Plain-preformatted file viewer (no markdown editor, per spec)
+- Forbidden-import guard test confirms the routes module imports no patch executor, benchmark runner, shell-out, or model client
+- Tests: `tests/test_dream_trials_routes.py` (30)
+
+### Phase 4.7d — Structured Trial Content Enrichment (shipped 2026-05-27)
+
+`core/dream_trials.py` content builders rewritten to interpolate the actual inputs instead of generic prompt questions. Web routes / CLI / UI / decision policy all unchanged.
+
+- `_build_reference_study` — splits `reference_notes` and each loaded markdown file into concrete snippets at line/sentence boundaries; explicit `"Evidence is weak…"` assumption when no grounded source is attached
+- `_build_baseline_answer` — concrete 3–5-sentence paragraph that quotes the title, hint, and first sentence of the notes; default position adapts to weak-vs-grounded
+- `_build_reasoning_chunks` — five concrete chunks in the spec ordering: problem → affected surface → produced artifact → risk boundary → safe next action. Surface hints heuristically extracted via `_extract_surface_hints` (backticked tokens + file-path-shaped substrings)
+- `_build_multi_perspective` — five views (beginner / professor / profit / maintainer / safety) namedrop the title, hint, and reference notes; no view body is just a placeholder question anymore
+- `_build_refutation` — main objections, worst-case, and simpler alternative quote the title and adapt to weak-vs-grounded evidence
+- `_compute_judge_scores` — explicit caps: no grounded source → confidence ≤ 30; ≥ 2 unreadable referenced files → confidence ≤ 60
+- Three new pure helpers: `_split_into_snippets`, `_extract_surface_hints`, `_first_sentence`
+- Tests: `tests/test_dream_trials_enriched.py` (12) including regression guards that `DECISION_POLICY` still blocks code changes and module imports stay pure
+
+### Phase 4.7e - Dream External Research Import (shipped 2026-05-27)
+
+Safe import/normalization only. Users can paste research from Zapier, Discord, manual web search, papers, or notes into local artifacts under `.agent/dream_references/<reference_id>/`, then use the generated markdown file as a Dream Trial reference.
+
+- `core/dream_references.py` (new): `create_dream_reference(repo_path, topic, raw_input, source_type="manual_paste", sources=None, key_ideas=None, risks_or_weaknesses=None, do_not_assume=None, suggested_dream_trial_input="", now=None)` writes `reference.json` and `reference.md`.
+- `reference.json` stores topic, source type, raw input, summary, normalized source entries, key ideas, risks/weaknesses, do-not-assume notes, suggested Dream Trial input, and `usable_as_markdown_file=true`.
+- `reference.md` renders the structured sections expected by Dream Trial markdown ingestion: Topic, Source Type, Summary, Sources, Key Ideas, Risks / Weaknesses, What C.A.T.T.U.S Should Not Assume, Suggested Dream Trial Input, and Raw Input.
+- `scripts/import_dream_reference.py` (new): CLI accepts `--repo-path`, `--topic`, `--raw` and/or `--input-file`, `--source-type`, repeated `--key-idea`, `--risk`, and `--do-not-assume`; prints `reference_id`, `reference.md`, `reference.json`, and short summary.
+- `web/routes/dream_references_routes.py` (new): `POST /dream/references/import`, `GET /dream/references/list`, `GET /dream/references/file`.
+- Dream tab: new "Research References" section with Topic, Source type, raw notes textarea, Import Reference, Refresh References, latest-reference cards, and "Use in markdown files field" button.
+- `core.dream_trials._read_markdown_files()` now accepts markdown files that resolve inside the repo root or inside that repo's `.agent/dream_references/` root; traversal and non-markdown files still become unknowns, not evidence.
+- Tests: `tests/test_dream_references.py` (14), `tests/test_dream_references_routes.py` (10), and `tests/test_dream_references_ui.py` (1).
+
+### Phase 4.7e-a — Loose Research Note Normalizer (shipped 2026-05-27)
+
+Some Zapier / Discord research outputs come back as a free-form blob with headings like `Summary`, `Key Papers & Articles`, `Key Insights`, `Resources & Links`, `Risks / Weaknesses`, etc. instead of structured JSON. This slice makes those usable without hand-editing.
+
+- `core/dream_references.py` — new public helper `normalize_loose_research_text(raw_input, topic=None) -> dict`. Pure-Python parser; preserves `raw_input` verbatim.
+- `_LOOSE_HEADINGS` dict recognizes 20+ heading variants (case-insensitive, tolerant of `#` markdown prefix and trailing `:`), including a `Research Results` skip-section marker.
+- URL-based sources from `Key Papers` + `Resources` + `Sources` sections are deduplicated by URL. Source-type inference is conservative: `gnu.org/software/.../manual`, `/manual/`, `/refman/`, `/reference/`, `/spec/`, `/docs/`, `docs.*` → `official_docs` (`high`); `oreilly.com`/`catb.org`/`/book/`/`.epub` → `book` (`medium`); `regular-expressions.info` → `web_guide` (`unknown`); `blog`/`/forum/`/`stackoverflow.com`/`reddit.com` → `blog` (`unknown`); else → `unknown` (`unknown`).
+- `SOURCE_ENTRY_TYPES` extended with `official_docs`, `book`, `web_guide` (backward compatible with existing `paper`/`docs`/`blog`/`forum`/`unknown`).
+- Conservative defaults injected only when the corresponding section is absent: 3 risk warnings ("Imported research was not independently verified.", "Source labels may be inaccurate.", "Performance or quality claims need supporting evidence.") and 2 do-not-assume warnings ("Do not treat imported research as verified truth.", "Do not auto-create patches or proposals from this reference alone.").
+- `create_dream_reference(..., normalize_loose=False)` — new opt-in flag. When `True` and `raw_input` is non-empty, the parser fills any field the caller didn't explicitly supply. Explicit non-empty caller values always win. Summary uses the parsed `Summary` section when available.
+- `scripts/import_dream_reference.py` — new `--normalize-loose` flag threaded through to the core API.
+- `/dream/references/import` accepts `normalize_loose` as JSON bool or form string (`1`/`true`/`yes`/`on`).
+- Dream tab — new "Normalize loose Zapier/Discord research" checkbox in the Research References section; `importDreamReference()` reads the checkbox state and includes `normalize_loose: <bool>` in the POST body.
+- Tests: `tests/test_dream_references_loose.py` (15) covering Summary extraction, numbered URL lines, cross-section dedup, key-insights → key_ideas, conservative defaults, no-overwrite of present sections, raw input preservation, explicit-override, parser-fills-missing, source-type / reliability inference, CLI flag end-to-end, web route flag (on / off), forbidden imports.
+
+### Phase 4.7e-b — Title-only Source Capture (shipped 2026-05-27)
+
+Zapier sometimes returns "Key Papers & Articles" lists without URLs (e.g. *The Unix Programming Environment*, *grep: A Pattern Matching Utility*). Phase 4.7e-a was dropping those silently. This slice captures them as honest, low-confidence source entries instead.
+
+- `_loose_parse_source_line` — now returns a `{title, url:""}` dict for URL-free lines that look like a real title, and still returns `None` for noise: markdown headings echoed in body, pure separators (`---`, `===`), fragments shorter than 3 chars, and generic section labels echoed in body (anything that matches `_LOOSE_HEADINGS`).
+- `_loose_extract_sources` rewritten with two passes — URL sources deduped by URL (Phase 4.7e-a behavior preserved); title-only sources deduped among themselves by normalized title and **suppressed when a URL source with the same normalized title exists** (URL preferred per spec).
+- Title-only entries carry `source_type="unknown"`, `reliability="unknown"`, and `why_relevant="Title-only source from imported notes; URL missing."` so the markdown renderer makes the gap visible.
+- `_render_reference_markdown` now renders an empty `url` as `URL: _missing_` instead of a dangling `URL:` line — true for both normalizer-produced and explicit-source entries.
+- Helper `_loose_normalize_title_for_dedup` (lowercase, collapse whitespace, strip punctuation) is the dedup key.
+- Tests: `tests/test_dream_references_title_only.py` (14) covering title-only capture, empty URL, low-confidence labels, missing-URL warning, case/whitespace-insensitive dedup, URL parsing unchanged, URL dedup unchanged, URL-vs-title preference, markdown `URL: _missing_` rendering, JSON-level distinctness, separator / label / short-line / stray-heading noise filtering, and the no-network guard (`requests`, `httpx`, `urllib`, `aiohttp`, `socket`).
+
+### Phase 4.7e-c — Markdown File Upload Fix (shipped 2026-05-27)
+
+**Bug found while reviewing the nearest dream trial:** browsers don't expose absolute filesystem paths from a file picker, so the Dream tab's "double-click to choose markdown files / drop markdown files here" affordance was effectively broken — the field got set to a bare filename like `notes.md`, the backend resolved it as `<repo>/notes.md`, and every picked file ended up marked `missing` in `markdown_file_details`. The reference notes textarea worked; the file picker did not.
+
+- `core/dream_trials.py` — new `_uploads_root(repo_path)` helper returning `.agent/<tag>/dream_trials_uploads/`. `_read_markdown_files` now includes this dir as a third valid allowed root alongside the repo and the `dream_references/` import root.
+- `web/routes/dream_trials_routes.py` — new `POST /dream/trials/upload-markdown` (multipart). Validates `repo_path` is a directory, requires a non-empty `file`, strips path components from the filename, requires `.md`/`.markdown` suffix, caps at 5 MiB, sanitizes the saved stem (`a-zA-Z0-9._-` only, ≤ 60 chars), stamps with `%Y%m%d-%H%M%S`, and collision-suffixes if needed. Saved path is containment-checked against the uploads root before write. Returns `{ok, path, name, size}` or `{ok:false, error}`.
+- Dream tab JS — `appendDreamReferenceFilePaths(files)` is now async. For each picked/dropped `.md`/`.markdown` file, it POSTs to `/dream/trials/upload-markdown` (using the current repo input) and inserts the returned sandboxed path into the markdown-files field. Failures surface in a single `alert()` listing the offending filenames. Legacy fallback (bare filename) only when no repo path is set yet.
+- Tests: `tests/test_dream_trials_upload.py` (13) covering happy path, round-trip-into-trial (uploaded file content lands in `reference_study.evidence`), distinct saved names on duplicate filenames, missing repo / missing file / non-markdown / size-cap / bad-repo rejections, traversal sanitization (`../`, `..\\`, `sub/dir/`, `/absolute/`), and the no-forbidden-imports guard on the routes module.
+
+### Hard rules upheld by tests (all eight slices)
+
+```text
+Phase 4.7a    no patch behavior change; invalid combos rejected, not coerced
+Phase 4.7b    report-only; no model / benchmark / patch / subprocess imports
+Phase 4.7c    read-only file access stays inside .agent/dream_trials; path
+              traversal blocked at trial_id regex + filename allowlist + relative_to()
+Phase 4.7d    recommend_human_approval still has patch/apply/commit in blocked_actions;
+              missing markdown files still land in reference_study.unknowns;
+              confidence capped when evidence is weak
+Phase 4.7e    import/normalization only; URLs stored as inert text; no browsing,
+              search, model/API client, subprocess, benchmark, patch executor,
+              or patch candidate imports; reference file route serves only
+              reference.md/reference.json and stays inside .agent/dream_references
+Phase 4.7e-a  loose parsing is pure-Python; raw_input preserved verbatim; explicit
+              caller fields override parsed values; conservative warnings injected
+              only when matching section is absent; no requests/httpx/urllib/aiohttp
+Phase 4.7e-b  title-only entries carry url=""+source_type="unknown"+reliability=
+              "unknown"+why_relevant warning; URL source preferred when titles match;
+              noise lines (separators, labels, <3 chars, stray headings) filtered
+Phase 4.7e-c  upload route: .md/.markdown only, 5 MiB cap, filename sanitized,
+              saved path containment-checked, uploads stay inside
+              .agent/<tag>/dream_trials_uploads; no forbidden imports added
+```
+
+### Success criteria
+
+```text
+Old kind/mode overlap is gone; only valid combos can land on the queue.   [met - 4.7a]
+Structured trial artifacts are written under .agent/dream_trials/.        [met - 4.7b]
+Trials are creatable / listable / readable from the web UI.                [met - 4.7c]
+Section bodies are concrete and namedrop the actual idea.                  [met - 4.7d]
+External research paste imports produce local markdown reference files.    [met - 4.7e]
+Imported reference markdown can feed structured Dream Trial evidence.      [met - 4.7e]
+Loose Zapier/Discord research blobs parse into structured fields.          [met - 4.7e-a]
+Title-only Key-Papers entries no longer disappear from sources.            [met - 4.7e-b]
+File-picker / drag-drop of markdown files actually feeds Dream Trials.     [met - 4.7e-c]
+recommend_human_approval never auto-approves code changes.                 [met - 4.7b/d]
+```
+
+Test sweep at end of 4.7e-c: **1106 passed** (compileall clean).
 
 ---
 
