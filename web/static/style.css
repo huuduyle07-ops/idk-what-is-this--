@@ -574,6 +574,19 @@ button {
 .dream-section input.dream-title { flex: 1; min-width: 200px; }
 .dream-section input.dream-hint  { flex: 2; min-width: 200px; }
 
+/* Phase 4.7a — Work type / Action level labels inside .dream-row */
+.dream-field-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.dream-field-label select {
+    margin: 0;
+}
+
 /* Time-budget label inside .dream-buttons (Slice α) */
 .dream-budget-label {
     display: inline-flex;

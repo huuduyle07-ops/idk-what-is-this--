@@ -377,19 +377,16 @@
           <div class="dream-section">
             <strong>Sleeping Consultant (overnight)</strong>
             <div class="dream-row">
-              <select id="dreamKind" title="Kind of work to queue">
-                <option value="bug">bug</option>
-                <option value="debt">debt</option>
-                <option value="idea">idea (vibe only)</option>
-                <option value="research">research</option>
-                <option value="reference_study">reference study</option>
-              </select>
-              <select id="dreamMode" title="Dream V2 mode: plan-only is safest; patch_if_safe lets narrow bug fixes auto-patch; research writes proposals only.">
-                <option value="plan_only" selected>plan_only</option>
-                <option value="patch_if_safe">patch_if_safe</option>
-                <option value="research">research</option>
-                <option value="case_idea_research">case_idea_research</option>
-              </select>
+              <label class="dream-field-label" for="dreamType">Work type:
+                <select id="dreamType" title="What kind of work this queue item represents (Phase 4.7a taxonomy).">
+                  <!-- Populated by fetchDreamTaxonomy() on load. -->
+                </select>
+              </label>
+              <label class="dream-field-label" for="dreamActionLevel">Action level:
+                <select id="dreamActionLevel" title="How aggressive Dream should be on this work type. Invalid levels for the chosen Work type are hidden automatically.">
+                  <!-- Populated by fetchDreamTaxonomy() / _renderActionLevelOptions(). -->
+                </select>
+              </label>
               <input id="dreamTitle" class="dream-title" type="text" placeholder="title">
               <input id="dreamHint" class="dream-hint" type="text" placeholder="hint (optional)">
               <button type="button" onclick="addDreamItem()">Add to queue</button>
@@ -1459,20 +1456,91 @@ function _dreamPatchStyle() {
     return document.getElementById("patchStyleSelect")?.value || "safe_minimal";
 }
 
-function _dreamMode() {
-    return document.getElementById("dreamMode")?.value || "plan_only";
+// Phase 4.7a — dream_type / action_level taxonomy.
+// Cached server matrix from /dream/taxonomy. Populated once on page load.
+let _dreamTaxonomy = null;
+
+function _dreamType() {
+    return document.getElementById("dreamType")?.value || "";
+}
+
+function _dreamActionLevel() {
+    return document.getElementById("dreamActionLevel")?.value || "";
+}
+
+// Map the new action_level to the legacy dream_mode the run-time still
+// consumes. Phase 4.7a does NOT change patch / proposal behavior; this is
+// purely a label translation so the existing `/dream/run` route keeps working.
+function _actionLevelToDreamMode(level) {
+    switch (level) {
+        case "patch_if_safe":      return "patch_if_safe";
+        case "report_only":        return "research";
+        case "case_idea_research": return "case_idea_research";
+        case "proposal_draft":     return "plan_only";  // no new flow this phase
+        case "plan_only":          return "plan_only";
+        default:                   return "plan_only";
+    }
+}
+
+function _renderDreamTypeOptions(taxonomy) {
+    const sel = document.getElementById("dreamType");
+    if (!sel) return;
+    const previous = sel.value;
+    sel.innerHTML = (taxonomy.dream_types || [])
+        .map(t => `<option value="${_escapeHtml(t)}">${_escapeHtml(t)}</option>`)
+        .join("");
+    if (previous && (taxonomy.dream_types || []).includes(previous)) {
+        sel.value = previous;
+    }
+}
+
+function _renderActionLevelOptions(dreamType) {
+    const sel = document.getElementById("dreamActionLevel");
+    if (!sel || !_dreamTaxonomy) return;
+    const allowed = (_dreamTaxonomy.allowed_combinations || {})[dreamType] || [];
+    const previous = sel.value;
+    sel.innerHTML = allowed
+        .map(l => `<option value="${_escapeHtml(l)}">${_escapeHtml(l)}</option>`)
+        .join("");
+    if (previous && allowed.includes(previous)) {
+        sel.value = previous;
+    } else if (allowed.length > 0) {
+        sel.value = allowed[0];
+    }
+    // Defensive: if the matrix has no allowed levels for this type (unexpected),
+    // disable the control so the user can't submit a guaranteed-invalid combo.
+    sel.disabled = allowed.length === 0;
+}
+
+function fetchDreamTaxonomy() {
+    return fetch("/dream/taxonomy")
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.dream_types) {
+                _dreamTaxonomy = data;
+                _renderDreamTypeOptions(data);
+                _renderActionLevelOptions(_dreamType());
+            }
+            return data;
+        })
+        .catch(err => console.warn("dream taxonomy fetch failed", err));
 }
 
 function addDreamItem() {
     const repo = _dreamRepo(); if (!repo) return;
-    const kind  = document.getElementById("dreamKind").value;
+    const dream_type   = _dreamType();
+    const action_level = _dreamActionLevel();
     const title = document.getElementById("dreamTitle").value.trim();
     const hint  = document.getElementById("dreamHint").value.trim();
     const notes = document.getElementById("dreamReferenceNotes")?.value.trim() || "";
     const reference_files = document.getElementById("dreamReferenceFiles")?.value.trim() || "";
     if (!title) { alert("Title is required."); return; }
 
-    const payload = { repo_path: repo, action: "add", kind, title, hint };
+    const payload = {
+        repo_path: repo, action: "add",
+        dream_type, action_level,
+        title, hint,
+    };
     if (notes) payload.notes = notes;
     if (reference_files) payload.reference_files = reference_files;
 
@@ -1665,7 +1733,10 @@ function startOvernight() {
         body: new URLSearchParams({
             repo_path: repo,
             patch_style: _dreamPatchStyle(),
-            dream_mode: _dreamMode(),
+            // Phase 4.7a: the run's dream_mode is derived from the currently
+            // selected Action level. Patch behavior is unchanged — proposal_draft
+            // and report_only fold into existing plan/research flows.
+            dream_mode: _actionLevelToDreamMode(_dreamActionLevel()),
             time_budget_sec: budgetSec,
         }),
     })
@@ -1884,6 +1955,18 @@ document.addEventListener("DOMContentLoaded", () => {
     // When the user types/pastes a new repo path, refresh the sidebar list.
     const repoInput = document.querySelector("input[name='repo_path']");
     if (repoInput) repoInput.addEventListener("change", refreshDreamRuns);
+
+    // Phase 4.7a: load the dream_type / action_level matrix into the dropdowns.
+    // The Work type select drives Action level visibility — changing it
+    // re-renders the Action level options from the cached matrix so the user
+    // can only pick a combination the backend accepts.
+    fetchDreamTaxonomy();
+    const dreamTypeEl = document.getElementById("dreamType");
+    if (dreamTypeEl) {
+        dreamTypeEl.addEventListener("change", () => {
+            _renderActionLevelOptions(_dreamType());
+        });
+    }
 });
 
 // --- Sidebar: past dream runs ------------------------------

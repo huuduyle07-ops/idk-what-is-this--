@@ -806,17 +806,57 @@ this server."` prints to stderr (exit 2) if `mcp` is not installed.
 
 ## Phase 9 — Portable packaging
 
-**Status: PARTIAL / PAUSED**
+**Status: PARTIAL — 9.1a through 9.1d shipped; 9.2 deferred**
 
-Local safe mode works. Docker app packaging is paused due to disk/Docker issues.
+Local safe mode works. Docker runtime is stabilized with pluggable embeddings and optional sandbox images. Sandbox worker wiring is deferred.
 
-### Current reality
+### Phase 9.1a — Lean Docker Image Split
 
-- Local Flask works
-- DB container works
-- App image build remains paused (user force-deleted the docker_data.vhdx 2026-05-16)
-- Ollama-in-Docker remains paused
-- Docker currently used only as optional infrastructure for Postgres/pgvector
+**Status: Shipped**
+
+- Move sentence-transformers/Torch out of default requirements
+- Add `requirements_embeddings.txt`
+- Keep default Docker image small
+- `INSTALL_EMBEDDINGS=false` by default
+
+### Phase 9.1b — Pluggable Embedding Provider
+
+**Status: Shipped**
+
+- `EMBEDDING_PROVIDER=off | local_minilm | gemini`
+- Gemini embeddings for Codespaces / lean Docker
+- Metadata signature guard
+- No silent fallback
+
+### Phase 9.1c — Docker Compose Web + DB Runtime
+
+**Status: Shipped**
+
+- `cattus-web` runs on `127.0.0.1:5056`
+- Postgres/pgvector runs in Docker
+- Local Windows web can connect via `localhost:5433`
+- Docker web uses `db:5432` internally
+- Ollama off by default
+- Embeddings off by default
+
+### Phase 9.1d — Optional Manual Sandbox Images
+
+**Status: Current / small checkpoint**
+
+- Re-pulled `ubuntu:24.04`
+- Re-pulled `python:3.12-slim`
+- Added optional `ubuntu-sandbox` / `python-sandbox` Compose profile
+- Kept them separate from `cattus-web`
+- No Docker socket mounted into web container
+
+### Phase 9.2 — Sandbox Worker Wiring
+
+**Status: Deferred**
+
+- `cattus-web` talks to `sandbox-worker`
+- `sandbox-worker` controls temp containers
+- No direct Docker socket in web app
+- Audit artifacts preserved
 
 ### Modes
 
@@ -827,18 +867,16 @@ Local safe mode works. Docker app packaging is paused due to disk/Docker issues.
 - Flask local, Postgres/pgvector Docker container, DB enabled, embeddings optional, Ollama installed directly on Windows if needed
 
 #### Docker mode
-- Paused until SSD/Docker storage is stable
-- app container optional, Ollama container later
-- do not run benchmarks automatically in container
+- App container stabilized via 9.1c; Ollama container remains later
+- Sandbox images available via optional Compose profile (9.1d)
+- Do not run benchmarks automatically in container
 
 ### Tasks
 
 - [ ] Finalize `.env.example`
 - [x] Keep `.env` ignored (user confirmed `.gitignore` handles this)
 - [ ] Keep `.dockerignore` strong: `.git`, `.agent`, `node_modules`, Rust `target`, temp/build outputs, `.env`
-- [ ] Split compose later:
-  - `docker-compose.yml` = db-only safe infra
-  - `docker-compose.full.yml` = app + db + ollama
+- [x] Split compose: `docker-compose.yml` = db + web runtime; optional sandbox profiles separate
 - [ ] Document: local safe mode, local full mode, DB-only Docker mode, full Docker mode
 
 ---

@@ -30,6 +30,7 @@ from core.sleeping_consultant import (
     request_stop,
 )
 from core import dream_artifacts
+from core import dream_taxonomy
 from core import benchmark_web
 from core import lesson_store
 from core import goal_brief as goal_brief_core
@@ -379,9 +380,12 @@ def dream_queue_route():
         return {"queue": []}
 
     if action == "add":
-        kind = request.form.get("kind", "bug").strip().lower()
-        if kind not in {"bug", "debt", "idea", "research", "reference_study"}:
-            return {"error": f"unknown kind: {kind}"}
+        # Phase 4.7a — taxonomy cleanup. The request can either:
+        #   (new path)    dream_type + action_level
+        #   (legacy path) kind ± mode (existing UI / scripts / queued items)
+        # Either way we end up with both the new fields AND the legacy `kind`
+        # populated so the run-time code in core/sleeping_consultant.py keeps
+        # working unchanged.
         title = request.form.get("title", "").strip()
         hint = request.form.get("hint", "").strip()
         notes = request.form.get("notes", "").strip()
@@ -389,8 +393,50 @@ def dream_queue_route():
         snippets_raw = request.form.get("snippets", "").strip()
         if not title:
             return {"error": "title is required"}
+
+        raw_dream_type = (request.form.get("dream_type") or "").strip()
+        raw_action_level = (request.form.get("action_level") or "").strip()
+        raw_kind = (request.form.get("kind") or "").strip()
+        raw_mode = (request.form.get("mode") or "").strip()
+
+        if raw_dream_type or raw_action_level:
+            dream_type = raw_dream_type
+            action_level = raw_action_level
+            if not action_level:
+                allowed = dream_taxonomy.allowed_action_levels(dream_type)
+                action_level = allowed[0] if allowed else ""
+            err = dream_taxonomy.validate(dream_type, action_level)
+            if err:
+                return {"error": err}
+        else:
+            # Legacy path: reject obvious garbage so we don't pollute the queue,
+            # then normalize the recognized aliases through the taxonomy.
+            legacy_kind_key = raw_kind.lower()
+            legacy_aliases = {
+                "", "bug", "bugs", "bug_investigation",
+                "debt", "debt_cleanup",
+                "idea", "ideas", "idea_trial",
+                "research", "research_study",
+                "reference study", "reference_study",
+                "case_idea_research",
+            }
+            if legacy_kind_key not in legacy_aliases:
+                return {"error": f"unknown kind: {raw_kind}"}
+            dream_type, action_level = dream_taxonomy.normalize_legacy(
+                raw_kind, raw_mode,
+            )
+
+        # Map the canonical dream_type back to the legacy `kind` value the
+        # run-time code still reads. Phase 4.7a is taxonomy cleanup only; it
+        # does NOT change the patch / proposal execution behavior.
+        kind = dream_taxonomy.legacy_kind_for_dream_type(dream_type)
+
         item = {
-            "kind": kind, "title": title, "hint": hint,
+            "kind": kind,
+            "dream_type": dream_type,
+            "action_level": action_level,
+            "title": title,
+            "hint": hint,
         }
         if notes:
             item["notes"] = notes
@@ -411,6 +457,21 @@ def dream_queue_route():
         return {"queue": items}
 
     return {"error": f"unknown action: {action}"}
+
+
+@app.route("/dream/taxonomy", methods=["GET"])
+def dream_taxonomy_route():
+    """Phase 4.7a: expose the dream_type / action_level matrix so the UI can
+    populate dropdowns and hide invalid action levels per work type without
+    duplicating the rules in JavaScript.
+    """
+    return {
+        "dream_types": list(dream_taxonomy.DREAM_TYPES),
+        "action_levels": list(dream_taxonomy.ACTION_LEVELS),
+        "allowed_combinations": {
+            k: list(v) for k, v in dream_taxonomy.ALLOWED_COMBINATIONS.items()
+        },
+    }
 
 
 @app.route("/dream/run", methods=["POST"])

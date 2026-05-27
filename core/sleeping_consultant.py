@@ -523,19 +523,28 @@ def _run_case_idea_research_item(
 
 
 def _normalize_dream_mode(value: str | None) -> str:
-    """Map UI/string aliases to Dream V2 modes. Default = plan_only."""
+    """Map UI/string aliases to Dream V2 modes. Default = plan_only.
+
+    Phase 4.7a: also accepts the new `action_level` aliases (report_only,
+    proposal_draft) so callers can pass either the legacy `dream_mode` or the
+    new `action_level` without a separate normalization layer. Patch behavior
+    is unchanged — proposal_draft folds into plan_only and report_only folds
+    into the existing research flow.
+    """
     v = (value or "").strip().lower()
     aliases = {
         "": "plan_only",
         "plan": "plan_only",
         "plan_only": "plan_only",
         "planonly": "plan_only",
+        "proposal_draft": "plan_only",
         "safe": "patch_if_safe",
         "patch": "patch_if_safe",
         "patch_if_safe": "patch_if_safe",
         "research": "research",
         "design": "research",
         "proposal": "research",
+        "report_only": "research",
         "reference_study": "case_idea_research",
         "case_idea": "case_idea_research",
         "case_idea_research": "case_idea_research",
