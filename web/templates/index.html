@@ -397,7 +397,10 @@
               <textarea id="dreamReferenceNotes" class="dream-reference-notes"
                         placeholder="reference notes for case ideas (optional)"></textarea>
               <input id="dreamReferenceFiles" class="dream-reference-files" type="text"
-                     placeholder="markdown files, comma-separated (optional)">
+                     placeholder="markdown files, comma-separated (optional)"
+                     title="Double-click to choose markdown files, or drop markdown files here.">
+              <input type="file" id="dreamReferenceFileInput"
+                     accept=".md,.markdown,text/markdown" multiple hidden>
             </div>
             <div class="dream-buttons">
               <label class="dream-budget-label" title="How long Dream can run before it stops accepting new items (Slice α).">
@@ -4549,6 +4552,8 @@ async function localCritique() {
 
 const repoInput = document.getElementById("repoPathInput");
 const folderInput = document.getElementById("folderInput");
+const dreamReferenceFiles = document.getElementById("dreamReferenceFiles");
+const dreamReferenceFileInput = document.getElementById("dreamReferenceFileInput");
 
 repoInput.addEventListener("dblclick", () => folderInput.click());
 
@@ -4580,6 +4585,78 @@ repoInput.addEventListener("change", () => {
 folderInput.addEventListener("change", () => {
     uploadFolderFiles(folderInput.files);
 });
+
+function normalizePathForCompare(path) {
+    return (path || "").replace(/\\/g, "/").replace(/\/+$/, "");
+}
+
+function toRepoRelativePath(path) {
+    const normalizedPath = normalizePathForCompare(path);
+    const normalizedRepo = normalizePathForCompare(repoInput?.value?.trim() || "");
+    if (!normalizedPath || !normalizedRepo) return normalizedPath;
+
+    const lowerPath = normalizedPath.toLowerCase();
+    const lowerRepo = normalizedRepo.toLowerCase();
+    if (lowerPath === lowerRepo) return "";
+    if (!lowerPath.startsWith(lowerRepo + "/")) return normalizedPath;
+    return normalizedPath.slice(normalizedRepo.length + 1);
+}
+
+function dreamReferencePathFromFile(file) {
+    const rawPath = file.webkitRelativePath || file.path || file.mozFullPath || file.name || "";
+    return toRepoRelativePath(rawPath);
+}
+
+function appendDreamReferenceFilePaths(files) {
+    if (!dreamReferenceFiles || !files?.length) return;
+
+    const existing = dreamReferenceFiles.value
+        .split(/[,\n]/)
+        .map(part => part.trim())
+        .filter(Boolean);
+    const seen = new Set(existing.map(part => normalizePathForCompare(part).toLowerCase()));
+    const next = [...existing];
+
+    for (const file of files) {
+        const path = dreamReferencePathFromFile(file).trim();
+        if (!/\.(md|markdown)$/i.test(path)) continue;
+
+        const key = normalizePathForCompare(path).toLowerCase();
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        next.push(path);
+    }
+
+    dreamReferenceFiles.value = next.join(", ");
+    dreamReferenceFiles.dispatchEvent(new Event("input", { bubbles: true }));
+    dreamReferenceFiles.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+if (dreamReferenceFiles && dreamReferenceFileInput) {
+    dreamReferenceFiles.addEventListener("dblclick", () => {
+        dreamReferenceFileInput.click();
+    });
+
+    dreamReferenceFiles.addEventListener("dragover", e => {
+        e.preventDefault();
+        dreamReferenceFiles.classList.add("dream-reference-files--dragover");
+    });
+
+    dreamReferenceFiles.addEventListener("dragleave", () => {
+        dreamReferenceFiles.classList.remove("dream-reference-files--dragover");
+    });
+
+    dreamReferenceFiles.addEventListener("drop", e => {
+        e.preventDefault();
+        dreamReferenceFiles.classList.remove("dream-reference-files--dragover");
+        appendDreamReferenceFilePaths(e.dataTransfer.files);
+    });
+
+    dreamReferenceFileInput.addEventListener("change", () => {
+        appendDreamReferenceFilePaths(dreamReferenceFileInput.files);
+        dreamReferenceFileInput.value = "";
+    });
+}
 
 async function uploadFolderFiles(files) {
     if (!files.length) return;

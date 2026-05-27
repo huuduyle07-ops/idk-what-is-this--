@@ -2038,6 +2038,12 @@ button {
     padding: 7px 8px;
 }
 
+.dream-reference-files--dragover {
+    border-color: var(--color-accent);
+    outline: 1px dashed var(--color-accent);
+    outline-offset: -3px;
+}
+
 .dream-reference-notes {
     min-height: 64px;
     resize: vertical;
