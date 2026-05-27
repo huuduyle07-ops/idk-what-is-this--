@@ -158,6 +158,74 @@ def _read_markdown_files(
     return loaded, missing, details
 
 
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
+_BULLET_PREFIX_RE = re.compile(r"^[#\-*]+\s*")
+_BACKTICK_RE = re.compile(r"`([^`]+)`")
+_FILEPATH_RE = re.compile(r"\b[\w./-]+\.[a-zA-Z]{1,5}\b")
+
+
+def _split_into_snippets(text: str, max_count: int = 6, max_chars: int = 240) -> list[str]:
+    """Split a blob of text into concrete short snippets.
+
+    Phase 4.7d: prefer per-line / per-bullet splits (common for pasted notes
+    and markdown headings), and fall back to sentence splits when the text is
+    a single line. Each snippet is capped at `max_chars` so the rendered
+    Markdown stays readable.
+    """
+    if not text:
+        return []
+    candidates: list[str] = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        stripped = _BULLET_PREFIX_RE.sub("", stripped)
+        if stripped:
+            candidates.append(stripped)
+    if len(candidates) < 2:
+        candidates = [c.strip() for c in _SENTENCE_SPLIT_RE.split(text.strip()) if c.strip()]
+
+    snippets: list[str] = []
+    for c in candidates:
+        if len(snippets) >= max_count:
+            break
+        if len(c) > max_chars:
+            c = c[:max_chars].rstrip() + "..."
+        snippets.append(c)
+    return snippets
+
+
+def _extract_surface_hints(text: str) -> list[str]:
+    """Best-effort heuristic: find `backticked` tokens and file-path-shaped
+    substrings in the inputs so the reasoning chunks can call them out by
+    name instead of vague placeholders.
+    """
+    if not text:
+        return []
+    seen: set[str] = set()
+    out: list[str] = []
+    for m in _BACKTICK_RE.finditer(text):
+        tok = m.group(1).strip()
+        if tok and tok not in seen:
+            seen.add(tok); out.append(tok)
+    for m in _FILEPATH_RE.finditer(text):
+        tok = m.group(0).strip()
+        if tok and tok not in seen and 3 <= len(tok) <= 80:
+            seen.add(tok); out.append(tok)
+    return out[:8]
+
+
+def _first_sentence(text: str, max_chars: int = 200) -> str:
+    text = (text or "").strip()
+    if not text:
+        return ""
+    parts = _SENTENCE_SPLIT_RE.split(text)
+    head = parts[0].strip() if parts else text
+    if len(head) > max_chars:
+        head = head[:max_chars].rstrip() + "..."
+    return head
+
+
 def _build_reference_study(
     reference_notes: str,
     loaded_texts: list[str],
@@ -170,19 +238,33 @@ def _build_reference_study(
 
     notes_stripped = reference_notes.strip()
     if notes_stripped:
-        evidence.append(notes_stripped)
+        # Phase 4.7d: split into concrete snippets at line / sentence
+        # boundaries instead of dumping one big blob, so the user sees each
+        # claim separately and the renderer can show them as bullets.
+        evidence.extend(_split_into_snippets(notes_stripped, max_count=6))
     for text in loaded_texts:
         if text.strip():
-            evidence.append(text.strip()[:_MAX_PER_FILE_CHARS])
+            evidence.extend(_split_into_snippets(text.strip(), max_count=4, max_chars=600))
+
+    evidence_is_weak = not evidence
 
     if not notes_stripped:
-        assumptions.append("No reference notes were provided; the analysis has no human-supplied anchor.")
+        assumptions.append(
+            "No reference notes were provided; the analysis has no human-supplied anchor."
+        )
     if not markdown_files_attempted:
         assumptions.append("No markdown reference files were attached.")
+    if evidence_is_weak:
+        # Phase 4.7d: explicitly mark weak grounding so the user can't read
+        # silence as a clean bill of health.
+        assumptions.append(
+            "Evidence is weak — the trial proceeds on intuition only, so every "
+            "downstream judgment should be treated as low-confidence."
+        )
 
     for path in missing_files:
         unknowns.append(f"Referenced file unavailable: {path}")
-    if not evidence:
+    if evidence_is_weak:
         unknowns.append("No grounded evidence is available for this trial.")
 
     return {
@@ -196,99 +278,284 @@ def _build_reference_study(
 # Reasoning scaffolding (no model calls)
 # ---------------------------------------------------------------------------
 
-def _build_baseline_answer(title: str, hint: str) -> str:
-    hint_part = f" The user's hint was: {hint}." if hint else ""
-    return (
-        f"Without structured reasoning, the naive answer to {title!r} is to weigh "
-        "it against gut feel and either pursue it or shelve it."
-        f"{hint_part} The structured trial below replaces that ad-hoc judgment "
-        "with explicit evidence, refutation, and an auditable decision."
+def _build_baseline_answer(
+    title: str,
+    hint: str,
+    reference_notes: str,
+    evidence_is_weak: bool,
+) -> str:
+    """Phase 4.7d: a concrete one-paragraph baseline that interpolates the
+    title, hint, and the first sentence of the reference notes. Earlier
+    versions were a generic prompt that didn't name the idea concretely.
+    """
+    parts: list[str] = [
+        f"Naively, the idea {title!r} would be evaluated by reading it once and "
+        "deciding whether it sounds promising."
+    ]
+    if hint:
+        parts.append(f"The author's hint adds context: \"{hint}\".")
+    notes_head = _first_sentence(reference_notes, max_chars=240)
+    if notes_head:
+        parts.append(f"The reference notes claim: \"{notes_head}\".")
+    if evidence_is_weak:
+        parts.append(
+            "With no grounded evidence attached, the unstructured baseline is to "
+            "either shelve the idea or gather more data before any action."
+        )
+    else:
+        parts.append(
+            "An unstructured baseline would lean on the cited evidence and the "
+            "hint to either pursue or shelve the idea — without an explicit "
+            "refutation step."
+        )
+    parts.append(
+        "The structured trial below replaces that ad-hoc baseline with explicit "
+        "evidence, refutation, and an auditable decision."
+    )
+    return " ".join(parts)
+
+
+def _build_reasoning_chunks(
+    title: str,
+    hint: str,
+    reference_notes: str,
+    evidence_is_weak: bool,
+    loaded_count: int,
+    missing_count: int,
+) -> list[dict]:
+    """Phase 4.7d: five concrete chunks instead of generic prompts.
+
+    Order matches the brief: problem → surface affected → artifact output
+    → risk boundary → next safe action.
+    """
+    surface_hints = _extract_surface_hints(f"{title}\n{hint}\n{reference_notes}")
+    notes_head = _first_sentence(reference_notes, max_chars=160)
+    hint_clause = f" Hint: {hint}." if hint else " No hint was provided."
+    notes_clause = f" Notes mention: {notes_head}." if notes_head else ""
+    surface_clause = (
+        f"Surface hints in the inputs: {', '.join(surface_hints)}."
+        if surface_hints
+        else "No file paths or backticked symbols were detected in the inputs."
     )
 
+    weak_risk_note = (
+        "Evidence is weak — any downstream action MUST add grounding first."
+        if evidence_is_weak
+        else "Detection was heuristic; final scope always needs human read-through."
+    )
 
-def _build_reasoning_chunks(title: str, hint: str) -> list[dict]:
-    hint_text = hint or "(no hint provided)"
+    safe_next_action_output = (
+        "Human review of the artifact. Optionally: gather more grounding evidence "
+        "and re-run this trial before proposing a code change."
+        if evidence_is_weak
+        else "Human review of the artifact. If the judge says recommend_human_approval, "
+        "the next allowed step is create_proposal_draft — still report-only."
+    )
+
+    missing_clause = (
+        f" {missing_count} referenced file(s) could not be read; those rows are unknowns."
+        if missing_count
+        else f" {loaded_count} referenced file(s) were ingested." if loaded_count
+        else " No reference files were attached."
+    )
+
     return [
         {
             "question": "What problem does this idea try to solve?",
-            "reasoning": f"Title: {title}. Hint: {hint_text}.",
-            "output": "Problem framing captured from input metadata. Deeper framing requires human review.",
-            "risk_or_unknown": "Framing is templated, not LLM-generated.",
-        },
-        {
-            "question": "What is the smallest concrete step toward validating the idea?",
-            "reasoning": (
-                "A report-only trial creates artifacts a human can inspect before any "
-                "code change is contemplated."
+            "reasoning": f"Title: {title}.{hint_clause}{notes_clause}",
+            "output": (
+                f"Problem framing recorded for {title!r}."
+                + (f" Surface hints: {', '.join(surface_hints[:5])}." if surface_hints else "")
             ),
-            "output": "Generate this trial's reports and queue them for human review.",
-            "risk_or_unknown": "If no human reads the report, the idea remains an unprocessed candidate.",
+            "risk_or_unknown": weak_risk_note,
         },
         {
-            "question": "What evidence and which unknowns are in front of us?",
-            "reasoning": "Evidence, assumptions, and unknowns are split in 01_reference_study.md.",
-            "output": "trial.json.reference_study captures the split for programmatic inspection.",
-            "risk_or_unknown": "Without further analysis, we cannot tell whether the evidence actually grounds the idea.",
+            "question": "What part of the current system would this touch?",
+            "reasoning": surface_clause,
+            "output": (
+                "Likely affected surface: "
+                + (", ".join(surface_hints[:5]) if surface_hints else "unknown until reviewed.")
+            ),
+            "risk_or_unknown": (
+                "Surface detection is a string-match heuristic; treat the list "
+                "as a starting point, not a guarantee."
+            ),
         },
         {
-            "question": "What would make this idea look foolish in retrospect?",
-            "reasoning": "Refutation surfaces objections, cost concerns, worst case, and a simpler alternative.",
-            "output": "See 05_refutation.md for the structured attack on the idea.",
-            "risk_or_unknown": "Refutation is heuristic; not a substitute for adversarial human review.",
+            "question": "What artifact would a successful trial produce?",
+            "reasoning": (
+                "Phase 4.7b/c trials produce seven structured markdown files plus "
+                "trial.json. No code change is produced in this phase."
+            ),
+            "output": (
+                f"A report-only artifact for human review of {title!r}. "
+                "No patch, no commit, no proposal."
+            ),
+            "risk_or_unknown": (
+                "Trial output is artifacts only by construction; no shell-out, "
+                "no benchmark execution, no model API calls."
+            ),
+        },
+        {
+            "question": "Where is the risk boundary?",
+            "reasoning": f"This trial is report-only.{missing_clause}",
+            "output": (
+                "Strictly out of scope: patch, apply, commit, benchmark execution. "
+                "Re-running with code changes is gated by human review of this report."
+            ),
+            "risk_or_unknown": (
+                "If unreviewed, the idea remains an unprocessed candidate."
+                if not evidence_is_weak
+                else "Evidence is weak — downstream action MUST add grounding."
+            ),
         },
         {
             "question": "What is the safe next action?",
-            "reasoning": "The judge maps scores + risk to a decision via a fixed policy.",
-            "output": "See trial.json.allowed_actions for what is permitted now.",
-            "risk_or_unknown": "Heuristic scores are not probabilities. Final call always rests with the human.",
+            "reasoning": (
+                "The judge maps scores + risk to a decision; see 06_judge_report.md."
+            ),
+            "output": safe_next_action_output,
+            "risk_or_unknown": (
+                "Heuristic scores are not probabilities; the human is the source of truth."
+            ),
         },
     ]
 
 
-def _build_multi_perspective() -> dict:
+def _build_multi_perspective(
+    title: str,
+    hint: str,
+    reference_notes: str,
+    evidence_is_weak: bool,
+) -> dict:
+    """Phase 4.7d: five concrete views that namedrop the idea and reference
+    notes, rather than generic prompt questions."""
+    notes_head = _first_sentence(reference_notes, max_chars=160)
+    hint_present = bool(hint and hint.strip())
+
+    grounding_clause = (
+        f' Reference snippet: "{notes_head}".'
+        if notes_head
+        else " No reference notes were attached, so this view runs on the title and hint alone."
+    )
+    weak_clause = (
+        " Supporting evidence is weak, so every verdict here is provisional."
+        if evidence_is_weak
+        else " Supporting evidence is at least partially grounded."
+    )
+
     return {
         "beginner": (
-            "Explain the idea so a curious newcomer can grasp it without jargon — "
-            "what is being proposed and why might it matter?"
-        ),
+            f"In plain terms, {title!r} proposes a change that is worth a careful read. "
+            f"The author's hint says: \"{hint}\"." if hint_present
+            else f"In plain terms, {title!r} proposes a change that is worth a careful read. "
+            "No hint was attached, so a newcomer reading just the title cannot tell what "
+            "the idea concretely changes."
+        ) + grounding_clause,
         "professor": (
-            "Examine rigor: assumptions, citations, theoretical soundness, and "
-            "comparable prior work."
+            f"Rigor check on {title!r}: "
+            + (
+                "reference notes are attached and form the starting evidence."
+                if notes_head
+                else "no citations are attached; every claim about the idea stands on author intuition."
+            )
+            + weak_clause
         ),
         "profit": (
-            "Will this idea move the needle on the project's real goals? What is "
-            "the value-to-effort ratio?"
+            f"Value-to-effort estimate for {title!r}: "
+            + (
+                f"the cited evidence — \"{notes_head}\" — hints at upside that must be "
+                "verified at production scale before any rollout."
+                if notes_head
+                else "value cannot be estimated without grounding. Effort is unknown until a proposal draft exists."
+            )
         ),
         "maintainer": (
-            "What does this cost in upkeep, complexity, and on-call surface? Are "
-            "there hidden long-term burdens?"
+            f"Upkeep view on {title!r}: every new mechanism adds a long tail of edge "
+            f"cases, on-call surface, and review burden."
+            + (f" The hint hints at the affected surface: \"{hint}\"." if hint_present
+               else " No hint was attached to narrow the touched surface.")
         ),
         "safety": (
-            "What goes wrong if this is shipped without sufficient guardrails? "
-            "What are the failure modes?"
+            f"Failure-mode view on {title!r}: "
+            + (
+                "cited evidence reduces — but does not eliminate — the risk of a regression "
+                "in unrelated areas."
+                if notes_head
+                else "with no grounding, the worst case is that the idea ships and silently "
+                "breaks an unrelated pipeline."
+            )
+            + " Validation commands and sandbox dry-run are explicitly out of scope for this phase."
         ),
     }
 
 
-def _build_refutation(title: str, hint: str) -> dict:
-    hint_clause = f" (hint: {hint})" if hint else ""
+def _build_refutation(
+    title: str,
+    hint: str,
+    reference_notes: str,
+    evidence_is_weak: bool,
+    missing_count: int,
+) -> dict:
+    """Phase 4.7d: refutation that quotes the idea concretely and adapts its
+    objections to whether evidence is present."""
+    notes_head = _first_sentence(reference_notes, max_chars=160)
+    missing_clause = (
+        f" {missing_count} referenced file(s) could not be read — treat their content as missing sources."
+        if missing_count
+        else ""
+    )
+
+    if evidence_is_weak:
+        weakest_assumption = (
+            f"The strongest unstated assumption behind {title!r} is that it works at all — "
+            f"there is no grounded evidence attached.{missing_clause}"
+        )
+        worst_case = (
+            f"{title!r} is implemented based on intuition; a downstream area silently "
+            "regresses and the rollback cost outstrips a pre-commit review."
+        )
+        simpler_alternative = (
+            f"Write a one-paragraph note describing {title!r}, shelve it under "
+            "`.agent/dream_trials/` (this report is exactly that), and revisit only "
+            "when a concrete pain-point makes the cost / benefit obvious."
+        )
+    else:
+        weakest_assumption = (
+            f"The riskiest assumption in {title!r} is that the cited evidence "
+            f"generalizes from its source context to this repo.{missing_clause}"
+            + (f" The cited claim was: \"{notes_head}\"." if notes_head else "")
+        )
+        worst_case = (
+            f"{title!r} ships, the cited gains do not generalize, and the team spends "
+            "more time un-doing it than the pilot ever saved."
+        )
+        simpler_alternative = (
+            f"Run {title!r} as a tiny pilot on the smallest viable scope first, and only "
+            "then propose a broader change with measurements."
+        )
+
+    second_objection = (
+        f"The hint \"{hint}\" provides framing but is not itself evidence."
+        if hint and hint.strip()
+        else f"No hint was provided, so the framing of {title!r} rests entirely on the title."
+    )
+
+    cost_concerns = [
+        f"Implementation effort and review burden for {title!r} are not yet estimated.",
+        "Token and time cost of any future LLM-based variant is not in scope here.",
+    ]
+    if missing_count:
+        cost_concerns.append(
+            "Re-running with the missing reference file(s) resolved would change scoring; "
+            "that cost is deferred to a follow-up trial."
+        )
+
     return {
-        "main_objections": [
-            f"The idea {title!r}{hint_clause} may rest on assumptions that have not been validated.",
-            "Without grounded evidence, downstream actions risk being based on speculation.",
-        ],
-        "cost_concerns": [
-            "Implementation effort, prompt-token cost, and review burden are not estimated here.",
-            "Maintenance cost over time is unknown without further analysis.",
-        ],
-        "worst_case": (
-            "The idea is implemented before adequate analysis, causes regressions in unrelated areas, "
-            "and the team is forced to roll it back at higher cost than a pre-commit review would have."
-        ),
-        "simpler_alternative": (
-            "Write a short note describing the idea and shelve it until a concrete pain point makes "
-            "the cost / benefit obvious."
-        ),
+        "main_objections": [weakest_assumption, second_objection],
+        "cost_concerns": cost_concerns,
+        "worst_case": worst_case,
+        "simpler_alternative": simpler_alternative,
     }
 
 
@@ -326,8 +593,14 @@ def _compute_judge_scores(
     if has_notes:    confidence += 25
     if loaded_count: confidence += 25
     if has_hint:     confidence += 10
+    # Phase 4.7d: explicit weak-evidence cap. No grounded source → confidence
+    # cannot exceed 30 regardless of how many "soft" signals are present.
     if not has_notes and not loaded_count:
         confidence = min(confidence, 30)
+    # Phase 4.7d: if more than one referenced file failed to load, treat the
+    # uncertainty as a confidence ceiling at 60.
+    if missing_count >= 2:
+        confidence = min(confidence, 60)
     confidence = min(90, max(0, confidence))
 
     if has_notes and loaded_count:
@@ -594,10 +867,34 @@ def create_structured_dream_trial(
         missing_files=missing_files,
         markdown_files_attempted=bool(files),
     )
-    baseline_answer = _build_baseline_answer(title, hint)
-    reasoning_chunks = _build_reasoning_chunks(title, hint)
-    multi_perspective = _build_multi_perspective()
-    refutation = _build_refutation(title, hint)
+    evidence_is_weak = not reference_study["evidence"]
+    baseline_answer = _build_baseline_answer(
+        title=title,
+        hint=hint,
+        reference_notes=reference_notes,
+        evidence_is_weak=evidence_is_weak,
+    )
+    reasoning_chunks = _build_reasoning_chunks(
+        title=title,
+        hint=hint,
+        reference_notes=reference_notes,
+        evidence_is_weak=evidence_is_weak,
+        loaded_count=len(loaded_texts),
+        missing_count=len(missing_files),
+    )
+    multi_perspective = _build_multi_perspective(
+        title=title,
+        hint=hint,
+        reference_notes=reference_notes,
+        evidence_is_weak=evidence_is_weak,
+    )
+    refutation = _build_refutation(
+        title=title,
+        hint=hint,
+        reference_notes=reference_notes,
+        evidence_is_weak=evidence_is_weak,
+        missing_count=len(missing_files),
+    )
 
     proposal_score, refutation_strength, confidence, risk = _compute_judge_scores(
         title=title,
