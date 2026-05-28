@@ -5,7 +5,7 @@ import subprocess, sys
 import shlex
 from pathlib import Path
 from typing import Tuple, Dict, Optional
-
+from dataclasses import dataclass
 # Compilers whose runtime DLLs frequently collide with Anaconda's bundled
 # mingw-w64 stubs (or other parallel installs) on Windows. When we see one of
 # these on PATH, we prepend its install dir to PATH for the child process so
@@ -13,6 +13,56 @@ from typing import Tuple, Dict, Optional
 # instead of crashing with NTSTATUS 0xC0000005 at startup due to ABI drift.
 _NATIVE_COMPILERS = ("g++", "gcc", "clang++", "clang")
 
+class GroundingResult:
+    is_grounded: bool
+    reason: str
+    matched_file: str | None
+    matched_snippet: str | None
+
+@dataclass(frozen=True)
+class GroundingResult:
+    is_grounded: bool
+    reason: str
+    matched_file: str | None = None
+    matched_snippet: str | None = None
+
+
+def validate_patch_candidate_grounding(repo_path: str, candidate: dict) -> GroundingResult:
+    repo = Path(repo_path).resolve()
+
+    rel = candidate.get("relative_path") or candidate.get("file") or ""
+    target = candidate.get("target_snippet") or ""
+
+    if not rel:
+        return GroundingResult(False, "patch_candidate missing relative_path/file")
+
+    if not target:
+        return GroundingResult(False, "patch_candidate missing target_snippet")
+
+    path = (repo / rel).resolve()
+
+    try:
+        path.relative_to(repo)
+    except ValueError:
+        return GroundingResult(False, f"path outside repo: {rel}")
+
+    if not path.exists():
+        return GroundingResult(False, f"target file does not exist: {rel}")
+
+    text = path.read_text(encoding="utf-8", errors="replace")
+
+    if target not in text:
+        return GroundingResult(
+            False,
+            f"target_snippet not found in source file: {rel}",
+        )
+
+    return GroundingResult(
+        True,
+        "target_snippet found in source file",
+        matched_file=rel,
+        matched_snippet=target,
+    )
 
 def _native_toolchain_env() -> Optional[dict]:
     """Return an env dict with the native compiler's bin dir prepended to PATH,

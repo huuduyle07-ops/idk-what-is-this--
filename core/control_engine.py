@@ -779,6 +779,8 @@ Rules:
 - Use patch_candidate only when editing one existing file.
 - Use patch_plan when creating files, editing multiple files, or changing APIs across files.
 - Every relative_path MUST stay inside the repo (no absolute paths, no '..').
+- Every patch_candidate.target_snippet must be an exact quote from the target file.
+- If it is not found, reject/demote the candidate before final result.
 """
 
     if style == "safe_minimal":

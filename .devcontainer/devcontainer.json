@@ -20,7 +20,7 @@
       "onAutoForward": "notify"
     }
   },
-  "postCreateCommand": "python -m pip install --upgrade pip && pip install -r requirements.txt",
+  "postCreateCommand": "python -m compileall -q core web scripts benchmarks tests || true",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -28,11 +28,6 @@
         "golang.go",
         "rust-lang.rust-analyzer"
       ]
-    }
-  },
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "24"
     }
   }
 }
