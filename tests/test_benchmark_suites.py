@@ -187,7 +187,7 @@ def test_full_discovery_matches_full_suite_manifest():
     discovered_names = sorted(runner.load_case(case_file)["name"] for case_file in cases)
     full_manifest = runner.load_suite_manifest("full_v1")
 
-    assert len(discovered_names) == 31
+    assert len(discovered_names) == 32
     assert discovered_names == sorted(full_manifest["case_names"])
 
 

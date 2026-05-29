@@ -8,6 +8,7 @@ from agents.gemini_client import run_gemini_request
 from core.agent_state import AgentState
 from core.validator import validate_patch_plan_grounding
 from database.memory import save_engineering_memory
+from patching.patch_grounding import enforce_patch_candidate_grounding
 
 SCHEMA_HINT = """
 {
@@ -1139,6 +1140,101 @@ def reject_ungrounded_patch(state: AgentState) -> None:
         }
         state.json_block["needs_escalation"] = True
         state.json_block["confidence"] = 0.0
+
+
+def _safe_repo_file_text(repo_path: str, rel: str) -> "str | None":
+    """Read `rel` from `repo_path`, but only if it stays inside the repo.
+
+    Read-only and traversal-guarded — same boundary rule as the other gates.
+    Returns None when the path is unsafe, missing, or unreadable.
+    """
+    if not repo_path or not rel:
+        return None
+    repo = Path(repo_path).resolve()
+    try:
+        path = (repo / rel).resolve()
+        path.relative_to(repo)
+    except (ValueError, OSError):
+        return None
+    if not path.is_file():
+        return None
+    try:
+        return path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+
+
+def _gather_candidate_grounding_sources(state: AgentState, candidate: dict) -> list:
+    """Collect real source text to quote-ground a patch_candidate against.
+
+    Sources = the on-disk target file (when present and inside the repo) plus
+    retrieved CONTROL context (patch_intent.source_snippet and any
+    related_snippets). Each entry is a (path, text) pair.
+    """
+    sources: list = []
+
+    rel = candidate.get("relative_path") or candidate.get("file") or ""
+    if state.repo_path and rel:
+        text = _safe_repo_file_text(state.repo_path, rel)
+        if text is not None:
+            sources.append((rel, text))
+
+    control = state.control_result or {}
+    patch_intent = control.get("patch_intent") or {}
+    source_snippet = patch_intent.get("source_snippet")
+    if isinstance(source_snippet, str) and source_snippet:
+        sources.append((patch_intent.get("target_file") or rel or None, source_snippet))
+
+    for related in control.get("related_snippets") or []:
+        if not isinstance(related, dict):
+            continue
+        snippet = related.get("snippet")
+        if isinstance(snippet, str) and snippet:
+            sources.append((related.get("file"), snippet))
+
+    return sources
+
+
+def reject_ungrounded_candidate_quotes(state: AgentState) -> None:
+    """Phase 12.9 — quote-only grounding for patch_candidate.
+
+    Defense-in-depth layered on top of `reject_ungrounded_patch`: a
+    hallucinated target_snippet must never surface as a valid candidate in the
+    final patch result. The candidate is grounded against the on-disk target
+    file (when available) AND retrieved source context; if target_snippet is
+    not an exact substring of any real source, the candidate is marked invalid,
+    patch_plan is nulled, confidence / control confidence are lowered, and a
+    clear warning is recorded.
+
+    Preserves existing behavior for valid exact snippets, and no-ops when there
+    is no real source to ground against (so it never invents new rejections).
+    """
+    block = state.json_block
+    if not isinstance(block, dict):
+        return
+
+    candidate = block.get("patch_candidate")
+    if not isinstance(candidate, dict):
+        return
+
+    sources = _gather_candidate_grounding_sources(state, candidate)
+    if not sources:
+        # Nothing real to check against — leave the primary gate's verdict alone
+        # rather than rejecting an unprovable candidate.
+        return
+
+    result = enforce_patch_candidate_grounding(block, sources)
+
+    if not result.is_grounded:
+        # Lower CONTROL's own confidence too, so consumers that read
+        # control_result (not just json_block) see the lowered control value.
+        control = state.control_result
+        if isinstance(control, dict):
+            if isinstance(control.get("confidence"), (int, float)):
+                control["confidence"] = 0.0
+            top = control.get("top_hypothesis")
+            if isinstance(top, dict) and isinstance(top.get("confidence"), (int, float)):
+                top["confidence"] = 0.0
 
 
 _IDENT_RE = re.compile(r"\b[A-Za-z_][A-Za-z_0-9]*\b")

@@ -38,6 +38,7 @@ from database.memory import (
 from patching.patch_gates import (
     collect_patch_repair_reasons,
     reject_ungrounded_patch,
+    reject_ungrounded_candidate_quotes,
     retry_structured_patch_json,
     normalize_patch_plan_schema,
     promote_go_missing_import_candidate_to_patch_plan,
@@ -304,6 +305,7 @@ def run_agent_web(
 
         normalize_patch_plan_schema(state)
         reject_ungrounded_patch(state)
+        reject_ungrounded_candidate_quotes(state)
         if state.json_block:
             state.final_answer = json.dumps(state.json_block, indent=2, ensure_ascii=False)
             state.human_answer = state.final_answer

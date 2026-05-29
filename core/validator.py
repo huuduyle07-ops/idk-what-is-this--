@@ -13,12 +13,6 @@ from dataclasses import dataclass
 # instead of crashing with NTSTATUS 0xC0000005 at startup due to ABI drift.
 _NATIVE_COMPILERS = ("g++", "gcc", "clang++", "clang")
 
-class GroundingResult:
-    is_grounded: bool
-    reason: str
-    matched_file: str | None
-    matched_snippet: str | None
-
 @dataclass(frozen=True)
 class GroundingResult:
     is_grounded: bool
@@ -27,42 +21,107 @@ class GroundingResult:
     matched_snippet: str | None = None
 
 
-def validate_patch_candidate_grounding(repo_path: str, candidate: dict) -> GroundingResult:
-    repo = Path(repo_path).resolve()
+# Phase 12.9 — the single human-readable rejection message for an ungrounded
+# patch candidate. Kept here (next to GroundingResult) so every gate that
+# rejects a hallucinated target_snippet reports the exact same wording.
+UNGROUNDED_PATCH_CANDIDATE_WARNING = (
+    "Rejected ungrounded patch candidate: target_snippet was not found in source."
+)
 
-    rel = candidate.get("relative_path") or candidate.get("file") or ""
-    target = candidate.get("target_snippet") or ""
 
-    if not rel:
-        return GroundingResult(False, "patch_candidate missing relative_path/file")
+def source_snippet_exists(snippet: str, source_text: str) -> bool:
+    """True iff `snippet` appears verbatim (exact substring) in `source_text`.
 
-    if not target:
+    Quote-only grounding primitive: no whitespace normalization, no fuzzy
+    matching. An empty snippet or empty source is never grounded. This is the
+    single substring check every candidate/plan grounding builds on, so the
+    "copied byte-exactly from source" rule cannot drift between gates.
+    """
+    if not snippet or not source_text:
+        return False
+    return snippet in source_text
+
+
+def _candidate_field(candidate, key):
+    if candidate is None:
+        return None
+    if isinstance(candidate, dict):
+        return candidate.get(key)
+    return getattr(candidate, key, None)
+
+
+def _candidate_target_snippet(candidate) -> str:
+    return _candidate_field(candidate, "target_snippet") or ""
+
+
+def _candidate_file(candidate) -> "str | None":
+    return (
+        _candidate_field(candidate, "relative_path")
+        or _candidate_field(candidate, "file")
+        or _candidate_field(candidate, "file_path")
+        or None
+    )
+
+
+def _iter_source_texts(source_text_or_files):
+    """Normalize the accepted source shapes into (path, text) pairs.
+
+    Accepts a single source string, a {path: text} mapping, an iterable of
+    (path, text) pairs, or an iterable of plain source strings.
+    """
+    src = source_text_or_files
+    if src is None:
+        return
+    if isinstance(src, str):
+        yield (None, src)
+        return
+    if isinstance(src, dict):
+        for path, text in src.items():
+            if isinstance(text, str):
+                yield (path, text)
+        return
+    try:
+        iterator = iter(src)
+    except TypeError:
+        return
+    for item in iterator:
+        if isinstance(item, str):
+            yield (None, item)
+        elif (
+            isinstance(item, (tuple, list))
+            and len(item) == 2
+            and isinstance(item[1], str)
+        ):
+            yield (item[0], item[1])
+
+
+def validate_patch_candidate_grounding(candidate, source_text_or_files) -> GroundingResult:
+    """Quote-ground a single patch candidate's target_snippet.
+
+    `candidate` is a patch_candidate dict (or any object exposing
+    `target_snippet` / `relative_path` / `file`). `source_text_or_files` is the
+    real source to ground against — the target file's text *or* retrieved
+    source context — given as a string, a {path: text} mapping, or an iterable
+    of (path, text) pairs / plain source strings.
+
+    `is_grounded` is True only when target_snippet is an EXACT substring of one
+    of the provided sources. We prefer exact quote grounding over any
+    semantic/fuzzy guessing.
+    """
+    target = _candidate_target_snippet(candidate)
+    if not target.strip():
         return GroundingResult(False, "patch_candidate missing target_snippet")
 
-    path = (repo / rel).resolve()
+    for path, text in _iter_source_texts(source_text_or_files):
+        if source_snippet_exists(target, text):
+            return GroundingResult(
+                True,
+                "target_snippet found verbatim in source",
+                matched_file=path or _candidate_file(candidate),
+                matched_snippet=target,
+            )
 
-    try:
-        path.relative_to(repo)
-    except ValueError:
-        return GroundingResult(False, f"path outside repo: {rel}")
-
-    if not path.exists():
-        return GroundingResult(False, f"target file does not exist: {rel}")
-
-    text = path.read_text(encoding="utf-8", errors="replace")
-
-    if target not in text:
-        return GroundingResult(
-            False,
-            f"target_snippet not found in source file: {rel}",
-        )
-
-    return GroundingResult(
-        True,
-        "target_snippet found in source file",
-        matched_file=rel,
-        matched_snippet=target,
-    )
+    return GroundingResult(False, UNGROUNDED_PATCH_CANDIDATE_WARNING)
 
 def _native_toolchain_env() -> Optional[dict]:
     """Return an env dict with the native compiler's bin dir prepended to PATH,

@@ -1,0 +1,16 @@
+{
+  "name": "python_pandas_iloc_off_by_one_and_decoy_enumerate",
+  "language": "python",
+  "category": "grounding",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python app.py",
+  "expected_changed_files": [
+    "app.py"
+  ],
+  "forbidden_changed_files": [
+    "customers.csv"
+  ],
+  "prompt": "Fix the report row-selection bug in app.py. The CSV contains customers ordered from Customer1 onward, but the generated report incorrectly starts at Customer2 and includes Customer11. The report should show exactly the first 10 rows: Customer1 through Customer10. Inspect the real source code and patch only the actual line responsible for selecting rows. Do not invent or patch an enumerate(..., start=...) loop unless that exact code exists in app.py. Do not change customers.csv."
+}
