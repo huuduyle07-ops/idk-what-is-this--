@@ -20,7 +20,11 @@ from core.pipeline import (
     run_draft_pipeline,
     run_review_pipeline,
 )
-from core.harness_modes import HarnessModeDecision, decide_harness_mode
+from core.harness_modes import (
+    HarnessModeDecision,
+    decide_harness_mode,
+    format_harness_deny_message,
+)
 from core.preflight import run_preflight_validation
 from core.project_tag import build_project_tag
 from core.repo_librarian import (
@@ -181,6 +185,10 @@ def _harness_payload(decision: HarnessModeDecision) -> dict:
 
 
 def _harness_block_answer(decision: HarnessModeDecision) -> str:
+    hard_deny = format_harness_deny_message(decision)
+    if hard_deny:
+        return hard_deny
+
     lines = [
         f"Harness mode: {decision.mode}",
         decision.reason,

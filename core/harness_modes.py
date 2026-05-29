@@ -15,6 +15,10 @@ MODE_UNGROUNDED_PATCH_BLOCKED = "ungrounded_patch_blocked"
 MODE_DEGRADED_CONTEXT = "degraded_context"
 
 _WINDOWS_ABSOLUTE_RE = re.compile(r"^[A-Za-z]:[\\/]")
+_HARD_DENY_MODES = {
+    MODE_CODESPACES_LOCAL_PATH_MISMATCH,
+    MODE_PATH_OUTSIDE_REPO,
+}
 
 
 @dataclass(frozen=True)
@@ -40,6 +44,22 @@ class HarnessModeDecision:
 def looks_like_windows_absolute_path(value: object) -> bool:
     text = str(value or "").strip().strip('"').strip("'")
     return bool(_WINDOWS_ABSOLUTE_RE.match(text))
+
+
+def detect_path_environment(value: object) -> str:
+    text = str(value or "").strip().strip('"').strip("'")
+    if not text:
+        return "unknown"
+    if looks_like_windows_absolute_path(text):
+        return "local_windows"
+    normalized = text.replace("\\", "/")
+    if normalized.startswith("/workspaces/"):
+        return "codespaces"
+    if normalized.startswith("/Users/"):
+        return "local_macos"
+    if normalized.startswith("/"):
+        return "local_linux"
+    return "repo_relative_or_unknown"
 
 
 def _path_values(*values: object) -> list[str]:
@@ -91,6 +111,9 @@ def decide_harness_mode(
         "runtime_environment": runtime_environment,
         "request_path": request_path or "",
         "target_path": target_path or "",
+        "detected_path_environment": detect_path_environment(
+            request_path or target_path or ""
+        ),
         "source_context_present": source_present,
         "grounding_failed": bool(grounding_failed),
         "index_degraded": bool(index_degraded),
@@ -165,3 +188,60 @@ def decide_harness_mode(
         warnings=[],
         evidence=evidence,
     )
+
+
+def _decision_requested_path(decision: HarnessModeDecision) -> str:
+    evidence = decision.evidence or {}
+    for key in ("request_path", "target_path"):
+        value = str(evidence.get(key) or "").strip()
+        if value:
+            return value
+    outside_paths = evidence.get("outside_paths")
+    if isinstance(outside_paths, list) and outside_paths:
+        return str(outside_paths[0])
+    return ""
+
+
+def format_harness_deny_message(
+    decision: HarnessModeDecision,
+    *,
+    runtime_environment: str | None = None,
+    repo_root: str | Path | None = None,
+    requested_path: str | None = None,
+) -> str:
+    if decision.mode not in _HARD_DENY_MODES:
+        return ""
+
+    evidence = decision.evidence or {}
+    current_env = runtime_environment or str(
+        evidence.get("runtime_environment") or "unknown"
+    )
+    active_repo_root = (
+        str(repo_root)
+        if repo_root is not None
+        else str(evidence.get("repo_root") or "unknown")
+    )
+    path_value = requested_path or _decision_requested_path(decision) or "unknown"
+    path_environment = detect_path_environment(path_value)
+
+    lines = [
+        "Cannot run: environment/path mismatch.",
+        f"Current runtime environment: {current_env}",
+        f"Active repo root: {active_repo_root}",
+        f"Requested path: {path_value}",
+        f"Detected path environment: {path_environment}",
+        f"Reason: {decision.reason}",
+    ]
+    if decision.warnings:
+        lines.append("Warnings:")
+        lines.extend(f"- {warning}" for warning in decision.warnings)
+    lines.extend(
+        [
+            "Model call: Gemini/model was not called; C.A.T.T.U.S will not guess across runtime boundaries.",
+            "How to fix:",
+            "- Use a path that exists inside the active repo root for the selected runtime.",
+            "- In GitHub Codespaces, use /workspaces/... paths instead of C:\\Users\\... paths.",
+            "- Or switch Running environment and repo path to the machine/container that actually has the requested file.",
+        ]
+    )
+    return "\n".join(lines)

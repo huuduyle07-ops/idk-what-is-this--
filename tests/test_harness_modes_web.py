@@ -80,6 +80,52 @@ def test_web_runner_returns_harness_metadata_and_skips_model_when_generation_for
     assert "source_missing" in result["state"]
 
 
+def test_web_runner_surfaces_environment_conflict_deny_and_skips_model(
+    tmp_path,
+    monkeypatch,
+):
+    from web import runner
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "app.py").write_text("print('old')\n", encoding="utf-8")
+    requested_path = r"C:\Users\Administrator\Desktop\ml-data\app.py"
+    control_result = {
+        "patch_intent": {
+            "file": requested_path,
+            "source_snippet": "print('old')",
+        },
+        "top_hypothesis": {"confidence": 0.9, "recommended_action": "patch"},
+    }
+    _patch_runner_basics(monkeypatch, runner, repo, control_result)
+    monkeypatch.setattr(
+        runner,
+        "run_draft_pipeline",
+        lambda state: (_ for _ in ()).throw(AssertionError("model should not be called")),
+    )
+    monkeypatch.setattr(
+        runner,
+        "maybe_run_auto_patch",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("patch should not apply")),
+    )
+
+    result = runner.run_agent_web(
+        f"fix {requested_path}",
+        str(repo),
+        runtime_environment="codespaces",
+    )
+
+    assert result["harness_mode"] == "codespaces_local_path_mismatch"
+    assert result["harness_mode_decision"]["can_generate_patch"] is False
+    assert result["harness_mode_decision"]["can_apply_patch"] is False
+    assert "Cannot run: environment/path mismatch." in result["answer"]
+    assert "Current runtime environment: codespaces" in result["answer"]
+    assert f"Active repo root: {repo.resolve()}" in result["answer"]
+    assert f"Requested path: {requested_path}" in result["answer"]
+    assert "Detected path environment: local_windows" in result["answer"]
+    assert "Gemini/model was not called" in result["answer"]
+
+
 def test_web_runner_marks_ungrounded_patch_and_does_not_apply(
     tmp_path,
     monkeypatch,
