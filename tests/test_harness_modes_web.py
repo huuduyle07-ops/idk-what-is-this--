@@ -119,11 +119,12 @@ def test_web_runner_surfaces_environment_conflict_deny_and_skips_model(
     assert result["harness_mode_decision"]["can_generate_patch"] is False
     assert result["harness_mode_decision"]["can_apply_patch"] is False
     assert "Cannot run: environment/path mismatch." in result["answer"]
-    assert "Current runtime environment: codespaces" in result["answer"]
-    assert f"Active repo root: {repo.resolve()}" in result["answer"]
-    assert f"Requested path: {requested_path}" in result["answer"]
-    assert "Detected path environment: local_windows" in result["answer"]
-    assert "Gemini/model was not called" in result["answer"]
+    assert "C.A.T.T.U.S is running in: GitHub Codespaces" in result["answer"]
+    assert "Requested path looks like: Local Windows" in result["answer"]
+    assert f"Active repo root:\n{repo.resolve()}" in result["answer"]
+    assert f"Requested path:\n{requested_path}" in result["answer"]
+    assert "GitHub Codespaces cannot access files on your Windows computer." in result["answer"]
+    assert "Gemini was not called." in result["answer"]
 
 
 def test_web_runner_marks_ungrounded_patch_and_does_not_apply(

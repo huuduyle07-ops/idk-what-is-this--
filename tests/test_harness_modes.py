@@ -141,11 +141,16 @@ def test_codespaces_windows_path_formats_hard_deny_message(tmp_path):
     message = format_harness_deny_message(decision)
 
     assert message.startswith("Cannot run: environment/path mismatch.")
-    assert "Current runtime environment: codespaces" in message
-    assert f"Active repo root: {repo.resolve()}" in message
-    assert f"Requested path: {requested_path}" in message
-    assert "Detected path environment: local_windows" in message
-    assert "Gemini/model was not called" in message
+    assert "C.A.T.T.U.S is running in: GitHub Codespaces" in message
+    assert "Requested path looks like: Local Windows" in message
+    assert f"Active repo root:\n{repo.resolve()}" in message
+    assert f"Requested path:\n{requested_path}" in message
+    assert "GitHub Codespaces cannot access files on your Windows computer." in message
+    assert (
+        "Open/copy the repo inside /workspaces/... or run C.A.T.T.U.S locally on Windows."
+        in message
+    )
+    assert "Gemini was not called." in message
     assert "C.A.T.T.U.S will not guess" in message
     assert "How to fix:" in message
 
@@ -166,8 +171,9 @@ def test_local_linux_windows_path_formats_environment_mismatch_deny(tmp_path):
 
     assert decision.mode == "path_outside_repo"
     assert "Cannot run: environment/path mismatch." in message
-    assert "Current runtime environment: local_linux" in message
-    assert "Detected path environment: local_windows" in message
+    assert "C.A.T.T.U.S is running in: Local Ubuntu/Linux" in message
+    assert "Requested path looks like: Local Windows" in message
+    assert "Local Ubuntu/Linux cannot access a Local Windows absolute path." in message
 
 
 def test_path_outside_repo_deny_includes_repo_root_and_requested_path(tmp_path):
@@ -185,9 +191,9 @@ def test_path_outside_repo_deny_includes_repo_root_and_requested_path(tmp_path):
     message = format_harness_deny_message(decision)
 
     assert "Cannot run:" in message
-    assert f"Active repo root: {repo.resolve()}" in message
-    assert f"Requested path: {outside}" in message
-    assert "Reason: Requested patch target is outside the configured repo root." in message
+    assert f"Active repo root:\n{repo.resolve()}" in message
+    assert f"Requested path:\n{outside}" in message
+    assert "The requested path is outside the active repo root." in message
 
 
 def test_normal_patch_has_no_hard_deny_message(tmp_path):

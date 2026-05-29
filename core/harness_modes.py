@@ -19,6 +19,17 @@ _HARD_DENY_MODES = {
     MODE_CODESPACES_LOCAL_PATH_MISMATCH,
     MODE_PATH_OUTSIDE_REPO,
 }
+_ENVIRONMENT_LABELS = {
+    "auto": "Auto-detect",
+    "local_windows": "Local Windows",
+    "local_linux": "Local Ubuntu/Linux",
+    "local_macos": "Local macOS",
+    "docker": "Docker container",
+    "codespaces": "GitHub Codespaces",
+    "custom": "Custom / other",
+    "repo_relative_or_unknown": "Repo-relative or unknown",
+    "unknown": "Unknown",
+}
 
 
 @dataclass(frozen=True)
@@ -60,6 +71,13 @@ def detect_path_environment(value: object) -> str:
     if normalized.startswith("/"):
         return "local_linux"
     return "repo_relative_or_unknown"
+
+
+def _environment_label(value: object) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return "Unknown"
+    return _ENVIRONMENT_LABELS.get(text, text.replace("_", " ").title())
 
 
 def _path_values(*values: object) -> list[str]:
@@ -202,6 +220,38 @@ def _decision_requested_path(decision: HarnessModeDecision) -> str:
     return ""
 
 
+def _deny_reason(decision: HarnessModeDecision, current_env: str, path_env: str) -> str:
+    current_label = _environment_label(current_env)
+    path_label = _environment_label(path_env)
+
+    if current_env == "codespaces" and path_env == "local_windows":
+        return "GitHub Codespaces cannot access files on your Windows computer."
+    if path_env == "local_windows" and current_env != "local_windows":
+        return f"{current_label} cannot access a {path_label} absolute path."
+    if decision.mode == MODE_PATH_OUTSIDE_REPO:
+        return "The requested path is outside the active repo root."
+    return decision.reason
+
+
+def _deny_fix(decision: HarnessModeDecision, current_env: str, path_env: str) -> str:
+    if current_env == "codespaces" and path_env == "local_windows":
+        return (
+            "Open/copy the repo inside /workspaces/... or run C.A.T.T.U.S "
+            "locally on Windows."
+        )
+    if path_env == "local_windows" and current_env != "local_windows":
+        return (
+            "Use a path under the active repo root in this runtime, or run "
+            "C.A.T.T.U.S on Windows with the matching repo path."
+        )
+    if decision.mode == MODE_PATH_OUTSIDE_REPO:
+        return (
+            "Use a file under the active repo root, or change the repo root "
+            "to the project C.A.T.T.U.S should patch."
+        )
+    return "Use a path that exists inside the active repo root for this runtime."
+
+
 def format_harness_deny_message(
     decision: HarnessModeDecision,
     *,
@@ -223,25 +273,27 @@ def format_harness_deny_message(
     )
     path_value = requested_path or _decision_requested_path(decision) or "unknown"
     path_environment = detect_path_environment(path_value)
+    reason = _deny_reason(decision, current_env, path_environment)
+    fix = _deny_fix(decision, current_env, path_environment)
 
     lines = [
         "Cannot run: environment/path mismatch.",
-        f"Current runtime environment: {current_env}",
-        f"Active repo root: {active_repo_root}",
-        f"Requested path: {path_value}",
-        f"Detected path environment: {path_environment}",
-        f"Reason: {decision.reason}",
+        "",
+        f"C.A.T.T.U.S is running in: {_environment_label(current_env)}",
+        f"Requested path looks like: {_environment_label(path_environment)}",
+        "",
+        "Active repo root:",
+        active_repo_root,
+        "",
+        "Requested path:",
+        path_value,
+        "",
+        "Reason:",
+        reason,
+        "",
+        "How to fix:",
+        fix,
+        "",
+        "Gemini was not called. C.A.T.T.U.S will not guess across runtime boundaries.",
     ]
-    if decision.warnings:
-        lines.append("Warnings:")
-        lines.extend(f"- {warning}" for warning in decision.warnings)
-    lines.extend(
-        [
-            "Model call: Gemini/model was not called; C.A.T.T.U.S will not guess across runtime boundaries.",
-            "How to fix:",
-            "- Use a path that exists inside the active repo root for the selected runtime.",
-            "- In GitHub Codespaces, use /workspaces/... paths instead of C:\\Users\\... paths.",
-            "- Or switch Running environment and repo path to the machine/container that actually has the requested file.",
-        ]
-    )
     return "\n".join(lines)
