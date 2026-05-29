@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os, uuid
+import re
 from pathlib import Path
 
 from core.agent_state import AgentState
@@ -19,6 +20,7 @@ from core.pipeline import (
     run_draft_pipeline,
     run_review_pipeline,
 )
+from core.harness_modes import HarnessModeDecision, decide_harness_mode
 from core.preflight import run_preflight_validation
 from core.project_tag import build_project_tag
 from core.repo_librarian import (
@@ -51,6 +53,9 @@ from patching.patch_gates import (
 )
 from core.source_snippet_fallback import hydrate_control_source_from_scout
 from web.mcp_inspector_processes import stop_mcp_inspectors
+
+
+_WINDOWS_PATH_HINT_RE = re.compile(r"[A-Za-z]:[\\/][^\s\"'<>|]+")
 
 
 def run_web_app(flask_app, **run_kwargs) -> None:
@@ -89,6 +94,103 @@ def launch_web(host: str | None = None, port: int = 5000, open_browser: bool = T
     run_web_app(app, host=host, port=port, debug=False, use_reloader=False)
 
 
+def _request_path_hint(query: str) -> str:
+    match = _WINDOWS_PATH_HINT_RE.search(query or "")
+    return match.group(0) if match else ""
+
+
+def _control_target_path(control_result: dict | None) -> str:
+    if not isinstance(control_result, dict):
+        return ""
+    patch_intent = control_result.get("patch_intent") or {}
+    if isinstance(patch_intent, dict):
+        for key in ("relative_path", "file", "target_file"):
+            value = patch_intent.get(key)
+            if value:
+                return str(value)
+    top = control_result.get("top_hypothesis") or {}
+    symbol = top.get("symbol") if isinstance(top, dict) else ""
+    if isinstance(symbol, str) and "::" in symbol:
+        return symbol.split("::", 1)[0]
+    return ""
+
+
+def _control_source_text(control_result: dict | None) -> str:
+    if not isinstance(control_result, dict):
+        return ""
+    patch_intent = control_result.get("patch_intent") or {}
+    if isinstance(patch_intent, dict):
+        source = patch_intent.get("source_snippet")
+        if isinstance(source, str) and source.strip():
+            return source
+    for related in control_result.get("related_snippets") or []:
+        if isinstance(related, dict):
+            snippet = related.get("snippet")
+            if isinstance(snippet, str) and snippet.strip():
+                return snippet
+    return ""
+
+
+def _context_is_degraded(control_result: dict | None) -> bool:
+    if not isinstance(control_result, dict):
+        return False
+    return any(
+        bool(control_result.get(key))
+        for key in (
+            "index_degraded",
+            "context_degraded",
+            "degraded_context",
+            "source_context_degraded",
+        )
+    )
+
+
+def _grounding_failed(json_block: dict | None) -> bool:
+    if not isinstance(json_block, dict):
+        return False
+    if json_block.get("patch_plan_rejected"):
+        return True
+    candidate = json_block.get("patch_candidate")
+    if not isinstance(candidate, dict):
+        return False
+    if candidate.get("grounding_error"):
+        return True
+    reason = str(candidate.get("reject_reason") or "").lower()
+    return bool(candidate.get("rejected")) and (
+        "ground" in reason
+        or "quote" in reason
+        or "target_snippet does not exist" in reason
+        or "not found" in reason
+    )
+
+
+def _harness_debug(decision: HarnessModeDecision) -> str:
+    return json.dumps(
+        {"harness_mode_decision": decision.to_dict()},
+        indent=2,
+        ensure_ascii=False,
+    )
+
+
+def _harness_payload(decision: HarnessModeDecision) -> dict:
+    return {
+        "harness_mode": decision.mode,
+        "harness_mode_decision": decision.to_dict(),
+        "harness_warnings": list(decision.warnings),
+    }
+
+
+def _harness_block_answer(decision: HarnessModeDecision) -> str:
+    lines = [
+        f"Harness mode: {decision.mode}",
+        decision.reason,
+    ]
+    if decision.warnings:
+        lines.append("Warnings:")
+        lines.extend(f"- {warning}" for warning in decision.warnings)
+    return "\n".join(lines)
+
+
 def run_agent_web(
     query: str,
     repo_path: str,
@@ -118,10 +220,22 @@ def run_agent_web(
         runtime_state["runtime_environment_custom_name"],
         runtime_state["runtime_environment_notes"],
     )
+    base_harness_decision = decide_harness_mode(
+        repo_root=repo_path or ".",
+        runtime_environment=runtime_state["runtime_environment"],
+        request_path=_request_path_hint(query),
+        source_context_present=True,
+    )
 
     inventory = inspect_repo_inventory(repo_path) if is_project_input else None
 
     if is_project_input and not inventory["ok"]:
+        empty_repo_decision = decide_harness_mode(
+            repo_root=repo_path,
+            runtime_environment=runtime_state["runtime_environment"],
+            request_path=_request_path_hint(query),
+            source_context_present=False,
+        )
         return {
             "answer": (
                 "Error: repo_path exists but contains 0 indexable files. "
@@ -135,6 +249,7 @@ def run_agent_web(
             "project_tag": project_tag or "",
             **runtime_state,
             "runtime_environment_description": runtime_description,
+            **_harness_payload(empty_repo_decision),
         }
 
     input_mode = detect_input_mode(query)
@@ -217,6 +332,7 @@ def run_agent_web(
                 "project_tag": final_tag,
                 **runtime_state,
                 "runtime_environment_description": runtime_description,
+                **_harness_payload(base_harness_decision),
             }
 
     state = AgentState(
@@ -237,6 +353,8 @@ def run_agent_web(
         runtime_environment=runtime_state["runtime_environment"],
         runtime_environment_custom_name=runtime_state["runtime_environment_custom_name"],
         runtime_environment_notes=runtime_state["runtime_environment_notes"],
+        harness_mode=base_harness_decision.mode,
+        harness_mode_decision=base_harness_decision.to_dict(),
     )
 
     try:
@@ -264,6 +382,39 @@ def run_agent_web(
             patch_intent = state.control_result.get("patch_intent") or {}
             if patch_intent.get("source_snippet"):
                 print("✅ CONTROL source_snippet recovered from Scout fallback")
+
+        pre_generation_decision = decide_harness_mode(
+            repo_root=state.repo_path or repo_path or ".",
+            runtime_environment=state.runtime_environment,
+            request_path=_request_path_hint(query),
+            target_path=_control_target_path(state.control_result),
+            source_text=_control_source_text(state.control_result),
+            index_degraded=_context_is_degraded(state.control_result),
+            patch_gates_passed=True,
+        )
+        state.harness_mode = pre_generation_decision.mode
+        state.harness_mode_decision = pre_generation_decision.to_dict()
+        if not pre_generation_decision.can_generate_patch:
+            answer = _harness_block_answer(pre_generation_decision)
+            try:
+                save_message(session_id, "user", query)
+                save_message(session_id, "assistant", answer)
+            except Exception as e:
+                print(f"âš ï¸ DB message save skipped: {e}")
+            return {
+                "answer": answer,
+                "context": json.dumps(state.control_result or {}, indent=2, ensure_ascii=False),
+                "graph": json.dumps(state.code_analysis, indent=2),
+                "state": _harness_debug(pre_generation_decision),
+                "patch": "",
+                "validation": "",
+                "project_tag": final_tag,
+                "patch_loop_attempts": state.patch_loop_attempts,
+                "patch_loop_stop_reason": state.patch_loop_stop_reason,
+                **runtime_state,
+                "runtime_environment_description": runtime_description,
+                **_harness_payload(pre_generation_decision),
+            }
 
         if state.control_result and state.control_result.get("scout"):
             scout_files = state.control_result["scout"].get("likely_files", [])
@@ -335,6 +486,19 @@ def run_agent_web(
         normalize_patch_plan_schema(state)
         reject_ungrounded_patch(state)
         reject_ungrounded_candidate_quotes(state)
+        grounding_failed = _grounding_failed(state.json_block)
+        post_gate_decision = decide_harness_mode(
+            repo_root=state.repo_path or repo_path or ".",
+            runtime_environment=state.runtime_environment,
+            request_path=_request_path_hint(query),
+            target_path=_control_target_path(state.control_result),
+            source_text=_control_source_text(state.control_result),
+            grounding_failed=grounding_failed,
+            index_degraded=_context_is_degraded(state.control_result),
+            patch_gates_passed=not grounding_failed,
+        )
+        state.harness_mode = post_gate_decision.mode
+        state.harness_mode_decision = post_gate_decision.to_dict()
         if state.json_block:
             state.final_answer = json.dumps(state.json_block, indent=2, ensure_ascii=False)
             state.human_answer = state.final_answer
@@ -345,7 +509,10 @@ def run_agent_web(
         else:
             print("No structured patch JSON.")
 
-        maybe_run_auto_patch(state, interactive=False)
+        if post_gate_decision.can_apply_patch:
+            maybe_run_auto_patch(state, interactive=False)
+        else:
+            print(f"Harness mode blocks apply: {post_gate_decision.mode}")
         state.session_id = session_id
         try:
             save_message(session_id, "user", query)
@@ -356,7 +523,7 @@ def run_agent_web(
             "answer": state.final_answer,
             "context": state.context_data,
             "graph": json.dumps(state.code_analysis, indent=2),
-            "state": state.memory_block,
+            "state": _harness_debug(post_gate_decision) + "\n\n" + (state.memory_block or ""),
             "patch": json.dumps(state.json_block, indent=2) if state.json_block else "",
             "validation": state.validation_output or "",
             "project_tag": final_tag,
@@ -364,6 +531,7 @@ def run_agent_web(
             "patch_loop_stop_reason": state.patch_loop_stop_reason,
             **runtime_state,
             "runtime_environment_description": runtime_description,
+            **_harness_payload(post_gate_decision),
         }
 
     except Exception as e:
@@ -379,4 +547,5 @@ def run_agent_web(
             "patch_loop_stop_reason": None,
             **runtime_state,
             "runtime_environment_description": runtime_description,
+            **_harness_payload(base_harness_decision),
         }

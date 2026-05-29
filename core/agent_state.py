@@ -49,6 +49,8 @@ class AgentState:
     runtime_environment: str = "auto"
     runtime_environment_custom_name: str = ""
     runtime_environment_notes: str = ""
+    harness_mode: str = "normal_patch"
+    harness_mode_decision: dict[str, Any] = field(default_factory=dict)
 
 
 def time_budget_exceeded(state: AgentState) -> bool:

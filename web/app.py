@@ -106,6 +106,8 @@ def save_session(
         "runtime_environment": runtime_environment,
         "runtime_environment_custom_name": runtime_environment_custom_name,
         "runtime_environment_notes": runtime_environment_notes,
+        "harness_mode": result.get("harness_mode", ""),
+        "harness_warnings": result.get("harness_warnings", []),
     }
 
     sessions.insert(0, session)

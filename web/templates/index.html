@@ -184,6 +184,10 @@
             <span class="status-chip__item">DNA: <strong>{{ 'off' if current and current.ignore_repo_dna else 'on' }}</strong></span>
             <span class="status-chip__sep">&middot;</span>
             <span class="status-chip__item">Env: <strong>{{ current.runtime_environment if current and current.runtime_environment else 'auto' }}</strong></span>
+            {% if current and current.harness_mode %}
+            <span class="status-chip__sep">&middot;</span>
+            <span class="status-chip__item">Harness: <strong>{{ current.harness_mode }}</strong></span>
+            {% endif %}
         </div>
 
         {% if error %}
