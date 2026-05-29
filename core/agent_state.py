@@ -46,6 +46,9 @@ class AgentState:
     patch_policy: dict[str, Any] = field(default_factory=dict)
     patch_loop_attempts: int = 0
     patch_loop_stop_reason: Optional[str] = None
+    runtime_environment: str = "auto"
+    runtime_environment_custom_name: str = ""
+    runtime_environment_notes: str = ""
 
 
 def time_budget_exceeded(state: AgentState) -> bool:

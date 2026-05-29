@@ -26,6 +26,10 @@ from core.repo_librarian import (
     inspect_repo_inventory,
     load_phantom_limb_report,
 )
+from core.runtime_environment import (
+    build_runtime_environment_state,
+    describe_runtime_environment,
+)
 from core.router import classify_task, detect_input_mode, detect_language
 from core.validation_command import extract_user_validation_command
 from database.memory import (
@@ -92,6 +96,9 @@ def run_agent_web(
     project_tag: str = None,
     patch_style: str = None,
     ignore_repo_dna: bool = False,
+    runtime_environment: str = "auto",
+    runtime_environment_custom_name: str = "",
+    runtime_environment_notes: str = "",
 ) -> dict:
     """Web-mode entry point: runs the full agent pipeline against a folder.
 
@@ -101,6 +108,16 @@ def run_agent_web(
     is_project_input = bool(repo_path) and os.path.isdir(repo_path)
     interface = "agent"
     mode = agent_mode if agent_mode in {"reviewer", "planner"} else "reviewer"
+    runtime_state = build_runtime_environment_state(
+        runtime_environment,
+        custom_name=runtime_environment_custom_name,
+        notes=runtime_environment_notes,
+    )
+    runtime_description = describe_runtime_environment(
+        runtime_state["runtime_environment"],
+        runtime_state["runtime_environment_custom_name"],
+        runtime_state["runtime_environment_notes"],
+    )
 
     inventory = inspect_repo_inventory(repo_path) if is_project_input else None
 
@@ -116,6 +133,8 @@ def run_agent_web(
             "patch": "",
             "validation": "",
             "project_tag": project_tag or "",
+            **runtime_state,
+            "runtime_environment_description": runtime_description,
         }
 
     input_mode = detect_input_mode(query)
@@ -131,8 +150,11 @@ def run_agent_web(
     task_info["repo_path"] = repo_path
     task_info["patch_style"] = patch_style
     task_info["ignore_repo_dna"] = bool(ignore_repo_dna)
+    task_info.update(runtime_state)
+    task_info["runtime_environment_description"] = runtime_description
 
     final_tag = build_project_tag(repo_path, project_tag)
+    print(f"Runtime environment: {runtime_description}")
 
     control_result = None
     if is_project_input:
@@ -181,6 +203,8 @@ def run_agent_web(
                 control_result["code_dna"] = dna
                 control_result["code_dna_mode"] = dna_mode
                 control_result["code_dna_prompt"] = dna_to_prompt_block(dna, mode=dna_mode)
+                control_result["runtime_environment"] = dict(runtime_state)
+                control_result["runtime_environment_description"] = runtime_description
 
         except Exception as e:
             return {
@@ -191,6 +215,8 @@ def run_agent_web(
                 "patch": "",
                 "validation": "",
                 "project_tag": final_tag,
+                **runtime_state,
+                "runtime_environment_description": runtime_description,
             }
 
     state = AgentState(
@@ -208,6 +234,9 @@ def run_agent_web(
         control_result=control_result,
         project_tag=final_tag,
         ignore_repo_dna=bool(ignore_repo_dna),
+        runtime_environment=runtime_state["runtime_environment"],
+        runtime_environment_custom_name=runtime_state["runtime_environment_custom_name"],
+        runtime_environment_notes=runtime_state["runtime_environment_notes"],
     )
 
     try:
@@ -333,6 +362,8 @@ def run_agent_web(
             "project_tag": final_tag,
             "patch_loop_attempts": state.patch_loop_attempts,
             "patch_loop_stop_reason": state.patch_loop_stop_reason,
+            **runtime_state,
+            "runtime_environment_description": runtime_description,
         }
 
     except Exception as e:
@@ -346,4 +377,6 @@ def run_agent_web(
             "project_tag": final_tag,
             "patch_loop_attempts": 0,
             "patch_loop_stop_reason": None,
+            **runtime_state,
+            "runtime_environment_description": runtime_description,
         }

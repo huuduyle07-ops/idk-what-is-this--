@@ -14,6 +14,8 @@
 
 > **2026-05-27 refresh:** Phase 4.7a-e Dream taxonomy, structured trial reports, enriched trial content, and external research reference import are shipped. Dream can now import pasted outside research into `.agent/dream_references/<reference_id>/reference.{json,md}` and pass the generated `reference.md` into report-only structured trials. Guardrails: no autonomous browsing, no search, no model/API calls, no subprocesses, no benchmarks, no patch creation, and no decision-policy relaxation beyond consuming imported local markdown references.
 
+> **2026-05-30 refresh:** Phase 12.9a Generated Artifact Ledger and Phase 12.10a Runtime Environment Selector are shipped. Benchmark reports now keep `changed_files` as the full observed set while separately reporting `patched_files`, allowed `generated_artifacts`, and `unexpected_mutations`; `allowed_generated_files` is exact-path only and never overrides `forbidden_changed_files`. The web app now records where C.A.T.T.U.S itself is running via `runtime_environment`, `runtime_environment_custom_name`, and `runtime_environment_notes`, with deterministic helper functions in `core/runtime_environment.py`, a Patch-tab dropdown/help text, session/result metadata, and runner debug metadata. Guardrails: no patch-logic changes, no path-guard relaxation, no broad generated-file patterns, no shell-based runtime detection, and no agent feature expansion yet. Roadmap maintenance note: this file is long; future agents should add compact dated memory notes near the top and move deep historical detail into an archive only when explicitly requested or when editing that section anyway.
+
 ## Current checkpoint
 
 The project is a coding-agent workspace, not a Gemini patch script. Phase 4.7a-e Dream report-only trial/reference import, Phase 5 web revamp plus Phase 5.6 Goal Brief Builder, Phase 5.7 Prompt-Version & Cost Quantifier, Phase 7.1-7.2.1.1 Mayor/workflow bridge, and Phase 8.1/8.2a/8.2b/8.2c/8.3 MCP foundations are shipped.
@@ -76,8 +78,8 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 4.7a-e
   - slowest-case and average-duration summaries
   - temp repo cleanup with retry on Windows
 - Benchmark suite:
-  - 31 cases exist across C++, Go, HTML, JavaScript, Python, Rust, and TypeScript.
-  - `--check`: 31 cases, 0 errors.
+  - 32 cases exist across C++, Go, HTML, JavaScript, Python, Rust, and TypeScript.
+  - `--check`: 32 cases, 0 errors.
   - Latest full fast run after Phase 12.5k:
     - 31/31 passed, 100% success rate.
     - Hard TypeScript nested-dispatch case passed.

@@ -22,6 +22,10 @@ from agents.deepseek_client import run_deepseek_review
 from config import get_agent_dir, FOLDER_BLACKLIST
 from core.project_tag import build_project_tag, fingerprint_repo  # re-exported for legacy callers
 from core.repo_librarian import inspect_repo_inventory
+from core.runtime_environment import (
+    build_runtime_environment_state,
+    describe_runtime_environment,
+)
 from core.run_lifecycle import run_patch_plan_with_artifacts
 from core.sleeping_consultant import (
     run_overnight,
@@ -81,6 +85,9 @@ def save_session(
     patch_style: str = "safe_minimal",
     ignore_repo_dna: bool = False,
     web_mode: str = "instant",
+    runtime_environment: str = "auto",
+    runtime_environment_custom_name: str = "",
+    runtime_environment_notes: str = "",
 ) -> dict:
     sessions = load_sessions()
 
@@ -96,6 +103,9 @@ def save_session(
         "patch_style": patch_style,
         "ignore_repo_dna": bool(ignore_repo_dna),
         "web_mode": _normalize_web_mode(web_mode),
+        "runtime_environment": runtime_environment,
+        "runtime_environment_custom_name": runtime_environment_custom_name,
+        "runtime_environment_notes": runtime_environment_notes,
     }
 
     sessions.insert(0, session)
@@ -129,6 +139,16 @@ def _attach_model_usage(result: dict, model_calls: list[dict] | None) -> dict:
     if model_calls is not None:
         result["usage"] = format_usage_report(model_calls)
         result["model_calls"] = list(model_calls)
+    return result
+
+
+def _attach_runtime_environment(result: dict, runtime_state: dict[str, str]) -> dict:
+    result.update(runtime_state)
+    result["runtime_environment_description"] = describe_runtime_environment(
+        runtime_state["runtime_environment"],
+        runtime_state["runtime_environment_custom_name"],
+        runtime_state["runtime_environment_notes"],
+    )
     return result
 
 def should_show_node_clean(node_id: str, show_tests: bool = False) -> bool:
@@ -168,6 +188,9 @@ def _run_mode(
     project_tag: str,
     patch_style: str = "safe_minimal",
     ignore_repo_dna: bool = False,
+    runtime_environment: str = "auto",
+    runtime_environment_custom_name: str = "",
+    runtime_environment_notes: str = "",
 ):
     """Dispatch to the right pipeline. Returns (result_dict, final_tag)."""
     if mode == "deep":
@@ -204,6 +227,9 @@ def _run_mode(
             project_tag=project_tag,
             patch_style=patch_style,
             ignore_repo_dna=ignore_repo_dna,
+            runtime_environment=runtime_environment,
+            runtime_environment_custom_name=runtime_environment_custom_name,
+            runtime_environment_notes=runtime_environment_notes,
         )
         return result, (result.get("project_tag") or project_tag)
 
@@ -252,10 +278,16 @@ def index():
         
         patch_style = normalize_patch_style(request.form.get("patch_style"))
         ignore_repo_dna = request.form.get("ignore_repo_dna") in {"1", "on", "true", "yes"}
+        runtime_state = build_runtime_environment_state(
+            request.form.get("runtime_environment"),
+            custom_name=request.form.get("runtime_environment_custom_name"),
+            notes=request.form.get("runtime_environment_notes"),
+        )
 
         if not query or not repo_path:
             error = "Both 'query' and 'repo_path' are required."
             result = _empty_result(error)
+            _attach_runtime_environment(result, runtime_state)
         else:
             # Compute the canonical tag once per real submission.
             project_tag = build_project_tag(repo_path, user_tag)
@@ -273,6 +305,9 @@ def index():
                         project_tag=project_tag,
                         patch_style=patch_style,
                         ignore_repo_dna=ignore_repo_dna,
+                        runtime_environment=runtime_state["runtime_environment"],
+                        runtime_environment_custom_name=runtime_state["runtime_environment_custom_name"],
+                        runtime_environment_notes=runtime_state["runtime_environment_notes"],
                     )
             except Exception as e:
                 import traceback
@@ -282,6 +317,7 @@ def index():
                 result = _empty_result(error)
                 result["validation"] = tb  # show traceback in the validation tab
             finally:
+                _attach_runtime_environment(result, runtime_state)
                 _attach_model_usage(result, model_calls)
 
             current = save_session(
@@ -293,6 +329,9 @@ def index():
                 patch_style,
                 ignore_repo_dna,
                 active_web_mode,
+                runtime_state["runtime_environment"],
+                runtime_state["runtime_environment_custom_name"],
+                runtime_state["runtime_environment_notes"],
             )
             sessions = load_sessions()
 

@@ -10,6 +10,7 @@
     <script src="{{ url_for('static', filename='keybindings.js') }}" defer></script>
 </head>
 {% set page_web_mode = active_web_mode|default('instant') %}
+{% set selected_runtime_environment = current.runtime_environment|default('auto') if current else 'auto' %}
 <body data-product-mode="{{ page_web_mode }}">
 
 <div class="layout">
@@ -133,6 +134,36 @@
               <span>Ignore repo DNA (use idiomatic style)</span>
             </label>
 
+            <label for="runtimeEnvironmentSelect">Running environment</label>
+            <select id="runtimeEnvironmentSelect" name="runtime_environment">
+                <option value="auto" {% if selected_runtime_environment == "auto" %}selected{% endif %}>Auto-detect</option>
+                <option value="local_windows" {% if selected_runtime_environment == "local_windows" %}selected{% endif %}>Local Windows</option>
+                <option value="local_linux" {% if selected_runtime_environment == "local_linux" %}selected{% endif %}>Local Ubuntu/Linux</option>
+                <option value="local_macos" {% if selected_runtime_environment == "local_macos" %}selected{% endif %}>Local macOS</option>
+                <option value="docker" {% if selected_runtime_environment == "docker" %}selected{% endif %}>Docker container</option>
+                <option value="codespaces" {% if selected_runtime_environment == "codespaces" %}selected{% endif %}>GitHub Codespaces</option>
+                <option value="custom" {% if selected_runtime_environment == "custom" %}selected{% endif %}>Custom / other</option>
+            </select>
+            <div class="field-help">Choose where C.A.T.T.U.S is running, not where your browser is open.</div>
+            <div id="runtimeEnvironmentCustomFields"
+                 class="runtime-environment-custom"
+                 {% if selected_runtime_environment != "custom" %}hidden{% endif %}>
+                <input
+                    id="runtimeEnvironmentCustomName"
+                    type="text"
+                    name="runtime_environment_custom_name"
+                    maxlength="80"
+                    placeholder="Custom environment name"
+                    value="{{ current.runtime_environment_custom_name if current else '' }}"
+                >
+                <textarea
+                    id="runtimeEnvironmentNotes"
+                    name="runtime_environment_notes"
+                    maxlength="1000"
+                    placeholder="Environment notes"
+                >{{ current.runtime_environment_notes if current else '' }}</textarea>
+            </div>
+
             <label for="applyPolicy">Apply policy:</label>
             <select id="applyPolicy" name="apply_policy">
                 <option value="ask">Ask before apply</option>
@@ -151,6 +182,8 @@
             <span class="status-chip__item">Style: <strong>{{ current.patch_style if current and current.patch_style else 'safe_minimal' }}</strong></span>
             <span class="status-chip__sep">·</span>
             <span class="status-chip__item">DNA: <strong>{{ 'off' if current and current.ignore_repo_dna else 'on' }}</strong></span>
+            <span class="status-chip__sep">&middot;</span>
+            <span class="status-chip__item">Env: <strong>{{ current.runtime_environment if current and current.runtime_environment else 'auto' }}</strong></span>
         </div>
 
         {% if error %}
@@ -947,6 +980,20 @@ function setProductMode(mode, options = {}) {
         if (applyPolicy) applyPolicy.value = "plan";
     }
 }
+
+function updateRuntimeEnvironmentCustomFields() {
+    const select = document.getElementById("runtimeEnvironmentSelect");
+    const customFields = document.getElementById("runtimeEnvironmentCustomFields");
+    if (!select || !customFields) return;
+    customFields.hidden = select.value !== "custom";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const select = document.getElementById("runtimeEnvironmentSelect");
+    if (!select) return;
+    select.addEventListener("change", updateRuntimeEnvironmentCustomFields);
+    updateRuntimeEnvironmentCustomFields();
+});
 
 document.addEventListener("submit", event => {
     if (event.target?.id !== "agentForm") return;
