@@ -654,6 +654,7 @@ def run_case(case_file: Path) -> dict[str, Any]:
     from web.runner import run_agent_web
     from core.validator import run_validation_command
     from agents.model_stats import ModelStatsScope, summarize as summarize_model_stats
+    from benchmarks.artifact_ledger import classify_changed_files
     case = load_case(case_file)
     case_dir = case_file.parent
 
@@ -717,6 +718,11 @@ def run_case(case_file: Path) -> dict[str, Any]:
         missing_expected = sorted(expected_changed - set(changed))
         touched_forbidden = sorted(forbidden_changed & set(changed))
 
+        # Phase 12.9a - Generated Artifact Ledger: separate intentionally
+        # patched files from allowed runtime/validation artifacts and
+        # unexpected mutations. Additive only; does not affect scoring below.
+        artifact_ledger = classify_changed_files(case, changed)
+
         success = bool(ok)
         if missing_expected:
             success = False
@@ -742,6 +748,9 @@ def run_case(case_file: Path) -> dict[str, Any]:
                 "difficulty": case.get("difficulty"),
                 "category": case.get("category", "uncategorized"),
                 "changed_files": changed,
+                "patched_files": artifact_ledger["patched_files"],
+                "generated_artifacts": artifact_ledger["generated_artifacts"],
+                "unexpected_mutations": artifact_ledger["unexpected_mutations"],
                 "missing_expected_files": missing_expected,
                 "touched_forbidden_files": touched_forbidden,
                 "validation_output": validation_output[-4000:],
@@ -828,6 +837,8 @@ def check_case(case_file: Path) -> dict[str, Any]:
         errors.append("expected_changed_files must be a list")
     if not isinstance(case.get("forbidden_changed_files", []), list):
         errors.append("forbidden_changed_files must be a list")
+    if not isinstance(case.get("allowed_generated_files", []), list):
+        errors.append("allowed_generated_files must be a list")
 
     if buggy_repo.exists():
         for rel in case.get("expected_changed_files", []) or []:
@@ -1174,6 +1185,24 @@ def _md_cell(s: Any) -> str:
     return str(s).replace("|", "\\|")
 
 
+def _file_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(item) for item in value]
+
+
+def _plain_file_list(value: Any) -> str:
+    files = _file_list(value)
+    return ", ".join(files) if files else "none"
+
+
+def _md_file_list(value: Any) -> str:
+    files = _file_list(value)
+    if not files:
+        return "none"
+    return ", ".join(f"`{_md_cell(file)}`" for file in files)
+
+
 def _format_patch_minimality_case(entry: dict[str, Any] | None) -> str:
     if not entry:
         return "unknown"
@@ -1281,6 +1310,43 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
         lines.append("|---|---|")
         for name, dur in durations[:5]:
             lines.append(f"| `{_md_cell(name)}` | {dur:.2f}s |")
+        lines.append("")
+
+    file_change_results = [
+        r for r in results
+        if any(
+            key in r
+            for key in (
+                "changed_files",
+                "patched_files",
+                "generated_artifacts",
+                "unexpected_mutations",
+            )
+        )
+    ]
+    if file_change_results:
+        lines.append("## File Changes")
+        lines.append("")
+        lines.append(
+            "| Name | Status | Changed | Patched | Generated Artifacts | "
+            "Unexpected Mutations |"
+        )
+        lines.append("|---|---|---|---|---|---|")
+        for r in file_change_results:
+            name = r.get("name") or "(unknown)"
+            status = (
+                "SKIP"
+                if r.get("skipped")
+                else ("PASS" if r.get("success") else "FAIL")
+            )
+            lines.append(
+                f"| `{_md_cell(name)}` | "
+                f"{status} | "
+                f"{_md_file_list(r.get('changed_files'))} | "
+                f"{_md_file_list(r.get('patched_files'))} | "
+                f"{_md_file_list(r.get('generated_artifacts'))} | "
+                f"{_md_file_list(r.get('unexpected_mutations'))} |"
+            )
         lines.append("")
 
     minimality_aggregates = patch_minimality_aggregates(results)
@@ -1684,6 +1750,9 @@ def main(argv: list[str] | None = None) -> int:
                         "category": case.get("category", "uncategorized"),
                         "duration_sec": 0.0,
                         "changed_files": [],
+                        "patched_files": [],
+                        "generated_artifacts": [],
+                        "unexpected_mutations": [],
                         "missing_expected_files": [],
                         "touched_forbidden_files": [],
                         "validation_output": "",
@@ -1709,6 +1778,10 @@ def main(argv: list[str] | None = None) -> int:
                     "name": case_file.parent.name,
                     "success": False,
                     "error": repr(e),
+                    "changed_files": [],
+                    "patched_files": [],
+                    "generated_artifacts": [],
+                    "unexpected_mutations": [],
                 },
                 compute_patch_minimality(
                     None,
@@ -1780,6 +1853,23 @@ def main(argv: list[str] | None = None) -> int:
             if not summary:
                 if res.get("changed_files"):
                     print("Changed:", ", ".join(res["changed_files"]))
+                if any(
+                    key in res
+                    for key in (
+                        "patched_files",
+                        "generated_artifacts",
+                        "unexpected_mutations",
+                    )
+                ):
+                    print("Patched:", _plain_file_list(res.get("patched_files")))
+                    print(
+                        "Generated artifacts:",
+                        _plain_file_list(res.get("generated_artifacts")),
+                    )
+                    print(
+                        "Unexpected mutations:",
+                        _plain_file_list(res.get("unexpected_mutations")),
+                    )
                 if res.get("missing_expected_files"):
                     print("Missing expected:", res["missing_expected_files"])
                 if res.get("touched_forbidden_files"):
