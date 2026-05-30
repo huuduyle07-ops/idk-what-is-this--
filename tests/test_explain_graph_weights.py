@@ -1,6 +1,7 @@
 """Phase 12.5b — tests for graph weight explainability helper and CLI."""
 from __future__ import annotations
 
+import ast
 import json
 import sys
 from pathlib import Path
@@ -500,3 +501,185 @@ def test_cli_table_output_respects_path_prefix(tmp_path, capsys, monkeypatch):
     assert "core/engine.py" in captured.out
     assert "graph/weights.py" not in captured.out
     assert "tests/test_engine.py" not in captured.out
+
+
+# --- Phase 12.13e attraction/repulsion report tests ---
+
+
+def test_cli_default_output_omits_attraction_section(tmp_path, capsys, monkeypatch):
+    graph = _build_simple_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        ["--repo-path", str(tmp_path), "--include-zero-penalty", "--top", "10"]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "core/b.py::helper" in captured.out
+    assert "Attraction / Repulsion Notes" not in captured.out
+    assert "attraction" not in captured.out.lower()
+
+
+def test_cli_include_attraction_adds_report_section(tmp_path, capsys, monkeypatch):
+    graph = _build_simple_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--include-zero-penalty",
+            "--include-attraction",
+            "--top",
+            "10",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "## Attraction / Repulsion Notes" in captured.out
+    for header in (
+        "node_id",
+        "total_weight",
+        "attraction",
+        "repulsion",
+        "net_score",
+        "generic hub?",
+        "reasons",
+    ):
+        assert header in captured.out
+
+
+def test_cli_include_attraction_marks_generic_utility_hub(
+    tmp_path, capsys, monkeypatch
+):
+    graph = _build_simple_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--include-zero-penalty",
+            "--include-attraction",
+            "--top",
+            "10",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    helper_rows = [
+        line for line in captured.out.splitlines() if line.startswith("| core/b.py::helper |")
+    ]
+    assert helper_rows
+    assert "| yes |" in helper_rows[-1]
+    assert "generic" in helper_rows[-1].lower() or "hub" in helper_rows[-1].lower()
+
+
+def test_cli_include_attraction_uses_query_and_target(
+    tmp_path, capsys, monkeypatch
+):
+    graph = _build_simple_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--include-zero-penalty",
+            "--include-attraction",
+            "--query",
+            "main",
+            "--target-node",
+            "core/a.py::main",
+            "--top",
+            "10",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    main_rows = [
+        line for line in captured.out.splitlines() if line.startswith("| core/a.py::main |")
+    ]
+    assert main_rows
+    assert "query text matches node id" in main_rows[-1]
+    assert "exact target match" in main_rows[-1]
+    assert "+" in main_rows[-1]
+
+
+def test_cli_include_attraction_guardrail_present(tmp_path, capsys, monkeypatch):
+    graph = _build_simple_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        [
+            "--repo-path",
+            str(tmp_path),
+            "--include-zero-penalty",
+            "--include-attraction",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert cli.ATTRACTION_REPORT_GUARDRAIL in captured.out
+    for token in (
+        "graph weights",
+        "CONTROL ranking",
+        "patch generation",
+        "validation",
+        "benchmark scoring",
+    ):
+        assert token in captured.out
+
+
+def test_cli_json_default_shape_remains_compatible(tmp_path, capsys, monkeypatch):
+    graph = _build_simple_graph()
+    monkeypatch.setattr(cli, "build_graph_from_repo", lambda _path: graph)
+
+    exit_code = cli.main(
+        ["--repo-path", str(tmp_path), "--json", "--include-zero-penalty"]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    assert payload
+    forbidden_new_keys = {
+        "attraction",
+        "repulsion",
+        "net_score",
+        "generic_hub",
+        "is_generic_hub",
+    }
+    assert forbidden_new_keys.isdisjoint(payload[0])
+
+
+def test_explain_graph_weights_has_no_forbidden_imports_or_calls():
+    source = Path(cli.__file__).read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    imported_modules: list[str] = []
+    call_names: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported_modules.extend(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported_modules.append(node.module)
+        elif isinstance(node, ast.Call):
+            func = node.func
+            if isinstance(func, ast.Name):
+                call_names.append(func.id)
+            elif isinstance(func, ast.Attribute):
+                call_names.append(func.attr)
+
+    forbidden_import_areas = ("patching", "model", "api", "run_benchmarks")
+    for imported in imported_modules:
+        parts = imported.split(".")
+        for forbidden in forbidden_import_areas:
+            assert not any(part == forbidden for part in parts), imported
+
+    forbidden_calls = {"call_model", "call_api", "run_benchmarks"}
+    assert forbidden_calls.isdisjoint(call_names)

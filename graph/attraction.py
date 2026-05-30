@@ -255,30 +255,59 @@ def explain_attraction_batch(
     return items
 
 
-def format_attraction_markdown(items: list[GraphAttraction]) -> str:
+def format_attraction_markdown(
+    items: list[GraphAttraction],
+    *,
+    heading: str = "# Graph Attraction / Repulsion (explain-only)",
+    guardrail: str = GRAPH_ATTRACTION_GUARDRAIL,
+    total_weights: dict[str, float] | None = None,
+) -> str:
     """Render attraction/repulsion explanations as a read-only Markdown table."""
     lines: list[str] = []
-    lines.append("# Graph Attraction / Repulsion (explain-only)")
+    lines.append(heading)
     lines.append("")
-    lines.append("| node_id | attraction | repulsion | net_score | generic hub? | reasons |")
-    lines.append("| --- | --- | --- | --- | --- | --- |")
+    if total_weights is None:
+        lines.append("| node_id | attraction | repulsion | net_score | generic hub? | reasons |")
+        lines.append("| --- | --- | --- | --- | --- | --- |")
+    else:
+        lines.append(
+            "| node_id | total_weight | attraction | repulsion | net_score | "
+            "generic hub? | reasons |"
+        )
+        lines.append("| --- | --- | --- | --- | --- | --- | --- |")
     if not items:
-        lines.append("| _(no nodes)_ | - | - | - | - | - |")
+        if total_weights is None:
+            lines.append("| _(no nodes)_ | - | - | - | - | - |")
+        else:
+            lines.append("| _(no nodes)_ | - | - | - | - | - | - |")
     else:
         for item in items:
             reasons = "; ".join(item.reasons) if item.reasons else "-"
             reasons = reasons.replace("|", "\\|").replace("\n", " ")
-            lines.append(
-                "| {nid} | {a:.2f} | {r:.2f} | {n:+.2f} | {hub} | {rs} |".format(
-                    nid=str(item.node_id).replace("|", "\\|"),
-                    a=item.attraction,
-                    r=item.repulsion,
-                    n=item.net_score,
-                    hub="yes" if item.is_generic_hub else "no",
-                    rs=reasons,
+            if total_weights is None:
+                lines.append(
+                    "| {nid} | {a:.2f} | {r:.2f} | {n:+.2f} | {hub} | {rs} |".format(
+                        nid=str(item.node_id).replace("|", "\\|"),
+                        a=item.attraction,
+                        r=item.repulsion,
+                        n=item.net_score,
+                        hub="yes" if item.is_generic_hub else "no",
+                        rs=reasons,
+                    )
                 )
-            )
+            else:
+                lines.append(
+                    "| {nid} | {tw:.2f} | {a:.2f} | {r:.2f} | {n:+.2f} | {hub} | {rs} |".format(
+                        nid=str(item.node_id).replace("|", "\\|"),
+                        tw=float(total_weights.get(item.node_id, 0.0)),
+                        a=item.attraction,
+                        r=item.repulsion,
+                        n=item.net_score,
+                        hub="yes" if item.is_generic_hub else "no",
+                        rs=reasons,
+                    )
+                )
     lines.append("")
-    lines.append(f"> {GRAPH_ATTRACTION_GUARDRAIL}")
+    lines.append(f"> {guardrail}")
     lines.append("")
     return "\n".join(lines)

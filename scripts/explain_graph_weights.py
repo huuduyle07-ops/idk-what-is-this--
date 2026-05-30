@@ -14,8 +14,14 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from graph.builder import build_graph_from_repo
+from graph.attraction import explain_attraction_batch, format_attraction_markdown
 from graph.weights import explain_node_weights
 
+
+ATTRACTION_REPORT_GUARDRAIL = (
+    "Attraction/repulsion is explain-only. It does not change graph weights, "
+    "CONTROL ranking, patch generation, validation, or benchmark scoring."
+)
 
 TABLE_COLUMNS = [
     ("rank", "Rank"),
@@ -90,6 +96,24 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Hide nodes whose symbol name after '::' is empty or whitespace.",
     )
+    parser.add_argument(
+        "--include-attraction",
+        action="store_true",
+        help=(
+            "Append an explain-only Attraction / Repulsion Notes section to "
+            "text output. JSON output keeps the default row shape."
+        ),
+    )
+    parser.add_argument(
+        "--query",
+        default="",
+        help="Optional query text used only for explain-only attraction notes.",
+    )
+    parser.add_argument(
+        "--target-node",
+        default="",
+        help="Optional target node id used only for explain-only attraction notes.",
+    )
     return parser
 
 
@@ -140,6 +164,41 @@ def _format_table(rows: list[dict[str, Any]]) -> str:
             "  ".join(display[key].ljust(widths[key]) for key, _label in TABLE_COLUMNS)
         )
     return "\n".join(lines)
+
+
+def _format_attraction_notes(
+    rows: list[dict[str, Any]],
+    *,
+    query: str = "",
+    target_node: str = "",
+) -> str:
+    attraction_nodes: list[dict[str, Any]] = []
+    total_weights: dict[str, float] = {}
+    for row in rows:
+        node_id = str(row.get("node_id") or "")
+        total_weight = float(row.get("total_weight") or 0.0)
+        total_weights[node_id] = total_weight
+        attraction_nodes.append(
+            {
+                "node_id": node_id,
+                "in_degree": row.get("in_degree"),
+                "out_degree": row.get("out_degree"),
+                "graph_weight": total_weight,
+                "failure_penalty": row.get("failure_penalty"),
+            }
+        )
+
+    items = explain_attraction_batch(
+        attraction_nodes,
+        query=query,
+        target_node=target_node,
+    )
+    return format_attraction_markdown(
+        items,
+        heading="## Attraction / Repulsion Notes",
+        guardrail=ATTRACTION_REPORT_GUARDRAIL,
+        total_weights=total_weights,
+    )
 
 
 def _node_path(node_id: str) -> str:
@@ -263,7 +322,19 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(ranked, indent=2, ensure_ascii=False))
     else:
-        print(_format_table(ranked))
+        output = _format_table(ranked)
+        if args.include_attraction:
+            output = "\n\n".join(
+                [
+                    output,
+                    _format_attraction_notes(
+                        ranked,
+                        query=args.query,
+                        target_node=args.target_node,
+                    ).rstrip(),
+                ]
+            )
+        print(output)
     return 0
 
 
