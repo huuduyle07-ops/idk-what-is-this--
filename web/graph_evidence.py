@@ -1,7 +1,13 @@
 from __future__ import annotations
 
+import re
 from datetime import datetime, timezone
 
+from core.evidence_confidence import (
+    classify_evidence_confidence,
+    combine_evidence_confidences,
+    format_evidence_confidence_block,
+)
 from graph.evidence_spread import assess_change_scope, compute_scope_aware_spread
 from graph.schema import ProgramGraph
 from graph.weights import compute_node_weights
@@ -10,6 +16,57 @@ EVIDENCE_SPREAD_GUARDRAIL = (
     "Evidence spread is explain-only. It does not override grounding, "
     "harness modes, patch safety, or validation."
 )
+
+EVIDENCE_CONFIDENCE_GUARDRAIL = (
+    "Evidence confidence is explain-only. It does not change patch generation, "
+    "CONTROL ranking, validation, or benchmark scoring."
+)
+
+# Matches an explicit graph distance inside a spread reason, e.g.
+# "distance-1 neighbor of ...", "distance 2", or "distance=0".
+_DISTANCE_REASON_RE = re.compile(r"distance[\s=\-]?(\d+)", re.IGNORECASE)
+
+
+def _node_graph_distance(node: dict, target_node: str = "") -> int | None:
+    """Resolve a node's supported graph distance (0/1/2) for confidence.
+
+    Read-only. A node that directly matches the target/query is distance 0;
+    otherwise the serialized ``distance`` field is used, falling back to an
+    explicit "distance-N" mention in the spread reasons. Anything outside the
+    supported 0/1/2 window (including missing evidence) returns ``None``.
+    """
+    node = node or {}
+    node_id = (node.get("node_id") or "").strip()
+    target = (target_node or "").strip()
+    if target and node_id == target:
+        return 0
+
+    distance = node.get("distance")
+    if isinstance(distance, bool):  # bool is an int subclass; reject it
+        distance = None
+    if isinstance(distance, int) and distance in (0, 1, 2):
+        return distance
+
+    for reason in node.get("reasons") or []:
+        match = _DISTANCE_REASON_RE.search(str(reason))
+        if match:
+            parsed = int(match.group(1))
+            if parsed in (0, 1, 2):
+                return parsed
+    return None
+
+
+def classify_spread_node_confidence(node: dict, target_node: str = ""):
+    """Classify explain-only evidence confidence for one spread node.
+
+    Maps the node's graph proximity to a confidence band via
+    :func:`core.evidence_confidence.classify_evidence_confidence`. Nodes with no
+    usable distance evidence are classified as missing (lowest confidence).
+    """
+    distance = _node_graph_distance(node, target_node)
+    if distance is None:
+        return classify_evidence_confidence("missing", is_missing=True)
+    return classify_evidence_confidence("graph_proximity", graph_distance=distance)
 
 
 def build_scope_evidence_spread_debug(
@@ -222,7 +279,50 @@ def format_evidence_spread_markdown(result: dict, *, generated_at: str | None = 
     lines.append(EVIDENCE_SPREAD_GUARDRAIL)
     lines.append("")
 
+    # Evidence Confidence is rendered after the spread guardrail so the spread
+    # body above the guardrail stays free of patch/CONTROL/validation/benchmark
+    # language; the confidence note carries its own explain-only guardrail.
+    lines.extend(_evidence_confidence_lines(nodes, target))
+
     return "\n".join(lines)
+
+
+def _evidence_confidence_lines(nodes: list, target: str) -> list[str]:
+    """Render the explain-only Evidence Confidence section for spread nodes.
+
+    Read-only formatter. Confidence is derived from already-computed spread
+    distances; it never re-ranks nodes, calls models, or feeds patch/validation.
+    """
+    confidences = [classify_spread_node_confidence(node, target) for node in nodes]
+    combined = combine_evidence_confidences(confidences)
+
+    lines: list[str] = []
+    lines.append("## Evidence Confidence")
+    lines.append("")
+    lines.append(f"- **combined_confidence**: {combined.confidence:.2f}")
+    lines.append(f"- **strongest_evidence**: {_md_escape(combined.reason)}")
+    lines.append("")
+    lines.append("| node_id | confidence | source | reason |")
+    lines.append("| --- | --- | --- | --- |")
+    if not nodes:
+        lines.append("| _(no scored nodes)_ | - | - | - |")
+    else:
+        for node, conf in zip(nodes, confidences):
+            lines.append(
+                "| {nid} | {c:.2f} | {src} | {rs} |".format(
+                    nid=_md_escape(node.get("node_id")),
+                    c=conf.confidence,
+                    src=_md_escape(conf.source_type),
+                    rs=_md_escape(conf.reason),
+                )
+            )
+    lines.append("")
+    # Shared per-source confidence block (header + combined summary).
+    lines.append(format_evidence_confidence_block(confidences))
+    lines.append("")
+    lines.append(f"> {EVIDENCE_CONFIDENCE_GUARDRAIL}")
+    lines.append("")
+    return lines
 
 
 def _serialize_spread_score(score) -> dict:
