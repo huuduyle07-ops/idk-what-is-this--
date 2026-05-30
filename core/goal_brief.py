@@ -439,6 +439,55 @@ def _write_outputs(
     return json_path, md_path
 
 
+def build_goal_brief_summary(brief_data: dict[str, Any]) -> dict[str, Any]:
+    """Return a friendly read-only summary for UI display.
+
+    This is intentionally separate from ``GOAL_BRIEF_SCHEMA``. It is returned
+    to callers, but never written into ``goal_brief.json``.
+    """
+    brief = normalize_goal_brief(brief_data)
+    evidence = brief["evidence"]
+    constraints = brief["constraints"]
+    validation = brief["validation"]
+    missing = _compute_missing_information(brief)
+
+    observed = evidence["actual_result"] or evidence["error_output"]
+    validation_text = " / ".join(
+        part for part in (validation["command"], validation["success_criteria"]) if part
+    )
+    constraints_text = ", ".join(constraints["allowed_files"])
+    if constraints["forbidden_files"]:
+        constraints_text = _append_text(
+            constraints_text,
+            "Forbidden: " + ", ".join(constraints["forbidden_files"]),
+        )
+
+    rows = [
+        _summary_row("Goal", brief["goal"]),
+        _summary_row("Type", brief["problem_type"]),
+        _summary_row("Observed Behavior", observed),
+        _summary_row("Validation", validation_text),
+        _summary_row("Constraints", constraints_text),
+        _summary_row("Missing", ", ".join(missing) if missing else "None"),
+    ]
+
+    return {
+        "status": brief["status"],
+        "ready": brief["status"] == "ready",
+        "missing_count": len(missing),
+        "rows": rows,
+    }
+
+
+def _summary_row(label: str, value: str) -> dict[str, str]:
+    text = _as_text(value)
+    return {
+        "label": label,
+        "value": text or "Missing",
+        "state": "complete" if text and text != "Missing" else "missing",
+    }
+
+
 def _result(
     brief: dict[str, Any],
     brief_dir: Path,
@@ -455,6 +504,7 @@ def _result(
         "brief_dir": str(brief_dir),
         "brief_path": str(json_path),
         "markdown_path": str(md_path) if md_path else "",
+        "summary": build_goal_brief_summary(brief),
         "assistant_message": assistant_message,
         "dry_run": bool(dry_run),
     }
@@ -597,12 +647,20 @@ def _apply_text_answer(brief: dict[str, Any], answer: str) -> None:
     if not text:
         return
 
+    problem_type = _extract_label(text, "problem_type", "problem type", "type")
     command = _extract_label(text, "command", "command_run", "command run")
     expected = _extract_label(text, "expected", "expected_result", "expected result")
     actual = _extract_label(text, "actual", "actual_result", "actual result")
     error = _extract_label(text, "error", "error_output", "stderr")
     changed = _extract_label(text, "changed_files", "changed files", "files")
+    allowed = _extract_label(text, "allowed_files", "allowed files")
+    forbidden = _extract_label(text, "forbidden_files", "forbidden files")
+    do_not_weaken = _extract_label(text, "do_not_weaken", "do not weaken")
+    validation_command = _extract_label(text, "validation_command", "validation command")
+    success_criteria = _extract_label(text, "success_criteria", "success criteria")
 
+    if problem_type:
+        brief["problem_type"] = _normalize_problem_type(problem_type)
     evidence = brief["evidence"]
     if command:
         evidence["command_run"] = command
@@ -615,7 +673,37 @@ def _apply_text_answer(brief: dict[str, Any], answer: str) -> None:
     if changed:
         evidence["changed_files"] = _safe_path_list(re.split(r"[, ]+", changed))
 
-    if not any((command, expected, actual, error, changed)):
+    constraints = brief["constraints"]
+    if allowed:
+        constraints["allowed_files"] = _safe_path_list(re.split(r"[, ]+", allowed))
+    if forbidden:
+        constraints["forbidden_files"] = (
+            []
+            if forbidden.lower() in {"none", "no", "n/a"}
+            else _safe_path_list(re.split(r"[, ]+", forbidden))
+        )
+    if do_not_weaken:
+        constraints["do_not_weaken"] = _dedupe_text(do_not_weaken)
+
+    validation = brief["validation"]
+    if validation_command:
+        validation["command"] = validation_command
+    if success_criteria:
+        validation["success_criteria"] = success_criteria
+
+    if not any((
+        problem_type,
+        command,
+        expected,
+        actual,
+        error,
+        changed,
+        allowed,
+        forbidden,
+        do_not_weaken,
+        validation_command,
+        success_criteria,
+    )):
         if re.search(r"(?i)\b(error|failed|traceback|exception)\b", text):
             evidence["error_output"] = _append_text(evidence["error_output"], text)
         else:

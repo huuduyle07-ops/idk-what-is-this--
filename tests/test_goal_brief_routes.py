@@ -26,6 +26,8 @@ def test_goal_brief_start_route_creates_draft(client):
     body = resp.get_json()
     assert body["ok"] is True
     assert body["brief"]["goal"] == "Fix weird auth failure"
+    assert body["summary"]["rows"][0]["label"] == "Goal"
+    assert body["summary"]["rows"][0]["value"] == "Fix weird auth failure"
     assert Path(body["brief_path"]).is_file()
 
 
@@ -82,4 +84,8 @@ def test_goal_brief_panel_is_rendered(client):
     html = resp.get_data(as_text=True)
     assert "ws-tab-goal-brief" in html
     assert "Start brief" in html
+    assert "goalBriefSummary" in html
+    assert "Reply or paste command output" in html
+    assert "Bug fix" in html
+    assert "Raw details" in html
     assert "Copy final prompt" in html

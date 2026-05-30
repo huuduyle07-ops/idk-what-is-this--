@@ -49,6 +49,26 @@ def test_create_brief_from_vague_goal_writes_draft_json(tmp_path):
     written = Path(result["brief_path"])
     assert written.is_file()
     assert json.loads(written.read_text(encoding="utf-8")) == brief
+    assert "summary" not in brief, "saved goal_brief.json must keep the fixed schema"
+
+
+def test_create_brief_returns_friendly_summary_without_mutating_schema(tmp_path):
+    result = goal_brief.create_goal_brief(
+        goal="Make goal brief easier to use",
+        goal_briefs_root=tmp_path,
+        interviewer=_mock_interviewer(),
+    )
+
+    summary = result["summary"]
+    assert summary["status"] == "draft"
+    assert summary["ready"] is False
+    assert summary["missing_count"] >= 1
+    labels = [row["label"] for row in summary["rows"]]
+    assert labels[:4] == ["Goal", "Type", "Observed Behavior", "Validation"]
+    assert summary["rows"][0]["value"] == "Make goal brief easier to use"
+
+    saved = json.loads(Path(result["brief_path"]).read_text(encoding="utf-8"))
+    assert set(saved.keys()) == set(goal_brief.GOAL_BRIEF_SCHEMA.keys())
 
 
 def test_create_brief_lists_missing_fields(tmp_path):
@@ -123,6 +143,40 @@ def test_update_brief_with_user_answer_changes_evidence_fields(tmp_path):
     assert brief["evidence"]["actual_result"] == "1 failed in checkout total"
     assert brief["evidence"]["changed_files"] == ["core/checkout.py"]
     assert brief["constraints"]["allowed_files"] == ["core/checkout.py", "tests/test_checkout.py"]
+
+
+def test_plain_text_answer_accepts_friendly_quick_reply_labels():
+    brief = goal_brief.normalize_goal_brief(
+        {
+            "goal": "Fix checkout",
+            "constraints": {"forbidden_files": ["old/forbidden.py"]},
+        }
+    )
+
+    updated = goal_brief.apply_answer_to_goal_brief(
+        brief,
+        "\n".join(
+            [
+                "problem_type: bug_fix",
+                "allowed_files: core/checkout.py, tests/test_checkout.py",
+                "forbidden_files: none",
+                "do_not_weaken: Do not skip checkout validation",
+                "success_criteria: pytest exits 0",
+            ]
+        ),
+    )
+
+    assert updated["problem_type"] == "bug_fix"
+    assert updated["constraints"]["allowed_files"] == [
+        "core/checkout.py",
+        "tests/test_checkout.py",
+    ]
+    assert updated["constraints"]["forbidden_files"] == []
+    assert updated["constraints"]["do_not_weaken"] == [
+        "Do not skip checkout validation",
+    ]
+    assert updated["validation"]["success_criteria"] == "pytest exits 0"
+    assert updated["evidence"]["actual_result"] == ""
 
 
 def test_final_prompt_includes_required_task_context(tmp_path):
