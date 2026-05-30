@@ -28,6 +28,8 @@ def test_runtime_environment_ui_contains_dropdown_options_and_help_text():
         assert f'value="{value}"' in template
     assert 'name="runtime_environment_custom_name"' in template
     assert 'name="runtime_environment_notes"' in template
+    assert "runtime_environment: runtimeEnv" in template
+    assert "repo_path: repo" in template
 
 
 def test_web_route_passes_runtime_environment_state_to_agent(

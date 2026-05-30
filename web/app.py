@@ -26,6 +26,11 @@ from core.runtime_environment import (
     build_runtime_environment_state,
     describe_runtime_environment,
 )
+from core.harness_modes import (
+    HarnessModeDecision,
+    decide_harness_mode,
+    format_harness_deny_message,
+)
 from core.run_lifecycle import run_patch_plan_with_artifacts
 from core.sleeping_consultant import (
     run_overnight,
@@ -152,6 +157,81 @@ def _attach_runtime_environment(result: dict, runtime_state: dict[str, str]) -> 
         runtime_state["runtime_environment_notes"],
     )
     return result
+
+def _control_target_path(control: dict | None) -> str:
+    if not isinstance(control, dict):
+        return ""
+    patch_intent = control.get("patch_intent") or {}
+    if isinstance(patch_intent, dict):
+        for key in ("relative_path", "file", "target_file"):
+            value = patch_intent.get(key)
+            if value:
+                return str(value)
+    top = control.get("top_hypothesis") or {}
+    symbol = top.get("symbol") if isinstance(top, dict) else ""
+    if isinstance(symbol, str) and "::" in symbol:
+        return symbol.split("::", 1)[0]
+    return ""
+
+
+def _control_source_text(control: dict | None) -> str:
+    if not isinstance(control, dict):
+        return ""
+    patch_intent = control.get("patch_intent") or {}
+    if isinstance(patch_intent, dict):
+        source = patch_intent.get("source_snippet")
+        if isinstance(source, str) and source.strip():
+            return source
+    for related in control.get("related_snippets") or []:
+        if isinstance(related, dict):
+            snippet = related.get("snippet")
+            if isinstance(snippet, str) and snippet.strip():
+                return snippet
+    return ""
+
+
+def _format_harness_generation_block(decision: HarnessModeDecision) -> str:
+    hard_deny = format_harness_deny_message(decision)
+    if hard_deny:
+        return hard_deny
+    lines = [
+        f"Harness mode: {decision.mode}",
+        decision.reason,
+    ]
+    if decision.warnings:
+        lines.append("Warnings:")
+        lines.extend(f"- {warning}" for warning in decision.warnings)
+    return "\n".join(lines)
+
+
+def _patch_generation_harness_block(repo_path: str | None, control: dict) -> dict | None:
+    runtime_state = build_runtime_environment_state(
+        request.form.get("runtime_environment"),
+        custom_name=request.form.get("runtime_environment_custom_name"),
+        notes=request.form.get("runtime_environment_notes"),
+    )
+    decision = decide_harness_mode(
+        repo_root=repo_path or ".",
+        runtime_environment=runtime_state["runtime_environment"],
+        request_path=repo_path or "",
+        target_path=_control_target_path(control),
+        source_text=_control_source_text(control),
+        patch_gates_passed=True,
+    )
+    if decision.can_generate_patch:
+        return None
+    return {
+        "error": _format_harness_generation_block(decision),
+        "harness_mode": decision.mode,
+        "harness_mode_decision": decision.to_dict(),
+        "harness_warnings": list(decision.warnings),
+        **runtime_state,
+        "runtime_environment_description": describe_runtime_environment(
+            runtime_state["runtime_environment"],
+            runtime_state["runtime_environment_custom_name"],
+            runtime_state["runtime_environment_notes"],
+        ),
+    }
 
 def should_show_node_clean(node_id: str, show_tests: bool = False) -> bool:
     if "::expr::" in node_id:
@@ -355,6 +435,10 @@ def generate_patch():
         control = json.loads(control_json)
     except Exception:
         return {"error": "Invalid control JSON"}
+
+    harness_block = _patch_generation_harness_block(repo_path, control)
+    if harness_block:
+        return harness_block
 
     prompt = build_control_prompt(control, "Generate patch", repo_path=repo_path or None)
 
@@ -1483,6 +1567,10 @@ def generate_candidates():
         control = json.loads(control_json)
     except Exception:
         return {"error": "Invalid control JSON"}
+
+    harness_block = _patch_generation_harness_block(repo_path, control)
+    if harness_block:
+        return harness_block
 
     prompts = [
         ("gemini_default", build_control_prompt(control, "Generate the best safe patch.", repo_path=repo_path)),

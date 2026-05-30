@@ -103,6 +103,10 @@ def _request_path_hint(query: str) -> str:
     return match.group(0) if match else ""
 
 
+def _request_path_hint_or_repo(query: str, repo_path: str | None) -> str:
+    return _request_path_hint(query) or str(repo_path or "").strip()
+
+
 def _control_target_path(control_result: dict | None) -> str:
     if not isinstance(control_result, dict):
         return ""
@@ -231,9 +235,24 @@ def run_agent_web(
     base_harness_decision = decide_harness_mode(
         repo_root=repo_path or ".",
         runtime_environment=runtime_state["runtime_environment"],
-        request_path=_request_path_hint(query),
+        request_path=_request_path_hint_or_repo(query, repo_path),
         source_context_present=True,
     )
+    if not base_harness_decision.can_generate_patch:
+        return {
+            "answer": _harness_block_answer(base_harness_decision),
+            "context": "",
+            "graph": "",
+            "state": _harness_debug(base_harness_decision),
+            "patch": "",
+            "validation": "",
+            "project_tag": project_tag or "",
+            "patch_loop_attempts": 0,
+            "patch_loop_stop_reason": None,
+            **runtime_state,
+            "runtime_environment_description": runtime_description,
+            **_harness_payload(base_harness_decision),
+        }
 
     inventory = inspect_repo_inventory(repo_path) if is_project_input else None
 
@@ -241,7 +260,7 @@ def run_agent_web(
         empty_repo_decision = decide_harness_mode(
             repo_root=repo_path,
             runtime_environment=runtime_state["runtime_environment"],
-            request_path=_request_path_hint(query),
+            request_path=_request_path_hint_or_repo(query, repo_path),
             source_context_present=False,
         )
         return {
@@ -394,7 +413,7 @@ def run_agent_web(
         pre_generation_decision = decide_harness_mode(
             repo_root=state.repo_path or repo_path or ".",
             runtime_environment=state.runtime_environment,
-            request_path=_request_path_hint(query),
+            request_path=_request_path_hint_or_repo(query, repo_path),
             target_path=_control_target_path(state.control_result),
             source_text=_control_source_text(state.control_result),
             index_degraded=_context_is_degraded(state.control_result),
@@ -498,7 +517,7 @@ def run_agent_web(
         post_gate_decision = decide_harness_mode(
             repo_root=state.repo_path or repo_path or ".",
             runtime_environment=state.runtime_environment,
-            request_path=_request_path_hint(query),
+            request_path=_request_path_hint_or_repo(query, repo_path),
             target_path=_control_target_path(state.control_result),
             source_text=_control_source_text(state.control_result),
             grounding_failed=grounding_failed,

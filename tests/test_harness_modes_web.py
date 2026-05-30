@@ -127,6 +127,102 @@ def test_web_runner_surfaces_environment_conflict_deny_and_skips_model(
     assert "Gemini was not called." in result["answer"]
 
 
+def test_web_runner_windows_repo_path_in_codespaces_denies_before_source_missing(
+    monkeypatch,
+):
+    from web import runner
+
+    repo_path = r"C:\Users\Admin\Documents\Code\day 14\AI project\app.py"
+    monkeypatch.setattr(
+        runner,
+        "run_draft_pipeline",
+        lambda state: (_ for _ in ()).throw(AssertionError("model should not be called")),
+    )
+
+    result = runner.run_agent_web(
+        "fix it",
+        repo_path,
+        runtime_environment="codespaces",
+    )
+
+    assert result["harness_mode"] == "codespaces_local_path_mismatch"
+    assert "Cannot run: environment/path mismatch." in result["answer"]
+    assert "Requested path looks like: Local Windows" in result["answer"]
+    assert repo_path in result["answer"]
+    assert "source_missing" not in result["answer"]
+
+
+def test_generate_candidates_denies_environment_conflict_without_model_call(monkeypatch):
+    from web import app as web_app
+
+    repo_path = r"C:\Users\Admin\Documents\Code\day 14\AI project\app.py"
+    control = {
+        "patch_intent": {
+            "file": "app.py",
+            "source_snippet": "print('old')",
+        }
+    }
+    monkeypatch.setattr(
+        web_app,
+        "run_gemini_request",
+        lambda prompt: (_ for _ in ()).throw(AssertionError("Gemini should not be called")),
+    )
+    monkeypatch.setattr(
+        web_app,
+        "run_deepseek_review",
+        lambda prompt: (_ for _ in ()).throw(AssertionError("DeepSeek should not be called")),
+    )
+
+    with web_app.app.test_client() as client:
+        response = client.post(
+            "/generate_candidates",
+            data={
+                "control": json.dumps(control),
+                "repo_path": repo_path,
+                "runtime_environment": "codespaces",
+            },
+        )
+
+    data = response.get_json()
+    assert response.status_code == 200
+    assert data["harness_mode"] == "codespaces_local_path_mismatch"
+    assert "Cannot run: environment/path mismatch." in data["error"]
+    assert "Gemini was not called." in data["error"]
+
+
+def test_generate_patch_denies_environment_conflict_without_model_call(monkeypatch):
+    from web import app as web_app
+
+    repo_path = r"C:\Users\Admin\Documents\Code\day 14\AI project\app.py"
+    control = {
+        "patch_intent": {
+            "file": "app.py",
+            "source_snippet": "print('old')",
+        }
+    }
+    monkeypatch.setattr(
+        web_app,
+        "run_gemini_request",
+        lambda prompt: (_ for _ in ()).throw(AssertionError("Gemini should not be called")),
+    )
+
+    with web_app.app.test_client() as client:
+        response = client.post(
+            "/generate_patch",
+            data={
+                "control": json.dumps(control),
+                "repo_path": repo_path,
+                "runtime_environment": "codespaces",
+            },
+        )
+
+    data = response.get_json()
+    assert response.status_code == 200
+    assert data["harness_mode"] == "codespaces_local_path_mismatch"
+    assert "Cannot run: environment/path mismatch." in data["error"]
+    assert "Gemini was not called." in data["error"]
+
+
 def test_web_runner_marks_ungrounded_patch_and_does_not_apply(
     tmp_path,
     monkeypatch,

@@ -56,6 +56,37 @@ def test_codespaces_windows_absolute_path_blocks_with_specific_mode(tmp_path):
     )
 
 
+def test_codespaces_windows_repo_path_blocks_before_source_missing():
+    repo_path = r"C:\Users\Admin\Documents\Code\day 14\AI project\app.py"
+
+    decision = decide_harness_mode(
+        repo_root=repo_path,
+        runtime_environment="codespaces",
+        request_path=repo_path,
+        source_text="",
+    )
+
+    assert decision.mode == "codespaces_local_path_mismatch"
+    assert decision.can_generate_patch is False
+    assert decision.can_apply_patch is False
+    assert decision.evidence["request_path"] == repo_path
+    assert "source_missing" not in decision.reason
+
+
+def test_codespaces_embedded_windows_repo_path_blocks_before_source_missing():
+    repo_path = r"/workspaces/idk-what-is-this--/C:\Users\Admin\project\app.py"
+
+    decision = decide_harness_mode(
+        repo_root=repo_path,
+        runtime_environment="codespaces",
+        request_path=repo_path,
+        source_text="",
+    )
+
+    assert decision.mode == "codespaces_local_path_mismatch"
+    assert decision.evidence["detected_path_environment"] == "local_windows"
+
+
 def test_missing_source_blocks_generation_and_apply(tmp_path):
     repo = tmp_path / "repo"
     repo.mkdir()

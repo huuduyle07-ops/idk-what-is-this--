@@ -4693,6 +4693,7 @@ function applyPatch() {
 function generatePatch() {
     const control = document.getElementById("context").innerText;
     const repo = document.querySelector("input[name='repo_path']").value;
+    const runtimeEnv = document.querySelector("select[name='runtime_environment']")?.value || "auto";
 
     fetch("/generate_patch", {
         method: "POST",
@@ -4701,6 +4702,7 @@ function generatePatch() {
         },
         body: new URLSearchParams({
             repo_path: repo,
+            runtime_environment: runtimeEnv,
             control: control
         })
     })
@@ -4709,6 +4711,13 @@ function generatePatch() {
         if (data.usage) {
             const usageEl = document.getElementById("usage");
             if (usageEl) usageEl.innerText = data.usage;
+        }
+        if (data.error) {
+            const answerEl = document.getElementById("answer");
+            if (answerEl) answerEl.innerText = data.error;
+            window.lastAction = "answer";
+            showTab("answer");
+            return;
         }
         if (data.patch) {
             // Phase 5 Slice 5: write raw JSON to #patchRawJson, then refresh card.
@@ -4797,13 +4806,19 @@ function renderDiff(diffText) {
 
 function generateCandidates() {
     const control = document.getElementById("context").innerText;
+    const repo = document.querySelector("input[name='repo_path']").value;
+    const runtimeEnv = document.querySelector("select[name='runtime_environment']")?.value || "auto";
 
     fetch("/generate_candidates", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: new URLSearchParams({ control })
+        body: new URLSearchParams({
+            control,
+            repo_path: repo,
+            runtime_environment: runtimeEnv
+        })
     })
     .then(res => res.json())
     .then(data => {

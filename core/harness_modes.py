@@ -15,6 +15,7 @@ MODE_UNGROUNDED_PATCH_BLOCKED = "ungrounded_patch_blocked"
 MODE_DEGRADED_CONTEXT = "degraded_context"
 
 _WINDOWS_ABSOLUTE_RE = re.compile(r"^[A-Za-z]:[\\/]")
+_WINDOWS_ABSOLUTE_ANYWHERE_RE = re.compile(r"[A-Za-z]:[\\/]")
 _HARD_DENY_MODES = {
     MODE_CODESPACES_LOCAL_PATH_MISMATCH,
     MODE_PATH_OUTSIDE_REPO,
@@ -57,11 +58,16 @@ def looks_like_windows_absolute_path(value: object) -> bool:
     return bool(_WINDOWS_ABSOLUTE_RE.match(text))
 
 
+def contains_windows_absolute_path(value: object) -> bool:
+    text = str(value or "").strip().strip('"').strip("'")
+    return bool(_WINDOWS_ABSOLUTE_ANYWHERE_RE.search(text))
+
+
 def detect_path_environment(value: object) -> str:
     text = str(value or "").strip().strip('"').strip("'")
     if not text:
         return "unknown"
-    if looks_like_windows_absolute_path(text):
+    if contains_windows_absolute_path(text):
         return "local_windows"
     normalized = text.replace("\\", "/")
     if normalized.startswith("/workspaces/"):
@@ -141,7 +147,7 @@ def decide_harness_mode(
     # Codespaces mismatch is a more useful diagnosis than generic
     # path_outside_repo for pasted local Windows paths.
     if runtime_environment == "codespaces" and any(
-        looks_like_windows_absolute_path(path) for path in paths
+        contains_windows_absolute_path(path) for path in paths
     ):
         warning = "Codespaces can only patch files inside the Codespaces workspace."
         return HarnessModeDecision(
