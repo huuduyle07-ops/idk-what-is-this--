@@ -8,6 +8,7 @@ from core.evidence_confidence import (
     combine_evidence_confidences,
     format_evidence_confidence_block,
 )
+from graph.attraction import explain_attraction_batch, format_attraction_markdown
 from graph.evidence_spread import assess_change_scope, compute_scope_aware_spread
 from graph.schema import ProgramGraph
 from graph.weights import compute_node_weights
@@ -20,6 +21,12 @@ EVIDENCE_SPREAD_GUARDRAIL = (
 EVIDENCE_CONFIDENCE_GUARDRAIL = (
     "Evidence confidence is explain-only. It does not change patch generation, "
     "CONTROL ranking, validation, or benchmark scoring."
+)
+
+GRAPH_ATTRACTION_REPORT_GUARDRAIL = (
+    "Graph attraction/repulsion is explain-only. It does not change Evidence "
+    "Spread scoring, CONTROL ranking, Phantom Limb ranking, patch generation, "
+    "validation, or benchmark scoring."
 )
 
 # Matches an explicit graph distance inside a spread reason, e.g.
@@ -284,6 +291,11 @@ def format_evidence_spread_markdown(result: dict, *, generated_at: str | None = 
     # language; the confidence note carries its own explain-only guardrail.
     lines.extend(_evidence_confidence_lines(nodes, target))
 
+    # Graph Attraction / Repulsion comes last, after Evidence Confidence, and is
+    # likewise explain-only: it reuses already-computed spread scores/confidence
+    # and never re-ranks anything.
+    lines.extend(_graph_attraction_lines(nodes, query, target))
+
     return "\n".join(lines)
 
 
@@ -321,6 +333,40 @@ def _evidence_confidence_lines(nodes: list, target: str) -> list[str]:
     lines.append(format_evidence_confidence_block(confidences))
     lines.append("")
     lines.append(f"> {EVIDENCE_CONFIDENCE_GUARDRAIL}")
+    lines.append("")
+    return lines
+
+
+def _graph_attraction_lines(nodes: list, query: str, target: str) -> list[str]:
+    """Render the explain-only Graph Attraction / Repulsion section.
+
+    Reuses the serialized spread nodes (and the confidence already derived for
+    each) as input to :func:`graph.attraction.explain_attraction_batch`. It does
+    not recompute spread scores or rankings - it only annotates which nodes pull
+    attention and which generic hubs push it away.
+    """
+    # Enrich a shallow copy of each node with its already-computed confidence so
+    # attraction can reward strong evidence without recomputing any ranking. The
+    # original spread node dicts are never mutated.
+    enriched: list[dict] = []
+    for node in nodes:
+        item = dict(node)
+        if "confidence" not in item and "evidence_confidence" not in item:
+            item["confidence"] = classify_spread_node_confidence(node, target).confidence
+        enriched.append(item)
+
+    items = explain_attraction_batch(enriched, query=query, target_node=target)
+
+    # Reuse the shared formatter for the table, but re-home its H1 as an H2
+    # subsection of this report.
+    table_md = format_attraction_markdown(items).replace(
+        "# Graph Attraction / Repulsion (explain-only)",
+        "## Graph Attraction / Repulsion",
+        1,
+    )
+
+    lines: list[str] = [table_md.rstrip(), ""]
+    lines.append(f"> {GRAPH_ATTRACTION_REPORT_GUARDRAIL}")
     lines.append("")
     return lines
 
