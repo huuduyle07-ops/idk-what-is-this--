@@ -1,6 +1,6 @@
 # Presentation Script — AI-Powered Code Analysis & Auto-Patching Agent
 > Spoken script for each slide. Estimated total time: ~15 minutes.
-> Narrative thread: We built the graph system → The benchmark exposed weaknesses → We improved the backend → The system stayed at 31/31 → We measured cost tradeoffs honestly.
+> Narrative thread: We built the graph system → The benchmark exposed weaknesses → We improved the backend → The system reached 32 benchmark cases → We measured cost tradeoffs honestly.
 
 ---
 
@@ -115,21 +115,7 @@ This is unvalidated. Before replacing the current scorer, the plan is to run a c
 
 ## Slide 10 — Conclusion
 
-"Here's the actual development sequence, backed by generated evidence files dated 2026-05-26.
-
-We built the graph system and ran an initial benchmark at 22 cases. It passed 22 out of 22, but the fallback count was 16 — meaning 16 of those 22 cases reached the fallback path rather than the primary repair pipeline. That's not a failure number, but it told us the primary path had coverage gaps.
-
-We identified the gaps: TypeScript import repair and hard nested-dispatch cases had no primary handler. We added both. We also expanded the benchmark to 31 cases — including medium adversarial cases and a hard TypeScript nested-dispatch case.
-
-**Full suite result (report `benchmark_report_1779784439`):** 31 out of 31 passed, zero failures, zero flaky. Fallback count: 12. Average run time: 42.27 seconds. Total tokens: 181,326. Estimated cost per full run: $0.22.
-
-Beyond pass/fail, we ran a **patch minimality experiment** — comparing a baseline pipeline against a variant with the minimality metric enabled. Both scored 31/31. The variant was 5.6 seconds faster per run and used 2 fewer fallbacks. Decision: greenlight. No human review required.
-
-We also maintain a **held-out evaluation split** (`held_out_v1`) — 7 adversarial cases kept completely separate from the main benchmark. These test multi-file root cause tracing, callback dispatch ambiguity, and false-positive suppression (cases where the correct answer is no patch). Latest result: 7 out of 7 passed. Average duration: 50.31 seconds, fallback count: 5. One case — `go_multifile_root_cause` — is on the **watchlist** with a historical failure rate of 0.50 across prior runs; it passed this run. The watchlist is observational only: it flags instability without changing the pass/fail score.
-
-The cost of getting here is real. Every run does full AST parsing, multi-pass graph construction, call edge resolution, node scoring, and patch validation. None of those steps are skipped. That is slow for an interactive tool. It is the tradeoff we made for correctness — the system does not apply a patch it has not validated, and both benchmark splits reflect that with zero regressions.
-
-Performance optimisation is next. But the number we are tracking to justify any change is 31/31 on the main suite and 7/7 on the held-out split — both at the same time."
+"The system now has 32 benchmark cases across 7 languages. The latest benchmark check reports 32 checked and 0 errors, and the full pytest suite reports 1207 passed. The most recent graph feature, Evidence Spread, is explain-only: it improves debugging and reporting without changing patch behavior."
 
 ---
 
