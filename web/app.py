@@ -53,7 +53,10 @@ from web.routes.dream_trials_routes import bp as dream_trials_routes_bp
 from web.routes.dream_references_routes import bp as dream_references_routes_bp
 from graph.builder import build_graph_from_repo
 from graph.exporter import safe_id, escape_mermaid_label
-from web.graph_evidence import build_scope_evidence_spread_debug
+from web.graph_evidence import (
+    build_scope_evidence_spread_debug,
+    format_evidence_spread_markdown,
+)
 
 app = Flask(__name__)
 app.register_blueprint(patch_routes_bp)
@@ -1737,6 +1740,78 @@ def graph_evidence_spread_route():
         return {
             "ok": False,
             "error": f"Failed to explain evidence spread: {type(e).__name__}: {e}",
+        }, 500
+
+
+@app.route("/graph/evidence_spread/export", methods=["POST"])
+def graph_evidence_spread_export_route():
+    """Export the scope-aware evidence spread explanation as a Markdown file.
+
+    Read-only / explain-only. Writes under
+    ``<.agent>/reports/evidence_spread/`` for the analyzed repo. No model
+    calls, no patch generation, no ranking or weight mutation.
+    """
+    import re
+    from datetime import datetime, timezone
+
+    repo_path = request.values.get("repo_path", "").strip()
+    if not repo_path:
+        return {"ok": False, "error": "No repo_path supplied."}, 400
+    if not Path(repo_path).is_dir():
+        return {"ok": False, "error": f"Path is not a directory: {repo_path}"}, 400
+
+    query = request.values.get("query", "")
+    target_node = request.values.get("target_node", "").strip() or None
+    seed_nodes = _split_csv(request.values.get("seed_nodes"))
+    try:
+        top_n = int(request.values.get("top_n", "10"))
+    except ValueError:
+        top_n = 10
+
+    try:
+        graph = build_graph_from_repo(repo_path)
+        result = build_scope_evidence_spread_debug(
+            graph,
+            query,
+            target_node=target_node,
+            seed_nodes=seed_nodes,
+            top_n=top_n,
+        )
+        markdown = format_evidence_spread_markdown(result)
+
+        reports_dir = (get_agent_dir(repo_path) / "reports" / "evidence_spread").resolve()
+        reports_dir.mkdir(parents=True, exist_ok=True)
+
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        slug_source = (target_node or query or "report").strip()
+        slug = re.sub(r"[^A-Za-z0-9._-]+", "_", slug_source).strip("_") or "report"
+        slug = slug[:60]
+        filename = f"evidence_spread_{timestamp}_{slug}.md"
+
+        out_path = (reports_dir / filename).resolve()
+        # Path containment guard — out_path must stay inside reports_dir.
+        try:
+            out_path.relative_to(reports_dir)
+        except ValueError:
+            return {
+                "ok": False,
+                "error": "Refused to write outside reports directory.",
+            }, 400
+
+        out_path.write_text(markdown, encoding="utf-8")
+
+        preview = markdown if len(markdown) <= 4000 else markdown[:4000] + "\n..."
+
+        return {
+            "ok": True,
+            "path": str(out_path),
+            "filename": out_path.name,
+            "markdown_preview": preview,
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "error": f"Failed to export evidence spread: {type(e).__name__}: {e}",
         }, 500
 
 
