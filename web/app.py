@@ -53,6 +53,7 @@ from web.routes.dream_trials_routes import bp as dream_trials_routes_bp
 from web.routes.dream_references_routes import bp as dream_references_routes_bp
 from graph.builder import build_graph_from_repo
 from graph.exporter import safe_id, escape_mermaid_label
+from web.graph_evidence import build_scope_evidence_spread_debug
 
 app = Flask(__name__)
 app.register_blueprint(patch_routes_bp)
@@ -1704,6 +1705,39 @@ def render_graph():
         "rendered_edges": len(edges),
         "truncated": truncated,
     }
+
+
+@app.route("/graph/evidence_spread", methods=["GET", "POST"])
+def graph_evidence_spread_route():
+    """Read-only scope-aware evidence spread debug output for Graph/Chat."""
+    repo_path = request.values.get("repo_path", "").strip()
+    if not repo_path:
+        return {"ok": False, "error": "No repo_path supplied."}, 400
+    if not Path(repo_path).is_dir():
+        return {"ok": False, "error": f"Path is not a directory: {repo_path}"}, 400
+
+    query = request.values.get("query", "")
+    target_node = request.values.get("target_node", "").strip() or None
+    seed_nodes = _split_csv(request.values.get("seed_nodes"))
+    try:
+        top_n = int(request.values.get("top_n", "10"))
+    except ValueError:
+        top_n = 10
+
+    try:
+        graph = build_graph_from_repo(repo_path)
+        return build_scope_evidence_spread_debug(
+            graph,
+            query,
+            target_node=target_node,
+            seed_nodes=seed_nodes,
+            top_n=top_n,
+        )
+    except Exception as e:
+        return {
+            "ok": False,
+            "error": f"Failed to explain evidence spread: {type(e).__name__}: {e}",
+        }, 500
 
 
 @app.route("/vault_path", methods=["POST"])

@@ -212,6 +212,14 @@
                 <div class="chat-empty">No answer yet.</div>
                 {% endif %}
             </div>
+            <div class="chat-debug-panel">
+                <div class="graph-spread-controls">
+                    <input id="chatSpreadTarget" type="text" placeholder="target node">
+                    <input id="chatSpreadTopN" type="number" min="1" max="50" value="10" title="Top N">
+                    <button type="button" onclick="explainEvidenceSpread('chat')">Graph Debug</button>
+                </div>
+                <pre id="chatSpreadDebug" class="chat-spread-debug"></pre>
+            </div>
         </section>
 
         <section id="instantModePanel" class="instant-mode-panel" data-mode-panel="instant">
@@ -284,21 +292,50 @@
             </div>
 
             <input type="hidden" id="goalBriefRef" value="">
-            <textarea id="goalBriefGoal" class="goal-brief-goal" placeholder="Vague goal"></textarea>
+            <textarea id="goalBriefGoal" class="goal-brief-goal" placeholder="What are you trying to get done?"></textarea>
 
             <div class="goal-brief-actions">
               <button type="button" onclick="startGoalBrief()">Start brief</button>
-              <button type="button" onclick="updateGoalBrief()">Update brief</button>
+              <button type="button" onclick="updateGoalBrief()">Send reply</button>
               <button type="button" onclick="copyGoalBriefFinalPrompt()">Copy final prompt</button>
               <button type="button" disabled title="Placeholder for a later gated handoff.">Send to Dream later</button>
             </div>
 
-            <div id="goalBriefChat" class="goal-brief-chat">
-              <div class="goal-brief-message goal-brief-message--assistant">Draft not started.</div>
+            <div class="goal-brief-main">
+              <div class="goal-brief-conversation">
+                <div id="goalBriefChat" class="goal-brief-chat">
+                  <div class="goal-brief-message goal-brief-message--assistant">Draft not started.</div>
+                </div>
+
+                <div class="goal-brief-chips" role="group" aria-label="Quick replies">
+                  <button type="button" onclick="insertGoalBriefReply('problem_type: bug_fix')">Bug fix</button>
+                  <button type="button" onclick="insertGoalBriefReply('problem_type: feature')">Feature</button>
+                  <button type="button" onclick="insertGoalBriefReply('command: python -m pytest tests -q')">I ran pytest</button>
+                  <button type="button" onclick="insertGoalBriefReply('actual: all tests pass')">All tests pass</button>
+                  <button type="button" onclick="insertGoalBriefReply('forbidden_files: none')">No files forbidden</button>
+                </div>
+
+                <textarea id="goalBriefAnswer" class="goal-brief-answer" placeholder="Reply or paste command output"></textarea>
+              </div>
+
+              <section id="goalBriefSummary" class="goal-brief-summary" aria-live="polite">
+                <div class="goal-brief-summary-row">
+                  <span>Goal</span>
+                  <strong>Missing</strong>
+                </div>
+                <div class="goal-brief-summary-row">
+                  <span>Type</span>
+                  <strong>Missing</strong>
+                </div>
+                <div class="goal-brief-summary-row">
+                  <span>Status</span>
+                  <strong>Not started</strong>
+                </div>
+              </section>
             </div>
 
-            <textarea id="goalBriefAnswer" class="goal-brief-answer" placeholder="Paste answer or terminal result"></textarea>
-
+            <details class="goal-brief-raw-details">
+            <summary>Raw details</summary>
             <div class="goal-brief-grid">
               <section>
                 <h3>Known Evidence</h3>
@@ -317,6 +354,7 @@
                 <pre id="goalBriefFinalPrompt" class="goal-brief-pre">Not ready.</pre>
               </section>
             </div>
+            </details>
           </section>
         </div>
 
@@ -778,6 +816,14 @@
             </button>
 
           </div>
+          <div class="graph-spread-panel">
+            <div class="graph-spread-controls">
+              <input id="graphSpreadTarget" type="text" placeholder="target node">
+              <input id="graphSpreadTopN" type="number" min="1" max="50" value="10" title="Top N">
+              <button type="button" onclick="explainEvidenceSpread('graph')">Scope Spread</button>
+            </div>
+            <pre id="graphSpreadOutput" class="graph-spread-output"></pre>
+          </div>
           <div id="graph">
             <div class="graph-controls">
               <button type="button" onclick="zoomGraph(1.25)" title="Zoom in">+</button>
@@ -1107,6 +1153,84 @@ function viewGraph(mode) {
     .catch(err => {
         canvas.innerHTML = `<pre>Network error: ${escapeHtml(String(err))}</pre>`;
     });
+}
+
+function spreadDebugConfig(surface) {
+    const isChat = surface === "chat";
+    return {
+        target: document.getElementById(isChat ? "chatSpreadTarget" : "graphSpreadTarget"),
+        topN: document.getElementById(isChat ? "chatSpreadTopN" : "graphSpreadTopN"),
+        output: document.getElementById(isChat ? "chatSpreadDebug" : "graphSpreadOutput"),
+    };
+}
+
+async function explainEvidenceSpread(surface) {
+    const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
+    const query = document.querySelector("textarea[name='query']")?.value.trim() || "";
+    const cfg = spreadDebugConfig(surface);
+    if (!cfg.output) return;
+    if (!repo) {
+        alert("Set a repo path first.");
+        return;
+    }
+
+    cfg.output.textContent = "Computing scope spread...";
+    const body = new URLSearchParams({
+        repo_path: repo,
+        query,
+        target_node: cfg.target?.value.trim() || "",
+        top_n: cfg.topN?.value || "10",
+    });
+
+    try {
+        const res = await fetch("/graph/evidence_spread", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body,
+        });
+        const data = await res.json();
+        cfg.output.textContent = renderEvidenceSpreadDebug(data);
+    } catch (err) {
+        cfg.output.textContent = `Spread error: ${String(err)}`;
+    }
+}
+
+function renderEvidenceSpreadDebug(data) {
+    if (!data || !data.ok) {
+        return data?.error || "Spread error";
+    }
+    if (data.empty) {
+        return data.message || "No graph evidence available.";
+    }
+
+    const lines = [
+        `Scope-aware evidence spread: top ${data.nodes.length} of ${data.scored_nodes}`,
+        `Query: ${data.query || "(none)"}`,
+    ];
+    if (data.target_node) lines.push(`Target: ${data.target_node}`);
+    if (data.scope_assessment) {
+        lines.push(`Scope: ${data.scope_assessment.scope}`);
+        for (const reason of data.scope_assessment.reasons || []) {
+            lines.push(`  - ${reason}`);
+        }
+    }
+    lines.push("");
+    for (const node of data.nodes || []) {
+        const reasons = (node.reasons || []).length
+            ? node.reasons.join("; ")
+            : "base weight only";
+        const distance = node.distance === 0
+            ? "seed"
+            : node.distance === null || node.distance === undefined
+                ? "-"
+                : `d${node.distance}`;
+        lines.push(
+            `${node.node_id} [${distance}] final=${node.final_score} ` +
+            `(base=${node.base_score}, spread=${node.spread_score})`
+        );
+        lines.push(`  ${reasons}`);
+    }
+    return lines.join("\n");
 }
 
 function openObsidian() {
@@ -3451,6 +3575,41 @@ function _goalBriefCommandList(items) {
     return `<ul>${values.map(item => `<li><code>${_escapeHtml(item)}</code></li>`).join("")}</ul>`;
 }
 
+function _renderGoalBriefSummary(summary) {
+    const el = document.getElementById("goalBriefSummary");
+    if (!el) return;
+    const rows = Array.isArray(summary?.rows) ? summary.rows : [];
+    if (!rows.length) {
+        el.innerHTML = `
+            <div class="goal-brief-summary-row">
+              <span>Status</span>
+              <strong>Not started</strong>
+            </div>`;
+        return;
+    }
+    const status = summary.ready
+        ? "Ready"
+        : `${summary.missing_count || 0} missing`;
+    el.innerHTML = `
+        <div class="goal-brief-summary-status ${summary.ready ? "goal-brief-summary-status--ready" : ""}">
+          <strong>${_escapeHtml(status)}</strong>
+        </div>
+        ${rows.map(row => `
+          <div class="goal-brief-summary-row goal-brief-summary-row--${row.state === "complete" ? "complete" : "missing"}">
+            <span>${_escapeHtml(row.label)}</span>
+            <strong>${_escapeHtml(row.value)}</strong>
+          </div>
+        `).join("")}`;
+}
+
+function insertGoalBriefReply(text) {
+    const answerEl = document.getElementById("goalBriefAnswer");
+    if (!answerEl) return;
+    const current = answerEl.value.trim();
+    answerEl.value = current ? `${current}\n${text}` : text;
+    answerEl.focus();
+}
+
 function _appendGoalBriefMessage(kind, text) {
     const chat = document.getElementById("goalBriefChat");
     if (!chat) return;
@@ -3486,6 +3645,7 @@ function _renderGoalBriefResponse(data, userText = "") {
     if (missingEl) missingEl.innerHTML = _goalBriefList(brief.missing_information || []);
     if (commandsEl) commandsEl.innerHTML = _goalBriefCommandList(brief.suggested_terminal_commands || []);
     if (finalEl) finalEl.textContent = brief.final_prompt || "Not ready.";
+    _renderGoalBriefSummary(data.summary);
 
     const status = brief.status === "ready" ? "Ready" : "Draft";
     _goalBriefStatus(`${status} - ${data.brief_path || "dry run"}`, brief.status === "ready" ? "ready" : "draft");
