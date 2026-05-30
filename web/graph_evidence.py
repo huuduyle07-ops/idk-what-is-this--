@@ -8,6 +8,7 @@ from core.evidence_confidence import (
     combine_evidence_confidences,
     format_evidence_confidence_block,
 )
+from core.related_notes import explain_related_notes, format_related_notes_markdown
 from graph.attraction import explain_attraction_batch, format_attraction_markdown
 from graph.evidence_spread import assess_change_scope, compute_scope_aware_spread
 from graph.schema import ProgramGraph
@@ -197,6 +198,36 @@ def _fmt_score(value) -> str:
         return f"{float(value):.4f}"
     except (TypeError, ValueError):
         return "-"
+
+
+def build_related_notes_debug_markdown(
+    notes,
+    *,
+    query: str = "",
+    target_node: str = "",
+    target_path: str = "",
+    graph_nodes=None,
+    limit: int = 5,
+) -> str:
+    """Render an explain-only Related Notes / Lessons debug section.
+
+    Accepts already-loaded note-like records only. It does not load or seed
+    lessons, write storage, call external services, or feed results back into
+    ranking/scoring/prompt behavior.
+    """
+    items = explain_related_notes(
+        notes,
+        query=query,
+        target_node=target_node,
+        target_path=target_path,
+        graph_nodes=graph_nodes,
+        limit=limit,
+    )
+    return format_related_notes_markdown(items).replace(
+        "# Phantom Limb Related Notes (explain-only)",
+        "## Related Notes / Lessons",
+        1,
+    )
 
 
 def format_evidence_spread_markdown(result: dict, *, generated_at: str | None = None) -> str:
