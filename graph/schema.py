@@ -46,3 +46,38 @@ class ProgramGraph:
             "nodes": [n.__dict__ for n in self.nodes.values()],
             "edges": [e.__dict__ for e in self.edges],
         }
+
+
+def build_graph(
+    nodes: list[dict[str, Any]] | None = None,
+    edges: list[dict[str, Any]] | None = None,
+) -> ProgramGraph:
+    """Construct a ProgramGraph from plain node/edge dicts.
+
+    Convenience constructor for callers and tests that have node/edge data as
+    dicts. Node dicts use ``id``/``type``/``label`` (plus optional metadata);
+    edge dicts use ``source``/``target``/``type`` (plus optional metadata).
+    Unknown keys are preserved as node/edge metadata.
+    """
+    graph = ProgramGraph()
+    for node in nodes or []:
+        meta = {
+            k: v for k, v in node.items() if k not in {"id", "type", "label"}
+        }
+        graph.add_node(
+            node["id"],
+            node.get("type", "symbol"),
+            node.get("label"),
+            **meta,
+        )
+    for edge in edges or []:
+        meta = {
+            k: v for k, v in edge.items() if k not in {"source", "target", "type"}
+        }
+        graph.add_edge(
+            edge["source"],
+            edge["target"],
+            edge.get("type", "edge"),
+            **meta,
+        )
+    return graph
