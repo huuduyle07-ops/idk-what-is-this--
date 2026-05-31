@@ -56,6 +56,7 @@ from graph.exporter import safe_id, escape_mermaid_label
 from web.graph_evidence import (
     build_scope_evidence_spread_debug,
     format_evidence_spread_markdown,
+    format_memory_temperature_section,
 )
 
 app = Flask(__name__)
@@ -2581,3 +2582,96 @@ if __name__ == "__main__":
     from web.runner import run_web_app
 
     run_web_app(app, debug=True)
+
+
+# === Phase 12.13f: explain-only graph explainability debug view ===
+@app.route("/graph/explainability/view", methods=["GET"])
+def graph_explainability_view_route():
+    """Read-only debug view of the explain-only report sections.
+
+    Renders already-computed evidence-spread Markdown (which carries the
+    Evidence Confidence and Graph Attraction / Repulsion sections) plus a
+    Related Notes / Lessons section derived from the same spread nodes. It makes
+    no model/API calls, writes nothing, and changes no ranking - explain-only.
+    """
+    repo_path = (request.values.get("repo_path") or "").strip()
+    if not repo_path:
+        return {"ok": False, "error": "repo_path is required"}, 400
+    if not Path(repo_path).is_dir():
+        return {"ok": False, "error": f"Path is not a directory: {repo_path}"}, 400
+
+    from core.related_notes import (
+        explain_related_notes,
+        format_related_notes_markdown,
+    )
+
+    query = (request.values.get("query") or "").strip()
+    target_node = (request.values.get("target_node") or "").strip()
+    try:
+        top_n = int((request.values.get("top_n") or "10").strip() or "10")
+    except (TypeError, ValueError):
+        top_n = 10
+
+    result = build_scope_evidence_spread_debug(
+        build_graph_from_repo(repo_path),
+        query,
+        target_node=target_node or None,
+        top_n=top_n,
+    )
+    spread_md = format_evidence_spread_markdown(result)
+
+    # Derive note-like records from the already-computed spread nodes so the
+    # Related Notes layer has explain-only input without any DB/model access.
+    derived_notes = [
+        {
+            "note_id": node.get("node_id"),
+            "title": node.get("node_id"),
+            "source_type": "graph",
+            "text": "; ".join(node.get("reasons") or []),
+            "path": str(node.get("node_id") or "").split("::", 1)[0],
+        }
+        for node in (result.get("nodes") or [])
+    ]
+    related_items = explain_related_notes(
+        derived_notes,
+        query=query,
+        target_node=target_node,
+        target_path="",
+    )
+    related_md = format_related_notes_markdown(related_items)
+
+    # Phase 12.14b: explain-only Memory Temperature view over the same derived
+    # notes. Visibility only - no retrieval, ranking, or prompt behavior.
+    temperature_md = format_memory_temperature_section(derived_notes)
+
+    markdown_text = (
+        spread_md.rstrip()
+        + "\n\n## Related Notes / Lessons\n\n"
+        + related_md.strip()
+        + "\n\n"
+        + temperature_md.strip()
+        + "\n"
+    )
+
+    response = {
+        "ok": True,
+        "markdown": markdown_text,
+        "sections": [
+            "Evidence Confidence",
+            "Graph Attraction / Repulsion",
+            "Related Notes / Lessons",
+            "Memory Temperature",
+        ],
+    }
+    if request.values.get("as", "").strip().lower() == "html":
+        try:
+            import markdown as _md_render
+
+            response["html"] = _md_render.markdown(
+                markdown_text,
+                extensions=["fenced_code", "tables", "toc"],
+            )
+        except Exception as exc:  # noqa: BLE001
+            response["html"] = ""
+            response["html_error"] = f"{type(exc).__name__}: {exc}"
+    return response

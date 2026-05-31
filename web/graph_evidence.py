@@ -8,6 +8,10 @@ from core.evidence_confidence import (
     combine_evidence_confidences,
     format_evidence_confidence_block,
 )
+from core.memory_temperature import (
+    MEMORY_TEMPERATURE_GUARDRAIL,
+    classify_memory_batch,
+)
 from core.related_notes import explain_related_notes, format_related_notes_markdown
 from graph.attraction import explain_attraction_batch, format_attraction_markdown
 from graph.evidence_spread import assess_change_scope, compute_scope_aware_spread
@@ -29,6 +33,18 @@ GRAPH_ATTRACTION_REPORT_GUARDRAIL = (
     "Spread scoring, CONTROL ranking, Phantom Limb ranking, patch generation, "
     "validation, or benchmark scoring."
 )
+
+# Phase 12.14b - thermal badges for the explain-only memory temperature view.
+_MEMORY_TEMPERATURE_BADGES = {
+    "hot": "🔥 hot",
+    "warm": "🌤 warm",
+    "cold": "❄️ cold",
+    "frozen": "🧊 frozen",
+}
+
+# Only the first few reasons are surfaced in the table so the section stays
+# readable; the full reasoning lives in the underlying classifier.
+_MEMORY_TEMPERATURE_MAX_REASONS = 3
 
 # Matches an explicit graph distance inside a spread reason, e.g.
 # "distance-1 neighbor of ...", "distance 2", or "distance=0".
@@ -200,6 +216,53 @@ def _fmt_score(value) -> str:
         return "-"
 
 
+def memory_temperature_badge(band: str) -> str:
+    """Map a thermal band to its explain-only display badge.
+
+    Unknown bands degrade gracefully (the raw band text is echoed) so a future
+    classifier band never crashes the report.
+    """
+    key = (band or "").strip().lower()
+    return _MEMORY_TEMPERATURE_BADGES.get(key, f"• {band}")
+
+
+def format_memory_temperature_section(notes, *, limit=None, now=None) -> str:
+    """Render an explain-only Memory Temperature subsection for note records.
+
+    Phase 12.14b: classifies each already-loaded note via
+    :func:`core.memory_temperature.classify_memory_batch` (hot/warm/cold/frozen)
+    and shows the band badge, temperature, ``should_surface``, and short
+    reasons. This is visibility only - it never loads, writes, retrieves, or
+    promotes lessons, and never feeds ranking/scoring/prompt behavior.
+    """
+    results = classify_memory_batch(notes, now=now, limit=limit)
+
+    lines: list[str] = []
+    lines.append("## Memory Temperature")
+    lines.append("")
+    lines.append("| item_id | band | temperature | should_surface | reasons |")
+    lines.append("| --- | --- | --- | --- | --- |")
+    if not results:
+        lines.append("| _(no notes)_ | - | - | - | - |")
+    else:
+        for item in results:
+            short_reasons = list(item.reasons)[:_MEMORY_TEMPERATURE_MAX_REASONS]
+            reasons_text = "; ".join(short_reasons) if short_reasons else "-"
+            lines.append(
+                "| {iid} | {badge} | {temp:.2f} | {surface} | {reasons} |".format(
+                    iid=_md_escape(item.item_id),
+                    badge=memory_temperature_badge(item.band),
+                    temp=item.temperature,
+                    surface="yes" if item.should_surface else "no",
+                    reasons=_md_escape(reasons_text),
+                )
+            )
+    lines.append("")
+    lines.append(f"> {MEMORY_TEMPERATURE_GUARDRAIL}")
+    lines.append("")
+    return "\n".join(lines)
+
+
 def build_related_notes_debug_markdown(
     notes,
     *,
@@ -208,12 +271,19 @@ def build_related_notes_debug_markdown(
     target_path: str = "",
     graph_nodes=None,
     limit: int = 5,
+    include_memory_temperature: bool = False,
+    now=None,
 ) -> str:
     """Render an explain-only Related Notes / Lessons debug section.
 
     Accepts already-loaded note-like records only. It does not load or seed
     lessons, write storage, call external services, or feed results back into
     ranking/scoring/prompt behavior.
+
+    When ``include_memory_temperature`` is true (Phase 12.14b), a read-only
+    Memory Temperature subsection is appended that classifies the same notes for
+    hot/warm/cold/frozen visibility. Default is off so existing callers keep
+    their original output shape.
     """
     items = explain_related_notes(
         notes,
@@ -223,11 +293,20 @@ def build_related_notes_debug_markdown(
         graph_nodes=graph_nodes,
         limit=limit,
     )
-    return format_related_notes_markdown(items).replace(
+    markdown = format_related_notes_markdown(items).replace(
         "# Phantom Limb Related Notes (explain-only)",
         "## Related Notes / Lessons",
         1,
     )
+    if include_memory_temperature:
+        # Classify every provided note (not just the surfaced subset) so frozen
+        # notes remain visible as explain-only evidence.
+        markdown = (
+            markdown.rstrip()
+            + "\n\n"
+            + format_memory_temperature_section(notes, now=now)
+        )
+    return markdown
 
 
 def format_evidence_spread_markdown(result: dict, *, generated_at: str | None = None) -> str:

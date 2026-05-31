@@ -18,6 +18,14 @@
 
 > **2026-05-30 refresh:** Phase 12.10b Adaptive Harness Modes and the follow-up hard-deny runtime/path conflict message are shipped. `core/harness_modes.py` now makes deterministic `normal_patch`, `source_missing`, `path_outside_repo`, `codespaces_local_path_mismatch`, `ungrounded_patch_blocked`, and `degraded_context` decisions; web runner metadata surfaces the decision; hard path/runtime conflicts return a user-readable deny block before draft generation, including current runtime, active repo root, requested path, detected path environment, reason, and fix instructions. Guardrails: no Dream changes, no benchmark scoring changes, no prompt-heavy model intelligence, no patch-gate relaxation, no patch generation or apply when hard-denied.
 
+> **2026-05-31 refresh:** Phase 12.13c-e explainability layers are shipped. Phase 12.13c adds `core.related_notes`, a deterministic explain-only scorer/Markdown formatter for already-loaded lesson/proposal/memory-style notes. Phase 12.13d adds a pure `Related Notes / Lessons` debug/report formatter in `web.graph_evidence` that accepts already-loaded note records only. Phase 12.13e adds default-off graph explainability attraction notes to `scripts/explain_graph_weights.py` via `--include-attraction`, with optional `--query` and `--target-node`, reusing `graph.attraction` and preserving default table/JSON output. Guardrails: no graph weight math changes, no CONTROL ranking changes, no Phantom Limb ranking changes, no Evidence Spread scoring changes, no patch generation/selection changes, no validation or benchmark scoring changes, no model/API calls, no DB/storage writes, and no lesson seeding. See the 2026-05-31 explainability-stack refresh below for Phase 12.12b and 12.13a/b/f.
+
+> **2026-05-31 refresh:** Phase 12.12b, 12.13a, 12.13b, and 12.13f explain-only explainability slices are shipped (read-only; no CONTROL ranking, Evidence Spread scoring, graph-weight math, Phantom Limb ranking, patch generation, validation, benchmark scoring, model/API, or DB changes). **Phase 12.12b** attaches Evidence Confidence to Evidence Spread Markdown via `web.graph_evidence`: `classify_spread_node_confidence()` maps each serialized spread node to a `core.evidence_confidence` band (direct target / distance-0 = highest, distance-1/2 lower, missing/out-of-window = 0.0), and a new "Evidence Confidence" section renders combined score, strongest evidence, a per-node confidence table, and the `EVIDENCE_CONFIDENCE_GUARDRAIL`. **Phase 12.13a** adds `graph/attraction.py` — an immutable `GraphAttraction` dataclass plus `classify_node_attraction()`, `is_generic_utility_hub()`, `explain_attraction_batch()`, and `format_attraction_markdown()`; query/target/confidence/failure/graph-weight pull attraction, generic hubs + high-in-degree-without-query-match push repulsion, `net_score = clamp(attraction − repulsion, −1, 1)`, with a query-match override so a directly-named node is never classified a hub. **Phase 12.13b** renders a "Graph Attraction / Repulsion" section in the Evidence Spread report (after Evidence Confidence) by feeding the already-serialized spread nodes — enriched with their already-computed confidence on a shallow copy, never mutated — into `explain_attraction_batch`, with `GRAPH_ATTRACTION_REPORT_GUARDRAIL`. **Phase 12.13f** surfaces the explain-only layers in artifacts/UI: the presentation evidence pack now emits `07_graph_attraction_explainability.md` (embeds the latest `.agent/reports/graph_attraction/` report or a graceful explain-only placeholder; source report never modified) and the evidence index links it; a read-only `GET /graph/explainability/view` route renders the already-computed Evidence Confidence, Graph Attraction / Repulsion, and a `core.related_notes`-derived Related Notes / Lessons section (optional `as=html`, no model calls). Full suite green at 1294 passed; `benchmark --check` 32/0.
+
+> **2026-05-31 refresh:** Phase 12.13g Explainability Dogfood Experiment Record is shipped (read-only; no model calls, no benchmark execution, no ranking/patching/validation/benchmark-scoring/UI changes). `core/explainability_dogfood.py` reuses `core.experiments` (`list_benchmark_reports`, `extract_benchmark_metrics`) to compare the latest two meaningful benchmark reports before/after the explainability stack when available, and degrades gracefully when fewer than two exist. It references the five Phase 12.12-12.13f artifacts (Evidence Confidence section, Graph Attraction/Repulsion section, Related Notes/Lessons debug output, the `explain_graph_weights --include-attraction` smoke report, and presentation pack file `07_graph_attraction_explainability.md`) with on-disk existence flags, and records a behavior-focused decision (correctness unchanged, `benchmark --check` 32/0, full pytest 1294 passed, explainability added). Correctness assessment matches the experiment decision policy: a `total` (suite-size) change marks the before/after pair inconclusive and falls back to the asserted fact (passed↑ alone is never a regression); a same-size `failed`/`flaky` increase or `passed` decrease flags `human_review_required`. `scripts/create_explainability_dogfood.py` is the CLI; output is `.agent/experiments/<timestamp>_explainability-stack-dogfood.{json,md}`. Tests: `tests/test_explainability_dogfood.py` (13). Full suite green at 1319 passed; `benchmark --check` 32/0.
+
+> **2026-05-31 refresh:** Phase 12.14b Memory Temperature in Related Notes / Explainability UI is shipped (UI/report visibility only; reuses `core.memory_temperature`; no lesson-retrieval, CONTROL-prompt, ranking, graph-weight, Phantom-Limb-scoring, patch-generation, validation, benchmark-scoring, lesson-write, model/API, or DB changes). `web.graph_evidence` gains `memory_temperature_badge()` (🔥 hot / 🌤 warm / ❄️ cold / 🧊 frozen, unknown bands echo gracefully) and `format_memory_temperature_section()`, which classifies already-loaded note records via `classify_memory_batch` and renders an explain-only `## Memory Temperature` table (item_id · band badge · temperature · should_surface · short reasons) closed by `MEMORY_TEMPERATURE_GUARDRAIL`. `build_related_notes_debug_markdown(..., include_memory_temperature=False, now=None)` appends the section when opted in (default off preserves existing callers/tests); frozen notes still appear but are flagged `should_surface=no`. `GET /graph/explainability/view` now also renders the Memory Temperature section over its derived spread notes and adds `"Memory Temperature"` to `sections`. Tests: `tests/test_related_notes_memory_temperature.py` (10). Full suite green at 1329 passed; `benchmark --check` 32/0.
+
 ## Current checkpoint
 
 The project is a coding-agent workspace, not a Gemini patch script. Phase 4.7a-e Dream report-only trial/reference import, Phase 5 web revamp plus Phase 5.6 Goal Brief Builder, Phase 5.7 Prompt-Version & Cost Quantifier, Phase 7.1-7.2.1.1 Mayor/workflow bridge, and Phase 8.1/8.2a/8.2b/8.2c/8.3 MCP foundations are shipped.
@@ -83,7 +91,7 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 4.7a-e
   - 32 cases exist across C++, Go, HTML, JavaScript, Python, Rust, and TypeScript.
   - `--check`: 32 cases, 0 errors.
   - Latest full fast run after Phase 12.5k:
-    - 31/31 passed, 100% success rate.
+    - latest historical 31/31, current suite 32 cases passed, 100% success rate.
     - Hard TypeScript nested-dispatch case passed.
     - Linter fusion preserved correctness but increased fallback pressure, so it is marked cost-sensitive.
 - Phase 4.5 CLI background/proposal MVP:
@@ -128,7 +136,7 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 4.7a-e
 
 ### Main caveats
 
-- Do not claim a future clean `31/31` after code changes until a fresh full fast run passes.
+- Do not claim a future clean `32/32` after code changes until a fresh full fast run passes.
 - Level 3 proposal queue is gated: items without `human_approved_for_proposal=true` must skip, even if they look obvious.
 - Docker should remain optional. Current local workflow should not depend on app containers.
 - MCTS / branched repair should wait until Dream V2 and report flow are stable.
@@ -143,7 +151,7 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 4.7a-e
 
 ### A. Promote `--retry-failed 1` from optional → critical-path · **✅ SHIPPED 2026-05-16**
 
-**Why:** With LLM-dependent tests, single-attempt suites are permanently flaky. The "official 31/31" milestone is unreachable without retry. Currently sitting as "remaining optional" in Phase 2; recommend moving to "Do now."
+**Why:** With LLM-dependent tests, single-attempt suites are permanently flaky. The "official 32/32" milestone is unreachable without retry. Currently sitting as "remaining optional" in Phase 2; recommend moving to "Do now."
 
 **Effort:** Small. ~50 lines in `benchmarks/run_benchmarks.py`. Add `--retry-failed N` flag, on failure rerun N times, mark `flaky=true` in report if any retry passes.
 
@@ -271,6 +279,18 @@ This makes Phase 6 a precondition-design problem, not just a storage problem. **
 4. Held-out eval set.
 5. Repeated-failure Dream seeding.
 6. ~~Phase 6 lessons — § M guard MVP is shipped; still wire `Candidate_Lesson` → `Active_Knowledge` storage, human approval, and retrieval that reads only active knowledge.~~ ✅ (manual-safe loop shipped; benchmark-report seeding shipped as 6.4b; proposal-artifact seeding shipped as 6.4c; Dream queue auto-creation remains)
+
+### O. λ-Driven Task Decomposition (Thinking Chunk Orchestration)
+
+**🤖 Gemini-proposed (2026-05-31), user-accepted as a research thread.** See **Phase 15** for the design.
+
+**Why:** In high-complexity zones (dense call graph, many coupled files), a single large model call either runs out of context or produces shallow analysis. Instead of forcing the model to "think slower," decompose the task at the Orchestrator layer: measure zone density via static analysis (Semble), compute a λ Task Decomposition Factor, and break the query into N parallel sub-tasks for fast model calls, then refine.
+
+**Semble's role:** CPU-based static scanner acts as a zero-cost radar. It reports coupling density and cross-file call graph complexity to the λ function, which decides how many Thinking Chunks to spawn.
+
+**Concern (specific to this hardware):** Parallel API requests on a battery-throttled machine may hit network latency walls before model speed matters. Context drift across sub-tasks ("Tam sao thất bản") is also a real coherence risk — each parallel sub-task loses global C.A.T.T.U.S graph context, and the Refine step must merge potentially contradictory outputs. The Phase 15 design includes falsifiable experiment criteria to avoid building this speculatively.
+
+**Suggested first step:** Phase 15a — implement λ as a complexity classifier only (no decomposition, no parallel calls). Measure whether the classifier's output correlates with cases where the agent currently under-performs. Only greenlight decomposition after that data exists.
 
 ---
 
@@ -691,6 +711,37 @@ Rules:
 - Must remain optional.
 - Must not block basic local mode.
 - Must not require Docker.
+- Compare against current indexer using AgentBench before adopting.
+
+### Candidate embedding model: Model2Vec
+
+Model2Vec creates ultra-fast, tiny static embedding models by distilling a Sentence Transformers model — CPU-only inference, no GPU, minimal Torch footprint.
+
+Potential uses:
+- Replace or complement `EMBEDDING_PROVIDER=local_minilm` with a smaller, faster option.
+- Back lesson retrieval scoring or graph similarity without API calls.
+- Low memory overhead — viable on an 8GB RAM machine with no GPU.
+
+Rules:
+- Do not replace the current embedding provider before AgentBench proves retrieval quality matches or improves.
+- Must remain optional (`EMBEDDING_PROVIDER=model2vec`).
+- Must not require Docker or heavy Torch startup overhead.
+- Compare retrieval precision vs MiniLM using held-out lesson lookup before adopting.
+
+### Candidate static analysis tool: Semble
+
+Semble performs code similarity and semantic clone detection using CPU-based static analysis with no API calls.
+
+Potential uses:
+- Fast pre-filter ("static radar") before graph expansion — scan for high-coupling zones and cross-file call graph density in milliseconds.
+- Feed coupling/complexity signals to the λ Task Decomposition Factor (see Phase 15 research thread).
+- Augment Phantom Limb by flagging structurally similar code clusters as likely root-cause candidates.
+- Index `.agent/lessons/` to surface structurally similar past patches for a new case.
+- Possible component of the reference study loop (Phase 7).
+
+Rules:
+- Do not replace existing Scout/CONTROL indexing until AgentBench proves it improves results.
+- Must remain optional; must not block basic local mode or require Docker.
 - Compare against current indexer using AgentBench before adopting.
 ---
 
@@ -1399,6 +1450,138 @@ The Phase 6.2.2 lesson `tags` are a **soft prototype** of taxonomy. A fixed taxo
 
 - **Phase 6.4 auto-creation** (hard)
 - ~200+ active lessons with derived tags (observation budget — informs the taxonomy)
+
+---
+
+## Phase 15 — λ-Driven Task Decomposition / Thinking Chunk Orchestration
+
+**Status: 🤖 Gemini-proposed research thread (2026-05-31), user-accepted as candidate scope, not yet scheduled**
+
+> Core concept originated from a wave-physics analogy for agent behavior. The λ (lambda) function was originally proposed as a "wave density" parameter; Gemini reinterpreted it as a **Task Decomposition Factor** at the Orchestrator layer — not a model-level slowdown (which is impossible with Chat/Flash APIs), but a scheduling decision the system makes before any model call.
+
+### Core idea
+
+When a query hits a high-complexity zone (many interconnected files, dense call graph, high coupling), the Orchestrator breaks the task into N parallel sub-tasks — each processed by a fast, cheap model (Gemini Flash / Haiku) — then uses a final Refine task to synthesize results. This is **Map-Reduce + Fixed-Time Budgeting**.
+
+λ controls the decomposition count. High λ = many sub-tasks; low λ = single call.
+
+```text
+[Complex query]
+      │
+      ▼  Semble: CPU-based static scan, milliseconds, no API call
+┌──────────────────────────────────────────────────────────┐
+│  Report: coupling density, cross-file call graph depth   │
+└──────────────────────────────────────────────────────────┘
+      │
+      ▼  λ function: density = f(coupling, file count, complexity)
+      │
+  [λ low] ──────────────────────► single model call (normal path)
+      │
+  [λ high]
+      │
+      ▼  Orchestrator: time-sliced sub-tasks (budget: e.g. 10 sec)
+ Task 1   Task 2   Task 3   Task 4   ← parallel Flash calls, ~1-2s each
+      └────────────┬────────────┘
+                   ▼
+              Task 5: Refine          ← synthesis call, coherence check
+```
+
+### Semble → λ → C.A.T.T.U.S pipeline
+
+Semble acts as a zero-cost pre-filter. It reports which zones are genuinely dense before λ computes a decomposition count. This is compatible with the existing graph weights architecture (`graph/weights.py` + `graph/penalty.py`) — λ would consume the same complexity/coupling signals already produced by the weight computation, not duplicate them.
+
+Full pipeline: **Semble measures coupling** → **λ computes density** → **Orchestrator schedules Thinking Chunks** → **C.A.T.T.U.S controls graph structure safely at output**.
+
+### Extended architecture: Dual-Sided Vector Embedding Space
+
+The current graph nodes are positioned purely by structural signals (in_degree, out_degree, complexity, penalty). This design splits the node space into two symmetric sides that **superpose**:
+
+**Static side (Semble — "structural body"):** Scans AST via tree-sitter to anchor each Node (file/class) to a hard coordinate determined by call-graph link counts. Runs local on CPU in milliseconds. Produces a Background Mesh — a fixed coordinate grid for the codebase.
+
+**Dynamic side (LLM semantic — "semantic soul"):** Computes pairwise Cosine Similarity between code segments using attention weights from Opus 4.8. These distances are not fixed; they shift with query context — what the user is asking about pulls semantically similar nodes closer.
+
+**Superposition — Hybrid Potential Field:**
+
+```
+V(r) = Attraction_semantic(r) − Repulsion_structural(r) + Penalty_flaky
+```
+
+- `Attraction_semantic` — LLM cosine similarity: files that *mean* similar things attract each other.
+- `Repulsion_structural` — structural graph distance: files with many intermediate hops between them are pushed apart (partially implemented already via `graph/weights.py` topology terms).
+- `Penalty_flaky` — the existing `graph/penalty.py` blocked-lesson + failed-patch-attempts penalty, already wired into all three consumers (CONTROL, project_map, Obsidian).
+
+> **Connection to shipped code:** `graph/attraction.py` (Phase 12.13a) already computes `net_score = clamp(attraction − repulsion, −1, 1)` using query-match and graph-weight signals. The Dual-Sided design would upgrade `attraction` to include LLM cosine similarity and upgrade `repulsion` to use structural distance more precisely — but the consumer API (`explain_attraction_batch`) stays the same. The `Penalty_flaky` term is already there.
+
+The static side already exists. The missing piece is the LLM semantic embedding layer and the superposition formula that merges both into a single field value per node pair. Model2Vec (see "A Reference") is the candidate for producing the static embedding component without GPU overhead.
+
+### Extended architecture: λ as Tensor Density Field
+
+The basic Phase 15 design treats λ as a scalar threshold. The full architecture upgrades it to a **matrix field** covering the entire codebase:
+
+```
+λ(x, y) = ∇² · M_complexity + T_network_latency
+```
+
+- `∇² · M_complexity` — the Laplacian of the complexity matrix: measures how *sharply* complexity changes across the codebase landscape. A zone that transitions from simple to dense very quickly has a high second derivative and therefore high λ. Flat complexity regions have λ ≈ 0 regardless of absolute complexity.
+- `T_network_latency` — a runtime term: measured API round-trip times from recent Flash calls fed back into λ. High latency → raise the decomposition threshold, because parallelism won't pay off on a slow network.
+
+**"Contextual Black Hole" condition:** When `λ(x,y)` crosses a critical density in a zone, the surrounding metric space collapses — the Wavefront BFS treats that zone as a high-cost sink where further decomposition loses coherence faster than it gains coverage. The correct response is to escalate to a stronger model (Opus) or insert a human checkpoint rather than spawning more Flash sub-tasks.
+
+> **Practical note for this hardware:** The `T_network_latency` term makes λ self-regulating. On a battery-throttled machine with high network latency, λ will naturally stay below the decomposition threshold more often — degrading gracefully to single-call mode without manual tuning. This is a feature, not a limitation: the system adapts to the environment it is running in.
+
+### Concrete Thinking Chunk sub-task design (Micro-kernel scheduling)
+
+When `λ(x,y)` exceeds the decomposition threshold, the Orchestrator fires a parallel worker pool — analogous to CPU micro-scheduling where a blocked thread yields to ready threads:
+
+| Task | Worker | What it does | Dependencies |
+|------|--------|-------------|--------------|
+| Task 1 | Semble (CPU-local) | Parse AST of the affected zone; emit call-graph density and coupling report | None — runs first |
+| Task 2 | Phase 6 lesson retrieval | Scan `active/` memory for structurally similar past bugs; return top-N candidates | None — parallel with Task 1 |
+| Task 3 | Sandbox Draft Patcher | Run a draft patch attempt in temp-clone isolation (Dream Trial rapid mode) | Task 1 output |
+| Task 5 (Refine) | Flash / Haiku | Wave interference: collect outputs from Tasks 1–3, identify maximum-amplitude results (highest agreement, lowest divergence), synthesize a single patch candidate | Tasks 1, 2, 3 complete |
+
+**Wave interference metaphor for Refine:** The final Flash call does not "think freely" — it performs mathematical aggregation. Outputs that agree across Tasks 1–3 are reinforced (constructive interference); outputs that contradict are suppressed (destructive interference). The final patch is the superposition state with maximum amplitude, i.e. highest agreement across workers.
+
+**Infrastructure reuse:** Task 2 is `core/lesson_retrieval.py` (already exists). Task 3 is the existing temp-clone Dream patch path (already exists). Only the Orchestrator scheduling layer and the Refine aggregator are new code. This is not a rewrite — it is a thin coordination layer over existing machinery.
+
+### Practical concerns (8GB RAM, battery-throttled hardware)
+
+The Gemini analysis identified three hard constraints before this can work on this machine:
+
+1. **Network I/O bottleneck.** Parallel API requests compete for a bandwidth-throttled network interface (battery-saving mode). Five simultaneous Flash requests may exceed the 10-second budget due to network latency alone, not model speed. The first request's response may not arrive before the second is issued. This alone can shatter the fixed-time budget.
+
+2. **Context Drift ("Tam sao thất bản").** Each parallel sub-task receives only a slice of the global C.A.T.T.U.S graph context. The Flash instance handling Task 1 has no visibility into what Task 3 is doing. The Refine task must merge outputs that may contradict each other or miss global invariants. This is a real coherence risk that grows with the number of chunks.
+
+3. **Orchestrator state management.** The coordinating model must maintain task-slicing state across the parallel wave. Using a Flash-class model to manage its own decomposition state in a 10-second loop is a fragile design; state ownership must live in deterministic Python code, not inside a model.
+
+### Falsifiable experiment (greenlight criteria)
+
+Do not schedule without:
+
+1. **Baseline single-call latency.** Record median wall-clock latency for complex CONTROL runs today on this hardware.
+2. **Parallel decomposition pilot.** Run 5 adversarial benchmark cases with λ-triggered decomposition (3–4 sub-tasks + refine). Measure wall-clock latency including network round-trips.
+3. **Context coherence check.** For each decomposed case, compare the Refine output against a single-call output. Track divergence rate.
+4. **Greenlight rule:** Decomposition must reduce wall-clock time by ≥30% WITHOUT increasing output divergence/hallucination rate on held-out cases ≥5pp.
+
+If network latency dominates (likely on this hardware), defer until a better-networked environment is available — not to add orchestration complexity to work around bad hardware.
+
+### Prerequisites (hard order)
+
+1. **AI Suggestion § B — held-out eval set.** The coherence experiment requires a fixed test set that has never been tuned to.
+2. **Semble benchmarked as a static filter** (see "A Reference" section). Must prove it identifies the right high-complexity zones before wiring its output into λ.
+3. **Graph weights and Phantom Limb stable.** They supply the complexity signals λ would consume.
+
+### Alternates (smaller scope if Phase 15 feels too ambitious)
+
+- **Phase 15a — λ as complexity classifier only (no decomposition).** Let λ annotate each CONTROL request with `complexity_class: low | medium | high` and surface that in the debug trace. This is the observability prerequisite that makes Phase 15 proper falsifiable. No parallel calls, no orchestration risk, no context drift.
+- **Phase 15b — Sequential Thinking Chunks (no parallelism).** Run sub-tasks serially, not concurrently. Avoids the network I/O race condition and context drift problem. Slower in theory but safer on this hardware, and preserves global context intact between chunks because each chunk can receive the previous chunk's output.
+
+### Do not do without these
+
+- Do not add parallel API request patterns until the network bottleneck is measured on this specific machine.
+- Do not let the Orchestrator slice tasks without a deterministic Python state-keeper (not another model call) managing the decomposition.
+- Do not wire Semble into the live patch path before its output is validated against AgentBench results.
+- Do not surface Thinking Chunks in the synchronous web patch flow — keep them in Dream / offline experiment mode only, mirroring the MCTS rule from Phase 10.
 
 ---
 
