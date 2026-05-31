@@ -15,6 +15,7 @@ EXPECTED_FILES = [
     "04_patch_minimality_experiment.md",
     "05_same_suite_trends.md",
     "06_graph_weight_explainability.md",
+    "07_graph_attraction_explainability.md",
 ]
 
 

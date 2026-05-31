@@ -31,7 +31,14 @@ EVIDENCE_FILES = [
     "04_patch_minimality_experiment.md",
     "05_same_suite_trends.md",
     "06_graph_weight_explainability.md",
+    "07_graph_attraction_explainability.md",
 ]
+
+GRAPH_ATTRACTION_GUARDRAIL = (
+    "> Graph attraction/repulsion is explain-only. It does not change Evidence "
+    "Spread scoring, CONTROL ranking, Phantom Limb ranking, patch generation, "
+    "validation, or benchmark scoring."
+)
 
 
 def _load_json(path: Path) -> dict[str, Any] | None:
@@ -142,6 +149,74 @@ def _find_graph_artifact(project_root: Path) -> tuple[str | None, Path | None]:
             except OSError:
                 continue
     return None, None
+
+
+def _find_graph_attraction_artifact(project_root: Path) -> tuple[str | None, Path | None]:
+    """Locate the latest graph attraction/repulsion smoke or report artifact.
+
+    Read-only. Prefers stable, well-known names, then the newest timestamped
+    report under ``.agent/reports/graph_attraction/``. Returns ``(text, path)``
+    or ``(None, None)`` when no artifact exists."""
+    candidates = [
+        project_root / ".agent" / "graph_attraction.md",
+        project_root / ".agent" / "graph_attraction_smoke.md",
+        project_root / ".agent" / "reports" / "graph_attraction" / "latest.md",
+    ]
+    reports_dir = project_root / ".agent" / "reports" / "graph_attraction"
+    if reports_dir.is_dir():
+        for path in sorted(reports_dir.glob("*.md"), reverse=True):
+            if path.name != "latest.md" and path not in candidates:
+                candidates.append(path)
+    for candidate in candidates:
+        if candidate.exists():
+            try:
+                return candidate.read_text(encoding="utf-8"), candidate
+            except OSError:
+                continue
+    return None, None
+
+
+def _format_graph_attraction(
+    artifact_text: str | None,
+    source_path: Path | None,
+    include_raw_paths: bool,
+) -> str:
+    if artifact_text is not None:
+        lines = [
+            "# 07 Graph Attraction / Repulsion Explainability",
+            "",
+            "An existing graph attraction/repulsion report was found.",
+            "",
+        ]
+        if include_raw_paths and source_path is not None:
+            lines.extend([f"_Source: `{source_path}`_", ""])
+        lines.extend(
+            [
+                "```",
+                artifact_text.strip(),
+                "```",
+                "",
+                GRAPH_ATTRACTION_GUARDRAIL,
+                "",
+            ]
+        )
+        return "\n".join(lines)
+
+    return (
+        "# 07 Graph Attraction / Repulsion Explainability\n\n"
+        "_No graph attraction/repulsion report was found under "
+        "`.agent/reports/graph_attraction/` (or `.agent/graph_attraction*.md`)._\n\n"
+        "This section is explain-only: it visualizes which graph nodes attract "
+        "attention (query / target / evidence-confidence matches) and which "
+        "generic utility hubs repel it. A report is produced by the read-only "
+        "evidence-spread export, which now embeds the Graph Attraction / "
+        "Repulsion section:\n\n"
+        "```\n"
+        "POST /graph/evidence_spread/export  (repo_path, query, target_node)\n"
+        "```\n\n"
+        + GRAPH_ATTRACTION_GUARDRAIL
+        + "\n"
+    )
 
 
 GRAPH_AUTORUN_TOP = 15
@@ -596,6 +671,9 @@ def _format_index() -> str:
             "- **Same-suite trends prevent fake comparisons** from "
             "same-total / different-case reports. "
             "See [05_same_suite_trends.md](05_same_suite_trends.md).",
+            "- **Graph attraction/repulsion is explain-only**, visualizing which "
+            "nodes pull attention and which generic hubs push it away. "
+            "See [07_graph_attraction_explainability.md](07_graph_attraction_explainability.md).",
             "",
             "## Generated at",
             "",
@@ -638,6 +716,7 @@ def build_evidence_pack(
     graph_auto = (
         _try_build_graph_explanation(project_root) if graph_text is None else None
     )
+    attraction_text, attraction_path = _find_graph_attraction_artifact(project_root)
 
     written: dict[str, Path] = {}
 
@@ -675,6 +754,10 @@ def build_evidence_pack(
         "06_graph_weight_explainability.md",
         _format_graph(graph_text, graph_path, graph_auto, include_raw_paths),
     )
+    _write(
+        "07_graph_attraction_explainability.md",
+        _format_graph_attraction(attraction_text, attraction_path, include_raw_paths),
+    )
     _write("00_evidence_index.md", _format_index())
 
     return {
@@ -687,6 +770,7 @@ def build_evidence_pack(
         "minimality_path": minimality_path,
         "graph_artifact_path": graph_path,
         "graph_auto_explanation": graph_auto,
+        "graph_attraction_artifact_path": attraction_path,
     }
 
 
