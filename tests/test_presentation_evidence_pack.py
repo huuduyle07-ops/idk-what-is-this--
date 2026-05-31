@@ -13,6 +13,7 @@ EXPECTED_FILES = [
     "05_same_suite_trends.md",
     "06_graph_weight_explainability.md",
     "07_graph_attraction_explainability.md",
+    "08_memory_temperature_explainability.md",
 ]
 
 
@@ -414,3 +415,153 @@ def test_graph_section_falls_back_to_placeholder_when_build_fails(tmp_path, monk
     assert "explain_graph_weights.py" in md
     assert "--top 15" in md
     assert result["graph_auto_explanation"] is None
+
+
+# --------------------------------------------------------------------------
+# Phase 12.14c - Memory Temperature evidence pack file
+# --------------------------------------------------------------------------
+
+MEMORY_TEMPERATURE_FILE = "08_memory_temperature_explainability.md"
+
+
+def test_memory_temperature_file_is_emitted(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+
+    path = result["output_dir"] / MEMORY_TEMPERATURE_FILE
+    assert path.exists()
+    assert path.read_text(encoding="utf-8").strip()
+
+
+def test_index_links_memory_temperature_file(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+    index = (result["output_dir"] / "00_evidence_index.md").read_text(encoding="utf-8")
+
+    assert f"]({MEMORY_TEMPERATURE_FILE})" in index
+    assert "memory temperature" in index.lower()
+
+
+def test_memory_temperature_placeholder_when_no_report(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / MEMORY_TEMPERATURE_FILE).read_text(encoding="utf-8")
+
+    # Graceful placeholder when there is no memory-temperature report yet.
+    assert "No memory" in md or "no memory" in md.lower()
+
+
+def test_memory_temperature_includes_formula_and_bands(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / MEMORY_TEMPERATURE_FILE).read_text(encoding="utf-8")
+
+    # Formula (Test 4).
+    assert "T_now" in md
+    assert "exp(" in md
+    assert "clamp(" in md
+    # hot/warm/cold/frozen explanation (Test 4).
+    for band in ("hot", "warm", "cold", "frozen"):
+        assert band in md.lower()
+    # Hard-freeze override is explained (Test 6 placeholder spec).
+    assert "freeze" in md.lower()
+
+
+def test_memory_temperature_includes_explain_only_guardrail(tmp_path):
+    from core.memory_temperature import MEMORY_TEMPERATURE_GUARDRAIL
+
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / MEMORY_TEMPERATURE_FILE).read_text(encoding="utf-8")
+
+    # Explain-only guardrail (Test 5).
+    assert "explain-only" in md.lower()
+    assert MEMORY_TEMPERATURE_GUARDRAIL in md
+
+
+def test_memory_temperature_embeds_existing_report(tmp_path):
+    project = tmp_path / "project"
+    report_dir = project / ".agent" / "reports" / "memory_temperature"
+    report_dir.mkdir(parents=True)
+    (report_dir / "latest.md").write_text(
+        "# Memory Temperature (explain-only)\n\nSENTINEL_REPORT_BODY\n",
+        encoding="utf-8",
+    )
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / MEMORY_TEMPERATURE_FILE).read_text(encoding="utf-8")
+
+    assert "SENTINEL_REPORT_BODY" in md
+    assert "explain-only" in md.lower()
+    assert result["memory_temperature_artifact_path"] is not None
+
+
+def test_memory_temperature_does_not_modify_source_report(tmp_path):
+    project = tmp_path / "project"
+    report_dir = project / ".agent" / "reports" / "memory_temperature"
+    report_dir.mkdir(parents=True)
+    source = report_dir / "latest.md"
+    source.write_text("# existing\n\nbody\n", encoding="utf-8")
+    before = source.read_text(encoding="utf-8")
+
+    pack.build_evidence_pack(project)
+
+    assert source.read_text(encoding="utf-8") == before
+
+
+def test_pack_module_has_no_forbidden_imports_or_calls():
+    import ast
+
+    source = Path(pack.__file__).read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    imported_modules: list[str] = []
+    call_names: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported_modules.extend(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported_modules.append(node.module)
+        elif isinstance(node, ast.Call):
+            func = node.func
+            if isinstance(func, ast.Name):
+                call_names.append(func.id)
+            elif isinstance(func, ast.Attribute):
+                call_names.append(func.attr)
+
+    forbidden_import_areas = (
+        "model",
+        "api",
+        "patching",
+        "validation",
+        "validator",
+        "run_benchmarks",
+    )
+    for imported in imported_modules:
+        parts = imported.split(".")
+        for forbidden in forbidden_import_areas:
+            assert not any(part == forbidden for part in parts), imported
+
+    forbidden_network = {"requests", "httpx", "urllib", "aiohttp", "socket", "subprocess", "openai"}
+    assert forbidden_network.isdisjoint(part.split(".")[0] for part in imported_modules)
+
+    forbidden_calls = {
+        "call_model",
+        "call_api",
+        "run_gemini_request",
+        "validate",
+        "run_benchmarks",
+        "start_benchmark_run_async",
+        "promote_lesson",
+        "save_candidate_lesson",
+    }
+    assert forbidden_calls.isdisjoint(call_names)

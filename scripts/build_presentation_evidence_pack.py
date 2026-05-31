@@ -15,6 +15,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from core.memory_temperature import MEMORY_TEMPERATURE_GUARDRAIL
+
 UNKNOWN = "unknown"
 
 GRAPH_EXPLAIN_COMMAND = (
@@ -32,7 +34,10 @@ EVIDENCE_FILES = [
     "05_same_suite_trends.md",
     "06_graph_weight_explainability.md",
     "07_graph_attraction_explainability.md",
+    "08_memory_temperature_explainability.md",
 ]
+
+MEMORY_TEMPERATURE_GUARDRAIL_BLOCK = f"> {MEMORY_TEMPERATURE_GUARDRAIL}"
 
 GRAPH_ATTRACTION_GUARDRAIL = (
     "> Graph attraction/repulsion is explain-only. It does not change Evidence "
@@ -215,6 +220,97 @@ def _format_graph_attraction(
         "POST /graph/evidence_spread/export  (repo_path, query, target_node)\n"
         "```\n\n"
         + GRAPH_ATTRACTION_GUARDRAIL
+        + "\n"
+    )
+
+
+def _find_memory_temperature_artifact(project_root: Path) -> tuple[str | None, Path | None]:
+    """Locate the latest memory-temperature report artifact, if any.
+
+    Read-only. Prefers stable, well-known names, then the newest timestamped
+    report under ``.agent/reports/memory_temperature/``. Returns ``(text, path)``
+    or ``(None, None)`` when no artifact exists."""
+    candidates = [
+        project_root / ".agent" / "memory_temperature.md",
+        project_root / ".agent" / "reports" / "memory_temperature" / "latest.md",
+    ]
+    reports_dir = project_root / ".agent" / "reports" / "memory_temperature"
+    if reports_dir.is_dir():
+        for path in sorted(reports_dir.glob("*.md"), reverse=True):
+            if path.name != "latest.md" and path not in candidates:
+                candidates.append(path)
+    for candidate in candidates:
+        if candidate.exists():
+            try:
+                return candidate.read_text(encoding="utf-8"), candidate
+            except OSError:
+                continue
+    return None, None
+
+
+def _format_memory_temperature(
+    artifact_text: str | None,
+    source_path: Path | None,
+    include_raw_paths: bool,
+) -> str:
+    if artifact_text is not None:
+        lines = [
+            "# 08 Memory Temperature Explainability",
+            "",
+            "An existing memory-temperature report was found.",
+            "",
+        ]
+        if include_raw_paths and source_path is not None:
+            lines.extend([f"_Source: `{source_path}`_", ""])
+        lines.extend(
+            [
+                "```",
+                artifact_text.strip(),
+                "```",
+                "",
+                MEMORY_TEMPERATURE_GUARDRAIL_BLOCK,
+                "",
+            ]
+        )
+        return "\n".join(lines)
+
+    # Graceful placeholder: explain the model even when no report exists yet.
+    return (
+        "# 08 Memory Temperature Explainability\n\n"
+        "_No memory-temperature report was found under "
+        "`.agent/reports/memory_temperature/` (or `.agent/memory_temperature.md`)._\n\n"
+        "This section is explain-only: it shows how warm each already-loaded "
+        "lesson / proposal / note is, so a reviewer can see *why* a memory would "
+        "or would not be surfaced. It never changes retrieval, ranking, or "
+        "scoring.\n\n"
+        "## Thermal bands\n\n"
+        "- 🔥 **hot** (`temperature >= 0.75`): recently reinforced or trusted; "
+        "would be surfaced.\n"
+        "- 🌤 **warm** (`temperature >= 0.40`): still relevant; would be "
+        "surfaced.\n"
+        "- ❄️ **cold** (`temperature < 0.40`): cooled off; not surfaced by "
+        "default.\n"
+        "- 🧊 **frozen** (`temperature == 0.0`): hard-frozen; never surfaced.\n\n"
+        "## Cooling formula\n\n"
+        "```\n"
+        "T_now = clamp(T_base * exp(-lambda * age_days) + reheating - risk, 0, 1)\n"
+        "```\n\n"
+        "where `lambda` is the cooling rate, `age_days` is how long since the "
+        "memory was last used, `reheating` rewards human approval / repeated "
+        "use / recent success, and `risk` subtracts needs-review and risk-score "
+        "penalties.\n\n"
+        "## Hard-freeze override\n\n"
+        "Records marked `blocked`, `unsafe`, failed-validation, or `audit-only` "
+        "are hard-frozen to `temperature == 0.0` regardless of reheating, so an "
+        "unsafe memory can never be surfaced. They remain visible here purely "
+        "for explanation.\n\n"
+        "A report is produced by the read-only memory-temperature classifier, "
+        "which is also embedded in the Related Notes / Lessons explainability "
+        "output:\n\n"
+        "```\n"
+        "GET /graph/explainability/view  (repo_path, query)\n"
+        "```\n\n"
+        + MEMORY_TEMPERATURE_GUARDRAIL_BLOCK
         + "\n"
     )
 
@@ -674,6 +770,10 @@ def _format_index() -> str:
             "- **Graph attraction/repulsion is explain-only**, visualizing which "
             "nodes pull attention and which generic hubs push it away. "
             "See [07_graph_attraction_explainability.md](07_graph_attraction_explainability.md).",
+            "- **Memory temperature is explain-only**, showing how warm each "
+            "loaded lesson/note is (hot/warm/cold/frozen) and *why* it would or "
+            "would not be surfaced. "
+            "See [08_memory_temperature_explainability.md](08_memory_temperature_explainability.md).",
             "",
             "## Generated at",
             "",
@@ -717,6 +817,7 @@ def build_evidence_pack(
         _try_build_graph_explanation(project_root) if graph_text is None else None
     )
     attraction_text, attraction_path = _find_graph_attraction_artifact(project_root)
+    memory_temp_text, memory_temp_path = _find_memory_temperature_artifact(project_root)
 
     written: dict[str, Path] = {}
 
@@ -758,6 +859,10 @@ def build_evidence_pack(
         "07_graph_attraction_explainability.md",
         _format_graph_attraction(attraction_text, attraction_path, include_raw_paths),
     )
+    _write(
+        "08_memory_temperature_explainability.md",
+        _format_memory_temperature(memory_temp_text, memory_temp_path, include_raw_paths),
+    )
     _write("00_evidence_index.md", _format_index())
 
     return {
@@ -771,6 +876,7 @@ def build_evidence_pack(
         "graph_artifact_path": graph_path,
         "graph_auto_explanation": graph_auto,
         "graph_attraction_artifact_path": attraction_path,
+        "memory_temperature_artifact_path": memory_temp_path,
     }
 
 
