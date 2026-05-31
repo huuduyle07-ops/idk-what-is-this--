@@ -119,11 +119,10 @@ def test_control_type_and_source_of_truth_are_correct():
     assert tuple(by_id["EMBEDDING_PROVIDER"]["enum_options"]) == ("off", "local_minilm", "gemini")
 
 
-def test_no_control_targets_env_files_in_this_phase():
-    # 12.15a never writes .env / docker-compose: env_targets are informational
-    # only and no apply function exists yet.
-    assert not hasattr(hc, "apply_to_env_files")
+def test_docker_compose_apply_not_implemented_yet():
+    # docker-compose writing is Phase 12.15c; it must not exist yet.
     assert not hasattr(hc, "apply_compose_patch")
+    assert not hasattr(hc, "preview_compose_patch")
 
 
 # --------------------------------------------------------------------------

@@ -18,7 +18,9 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import tempfile
+from datetime import datetime
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -476,3 +478,192 @@ def set_override(
     result["applied_live"] = applied_live
     result["restart_required"] = restart_required
     return result
+
+
+# ---------------------------------------------------------------------------
+# Phase 12.15b - Apply overlay values to .env (backup first; never compose)
+# ---------------------------------------------------------------------------
+ENV_TARGET = ".env"
+
+
+def default_env_path() -> Path:
+    return Path(_config.BASE_DIR) / ".env"
+
+
+def _env_path(repo_path: str | Path | None) -> Path:
+    if repo_path is not None:
+        return Path(repo_path) / ".env"
+    return default_env_path()
+
+
+def _selected_env_controls(control_ids) -> list[HarnessControl]:
+    """Resolve the editable, .env-targeted controls to consider.
+
+    With explicit ``control_ids``, planned / locked / unknown / non-editable /
+    non-.env controls raise HarnessControlError. With ``None``, scan all
+    editable controls whose ``env_targets`` include ``.env``.
+    """
+    if control_ids is None:
+        return [c for c in REGISTRY if c.editable and ENV_TARGET in c.env_targets]
+    selected: list[HarnessControl] = []
+    for cid in control_ids:
+        control = get_control(cid)
+        if control is None:
+            raise HarnessControlError(f"unknown control: {cid!r}")
+        if control.control_type == LOCKED_INVARIANT:
+            raise HarnessControlError(f"{cid} is a locked safety invariant.")
+        if control.control_type == READ_ONLY_PLANNED or not control.wired:
+            raise HarnessControlError(f"{cid} is planned / not wired.")
+        if not control.editable or ENV_TARGET not in control.env_targets:
+            raise HarnessControlError(f"{cid} does not target {ENV_TARGET}.")
+        selected.append(control)
+    return selected
+
+
+_env_line_re_cache: dict[str, re.Pattern] = {}
+
+
+def _env_key_pattern(key: str) -> re.Pattern:
+    pat = _env_line_re_cache.get(key)
+    if pat is None:
+        pat = re.compile(r"^\s*(?:export\s+)?" + re.escape(key) + r"\s*=")
+        _env_line_re_cache[key] = pat
+    return pat
+
+
+def _read_env_value(text: str, key: str) -> str | None:
+    pattern = _env_key_pattern(key)
+    for line in text.split("\n"):
+        if pattern.match(line):
+            return line.split("=", 1)[1].strip()
+    return None
+
+
+def _set_or_append_env_line(text: str, key: str, value: str) -> str:
+    pattern = _env_key_pattern(key)
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        if pattern.match(line):
+            lines[i] = f"{key}={value}"
+            return "\n".join(lines)
+    # Not found: append, preserving a trailing newline if present.
+    if lines and lines[-1] == "":
+        lines.insert(len(lines) - 1, f"{key}={value}")
+    else:
+        lines.append(f"{key}={value}")
+    return "\n".join(lines)
+
+
+def _normalize_env_current(control: HarnessControl, raw: str | None) -> str | None:
+    if raw is None:
+        return None
+    if control.value_kind == "bool":
+        t = raw.strip().lower()
+        if t in _TRUE_STRINGS:
+            return "true"
+        if t in _FALSE_STRINGS:
+            return "false"
+    return raw.strip()
+
+
+def pending_env_diff(
+    control_ids=None,
+    repo_path: str | Path | None = None,
+    overlay_path: str | Path | None = None,
+) -> list[dict[str, Any]]:
+    """Return the overlay-vs-.env differences for editable .env controls.
+
+    Each entry: ``{control_id, env_var, old, new, control_type, restart_required}``.
+    Read-only — touches no files for writing.
+    """
+    overlay = load_overlay(overlay_path)
+    env_path = _env_path(repo_path)
+    try:
+        env_text = env_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        env_text = ""
+
+    diff: list[dict[str, Any]] = []
+    for control in _selected_env_controls(control_ids):
+        desired = overlay.get(control.env_var)
+        if desired is None:
+            continue
+        raw_current = _read_env_value(env_text, control.env_var)
+        if _normalize_env_current(control, raw_current) == desired:
+            continue
+        diff.append(
+            {
+                "control_id": control.id,
+                "env_var": control.env_var,
+                "old": raw_current,
+                "new": desired,
+                "control_type": control.control_type,
+                "restart_required": control.control_type == EDITABLE_RESTART_REQUIRED,
+            }
+        )
+    return diff
+
+
+def _backup_env_file(env_path: Path, now: datetime | None) -> Path:
+    """Write a timestamped byte-for-byte backup of ``env_path``. May raise OSError."""
+    stamp = (now or datetime.now()).strftime("%Y%m%d_%H%M%S")
+    backup_path = env_path.parent / f"{env_path.name}.bak-{stamp}"
+    backup_path.write_bytes(env_path.read_bytes())
+    return backup_path
+
+
+def apply_to_env_files(
+    control_ids=None,
+    repo_path: str | Path | None = None,
+    now: datetime | None = None,
+    overlay_path: str | Path | None = None,
+) -> dict[str, Any]:
+    """Apply overlay values to ``.env`` after a timestamped backup.
+
+    Never writes ``docker-compose.yml``. Surgically updates only targeted
+    ``KEY=value`` lines (appending if absent) and leaves all other lines
+    byte-identical. Aborts (raising HarnessControlError) if the backup fails,
+    leaving ``.env`` untouched. A no-op when there is no pending diff.
+    """
+    diff = pending_env_diff(control_ids, repo_path=repo_path, overlay_path=overlay_path)
+    if not diff:
+        return {
+            "noop": True,
+            "file_written": None,
+            "backup_created": None,
+            "changes": [],
+            "restart_required": [],
+        }
+
+    env_path = _env_path(repo_path)
+
+    backup_created: str | None = None
+    if env_path.exists():
+        try:
+            backup_path = _backup_env_file(env_path, now)
+        except OSError as exc:
+            raise HarnessControlError(
+                f"backup of {env_path} failed; .env left untouched: {exc}"
+            ) from exc
+        backup_created = str(backup_path)
+
+    try:
+        text = env_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        text = ""
+    for entry in diff:
+        text = _set_or_append_env_line(text, entry["env_var"], entry["new"])
+    env_path.write_text(text, encoding="utf-8")
+
+    changes = [
+        {"control_id": e["control_id"], "env_var": e["env_var"], "old": e["old"], "new": e["new"]}
+        for e in diff
+    ]
+    restart_required = [e["control_id"] for e in diff if e["restart_required"]]
+    return {
+        "noop": False,
+        "file_written": str(env_path),
+        "backup_created": backup_created,
+        "changes": changes,
+        "restart_required": restart_required,
+    }

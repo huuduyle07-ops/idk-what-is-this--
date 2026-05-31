@@ -3541,3 +3541,23 @@ button {
 .harness-chip--risk-low { background: #f1f5f9; color: #475569; }
 .harness-chip--risk-medium { background: #fef9c3; color: #854d0e; }
 .harness-chip--risk-high { background: #fee2e2; color: #991b1b; }
+.harness-envapply__box {
+    border: 1px solid #f0c987;
+    background: #fffaf0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+}
+.harness-envapply__title { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+.harness-envapply__list { margin: 4px 0 8px; padding-left: 18px; font-size: 12px; }
+.harness-envapply__btn {
+    cursor: pointer;
+    border-radius: 6px;
+    border: 1px solid #d98a16;
+    background: #f6a623;
+    color: #1f2328;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.harness-envapply__hint { font-size: 11px; color: var(--color-text-muted, #666); margin-left: 8px; }

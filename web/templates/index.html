@@ -907,6 +907,7 @@
               <code>.env</code> or <code>docker-compose.yml</code>.
             </div>
             <div id="harnessControlsDocker" class="harness-controls__docker"></div>
+            <div id="harnessEnvApply" class="harness-controls__envapply"></div>
             <div id="harnessControlsList" class="harness-controls__list">
               <div class="health-empty">Loading…</div>
             </div>
@@ -3903,6 +3904,8 @@ function _renderHarnessControls(data) {
             `<span class="harness-chip harness-chip--readonly">status only · no lifecycle</span>`;
     }
 
+    _renderHarnessEnvApply(data.env_diff || []);
+
     const cats = data.categories || {};
     const order = _HARNESS_CATEGORY_ORDER.filter(k => cats[k] && cats[k].length)
         .concat(Object.keys(cats).filter(k => !_HARNESS_CATEGORY_ORDER.includes(k)));
@@ -3915,6 +3918,57 @@ function _renderHarnessControls(data) {
                 </div>`;
     }).join("");
     list.innerHTML = html || `<div class="health-empty">No controls.</div>`;
+}
+
+function _renderHarnessEnvApply(diff) {
+    const el = document.getElementById("harnessEnvApply");
+    if (!el) return;
+    if (!diff || !diff.length) {
+        el.innerHTML = "";
+        return;
+    }
+    const rows = diff.map(d => {
+        const restart = d.restart_required
+            ? ` <span class="harness-chip harness-chip--restart">restart</span>` : "";
+        const oldv = d.old == null ? "<em>(absent)</em>" : _escapeHtml(d.old);
+        return `<li><code>${_escapeHtml(d.env_var)}</code>: ${oldv} → <strong>${_escapeHtml(d.new)}</strong>${restart}</li>`;
+    }).join("");
+    el.innerHTML = `
+        <div class="harness-envapply__box">
+          <div class="harness-envapply__title">Pending <code>.env</code> changes (${diff.length})</div>
+          <ul class="harness-envapply__list">${rows}</ul>
+          <button type="button" class="harness-envapply__btn" onclick="applyEnvFiles()">
+            Apply to <code>.env</code></button>
+          <span class="harness-envapply__hint">Backs up <code>.env</code> first. Does not touch <code>docker-compose.yml</code>.</span>
+        </div>`;
+}
+
+function applyEnvFiles() {
+    fetch("/harness/controls/apply-env", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+    })
+        .then(r => r.json().then(body => ({ ok: r.ok, body })))
+        .then(({ ok, body }) => {
+            if (!ok || !body.ok) {
+                alert("Apply to .env failed: " + ((body && body.error) || "unknown error"));
+                return;
+            }
+            const rep = body.report || {};
+            if (rep.noop) {
+                _harnessFlash("No pending <code>.env</code> changes — nothing to apply.");
+            } else {
+                let msg = `Wrote <code>${_escapeHtml(rep.file_written)}</code>.`;
+                if (rep.backup_created) msg += ` Backup: <code>${_escapeHtml(rep.backup_created)}</code>.`;
+                if (rep.restart_required && rep.restart_required.length) {
+                    msg += ` Restart required for: ${_escapeHtml(rep.restart_required.join(", "))}.`;
+                }
+                _harnessFlash(msg);
+            }
+            loadHarnessControls(true);
+        })
+        .catch(err => alert("Request failed: " + err));
 }
 
 function setHarnessOverride(controlId, value) {
