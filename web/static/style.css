@@ -3547,9 +3547,13 @@ button {
     border-radius: 8px;
     padding: 8px 12px;
     margin-bottom: 12px;
+    color: #b91c1c;
 }
-.harness-envapply__title { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
-.harness-envapply__list { margin: 4px 0 8px; padding-left: 18px; font-size: 12px; }
+.harness-envapply__box code,
+.harness-envapply__box strong,
+.harness-envapply__box em { color: #991b1b; }
+.harness-envapply__title { font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #b91c1c; }
+.harness-envapply__list { margin: 4px 0 8px; padding-left: 18px; font-size: 12px; color: #b91c1c; }
 .harness-envapply__btn {
     cursor: pointer;
     border-radius: 6px;
@@ -3560,4 +3564,29 @@ button {
     font-size: 12px;
     font-weight: 600;
 }
-.harness-envapply__hint { font-size: 11px; color: var(--color-text-muted, #666); margin-left: 8px; }
+.harness-envapply__hint { font-size: 11px; color: #c2410c; margin-left: 8px; }
+.harness-composeapply__box {
+    border: 1px solid #93c5fd;
+    background: #f0f7ff;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    color: #1e3a8a;
+}
+.harness-composeapply__box code,
+.harness-composeapply__box strong,
+.harness-composeapply__box em { color: #1e40af; }
+.harness-composeapply__title { font-weight: 600; font-size: 13px; margin-bottom: 2px; color: #1e3a8a; }
+.harness-composeapply__sub { font-size: 11px; color: #2563eb; margin-bottom: 4px; }
+.harness-composeapply__list { margin: 4px 0 8px; padding-left: 18px; font-size: 12px; color: #1e3a8a; }
+.harness-composeapply__preview {
+    cursor: pointer; border-radius: 6px; border: 1px solid #93c5fd;
+    background: #e0edff; color: #1e3a8a; padding: 5px 12px; font-size: 12px; margin-right: 6px;
+}
+.harness-composeapply__btn {
+    cursor: pointer; border-radius: 6px; border: 1px solid #2563eb;
+    background: #3b82f6; color: #fff; padding: 5px 12px; font-size: 12px; font-weight: 600;
+}
+.harness-composeapply__notice {
+    font-size: 11px; color: #b45309; margin-top: 6px; line-height: 1.5;
+}

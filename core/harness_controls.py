@@ -667,3 +667,268 @@ def apply_to_env_files(
         "changes": changes,
         "restart_required": restart_required,
     }
+
+
+# ---------------------------------------------------------------------------
+# Phase 12.15c - Preview / apply to docker-compose.yml (cattus-web only)
+# ---------------------------------------------------------------------------
+COMPOSE_TARGET = "docker-compose.yml"
+COMPOSE_SERVICE = "cattus-web"
+_COMPOSE_KEY_RE = re.compile(r"^(\s+)([A-Za-z_][A-Za-z0-9_]*):\s?(.*)$")
+
+
+def default_compose_path() -> Path:
+    return Path(_config.BASE_DIR) / "docker-compose.yml"
+
+
+def _compose_path(repo_path: str | Path | None) -> Path:
+    if repo_path is not None:
+        return Path(repo_path) / "docker-compose.yml"
+    return default_compose_path()
+
+
+def _selected_compose_controls(control_ids) -> list[HarnessControl]:
+    """Resolve editable controls whose env_targets include docker-compose.yml.
+
+    Explicit planned / locked / unknown / non-editable / non-compose ids raise.
+    """
+    if control_ids is None:
+        return [c for c in REGISTRY if c.editable and COMPOSE_TARGET in c.env_targets]
+    selected: list[HarnessControl] = []
+    for cid in control_ids:
+        control = get_control(cid)
+        if control is None:
+            raise HarnessControlError(f"unknown control: {cid!r}")
+        if control.control_type == LOCKED_INVARIANT:
+            raise HarnessControlError(f"{cid} is a locked safety invariant.")
+        if control.control_type == READ_ONLY_PLANNED or not control.wired:
+            raise HarnessControlError(f"{cid} is planned / not wired.")
+        if not control.editable or COMPOSE_TARGET not in control.env_targets:
+            raise HarnessControlError(f"{cid} does not target {COMPOSE_TARGET}.")
+        selected.append(control)
+    return selected
+
+
+def _indent_of(line: str) -> int:
+    return len(line) - len(line.lstrip(" "))
+
+
+def _unquote(value: str) -> str:
+    v = value.strip()
+    if len(v) >= 2 and v[0] == v[-1] and v[0] in ("'", '"'):
+        return v[1:-1]
+    return v
+
+
+def _service_block_range(lines: list[str], service: str):
+    services_idx = None
+    for i, ln in enumerate(lines):
+        if ln.strip() == "services:" and _indent_of(ln) == 0:
+            services_idx = i
+            break
+    if services_idx is None:
+        return None
+    svc_idx = svc_indent = None
+    for i in range(services_idx + 1, len(lines)):
+        ln = lines[i]
+        if ln.strip() == "":
+            continue
+        ind = _indent_of(ln)
+        if ind == 0:
+            break  # left the services: section
+        if ln.strip() == f"{service}:":
+            svc_idx, svc_indent = i, ind
+            break
+    if svc_idx is None:
+        return None
+    svc_end = len(lines)
+    for i in range(svc_idx + 1, len(lines)):
+        ln = lines[i]
+        if ln.strip() == "":
+            continue
+        if _indent_of(ln) <= svc_indent:
+            svc_end = i
+            break
+    return svc_idx, svc_indent, svc_end
+
+
+def _env_block_range(lines: list[str], svc_idx: int, svc_indent: int, svc_end: int):
+    env_idx = env_indent = None
+    for i in range(svc_idx + 1, svc_end):
+        ln = lines[i]
+        if ln.strip() == "":
+            continue
+        ind = _indent_of(ln)
+        if ind <= svc_indent:
+            break
+        if ln.strip() == "environment:" and ind == svc_indent + 2:
+            env_idx, env_indent = i, ind
+            break
+    if env_idx is None:
+        return None
+    env_end = svc_end
+    for i in range(env_idx + 1, svc_end):
+        ln = lines[i]
+        if ln.strip() == "":
+            continue
+        if _indent_of(ln) <= env_indent:
+            env_end = i
+            break
+    return env_idx, env_indent, env_end
+
+
+def _compose_env_keys(lines: list[str], env_idx: int, env_end: int) -> list[tuple[int, str, str, str]]:
+    """Return (line_index, indent_str, key, raw_value) for each env key line."""
+    keys: list[tuple[int, str, str, str]] = []
+    for i in range(env_idx + 1, env_end):
+        if lines[i].strip() == "":
+            continue
+        m = _COMPOSE_KEY_RE.match(lines[i])
+        if m:
+            keys.append((i, m.group(1), m.group(2), m.group(3)))
+    return keys
+
+
+def _read_compose_env_value(text: str, key: str) -> str | None:
+    lines = text.split("\n")
+    rng = _service_block_range(lines, COMPOSE_SERVICE)
+    if rng is None:
+        return None
+    erng = _env_block_range(lines, *rng)
+    if erng is None:
+        return None
+    env_idx, _env_indent, env_end = erng
+    for _i, _ind, k, raw in _compose_env_keys(lines, env_idx, env_end):
+        if k == key:
+            return _unquote(raw)
+    return None
+
+
+def _set_compose_env_value(text: str, key: str, value: str) -> str:
+    lines = text.split("\n")
+    rng = _service_block_range(lines, COMPOSE_SERVICE)
+    if rng is None:
+        raise HarnessControlError(f"service {COMPOSE_SERVICE!r} not found in docker-compose.yml")
+    erng = _env_block_range(lines, *rng)
+    if erng is None:
+        raise HarnessControlError(
+            f"{COMPOSE_SERVICE}.environment block not found in docker-compose.yml"
+        )
+    env_idx, env_indent, env_end = erng
+    env_keys = _compose_env_keys(lines, env_idx, env_end)
+
+    for i, ind, k, _raw in env_keys:
+        if k == key:
+            lines[i] = f'{ind}{key}: "{value}"'
+            return "\n".join(lines)
+
+    # Append after the last existing env key (or right under environment:).
+    key_indent = env_keys[0][1] if env_keys else " " * (env_indent + 2)
+    insert_at = (env_keys[-1][0] + 1) if env_keys else (env_idx + 1)
+    lines.insert(insert_at, f'{key_indent}{key}: "{value}"')
+    return "\n".join(lines)
+
+
+def preview_compose_patch(
+    control_ids=None,
+    repo_path: str | Path | None = None,
+    overlay_path: str | Path | None = None,
+) -> list[dict[str, Any]]:
+    """Return the overlay-vs-docker-compose diff. Writes nothing."""
+    overlay = load_overlay(overlay_path)
+    compose_path = _compose_path(repo_path)
+    try:
+        text = compose_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        text = ""
+
+    diff: list[dict[str, Any]] = []
+    for control in _selected_compose_controls(control_ids):
+        desired = overlay.get(control.env_var)
+        if desired is None:
+            continue
+        raw_current = _read_compose_env_value(text, control.env_var)
+        normalized = None
+        if raw_current is not None:
+            normalized = raw_current.strip()
+            if control.value_kind == "bool":
+                low = normalized.lower()
+                if low in _TRUE_STRINGS:
+                    normalized = "true"
+                elif low in _FALSE_STRINGS:
+                    normalized = "false"
+        if normalized == desired:
+            continue
+        diff.append(
+            {
+                "control_id": control.id,
+                "env_var": control.env_var,
+                "old": raw_current,
+                "new": desired,
+                "restart_required": True,
+            }
+        )
+    return diff
+
+
+def _backup_compose_file(compose_path: Path, now: datetime | None) -> Path:
+    """Write a timestamped byte-for-byte backup of docker-compose.yml. May raise OSError."""
+    stamp = (now or datetime.now()).strftime("%Y%m%d_%H%M%S")
+    backup_path = compose_path.parent / f"{compose_path.name}.bak-{stamp}"
+    backup_path.write_bytes(compose_path.read_bytes())
+    return backup_path
+
+
+def apply_compose_patch(
+    control_ids=None,
+    repo_path: str | Path | None = None,
+    now: datetime | None = None,
+    overlay_path: str | Path | None = None,
+) -> dict[str, Any]:
+    """Apply overlay values to docker-compose.yml after a timestamped backup.
+
+    Updates only the ``cattus-web`` service ``environment:`` keys; leaves all
+    other services, volumes, healthchecks, and comments byte-identical. Aborts
+    (raising HarnessControlError) if the backup fails. A no-op when there is no
+    pending diff. Never runs Docker.
+    """
+    diff = preview_compose_patch(control_ids, repo_path=repo_path, overlay_path=overlay_path)
+    if not diff:
+        return {
+            "noop": True,
+            "file_written": None,
+            "backup_created": None,
+            "changes": [],
+            "restart_required": False,
+        }
+
+    compose_path = _compose_path(repo_path)
+    backup_created: str | None = None
+    if compose_path.exists():
+        try:
+            backup_path = _backup_compose_file(compose_path, now)
+        except OSError as exc:
+            raise HarnessControlError(
+                f"backup of {compose_path} failed; docker-compose.yml left untouched: {exc}"
+            ) from exc
+        backup_created = str(backup_path)
+
+    try:
+        text = compose_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        text = ""
+    for entry in diff:
+        text = _set_compose_env_value(text, entry["env_var"], entry["new"])
+    compose_path.write_text(text, encoding="utf-8")
+
+    changes = [
+        {"control_id": e["control_id"], "env_var": e["env_var"], "old": e["old"], "new": e["new"]}
+        for e in diff
+    ]
+    return {
+        "noop": False,
+        "file_written": str(compose_path),
+        "backup_created": backup_created,
+        "changes": changes,
+        "restart_required": True,
+    }

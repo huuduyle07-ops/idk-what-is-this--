@@ -119,10 +119,11 @@ def test_control_type_and_source_of_truth_are_correct():
     assert tuple(by_id["EMBEDDING_PROVIDER"]["enum_options"]) == ("off", "local_minilm", "gemini")
 
 
-def test_docker_compose_apply_not_implemented_yet():
-    # docker-compose writing is Phase 12.15c; it must not exist yet.
-    assert not hasattr(hc, "apply_compose_patch")
-    assert not hasattr(hc, "preview_compose_patch")
+def test_compose_and_env_apply_functions_exist():
+    # 12.15b added .env apply; 12.15c added docker-compose preview/apply.
+    assert hasattr(hc, "apply_to_env_files")
+    assert hasattr(hc, "preview_compose_patch")
+    assert hasattr(hc, "apply_compose_patch")
 
 
 # --------------------------------------------------------------------------

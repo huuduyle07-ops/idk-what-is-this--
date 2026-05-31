@@ -41,11 +41,16 @@ def harness_controls_list():
         env_diff = hc.pending_env_diff()
     except Exception:  # noqa: BLE001 - never let a diff probe crash the panel
         env_diff = []
+    try:
+        compose_diff = hc.preview_compose_patch()
+    except Exception:  # noqa: BLE001
+        compose_diff = []
     return {
         "ok": True,
         "categories": categories,
         "docker_status": _docker_status(),
         "env_diff": env_diff,
+        "compose_diff": compose_diff,
     }
 
 
@@ -58,6 +63,40 @@ def harness_controls_apply_env():
 
     try:
         report = hc.apply_to_env_files(control_ids=control_ids)
+    except hc.HarnessControlError as exc:
+        return {"ok": False, "error": str(exc)}, 400
+    except Exception as exc:  # noqa: BLE001
+        return {"ok": False, "error": f"unexpected error: {exc}"}, 500
+
+    return {"ok": True, "report": report}
+
+
+@bp.route("/harness/controls/compose-preview", methods=["POST"])
+def harness_controls_compose_preview():
+    payload = request.get_json(silent=True) or request.form
+    control_ids = payload.get("control_ids")
+    if control_ids is not None and not isinstance(control_ids, list):
+        return {"ok": False, "error": "control_ids must be a list"}, 400
+
+    try:
+        diff = hc.preview_compose_patch(control_ids=control_ids)
+    except hc.HarnessControlError as exc:
+        return {"ok": False, "error": str(exc)}, 400
+    except Exception as exc:  # noqa: BLE001
+        return {"ok": False, "error": f"unexpected error: {exc}"}, 500
+
+    return {"ok": True, "diff": diff}
+
+
+@bp.route("/harness/controls/compose-apply", methods=["POST"])
+def harness_controls_compose_apply():
+    payload = request.get_json(silent=True) or request.form
+    control_ids = payload.get("control_ids")
+    if control_ids is not None and not isinstance(control_ids, list):
+        return {"ok": False, "error": "control_ids must be a list"}, 400
+
+    try:
+        report = hc.apply_compose_patch(control_ids=control_ids)
     except hc.HarnessControlError as exc:
         return {"ok": False, "error": str(exc)}, 400
     except Exception as exc:  # noqa: BLE001

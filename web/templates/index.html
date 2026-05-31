@@ -908,6 +908,7 @@
             </div>
             <div id="harnessControlsDocker" class="harness-controls__docker"></div>
             <div id="harnessEnvApply" class="harness-controls__envapply"></div>
+            <div id="harnessComposeApply" class="harness-controls__composeapply"></div>
             <div id="harnessControlsList" class="harness-controls__list">
               <div class="health-empty">Loading…</div>
             </div>
@@ -3905,6 +3906,7 @@ function _renderHarnessControls(data) {
     }
 
     _renderHarnessEnvApply(data.env_diff || []);
+    _renderHarnessComposeApply(data.compose_diff || []);
 
     const cats = data.categories || {};
     const order = _HARNESS_CATEGORY_ORDER.filter(k => cats[k] && cats[k].length)
@@ -3964,6 +3966,90 @@ function applyEnvFiles() {
                 if (rep.restart_required && rep.restart_required.length) {
                     msg += ` Restart required for: ${_escapeHtml(rep.restart_required.join(", "))}.`;
                 }
+                _harnessFlash(msg);
+            }
+            loadHarnessControls(true);
+        })
+        .catch(err => alert("Request failed: " + err));
+}
+
+function _harnessComposeDiffRows(diff) {
+    return diff.map(d => {
+        const oldv = d.old == null ? "<em>(absent)</em>" : _escapeHtml(d.old);
+        return `<li><code>${_escapeHtml(d.env_var)}</code>: ${oldv} → <strong>${_escapeHtml(d.new)}</strong></li>`;
+    }).join("");
+}
+
+function _renderHarnessComposeApply(diff) {
+    const el = document.getElementById("harnessComposeApply");
+    if (!el) return;
+    if (!diff || !diff.length) {
+        el.innerHTML = "";
+        return;
+    }
+    el.innerHTML = `
+        <div class="harness-composeapply__box">
+          <div class="harness-composeapply__title">Pending <code>docker-compose.yml</code> changes (${diff.length})</div>
+          <div class="harness-composeapply__sub">Updates only the <code>cattus-web</code> service <code>environment:</code> keys.</div>
+          <ul class="harness-composeapply__list">${_harnessComposeDiffRows(diff)}</ul>
+          <button type="button" class="harness-composeapply__preview" onclick="previewComposePatch()">
+            Preview compose patch</button>
+          <button type="button" class="harness-composeapply__btn" onclick="applyComposePatch()">
+            Apply compose patch</button>
+          <div class="harness-composeapply__notice">
+            ⚠️ Backs up <code>docker-compose.yml</code> first. Docker is <strong>not</strong> restarted
+            automatically — rebuild/restart the container yourself for changes to take effect.
+          </div>
+        </div>`;
+}
+
+function previewComposePatch() {
+    fetch("/harness/controls/compose-preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+    })
+        .then(r => r.json().then(body => ({ ok: r.ok, body })))
+        .then(({ ok, body }) => {
+            if (!ok || !body.ok) {
+                alert("Preview failed: " + ((body && body.error) || "unknown error"));
+                return;
+            }
+            const diff = body.diff || [];
+            if (!diff.length) {
+                _harnessFlash("No pending <code>docker-compose.yml</code> changes.");
+                _renderHarnessComposeApply([]);
+                return;
+            }
+            _renderHarnessComposeApply(diff);
+        })
+        .catch(err => alert("Request failed: " + err));
+}
+
+function applyComposePatch() {
+    if (!window.confirm(
+        "Apply pending changes to docker-compose.yml?\n\n" +
+        "A timestamped backup is created first. Docker is NOT restarted automatically — " +
+        "you must rebuild/restart the container yourself afterwards."
+    )) return;
+    fetch("/harness/controls/compose-apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+    })
+        .then(r => r.json().then(body => ({ ok: r.ok, body })))
+        .then(({ ok, body }) => {
+            if (!ok || !body.ok) {
+                alert("Apply compose patch failed: " + ((body && body.error) || "unknown error"));
+                return;
+            }
+            const rep = body.report || {};
+            if (rep.noop) {
+                _harnessFlash("No pending <code>docker-compose.yml</code> changes — nothing to apply.");
+            } else {
+                let msg = `Wrote <code>${_escapeHtml(rep.file_written)}</code>.`;
+                if (rep.backup_created) msg += ` Backup: <code>${_escapeHtml(rep.backup_created)}</code>.`;
+                msg += " Docker not restarted — rebuild/restart the container yourself.";
                 _harnessFlash(msg);
             }
             loadHarnessControls(true);
