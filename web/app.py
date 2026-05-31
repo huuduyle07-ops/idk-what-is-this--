@@ -51,6 +51,7 @@ from web.patch_helpers import patch_plan_files
 from web.routes.patch_routes import bp as patch_routes_bp
 from web.routes.dream_trials_routes import bp as dream_trials_routes_bp
 from web.routes.dream_references_routes import bp as dream_references_routes_bp
+from web.routes.harness_controls_routes import bp as harness_controls_routes_bp
 from graph.builder import build_graph_from_repo
 from graph.exporter import safe_id, escape_mermaid_label
 from web.graph_evidence import (
@@ -63,6 +64,7 @@ app = Flask(__name__)
 app.register_blueprint(patch_routes_bp)
 app.register_blueprint(dream_trials_routes_bp)
 app.register_blueprint(dream_references_routes_bp)
+app.register_blueprint(harness_controls_routes_bp)
 
 WEB_DIR = Path(__file__).parent
 SESSION_FILE = WEB_DIR / "sessions.json"

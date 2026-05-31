@@ -1,0 +1,64 @@
+"""Phase 12.15a - Harness Control routes.
+
+GET /harness/controls          → grouped registry + read-only docker status.
+POST /harness/controls/overlay → Save overlay (persist desired value), and
+                                 live-patch editable_live controls in-process.
+
+Read-only with respect to models / DB / patching. This phase never writes
+``.env`` or ``docker-compose.yml`` and never starts/stops containers.
+"""
+from __future__ import annotations
+
+from flask import Blueprint, request
+
+from core import harness_controls as hc
+
+
+bp = Blueprint("harness_controls_routes", __name__)
+
+
+def _docker_status() -> dict:
+    """Reuse the existing read-only docker probe. Fail-soft to a stub."""
+    try:
+        from core.health import check_docker_sandbox
+
+        return check_docker_sandbox()
+    except Exception as exc:  # noqa: BLE001 - never let the panel crash
+        return {
+            "name": "Docker sandbox",
+            "status": "error",
+            "detail": f"probe failed: {type(exc).__name__}: {exc}"[:160],
+        }
+
+
+@bp.route("/harness/controls", methods=["GET"])
+def harness_controls_list():
+    try:
+        categories = hc.list_categories()
+    except Exception as exc:  # noqa: BLE001
+        return {"ok": False, "error": f"failed to list controls: {exc}"}, 500
+    return {
+        "ok": True,
+        "categories": categories,
+        "docker_status": _docker_status(),
+    }
+
+
+@bp.route("/harness/controls/overlay", methods=["POST"])
+def harness_controls_overlay():
+    payload = request.get_json(silent=True) or request.form
+    control_id = str(payload.get("control_id") or "").strip()
+    if not control_id:
+        return {"ok": False, "error": "control_id is required"}, 400
+    if "value" not in payload:
+        return {"ok": False, "error": "value is required"}, 400
+    value = payload.get("value")
+
+    try:
+        control = hc.set_override(control_id, value)
+    except hc.HarnessControlError as exc:
+        return {"ok": False, "error": str(exc)}, 400
+    except Exception as exc:  # noqa: BLE001
+        return {"ok": False, "error": f"unexpected error: {exc}"}, 500
+
+    return {"ok": True, "control": control}

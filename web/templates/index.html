@@ -887,6 +887,31 @@
             </div>
           </div>
 
+          <!-- Phase 12.15a: Harness Controls.
+               Shows current effective gate state and saves desired overrides to
+               .agent/harness_overrides.json. Live controls take effect now;
+               restart-required need an app restart. Planned & locked controls
+               are read-only. This panel never writes .env or docker-compose.yml. -->
+          <div class="health-section harness-controls-section">
+            <div class="health-header">
+              <strong>Harness Controls</strong>
+              <button type="button" class="sidebar-refresh"
+                      onclick="loadHarnessControls(true)"
+                      title="Re-fetch /harness/controls">⟳ Refresh</button>
+            </div>
+            <div class="harness-controls__note">
+              Saves desired overrides to <code>.agent/harness_overrides.json</code>.
+              <span class="harness-chip harness-chip--live">live</span> controls take effect now;
+              <span class="harness-chip harness-chip--restart">restart</span> controls need an app restart.
+              Planned and locked controls are read-only. This panel does not write
+              <code>.env</code> or <code>docker-compose.yml</code>.
+            </div>
+            <div id="harnessControlsDocker" class="harness-controls__docker"></div>
+            <div id="harnessControlsList" class="harness-controls__list">
+              <div class="health-empty">Loading…</div>
+            </div>
+          </div>
+
           <!-- Help / README viewer -->
           <div class="health-section">
             <div class="health-header">
@@ -3525,6 +3550,7 @@ function showWorkspaceTab(id) {
         dream:      () => { refreshDreamStatus(); refreshDreamReferences(false); loadPlanItems(false); },
         settings:   () => {
             loadHealthPanel(false);
+            if (typeof loadHarnessControls === "function") loadHarnessControls(false);
             if (typeof loadToolRegistry === "function") loadToolRegistry(false);
             if (typeof loadMcpAudit === "function") loadMcpAudit(false);
         },
@@ -3761,6 +3787,167 @@ function loadHealthPanel(force = false) {
         .catch(err => {
             if (list) list.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
         });
+}
+
+// Phase 12.15a: Harness Controls.
+// Reads GET /harness/controls; POST /harness/controls/overlay to save a desired
+// override. Live controls take effect now; restart-required need a restart.
+// Planned & locked controls are read-only. Never writes .env / docker-compose.
+let _harnessLoaded = false;
+
+const _HARNESS_CATEGORY_ORDER = ["gates", "dream", "docker", "invariants"];
+const _HARNESS_CATEGORY_LABELS = {
+    gates: "Gates", dream: "Dream", docker: "Docker", invariants: "Locked invariants",
+};
+
+function loadHarnessControls(force = false) {
+    if (_harnessLoaded && !force) return;
+    const list = document.getElementById("harnessControlsList");
+    if (list) list.innerHTML = `<div class="health-empty">Loading…</div>`;
+    fetch("/harness/controls")
+        .then(r => r.json())
+        .then(data => { _renderHarnessControls(data); _harnessLoaded = true; })
+        .catch(err => {
+            if (list) list.innerHTML =
+                `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        });
+}
+
+function _harnessTypeChip(t) {
+    if (t === "editable_live")
+        return `<span class="harness-chip harness-chip--live">live</span>`;
+    if (t === "editable_restart_required")
+        return `<span class="harness-chip harness-chip--restart">restart</span>`;
+    if (t === "read_only_planned")
+        return `<span class="harness-chip harness-chip--planned">planned</span>`;
+    if (t === "locked_invariant")
+        return `<span class="harness-chip harness-chip--locked">locked</span>`;
+    return "";
+}
+
+function _harnessStateBadge(c) {
+    const shown = c.pending != null ? c.pending : c.current_effective;
+    const s = String(shown).toLowerCase();
+    let cls = "health-badge--off", text = shown;
+    if (c.control_type === "locked_invariant") { cls = "health-badge--ok"; text = "on"; }
+    else if (c.control_type === "read_only_planned") { cls = "health-badge--missing"; text = "planned"; }
+    else if (s === "true" || s === "on") { cls = "health-badge--ok"; text = "on"; }
+    else if (s === "false" || s === "off") { cls = "health-badge--off"; text = "off"; }
+    const pending = c.applied_differs
+        ? ` <span class="harness-chip harness-chip--pending">pending restart/apply</span>` : "";
+    return `<span class="health-badge ${cls}">${_escapeHtml(text)}</span>${pending}`;
+}
+
+function _harnessControlInput(c) {
+    if (c.control_type === "read_only_planned") {
+        const ref = c.plan_ref ? ` (${_escapeHtml(c.plan_ref)})` : "";
+        return `<span class="harness-row__readonly">read-only${ref}</span>`;
+    }
+    if (c.control_type === "locked_invariant") {
+        return `<span class="harness-row__readonly">locked on</span>`;
+    }
+    const shown = c.pending != null ? c.pending : c.current_effective;
+    if (c.value_kind === "enum") {
+        const opts = (c.enum_options || []).map(o =>
+            `<option value="${_escapeHtml(o)}"${String(shown) === o ? " selected" : ""}>${_escapeHtml(o)}</option>`
+        ).join("");
+        return `<select class="harness-row__select"
+                   onchange="setHarnessOverride('${_escapeHtml(c.id)}', this.value)">${opts}</select>`;
+    }
+    // bool toggle
+    const isOn = String(shown).toLowerCase() === "true";
+    const next = isOn ? "false" : "true";
+    return `<button type="button"
+               class="harness-row__toggle ${isOn ? "is-on" : "is-off"}"
+               onclick="setHarnessOverride('${_escapeHtml(c.id)}', '${next}')">
+               ${isOn ? "Turn off" : "Turn on"}</button>`;
+}
+
+function _harnessControlRow(c) {
+    return `
+        <div class="harness-row harness-row--${_escapeHtml(c.control_type)}">
+          <div class="harness-row__main">
+            <div class="harness-row__label">${_escapeHtml(c.label)}</div>
+            <div class="harness-row__meta">
+              ${_harnessTypeChip(c.control_type)}
+              <span class="harness-chip harness-chip--src">${_escapeHtml(c.source_of_truth)}</span>
+              <span class="harness-chip harness-chip--risk-${_escapeHtml(c.risk)}">risk: ${_escapeHtml(c.risk)}</span>
+              ${c.env_var ? `<code class="harness-row__env">${_escapeHtml(c.env_var)}</code>` : ""}
+            </div>
+            <div class="harness-row__desc">${_escapeHtml(c.description || "")}</div>
+          </div>
+          <div class="harness-row__state">${_harnessStateBadge(c)}</div>
+          <div class="harness-row__action">${_harnessControlInput(c)}</div>
+        </div>`;
+}
+
+function _renderHarnessControls(data) {
+    const dockerEl = document.getElementById("harnessControlsDocker");
+    const list = document.getElementById("harnessControlsList");
+    if (!list) return;
+
+    if (!data || data.ok === false) {
+        const err = (data && data.error) || "unknown error";
+        if (dockerEl) dockerEl.innerHTML = "";
+        list.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        return;
+    }
+
+    if (dockerEl) {
+        const d = data.docker_status || {};
+        const cls = _healthBadgeClass(d.status);
+        dockerEl.innerHTML =
+            `<span class="health-badge ${cls}">${_escapeHtml(d.status || "?")}</span> ` +
+            `<strong>${_escapeHtml(d.name || "Docker")}</strong> ` +
+            `<span class="harness-controls__docker-detail">${_escapeHtml(d.detail || "")}</span> ` +
+            `<span class="harness-chip harness-chip--readonly">status only · no lifecycle</span>`;
+    }
+
+    const cats = data.categories || {};
+    const order = _HARNESS_CATEGORY_ORDER.filter(k => cats[k] && cats[k].length)
+        .concat(Object.keys(cats).filter(k => !_HARNESS_CATEGORY_ORDER.includes(k)));
+    const html = order.map(cat => {
+        const rows = (cats[cat] || []).map(_harnessControlRow).join("");
+        const label = _HARNESS_CATEGORY_LABELS[cat] || cat;
+        return `<div class="harness-group">
+                  <div class="harness-group__title">${_escapeHtml(label)}</div>
+                  ${rows}
+                </div>`;
+    }).join("");
+    list.innerHTML = html || `<div class="health-empty">No controls.</div>`;
+}
+
+function setHarnessOverride(controlId, value) {
+    fetch("/harness/controls/overlay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ control_id: controlId, value: value }),
+    })
+        .then(r => r.json().then(body => ({ ok: r.ok, body })))
+        .then(({ ok, body }) => {
+            if (!ok || !body.ok) {
+                alert("Could not save override: " + ((body && body.error) || "unknown error"));
+                return;
+            }
+            const c = body.control || {};
+            if (c.restart_required) {
+                _harnessFlash(`Saved. ${_escapeHtml(controlId)} is restart-required — restart the app to apply.`);
+            } else if (c.applied_live) {
+                _harnessFlash(`Saved and applied live: ${_escapeHtml(controlId)}.`);
+            }
+            loadHarnessControls(true);
+        })
+        .catch(err => alert("Request failed: " + err));
+}
+
+function _harnessFlash(msg) {
+    const el = document.getElementById("harnessControlsList");
+    if (!el) return;
+    const note = document.createElement("div");
+    note.className = "harness-controls__flash";
+    note.innerHTML = msg;
+    el.parentNode.insertBefore(note, el);
+    setTimeout(() => { if (note.parentNode) note.parentNode.removeChild(note); }, 6000);
 }
 
 // Phase 8-prep.1: Tool Registry viewer.
