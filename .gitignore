@@ -20,9 +20,11 @@ debug_last_*.txt
 
 # Local scratch tests
 local_test_repos/
+test_repo/
 scratch/
 tmp_tests/
 playground/
+.fresh_tmp_*/
 
 # Editor / cache / build
 .vscode/
