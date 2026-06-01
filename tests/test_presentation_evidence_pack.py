@@ -14,6 +14,7 @@ EXPECTED_FILES = [
     "06_graph_weight_explainability.md",
     "07_graph_attraction_explainability.md",
     "08_memory_temperature_explainability.md",
+    "09_memory_temperature_tiebreaker_dogfood.md",
 ]
 
 
@@ -565,3 +566,197 @@ def test_pack_module_has_no_forbidden_imports_or_calls():
         "save_candidate_lesson",
     }
     assert forbidden_calls.isdisjoint(call_names)
+
+
+# --------------------------------------------------------------------------
+# Phase 13.11b - Memory Temperature Tie-breaker Dogfood evidence pack file
+# --------------------------------------------------------------------------
+
+TIEBREAKER_DOGFOOD_FILE = "09_memory_temperature_tiebreaker_dogfood.md"
+
+
+def test_tiebreaker_dogfood_file_is_emitted(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+
+    path = result["output_dir"] / TIEBREAKER_DOGFOOD_FILE
+    assert path.exists()
+    assert path.read_text(encoding="utf-8").strip()
+
+
+def test_index_links_tiebreaker_dogfood_file(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+    index = (result["output_dir"] / "00_evidence_index.md").read_text(encoding="utf-8")
+
+    assert f"]({TIEBREAKER_DOGFOOD_FILE})" in index
+    assert "tie-breaker" in index.lower()
+
+
+def test_tiebreaker_dogfood_states_live_retrieval_unchanged(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / TIEBREAKER_DOGFOOD_FILE).read_text(encoding="utf-8")
+
+    assert "live retrieval is unchanged" in md.lower()
+
+
+def test_tiebreaker_dogfood_states_control_prompt_unchanged(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / TIEBREAKER_DOGFOOD_FILE).read_text(encoding="utf-8")
+
+    assert "control prompt is unchanged" in md.lower()
+
+
+def test_tiebreaker_dogfood_states_flag_false_unwired(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / TIEBREAKER_DOGFOOD_FILE).read_text(encoding="utf-8")
+
+    assert "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED" in md
+    lowered = md.lower()
+    assert "false" in lowered and "unwired" in lowered
+
+
+def test_tiebreaker_dogfood_states_cold_not_hard_filtered(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / TIEBREAKER_DOGFOOD_FILE).read_text(encoding="utf-8")
+
+    lowered = md.lower()
+    assert "cold" in lowered
+    assert "hard-filter" in lowered  # "never/not hard-filtered"
+
+
+def test_tiebreaker_dogfood_marks_frozen_audit_blocked_excluded(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / TIEBREAKER_DOGFOOD_FILE).read_text(encoding="utf-8")
+
+    lowered = md.lower()
+    # Explicit statement and the per-candidate exclusion column.
+    assert "excluded from control" in lowered
+    assert "excluded_from_control" in md
+    for term in ("frozen", "audit-only", "blocked"):
+        assert term in lowered
+
+
+def test_tiebreaker_dogfood_contains_representative_table(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / TIEBREAKER_DOGFOOD_FILE).read_text(encoding="utf-8")
+
+    # The dogfood table header from core.memory_temperature_retrieval_dogfood.
+    assert "| item_id |" in md
+    assert "original_rank" in md
+    assert "adjusted_rank" in md
+    assert "temperature_band" in md
+    # At least one representative built-in sample candidate is shown.
+    assert "blocked-lesson" in md
+
+
+def test_tiebreaker_dogfood_build_is_read_only(tmp_path):
+    project = tmp_path / "project"
+    bench = project / ".agent" / "benchmarks"
+    full = _write_benchmark_report(bench, "benchmark_report_full.json", total=31, passed=31)
+    exp_dir = project / ".agent" / "experiments"
+    experiment = _write_json(
+        exp_dir / "20260525_patch-minimality.json",
+        {
+            "experiment_id": "20260525_patch-minimality",
+            "title": "Patch minimality metric check",
+            "status": "compared",
+            "result": {"decision": {"status": "greenlight"}, "metrics": {}},
+            "created_at": "2026-05-25T01:30:52+00:00",
+        },
+    )
+    snapshots = {
+        path: path.read_text(encoding="utf-8") for path in (full, experiment)
+    }
+
+    pack.build_evidence_pack(project)
+
+    # The tie-breaker dogfood is built from a built-in sample; it must not
+    # touch (or even read into) the benchmark / experiment source artifacts.
+    for path, content in snapshots.items():
+        assert path.read_text(encoding="utf-8") == content
+    # No stray report files were written under the source artifact dirs.
+    assert sorted(p.name for p in bench.glob("*.json")) == ["benchmark_report_full.json"]
+    assert sorted(p.name for p in exp_dir.glob("*.json")) == ["20260525_patch-minimality.json"]
+
+
+def test_pack_module_has_no_tiebreaker_live_wiring():
+    import ast
+
+    source = Path(pack.__file__).read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    imported_modules: list[str] = []
+    call_names: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported_modules.extend(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported_modules.append(node.module)
+        elif isinstance(node, ast.Call):
+            func = node.func
+            if isinstance(func, ast.Name):
+                call_names.append(func.id)
+            elif isinstance(func, ast.Attribute):
+                call_names.append(func.attr)
+
+    # No live-retrieval / CONTROL-prompt / storage / DB / docker wiring.
+    forbidden_modules = {
+        "lesson_store",
+        "lesson_retrieval",
+        "control_engine",
+        "database",
+        "db",
+        "docker",
+        "subprocess",
+    }
+    for imported in imported_modules:
+        parts = imported.split(".")
+        assert forbidden_modules.isdisjoint(parts), imported
+
+    # No enabling the harness flag, no patching / validation / benchmark exec,
+    # no DB writes, no model/API calls.
+    forbidden_calls = {
+        "enable_control",
+        "set_harness_control",
+        "apply_patch_plan",
+        "generate_patch",
+        "run_validation",
+        "validate_patch",
+        "run_benchmarks",
+        "execute",
+        "commit",
+        "list_lessons",
+        "list_active_lessons",
+        "save_lesson",
+        "promote_lesson",
+        "block_lesson",
+        "Popen",
+        "check_call",
+    }
+    assert forbidden_calls.isdisjoint(call_names)
+
+    # The harness flag is only ever *described* as false/unwired, never set true.
+    assert "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED = True" not in source
+    assert "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED=True" not in source

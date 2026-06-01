@@ -311,6 +311,18 @@ LESSON_AUTO_ACTIVE = os.getenv("LESSON_AUTO_ACTIVE", "false").lower() not in {"0
 LESSON_RETRIEVAL_ENABLED = os.getenv("LESSON_RETRIEVAL_ENABLED", "false").lower() not in {"0", "false", "no"}
 LESSON_RETRIEVAL_LIMIT = int(os.getenv("LESSON_RETRIEVAL_LIMIT", "5"))
 LESSON_RETRIEVAL_MAX_CHARS = int(os.getenv("LESSON_RETRIEVAL_MAX_CHARS", "3000"))
+
+# Phase 13.11a: wire the Phase 13.9 Memory Temperature tie-breaker into the
+# final lesson-candidate ordering boundary (core.lesson_retrieval), behind a
+# disabled-by-default flag so live behavior is exactly unchanged. When false
+# (default), lesson ordering is an exact pass-through: no tie-break metadata, no
+# mutation. When true (controlled local experiments only), near-equal lessons
+# may be reordered by thermal band; the original relevance score is preserved,
+# cold lessons are never hard-filtered, and frozen/audit-only/blocked lessons are
+# never surfaced. The matching harness control stays READ_ONLY_PLANNED — this is
+# an env/config reader, not an editable UI toggle.
+MEMORY_TEMPERATURE_RETRIEVAL_ENABLED = os.getenv("MEMORY_TEMPERATURE_RETRIEVAL_ENABLED", "false").lower() not in {"0", "false", "no"}
+MEMORY_TEMPERATURE_TIEBREAK_ONLY = os.getenv("MEMORY_TEMPERATURE_TIEBREAK_ONLY", "true").lower() not in {"0", "false", "no"}
 CONTROL_TIME_BUDGET_SEC = 180
 MAX_REVIEW_AGENTS = 2
 

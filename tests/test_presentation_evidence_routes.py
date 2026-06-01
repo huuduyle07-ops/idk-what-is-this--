@@ -17,6 +17,7 @@ EXPECTED_FILES = [
     "06_graph_weight_explainability.md",
     "07_graph_attraction_explainability.md",
     "08_memory_temperature_explainability.md",
+    "09_memory_temperature_tiebreaker_dogfood.md",
 ]
 
 

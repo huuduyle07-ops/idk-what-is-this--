@@ -2,8 +2,14 @@
 
 Reads ONLY from `lessons/active/` via `core.lesson_store.list_lessons(status="active")`.
 Never reads candidate or blocked buckets. Never writes, never calls a model,
-never mutates a lesson record. Not yet wired into CONTROL / patch prompts —
-that wiring is Phase 6.3.
+never mutates a lesson record.
+
+Phase 13.11a: the final ordering boundary (`find_active_lessons`) optionally
+applies the Phase 13.9 Memory Temperature tie-breaker, gated by a
+disabled-by-default config flag (`MEMORY_TEMPERATURE_RETRIEVAL_ENABLED`). When
+the flag is false (the default) the ordering is an exact pass-through — no
+reordering, no metadata, no mutation — so live behavior is unchanged. The
+CONTROL prompt builder is untouched; it still consumes this boundary's output.
 """
 from __future__ import annotations
 
@@ -11,6 +17,10 @@ import re
 from typing import Any
 
 from core.lesson_store import STATUS_ACTIVE, list_lessons
+from core.memory_temperature_retrieval import (
+    TIEBREAK_METADATA_KEY,
+    apply_memory_temperature_tiebreaker,
+)
 
 
 _LIMIT_MIN = 1
@@ -174,7 +184,79 @@ def find_active_lessons(
         decorated = dict(lesson)
         decorated["_match_score"] = score
         out.append(decorated)
+    return _maybe_apply_temperature_tiebreaker(out)
+
+
+def _temperature_tiebreaker_flags() -> tuple[bool, bool]:
+    """Read the Phase 13.11a tie-breaker flags from config (fail-closed).
+
+    Returns ``(enabled, tiebreak_only)``. Defaults — and the fallback on any
+    import/attribute error — are ``(False, True)`` so the live ordering is
+    exactly unchanged. The flags are read here (at the call site), never inside
+    the pure tie-breaker helper.
+    """
+    try:
+        import config as _config
+    except Exception:
+        return False, True
+    enabled = bool(getattr(_config, "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED", False))
+    tiebreak_only = bool(getattr(_config, "MEMORY_TEMPERATURE_TIEBREAK_ONLY", True))
+    return enabled, tiebreak_only
+
+
+def _maybe_apply_temperature_tiebreaker(lessons: list[dict]) -> list[dict]:
+    """Optionally reorder near-equal lessons by Memory Temperature (Phase 13.11a).
+
+    Default-off (flag false): returns ``lessons`` unchanged — same objects, same
+    order, no metadata, no mutation — so the CONTROL prompt is unaffected.
+
+    Enabled: maps each lesson's integer ``_match_score`` onto the ``score`` key
+    the tie-breaker groups by, runs the conservative tie-break, then re-projects
+    the resulting order back onto the original lesson records (preserving every
+    field and the original ``_match_score``) with only the debug tie-break
+    metadata attached. Inputs are never mutated. Cold lessons are never
+    hard-filtered and frozen/audit-only/blocked lessons are only sunk last,
+    never surfaced or removed — that behavior lives in the 13.9 helper.
+    """
+    enabled, tiebreak_only = _temperature_tiebreaker_flags()
+    if not enabled:
+        return lessons
+
+    view = [
+        dict(lesson, score=_coerce_match_score(lesson.get("_match_score")))
+        for lesson in lessons
+    ]
+    adjusted = apply_memory_temperature_tiebreaker(
+        view, enabled=True, tiebreak_only=tiebreak_only, now=None
+    )
+
+    out: list[dict] = []
+    for item in adjusted:
+        meta = item.get(TIEBREAK_METADATA_KEY) if isinstance(item, dict) else None
+        original_index: int | None = None
+        if isinstance(meta, dict):
+            rank = meta.get("original_rank")
+            if isinstance(rank, int) and 1 <= rank <= len(lessons):
+                original_index = rank - 1
+        if original_index is not None:
+            # Original record (with its real `_match_score`) + debug metadata;
+            # drop the throwaway `score` view key by not copying it.
+            record = dict(lessons[original_index])
+            record[TIEBREAK_METADATA_KEY] = meta
+        else:
+            # Defensive fallback: keep the adjusted copy but strip the view key.
+            record = dict(item)
+            record.pop("score", None)
+        out.append(record)
     return out
+
+
+def _coerce_match_score(value: Any) -> float:
+    if isinstance(value, bool):
+        return 0.0
+    if isinstance(value, (int, float)):
+        return float(value)
+    return 0.0
 
 
 def format_lessons_for_prompt(lessons: list[dict], max_chars: int = 4000) -> str:
