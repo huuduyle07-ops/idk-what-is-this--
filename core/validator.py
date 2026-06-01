@@ -6,6 +6,8 @@ import shlex
 from pathlib import Path
 from typing import Tuple, Dict, Optional
 from dataclasses import dataclass
+
+from core.validation_command import validation_command_safety_issue
 # Compilers whose runtime DLLs frequently collide with Anaconda's bundled
 # mingw-w64 stubs (or other parallel installs) on Windows. When we see one of
 # these on PATH, we prepend its install dir to PATH for the child process so
@@ -146,6 +148,15 @@ def _native_toolchain_env() -> Optional[dict]:
 def run_validation_command(command: str, cwd: str, timeout: int = 30) -> tuple[bool, str]:
     if not command:
         return True, ""
+
+    # Phase 13.6 — shared shell chokepoint. Every validation command (user text,
+    # hardcoded default, or DB/profile-derived) flows through here before the
+    # shell sees it, so this is the one place to screen for destructive ops. With
+    # shell=True below, an unscreened command would run verbatim — so refuse here
+    # and never execute it.
+    issue = validation_command_safety_issue(command)
+    if issue:
+        return False, f"❌ Validation command blocked for safety: {issue}"
 
     try:
         is_windows = sys.platform == "win32"
