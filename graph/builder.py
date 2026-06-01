@@ -70,12 +70,6 @@ def build_graph_from_repo(repo_path: str) -> ProgramGraph:
                     graph.add_edge(sym_id, node_id, "executes")
 
             if sym.get("kind") == "function":
-                for step in sym.get("execution_flow", []):
-                    if step.get("type") == "expression":
-                        node_id = f"{sym_id}::expr::{step.get('start')}"
-                        graph.add_node(node_id, "expression", step.get("text", ""))
-                        graph.add_edge(sym_id, node_id, "executes")
-
                 for call in sym.get("calls", []):
                     call_id = f"call::{call}"
                     graph.add_node(call_id, "call", call)
