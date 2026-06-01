@@ -26,6 +26,8 @@ def test_goal_brief_start_route_creates_draft(client):
     body = resp.get_json()
     assert body["ok"] is True
     assert body["brief"]["goal"] == "Fix weird auth failure"
+    assert "summary" not in body["brief"]
+    assert set(body["brief"]) == set(goal_brief.GOAL_BRIEF_SCHEMA)
     assert body["summary"]["rows"][0]["label"] == "Goal"
     assert body["summary"]["rows"][0]["value"] == "Fix weird auth failure"
     assert Path(body["brief_path"]).is_file()
@@ -89,3 +91,23 @@ def test_goal_brief_panel_is_rendered(client):
     assert "Bug fix" in html
     assert "Raw details" in html
     assert "Copy final prompt" in html
+
+
+def test_goal_brief_panel_renders_guided_checklist(client):
+    resp = client.get("/")
+
+    assert resp.status_code == 200
+    html = resp.get_data(as_text=True)
+    assert 'id="goalBriefChecklist"' in html
+    assert "goal-brief-checklist-empty" in html
+    assert "Start with a goal to build the checklist." in html
+    assert "Task type" in html
+    assert "Observed result" in html
+    assert "Success criteria" in html
+    assert "Expected pass" in html
+    assert "Actual failure" in html
+    assert "Allowed files" in html
+    assert "Validation command" in html
+    assert 'const goalComplete = Boolean(String(brief.goal || "").trim());' in html
+    assert "insertGoalBriefReply('expected_result: all tests pass')" in html
+    assert "insertGoalBriefReply('validation_command: python -m pytest tests -q')" in html

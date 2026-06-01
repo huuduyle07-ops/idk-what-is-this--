@@ -1680,6 +1680,80 @@ button {
     color: #86efac;
 }
 
+.goal-brief-progress {
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+    color: #fbbf24;
+}
+
+.goal-brief-checklist {
+    display: grid;
+    gap: 10px;
+}
+
+.goal-brief-checklist-empty {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.goal-brief-checklist-group {
+    display: grid;
+    gap: 6px;
+}
+
+.goal-brief-checklist-group__title {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.goal-brief-checklist-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface-2);
+}
+
+.goal-brief-checklist-row--complete {
+    border-color: #166534;
+}
+
+.goal-brief-checklist-row--missing {
+    border-color: #7f1d1d;
+}
+
+.goal-brief-checklist-row__main {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+}
+
+.goal-brief-checklist-row__main span {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.goal-brief-checklist-row__main strong {
+    font-size: 12px;
+    font-weight: 600;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.goal-brief-checklist-row--missing strong {
+    color: #fca5a5;
+}
+
+.goal-brief-checklist-row button {
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
 .goal-brief-summary-row {
     display: grid;
     grid-template-columns: 118px minmax(0, 1fr);
