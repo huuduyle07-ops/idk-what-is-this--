@@ -14,6 +14,19 @@ def get_cached_graph(repo_path: str):
     return _graph_cache[repo_path]
 
 
+def clear_graph_cache(repo_path: str | None = None) -> None:
+    """Invalidate this module's graph cache (Phase 13.1).
+
+    Keyed by the raw ``repo_path``, mirroring ``get_cached_graph``. Passing
+    ``None`` clears everything; popping a missing key is a no-op, so repeated
+    clearing is safe.
+    """
+    if repo_path is None:
+        _graph_cache.clear()
+        return
+    _graph_cache.pop(repo_path, None)
+
+
 def extract_symbol_candidates(query: str) -> list[str]:
     import re
 

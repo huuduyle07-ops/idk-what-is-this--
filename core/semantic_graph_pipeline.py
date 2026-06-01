@@ -16,6 +16,19 @@ def get_semantic_graph(repo_path: str):
     return _graph_cache[repo]
 
 
+def clear_graph_cache(repo_path: str | None = None) -> None:
+    """Invalidate the semantic-graph pipeline cache (Phase 13.1).
+
+    Keyed the same way ``get_semantic_graph`` stores entries
+    (``str(Path(repo_path).resolve())``). Passing ``None`` clears everything;
+    popping a missing key is a no-op, so repeated clearing is safe.
+    """
+    if repo_path is None:
+        _graph_cache.clear()
+        return
+    _graph_cache.pop(str(Path(repo_path).resolve()), None)
+
+
 def build_obsidian_semantic_context(
     repo_path: str,
     vault_path: str,

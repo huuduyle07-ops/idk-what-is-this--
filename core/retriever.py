@@ -235,6 +235,21 @@ def get_cached_graph(repo_path):
         _graph_cache[repo_path] = build_graph_from_repo(repo_path)
     return _graph_cache[repo_path]
 
+def clear_graph_cache(repo_path: str | None = None) -> None:
+    """Invalidate the retriever's module-level graph cache (Phase 13.1).
+
+    ``_graph_cache`` is populated under two key conventions for the same repo:
+    ``get_cached_graph`` keys by the raw path while ``_get_cached_repo_graph``
+    keys by ``os.path.abspath``. Pop both so a single repo is fully cleared.
+    Passing ``None`` clears every entry. Popping a missing key is a no-op, so
+    repeated clearing is safe.
+    """
+    if repo_path is None:
+        _graph_cache.clear()
+        return
+    _graph_cache.pop(repo_path, None)
+    _graph_cache.pop(os.path.abspath(repo_path), None)
+
 # --- Embeddings ---
 
 def _flag(name: str, default: str = "true") -> bool:

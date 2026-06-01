@@ -35,12 +35,33 @@ def get_cached_graph(repo_path: str):
     return _graph_cache[repo_abs]
 
 def clear_graph_cache(repo_path: str | None = None) -> None:
+    """Clear the CONTROL graph cache *and* every other module-level graph cache.
+
+    Phase 13.1 (Graph Cache Invalidation Unification): CLI and web call this
+    helper believing it invalidates all graph caches before a re-analysis.
+    Historically it cleared only this module's ``_graph_cache``, leaving the
+    retriever, semantic-graph pipeline, and deep-project-understand caches free
+    to serve a stale graph. We now fan out to each of those caches so a re-index
+    never leaves a stale graph behind any consumer. Imports are function-local
+    to avoid any import cycle at module load.
+    """
     if repo_path is None:
         _graph_cache.clear()
-        return
+    else:
+        repo_abs = os.path.abspath(repo_path)
+        _graph_cache.pop(repo_abs, None)
 
-    repo_abs = os.path.abspath(repo_path)
-    _graph_cache.pop(repo_abs, None)
+    from core.retriever import clear_graph_cache as _clear_retriever_graph_cache
+    from core.semantic_graph_pipeline import (
+        clear_graph_cache as _clear_semantic_graph_cache,
+    )
+    from reasoning.deep_project_understand import (
+        clear_graph_cache as _clear_deep_graph_cache,
+    )
+
+    _clear_retriever_graph_cache(repo_path)
+    _clear_semantic_graph_cache(repo_path)
+    _clear_deep_graph_cache(repo_path)
 
 def extract_hotspots_from_project_map(project_map: str, limit: int = 10) -> list[str]:
     result: list[str] = []
