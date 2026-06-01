@@ -58,6 +58,7 @@ from web.graph_evidence import (
     build_scope_evidence_spread_debug,
     format_evidence_spread_markdown,
     format_memory_temperature_section,
+    format_memory_temperature_shadow_section,
 )
 
 app = Flask(__name__)
@@ -2645,6 +2646,7 @@ def graph_explainability_view_route():
     # Phase 12.14b: explain-only Memory Temperature view over the same derived
     # notes. Visibility only - no retrieval, ranking, or prompt behavior.
     temperature_md = format_memory_temperature_section(derived_notes)
+    shadow_md = format_memory_temperature_shadow_section(derived_notes)
 
     markdown_text = (
         spread_md.rstrip()
@@ -2652,6 +2654,8 @@ def graph_explainability_view_route():
         + related_md.strip()
         + "\n\n"
         + temperature_md.strip()
+        + "\n\n"
+        + shadow_md.strip()
         + "\n"
     )
 
@@ -2663,6 +2667,7 @@ def graph_explainability_view_route():
             "Graph Attraction / Repulsion",
             "Related Notes / Lessons",
             "Memory Temperature",
+            "Memory Temperature Shadow Retrieval",
         ],
     }
     if request.values.get("as", "").strip().lower() == "html":

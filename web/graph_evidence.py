@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from datetime import datetime, timezone
 
 from core.evidence_confidence import (
@@ -12,6 +13,7 @@ from core.memory_temperature import (
     MEMORY_TEMPERATURE_GUARDRAIL,
     classify_memory_batch,
 )
+from core.memory_temperature_shadow import build_shadow_retrieval_report
 from core.related_notes import explain_related_notes, format_related_notes_markdown
 from graph.attraction import explain_attraction_batch, format_attraction_markdown
 from graph.evidence_spread import assess_change_scope, compute_scope_aware_spread
@@ -32,6 +34,12 @@ GRAPH_ATTRACTION_REPORT_GUARDRAIL = (
     "Graph attraction/repulsion is explain-only. It does not change Evidence "
     "Spread scoring, CONTROL ranking, Phantom Limb ranking, patch generation, "
     "validation, or benchmark scoring."
+)
+
+MEMORY_TEMPERATURE_SHADOW_REPORT_GUARDRAIL = (
+    "Shadow retrieval is explain-only. It does not change lesson retrieval "
+    "order, CONTROL prompts, ranking, patch generation, validation, benchmark "
+    "scoring, or storage behavior."
 )
 
 # Phase 12.14b - thermal badges for the explain-only memory temperature view.
@@ -263,6 +271,84 @@ def format_memory_temperature_section(notes, *, limit=None, now=None) -> str:
     return "\n".join(lines)
 
 
+def format_memory_temperature_shadow_section(notes, *, limit=None, now=None) -> str:
+    """Render shadow temperature retrieval over already-loaded notes only."""
+    records = notes if isinstance(notes, list) else list(notes or [])
+    report = build_shadow_retrieval_report(records, now=now, limit=limit)
+    items = list(report.get("items") or [])
+
+    lines: list[str] = []
+    lines.append("## Memory Temperature Shadow Retrieval")
+    lines.append("")
+    lines.append(
+        "| item_id | source_key | original_rank | shadow_rank | rank_delta | "
+        "temperature_band | should_surface | excluded | blocked | reason |"
+    )
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
+    if not items:
+        lines.append("| _(no shadow lessons)_ | - | - | - | - | - | - | - | - | - |")
+    else:
+        for item in items:
+            original_rank = item.get("original_rank")
+            record = _shadow_record_for_rank(records, original_rank)
+            lines.append(
+                "| {item_id} | {source_key} | {original_rank} | {shadow_rank} | "
+                "{rank_delta} | {band} | {surface} | {excluded} | {blocked} | "
+                "{reason} |".format(
+                    item_id=_md_escape(item.get("item_id")),
+                    source_key=_md_escape(_shadow_source_key(record)),
+                    original_rank=original_rank or "-",
+                    shadow_rank=_shadow_optional_int(item.get("shadow_rank")),
+                    rank_delta=_shadow_optional_int(item.get("rank_delta")),
+                    band=_md_escape(item.get("temperature_band")),
+                    surface="yes" if item.get("should_surface") else "no",
+                    excluded="yes" if item.get("excluded") else "no",
+                    blocked="yes" if item.get("blocked") else "no",
+                    reason=_md_escape(item.get("reason") or "-"),
+                )
+            )
+    lines.append("")
+    lines.append(f"> {MEMORY_TEMPERATURE_SHADOW_REPORT_GUARDRAIL}")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def _shadow_record_for_rank(records, original_rank):
+    try:
+        index = int(original_rank) - 1
+    except (TypeError, ValueError):
+        return {}
+    if 0 <= index < len(records):
+        return records[index]
+    return {}
+
+
+def _shadow_source_key(record) -> str:
+    if not isinstance(record, Mapping):
+        return "unknown"
+    source = (
+        record.get("source_type")
+        or record.get("source")
+        or record.get("kind")
+        or "unknown"
+    )
+    key = (
+        record.get("path")
+        or record.get("file")
+        or record.get("node_id")
+        or record.get("note_id")
+        or record.get("id")
+        or ""
+    )
+    source_text = str(source).strip() or "unknown"
+    key_text = str(key).strip()
+    return f"{source_text}:{key_text}" if key_text else source_text
+
+
+def _shadow_optional_int(value):
+    return value if value is not None else "-"
+
+
 def build_related_notes_debug_markdown(
     notes,
     *,
@@ -272,6 +358,7 @@ def build_related_notes_debug_markdown(
     graph_nodes=None,
     limit: int = 5,
     include_memory_temperature: bool = False,
+    include_shadow_retrieval: bool = False,
     now=None,
 ) -> str:
     """Render an explain-only Related Notes / Lessons debug section.
@@ -284,6 +371,10 @@ def build_related_notes_debug_markdown(
     Memory Temperature subsection is appended that classifies the same notes for
     hot/warm/cold/frozen visibility. Default is off so existing callers keep
     their original output shape.
+
+    When ``include_shadow_retrieval`` is true (Phase 13.8), a read-only shadow
+    retrieval subsection is appended for the same already-loaded notes. It
+    never feeds live retrieval, prompt, ranking, or storage behavior.
     """
     items = explain_related_notes(
         notes,
@@ -305,6 +396,12 @@ def build_related_notes_debug_markdown(
             markdown.rstrip()
             + "\n\n"
             + format_memory_temperature_section(notes, now=now)
+        )
+    if include_shadow_retrieval:
+        markdown = (
+            markdown.rstrip()
+            + "\n\n"
+            + format_memory_temperature_shadow_section(notes, now=now)
         )
     return markdown
 
