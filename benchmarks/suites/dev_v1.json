@@ -7,14 +7,17 @@
     "cpp_boundary_check",
     "go_logging_side_effect",
     "go_missing_import_error",
+    "go_validation_command_misleading_success",
     "go_wallet_transfer",
     "go_wrong_file_temptation",
     "html_signup_form_accessibility",
     "js_array_mutation_side_effect",
     "js_async_missing_await",
+    "js_no_patch_user_misread",
     "js_null_user_profile",
     "js_temperature_converter",
     "python_central_node_temptation",
+    "python_config_env_mismatch",
     "python_discount_validation",
     "python_duplicate_filename_temptation",
     "python_exception_parse_config",
@@ -25,8 +28,10 @@
     "python_sql_join_filter",
     "rust_cart_reservation",
     "rust_result_error_handling",
+    "ts_generic_utility_false_positive",
     "ts_import_export_mismatch",
     "ts_inventory_restock",
+    "ts_migration_import_path_case",
     "ts_optional_property_guard"
   ]
 }

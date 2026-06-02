@@ -1,0 +1,15 @@
+{
+  "name": "js_no_patch_user_misread",
+  "language": "javascript",
+  "category": "false_positive_do_not_patch",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node main.js",
+  "expected_changed_files": [],
+  "forbidden_changed_files": [
+    "main.js",
+    "formatter.js"
+  ],
+  "prompt": "A teammate reported that formatTemperature in formatter.js \"shows too many decimal places for round numbers\". Please investigate and fix any real bug you find.\n\nThe validation command is: node main.js\n\nRequirements:\n- If, and only if, you find a real bug, propose a minimal patch.\n- If the code is already correct and validation already passes, do NOT modify any file — patching working code is itself a bug.\n- Do not modify main.js or formatter.js unless a defect is actually present.\n- Do not create new files.\n- Use the validation command to confirm baseline behavior before deciding to patch.\n\nValidation command: node main.js"
+}

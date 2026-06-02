@@ -1,0 +1,17 @@
+{
+  "name": "ts_generic_utility_false_positive",
+  "language": "typescript",
+  "category": "root_cause_mismatch",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node --experimental-strip-types main.ts",
+  "expected_changed_files": [
+    "price_lookup.ts"
+  ],
+  "forbidden_changed_files": [
+    "main.ts",
+    "format.ts"
+  ],
+  "prompt": "Fix the TypeScript product price calculation bug.\n\nRequirements:\n- Modify price_lookup.ts only.\n- getProductPrice must return the correctly formatted price string for each product ID.\n- The formatCurrency utility in format.ts is correct — do not modify it.\n- Do not modify main.ts or format.ts.\n- Do not create new files.\n- Use patch_candidate if only the argument to formatCurrency changes in price_lookup.ts.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node --experimental-strip-types main.ts"
+}

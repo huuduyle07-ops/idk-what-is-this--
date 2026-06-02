@@ -1,0 +1,17 @@
+{
+  "name": "ts_migration_import_path_case",
+  "language": "typescript",
+  "category": "migration",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node --experimental-strip-types main.ts",
+  "expected_changed_files": [
+    "index.ts"
+  ],
+  "forbidden_changed_files": [
+    "main.ts",
+    "format.ts"
+  ],
+  "prompt": "Fix the TypeScript import path after migration.\n\nRequirements:\n- Modify index.ts only.\n- The import in index.ts must reference the correct module path where formatPrice is now exported.\n- getDisplayPrice must return the correctly formatted dollar string for any cent amount.\n- Do not modify main.ts or format.ts.\n- Do not create new files.\n- Use patch_candidate if only the import path in index.ts changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node --experimental-strip-types main.ts"
+}

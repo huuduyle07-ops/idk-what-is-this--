@@ -1,0 +1,17 @@
+{
+  "name": "go_validation_command_misleading_success",
+  "language": "go",
+  "category": "correctness",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "go run .",
+  "expected_changed_files": [
+    "calculator.go"
+  ],
+  "forbidden_changed_files": [
+    "main.go",
+    "go.mod"
+  ],
+  "prompt": "Fix the Go Clamp function bug.\n\nRequirements:\n- Modify calculator.go only.\n- Clamp must return minVal when value is below minVal.\n- Clamp must return maxVal when value is above maxVal.\n- Clamp must return value unchanged when value is within [minVal, maxVal].\n- Do not modify main.go or go.mod.\n- Do not create new files.\n- Use patch_candidate if only Clamp changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: go run ."
+}

@@ -1,0 +1,17 @@
+{
+  "name": "python_embedding_provider_switch",
+  "language": "python",
+  "category": "migration",
+  "difficulty": "hard",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "embedding_adapter.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py",
+    "provider_config.py"
+  ],
+  "prompt": "Fix the Python embedding provider migration bug.\n\nRequirements:\n- Modify embedding_adapter.py only.\n- get_embedding must handle every provider listed in provider_config.AVAILABLE_PROVIDERS.\n- The new default provider (openai_v3) must be routed to a valid embedding function.\n- Do not modify main.py or provider_config.py.\n- Do not create new files.\n- Use patch_candidate if only the PROVIDER_MAP mapping changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

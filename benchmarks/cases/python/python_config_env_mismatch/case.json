@@ -1,0 +1,16 @@
+{
+  "name": "python_config_env_mismatch",
+  "language": "python",
+  "category": "config_mismatch",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": [
+    "config.py"
+  ],
+  "forbidden_changed_files": [
+    "main.py"
+  ],
+  "prompt": "Fix the Python config environment variable mismatch.\n\nRequirements:\n- Modify config.py only.\n- get_database_url must read from the DATABASE_URL environment variable.\n- get_port must read from the SERVER_PORT environment variable and return an int.\n- Do not modify main.py.\n- Do not create new files.\n- Use patch_candidate if only the env key name in get_database_url changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

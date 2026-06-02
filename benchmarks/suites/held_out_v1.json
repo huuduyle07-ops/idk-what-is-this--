@@ -9,6 +9,10 @@
     "python_false_positive_no_patch",
     "go_multifile_root_cause",
     "ts_callback_dispatch_ambiguity",
-    "ts_false_positive_no_patch"
+    "ts_false_positive_no_patch",
+    "python_embedding_provider_switch",
+    "rust_multi_file_trait_impl_root_cause",
+    "python_forbidden_file_temptation",
+    "ts_migration_import_path_case"
   ]
 }

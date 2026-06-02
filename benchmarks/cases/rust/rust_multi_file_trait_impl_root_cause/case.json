@@ -1,0 +1,18 @@
+{
+  "name": "rust_multi_file_trait_impl_root_cause",
+  "language": "rust",
+  "category": "multi_file_root_cause",
+  "difficulty": "hard",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "cargo run",
+  "expected_changed_files": [
+    "src/processor.rs"
+  ],
+  "forbidden_changed_files": [
+    "src/main.rs",
+    "Cargo.toml",
+    "Cargo.lock"
+  ],
+  "prompt": "Fix the Rust word count trait implementation bug.\n\nRequirements:\n- Modify src/processor.rs only.\n- The word_count method of the Summarize trait must count whitespace-delimited words, not characters.\n- word_count must return 0 for an empty document.\n- word_count must ignore leading, trailing, and consecutive whitespace.\n- Do not modify src/main.rs, Cargo.toml, or Cargo.lock.\n- Do not create new files.\n- Use patch_candidate if only word_count changes in src/processor.rs.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: cargo run"
+}
