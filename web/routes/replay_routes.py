@@ -5,8 +5,13 @@ import json
 from pathlib import Path
 from typing import Any
 
-from flask import Blueprint, request
+from flask import Blueprint, Response, request
 
+from core.replay_compare import (
+    DEFAULT_MAX_CHARS as COMPARE_DEFAULT_MAX_CHARS,
+    compare_replay_to_current,
+    format_replay_compare_markdown,
+)
 from core.replay_recorder import (
     ARTIFACT_NAMES,
     JSON_ARTIFACT_NAMES,
@@ -22,6 +27,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LIMIT = 50
 MAX_LIMIT = 200
 PREVIEW_CHAR_LIMIT = 12000
+COMPARE_MAX_CHARS = COMPARE_DEFAULT_MAX_CHARS
 
 REPLAY_ARTIFACT_ORDER = [
     "user_query.txt",
@@ -55,6 +61,16 @@ def _limit_from_request() -> int:
     if limit <= 0:
         return DEFAULT_LIMIT
     return min(limit, MAX_LIMIT)
+
+
+def _compare_max_chars_from_request() -> int:
+    try:
+        max_chars = int(str(request.values.get("max_chars") or "").strip())
+    except ValueError:
+        return COMPARE_MAX_CHARS
+    if max_chars <= 0:
+        return COMPARE_MAX_CHARS
+    return min(max_chars, COMPARE_MAX_CHARS)
 
 
 def _safe_replay_id(replay_id: str) -> str:
@@ -205,6 +221,39 @@ def replays_detail_route(replay_id: str):
         "artifacts": artifacts,
         "artifact_order": REPLAY_ARTIFACT_ORDER,
         "preview_char_limit": PREVIEW_CHAR_LIMIT,
+    }
+
+
+@bp.route("/replays/<replay_id>/compare", methods=["GET"])
+def replays_compare_route(replay_id: str):
+    try:
+        repo = _repo_from_request()
+        safe_id = _safe_replay_id(replay_id)
+        max_chars = _compare_max_chars_from_request()
+        result = compare_replay_to_current(
+            repo,
+            safe_id,
+            max_chars=max_chars,
+        )
+    except ValueError as exc:
+        return {"ok": False, "error": str(exc)}, 400
+    except FileNotFoundError as exc:
+        return {"ok": False, "error": str(exc), "replay_id": replay_id}, 404
+    except OSError as exc:
+        return {"ok": False, "error": str(exc)}, 500
+
+    if str(request.values.get("format") or "").strip().lower() == "markdown":
+        return Response(
+            format_replay_compare_markdown(result),
+            mimetype="text/markdown",
+        )
+
+    return {
+        "ok": True,
+        "repo_path": str(repo.resolve()),
+        "replay_id": safe_id,
+        "compare": result.to_dict(),
+        "max_chars": max_chars,
     }
 
 

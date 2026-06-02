@@ -92,6 +92,8 @@ def test_replay_panel_has_no_delete_or_execution_buttons():
         "deleteReplay",
         "rerunReplay",
         "replayRun",
+        "applyReplay",
+        "validateReplay",
         "applyPatch(",
         "runAllBenchmarks(",
         "startOvernight(",
@@ -107,8 +109,19 @@ def test_replay_fetches_are_get_only_and_route_scoped():
 
     assert "fetch(`/replays?repo_path=${encodeURIComponent(repo)}&limit=50`)" in js
     assert "fetch(`/replays/${encodeURIComponent(replayId)}?repo_path=${encodeURIComponent(repo)}`)" in js
+    assert "fetch(`/replays/${encodeURIComponent(replayId)}/compare?repo_path=${encodeURIComponent(repo)}`)" in js
     assert 'method: "POST"' not in js
     assert "fetch(\"/replays" not in js
+
+
+def test_replay_compare_action_exists_and_is_read_only():
+    js = _replay_js_segment(_template())
+
+    assert "Compare with current" in js
+    assert "compareReplay(replayId)" in js
+    assert "Compare reads only current saved debug artifacts." in js
+    assert "run_patch_plan_with_artifacts" not in js
+    assert "run_validation_command" not in js
 
 
 def test_artifact_text_is_escaped_and_large_preview_note_exists():
@@ -116,8 +129,11 @@ def test_artifact_text_is_escaped_and_large_preview_note_exists():
 
     assert '_escapeHtml(artifact.preview || "")' in js
     assert "_escapeHtml(JSON.stringify(manifest, null, 2))" in js
+    assert "_escapeHtml(diff)" in js
+    assert "_escapeHtml(result.guardrail_note || \"\")" in js
     assert "Preview truncated at" in js
     assert "innerHTML = artifact.preview" not in js
+    assert "innerHTML = summary.diff" not in js
 
 
 def test_json_artifacts_are_rendered_as_json_type_when_marked_by_route():

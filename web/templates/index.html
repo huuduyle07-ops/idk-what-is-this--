@@ -4666,6 +4666,63 @@ function _renderReplayArtifact(name, artifact) {
         </details>`;
 }
 
+function _renderReplayCompareArtifact(summary) {
+    const name = summary?.artifact_name || "artifact";
+    const status = summary?.status || "unknown";
+    const diff = summary?.diff || "";
+    const note = summary?.note || "";
+    const truncated = summary?.diff_truncated
+        ? `<div class="replay-artifact__truncated">Diff truncated for display.</div>`
+        : "";
+    const emptyDiff = diff
+        ? ""
+        : `<div class="replay-artifact__missing">${_escapeHtml(note || "No diff available.")}</div>`;
+    return `
+        <details class="replay-artifact replay-compare-artifact">
+            <summary>
+                <code>${_escapeHtml(name)}</code>
+                <span class="tool-badge ${status === "changed" ? "tool-badge--warn" : "tool-badge--off"}">${_escapeHtml(status)}</span>
+                <span class="replay-row__meta">+${Number(summary?.line_additions || 0)} / -${Number(summary?.line_deletions || 0)}</span>
+                <span class="replay-row__meta">${Number(summary?.old_size || 0)} -> ${Number(summary?.current_size || 0)} bytes</span>
+            </summary>
+            ${note && diff ? `<div class="replay-artifact__missing">${_escapeHtml(note)}</div>` : ""}
+            ${truncated}
+            ${emptyDiff}
+            ${diff ? `<pre class="replay-artifact__pre replay-compare__diff">${_escapeHtml(diff)}</pre>` : ""}
+        </details>`;
+}
+
+function _renderReplayCompare(data) {
+    if (!data || data.ok === false) {
+        const err = (data && data.error) || "unknown error";
+        return `<div class="health-empty">Compare failed: ${_escapeHtml(err)}</div>`;
+    }
+    const result = data.compare || {};
+    const summaries = Array.isArray(result.artifact_summaries)
+        ? result.artifact_summaries
+        : [];
+    return `
+        <details class="replay-compare" open>
+            <summary>
+                Compare with current
+                <span class="health-badge ${result.changed_count ? "health-badge--error" : "health-badge--ok"}">
+                    ${Number(result.changed_count || 0)} changed
+                </span>
+                <span class="replay-row__meta">${Number(result.unchanged_count || 0)} unchanged</span>
+            </summary>
+            <div class="replay-compare__summary">
+                <div><strong>Compared</strong> ${_escapeHtml(result.compared_at || "")}</div>
+                <div><strong>Compared artifacts</strong> ${Array.isArray(result.artifacts_compared) ? result.artifacts_compared.length : 0}</div>
+                <div><strong>Missing current</strong> ${Array.isArray(result.artifacts_missing_current) ? result.artifacts_missing_current.length : 0}</div>
+                <div><strong>Missing replay</strong> ${Array.isArray(result.artifacts_missing_old) ? result.artifacts_missing_old.length : 0}</div>
+            </div>
+            <div class="replay-debugger__note">${_escapeHtml(result.guardrail_note || "")}</div>
+            <div class="replay-artifacts">
+                ${summaries.map(item => _renderReplayCompareArtifact(item)).join("")}
+            </div>
+        </details>`;
+}
+
 function _renderReplayDetail(data) {
     const detail = document.getElementById("replayDetail");
     if (!detail) return;
@@ -4681,8 +4738,18 @@ function _renderReplayDetail(data) {
     const order = Array.isArray(data.artifact_order) && data.artifact_order.length
         ? data.artifact_order
         : REPLAY_ARTIFACT_ORDER;
+    const replayId = manifest.replay_id || data.replay_id || _activeReplayId || "";
+    const compareAction = replayId ? `
+        <div class="replay-actions">
+            <button type="button" class="lesson-btn--secondary"
+                    onclick="compareReplay('${_replayJsArg(replayId)}')">Compare with current</button>
+        </div>
+        <div id="replayCompare" class="replay-compare-slot">
+            <div class="health-empty">Compare reads only current saved debug artifacts.</div>
+        </div>` : "";
     detail.innerHTML =
         _renderReplayManifest(manifest) +
+        compareAction +
         `<div class="replay-artifacts">${order.map(name => _renderReplayArtifact(name, artifacts[name])).join("")}</div>`;
 }
 
@@ -4708,6 +4775,25 @@ function viewReplay(replayId) {
         .catch(err => {
             if (detail) detail.innerHTML =
                 `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        });
+}
+
+function compareReplay(replayId) {
+    const repo = _replayRepoPath();
+    const target = document.getElementById("replayCompare");
+    if (!repo) {
+        if (target) target.innerHTML = `<div class="health-empty">Set a repo path first.</div>`;
+        return;
+    }
+    if (target) target.innerHTML = `<div class="health-empty">Comparing saved current artifacts...</div>`;
+    fetch(`/replays/${encodeURIComponent(replayId)}/compare?repo_path=${encodeURIComponent(repo)}`)
+        .then(r => r.json().then(body => ({ status: r.status, body })))
+        .then(({ status, body }) => {
+            if (target) target.innerHTML = _renderReplayCompare(body);
+        })
+        .catch(err => {
+            if (target) target.innerHTML =
+                `<div class="health-empty">Compare failed: ${_escapeHtml(err)}</div>`;
         });
 }
 
