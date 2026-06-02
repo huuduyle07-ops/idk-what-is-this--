@@ -18,6 +18,7 @@ from agents.model_stats import ModelStatsScope, format_usage_report
 from core.json_utils import extract_json_block
 from core.validation_command import get_default_validation_command
 from web.runner import run_agent_web
+from web.dream_report_markdown import render_dream_report_markdown
 from agents.deepseek_client import run_deepseek_review
 from config import get_agent_dir, FOLDER_BLACKLIST
 from core.project_tag import build_project_tag, fingerprint_repo  # re-exported for legacy callers
@@ -738,7 +739,14 @@ def dream_report_route():
 
     if not report_dir.is_dir():
         return {"error": f"no report for date={date}{(' run=' + run) if run else ' (legacy)'}"}
-    return dream_artifacts.read_report(report_dir)
+    report = dream_artifacts.read_report(report_dir)
+    # Phase 5P.1: render the morning report Markdown to safe HTML for the
+    # viewer modal. The raw `morning_report` text is left in place as a
+    # fallback; this only adds a rendered companion field.
+    report["morning_report_html"] = render_dream_report_markdown(
+        report.get("morning_report", "")
+    )
+    return report
 
 
 @app.route("/dream/apply", methods=["POST"])

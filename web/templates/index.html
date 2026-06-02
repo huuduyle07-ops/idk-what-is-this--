@@ -599,9 +599,14 @@
                Report-only artifacts for idea / research / reference work types.
                Reuses the Work type, Action level, title, hint, reference notes,
                and markdown files fields above; never patches, never commits. -->
-          <div class="dream-section dream-trials-section">
+          <details id="dreamTrialsSection" class="dream-section dream-trials-section" data-ui-group="dream-structured-trials">
+            <summary class="dream-trials-summary">Research / Trial reports</summary>
             <div class="dream-trials-header">
               <strong>Structured Trial Reports</strong>
+            </div>
+            <div id="dreamTrialsRelevanceNote" class="dream-trials-relevance" hidden>
+              Structured Trial Reports are used for research/study workflows.
+              Choose a research or report-only action level to create one.
             </div>
             <div class="dream-trials-note">
               Creates seven structured markdown files plus a <code>trial.json</code> under
@@ -635,7 +640,8 @@
               </div>
               <pre id="dreamTrialViewerBody" class="dream-trial-viewer-body"></pre>
             </div>
-          </div>
+          </details>
+          <!-- /dream-structured-trials -->
 
           <!-- Phase 5 Polish: Plan items from the latest background_dream_plan_*.json.
                Each item has a "Make proposal" button that triggers the same flow
@@ -2131,9 +2137,24 @@ const _TRIAL_ALLOWED_DREAM_TYPES = new Set([
     "idea_trial", "research_study", "reference_study", "case_idea_research",
 ]);
 
+// Phase 5P.1: the Structured Trial Reports panel is research/study clutter for
+// normal bug/debt Dream modes, so it stays collapsed unless the selected Work
+// type is a research/idea/reference type OR the Action level is report-only /
+// case_idea_research. Visibility is broader than create-eligibility on purpose:
+// the panel is reachable (to browse past trials) even when the exact Work type
+// / Action level combo can't create a new one.
+const _TRIAL_RELEVANT_ACTION_LEVELS = new Set([
+    "report_only", "case_idea_research",
+]);
+
 function _trialCreateAllowed() {
     return _TRIAL_ALLOWED_DREAM_TYPES.has(_dreamType())
         && _dreamActionLevel() === "report_only";
+}
+
+function _trialPanelRelevant() {
+    return _TRIAL_ALLOWED_DREAM_TYPES.has(_dreamType())
+        || _TRIAL_RELEVANT_ACTION_LEVELS.has(_dreamActionLevel());
 }
 
 function _updateTrialCreateAvailability() {
@@ -2142,6 +2163,17 @@ function _updateTrialCreateAvailability() {
     const allowed = _trialCreateAllowed();
     if (btn) btn.disabled = !allowed;
     if (note) note.hidden = allowed;
+}
+
+// Expand the trials disclosure for relevant Work type / Action level combos and
+// collapse it otherwise. The panel is never removed from the DOM — all IDs and
+// handlers stay intact — so existing trial routes/controls keep working.
+function _updateTrialPanelVisibility() {
+    const section = document.getElementById("dreamTrialsSection");
+    const relevanceNote = document.getElementById("dreamTrialsRelevanceNote");
+    const relevant = _trialPanelRelevant();
+    if (section) section.open = relevant;
+    if (relevanceNote) relevanceNote.hidden = relevant;
 }
 
 function createDreamTrial() {
@@ -2602,17 +2634,24 @@ document.addEventListener("DOMContentLoaded", () => {
     // can only pick a combination the backend accepts.
     // Phase 4.7c: the same Work type / Action level controls also gate the
     // Create Trial Report button — update it whenever either changes.
-    fetchDreamTaxonomy().then(() => _updateTrialCreateAvailability());
+    fetchDreamTaxonomy().then(() => {
+        _updateTrialCreateAvailability();
+        _updateTrialPanelVisibility();
+    });
     const dreamTypeEl = document.getElementById("dreamType");
     if (dreamTypeEl) {
         dreamTypeEl.addEventListener("change", () => {
             _renderActionLevelOptions(_dreamType());
             _updateTrialCreateAvailability();
+            _updateTrialPanelVisibility();
         });
     }
     const dreamLevelEl = document.getElementById("dreamActionLevel");
     if (dreamLevelEl) {
-        dreamLevelEl.addEventListener("change", _updateTrialCreateAvailability);
+        dreamLevelEl.addEventListener("change", () => {
+            _updateTrialCreateAvailability();
+            _updateTrialPanelVisibility();
+        });
     }
 });
 
@@ -2688,10 +2727,18 @@ function viewDreamRun(date, runId) {
         const items = data.items || [];
         const caseIdeas = data.case_ideas || [];
         const morning = data.morning_report || "(no morning_report.txt)";
+        // Phase 5P.1: the server renders the morning report Markdown to safe
+        // HTML (escape-by-default, no raw HTML), so the viewer shows real
+        // headings / lists / tables instead of a plain preformatted dump.
+        // Fall back to the escaped raw text if the rendered HTML is absent.
+        const morningHtml =
+            (typeof data.morning_report_html === "string" && data.morning_report_html.length > 0)
+                ? `<div class="dream-report-md">${data.morning_report_html}</div>`
+                : `<pre class="dream-report-pre">${_escapeHtml(morning)}</pre>`;
         const body = `
             <details class="dream-report-summary" open>
                 <summary>Morning report</summary>
-                <pre class="dream-report-pre">${_escapeHtml(morning)}</pre>
+                ${morningHtml}
             </details>
             ${_renderCaseIdeaCandidates(caseIdeas)}
             <div class="dream-section-heading">Items (${items.length})</div>
