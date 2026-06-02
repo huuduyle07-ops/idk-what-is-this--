@@ -265,17 +265,24 @@ def test_tiebreak_metadata_only_present_when_enabled(monkeypatch):
 # ---------------------------------------------------------------------------
 # 11 - harness default remains false / unwired
 # ---------------------------------------------------------------------------
-def test_harness_default_remains_false_and_unwired():
+def test_harness_retrieval_toggle_editable_default_off():
     from core import harness_controls as hc
 
     assert config.MEMORY_TEMPERATURE_RETRIEVAL_ENABLED is False
     assert config.MEMORY_TEMPERATURE_TIEBREAK_ONLY is True
 
-    for control_id in ("MEMORY_TEMPERATURE_RETRIEVAL_ENABLED", "MEMORY_TEMPERATURE_TIEBREAK_ONLY"):
-        control = hc.get_control(control_id)
-        assert control is not None
-        assert control.control_type == hc.READ_ONLY_PLANNED
-        assert control.wired is False
+    # RETRIEVAL_ENABLED is now an editable_live toggle, OFF by default...
+    retrieval = hc.get_control("MEMORY_TEMPERATURE_RETRIEVAL_ENABLED")
+    assert retrieval is not None
+    assert retrieval.control_type == hc.EDITABLE_LIVE
+    assert retrieval.wired is True
+    assert bool(retrieval.config_default) is False
+
+    # ...while TIEBREAK_ONLY stays planned / locked on.
+    tiebreak = hc.get_control("MEMORY_TEMPERATURE_TIEBREAK_ONLY")
+    assert tiebreak is not None
+    assert tiebreak.control_type == hc.READ_ONLY_PLANNED
+    assert tiebreak.wired is False
 
 
 # ---------------------------------------------------------------------------

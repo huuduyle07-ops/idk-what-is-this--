@@ -87,7 +87,7 @@ def test_overlay_route_restart_required_does_not_patch_live(client, monkeypatch)
 def test_overlay_route_rejects_planned_control(client):
     resp = client.post(
         "/harness/controls/overlay",
-        json={"control_id": "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED", "value": "true"},
+        json={"control_id": "MEMORY_TEMPERATURE_TIEBREAK_ONLY", "value": "false"},
     )
     assert resp.status_code == 400
     body = resp.get_json()

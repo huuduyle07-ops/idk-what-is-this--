@@ -93,11 +93,17 @@ def _tokenize_query(query: str | None) -> list[str]:
 
 
 def list_active_lessons(repo_path: str | None = None) -> list[dict]:
-    """Return active, retrieval-eligible lessons.
+    """Return active, retrieval-eligible lessons for the given `repo_path` scope.
 
-    Lessons live in a single global bucket (`.agent/lessons/active/`) in the
-    AI project's own agent dir; `repo_path` is accepted for API stability
-    but does not change the read scope.
+    The read scope is delegated to `lesson_store.list_lessons(status="active",
+    repo_path=repo_path)`:
+
+      * with `repo_path` → the **union** of this repo's repo-scoped active
+        bucket and the global active bucket, so both current-repo lessons and
+        explicitly-global lessons are retrievable;
+      * without `repo_path` → the global active bucket only (legacy behavior).
+
+    Results are deduped by `id` and ordered by `list_lessons` (newest first).
 
     Defensive double-check: filters anything where `status != "active"` or
     top-level `active_knowledge_allowed` is not True. The storage layer

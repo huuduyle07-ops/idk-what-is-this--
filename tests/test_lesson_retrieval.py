@@ -137,6 +137,57 @@ def test_active_lesson_with_flag_false_filtered_out(lessons_repo):
     assert tampered_id not in ids
 
 
+# --- list_active_lessons: scope (Phase 13.19 — R6 docstring/code contract) -
+
+
+def test_list_active_lessons_with_repo_path_returns_repo_and_global_union(
+    lessons_repo, tmp_path
+):
+    """`repo_path` DOES change the read scope: it returns the union of this
+    repo's repo-scoped active lessons and the global active bucket. Pins the
+    corrected docstring (the old one wrongly claimed repo_path was inert)."""
+    repo_a = tmp_path / "repo-a"
+    repo_b = tmp_path / "repo-b"
+    repo_a.mkdir()
+    repo_b.mkdir()
+
+    global_lesson = _save_active(case_name="global_case", scope="global")
+    repo_a_lesson = _save_active(case_name="repo_a_case", repo_path=str(repo_a), scope="repo")
+    repo_b_lesson = _save_active(case_name="repo_b_case", repo_path=str(repo_b), scope="repo")
+
+    results = lesson_retrieval.list_active_lessons(repo_path=str(repo_a))
+    ids = {r["id"] for r in results}
+
+    assert global_lesson["id"] in ids       # global is always included
+    assert repo_a_lesson["id"] in ids       # current repo's lessons included
+    assert repo_b_lesson["id"] not in ids   # other repos' lessons excluded
+
+
+def test_list_active_lessons_without_repo_path_is_global_only(lessons_repo, tmp_path):
+    """Without `repo_path` the scope is the global bucket only — repo-scoped
+    active lessons are not visible. Pins the legacy half of the contract."""
+    repo_a = tmp_path / "repo-a"
+    repo_a.mkdir()
+
+    global_lesson = _save_active(case_name="global_case", scope="global")
+    repo_a_lesson = _save_active(case_name="repo_a_case", repo_path=str(repo_a), scope="repo")
+
+    results = lesson_retrieval.list_active_lessons()
+    ids = {r["id"] for r in results}
+
+    assert global_lesson["id"] in ids
+    assert repo_a_lesson["id"] not in ids
+
+
+def test_list_active_lessons_docstring_matches_union_behavior():
+    """Regression lock for R6: the docstring must not re-assert the stale
+    'repo_path does not change the read scope' claim and must document the
+    repo+global union it actually implements."""
+    doc = (lesson_retrieval.list_active_lessons.__doc__ or "").lower()
+    assert "does not change the read scope" not in doc
+    assert "union" in doc
+
+
 # --- find_active_lessons: safety filters ----------------------------------
 
 

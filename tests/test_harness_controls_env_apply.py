@@ -149,7 +149,7 @@ def test_no_pending_diff_is_safe_noop(tmp_path):
 
 @pytest.mark.parametrize(
     "control_id",
-    ["MEMORY_TEMPERATURE_RETRIEVAL_ENABLED", "quote_grounding", "nope_unknown"],
+    ["MEMORY_TEMPERATURE_TIEBREAK_ONLY", "quote_grounding", "nope_unknown"],
 )
 def test_planned_locked_unknown_controls_rejected(tmp_path, control_id):
     env_path, overlay_path = _setup(tmp_path, {"LESSON_RETRIEVAL_ENABLED": "true"})

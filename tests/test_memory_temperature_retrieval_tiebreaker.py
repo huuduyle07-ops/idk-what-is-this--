@@ -270,7 +270,8 @@ def test_harness_flag_default_remains_false():
 
     control = get_control("MEMORY_TEMPERATURE_RETRIEVAL_ENABLED")
     assert control is not None
-    assert control.wired is False
+    # Now an editable_live toggle, but still OFF by default (config_default false).
+    assert control.wired is True
     assert bool(control.config_default) is False
     assert current_effective(control) not in {"true", "on"}
 

@@ -165,16 +165,21 @@ REGISTRY: tuple[HarnessControl, ...] = (
     # --- planned / not wired ---
     HarnessControl(
         id="MEMORY_TEMPERATURE_RETRIEVAL_ENABLED",
-        label="Memory temperature → retrieval (planned)",
+        label="Memory temperature → retrieval (tie-break, experimental)",
         env_var="MEMORY_TEMPERATURE_RETRIEVAL_ENABLED",
         category="gates",
-        control_type=READ_ONLY_PLANNED,
-        source_of_truth=SRC_PLANNED,
-        wired=False,
+        control_type=EDITABLE_LIVE,
+        source_of_truth=SRC_OVERLAY,
+        wired=True,
         risk="medium",
         value_kind="bool",
-        description="Future: let memory temperature influence retrieval. Not wired; greenlight-gated.",
-        plan_ref="Phase 12.14d",
+        description=(
+            "Let memory temperature break ties in lesson retrieval "
+            "(conservative tie-break only; default off; experimental). "
+            "Tie-break-only safety stays locked on."
+        ),
+        env_targets=(".env",),
+        config_default=False,
     ),
     HarnessControl(
         id="MEMORY_TEMPERATURE_TIEBREAK_ONLY",

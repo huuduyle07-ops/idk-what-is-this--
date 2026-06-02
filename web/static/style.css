@@ -3664,3 +3664,84 @@ button {
 .harness-composeapply__notice {
     font-size: 11px; color: #b45309; margin-top: 6px; line-height: 1.5;
 }
+
+/* ── Phase UI.1: Web Information Architecture ──────────────────
+   Button hierarchy + collapsible Advanced/Debug/Report panels.
+   Goal: keep power, hide complexity. Additive only — no element
+   was renamed or removed. */
+
+/* Primary actions read as the main call-to-action; secondary
+   actions inside "More actions" are muted. */
+.actions--primary {
+    border-top: none;
+    padding-top: 4px;
+}
+.actions--primary > button {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-accent-fg);
+    font-weight: 600;
+}
+.actions--primary > button:hover {
+    background: var(--color-accent-hov);
+    border-color: var(--color-accent-hov);
+}
+.actions--secondary {
+    border-top: none;
+    margin: 8px 0 0;
+}
+.actions--secondary > button {
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    border-color: var(--color-border);
+    font-weight: 500;
+}
+
+/* Compact collapsible disclosures used to demote secondary,
+   advanced/debug, and report controls. */
+.more-actions,
+.advanced-panel,
+.reports-panel {
+    margin: 8px 0;
+}
+.more-actions > summary,
+.advanced-panel > summary,
+.reports-panel > summary {
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    padding: 4px 0;
+    list-style: revert;
+}
+.more-actions > summary:hover,
+.advanced-panel > summary:hover,
+.reports-panel > summary:hover {
+    color: var(--color-text);
+}
+
+/* Advanced panels (harness controls, tool registry, MCP audit) get a
+   subtle inset so it's clear they were intentionally tucked away. */
+.advanced-panel[open],
+.reports-panel[open] {
+    border-left: 2px solid var(--color-border);
+    padding-left: 10px;
+}
+
+/* Dangerous/config disclosure (the .env / docker-compose apply panel)
+   is flagged with a warning accent on its summary so an operator knows
+   it holds machine-mutating actions before expanding it. */
+.advanced-panel[data-ui-group="settings-harness"] > summary {
+    color: var(--color-warning);
+}
+.advanced-panel[data-ui-group="settings-harness"][open] {
+    border-left-color: var(--color-warning);
+}
+
+/* Reinforce the dangerous/config buttons themselves with a clear danger
+   focus ring (they already carry warning fills above). */
+.harness-envapply__btn:focus-visible,
+.harness-composeapply__btn:focus-visible {
+    outline: 2px solid var(--color-danger);
+    outline-offset: 2px;
+}

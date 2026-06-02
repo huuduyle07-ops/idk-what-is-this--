@@ -576,6 +576,12 @@ def list_lessons(
 
     Filters by `status` if provided. Dedupes by `id` across buckets, preferring
     the entry whose `status` field matches its bucket name.
+
+    Scope (via `_scope_roots_for_query`): an explicit `scope` of "global" or
+    "repo" reads only that bucket; otherwise the read scope depends on
+    `repo_path` — when given (and `include_global=True`, the default) it reads
+    the **union** of the repo-scoped bucket and the global bucket, and when
+    omitted it reads the global bucket only.
     """
     if status is not None and status not in LESSON_STATUSES:
         raise ValueError(f"invalid status: {status!r}")

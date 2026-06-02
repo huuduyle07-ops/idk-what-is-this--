@@ -103,7 +103,7 @@ def test_preview_only_includes_compose_target_controls(tmp_path):
 @pytest.mark.parametrize(
     "control_id",
     [
-        "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED",  # planned
+        "MEMORY_TEMPERATURE_TIEBREAK_ONLY",      # planned
         "quote_grounding",                       # locked
         "nope_unknown",                          # unknown
         "LESSON_RETRIEVAL_ENABLED",              # editable but .env-only (non-compose)

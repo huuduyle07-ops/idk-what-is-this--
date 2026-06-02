@@ -391,7 +391,7 @@ def _format_memory_temperature_tiebreaker_dogfood(include_raw_paths: bool) -> st
     Read-only / explain-only: it runs the default-off tie-breaker over a
     deterministic built-in sample (never querying the DB or ``lesson_store``)
     and embeds the resulting evidence table. It does not touch live retrieval,
-    the CONTROL prompt, or the (still false / unwired) harness flag."""
+    the CONTROL prompt, or the harness flag (which is off by default)."""
     candidates = _tiebreaker_dogfood_sample_candidates()
     report = build_memory_temperature_tiebreaker_dogfood(
         candidates, now=TIEBREAKER_DOGFOOD_REFERENCE_NOW, enabled=True
@@ -405,12 +405,12 @@ def _format_memory_temperature_tiebreaker_dogfood(include_raw_paths: bool) -> st
         "tie-breaker. When enabled, the tie-breaker only reorders lesson",
         "candidates *within* a near-equal relevance group (hot/warm memories",
         "rise, cold ones fall); the relevance score and the overall ranking are",
-        "preserved. It is default-off and unwired.",
+        "preserved. It is off by default (an opt-in editable toggle).",
         "",
         "- Live retrieval is unchanged.",
         "- CONTROL prompt is unchanged.",
-        "- `MEMORY_TEMPERATURE_RETRIEVAL_ENABLED` remains false / unwired "
-        "(harness control type READ_ONLY_PLANNED).",
+        "- `MEMORY_TEMPERATURE_RETRIEVAL_ENABLED` is off by default "
+        "(an opt-in editable toggle; this pack never enables it).",
         "- Cold memories are never hard-filtered (they only lose priority inside "
         "a near-equal group).",
         "- Frozen / audit-only / blocked memories are excluded from CONTROL and "
@@ -888,7 +888,7 @@ def _format_index() -> str:
             "- **Memory temperature tie-breaker is evidence-only dogfood**, "
             "showing what the default-off tie-breaker *would* do to near-equal "
             "candidates without changing live retrieval, the CONTROL prompt, or "
-            "the (still false / unwired) harness flag. "
+            "the harness flag (which is off by default). "
             "See [09_memory_temperature_tiebreaker_dogfood.md](09_memory_temperature_tiebreaker_dogfood.md).",
             "",
             "## Generated at",

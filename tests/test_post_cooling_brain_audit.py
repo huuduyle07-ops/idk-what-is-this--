@@ -10,7 +10,9 @@ for stale claims and contradictions and pins down the *current* truth:
   * The tie-breaker is wired ONLY at the ``core.lesson_retrieval`` final
     ordering boundary, behind that disabled flag.
   * ``control_engine`` is not directly wired (it merely consumes the boundary).
-  * The harness controls stay ``READ_ONLY_PLANNED`` / not UI-editable.
+  * ``MEMORY_TEMPERATURE_RETRIEVAL_ENABLED`` is now an ``editable_live`` UI
+    toggle (default off); ``MEMORY_TEMPERATURE_TIEBREAK_ONLY`` stays
+    ``READ_ONLY_PLANNED`` (tie-break-only safety locked on).
   * Default behavior is unchanged; the CONTROL prompt is unchanged when disabled.
   * Cold memories are de-prioritized inside a group, never hard-filtered.
   * Frozen / audit-only / blocked memories are excluded from CONTROL, never
@@ -77,17 +79,21 @@ def test_config_defaults_remain_disabled():
 # ---------------------------------------------------------------------------
 # 2 - harness controls stay READ_ONLY_PLANNED / not UI-editable
 # ---------------------------------------------------------------------------
-def test_harness_controls_remain_read_only_planned():
+def test_memory_temperature_harness_control_state():
     from core import harness_controls as hc
 
-    for control_id in (
-        "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED",
-        "MEMORY_TEMPERATURE_TIEBREAK_ONLY",
-    ):
-        control = hc.get_control(control_id)
-        assert control is not None, control_id
-        assert control.control_type == hc.READ_ONLY_PLANNED, control_id
-        assert control.wired is False, control_id
+    # RETRIEVAL_ENABLED is now an editable_live UI toggle, OFF by default.
+    retrieval = hc.get_control("MEMORY_TEMPERATURE_RETRIEVAL_ENABLED")
+    assert retrieval is not None
+    assert retrieval.control_type == hc.EDITABLE_LIVE
+    assert retrieval.wired is True
+    assert bool(retrieval.config_default) is False
+
+    # TIEBREAK_ONLY stays planned / not UI-editable (tie-break-only safety).
+    tiebreak = hc.get_control("MEMORY_TEMPERATURE_TIEBREAK_ONLY")
+    assert tiebreak is not None
+    assert tiebreak.control_type == hc.READ_ONLY_PLANNED
+    assert tiebreak.wired is False
 
 
 # ---------------------------------------------------------------------------

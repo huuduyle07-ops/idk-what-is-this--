@@ -738,6 +738,25 @@ Verify by running a patch flow with retrieval on, then inspecting `.agent/debug_
 
 Active lessons are **advisory hints, lowest priority**. The user request, repo state, validation output, and Patch Safety gate all outrank them.
 
+### Cooling Brain (Memory Temperature) — experimental tie-break toggle
+
+"Cooling Brain" is the Memory Temperature layer. Every lesson/note carries a thermal band — 🔥 hot / 🌤 warm / ❄️ cold / 🧊 frozen — derived from how recently and how often it has been useful (`T_now = clamp(T_base · exp(-λ · age_days) + reheating − risk, 0, 1)`, with a hard-freeze override for audit-only records). By default this is **explain-only**: it changes nothing about retrieval.
+
+The toggle lets temperature act as a **conservative tie-breaker** when ranking active lessons for the CONTROL prompt. It is **OFF by default**.
+
+**What it does when ON (and only when `LESSON_RETRIEVAL_ENABLED=true` too):** within a group of lessons whose relevance scores are *near-equal*, hotter lessons rise and colder ones fall. That is the *only* change — relevance scores are preserved, the set of lessons is unchanged, cold lessons are **never** hard-filtered, and frozen / audit-only / blocked lessons are **never** surfaced (they sink to the bottom of their group). The effect is visible only as the order of entries inside the `[ACTIVE LESSONS]` block.
+
+**How to turn it on (the button):**
+
+1. Open the **Settings / Health** tab → **Harness Controls** panel.
+2. Flip the **"Memory temperature → retrieval (tie-break, experimental)"** toggle on.
+3. It is an *editable-live* control: it takes effect immediately for the next retrieval (no restart), and the desired value is saved to `.agent/harness_overrides.json`.
+4. To make it survive a process restart, click **"Apply to `.env`"** in the same panel (writes `MEMORY_TEMPERATURE_RETRIEVAL_ENABLED=true`, backing up `.env` first).
+
+Equivalent without the UI: set `MEMORY_TEMPERATURE_RETRIEVAL_ENABLED=true` in `.env`. The companion flag `MEMORY_TEMPERATURE_TIEBREAK_ONLY` stays **locked on** (read-only) so the toggle can only ever do the safe tie-break — it can never hard-filter or aggressively reorder.
+
+**See it before trusting it:** the read-only report `GET /graph/explainability/view?repo_path=<repo>` renders the per-note temperature bands and a *shadow* retrieval preview (original rank vs. what the tie-breaker would do) without changing live behavior.
+
 ### Mayor Mode (Phase 7.1) — handoffs to external agents
 
 A bounded way to ship a task to Codex / Claude Code / Gemini / other without ever modifying the real repo.

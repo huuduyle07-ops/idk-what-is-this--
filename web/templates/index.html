@@ -247,14 +247,23 @@
             <button type="button" onclick="showTab('candidates')">Candidates</button>
           </div>
 
-          <div class="actions">
+          <!-- Phase UI.1: primary patch actions stay visible; the rest fold
+               into a collapsed "More actions" group. All onclick handlers are
+               preserved verbatim. -->
+          <div class="actions actions--primary">
             <button type="button" onclick="generatePatch()">Generate Patch</button>
-            <button type="button" onclick="generateCandidates()">Generate Candidates</button>
-            <button type="button" onclick="testPatch()">Test Run Patch</button>
             <button type="button" onclick="applyPatch()">Apply / Review Patch</button>
-            <button type="button" onclick="undoPatch()">Undo</button>
-            <button type="button" onclick="localCritique()" title="Send current patch to local Ollama DeepSeek for review (does not auto-apply)">&#x1F9E0; Local Critique</button>
           </div>
+          <details class="more-actions" data-ui-group="chat-more-actions">
+            <summary class="more-actions__summary">More actions</summary>
+            <div class="actions actions--secondary">
+              <button type="button" onclick="generateCandidates()">Generate Candidates</button>
+              <button type="button" onclick="testPatch()">Test Run Patch</button>
+              <button type="button" onclick="undoPatch()">Undo</button>
+              <button type="button" onclick="localCritique()" title="Send current patch to local Ollama DeepSeek for review (does not auto-apply)">&#x1F9E0; Local Critique</button>
+            </div>
+          </details>
+          <!-- /chat-more-actions -->
 
           <div class="local-critique-section" id="localCritiqueSection">
             <strong>&#x1F9E0; Local Critique result</strong>
@@ -374,6 +383,10 @@
                       title="Copy a repo into benchmarks/cases and write a case.json.">
                 Add case
               </button>
+              <button type="button" id="benchOptionsToggle" onclick="toggleBenchmarkOptions()"
+                      title="Adjust run mode: fast, turbo, skip toolchain failures, retry failed.">
+                ⚙ Options
+              </button>
               <button type="button" id="stopBenchBtn" onclick="stopBenchmarkRun()"
                       title="Ask the benchmark runner to stop after the current case."
                       hidden>
@@ -382,6 +395,28 @@
               <button type="button" onclick="refreshBenchmarkStatus()" title="Refresh benchmark run status.">
                 Refresh status
               </button>
+            </div>
+            <div id="benchRunOptions" class="bench-run-options" hidden
+                 style="margin:0.5em 0; padding:0.6em 0.8em; border:1px solid #3a3a3a; border-radius:6px; display:flex; flex-wrap:wrap; gap:0.9em; align-items:center;">
+              <strong style="font-size:0.85em;">Run options</strong>
+              <label title="Fast mode (default on): use the faster benchmark path.">
+                <input type="checkbox" id="benchOptFast" checked> Fast
+              </label>
+              <label title="Turbo mode: most aggressive speed (may supersede Fast).">
+                <input type="checkbox" id="benchOptTurbo"> Turbo
+              </label>
+              <label title="Skip cases whose toolchain is missing instead of failing them.">
+                <input type="checkbox" id="benchOptSkipToolchain" checked> Skip toolchain failures
+              </label>
+              <label title="Re-run failed cases up to N times; a pass on retry is marked flaky.">
+                Retry failed:
+                <select id="benchOptRetry">
+                  <option value="0" selected>0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                </select>
+              </label>
             </div>
             <div id="benchRunStatus" class="bench-run-status"></div>
           </div>
@@ -426,6 +461,11 @@
           <!-- Phase 5.7: Prompt / Cost Quantifier panel. Read-only — never
                runs benchmarks, never calls a model, never executes a patch.
                Source benchmark_report_*.json files are never modified. -->
+          <!-- Phase UI.1: Prompt/Cost is a secondary "report" panel; collapse it
+               by default (the evidence pack + its "Open evidence index" stay
+               visible above). -->
+          <details class="reports-panel" data-ui-group="benchmark-prompt-cost">
+            <summary class="reports-panel__summary">Prompt / Cost Quantifier (advanced)</summary>
           <div class="bench-runner" id="promptCostSection" style="margin-top:1em;">
             <div class="bench-runner-header">
               <strong>Prompt / Cost Quantifier</strong>
@@ -441,6 +481,8 @@
             <div id="promptCostSummary" class="health-empty">Click <em>Refresh prompt/cost</em> to compute.</div>
             <div id="promptCostTable" class="health-empty" hidden></div>
           </div>
+          </details>
+          <!-- /benchmark-prompt-cost -->
         </div>
 
         <!-- Dream -->
@@ -888,6 +930,12 @@
                .agent/harness_overrides.json. Live controls take effect now;
                restart-required need an app restart. Planned & locked controls
                are read-only. This panel never writes .env or docker-compose.yml. -->
+          <!-- Phase UI.1: Harness Controls holds the dangerous/config actions
+               (.env apply + docker-compose apply, injected by JS). Collapse the
+               whole panel into an Advanced disclosure so those actions are never
+               always-visible primary buttons. -->
+          <details class="advanced-panel" data-ui-group="settings-harness">
+            <summary class="advanced-panel__summary">Advanced — Harness Controls (.env / docker-compose)</summary>
           <div class="health-section harness-controls-section">
             <div class="health-header">
               <strong>Harness Controls</strong>
@@ -909,6 +957,8 @@
               <div class="health-empty">Loading…</div>
             </div>
           </div>
+          </details>
+          <!-- /settings-harness -->
 
           <!-- Help / README viewer -->
           <div class="health-section">
@@ -921,6 +971,11 @@
             <button type="button" onclick="openHelpModal()">Open README</button>
           </div>
 
+          <!-- Phase UI.1: Tool Registry + MCP Audit are debug/inspection panels;
+               collapse them together behind an Advanced / Debug disclosure. Both
+               remain read-only and metadata-only. -->
+          <details class="advanced-panel" data-ui-group="settings-debug">
+            <summary class="advanced-panel__summary">Advanced / Debug — Tool Registry &amp; MCP Audit</summary>
           <!-- Phase 8-prep.1: Tool Registry viewer.
                Metadata-only. Reads GET /tools/registry; never invokes a tool. -->
           <div class="health-section tool-registry-section">
@@ -964,6 +1019,8 @@
               <div class="health-empty">No MCP audit events yet.</div>
             </div>
           </div>
+          </details>
+          <!-- /settings-debug -->
         </div>
         </section>
     </main>
@@ -4390,6 +4447,24 @@ function runAllBenchmarks() {
     startBenchmarkRun("all", []);
 }
 
+function toggleBenchmarkOptions() {
+    const panel = document.getElementById("benchRunOptions");
+    if (panel) panel.hidden = !panel.hidden;
+}
+
+function _benchmarkRunOptions() {
+    const fast = document.getElementById("benchOptFast");
+    const turbo = document.getElementById("benchOptTurbo");
+    const skip = document.getElementById("benchOptSkipToolchain");
+    const retry = document.getElementById("benchOptRetry");
+    return {
+        fast: (fast ? fast.checked : true) ? "true" : "false",
+        turbo: (turbo && turbo.checked) ? "true" : "false",
+        skip_toolchain_failures: (skip ? skip.checked : true) ? "true" : "false",
+        retry_failed: retry ? String(retry.value || "0") : "0",
+    };
+}
+
 function startBenchmarkRun(selection, cases) {
     const repo = _benchmarkRepoPath();
     if (!repo) { alert("Set a repo path first."); return; }
@@ -4407,10 +4482,8 @@ function startBenchmarkRun(selection, cases) {
             repo_path: repo,
             selection,
             cases: JSON.stringify(cases || []),
-            fast: "true",
-            skip_toolchain_failures: "true",
             markdown: "true",
-            retry_failed: "0",
+            ..._benchmarkRunOptions(),
         }),
     })
     .then(r => r.json().then(data => ({ status: r.status, data })))

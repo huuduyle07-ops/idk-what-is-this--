@@ -26,12 +26,12 @@ EDITABLE_WIRED = {
     "LESSON_RETRIEVAL_ENABLED",
     "MUTATION_ORACLE_ENABLED",
     "OLLAMA_ENABLED",
+    "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED",
     "AUTO_PATCH_ENABLED",
     "DB_ENABLED",
     "EMBEDDING_PROVIDER",
 }
 PLANNED = {
-    "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED",
     "MEMORY_TEMPERATURE_TIEBREAK_ONLY",
     "dream_create_patches",
 }
@@ -65,6 +65,7 @@ def _fake_config() -> types.SimpleNamespace:
         LESSON_RETRIEVAL_ENABLED=False,
         MUTATION_ORACLE_ENABLED=False,
         OLLAMA_ENABLED=False,
+        MEMORY_TEMPERATURE_RETRIEVAL_ENABLED=False,
         AUTO_PATCH_ENABLED=True,
         DB_ENABLED=True,
     )
@@ -99,7 +100,12 @@ def test_control_type_and_source_of_truth_are_correct():
         }
         assert by_id[cid]["wired"] is True
 
-    for cid in ("LESSON_RETRIEVAL_ENABLED", "MUTATION_ORACLE_ENABLED", "OLLAMA_ENABLED"):
+    for cid in (
+        "LESSON_RETRIEVAL_ENABLED",
+        "MUTATION_ORACLE_ENABLED",
+        "OLLAMA_ENABLED",
+        "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED",
+    ):
         assert by_id[cid]["control_type"] == "editable_live"
     for cid in ("AUTO_PATCH_ENABLED", "DB_ENABLED", "EMBEDDING_PROVIDER"):
         assert by_id[cid]["control_type"] == "editable_restart_required"
@@ -194,7 +200,7 @@ def test_planned_control_cannot_be_set(tmp_path):
     overlay = tmp_path / "harness_overrides.json"
     with pytest.raises(hc.HarnessControlError):
         hc.set_override(
-            "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED", "true",
+            "MEMORY_TEMPERATURE_TIEBREAK_ONLY", "false",
             overlay_path=overlay, config_module=_fake_config(),
         )
     # nothing written

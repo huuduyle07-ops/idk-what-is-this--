@@ -90,7 +90,8 @@ def test_report_confirms_default_off_passthrough_behavior():
     assert report["live_retrieval_unchanged"] is True
     assert report["control_prompt_unchanged"] is True
     assert report["harness_flag_enabled"] is False
-    assert report["harness_flag_wired"] is False
+    # The harness flag is now a wired editable toggle, but still OFF by default.
+    assert report["harness_flag_wired"] is True
     assert report["evidence_only"] is True
     assert report["candidate_count"] == 3
 

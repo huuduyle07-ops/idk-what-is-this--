@@ -617,7 +617,7 @@ def test_tiebreaker_dogfood_states_control_prompt_unchanged(tmp_path):
     assert "control prompt is unchanged" in md.lower()
 
 
-def test_tiebreaker_dogfood_states_flag_false_unwired(tmp_path):
+def test_tiebreaker_dogfood_states_flag_off_by_default(tmp_path):
     project = tmp_path / "project"
     project.mkdir()
 
@@ -626,7 +626,7 @@ def test_tiebreaker_dogfood_states_flag_false_unwired(tmp_path):
 
     assert "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED" in md
     lowered = md.lower()
-    assert "false" in lowered and "unwired" in lowered
+    assert "off by default" in lowered
 
 
 def test_tiebreaker_dogfood_states_cold_not_hard_filtered(tmp_path):

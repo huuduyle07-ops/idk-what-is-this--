@@ -13,7 +13,7 @@ It is dogfood / explain-only and deterministic. It:
     ``lesson_store`` or the DB;
   * never wires into live lesson retrieval and never touches the CONTROL prompt;
   * never enables ``MEMORY_TEMPERATURE_RETRIEVAL_ENABLED`` (the live harness
-    control stays false / unwired / READ_ONLY_PLANNED) - the ``enabled``
+    control defaults to false / off and this dogfood never sets it) - the ``enabled``
     parameter here only drives the *simulation* shown in the report;
   * never hard-filters cold lessons and never revives or surfaces
     frozen / audit-only / blocked lessons;
@@ -85,7 +85,7 @@ def build_memory_temperature_tiebreaker_dogfood(
         "live_retrieval_unchanged": True,
         "control_prompt_unchanged": True,
         "harness_flag_enabled": False,
-        "harness_flag_wired": False,
+        "harness_flag_wired": True,
         "evidence_only": True,
         "rows": rows,
         "guardrail": MEMORY_TEMPERATURE_TIEBREAKER_DOGFOOD_GUARDRAIL,
@@ -111,8 +111,8 @@ def format_memory_temperature_tiebreaker_dogfood_markdown(report: dict[str, Any]
         "- This is an evidence-only dogfood report.",
         "- Live retrieval is unchanged.",
         "- CONTROL prompt is unchanged.",
-        "- `MEMORY_TEMPERATURE_RETRIEVAL_ENABLED` remains false / unwired "
-        "(harness control type READ_ONLY_PLANNED).",
+        "- `MEMORY_TEMPERATURE_RETRIEVAL_ENABLED` is off by default "
+        "(an opt-in editable toggle; this dogfood never enables it).",
         "- Cold lessons are never hard-filtered; frozen / audit-only / blocked "
         "lessons are never revived or surfaced.",
         "",
