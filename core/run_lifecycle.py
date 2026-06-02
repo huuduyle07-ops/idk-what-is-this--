@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from core.brain_stamp import collect_brain_stamp
 from core.patch_safety import evaluate_patch_safety
-from core.run_artifacts import RunArtifactRecorder
+from core.replay_recorder import (
+    create_replay_bundle,
+    finalize_replay_bundle,
+    write_replay_artifact,
+    write_replay_json,
+)
 from patching.patch_plan_executor import apply_patch_plan
 
 
@@ -28,15 +35,81 @@ def run_patch_plan_with_artifacts(
 ) -> dict[str, Any]:
     """Run a patch plan and persist a replay bundle around the existing executor."""
     brain_stamp = collect_brain_stamp(project_root)
-    recorder = RunArtifactRecorder.start(
-        repo_path=project_root,
-        source=source,
-        brain_stamp=brain_stamp,
-    )
-    recorder.write_text("user_query.txt", user_query or "")
-    recorder.write_json("control_result.json", control_result or {})
-    recorder.write_json("patch_plan.json", plan)
-    recorder.append_event("started", {"validation_command": validation_command or ""})
+    bundle = None
+    try:
+        bundle = create_replay_bundle(
+            project_root,
+            run_kind=source,
+            user_query=user_query or "",
+        )
+    except OSError:
+        bundle = None
+    events: list[dict[str, Any]] = []
+
+    def safe_write_json(name: str, obj: Any) -> None:
+        if bundle is None:
+            return
+        try:
+            write_replay_json(bundle, name, obj)
+        except OSError:
+            pass
+
+    def safe_write_artifact(name: str, content: str) -> None:
+        if bundle is None:
+            return
+        try:
+            write_replay_artifact(bundle, name, content)
+        except OSError:
+            pass
+
+    safe_write_json("brain_stamp.json", brain_stamp or {})
+    safe_write_json("control_result.json", control_result or {})
+    safe_write_json("patch_parsed.json", plan)
+    safe_write_json("patch_plan.json", plan)
+
+    def with_replay_fields(result: dict[str, Any]) -> dict[str, Any]:
+        result = {
+            **result,
+            "brain_stamp_id": brain_stamp.get("brain_stamp_id"),
+        }
+        if bundle is not None:
+            result["replay_dir"] = str(bundle.replay_dir)
+            result["replay_id"] = bundle.replay_id
+        return result
+
+    def append_event(phase: str, payload: dict[str, Any] | None = None) -> None:
+        if bundle is None:
+            return
+        events.append(
+            {
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "source": source,
+                "phase": phase,
+                "payload": payload or {},
+            }
+        )
+        safe_write_artifact(
+            "events.jsonl",
+            "".join(
+                json.dumps(event, sort_keys=True, ensure_ascii=False, default=str) + "\n"
+                for event in events
+            ),
+        )
+
+    def finish(status: str, result: dict[str, Any]) -> None:
+        if bundle is not None:
+            try:
+                finalize_replay_bundle(
+                    bundle,
+                    {
+                        "status": status,
+                        "result": result,
+                    },
+                )
+            except OSError:
+                pass
+
+    append_event("started", {"validation_command": validation_command or ""})
 
     patch_safety = evaluate_patch_safety(
         _patch_plan_files(plan),
@@ -46,25 +119,26 @@ def run_patch_plan_with_artifacts(
         message = "Patch plan blocked by safety gate: " + "; ".join(
             patch_safety["reasons"]
         )
-        result = {
-            "success": False,
-            "applied_ops": [],
-            "diffs": [],
-            "rollback_performed": False,
-            "failed_op_index": None,
-            "failed_op": None,
-            "error": message,
-            "validation_ok": None,
-            "validation_command": validation_command or "",
-            "validation_output": "",
-            "message": message,
-            "patch_safety": patch_safety,
-            "replay_dir": str(recorder.replay_dir),
-            "brain_stamp_id": brain_stamp.get("brain_stamp_id"),
-        }
-        recorder.write_json("apply_result.json", result)
-        recorder.write_text("validation_output.txt", "")
-        recorder.append_event(
+        result = with_replay_fields(
+            {
+                "success": False,
+                "applied_ops": [],
+                "diffs": [],
+                "rollback_performed": False,
+                "failed_op_index": None,
+                "failed_op": None,
+                "error": message,
+                "validation_ok": None,
+                "validation_command": validation_command or "",
+                "validation_output": "",
+                "message": message,
+                "patch_safety": patch_safety,
+            }
+        )
+        if bundle is not None:
+            safe_write_json("apply_result.json", result)
+            safe_write_artifact("validation_output.txt", "")
+        append_event(
             "patch_plan_blocked_by_safety",
             {
                 "success": False,
@@ -72,7 +146,7 @@ def run_patch_plan_with_artifacts(
                 "reasons": patch_safety.get("reasons", []),
             },
         )
-        recorder.finish("failed", result)
+        finish("failed", result)
         return result
 
     result = apply_patch_plan(
@@ -80,15 +154,12 @@ def run_patch_plan_with_artifacts(
         plan,
         validation_command=validation_command,
     )
-    result = {
-        **result,
-        "replay_dir": str(recorder.replay_dir),
-        "brain_stamp_id": brain_stamp.get("brain_stamp_id"),
-    }
+    result = with_replay_fields(result)
 
-    recorder.write_json("apply_result.json", result)
-    recorder.write_text("validation_output.txt", result.get("validation_output", "") or "")
-    recorder.append_event(
+    if bundle is not None:
+        safe_write_json("apply_result.json", result)
+        safe_write_artifact("validation_output.txt", result.get("validation_output", "") or "")
+    append_event(
         "patch_plan_applied" if result.get("success") else "patch_plan_failed",
         {
             "success": bool(result.get("success")),
@@ -97,6 +168,6 @@ def run_patch_plan_with_artifacts(
         },
     )
     if result.get("rollback_performed"):
-        recorder.append_event("rollback_performed", {"failed_op_index": result.get("failed_op_index")})
-    recorder.finish("success" if result.get("success") else "failed", result)
+        append_event("rollback_performed", {"failed_op_index": result.get("failed_op_index")})
+    finish("success" if result.get("success") else "failed", result)
     return result
