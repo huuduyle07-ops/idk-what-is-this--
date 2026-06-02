@@ -5151,6 +5151,159 @@ function _renderFlakyCasesTable(report) {
     `;
 }
 
+// Phase 5P.2: per-case status / model labels for the compact rows table.
+function _benchCaseStatus(result) {
+    if (!result) return "unknown";
+    if (result.skipped) return "skipped";
+    if (result.flaky === true && result.success === true) return "flaky";
+    return result.success ? "pass" : "fail";
+}
+
+function _benchModelLabel(result) {
+    // Selected model for this case, or a literal "unknown" when the report
+    // predates model-stats capture or the field is empty/null. Never throws on
+    // a missing result object / field.
+    const model = result && result.selected_model;
+    if (typeof model === "string" && model.trim()) return model.trim();
+    return "unknown";
+}
+
+function _benchModelsUsedLine(report) {
+    // Top-level role -> {model: cases_won} aggregate as a compact summary line.
+    // Renders nothing (not "unknown") when the report carries no model usage.
+    const used = (report && report.models_used) || {};
+    const roles = Object.keys(used);
+    if (roles.length === 0) return "";
+    const parts = roles.sort().map(role => {
+        const models = used[role] || {};
+        const names = Object.keys(models).sort().join(", ");
+        return `${_escapeHtml(role)}: ${_escapeHtml(names || "unknown")}`;
+    });
+    return `<div class="bench-models-line">Models — ${parts.join(" · ")}</div>`;
+}
+
+// Phase 5P.2: client-side quick filters. State is per-rendered-report and reset
+// in _renderBenchmarkDetail. Filtering only toggles row visibility in the DOM —
+// it never calls a benchmark route, so it cannot change runner/scoring behavior.
+let _benchActiveFilters = { language: "", category: "", difficulty: "" };
+
+function _renderBenchFilters(report) {
+    const results = (report && report.results) || [];
+    if (results.length === 0) return "";
+    const dims = [
+        { dim: "language", label: "Language", key: "language", fallback: "unknown" },
+        { dim: "category", label: "Category", key: "category", fallback: "uncategorized" },
+        { dim: "difficulty", label: "Difficulty", key: "difficulty", fallback: "unknown" },
+    ];
+    const groups = dims.map(({ dim, label, key, fallback }) => {
+        const counts = {};
+        results.forEach(r => {
+            const v = (r && r[key]) || fallback;
+            counts[v] = (counts[v] || 0) + 1;
+        });
+        const values = Object.keys(counts).sort();
+        if (values.length <= 1) return "";  // nothing meaningful to filter on
+        const chips = values.map(v =>
+            `<button type="button" class="bench-filter-chip"`
+            + ` data-bench-dim="${dim}" data-bench-val="${_escapeHtml(v)}"`
+            + ` onclick="benchFilterCases(this)">${_escapeHtml(v)} (${counts[v]})</button>`
+        ).join("");
+        return `<div class="bench-filter-group"><span class="bench-filter-label">${label}</span>${chips}</div>`;
+    }).join("");
+    if (!groups.trim()) return "";
+    return `<div class="bench-filters" id="benchFilters">${groups}</div>`;
+}
+
+function benchFilterCases(btn) {
+    // Client-side only: read the chip's dimension/value, toggle it, re-apply.
+    const dim = btn && btn.getAttribute("data-bench-dim");
+    const val = btn && btn.getAttribute("data-bench-val");
+    if (!dim) return;
+    _benchActiveFilters[dim] = (_benchActiveFilters[dim] === val) ? "" : val;
+    _applyBenchCaseFilters();
+}
+
+function _applyBenchCaseFilters() {
+    const detail = document.getElementById("benchDetail");
+    if (!detail) return;
+    const rows = detail.querySelectorAll(".bench-case-compact-row");
+    let shown = 0;
+    rows.forEach(row => {
+        const okLang = !_benchActiveFilters.language
+            || row.getAttribute("data-bench-lang") === _benchActiveFilters.language;
+        const okCat = !_benchActiveFilters.category
+            || row.getAttribute("data-bench-cat") === _benchActiveFilters.category;
+        const okDiff = !_benchActiveFilters.difficulty
+            || row.getAttribute("data-bench-diff") === _benchActiveFilters.difficulty;
+        const show = okLang && okCat && okDiff;
+        row.hidden = !show;
+        if (show) shown++;
+    });
+    detail.querySelectorAll(".bench-filter-chip").forEach(chip => {
+        const dim = chip.getAttribute("data-bench-dim");
+        const val = chip.getAttribute("data-bench-val");
+        chip.classList.toggle("is-active", _benchActiveFilters[dim] === val);
+    });
+    const countEl = document.getElementById("benchCompactCount");
+    if (countEl) countEl.textContent = String(shown);
+}
+
+function _renderCompactCasesTable(report) {
+    // One scannable row per case: status / name / lang+cat+diff / duration /
+    // model / fallbacks / tokens / cost. Every per-case model field degrades
+    // gracefully (unknown / em-dash) so older reports never crash the panel.
+    const results = (report && report.results) || [];
+    if (results.length === 0) return "";
+    const rows = results.map(r => {
+        const status = _benchCaseStatus(r);
+        const lang = (r && r.language) || "unknown";
+        const cat = (r && r.category) || "uncategorized";
+        const diff = (r && r.difficulty) || "unknown";
+        const dur = Number((r && r.duration_sec) || 0);
+        const model = _benchModelLabel(r);
+        const calls = Array.isArray(r && r.model_calls) ? r.model_calls.length : null;
+        const fallbackCell = (r && r.fallback_count != null) ? String(_benchInt(r.fallback_count, 0)) : "—";
+        const hasTokens = r && r.total_tokens != null && _benchInt(r.total_tokens, 0) > 0;
+        const tokensCell = hasTokens ? String(_benchInt(r.total_tokens, 0)) : "—";
+        const costCell = (r && r.estimated_cost_usd != null) ? _benchFmtCost(r.estimated_cost_usd) : "—";
+        const modelTitle = calls != null ? ` title="${calls} model call(s)"` : "";
+        return `
+            <tr class="bench-case-compact-row bench-case-compact-row--${status}"
+                data-bench-lang="${_escapeHtml(lang)}"
+                data-bench-cat="${_escapeHtml(cat)}"
+                data-bench-diff="${_escapeHtml(diff)}"
+                data-bench-status="${status}">
+                <td><span class="bench-status-badge bench-status-badge--${status}">${status}</span></td>
+                <td><code>${_escapeHtml((r && r.name) || "?")}</code></td>
+                <td class="bench-case-tags">${_escapeHtml(lang)} / ${_escapeHtml(cat)} / ${_escapeHtml(diff)}</td>
+                <td class="right">${dur.toFixed(2)}s</td>
+                <td class="bench-case-model"${modelTitle}>${_escapeHtml(model)}</td>
+                <td class="right">${fallbackCell}</td>
+                <td class="right">${tokensCell}</td>
+                <td class="right">${costCell}</td>
+            </tr>
+        `;
+    }).join("");
+    return `
+        <div class="bench-section-heading">Cases (<span id="benchCompactCount">${results.length}</span>/${results.length})</div>
+        <table class="bench-table bench-case-compact">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Case</th>
+                    <th>Lang / Cat / Diff</th>
+                    <th class="right">Duration</th>
+                    <th>Model</th>
+                    <th class="right" title="Model fallbacks for this case">Fallbacks</th>
+                    <th class="right">Tokens</th>
+                    <th class="right">Cost</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+    `;
+}
+
 function _renderBenchmarkDetail(report, filename) {
     const detail = document.getElementById("benchDetail");
     if (!detail) return;
@@ -5177,6 +5330,8 @@ function _renderBenchmarkDetail(report, filename) {
             <span class="health-summary-pill health-badge--missing">flaky: ${flaky}</span>
             <span class="health-summary-pill health-badge--available">total: ${total}</span>
             <span class="health-summary-pill health-badge--available">${(rate * 100).toFixed(1)}% / ${duration.toFixed(1)}s</span>
+            ${report.total_fallbacks ? `<span class="health-summary-pill health-badge--missing">fallbacks: ${_benchInt(report.total_fallbacks, 0)}</span>` : ""}
+            ${report.self_corrected_count ? `<span class="health-summary-pill health-badge--available">self-corrected: ${_benchInt(report.self_corrected_count, 0)}</span>` : ""}
             ${totalTokens ? `<span class="health-summary-pill health-badge--available">tokens: ${totalTokens}</span>` : ""}
             ${totalTokens ? `<span class="health-summary-pill health-badge--available">cost: ${_benchFmtCost(estimatedCost)}</span>` : ""}
         </div>
@@ -5228,15 +5383,35 @@ function _renderBenchmarkDetail(report, filename) {
         </div>
     `;
 
+    const modelsLine = _benchModelsUsedLine(report);
+    const filtersHtml = _renderBenchFilters(report);
+    const compactHtml = _renderCompactCasesTable(report);
+
+    // Raw report JSON stays behind a collapsed <details> so it never overwhelms
+    // the panel; escaped so it can't inject markup.
+    const rawJsonHtml = `
+        <details class="bench-raw-json">
+            <summary>Raw report JSON</summary>
+            <pre class="bench-raw-json-body">${_escapeHtml(JSON.stringify(report, null, 2))}</pre>
+        </details>
+    `;
+
+    // Fresh report → clear any quick-filter state left over from the last one.
+    _benchActiveFilters = { language: "", category: "", difficulty: "" };
+
     detail.innerHTML = `
         <div class="bench-detail-filename">
             <code>${_escapeHtml(filename)}</code>
         </div>
         ${totalsHtml}
+        ${modelsLine}
+        ${filtersHtml}
+        ${compactHtml}
         ${groupsHtml}
         ${flakyHtml}
         ${slowestHtml}
         ${failuresHtml}
+        ${rawJsonHtml}
         ${actionsHtml}
     `;
 }

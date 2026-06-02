@@ -2099,6 +2099,137 @@ button {
     gap: 8px;
 }
 
+/* Phase 5P.2 — benchmark report density polish. */
+.bench-models-line {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: -8px 0 12px;
+    word-break: break-word;
+}
+
+.bench-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 8px 0 12px;
+}
+
+.bench-filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.bench-filter-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-right: 2px;
+}
+
+.bench-filter-chip {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    cursor: pointer;
+    line-height: 1.6;
+}
+
+.bench-filter-chip:hover {
+    border-color: var(--color-text-muted);
+}
+
+.bench-filter-chip.is-active {
+    background: var(--color-accent, #2563eb);
+    border-color: var(--color-accent, #2563eb);
+    color: #fff;
+}
+
+.bench-case-compact {
+    margin-top: 4px;
+}
+
+.bench-case-compact .bench-case-tags {
+    color: var(--color-text-muted);
+    font-size: 11px;
+}
+
+.bench-case-compact .bench-case-model {
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    word-break: break-word;
+}
+
+.bench-case-compact-row--fail {
+    background: rgba(185, 28, 28, 0.10);
+}
+
+.bench-case-compact-row--flaky {
+    background: rgba(201, 122, 0, 0.10);
+}
+
+.bench-status-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+}
+
+.bench-status-badge--pass {
+    color: #16a34a;
+    border-color: #16a34a;
+}
+
+.bench-status-badge--fail {
+    color: #f87171;
+    border-color: #b91c1c;
+}
+
+.bench-status-badge--flaky {
+    color: #f59e0b;
+    border-color: #c97a00;
+}
+
+.bench-status-badge--skipped {
+    color: var(--color-text-muted);
+}
+
+.bench-raw-json {
+    margin-top: 16px;
+    font-size: 12px;
+}
+
+.bench-raw-json > summary {
+    cursor: pointer;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 12px;
+}
+
+.bench-raw-json-body {
+    margin-top: 8px;
+    max-height: 320px;
+    overflow: auto;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 11px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
 .bench-runner {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
