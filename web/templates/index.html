@@ -1572,6 +1572,15 @@ function _renderDreamItemCard(it, opts = {}) {
     const promoteBtn = canPromote
         ? `<button type="button" class="dream-action-btn" onclick="promoteDreamArtifact('${_escapeHtml(opts.date || "")}', '${_escapeHtml(opts.runId)}', ${Number(it.idx)}, '${_escapeHtml(it.latest_refined_artifact)}')">Promote refined</button>`
         : "";
+    // Phase 6.4e: create a repo-scoped lesson CANDIDATE from a validated Dream
+    // item. Only offered for ready_to_apply items in a timestamped run report
+    // (needs item_dir_name + run context). The candidate still requires Promote
+    // in the Memory tab before retrieval can use it.
+    const canLessonize = status === "ready_to_apply" && !!opts.runId && !!it.item_dir_name;
+    const lessonizeBtn = canLessonize
+        ? `<button type="button" class="dream-action-btn" onclick="createDreamLessonCandidate('${_escapeHtml(opts.date || "")}', '${_escapeHtml(opts.runId)}', '${_escapeHtml(it.item_dir_name)}')" title="Create a repo-scoped lesson candidate from this validated Dream item. It still needs Promote in the Memory tab before retrieval can use it.">Create candidate lesson</button>`
+        : "";
+    const dreamActionButtons = [promoteBtn, lessonizeBtn].filter(Boolean).join("");
     const patchBlockerDetails = _renderPatchBlockerDetails(it);
     return `
         <div class="dream-item-card">
@@ -1589,7 +1598,7 @@ function _renderDreamItemCard(it, opts = {}) {
                 </div>
                 ${summary ? `<div class="dream-item-card__summary">${summary}</div>` : ""}
                 ${patchBlockerDetails}
-                ${promoteBtn ? `<div class="dream-item-card__actions">${promoteBtn}</div>` : ""}
+                ${dreamActionButtons ? `<div class="dream-item-card__actions">${dreamActionButtons}</div>` : ""}
             </div>
         </div>
     `;
@@ -3244,6 +3253,48 @@ function promoteProposalToLesson(proposalDir, allowFailed) {
                 statusEl.className = "proposals-status proposals-status--failed";
             }
         });
+}
+
+// Phase 6.4e — create a repo-scoped lesson CANDIDATE from a validated Dream
+// item. Sends a relative date/run/item ref; the server resolves it against the
+// repo's dreams root and never promotes to active.
+function createDreamLessonCandidate(date, runId, itemDirName) {
+    const repoEl = document.querySelector("input[name='repo_path']");
+    const repo = repoEl ? repoEl.value.trim() : "";
+    if (!repo) { alert("Set a repo path first."); return; }
+    if (!itemDirName) { alert("This Dream item has no artifact directory."); return; }
+    const warn = `Create a lesson candidate from this Dream item?\n\nIt will appear in the Lessons list as a CANDIDATE. You still need to click "Promote" on the lesson card to move it to active.`;
+    if (!confirm(warn)) return;
+
+    const itemDir = [date, runId, itemDirName].filter(Boolean).join("/");
+    openAppModal("Dream lesson candidate", `<div class="health-empty">Creating candidate…</div>`);
+    fetch("/lessons/create-candidate-from-dream", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ item_dir: itemDir, repo_path: repo }),
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                openAppModal("Dream lesson candidate", `<div class="health-empty">Failed: ${_escapeHtml(data.error || "unknown error")}</div>`);
+                return;
+            }
+            const res = data.result || {};
+            const rows = [
+                ["status", res.status],
+                ["scope", res.scope],
+                ["source_key", res.source_key],
+                ["reason", res.reason],
+                ["lesson_id", res.lesson_id],
+                ["promotion", res.promotion],
+                ["active_knowledge_allowed", String(res.active_knowledge_allowed)],
+            ].filter(([, v]) => v !== undefined && v !== null && v !== "")
+             .map(([k, v]) => `<tr><th>${_escapeHtml(k)}</th><td><code>${_escapeHtml(String(v))}</code></td></tr>`)
+             .join("");
+            openAppModal("Dream lesson candidate", `<table class="lesson-result-table">${rows}</table>`);
+            if (typeof loadLessons === "function") loadLessons(true);
+        })
+        .catch(err => openAppModal("Dream lesson candidate", `<div class="health-empty">Network error: ${_escapeHtml(err)}</div>`));
 }
 
 // Phase 8 — Local MCP Inspector shortcuts

@@ -2253,6 +2253,76 @@ def proposals_promote_route():
     }
 
 
+# ---------------------------------------------------------------------------
+# Phase 6.4e — gated "auto candidate creation" operator actions.
+# Backed by core/lesson_auto_candidates.py. These are explicit, controlled
+# triggers (the helper is an exact no-op unless enabled=True is passed, which
+# only happens here). They create CANDIDATE lessons only; promotion to active
+# stays a manual Memory-tab action and lesson_quality remains the routing
+# authority. They never run benchmarks/models/patch executors/validation, never
+# enable retrieval, and never mutate the source artifacts.
+# ---------------------------------------------------------------------------
+
+def _truthy_form(value) -> bool:
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+@app.route("/lessons/create-candidate-from-proposal", methods=["POST"])
+def lessons_create_candidate_from_proposal_route():
+    """Create a lesson candidate from a proposal artifact (uniform result).
+
+    Form/JSON: proposal_dir (required), repo_path?, global_candidate?,
+    include_failed?. Returns {ok, result} where result carries
+    status/scope/source_key/reason/active_knowledge_allowed.
+    """
+    from core.lesson_auto_candidates import maybe_create_lesson_candidate_from_proposal
+
+    payload = request.get_json(silent=True) or request.form
+    proposal_dir = (payload.get("proposal_dir") or "").strip()
+    if not proposal_dir:
+        return {"ok": False, "error": "proposal_dir is required"}, 400
+    repo_path = (payload.get("repo_path") or "").strip() or None
+    try:
+        result = maybe_create_lesson_candidate_from_proposal(
+            proposal_dir,
+            repo_path=repo_path,
+            enabled=True,
+            global_candidate=_truthy_form(payload.get("global_candidate")),
+            include_failed=_truthy_form(payload.get("include_failed")),
+        )
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    return {"ok": True, "result": result}
+
+
+@app.route("/lessons/create-candidate-from-dream", methods=["POST"])
+def lessons_create_candidate_from_dream_route():
+    """Create a lesson candidate from a Dream ready_to_apply item (uniform result).
+
+    Form/JSON: item_dir (required; may be a relative date/run/item ref resolved
+    against the repo's dreams root), repo_path (required for repo scope),
+    global_candidate?, include_failed?.
+    """
+    from core.lesson_auto_candidates import maybe_create_lesson_candidate_from_dream_item
+
+    payload = request.get_json(silent=True) or request.form
+    item_dir = (payload.get("item_dir") or payload.get("dream_item_dir") or "").strip()
+    if not item_dir:
+        return {"ok": False, "error": "item_dir is required"}, 400
+    repo_path = (payload.get("repo_path") or "").strip() or None
+    try:
+        result = maybe_create_lesson_candidate_from_dream_item(
+            item_dir,
+            repo_path=repo_path,
+            enabled=True,
+            global_candidate=_truthy_form(payload.get("global_candidate")),
+            include_failed=_truthy_form(payload.get("include_failed")),
+        )
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    return {"ok": True, "result": result}
+
+
 @app.route("/upload_folder", methods=["POST"])
 def upload_folder():
     files = request.files.getlist("files")
