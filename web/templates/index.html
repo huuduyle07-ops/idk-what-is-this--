@@ -82,12 +82,12 @@
                     placeholder="Repo path or drag folder here"
                     value="{{ current.repo_path if current else '' }}"
                     required
-                    style="flex:2"
+                    class="flex-2"
                 >
                 <input name="project_tag"
                        value="{{ current.project_tag if current else '' }}"
                        placeholder="Tag (auto)"
-                       style="flex:1" />
+                          class="flex-1" />
             </div>
             <input type="file" id="folderInput" webkitdirectory multiple hidden>
 
@@ -396,9 +396,8 @@
                 Refresh status
               </button>
             </div>
-            <div id="benchRunOptions" class="bench-run-options" hidden
-                 style="margin:0.5em 0; padding:0.6em 0.8em; border:1px solid #3a3a3a; border-radius:6px; display:flex; flex-wrap:wrap; gap:0.9em; align-items:center;">
-              <strong style="font-size:0.85em;">Run options</strong>
+                        <div id="benchRunOptions" class="bench-run-options" hidden>
+                            <strong>Run options</strong>
               <label title="Fast mode (default on): use the faster benchmark path.">
                 <input type="checkbox" id="benchOptFast" checked> Fast
               </label>
@@ -435,7 +434,7 @@
           </div>
 
           <!-- Phase 12.8a: presentation evidence pack helper -->
-          <div class="bench-runner" id="evidencePackSection" style="margin-top:1em;">
+          <div class="bench-runner mt-1" id="evidencePackSection">
             <div class="bench-runner-header">
               <strong>Presentation evidence pack</strong>
               <span class="bench-runner-note">Bundles existing benchmark, experiment, trend, watchlist, and graph evidence into .agent/presentation_evidence/. Read-only: never runs benchmarks or calls models.</span>
@@ -466,7 +465,7 @@
                visible above). -->
           <details class="reports-panel" data-ui-group="benchmark-prompt-cost">
             <summary class="reports-panel__summary">Prompt / Cost Quantifier (advanced)</summary>
-          <div class="bench-runner" id="promptCostSection" style="margin-top:1em;">
+          <div class="bench-runner mt-1" id="promptCostSection">
             <div class="bench-runner-header">
               <strong>Prompt / Cost Quantifier</strong>
               <span class="bench-runner-note">Groups existing benchmark reports by <code>prompt_config_hash</code> so you can see if a prompt/config version is more expensive, slower, or fallback-heavy. Read-only.</span>
@@ -971,7 +970,7 @@
             <div class="health-header">
               <strong>Help</strong>
             </div>
-            <p style="font-size:13px;color:var(--color-text-muted);margin:6px 0 10px;">
+                        <p class="help-note">
               Opens the project README with usage instructions.
             </p>
             <button type="button" onclick="openHelpModal()">Open README</button>
