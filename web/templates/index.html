@@ -980,7 +980,7 @@
                collapse them together behind an Advanced / Debug disclosure. Both
                remain read-only and metadata-only. -->
           <details class="advanced-panel" data-ui-group="settings-debug">
-            <summary class="advanced-panel__summary">Advanced / Debug — Tool Registry &amp; MCP Audit</summary>
+            <summary class="advanced-panel__summary">Advanced / Debug — Tool Registry, Replay Debugger &amp; MCP Audit</summary>
           <!-- Phase 8-prep.1: Tool Registry viewer.
                Metadata-only. Reads GET /tools/registry; never invokes a tool. -->
           <div class="health-section tool-registry-section">
@@ -1022,6 +1022,27 @@
             </div>
             <div id="mcpAuditList" class="mcp-audit__list">
               <div class="health-empty">No MCP audit events yet.</div>
+            </div>
+          </div>
+          <!-- Phase 13R.2: Replay Debugger.
+               Read-only view of .agent/replays bundles. It only fetches captured
+               artifacts and never executes model, patch, validation, benchmark,
+               Dream, lesson, or cleanup work. -->
+          <div class="health-section replay-debugger-section">
+            <div class="health-header">
+              <strong>Replay Debugger</strong>
+              <button type="button" class="sidebar-refresh"
+                      onclick="loadReplays(true)"
+                      title="Re-fetch /replays for the selected repo">Refresh replays</button>
+            </div>
+            <div class="replay-debugger__note">
+              Replay viewer is read-only. It opens captured files from <code>.agent/replays</code>.
+            </div>
+            <div id="replayList" class="replay-debugger__list">
+              <div class="health-empty">Set a repo path to load replay bundles.</div>
+            </div>
+            <div id="replayDetail" class="replay-debugger__detail">
+              <div class="health-empty">Pick a replay to inspect captured artifacts.</div>
             </div>
           </div>
           </details>
@@ -3705,6 +3726,7 @@ function showWorkspaceTab(id) {
             if (typeof loadHarnessControls === "function") loadHarnessControls(false);
             if (typeof loadToolRegistry === "function") loadToolRegistry(false);
             if (typeof loadMcpAudit === "function") loadMcpAudit(false);
+            if (typeof loadReplays === "function") loadReplays(false);
         },
         graph:      () => {},
     };
@@ -4488,6 +4510,203 @@ function loadMcpAudit(force = false) {
         })
         .catch(err => {
             if (list) list.innerHTML =
+                `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        });
+}
+
+// Phase 13R.2: Replay Debugger panel.
+// Read-only fetches of replay manifests and captured artifact previews.
+let _replayLoaded = false;
+let _activeReplayId = null;
+
+const REPLAY_ARTIFACT_ORDER = [
+    "user_query.txt",
+    "control_result.json",
+    "scout_snippets.json",
+    "active_lessons_injected.json",
+    "model_prompt.txt",
+    "model_raw_response.txt",
+    "patch_parsed.json",
+    "apply_result.json",
+    "validation_output.txt",
+    "self_correct_attempts.json",
+    "brain_stamp.json",
+    "final_status.json",
+];
+
+function _replayRepoPath() {
+    return document.getElementById("repoPathInput")?.value.trim()
+        || document.querySelector("input[name='repo_path']")?.value.trim()
+        || "";
+}
+
+function _replayStatusText(value) {
+    if (value == null || value === "") return "pending";
+    if (typeof value === "string") return value;
+    try { return JSON.stringify(value); }
+    catch { return String(value); }
+}
+
+function _replayStatusClass(value) {
+    const status = _replayStatusText(value).toLowerCase();
+    if (status.includes("success") || status.includes("passed")) return "health-badge--ok";
+    if (status.includes("fail") || status.includes("blocked") || status.includes("error")) return "health-badge--error";
+    return "health-badge--off";
+}
+
+function _replayJsArg(value) {
+    return _escapeHtml(value).replace(/'/g, "\\'");
+}
+
+function _renderReplayList(data) {
+    const list = document.getElementById("replayList");
+    const detail = document.getElementById("replayDetail");
+    if (!list) return;
+
+    if (!data || data.ok === false) {
+        const err = (data && data.error) || "unknown error";
+        list.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        if (detail) detail.innerHTML = `<div class="health-empty">Pick a replay to inspect captured artifacts.</div>`;
+        return;
+    }
+
+    const replays = Array.isArray(data.replays) ? data.replays : [];
+    if (replays.length === 0) {
+        list.innerHTML = `<div class="health-empty">No replay bundles found for this repo.</div>`;
+        if (detail) detail.innerHTML = `<div class="health-empty">Pick a replay to inspect captured artifacts.</div>`;
+        return;
+    }
+
+    list.innerHTML = replays.map(item => {
+        const replayId = item.replay_id || "";
+        const files = Array.isArray(item.files_present) ? item.files_present.length : 0;
+        const pinned = item.pinned === true ? "yes" : "no";
+        const status = _replayStatusText(item.final_status);
+        const selected = replayId === _activeReplayId ? " replay-row--active" : "";
+        return `
+            <div class="replay-row${selected}">
+                <div class="replay-row__main">
+                    <code class="replay-row__id">${_escapeHtml(replayId)}</code>
+                    <span class="health-badge ${_replayStatusClass(item.final_status)}">${_escapeHtml(status)}</span>
+                    <span class="replay-row__meta">${_escapeHtml(item.created_at || "")}</span>
+                    <span class="replay-row__meta">kind: <code>${_escapeHtml(item.run_kind || "")}</code></span>
+                    <span class="replay-row__meta">files: ${files}</span>
+                    <span class="replay-row__meta">pinned: ${_escapeHtml(pinned)}</span>
+                </div>
+                <button type="button" class="lesson-btn--secondary"
+                        onclick="viewReplay('${_replayJsArg(replayId)}')">View details</button>
+            </div>`;
+    }).join("");
+}
+
+function loadReplays(force = false) {
+    if (_replayLoaded && !force) return;
+    const list = document.getElementById("replayList");
+    const repo = _replayRepoPath();
+    if (!repo) {
+        if (list) list.innerHTML = `<div class="health-empty">Set a repo path to load replay bundles.</div>`;
+        return;
+    }
+    if (list) list.innerHTML = `<div class="health-empty">Loading replay bundles...</div>`;
+    fetch(`/replays?repo_path=${encodeURIComponent(repo)}&limit=50`)
+        .then(r => r.json())
+        .then(data => {
+            _renderReplayList(data);
+            _replayLoaded = true;
+        })
+        .catch(err => {
+            if (list) list.innerHTML =
+                `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        });
+}
+
+function _renderReplayManifest(manifest) {
+    const files = Array.isArray(manifest.files_present) ? manifest.files_present : [];
+    const finalStatus = _replayStatusText(manifest.final_status);
+    return `
+        <div class="replay-manifest">
+            <div><strong>Replay</strong> <code>${_escapeHtml(manifest.replay_id || "")}</code></div>
+            <div><strong>Created</strong> ${_escapeHtml(manifest.created_at || "")}</div>
+            <div><strong>Kind</strong> <code>${_escapeHtml(manifest.run_kind || "")}</code></div>
+            <div><strong>Status</strong> <span class="health-badge ${_replayStatusClass(manifest.final_status)}">${_escapeHtml(finalStatus)}</span></div>
+            <div><strong>Files</strong> ${files.length}</div>
+            <div><strong>Pinned</strong> ${manifest.pinned === true ? "yes" : "no"}</div>
+            ${manifest.brain_stamp_id ? `<div><strong>Brain stamp</strong> <code>${_escapeHtml(manifest.brain_stamp_id)}</code></div>` : ""}
+            ${manifest.brain_stamp_hash ? `<div><strong>Brain hash</strong> <code>${_escapeHtml(manifest.brain_stamp_hash)}</code></div>` : ""}
+            <details class="replay-artifact">
+                <summary>Raw manifest</summary>
+                <pre class="replay-artifact__pre">${_escapeHtml(JSON.stringify(manifest, null, 2))}</pre>
+            </details>
+        </div>`;
+}
+
+function _renderReplayArtifact(name, artifact) {
+    if (!artifact || artifact.captured !== true) {
+        return `
+            <details class="replay-artifact">
+                <summary><code>${_escapeHtml(name)}</code> <span class="tool-badge tool-badge--off">not captured</span></summary>
+                <div class="replay-artifact__missing">not captured</div>
+            </details>`;
+    }
+
+    const type = artifact.content_type === "json" ? "json" : "text";
+    const truncatedNote = artifact.truncated
+        ? `<div class="replay-artifact__truncated">Preview truncated at ${Number(artifact.preview_char_limit || 0)} characters.</div>`
+        : "";
+    const size = Number(artifact.size_bytes || 0);
+    return `
+        <details class="replay-artifact">
+            <summary>
+                <code>${_escapeHtml(name)}</code>
+                <span class="tool-badge tool-badge--ok">${_escapeHtml(type)}${artifact.truncated ? " truncated" : ""}</span>
+                <span class="replay-artifact__size">${size} bytes</span>
+            </summary>
+            ${truncatedNote}
+            <pre class="replay-artifact__pre replay-artifact__pre--${_escapeHtml(type)}">${_escapeHtml(artifact.preview || "")}</pre>
+        </details>`;
+}
+
+function _renderReplayDetail(data) {
+    const detail = document.getElementById("replayDetail");
+    if (!detail) return;
+
+    if (!data || data.ok === false) {
+        const err = (data && data.error) || "unknown error";
+        detail.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        return;
+    }
+
+    const manifest = data.manifest || {};
+    const artifacts = data.artifacts || {};
+    const order = Array.isArray(data.artifact_order) && data.artifact_order.length
+        ? data.artifact_order
+        : REPLAY_ARTIFACT_ORDER;
+    detail.innerHTML =
+        _renderReplayManifest(manifest) +
+        `<div class="replay-artifacts">${order.map(name => _renderReplayArtifact(name, artifacts[name])).join("")}</div>`;
+}
+
+function viewReplay(replayId) {
+    const repo = _replayRepoPath();
+    const detail = document.getElementById("replayDetail");
+    if (!repo) {
+        if (detail) detail.innerHTML = `<div class="health-empty">Set a repo path first.</div>`;
+        return;
+    }
+    _activeReplayId = replayId;
+    if (detail) detail.innerHTML = `<div class="health-empty">Loading replay ${_escapeHtml(replayId)}...</div>`;
+    fetch(`/replays/${encodeURIComponent(replayId)}?repo_path=${encodeURIComponent(repo)}`)
+        .then(r => r.json().then(body => ({ status: r.status, body })))
+        .then(({ status, body }) => {
+            if (status >= 400 && body && body.ok === false) {
+                _renderReplayDetail(body);
+                return;
+            }
+            _renderReplayDetail(body);
+            loadReplays(true);
+        })
+        .catch(err => {
+            if (detail) detail.innerHTML =
                 `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
         });
 }

@@ -1433,6 +1433,112 @@ button {
     border: 1px solid var(--color-border);
 }
 
+/* Phase 13R.2: Replay Debugger viewer (Settings/Health) */
+.replay-debugger__note {
+    margin: 4px 0 10px 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.replay-debugger__list,
+.replay-debugger__detail {
+    display: grid;
+    gap: 8px;
+}
+
+.replay-debugger__detail {
+    margin-top: 12px;
+}
+
+.replay-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface-2);
+}
+
+.replay-row--active {
+    border-color: var(--color-accent);
+}
+
+.replay-row__main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    align-items: center;
+    min-width: 0;
+}
+
+.replay-row__id {
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.replay-row__meta {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.replay-manifest {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface-2);
+    font-size: 12px;
+}
+
+.replay-manifest .replay-artifact {
+    grid-column: 1 / -1;
+}
+
+.replay-artifacts {
+    display: grid;
+    gap: 8px;
+}
+
+.replay-artifact {
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface-2);
+}
+
+.replay-artifact summary {
+    cursor: pointer;
+    padding: 8px 10px;
+}
+
+.replay-artifact__size,
+.replay-artifact__missing,
+.replay-artifact__truncated {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.replay-artifact__missing,
+.replay-artifact__truncated {
+    padding: 0 10px 8px 10px;
+}
+
+.replay-artifact__pre {
+    max-height: 360px;
+    overflow: auto;
+    margin: 0;
+    padding: 10px;
+    border-top: 1px solid var(--color-border);
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: 12px;
+}
+
 /* Phase 8.3.1: Recent MCP Audit viewer (Settings/Health) */
 .mcp-audit__note {
     margin: 4px 0 10px 0;
