@@ -16,10 +16,42 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 _FILENAME_RE = re.compile(r"^benchmark_report_(\d+)\.json$")
+_META_FILENAME = "history_meta.json"
 
 
 def _bench_dir(repo_path: str | Path) -> Path:
     return Path(repo_path).resolve() / ".agent" / "benchmarks"
+
+
+def _meta_path(repo_path: str | Path) -> Path:
+    return _bench_dir(repo_path) / _META_FILENAME
+
+
+def read_benchmark_meta(repo_path: str | Path) -> dict:
+    path = _meta_path(repo_path)
+    if not path.is_file():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def write_benchmark_meta(repo_path: str | Path, meta: dict) -> None:
+    path = _meta_path(repo_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(path)
+
+
+def update_benchmark_entry(repo_path: str | Path, filename: str, **fields) -> dict:
+    meta = read_benchmark_meta(repo_path)
+    entry = dict(meta.get(filename, {}))
+    entry.update(fields)
+    meta[filename] = entry
+    write_benchmark_meta(repo_path, meta)
+    return entry
 
 
 def _summarize_one(path: Path) -> dict | None:
@@ -50,19 +82,33 @@ def _summarize_one(path: Path) -> dict | None:
     }
 
 
-def list_benchmark_reports(repo_path: str | Path) -> list[dict]:
+def list_benchmark_reports(
+    repo_path: str | Path,
+    include_archived: bool = False,
+) -> list[dict]:
     """All benchmark reports for a repo, newest first.
 
     Returns an empty list if .agent/benchmarks/ doesn't exist or contains no
-    parseable reports."""
+    parseable reports. Entries with deleted=True are always hidden.
+    Entries with archived=True are hidden unless include_archived is set."""
     bench_dir = _bench_dir(repo_path)
     if not bench_dir.is_dir():
         return []
+    meta = read_benchmark_meta(repo_path)
     summaries: list[dict] = []
     for p in bench_dir.glob("benchmark_report_*.json"):
         s = _summarize_one(p)
-        if s is not None:
-            summaries.append(s)
+        if s is None:
+            continue
+        entry = meta.get(s["filename"], {})
+        s["archived"] = bool(entry.get("archived", False))
+        s["pinned"] = bool(entry.get("pinned", False))
+        s["deleted"] = bool(entry.get("deleted", False))
+        if s["deleted"]:
+            continue
+        if s["archived"] and not include_archived:
+            continue
+        summaries.append(s)
     summaries.sort(key=lambda s: s["timestamp_epoch"], reverse=True)
     return summaries
 
