@@ -119,6 +119,23 @@ def test_retrieval_enabled_candidate_only_omits_block(lessons_repo, monkeypatch)
     assert "candidate_title_should_not_leak" not in prompt
 
 
+def test_retrieval_enabled_blocked_only_omits_block(lessons_repo, monkeypatch):
+    """A blocked lesson must not surface in CONTROL active-lesson context."""
+    monkeypatch.setattr(config_module, "LESSON_RETRIEVAL_ENABLED", True)
+    lesson_store.save_candidate_lesson(
+        _candidate(touched_forbidden_files=["secrets.env"]),
+        source="manual",
+        title="blocked_title_should_not_leak",
+    )
+
+    prompt = control_engine.build_control_prompt(
+        _control_result(), "anything", repo_path=str(lessons_repo)
+    )
+
+    assert "[ACTIVE LESSONS" not in prompt
+    assert "blocked_title_should_not_leak" not in prompt
+
+
 # --- 3. retrieval enabled with active lesson ----------------------------
 
 
