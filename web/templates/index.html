@@ -2886,7 +2886,7 @@ function refreshDreamRuns() {
     .then(r => r.json())
     .then(data => {
         if (data.error) {
-            container.innerHTML = `<div class="dream-runs-empty">${data.error}</div>`;
+            container.innerHTML = `<div class="dream-runs-empty">${_escapeHtml(data.error)}</div>`;
             return;
         }
         const reports = data.reports || [];
@@ -2933,7 +2933,7 @@ function refreshDreamRuns() {
         }).join("");
     })
     .catch(err => {
-        container.innerHTML = `<div class="dream-runs-empty">Load error: ${err}</div>`;
+        container.innerHTML = `<div class="dream-runs-empty">Load error: ${_escapeHtml(String(err))}</div>`;
     });
 }
 
