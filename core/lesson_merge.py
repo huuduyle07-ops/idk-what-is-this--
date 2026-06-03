@@ -132,3 +132,64 @@ def archive_lesson(
         scope=scope,
         repo_scope_id=repo_scope_id,
     )
+
+
+def create_merge(
+    source_ids: list[str],
+    title: str,
+    summary: str,
+    tags: list[str],
+    *,
+    repo_path: str | None = None,
+    scope: str | None = None,
+    repo_scope_id: str | None = None,
+    confirm_supersede_active: bool = False,
+    confirm_mix_kinds: bool = False,
+) -> tuple[dict, list[str]]:
+    """Create a merged lesson candidate from source_ids.
+
+    Returns (new_record, superseded_ids).
+    Raises ValueError if guards not confirmed; LookupError if any ID not found.
+    The merged record is always candidate and never auto-promoted.
+    """
+    if len(source_ids) < 2:
+        raise ValueError("create_merge requires at least 2 source IDs")
+
+    lessons = [
+        get_lesson_by_id(
+            lid, repo_path=repo_path, scope=scope, repo_scope_id=repo_scope_id
+        )
+        for lid in source_ids
+    ]
+
+    active_ids = [lesson["id"] for lesson in lessons if lesson.get("status") == STATUS_ACTIVE]
+    if active_ids and not confirm_supersede_active:
+        raise ValueError(
+            f"active lessons require confirm_supersede_active=True: {active_ids}"
+        )
+
+    kinds = {lesson.get("kind") or "lesson" for lesson in lessons}
+    if len(kinds) > 1 and not confirm_mix_kinds:
+        raise ValueError(
+            f"mixed lesson kinds require confirm_mix_kinds=True: {sorted(kinds)}"
+        )
+
+    record, _ = preview_merge(lessons, title=title, summary=summary, tags=tags)
+
+    # Assign identity
+    lessons_root = _lessons_root(repo_path)
+    lesson_id = _generate_lesson_id(lessons_root)
+    now = _now_iso()
+    record["id"] = lesson_id
+    record["created_at"] = now
+    record["updated_at"] = now
+
+    # Write merged record first — patch sources only after successful write
+    save_raw_lesson_record(record, repo_path=repo_path)
+
+    superseded: list[str] = []
+    for lid in source_ids:
+        patch_lesson_fields(lid, {"superseded_by": lesson_id}, repo_path=repo_path)
+        superseded.append(lid)
+
+    return record, superseded
