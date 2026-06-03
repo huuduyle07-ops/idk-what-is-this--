@@ -44,6 +44,7 @@ from core import dream_taxonomy
 from core import benchmark_web
 from core import lesson_store
 from core import goal_brief as goal_brief_core
+from core import goal_brief_autocomplete as goal_brief_autocomplete_core
 from core.patch_safety import evaluate_patch_safety
 from core.mcp_audit import list_mcp_invocations
 from database.memory_consolidator import consolidate_all
@@ -978,6 +979,25 @@ def _goal_brief_payload() -> dict:
 
 def _truthy_form_value(value: object) -> bool:
     return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+@app.route("/goal-brief/autocomplete", methods=["POST"])
+def goal_brief_autocomplete_route():
+    payload = _goal_brief_payload()
+    result = goal_brief_autocomplete_core.autocomplete_goal_brief(
+        str(payload.get("messy_intent") or ""),
+        repo_path=(str(payload.get("repo_path") or "").strip() or None),
+        mode_hint=(str(payload.get("mode_hint") or "").strip() or None),
+        validation_hint=(str(payload.get("validation_hint") or "").strip() or None),
+    )
+    if not result.get("ok"):
+        return result, 400
+    draft = result["draft"]
+    return {
+        "ok": True,
+        "draft": draft,
+        "markdown": goal_brief_autocomplete_core.render_goal_brief_draft_markdown(draft),
+    }
 
 
 @app.route("/goal-brief/start", methods=["POST"])

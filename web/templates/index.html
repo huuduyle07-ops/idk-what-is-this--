@@ -303,6 +303,18 @@
             <input type="hidden" id="goalBriefRef" value="">
             <textarea id="goalBriefGoal" class="goal-brief-goal" placeholder="What are you trying to get done?"></textarea>
 
+            <section class="goal-brief-autocomplete" aria-label="Goal Brief autocomplete">
+              <label for="goalBriefMessyIntent">Messy intent</label>
+              <textarea id="goalBriefMessyIntent" class="goal-brief-autocomplete-input" placeholder="Paste rough notes, errors, desired behavior, likely files, and validation ideas."></textarea>
+              <div class="goal-brief-actions">
+                <button type="button" onclick="draftGoalBriefAutocomplete()">Draft Goal Brief</button>
+                <button type="button" id="goalBriefAutocompleteUse" onclick="useGoalBriefAutocompleteDraft()" disabled>Use this in Goal Brief</button>
+              </div>
+              <div id="goalBriefAutocompletePreview" class="goal-brief-autocomplete-preview" aria-live="polite">
+                <span class="goal-brief-muted">No autocomplete draft yet.</span>
+              </div>
+            </section>
+
             <div class="goal-brief-actions">
               <button type="button" onclick="startGoalBrief()">Start brief</button>
               <button type="button" onclick="updateGoalBrief()">Send reply</button>
@@ -3755,6 +3767,7 @@ function _escapeHtml(s) {
 }
 
 let _goalBriefCurrent = null;
+let _goalBriefAutocompleteDraft = null;
 
 function _goalBriefStatus(text, kind = "") {
     const el = document.getElementById("goalBriefStatus");
@@ -3945,6 +3958,90 @@ function _renderGoalBriefResponse(data, userText = "") {
 
     const status = brief.status === "ready" ? "Ready" : "Draft";
     _goalBriefStatus(`${status} - ${data.brief_path || "dry run"}`, brief.status === "ready" ? "ready" : "draft");
+}
+
+function _goalBriefAutocompleteValue(value) {
+    if (Array.isArray(value)) return value.length ? value.join("\n") : "None";
+    return String(value || "").trim() || "Missing";
+}
+
+function _renderGoalBriefAutocompletePreview(draft) {
+    const preview = document.getElementById("goalBriefAutocompletePreview");
+    const useButton = document.getElementById("goalBriefAutocompleteUse");
+    if (!preview) return;
+    if (!draft) {
+        preview.innerHTML = '<span class="goal-brief-muted">No autocomplete draft yet.</span>';
+        if (useButton) useButton.disabled = true;
+        return;
+    }
+    const fields = [
+        ["Title", draft.title],
+        ["Problem", draft.problem_statement],
+        ["Outcome", draft.desired_outcome],
+        ["Areas", draft.suspected_files_or_areas],
+        ["Constraints", draft.constraints],
+        ["Safety", draft.safety_notes],
+        ["Mode", draft.suggested_mode],
+        ["Validation", draft.validation_hints],
+        ["Questions", draft.open_questions],
+    ];
+    preview.innerHTML = fields.map(([label, value]) => `
+        <div class="goal-brief-autocomplete-field">
+          <span>${_escapeHtml(label)}</span>
+          <strong>${_escapeHtml(_goalBriefAutocompleteValue(value))}</strong>
+        </div>
+    `).join("");
+    if (useButton) useButton.disabled = false;
+}
+
+function draftGoalBriefAutocomplete() {
+    const intentEl = document.getElementById("goalBriefMessyIntent");
+    const intent = intentEl ? intentEl.value.trim() : "";
+    if (!intent) {
+        _goalBriefStatus("Enter messy intent first.", "failed");
+        return;
+    }
+    _goalBriefStatus("Drafting goal brief...", "draft");
+    const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
+    const validationHint = document.getElementById("goalBriefAnswer")?.value.trim() || "";
+    fetch("/goal-brief/autocomplete", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ messy_intent: intent, repo_path: repo, validation_hint: validationHint }),
+    })
+        .then(r => r.json().then(data => ({ status: r.status, data })))
+        .then(({ status, data }) => {
+            if (status >= 400 || !data.ok) {
+                _goalBriefAutocompleteDraft = null;
+                _renderGoalBriefAutocompletePreview(null);
+                _goalBriefStatus(data.error || "Could not draft goal brief.", "failed");
+                return;
+            }
+            _goalBriefAutocompleteDraft = data.draft || null;
+            _renderGoalBriefAutocompletePreview(_goalBriefAutocompleteDraft);
+            _goalBriefStatus("Autocomplete draft ready.", "draft");
+        })
+        .catch(err => _goalBriefStatus(`Network error: ${err}`, "failed"));
+}
+
+function useGoalBriefAutocompleteDraft() {
+    const draft = _goalBriefAutocompleteDraft;
+    if (!draft) {
+        _goalBriefStatus("Draft Goal Brief first.", "failed");
+        return;
+    }
+    const goalEl = document.getElementById("goalBriefGoal");
+    const answerEl = document.getElementById("goalBriefAnswer");
+    const lines = [
+        `problem_type: ${draft.suggested_mode || "unknown"}`,
+        `expected_result: ${draft.desired_outcome || ""}`,
+        `allowed_files: ${(draft.suspected_files_or_areas || []).join(", ") || "unknown"}`,
+        `validation_command: ${(draft.validation_hints || [])[0] || ""}`,
+        `success_criteria: ${draft.desired_outcome || ""}`,
+    ].filter(line => !line.endsWith(": "));
+    if (goalEl) goalEl.value = draft.title || draft.problem_statement || goalEl.value;
+    if (answerEl) answerEl.value = lines.join("\n");
+    _goalBriefStatus("Autocomplete draft copied into Goal Brief fields.", "draft");
 }
 
 function startGoalBrief() {
