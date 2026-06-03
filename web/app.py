@@ -1264,7 +1264,11 @@ def benchmarks_report_route():
     data = read_benchmark_report(repo_path, filename)
     if data is None:
         return {"error": f"report not found or invalid name: {filename}"}, 404
-    return data
+    # Phase 14.3: attach a read-only failure taxonomy for display. This only
+    # classifies already-loaded results; it never writes artifacts or changes
+    # scoring, and the stored report file on disk is left untouched.
+    from core.failure_taxonomy import summarize_benchmark_failures
+    return {**data, "failure_taxonomy": summarize_benchmark_failures(data)}
 
 
 @app.route("/benchmarks/create-case", methods=["POST"])

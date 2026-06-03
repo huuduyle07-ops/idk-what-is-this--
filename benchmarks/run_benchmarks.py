@@ -1435,6 +1435,12 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
                 )
             lines.append("")
 
+    # Read-only failure taxonomy section (Phase 14.3). Classification of the
+    # already-computed results only; does not change scoring or pass/fail.
+    from core.failure_taxonomy import render_benchmark_taxonomy_lines
+
+    lines.extend(render_benchmark_taxonomy_lines(report))
+
     path.write_text("\n".join(lines), encoding="utf-8")
 
 

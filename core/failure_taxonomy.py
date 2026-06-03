@@ -59,6 +59,16 @@ GUARDRAIL_NOTE = (
     "network calls, or mutates any file."
 )
 
+# Short guardrail shown in benchmark report views (Phase 14.3). Display-only.
+BENCHMARK_DISPLAY_GUARDRAIL_NOTE = (
+    "Failure taxonomy is read-only and does not affect benchmark scoring, "
+    "patching, validation, or lesson promotion."
+)
+
+# Keys under which a benchmark report may hold its per-case result list, in
+# precedence order (newest shape first, older shapes after).
+_BENCHMARK_RESULT_KEYS = ("results", "case_results", "cases")
+
 # Deterministic thresholds (override per-case via the documented keys below).
 DEFAULT_LARGE_PATCH_LINES = 150
 DEFAULT_LARGE_PATCH_FILES = 8
@@ -426,7 +436,111 @@ def format_failure_taxonomy_report(
     return "\n".join(lines) + "\n"
 
 
+# --- benchmark report integration (Phase 14.3, display-only) ----------------
+
+
+def summarize_benchmark_failures(report: Any) -> dict[str, Any]:
+    """Classify the *failing* cases of an already-loaded benchmark report.
+
+    Purely a display aid: it reads the report, classifies each failing case
+    with :func:`classify_failure`, and returns a compact summary. Passing and
+    skipped cases are never classified. The ``report`` is never mutated, no
+    files are written, and nothing about scoring/pass-fail is touched.
+    """
+    results = _benchmark_results(report)
+    classifications: list[dict[str, Any]] = []
+    counts: dict[str, int] = {}
+
+    for index, case in enumerate(results):
+        if not _is_failing_case(case):
+            continue
+        # classify_failure copies its input and never mutates it.
+        result = classify_failure(case)
+        counts[result.category] = counts.get(result.category, 0) + 1
+        name = str(case.get("name") or "").strip() or f"case_{index}"
+        classifications.append(
+            {
+                "name": name,
+                "category": result.category,
+                "confidence": result.confidence,
+                "explanation": result.explanation,
+                "recommended_next_action": result.recommended_next_action,
+            }
+        )
+
+    ordered_counts = {
+        category: counts[category]
+        for category in CATEGORIES
+        if category in counts
+    }
+    return {
+        "total_cases": len(results),
+        "total_failing": len(classifications),
+        "counts_by_category": ordered_counts,
+        "classifications": classifications,
+        "guardrail_note": BENCHMARK_DISPLAY_GUARDRAIL_NOTE,
+    }
+
+
+def render_benchmark_taxonomy_lines(report: Any) -> list[str]:
+    """Return Markdown lines for a read-only ``## Failure Taxonomy`` section.
+
+    Shows a friendly empty state when there are no failing cases. Display-only:
+    classification of already-loaded evidence, nothing is acted upon.
+    """
+    summary = summarize_benchmark_failures(report)
+    lines = ["## Failure Taxonomy", ""]
+    if not summary["classifications"]:
+        lines.append("No failing cases to classify.")
+        lines.append("")
+        lines.append(f"> {BENCHMARK_DISPLAY_GUARDRAIL_NOTE}")
+        lines.append("")
+        return lines
+
+    lines.append("Counts by category:")
+    lines.append("")
+    for category, count in summary["counts_by_category"].items():
+        lines.append(f"- {category}: {count}")
+    lines.append("")
+    lines.append("| Case | Category | Confidence | Recommended next action |")
+    lines.append("|---|---|---|---|")
+    for item in summary["classifications"]:
+        name = str(item["name"]).replace("|", "\\|")
+        action = str(item["recommended_next_action"]).replace("|", "\\|")
+        lines.append(
+            f"| `{name}` | {item['category']} | "
+            f"{item['confidence']:.2f} | {action} |"
+        )
+    lines.append("")
+    lines.append(f"> {BENCHMARK_DISPLAY_GUARDRAIL_NOTE}")
+    lines.append("")
+    return lines
+
+
 # --- internals --------------------------------------------------------------
+
+
+def _benchmark_results(report: Any) -> list[dict[str, Any]]:
+    if not isinstance(report, dict):
+        return []
+    for key in _BENCHMARK_RESULT_KEYS:
+        value = report.get(key)
+        if isinstance(value, list):
+            return [item for item in value if isinstance(item, dict)]
+    return []
+
+
+def _is_failing_case(case: dict[str, Any]) -> bool:
+    """A case counts as failing when it neither passed nor was skipped."""
+    if case.get("skipped"):
+        return False
+    for key in ("success", "passed", "ok", "correct"):
+        if case.get(key) is True:
+            return False
+    status = str(case.get("status") or "").lower()
+    if status in {"pass", "passed", "ok", "success"}:
+        return False
+    return _case_failed(case)
 
 
 def _build(category: str, evidence: list[str]) -> FailureClassification:
