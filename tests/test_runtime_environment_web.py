@@ -79,7 +79,7 @@ def test_web_route_passes_runtime_environment_state_to_agent(
             "validation": "",
         }, project_tag
 
-    monkeypatch.setattr(web_app, "SESSION_FILE", session_file)
+    import web.session_store as _ss; monkeypatch.setattr(_ss, "SESSION_FILE", session_file)
     monkeypatch.setattr(web_app, "_run_mode", fake_run_mode)
     monkeypatch.setattr(web_app, "build_project_tag", lambda repo_path, user_tag: "demo-tag")
 
@@ -130,7 +130,7 @@ def test_web_route_preserves_custom_runtime_environment_details(
             "validation": "",
         }, kwargs["project_tag"]
 
-    monkeypatch.setattr(web_app, "SESSION_FILE", session_file)
+    import web.session_store as _ss; monkeypatch.setattr(_ss, "SESSION_FILE", session_file)
     monkeypatch.setattr(web_app, "_run_mode", fake_run_mode)
     monkeypatch.setattr(web_app, "build_project_tag", lambda repo_path, user_tag: "demo-tag")
 

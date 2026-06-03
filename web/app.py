@@ -74,26 +74,10 @@ app.register_blueprint(harness_controls_routes_bp)
 app.register_blueprint(replay_routes_bp)
 
 WEB_DIR = Path(__file__).parent
+from web.session_store import load_sessions, save_sessions, find_session
 from scripts.run_patch_proposal_queue import PROPOSAL_ROOT as _DREAM_PROPOSAL_ROOT
-SESSION_FILE = WEB_DIR / "sessions.json"
 BACKUP_DIR = WEB_DIR / "backups"
 BACKUP_DIR.mkdir(exist_ok=True)
-
-def load_sessions() -> list[dict]:
-    if not SESSION_FILE.exists():
-        return []
-
-    try:
-        return json.loads(SESSION_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        return []
-
-
-def save_sessions(sessions: list[dict]) -> None:
-    SESSION_FILE.write_text(
-        json.dumps(sessions, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
 
 
 def save_session(
@@ -134,13 +118,6 @@ def save_session(
     save_sessions(sessions[:30])
 
     return session
-
-def find_session(session_id: str) -> dict | None:
-    for s in load_sessions():
-        if s.get("id") == session_id:
-            return s
-    return None
-
 
 def _normalize_web_mode(value: str | None) -> str:
     return "chat" if (value or "").strip().lower() == "chat" else "instant"
