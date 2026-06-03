@@ -102,22 +102,13 @@ def test_lesson_record_has_all_13_fields(lessons_repo):
     )
 
     expected_keys = {
-        "id",
-        "status",
-        "scope",
-        "repo_scope_id",
-        "repo_path_hint",
-        "created_at",
-        "updated_at",
-        "source",
-        "source_report",
-        "case_name",
-        "title",
-        "summary",
-        "tags",
-        "candidate",
-        "evaluation",
+        "id", "status", "scope", "repo_scope_id", "repo_path_hint",
+        "created_at", "updated_at", "source", "source_report", "case_name",
+        "title", "summary", "tags", "candidate", "evaluation",
         "active_knowledge_allowed",
+        # Phase b2 additions
+        "kind", "archived", "superseded_by", "supersedes",
+        "merge_sources", "merge_sources_data", "duplicate_of",
     }
     assert set(saved.keys()) == expected_keys
 
@@ -472,3 +463,84 @@ def test_repo_scope_id_path_traversal_rejected(lessons_repo, tmp_path):
                 scope="repo",
                 repo_scope_id=bad_scope,
             )
+
+
+# ── new helpers ──────────────────────────────────────────────────────────────
+
+
+def test_get_lesson_by_id_returns_normalized_record(lessons_repo):
+    saved = lesson_store.save_candidate_lesson(_valid_candidate())
+    record = lesson_store.get_lesson_by_id(saved["id"])
+    assert record["id"] == saved["id"]
+    assert record["status"] == "candidate"
+
+
+def test_get_lesson_by_id_raises_for_unknown(lessons_repo):
+    with pytest.raises(LookupError):
+        lesson_store.get_lesson_by_id("20240101_000000_000000")
+
+
+def test_patch_lesson_fields_updates_in_place(lessons_repo):
+    saved = lesson_store.save_candidate_lesson(_valid_candidate())
+    updated = lesson_store.patch_lesson_fields(
+        saved["id"], {"superseded_by": "20240101_000000_000001"}
+    )
+    assert updated["superseded_by"] == "20240101_000000_000001"
+    # File must still be in the candidate bucket, not moved
+    bucket = _bucket_dir(lessons_repo, "candidate") / f"{saved['id']}.json"
+    assert bucket.is_file()
+
+
+def test_patch_lesson_fields_rejects_status_and_id(lessons_repo):
+    saved = lesson_store.save_candidate_lesson(_valid_candidate())
+    with pytest.raises(ValueError):
+        lesson_store.patch_lesson_fields(saved["id"], {"status": "active"})
+    with pytest.raises(ValueError):
+        lesson_store.patch_lesson_fields(saved["id"], {"id": "other"})
+
+
+def test_patch_lesson_fields_raises_for_unknown(lessons_repo):
+    with pytest.raises(LookupError):
+        lesson_store.patch_lesson_fields(
+            "20240101_000000_000000", {"archived": True}
+        )
+
+
+def test_save_raw_lesson_record_writes_to_candidate_bucket(lessons_repo):
+    record = {
+        "id": "20240101_000000_000001",
+        "status": "candidate",
+        "scope": "global",
+        "repo_scope_id": None,
+        "title": "raw",
+        "summary": "",
+        "tags": [],
+    }
+    lesson_store.save_raw_lesson_record(record)
+    bucket = _bucket_dir(lessons_repo, "candidate") / "20240101_000000_000001.json"
+    assert bucket.is_file()
+
+
+def test_save_raw_lesson_record_rejects_non_candidate(lessons_repo):
+    record = {
+        "id": "20240101_000000_000001",
+        "status": "active",
+        "scope": "global",
+        "repo_scope_id": None,
+    }
+    with pytest.raises(ValueError):
+        lesson_store.save_raw_lesson_record(record)
+
+
+# ── new fields on save_candidate_lesson ──────────────────────────────────────
+
+
+def test_save_candidate_lesson_includes_new_fields(lessons_repo):
+    saved = lesson_store.save_candidate_lesson(_valid_candidate())
+    assert saved["kind"] == "lesson"
+    assert saved["archived"] is False
+    assert saved["superseded_by"] is None
+    assert saved["supersedes"] == []
+    assert saved["merge_sources"] == []
+    assert saved["merge_sources_data"] == []
+    assert saved["duplicate_of"] is None

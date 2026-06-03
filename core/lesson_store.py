@@ -558,6 +558,14 @@ def save_candidate_lesson(
         # "top-level true => file in active/" so any code that reads this
         # field instead of checking the bucket can never pull a candidate.
         "active_knowledge_allowed": status == STATUS_ACTIVE,
+        # Phase b2 additions
+        "kind": "lesson",
+        "archived": False,
+        "superseded_by": None,
+        "supersedes": [],
+        "merge_sources": [],
+        "merge_sources_data": [],
+        "duplicate_of": None,
     }
 
     path = _lesson_path(scope_root, status, lesson_id)
@@ -793,4 +801,92 @@ def block_lesson(
             old_path.unlink(missing_ok=True)
         except OSError:
             pass
+    return record
+
+
+def get_lesson_by_id(
+    lesson_id: str,
+    repo_path: str | None = None,
+    *,
+    scope: str | None = None,
+    repo_scope_id: str | None = None,
+) -> dict:
+    """Return a normalized lesson record by ID. Raises LookupError if not found."""
+    _validate_lesson_id(lesson_id)
+    lessons_root = _lessons_root(repo_path)
+    found = _find_lesson_for_operation(
+        lessons_root,
+        lesson_id,
+        repo_path=repo_path,
+        scope=scope,
+        repo_scope_id=repo_scope_id,
+    )
+    if found is None:
+        raise LookupError(f"lesson not found: {lesson_id}")
+    _, _, _, _, _, record = found
+    return record
+
+
+def patch_lesson_fields(
+    lesson_id: str,
+    fields: dict,
+    repo_path: str | None = None,
+    *,
+    scope: str | None = None,
+    repo_scope_id: str | None = None,
+) -> dict:
+    """Update fields on an existing lesson record in-place (atomic).
+
+    The file stays in its current bucket. Cannot change 'id' or 'status'.
+    """
+    _forbidden = {"id", "status"}
+    bad = _forbidden & set(fields)
+    if bad:
+        raise ValueError(f"patch_lesson_fields: cannot change {bad!r}")
+
+    _validate_lesson_id(lesson_id)
+    lessons_root = _lessons_root(repo_path)
+    found = _find_lesson_for_operation(
+        lessons_root,
+        lesson_id,
+        repo_path=repo_path,
+        scope=scope,
+        repo_scope_id=repo_scope_id,
+    )
+    if found is None:
+        raise LookupError(f"lesson not found: {lesson_id}")
+
+    path, current_status, scope_name, resolved_repo_scope_id, repo_path_hint, record = found
+    record.update(fields)
+    record["updated_at"] = _now_iso()
+    _atomic_write_json(path, record)
+    return _normalize_record(
+        record,
+        bucket_status=current_status,
+        scope=scope_name,
+        repo_scope_id=resolved_repo_scope_id,
+        repo_path_hint=repo_path_hint,
+    )
+
+
+def save_raw_lesson_record(
+    record: dict,
+    *,
+    repo_path: str | None = None,
+) -> dict:
+    """Write a pre-built lesson record directly to the candidate bucket (atomic).
+
+    The record must already have a valid 'id' and status='candidate'.
+    Used by lesson_merge.create_merge() to write merged records.
+    """
+    lesson_id = record.get("id")
+    _validate_lesson_id(lesson_id)
+    if record.get("status") != STATUS_CANDIDATE:
+        raise ValueError("save_raw_lesson_record: status must be 'candidate'")
+    scope_name = record.get("scope", SCOPE_GLOBAL)
+    resolved_repo_scope_id = record.get("repo_scope_id")
+    lessons_root = _lessons_root(repo_path)
+    scope_root = _scope_root(lessons_root, scope_name, resolved_repo_scope_id)
+    path = _lesson_path(scope_root, STATUS_CANDIDATE, lesson_id)
+    _atomic_write_json(path, record)
     return record
