@@ -45,6 +45,8 @@ from core import benchmark_web
 from core import lesson_store
 from core import goal_brief as goal_brief_core
 from core import goal_brief_autocomplete as goal_brief_autocomplete_core
+from core import mode_router as mode_router_core
+from core import review_pack_generator as review_pack_generator_core
 from core.patch_safety import evaluate_patch_safety
 from core.mcp_audit import list_mcp_invocations
 from database.memory_consolidator import consolidate_all
@@ -997,6 +999,53 @@ def goal_brief_autocomplete_route():
         "ok": True,
         "draft": draft,
         "markdown": goal_brief_autocomplete_core.render_goal_brief_draft_markdown(draft),
+    }
+
+
+@app.route("/mode/router", methods=["POST"])
+def mode_router_route():
+    payload = _goal_brief_payload()
+    goal_brief = payload.get("goal_brief") if isinstance(payload.get("goal_brief"), dict) else None
+    handoff_draft = payload.get("handoff_draft") if isinstance(payload.get("handoff_draft"), dict) else None
+    result = mode_router_core.route_mode(
+        str(payload.get("user_intent") or ""),
+        goal_brief=goal_brief,
+        handoff_draft=handoff_draft,
+    )
+    if not result.get("ok"):
+        return result, 400
+    draft = result["draft"]
+    return {
+        "ok": True,
+        "draft": draft,
+        "markdown": mode_router_core.render_mode_route_markdown(draft),
+    }
+
+
+@app.route("/review-pack/generate", methods=["POST"])
+def review_pack_generate_route():
+    payload = _goal_brief_payload()
+    goal_brief = payload.get("goal_brief") if isinstance(payload.get("goal_brief"), dict) else None
+    mode_router_result = (
+        payload.get("mode_router_result")
+        if isinstance(payload.get("mode_router_result"), dict)
+        else None
+    )
+    handoff_draft = payload.get("handoff_draft") if isinstance(payload.get("handoff_draft"), dict) else None
+    result = review_pack_generator_core.generate_review_pack(
+        goal_brief=goal_brief,
+        mode_router_result=mode_router_result,
+        handoff_draft=handoff_draft,
+        repo_path=(str(payload.get("repo_path") or "").strip() or None),
+        worker_target=(str(payload.get("worker_target") or "").strip() or None),
+    )
+    if not result.get("ok"):
+        return result, 400
+    draft = result["draft"]
+    return {
+        "ok": True,
+        "draft": draft,
+        "markdown": review_pack_generator_core.render_review_pack_markdown(draft),
     }
 
 

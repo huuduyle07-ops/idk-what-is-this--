@@ -1881,6 +1881,103 @@ button {
     overflow-wrap: anywhere;
 }
 
+.mode-router-panel {
+    display: grid;
+    gap: 8px;
+    margin: 10px 0;
+    padding: 10px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+}
+
+.mode-router-panel label {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.mode-router-input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 72px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+}
+
+.mode-router-preview {
+    display: grid;
+    gap: 7px;
+}
+
+.mode-router-field {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 8px;
+    padding: 7px 8px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+}
+
+.mode-router-field span {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.mode-router-field strong {
+    font-size: 12px;
+    font-weight: 600;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.review-pack-panel {
+    display: grid;
+    gap: 8px;
+    margin: 10px 0;
+    padding: 10px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+}
+
+.review-pack-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.review-pack-row label {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.review-pack-row select {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    color: var(--color-text);
+    min-height: 30px;
+}
+
+.review-pack-preview {
+    box-sizing: border-box;
+    min-height: 160px;
+    max-height: 340px;
+    overflow: auto;
+    padding: 9px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    color: var(--color-text);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
 .goal-brief-answer {
     min-height: 110px;
 }

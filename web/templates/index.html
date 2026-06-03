@@ -315,6 +315,34 @@
               </div>
             </section>
 
+            <section class="mode-router-panel" aria-label="Mode router">
+              <label for="modeRouterIntent">Mode routing intent</label>
+              <textarea id="modeRouterIntent" class="mode-router-input" placeholder="Paste the request to classify, or leave blank to use the current Goal Brief/Handoff draft."></textarea>
+              <div class="goal-brief-actions">
+                <button type="button" onclick="suggestModeRoute()">Suggest mode</button>
+              </div>
+              <div id="modeRouterPreview" class="mode-router-preview" aria-live="polite">
+                <span class="goal-brief-muted">No mode suggestion yet.</span>
+              </div>
+            </section>
+
+            <section class="review-pack-panel" aria-label="Review pack generator">
+              <div class="review-pack-row">
+                <label for="reviewPackWorkerTarget">Review pack target</label>
+                <select id="reviewPackWorkerTarget">
+                  <option value="generic">generic</option>
+                  <option value="codex">codex</option>
+                  <option value="claude">claude</option>
+                  <option value="gemini">gemini</option>
+                </select>
+              </div>
+              <div class="goal-brief-actions">
+                <button type="button" onclick="generateReviewPack()">Generate review pack</button>
+                <button type="button" id="reviewPackCopy" onclick="copyReviewPackMarkdown()" disabled>Copy Markdown</button>
+              </div>
+              <pre id="reviewPackPreview" class="review-pack-preview" aria-live="polite">No review pack generated yet.</pre>
+            </section>
+
             <div class="goal-brief-actions">
               <button type="button" onclick="startGoalBrief()">Start brief</button>
               <button type="button" onclick="updateGoalBrief()">Send reply</button>
@@ -3491,6 +3519,147 @@ async function refreshHandoffs() {
     } catch (e) {
         if (status) status.textContent = "Error: " + e.message;
     }
+}
+
+let _modeRouterCurrent = null;
+
+async function suggestModeRoute() {
+    const status = document.getElementById("goalBriefStatus");
+    const intentEl = document.getElementById("modeRouterIntent");
+    const messyEl = document.getElementById("goalBriefMessyIntent");
+    const explicitIntent = intentEl ? intentEl.value.trim() : "";
+    const fallbackIntent = messyEl ? messyEl.value.trim() : "";
+    const userIntent = explicitIntent || fallbackIntent;
+    if (status) status.textContent = "Suggesting mode...";
+    try {
+        const resp = await fetch("/mode/router", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_intent: userIntent,
+                goal_brief: _goalBriefAutocompleteDraft || _goalBriefCurrent || null,
+                handoff_draft: _handoffDraftCurrent || null,
+            }),
+        });
+        const body = await resp.json();
+        if (!body.ok) {
+            _modeRouterCurrent = null;
+            _renderModeRouterPreview(null);
+            if (status) status.textContent = "Error: " + (body.error || "unknown");
+            return;
+        }
+        _modeRouterCurrent = body.draft || null;
+        _renderModeRouterPreview(_modeRouterCurrent);
+        if (status) status.textContent = "Mode suggestion ready. Review before taking action.";
+    } catch (e) {
+        if (status) status.textContent = "Error: " + e.message;
+    }
+}
+
+function _modeRouterValue(value) {
+    if (Array.isArray(value)) return value.length ? value.join("\n") : "None";
+    if (value === false) return "false";
+    if (value === true) return "true";
+    return String(value || "").trim() || "Missing";
+}
+
+function _renderModeRouterPreview(draft) {
+    const preview = document.getElementById("modeRouterPreview");
+    if (!preview) return;
+    if (!draft) {
+        preview.innerHTML = '<span class="goal-brief-muted">No mode suggestion yet.</span>';
+        return;
+    }
+    const fields = [
+        ["Recommended", draft.suggested_mode],
+        ["Confidence", draft.confidence],
+        ["Reasons", draft.reasons],
+        ["Risks", draft.risk_notes],
+        ["Next", draft.next_safe_action],
+        ["Confirm", draft.required_user_confirmation],
+    ];
+    preview.innerHTML = fields.map(([label, value]) => `
+        <div class="mode-router-field">
+          <span>${_escapeHtml(label)}</span>
+          <strong>${_escapeHtml(_modeRouterValue(value))}</strong>
+        </div>
+    `).join("");
+}
+
+let _reviewPackCurrent = null;
+let _reviewPackMarkdown = "";
+
+function _reviewPackGoalBriefSource() {
+    if (_goalBriefAutocompleteDraft) return _goalBriefAutocompleteDraft;
+    if (_goalBriefCurrent) return _goalBriefCurrent;
+    const goal = document.getElementById("goalBriefGoal")?.value.trim() || "";
+    const intent = document.getElementById("goalBriefMessyIntent")?.value.trim() || "";
+    if (!goal && !intent) return null;
+    return {
+        title: goal || "Review Pack Draft",
+        goal,
+        problem_statement: intent || goal,
+        desired_outcome: "",
+        suspected_files_or_areas: [],
+        validation_hints: [],
+    };
+}
+
+async function generateReviewPack() {
+    const status = document.getElementById("goalBriefStatus");
+    const copyButton = document.getElementById("reviewPackCopy");
+    const goalBrief = _reviewPackGoalBriefSource();
+    if (!goalBrief) {
+        if (status) status.textContent = "Add a Goal Brief or messy intent before generating a review pack.";
+        _renderReviewPackPreview("");
+        return;
+    }
+    if (status) status.textContent = "Generating review pack...";
+    try {
+        const resp = await fetch("/review-pack/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                goal_brief: goalBrief,
+                mode_router_result: _modeRouterCurrent || null,
+                handoff_draft: _handoffDraftCurrent || null,
+                repo_path: document.querySelector("input[name='repo_path']")?.value.trim() || "",
+                worker_target: document.getElementById("reviewPackWorkerTarget")?.value || "generic",
+            }),
+        });
+        const body = await resp.json();
+        if (!body.ok) {
+            _reviewPackCurrent = null;
+            _reviewPackMarkdown = "";
+            _renderReviewPackPreview("");
+            if (copyButton) copyButton.disabled = true;
+            if (status) status.textContent = "Error: " + (body.error || "unknown");
+            return;
+        }
+        _reviewPackCurrent = body.draft || null;
+        _reviewPackMarkdown = body.markdown || "";
+        _renderReviewPackPreview(_reviewPackMarkdown);
+        if (copyButton) copyButton.disabled = !_reviewPackMarkdown;
+        if (status) status.textContent = "Review pack ready. Review before sharing with a worker.";
+    } catch (e) {
+        if (status) status.textContent = "Error: " + e.message;
+    }
+}
+
+function _renderReviewPackPreview(markdown) {
+    const preview = document.getElementById("reviewPackPreview");
+    if (!preview) return;
+    preview.textContent = String(markdown || "").trim() || "No review pack generated yet.";
+}
+
+function copyReviewPackMarkdown() {
+    if (!_reviewPackMarkdown) {
+        _goalBriefStatus("Generate review pack first.", "failed");
+        return;
+    }
+    navigator.clipboard.writeText(_reviewPackMarkdown)
+        .then(() => _goalBriefStatus("Review pack Markdown copied.", "ready"))
+        .catch(err => _goalBriefStatus(`Copy failed: ${err}`, "failed"));
 }
 
 async function createHandoff(thenRun) {
