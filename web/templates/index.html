@@ -464,6 +464,11 @@
               <div class="bench-sidebar-header">
                 <strong>Past runs</strong>
               </div>
+              <label class="history-toggle">
+                <input type="checkbox" id="showArchivedBenchmarks"
+                       onchange="loadBenchmarksPanel(true)">
+                Show archived reports
+              </label>
               <div id="benchList" class="bench-list">
                 <div class="health-empty">Loading…</div>
               </div>
@@ -5798,15 +5803,90 @@ function _renderBenchmarkList(reports) {
         list.innerHTML = `<div class="health-empty">No reports in .agent/benchmarks/.</div>`;
         return;
     }
+    const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
     list.innerHTML = reports.map(r => `
         <div class="bench-list-item ${r.filename === _benchActiveFilename ? "is-active" : ""}"
+             data-bench-filename="${_escapeHtml(r.filename)}"
+             data-bench-pinned="${r.pinned ? '1' : '0'}"
+             data-bench-archived="${r.archived ? '1' : '0'}"
+             data-bench-repo="${_escapeHtml(repo)}"
              onclick="viewBenchmarkReport('${_escapeHtml(r.filename)}')">
             <div class="bench-list-item-date">${_benchFmtDate(r.timestamp_iso)}</div>
             <div class="bench-list-item-summary">
                 ${r.passed}/${r.total} / ${_benchFmtRate(r.success_rate)} / ${(r.duration_sec || 0).toFixed(1)}s / ${_benchFmtCost(r.total_estimated_cost_usd)}
             </div>
+            <div class="history-actions" data-ui-group="benchmark-history-actions">
+                <button class="history-btn"
+                        onclick="event.stopPropagation(); _archiveBenchmark(this)">
+                    ${r.archived ? 'Unarchive' : 'Archive'}
+                </button>
+                <button class="history-btn"
+                        onclick="event.stopPropagation(); _pinBenchmark(this)">
+                    ${r.pinned ? 'Unpin' : 'Pin'}
+                </button>
+                <button class="history-btn history-btn--danger"
+                        onclick="event.stopPropagation(); _deleteBenchmark(this)">
+                    Delete
+                </button>
+            </div>
         </div>
     `).join("");
+}
+
+function _archiveBenchmark(btn) {
+    const card = btn.closest('[data-bench-filename]');
+    const repoPath = card.dataset.benchRepo;
+    const filename = card.dataset.benchFilename;
+    const archive = card.dataset.benchArchived !== '1';
+    fetch("/history/benchmark/update", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({repo_path: repoPath, filename, archived: archive ? "true" : "false"})
+    })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(data => {
+        if (data.ok) { loadBenchmarksPanel(true); }
+        else { alert(data.error || "Archive failed"); }
+    })
+    .catch(err => console.error("_archiveBenchmark error:", err));
+}
+
+function _pinBenchmark(btn) {
+    const card = btn.closest('[data-bench-filename]');
+    const repoPath = card.dataset.benchRepo;
+    const filename = card.dataset.benchFilename;
+    const pin = card.dataset.benchPinned !== '1';
+    fetch("/history/benchmark/update", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({repo_path: repoPath, filename, pinned: pin ? "true" : "false"})
+    })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(data => {
+        if (data.ok) { loadBenchmarksPanel(true); }
+        else { alert(data.error || "Pin failed"); }
+    })
+    .catch(err => console.error("_pinBenchmark error:", err));
+}
+
+function _deleteBenchmark(btn) {
+    const card = btn.closest('[data-bench-filename]');
+    if (card.dataset.benchPinned === '1') { alert("Unpin before deleting"); return; }
+    const input = prompt("Type DELETE_BENCHMARK_REPORT to confirm deletion:");
+    if (input !== "DELETE_BENCHMARK_REPORT") return;
+    const repoPath = card.dataset.benchRepo;
+    const filename = card.dataset.benchFilename;
+    fetch("/history/benchmark/delete", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({repo_path: repoPath, filename, confirm: "DELETE_BENCHMARK_REPORT"})
+    })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(data => {
+        if (data.ok) { loadBenchmarksPanel(true); }
+        else { alert(data.error || "Delete failed"); }
+    })
+    .catch(err => console.error("_deleteBenchmark error:", err));
 }
 
 // Phase 12.8a: presentation evidence pack helpers.
@@ -6040,6 +6120,8 @@ function refreshPromptCost() {
 
 function loadBenchmarksPanel(force = false) {
     if (_benchLoaded && !force) return;
+    const toggle = document.getElementById("showArchivedBenchmarks");
+    const includeArchived = toggle ? toggle.checked : false;
     const list = document.getElementById("benchList");
     if (list) list.innerHTML = `<div class="health-empty">Loading…</div>`;
     const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
@@ -6049,7 +6131,8 @@ function loadBenchmarksPanel(force = false) {
     }
     refreshPresentationEvidence();
     refreshPromptCost();
-    fetch(`/benchmarks/list?repo_path=${encodeURIComponent(repo)}`)
+    const benchUrl = `/benchmarks/list?repo_path=${encodeURIComponent(repo)}${includeArchived ? '&include_archived=1' : ''}`;
+    fetch(benchUrl)
         .then(r => r.json())
         .then(data => {
             if (data.error) {
