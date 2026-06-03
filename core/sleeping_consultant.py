@@ -1445,11 +1445,12 @@ def run_overnight(
         )
 
     # Write outputs
-    dream_artifacts.write_report_markdown(
+    dream_artifacts.write_dream_run_summary(
         report_dir,
         results,
         dream_mode=mode,
         case_ideas=case_ideas if case_idea_run else None,
+        lesson_notes=lesson_notes if case_idea_run else None,
     )
     (report_dir / "list.json").write_text(
         json.dumps({

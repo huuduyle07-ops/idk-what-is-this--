@@ -197,8 +197,8 @@ def test_dream_report_route_returns_rendered_morning_html(client, tmp_path, monk
     run = "010203-run"
     report_dir = dreams / date / run
     report_dir.mkdir(parents=True)
-    (report_dir / "morning_report.txt").write_text(
-        "# Morning report\n\n- one\n- two\n", encoding="utf-8"
+    (report_dir / "dream_run_summary.md").write_text(
+        "# Dream run summary\n\n- one\n- two\n", encoding="utf-8"
     )
     (report_dir / "list.json").write_text(
         json.dumps({"items": [], "dream_mode": "research"}), encoding="utf-8"
@@ -210,10 +210,10 @@ def test_dream_report_route_returns_rendered_morning_html(client, tmp_path, monk
     body = resp.get_json()
     # New field carries the rendered HTML the modal injects.
     assert "morning_report_html" in body
-    assert "<h1>Morning report</h1>" in body["morning_report_html"]
+    assert "<h1>Dream run summary</h1>" in body["morning_report_html"]
     assert "<li>one</li>" in body["morning_report_html"]
     # The raw text is still present so older clients / fallbacks keep working.
-    assert body["morning_report"].startswith("# Morning report")
+    assert body["morning_report"].startswith("# Dream run summary")
 
 
 def test_dream_report_route_html_escapes_injected_markup(client, tmp_path, monkeypatch):
@@ -226,7 +226,7 @@ def test_dream_report_route_html_escapes_injected_markup(client, tmp_path, monke
     run = "020304-run"
     report_dir = dreams / date / run
     report_dir.mkdir(parents=True)
-    (report_dir / "morning_report.txt").write_text(
+    (report_dir / "dream_run_summary.md").write_text(
         "<script>alert(1)</script>", encoding="utf-8"
     )
     (report_dir / "list.json").write_text(json.dumps({"items": []}), encoding="utf-8")
