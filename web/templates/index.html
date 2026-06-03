@@ -1643,15 +1643,21 @@ function _renderDreamItemCard(it, opts = {}) {
     const promoteBtn = canPromote
         ? `<button type="button" class="dream-action-btn" onclick="promoteDreamArtifact('${_escapeHtml(opts.date || "")}', '${_escapeHtml(opts.runId)}', ${Number(it.idx)}, '${_escapeHtml(it.latest_refined_artifact)}')">Promote refined</button>`
         : "";
-    // Phase 6.4e: create a repo-scoped lesson CANDIDATE from a validated Dream
-    // item. Only offered for ready_to_apply items in a timestamped run report
-    // (needs item_dir_name + run context). The candidate still requires Promote
-    // in the Memory tab before retrieval can use it.
-    const canLessonize = status === "ready_to_apply" && !!opts.runId && !!it.item_dir_name;
-    const lessonizeBtn = canLessonize
-        ? `<button type="button" class="dream-action-btn" onclick="createDreamLessonCandidate('${_escapeHtml(opts.date || "")}', '${_escapeHtml(opts.runId)}', '${_escapeHtml(it.item_dir_name)}')" title="Create a repo-scoped lesson candidate from this validated Dream item. It still needs Promote in the Memory tab before retrieval can use it.">Create candidate lesson</button>`
+    // Eligible: any non-error, non-skipped item with a known item_dir_name and a run context.
+    const _skippedOrError = status === "error" || status.startsWith("skipped_");
+    const canAction = !!opts.runId && !!it.item_dir_name && !_skippedOrError;
+
+    // ready_to_apply uses the richer lesson_auto_candidates path (existing function).
+    // All other eligible statuses use the simple text-based route.
+    const lessonizeBtn = canAction
+        ? (status === "ready_to_apply"
+            ? `<button type="button" class="dream-action-btn" onclick="createDreamLessonCandidate('${_escapeHtml(opts.date || "")}', '${_escapeHtml(opts.runId)}', '${_escapeHtml(it.item_dir_name)}')" title="Create a repo-scoped lesson candidate from this validated Dream item. It still needs Promote in the Memory tab before retrieval can use it.">Create candidate lesson</button>`
+            : `<button type="button" class="dream-action-btn" onclick="createDreamLessonCandidateSimple('${_escapeHtml(opts.date || "")}', '${_escapeHtml(opts.runId)}', ${Number(it.idx)})" title="Create a candidate lesson from this Dream item. It still needs Promote in the Memory tab before retrieval can use it.">Create candidate lesson</button>`)
         : "";
-    const dreamActionButtons = [promoteBtn, lessonizeBtn].filter(Boolean).join("");
+    const proposalBtn = canAction
+        ? `<button type="button" class="dream-action-btn" onclick="createDreamProposal('${_escapeHtml(opts.date || "")}', '${_escapeHtml(opts.runId)}', ${Number(it.idx)})" title="Write a proposal draft (no model call). Appears in Memory → Proposals.">Create proposal</button>`
+        : "";
+    const dreamActionButtons = [promoteBtn, lessonizeBtn, proposalBtn].filter(Boolean).join("");
     const patchBlockerDetails = _renderPatchBlockerDetails(it);
     return `
         <div class="dream-item-card">
@@ -3396,6 +3402,66 @@ function createDreamLessonCandidate(date, runId, itemDirName) {
             if (typeof loadLessons === "function") loadLessons(true);
         })
         .catch(err => openAppModal("Dream lesson candidate", `<div class="health-empty">Network error: ${_escapeHtml(err)}</div>`));
+}
+
+// Phase 11-prep-cleanup-a: create a candidate lesson from any eligible Dream item
+// (non-ready_to_apply path — uses the simple text-based route).
+function createDreamLessonCandidateSimple(date, runId, itemIdx) {
+    const repoEl = document.querySelector("input[name='repo_path']");
+    const repo = repoEl ? repoEl.value.trim() : "";
+    if (!repo) { alert("Set a repo path first."); return; }
+    const warn = "Create a candidate lesson from this Dream item?\n\nIt will appear in the Lessons list as a CANDIDATE. You still need to click \"Promote\" to move it to active.";
+    if (!confirm(warn)) return;
+
+    openAppModal("Dream lesson candidate", `<div class="health-empty">Creating candidate…</div>`);
+    fetch("/dream/create-lesson-candidate", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ repo_path: repo, date, run: runId, item_idx: String(itemIdx) }),
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                openAppModal("Dream lesson candidate", `<div class="health-empty">Failed: ${_escapeHtml(data.error || "unknown error")}</div>`);
+                return;
+            }
+            const rows = [
+                ["status", data.status],
+                ["lesson_id", data.lesson_id],
+                ["active_knowledge_allowed", String(data.active_knowledge_allowed)],
+                ["scope", data.scope],
+            ].filter(([, v]) => v !== undefined && v !== null && v !== "")
+             .map(([k, v]) => `<tr><th>${_escapeHtml(k)}</th><td><code>${_escapeHtml(String(v))}</code></td></tr>`)
+             .join("");
+            openAppModal("Dream lesson candidate", `<table class="lesson-result-table">${rows}</table>`);
+            if (typeof loadLessons === "function") loadLessons(true);
+        })
+        .catch(err => openAppModal("Dream lesson candidate", `<div class="health-empty">Network error: ${_escapeHtml(String(err))}</div>`));
+}
+
+// Phase 11-prep-cleanup-a: create a proposal draft from any eligible Dream item.
+function createDreamProposal(date, runId, itemIdx) {
+    const repoEl = document.querySelector("input[name='repo_path']");
+    const repo = repoEl ? repoEl.value.trim() : "";
+    if (!repo) { alert("Set a repo path first."); return; }
+    const warn = "Create a proposal draft from this Dream item?\n\nThis writes a static proposal.md (no model call). It will appear in Memory → Proposals for review.";
+    if (!confirm(warn)) return;
+
+    openAppModal("Dream proposal", `<div class="health-empty">Creating proposal draft…</div>`);
+    fetch("/dream/create-proposal", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ repo_path: repo, date, run: runId, item_idx: String(itemIdx) }),
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                openAppModal("Dream proposal", `<div class="health-empty">Failed: ${_escapeHtml(data.error || "unknown error")}</div>`);
+                return;
+            }
+            openAppModal("Dream proposal", `<div class="health-empty">✓ Proposal draft written to <code>${_escapeHtml(data.proposal_dir || "")}</code>. Reload Memory → Proposals to see it.</div>`);
+        })
+        .catch(err => openAppModal("Dream proposal", `<div class="health-empty">Network error: ${_escapeHtml(String(err))}</div>`));
 }
 
 // Phase 8 — Local MCP Inspector shortcuts
