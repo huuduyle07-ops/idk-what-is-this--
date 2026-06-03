@@ -8,8 +8,12 @@ from pathlib import Path
 import pytest
 
 from core.replay_janitor import (
+    CONFIRM_TOKEN,
     GUARDRAIL_NOTE,
+    ReplayCleanupResult,
     ReplayJanitorPlan,
+    _rmtree_contained,
+    apply_replay_cleanup,
     format_replay_janitor_markdown,
     plan_replay_cleanup,
 )
@@ -180,7 +184,9 @@ def test_markdown_includes_guardrail_note_and_entries(tmp_path):
     assert "Dry-run only" in markdown
 
 
-def test_replay_janitor_ast_guard_read_only_scope():
+def test_replay_janitor_ast_guard_minimal_deletion_primitive():
+    # 13R.5: the janitor may now delete bundles, but only through the single
+    # contained rmtree primitive. Everything else dangerous stays forbidden.
     tree = ast.parse(Path("core/replay_janitor.py").read_text(encoding="utf-8"))
     imports = _imported_modules(tree)
     calls = _called_names(tree)
@@ -196,7 +202,6 @@ def test_replay_janitor_ast_guard_read_only_scope():
         "requests",
         "httpx",
         "subprocess",
-        "shutil",
     }
     forbidden_calls = {
         "ChatCompletion",
@@ -213,7 +218,6 @@ def test_replay_janitor_ast_guard_read_only_scope():
         "remove",
         "removedirs",
         "rmdir",
-        "rmtree",
         "run_benchmark",
         "run_benchmarks",
         "run_deepseek_review",
@@ -229,6 +233,150 @@ def test_replay_janitor_ast_guard_read_only_scope():
 
     assert {name.split(".", 1)[0] for name in imports}.isdisjoint(forbidden_import_roots)
     assert calls.isdisjoint(forbidden_calls)
+    # The one allowed deletion primitive is present and confined to a helper.
+    assert "rmtree" in calls
+
+
+# --- Phase 13R.5: apply gate ------------------------------------------------
+
+
+def test_apply_without_confirmation_deletes_nothing(tmp_path):
+    repo = _repo(tmp_path)
+    base = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    keep = _make_bundle(repo, "keep", base + timedelta(seconds=1))
+    drop = _make_bundle(repo, "drop", base)
+
+    result = apply_replay_cleanup(
+        repo, max_keep=1, now=base + timedelta(seconds=2)
+    )
+
+    assert isinstance(result, ReplayCleanupResult)
+    assert result.confirmed is False
+    assert result.deleted == []
+    assert drop.replay_id in result.blocked
+    assert keep.replay_dir.is_dir()
+    assert drop.replay_dir.is_dir()
+
+
+def test_apply_with_confirmation_deletes_only_cleanup_candidates(tmp_path):
+    repo = _repo(tmp_path)
+    base = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    keep = _make_bundle(repo, "keep", base + timedelta(seconds=1))
+    drop = _make_bundle(repo, "drop", base)
+
+    result = apply_replay_cleanup(
+        repo,
+        confirm=CONFIRM_TOKEN,
+        max_keep=1,
+        now=base + timedelta(seconds=2),
+    )
+
+    assert result.confirmed is True
+    assert result.deleted == [drop.replay_id]
+    assert drop.replay_id not in result.skipped
+    assert not drop.replay_dir.exists()
+    assert keep.replay_dir.is_dir()
+    assert keep.replay_id in result.skipped
+
+
+def test_apply_never_deletes_pinned(tmp_path):
+    repo = _repo(tmp_path)
+    base = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    pinned = _make_bundle(repo, "pinned", base)
+    _make_bundle(repo, "newer", base + timedelta(seconds=1))
+
+    result = apply_replay_cleanup(
+        repo,
+        confirm=CONFIRM_TOKEN,
+        max_keep=1,
+        pinned_ids=[pinned.replay_id],
+        now=base + timedelta(seconds=2),
+    )
+
+    assert pinned.replay_id not in result.deleted
+    assert pinned.replay_dir.is_dir()
+
+
+def test_apply_never_deletes_keep_bundles(tmp_path):
+    repo = _repo(tmp_path)
+    base = datetime(2026, 6, 1, tzinfo=timezone.utc)
+    recent = _make_bundle(repo, "recent", base - timedelta(hours=1))
+
+    result = apply_replay_cleanup(
+        repo, confirm=CONFIRM_TOKEN, max_age_days=7, now=base
+    )
+
+    assert recent.replay_id not in result.deleted
+    assert recent.replay_dir.is_dir()
+
+
+def test_apply_does_not_delete_invalid_bundles_by_default(tmp_path):
+    repo = _repo(tmp_path)
+    _make_bundle(repo, "good", datetime(2026, 1, 1, tzinfo=timezone.utc))
+    root = repo / ".agent" / "replays"
+    invalid_dir = root / "20260101_000000_nomanifst"
+    invalid_dir.mkdir()
+
+    result = apply_replay_cleanup(
+        repo,
+        confirm=CONFIRM_TOKEN,
+        max_age_days=0,
+        now=datetime(2026, 6, 1, tzinfo=timezone.utc),
+    )
+
+    assert "20260101_000000_nomanifst" not in result.deleted
+    assert invalid_dir.is_dir()
+
+
+def test_apply_containment_guard_blocks_outside_paths(tmp_path):
+    repo = _repo(tmp_path)
+    root = repo / ".agent" / "replays"
+    root.mkdir(parents=True)
+    outside = tmp_path / "outside_dir"
+    outside.mkdir()
+    (outside / "keep.txt").write_text("safe", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="escapes"):
+        _rmtree_contained(root, outside)
+
+    assert outside.is_dir()
+    assert (outside / "keep.txt").is_file()
+
+
+def test_apply_containment_guard_refuses_replays_root(tmp_path):
+    repo = _repo(tmp_path)
+    root = repo / ".agent" / "replays"
+    root.mkdir(parents=True)
+
+    with pytest.raises(ValueError, match="root"):
+        _rmtree_contained(root, root)
+
+    assert root.is_dir()
+
+
+def test_apply_rejects_traversal_replay_id(tmp_path):
+    repo = _repo(tmp_path)
+
+    with pytest.raises(ValueError, match="invalid"):
+        apply_replay_cleanup(repo, confirm=CONFIRM_TOKEN, pinned_ids=["../escape"])
+
+
+def test_apply_is_idempotent(tmp_path):
+    repo = _repo(tmp_path)
+    base = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    _make_bundle(repo, "keep", base + timedelta(seconds=1))
+    drop = _make_bundle(repo, "drop", base)
+
+    first = apply_replay_cleanup(
+        repo, confirm=CONFIRM_TOKEN, max_keep=1, now=base + timedelta(seconds=2)
+    )
+    second = apply_replay_cleanup(
+        repo, confirm=CONFIRM_TOKEN, max_keep=1, now=base + timedelta(seconds=2)
+    )
+
+    assert first.deleted == [drop.replay_id]
+    assert second.deleted == []
+    assert second.errors == []
 
 
 def _imported_modules(tree: ast.AST) -> set[str]:

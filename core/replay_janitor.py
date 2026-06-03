@@ -9,6 +9,7 @@ network calls. Acting on the plan is intentionally out of scope here.
 """
 from __future__ import annotations
 
+import shutil
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,6 +23,9 @@ REPLAYS_SUBDIR = Path(".agent") / "replays"
 CLASS_KEEP = "keep"
 CLASS_CLEANUP = "cleanup_candidate"
 CLASS_INVALID = "invalid_or_unreadable"
+
+# Phase 13R.5: the exact, case-sensitive token required to actually delete.
+CONFIRM_TOKEN = "DELETE_REPLAY_CANDIDATES"
 
 GUARDRAIL_NOTE = (
     "Replay janitor is a read-only dry-run: it never deletes bundles, mutates "
@@ -200,6 +204,118 @@ def format_replay_janitor_markdown(plan: ReplayJanitorPlan) -> str:
             ]
         )
     return "\n".join(lines) + "\n"
+
+
+@dataclass(frozen=True)
+class ReplayCleanupResult:
+    confirmed: bool
+    confirm_token_required: str
+    deleted: list[str] = field(default_factory=list)
+    skipped: list[str] = field(default_factory=list)
+    blocked: list[str] = field(default_factory=list)
+    errors: list[dict[str, str]] = field(default_factory=list)
+    plan_summary: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+def apply_replay_cleanup(
+    repo_path: str | Path,
+    *,
+    confirm: str | None = None,
+    max_age_days: float | None = None,
+    max_keep: int | None = None,
+    pinned_ids: Iterable[str] = (),
+    now: datetime | None = None,
+) -> ReplayCleanupResult:
+    """Confirmation-gated deletion of ``cleanup_candidate`` replay bundles.
+
+    The deletion plan is produced by the read-only :func:`plan_replay_cleanup`
+    with ``include_invalid=False`` so invalid/unreadable bundles are *never*
+    deletion targets in this phase. Only bundles classified
+    ``cleanup_candidate`` (never ``keep``, never pinned, never invalid) are
+    eligible, and nothing is deleted unless ``confirm`` exactly equals
+    :data:`CONFIRM_TOKEN`.
+    """
+    repo = Path(repo_path).resolve()
+    if not repo.is_dir():
+        raise FileNotFoundError(f"repo_path is not a directory: {repo_path}")
+
+    plan = plan_replay_cleanup(
+        repo,
+        max_age_days=max_age_days,
+        max_keep=max_keep,
+        include_invalid=False,
+        pinned_ids=pinned_ids,
+        now=now,
+    )
+
+    candidates = [
+        entry.replay_id
+        for entry in plan.entries
+        if entry.classification == CLASS_CLEANUP
+    ]
+    non_candidates = [
+        entry.replay_id
+        for entry in plan.entries
+        if entry.classification != CLASS_CLEANUP
+    ]
+    plan_summary = plan.to_dict()
+
+    if confirm != CONFIRM_TOKEN:
+        return ReplayCleanupResult(
+            confirmed=False,
+            confirm_token_required=CONFIRM_TOKEN,
+            deleted=[],
+            skipped=non_candidates,
+            blocked=candidates,
+            errors=[],
+            plan_summary=plan_summary,
+        )
+
+    replays_root = (repo / REPLAYS_SUBDIR).resolve()
+    deleted: list[str] = []
+    errors: list[dict[str, str]] = []
+    for replay_id in candidates:
+        try:
+            safe_id = _validate_replay_id(replay_id)
+            bundle_dir = (replays_root / safe_id).resolve()
+            if not bundle_dir.exists():
+                # Already gone (idempotent re-run); nothing to do.
+                continue
+            _rmtree_contained(replays_root, bundle_dir)
+            deleted.append(safe_id)
+        except (ValueError, OSError) as exc:
+            errors.append({"replay_id": replay_id, "error": str(exc)})
+
+    return ReplayCleanupResult(
+        confirmed=True,
+        confirm_token_required=CONFIRM_TOKEN,
+        deleted=deleted,
+        skipped=non_candidates,
+        blocked=[],
+        errors=errors,
+        plan_summary=plan_summary,
+    )
+
+
+def _rmtree_contained(replays_root: Path, target: Path) -> None:
+    """Delete ``target`` only when it is a real directory strictly inside
+    ``replays_root``. This is the sole deletion primitive in this module."""
+    root = replays_root.resolve()
+    resolved = target.resolve()
+    if resolved == root:
+        raise ValueError(f"refusing to delete replays root: {resolved}")
+    try:
+        resolved.relative_to(root)
+    except ValueError as exc:
+        raise ValueError(
+            f"deletion target escapes replays dir: {resolved}"
+        ) from exc
+    if not resolved.is_dir():
+        raise ValueError(f"deletion target is not a directory: {resolved}")
+    shutil.rmtree(resolved)
 
 
 def _scan_bundles(repo: Path) -> list[dict[str, Any]]:

@@ -13,6 +13,7 @@ from core.replay_compare import (
     format_replay_compare_markdown,
 )
 from core.replay_janitor import (
+    apply_replay_cleanup,
     format_replay_janitor_markdown,
     plan_replay_cleanup,
 )
@@ -252,6 +253,46 @@ def replays_janitor_route():
         "ok": True,
         "repo_path": str(repo.resolve()),
         "plan": plan.to_dict(),
+    }
+
+
+@bp.route("/replays/janitor/apply", methods=["POST"])
+def replays_janitor_apply_route():
+    """Confirmation-gated deletion of cleanup_candidate replay bundles.
+
+    GET /replays/janitor stays dry-run only; this POST route is the only path
+    that deletes, and only when ``confirm`` equals the exact token.
+    """
+    try:
+        repo = _repo_from_request()
+        confirm = str(request.values.get("confirm") or "").strip() or None
+        result = apply_replay_cleanup(
+            repo,
+            confirm=confirm,
+            max_age_days=_optional_float("max_age_days"),
+            max_keep=_optional_int("max_keep"),
+            pinned_ids=_pinned_ids_from_request(),
+        )
+    except ValueError as exc:
+        return {"ok": False, "error": str(exc)}, 400
+    except OSError as exc:
+        return {"ok": False, "error": str(exc)}, 500
+
+    if not result.confirmed:
+        return {
+            "ok": False,
+            "confirmed": False,
+            "error": (
+                "confirmation token required: send "
+                f"confirm={result.confirm_token_required}"
+            ),
+            "result": result.to_dict(),
+        }, 400
+
+    return {
+        "ok": True,
+        "repo_path": str(repo.resolve()),
+        "result": result.to_dict(),
     }
 
 

@@ -269,6 +269,102 @@ def test_janitor_route_is_get_only(client, repo):
     assert response.status_code == 405
 
 
+def test_apply_route_without_confirmation_is_blocked(client, repo):
+    base = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    keep = create_replay_bundle(repo, run_kind="keep", now=base)
+    drop = create_replay_bundle(
+        repo, run_kind="drop", now=base.replace(year=2025)
+    )
+
+    response = client.post(
+        "/replays/janitor/apply",
+        query_string={"repo_path": str(repo), "max_keep": "1"},
+    )
+    body = response.get_json()
+
+    assert response.status_code == 400
+    assert body["ok"] is False
+    assert body["confirmed"] is False
+    assert drop.replay_dir.is_dir()
+    assert keep.replay_dir.is_dir()
+
+
+def test_apply_route_with_confirmation_deletes_eligible(client, repo):
+    base = datetime(2026, 1, 1, 0, 0, 1, tzinfo=timezone.utc)
+    keep = create_replay_bundle(repo, run_kind="keep", now=base)
+    drop = create_replay_bundle(
+        repo,
+        run_kind="drop",
+        now=datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+    )
+
+    response = client.post(
+        "/replays/janitor/apply",
+        query_string={
+            "repo_path": str(repo),
+            "max_keep": "1",
+            "confirm": "DELETE_REPLAY_CANDIDATES",
+        },
+    )
+    body = response.get_json()
+
+    assert response.status_code == 200
+    assert body["ok"] is True
+    assert body["result"]["confirmed"] is True
+    assert body["result"]["deleted"] == [drop.replay_id]
+    assert not drop.replay_dir.exists()
+    assert keep.replay_dir.is_dir()
+
+
+def test_apply_route_pinned_is_never_deleted(client, repo):
+    base = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+    pinned = create_replay_bundle(repo, run_kind="pinned", now=base)
+    create_replay_bundle(
+        repo, run_kind="newer", now=base.replace(second=1)
+    )
+
+    response = client.post(
+        "/replays/janitor/apply",
+        query_string={
+            "repo_path": str(repo),
+            "max_keep": "1",
+            "pinned": pinned.replay_id,
+            "confirm": "DELETE_REPLAY_CANDIDATES",
+        },
+    )
+    body = response.get_json()
+
+    assert response.status_code == 200
+    assert pinned.replay_id not in body["result"]["deleted"]
+    assert pinned.replay_dir.is_dir()
+
+
+def test_get_janitor_route_never_deletes(client, repo):
+    base = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+    drop = create_replay_bundle(repo, run_kind="drop", now=base)
+    create_replay_bundle(repo, run_kind="newer", now=base.replace(second=1))
+
+    response = client.get(
+        "/replays/janitor",
+        query_string={
+            "repo_path": str(repo),
+            "max_keep": "1",
+            "confirm": "DELETE_REPLAY_CANDIDATES",
+        },
+    )
+
+    assert response.status_code == 200
+    assert drop.replay_dir.is_dir()
+
+
+def test_apply_route_rejects_get(client, repo):
+    response = client.get(
+        "/replays/janitor/apply", query_string={"repo_path": str(repo)}
+    )
+
+    assert response.status_code == 405
+
+
 def test_replay_viewer_routes_ast_guard_read_only_scope():
     tree = ast.parse(Path("web/routes/replay_routes.py").read_text(encoding="utf-8"))
     imports = _imported_modules(tree)
