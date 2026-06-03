@@ -2798,16 +2798,17 @@ function refreshSessionList() {
             container.innerHTML = sessions.map(s => `
                 <a class="session-item ${s.archived ? 'session-item--archived' : ''}"
                    href="/session/${encodeURIComponent(s.id)}"
-                   data-session-id="${_escapeHtml(s.id)}">
+                   data-session-id="${_escapeHtml(s.id)}"
+                   data-archived="${s.archived ? '1' : '0'}">
                   <div class="session-title">${_escapeHtml(s.title || '(untitled)')}</div>
                   <div class="session-meta">${_escapeHtml(s.web_mode || 'instant')} / ${_escapeHtml(s.mode || '')} - ${_escapeHtml(s.created_at || '')}</div>
                   <div class="history-actions" data-ui-group="session-history-actions">
                     <button class="history-btn"
-                            onclick="event.stopPropagation(); _archiveSession('${_escapeHtml(s.id)}', ${!s.archived})">
+                            onclick="event.stopPropagation(); _archiveSession(this.closest('[data-session-id]').dataset.sessionId, this.closest('[data-session-id]').dataset.archived !== '1')">
                       ${s.archived ? 'Unarchive' : 'Archive'}
                     </button>
                     <button class="history-btn history-btn--danger"
-                            onclick="event.stopPropagation(); _deleteSession('${_escapeHtml(s.id)}')">
+                            onclick="event.stopPropagation(); _deleteSession(this.closest('[data-session-id]').dataset.sessionId)">
                       Delete
                     </button>
                   </div>
@@ -2825,7 +2826,7 @@ function _archiveSession(sessionId, archive) {
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: new URLSearchParams({session_id: sessionId, archived: archive ? "true" : "false"})
     })
-    .then(r => r.json())
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
     .then(data => {
         if (data.ok) { refreshSessionList(); }
         else { alert(data.error || "Archive failed"); }
@@ -2841,7 +2842,7 @@ function _deleteSession(sessionId) {
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: new URLSearchParams({session_id: sessionId, confirm: "DELETE_SESSION"})
     })
-    .then(r => r.json())
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
     .then(data => {
         if (data.ok) { refreshSessionList(); }
         else { alert(data.error || "Delete failed"); }
