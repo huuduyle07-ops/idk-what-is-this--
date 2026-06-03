@@ -1,12 +1,8 @@
-from __future__ import annotations
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = PROJECT_ROOT / "web" / "templates" / "index.html"
-
-
-def _tmpl():
-    return TEMPLATE.read_text(encoding="utf-8")
+_TMPL = TEMPLATE.read_text(encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -14,23 +10,23 @@ def _tmpl():
 # ---------------------------------------------------------------------------
 
 def test_session_refresh_function_defined():
-    assert "function refreshSessionList(" in _tmpl()
+    assert "function refreshSessionList(" in _TMPL
 
 
 def test_session_history_endpoint_referenced():
-    assert "/history/sessions" in _tmpl()
+    assert "/history/sessions" in _TMPL
 
 
 def test_session_include_archived_param():
-    assert "include_archived=1" in _tmpl()
+    assert "include_archived=1" in _TMPL
 
 
 def test_session_delete_confirm_string():
-    assert "DELETE_SESSION" in _tmpl()
+    assert "DELETE_SESSION" in _TMPL
 
 
 def test_session_archive_and_delete_endpoints():
-    t = _tmpl()
+    t = _TMPL
     assert "/history/session/archive" in t
     assert "/history/session/delete" in t
 
@@ -40,23 +36,23 @@ def test_session_archive_and_delete_endpoints():
 # ---------------------------------------------------------------------------
 
 def test_benchmark_archived_toggle_id():
-    assert 'id="showArchivedBenchmarks"' in _tmpl()
+    assert 'id="showArchivedBenchmarks"' in _TMPL
 
 
 def test_benchmark_delete_confirm_string():
-    assert "DELETE_BENCHMARK_REPORT" in _tmpl()
+    assert "DELETE_BENCHMARK_REPORT" in _TMPL
 
 
 def test_benchmark_update_endpoint():
-    assert "/history/benchmark/update" in _tmpl()
+    assert "/history/benchmark/update" in _TMPL
 
 
 def test_benchmark_delete_endpoint():
-    assert "/history/benchmark/delete" in _tmpl()
+    assert "/history/benchmark/delete" in _TMPL
 
 
 def test_benchmark_pinned_guard_phrase():
-    assert "Unpin before deleting" in _tmpl()
+    assert "Unpin before deleting" in _TMPL
 
 
 # ---------------------------------------------------------------------------
@@ -64,24 +60,23 @@ def test_benchmark_pinned_guard_phrase():
 # ---------------------------------------------------------------------------
 
 def test_dream_archived_toggle_id():
-    assert 'id="showArchivedDreamRuns"' in _tmpl()
+    assert 'id="showArchivedDreamRuns"' in _TMPL
 
 
 def test_dream_delete_confirm_string():
-    assert "DELETE_DREAM_RUN" in _tmpl()
+    assert "DELETE_DREAM_RUN" in _TMPL
 
 
 def test_dream_update_endpoint():
-    assert "/history/dream/update" in _tmpl()
+    assert "/history/dream/update" in _TMPL
 
 
 def test_dream_delete_endpoint():
-    assert "/history/dream/delete" in _tmpl()
+    assert "/history/dream/delete" in _TMPL
 
 
 def test_dream_pinned_guard_phrase():
-    t = _tmpl()
-    assert "/history/dream/delete" in t and "Unpin before deleting" in t
+    assert "Unpin before deleting" in _TMPL
 
 
 # ---------------------------------------------------------------------------
@@ -102,7 +97,7 @@ def test_history_actions_do_not_invoke_execution_endpoints():
         "/history/benchmark",
         "/history/dream",
     ]
-    lines = _tmpl().splitlines()
+    lines = _TMPL.splitlines()
     for line in lines:
         if any(route in line for route in HISTORY_ROUTES):
             for fn in EXEC_FNS:
