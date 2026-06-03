@@ -5810,7 +5810,7 @@ function _renderBenchmarkList(reports) {
              data-bench-pinned="${r.pinned ? '1' : '0'}"
              data-bench-archived="${r.archived ? '1' : '0'}"
              data-bench-repo="${_escapeHtml(repo)}"
-             onclick="viewBenchmarkReport('${_escapeHtml(r.filename)}')">
+             onclick="viewBenchmarkReport(this.dataset.benchFilename)">
             <div class="bench-list-item-date">${_benchFmtDate(r.timestamp_iso)}</div>
             <div class="bench-list-item-summary">
                 ${r.passed}/${r.total} / ${_benchFmtRate(r.success_rate)} / ${(r.duration_sec || 0).toFixed(1)}s / ${_benchFmtCost(r.total_estimated_cost_usd)}
