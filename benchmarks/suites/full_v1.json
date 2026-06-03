@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "suite_id": "full_v1",
-  "description": "All 41 AgentBench cases present in the v1 suite (32 original + 8 added in Phase 12.6 + 1 added in Phase 12.7).",
+  "description": "All 42 AgentBench cases present in the v1 suite (32 original + 8 added in Phase 12.6 + 1 added in Phase 12.7 + 1 added in Phase 13).",
   "case_names": [
     "cpp_account_interest",
     "cpp_boundary_check",
@@ -30,6 +30,7 @@
     "python_mutable_default",
     "python_off_by_one_pagination",
     "python_pandas_iloc_off_by_one_and_decoy_enumerate",
+    "python_rubiks_inverse_sequence_trap",
     "python_sql_account_transfer",
     "python_sql_join_filter",
     "rust_cart_reservation",

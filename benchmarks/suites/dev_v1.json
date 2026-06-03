@@ -24,6 +24,7 @@
     "python_mutable_default",
     "python_off_by_one_pagination",
     "python_pandas_iloc_off_by_one_and_decoy_enumerate",
+    "python_rubiks_inverse_sequence_trap",
     "python_sql_account_transfer",
     "python_sql_join_filter",
     "rust_cart_reservation",

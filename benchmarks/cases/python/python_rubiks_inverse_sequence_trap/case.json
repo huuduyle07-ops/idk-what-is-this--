@@ -1,0 +1,17 @@
+{
+  "name": "python_rubiks_inverse_sequence_trap",
+  "language": "python",
+  "category": "algorithm",
+  "difficulty": "hard",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python -m pytest -q",
+  "expected_changed_files": [
+    "cube.py"
+  ],
+  "forbidden_changed_files": [
+    "test_cube.py"
+  ],
+  "allowed_generated_files": [],
+  "prompt": "Fix the inverse sequence bug in cube.py.\n\nSymptom: applying a multi-move sequence followed by its computed inverse does not restore the cube to the solved state. Single-move inverses work correctly, but two-or-more move sequences do not.\n\nRequirements:\n- Modify cube.py only.\n- inverse_sequence(moves) must return the inverse of each move in an order such that apply_sequence(cube, moves + inverse_sequence(moves)) returns the solved cube for any valid sequence.\n- Do not modify test_cube.py.\n- Do not create new files.\n- Use patch_candidate if only inverse_sequence changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python -m pytest -q"
+}
