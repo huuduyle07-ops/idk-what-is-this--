@@ -1019,6 +1019,134 @@ def write_report_markdown(
     return out_path
 
 
+def write_dream_run_summary(
+    report_dir: Path,
+    items: list[dict],
+    dream_mode: str | None = None,
+    case_ideas: list[dict] | None = None,
+    lesson_notes: list[str] | None = None,
+) -> Path:
+    """Write dream_run_summary.md — richer successor to morning_report.txt.
+
+    All content is derived deterministically from the already-processed items
+    and lesson_notes. No LLM calls, no subprocess, no patch execution.
+    """
+    lines: list[str] = [
+        f"# Dream run summary — {datetime.now():%Y-%m-%d %H:%M}",
+        "",
+        f"Total items: {len(items)}",
+    ]
+    if dream_mode:
+        lines.append(f"Dream mode: `{dream_mode}`")
+    lines.append("")
+
+    status_counts: dict[str, int] = {}
+    for it in items:
+        st = it.get("status", "unknown")
+        status_counts[st] = status_counts.get(st, 0) + 1
+
+    if status_counts:
+        lines.append("## Summary")
+        for st, count in sorted(status_counts.items()):
+            descr = STATUS_LEGEND.get(st)
+            if descr:
+                lines.append(f"- **{st}** ({count}) — {descr}")
+            else:
+                lines.append(f"- **{st}** ({count})")
+        lines.append("")
+
+    notes = [str(n).strip() for n in (lesson_notes or []) if str(n or "").strip()]
+    if notes:
+        lines.append("## Candidate lessons")
+        lines.append("")
+        for note in notes:
+            lines.append(f"- {note}")
+        lines.append("")
+
+    if case_ideas is not None:
+        lines.append("## Case idea candidates")
+        lines.append("")
+        if case_ideas:
+            lines.append("| Pattern | Suggested case | Language | Category | Difficulty | Approved? |")
+            lines.append("| --- | --- | --- | --- | --- | --- |")
+            for idea in case_ideas:
+                approved = "yes" if idea.get("human_approved_for_case_creation") is True else "no"
+                lines.append(
+                    "| "
+                    + " | ".join([
+                        _md_cell(idea.get("pattern")),
+                        _md_cell(idea.get("suggested_case_name")),
+                        _md_cell(idea.get("language")),
+                        _md_cell(idea.get("category")),
+                        _md_cell(idea.get("difficulty")),
+                        approved,
+                    ])
+                    + " |"
+                )
+        else:
+            lines.append("No case ideas were generated from the provided reference notes.")
+        lines.append("")
+
+    lines.append("## Items")
+    lines.append("")
+    next_steps: list[str] = []
+    for it in items:
+        idx = it.get("idx", "?")
+        kind = it.get("kind", "?")
+        title = it.get("title", "?")
+        status = it.get("status", "?")
+        summary = it.get("summary", "")
+        hint = it.get("hint", "")
+        item_dir_name = it.get("item_dir_name", "")
+
+        lines.append(f"### {idx}. [{kind}] {title}")
+        lines.append(f"- status: **{status}**")
+        if summary:
+            lines.append(f"- summary: {summary}")
+        if hint:
+            lines.append(f"- suspected root cause: {hint}")
+        if item_dir_name:
+            lines.append(f"- evidence: [{item_dir_name}/](./{item_dir_name}/)")
+
+        blockers = it.get("patch_blockers") or []
+        if blockers:
+            blocker_summary_text = it.get("patch_blocker_summary") or patch_blocker_summary(blockers)
+            lines.append(f"- {blocker_summary_text}")
+            for blocker in blockers:
+                code = blocker.get("code", "unknown")
+                message = blocker.get("message", "")
+                evidence = blocker.get("evidence", "")
+                override_hint = blocker.get("override_hint", "")
+                detail = f"  - `{code}`: {message}"
+                if evidence:
+                    detail += f" ({evidence})"
+                lines.append(detail)
+                if override_hint:
+                    lines.append(f"    - *Override path*: {override_hint}")
+                    next_steps.append(f"**{title}** (`{code}`): {override_hint}")
+        lines.append("")
+
+    if next_steps:
+        lines.append("## Next steps")
+        lines.append("")
+        for step in next_steps:
+            lines.append(f"- {step}")
+        lines.append("")
+    else:
+        lines.append("## Next steps")
+        lines.append("")
+        lines.append("No unresolved blockers.")
+        lines.append("")
+
+    out_path = report_dir / "dream_run_summary.md"
+    out_path.write_text("\n".join(lines), encoding="utf-8")
+    return out_path
+
+
+# Backward-compat alias — remove once all callers are updated.
+write_report_markdown = write_dream_run_summary
+
+
 # === Slice γ3.2: preferred refined artifact (metadata pointer) ===
 #
 # Lets the user mark one refined artifact (`plan_analysis.refined_passN.json`
