@@ -839,7 +839,7 @@ def patch_lesson_fields(
 
     The file stays in its current bucket. Cannot change 'id' or 'status'.
     """
-    _forbidden = {"id", "status"}
+    _forbidden = {"id", "status", "active_knowledge_allowed"}
     bad = _forbidden & set(fields)
     if bad:
         raise ValueError(f"patch_lesson_fields: cannot change {bad!r}")
@@ -884,6 +884,7 @@ def save_raw_lesson_record(
     if record.get("status") != STATUS_CANDIDATE:
         raise ValueError("save_raw_lesson_record: status must be 'candidate'")
     scope_name = record.get("scope", SCOPE_GLOBAL)
+    _validate_scope(scope_name)
     resolved_repo_scope_id = record.get("repo_scope_id")
     lessons_root = _lessons_root(repo_path)
     scope_root = _scope_root(lessons_root, scope_name, resolved_repo_scope_id)
