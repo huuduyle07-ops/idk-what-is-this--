@@ -48,12 +48,12 @@
 
         <h3>Recent</h3>
 
-        {% for s in sessions %}
-        <a class="session-item" href="{{ url_for('load_session', session_id=s.id) }}">
-            <div class="session-title">{{ s.title }}</div>
-            <div class="session-meta">{{ s.web_mode|default('instant') }} / {{ s.mode }} - {{ s.created_at }}</div>
-        </a>
-        {% endfor %}
+        <label class="history-toggle">
+          <input type="checkbox" id="showArchivedSessions"
+                 onchange="refreshSessionList()">
+          Show archived sessions
+        </label>
+        <div id="sessionList"></div>
 
         <h3 class="sidebar-section-heading">
           Dream runs
@@ -2743,6 +2743,7 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshDreamStatus().then(state => {
         if (state && state.status === "running") _startDreamPolling();
     });
+    refreshSessionList();
     // Pre-fill the sidebar's dream-runs list if a repo_path is already set
     // (page reloaded into a session).
     refreshDreamRuns();
@@ -2778,6 +2779,75 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// --- Sidebar: session list --------------------------------
+function refreshSessionList() {
+    const toggle = document.getElementById("showArchivedSessions");
+    const includeArchived = toggle ? toggle.checked : false;
+    const url = includeArchived ? "/history/sessions?include_archived=1" : "/history/sessions";
+    const container = document.getElementById("sessionList");
+    if (!container) return;
+    fetch(url)
+        .then(r => r.json())
+        .then(data => {
+            const sessions = data.sessions || [];
+            if (sessions.length === 0) {
+                container.innerHTML = '<div class="session-item">No sessions yet.</div>';
+                return;
+            }
+            container.innerHTML = sessions.map(s => `
+                <a class="session-item ${s.archived ? 'session-item--archived' : ''}"
+                   href="/session/${encodeURIComponent(s.id)}"
+                   data-session-id="${_escapeHtml(s.id)}">
+                  <div class="session-title">${_escapeHtml(s.title || '(untitled)')}</div>
+                  <div class="session-meta">${_escapeHtml(s.web_mode || 'instant')} / ${_escapeHtml(s.mode || '')} - ${_escapeHtml(s.created_at || '')}</div>
+                  <div class="history-actions" data-ui-group="session-history-actions">
+                    <button class="history-btn"
+                            onclick="event.stopPropagation(); _archiveSession('${_escapeHtml(s.id)}', ${!s.archived})">
+                      ${s.archived ? 'Unarchive' : 'Archive'}
+                    </button>
+                    <button class="history-btn history-btn--danger"
+                            onclick="event.stopPropagation(); _deleteSession('${_escapeHtml(s.id)}')">
+                      Delete
+                    </button>
+                  </div>
+                </a>
+            `).join("");
+        })
+        .catch(err => {
+            container.innerHTML = `<div class="session-item">Load error: ${_escapeHtml(String(err))}</div>`;
+        });
+}
+
+function _archiveSession(sessionId, archive) {
+    fetch("/history/session/archive", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({session_id: sessionId, archived: archive ? "true" : "false"})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok) { refreshSessionList(); }
+        else { alert(data.error || "Archive failed"); }
+    })
+    .catch(err => console.error("_archiveSession error:", err));
+}
+
+function _deleteSession(sessionId) {
+    const input = prompt("Type DELETE_SESSION to confirm deletion:");
+    if (input !== "DELETE_SESSION") return;
+    fetch("/history/session/delete", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({session_id: sessionId, confirm: "DELETE_SESSION"})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok) { refreshSessionList(); }
+        else { alert(data.error || "Delete failed"); }
+    })
+    .catch(err => console.error("_deleteSession error:", err));
+}
 
 // --- Sidebar: past dream runs ------------------------------
 function _statusesPretty(statuses) {
