@@ -872,7 +872,7 @@
               Only <strong>Active</strong> lessons will be retrieval-eligible in future phases.
               Only Active lessons can be used as patch-prompt hints, and only when LESSON_RETRIEVAL_ENABLED=true.
             </div>
-            <div class="lessons-filters" role="group" aria-label="Lesson status filter">
+            <div class="lessons-filters" role="group" aria-label="Lesson filter">
               <button type="button" class="lessons-filter lessons-filter--active"
                       data-status="" onclick="filterLessons('')">All</button>
               <button type="button" class="lessons-filter"
@@ -881,6 +881,24 @@
                       data-status="active" onclick="filterLessons('active')">Active</button>
               <button type="button" class="lessons-filter"
                       data-status="blocked" onclick="filterLessons('blocked')">Blocked</button>
+              <span class="lessons-filter-sep" aria-hidden="true">|</span>
+              <select id="lessonFilterLanguage" class="lessons-filter-select"
+                      onchange="_applyLessonFilters()" title="Filter by language">
+                <option value="">All languages</option>
+              </select>
+              <select id="lessonFilterSource" class="lessons-filter-select"
+                      onchange="_applyLessonFilters()" title="Filter by source">
+                <option value="">All sources</option>
+              </select>
+              <select id="lessonFilterCategory" class="lessons-filter-select"
+                      onchange="_applyLessonFilters()" title="Filter by category">
+                <option value="">All categories</option>
+              </select>
+              <select id="lessonFilterDifficulty" class="lessons-filter-select"
+                      onchange="_applyLessonFilters()" title="Filter by difficulty"
+                      style="display:none">
+                <option value="">All difficulties</option>
+              </select>
             </div>
             <div id="lessonsStatus" class="lessons-status"></div>
             <div id="lessonsList" class="lessons-list">
@@ -2975,6 +2993,79 @@ function promoteDreamArtifact(date, runId, itemIdx, artifact) {
 // ============================================================
 let _lessonsLoaded = false;
 let _lessonsCurrentStatus = "";
+let _lessonsData = [];
+const _KNOWN_LESSON_LANGUAGES = new Set([
+    "python", "go", "javascript", "typescript", "rust", "cpp", "java",
+    "html", "ruby", "kotlin", "swift", "c", "bash", "sql"
+]);
+
+function _lessonLanguage(lesson) {
+    const lang = lesson.candidate && lesson.candidate.language;
+    if (typeof lang === "string" && lang.trim()) return lang.trim().toLowerCase();
+    const tags = Array.isArray(lesson.tags) ? lesson.tags : [];
+    return tags.find(t => _KNOWN_LESSON_LANGUAGES.has(String(t).toLowerCase())) || "";
+}
+
+function _lessonCategory(lesson) {
+    const cat = lesson.candidate && lesson.candidate.category;
+    if (typeof cat === "string" && cat.trim()) return cat.trim().toLowerCase();
+    const tags = Array.isArray(lesson.tags) ? lesson.tags : [];
+    const lang = _lessonLanguage(lesson);
+    const idx = tags.findIndex(t => String(t).toLowerCase() === lang);
+    return (idx >= 0 && idx + 1 < tags.length) ? String(tags[idx + 1]).toLowerCase() : "";
+}
+
+function _lessonDifficulty(lesson) {
+    const diff = lesson.candidate && lesson.candidate.difficulty;
+    return (typeof diff === "string" && diff.trim()) ? diff.trim().toLowerCase() : "";
+}
+
+function _populateLessonFilterDropdowns(lessons) {
+    const langs = new Set(), sources = new Set(), cats = new Set(), diffs = new Set();
+    for (const l of lessons) {
+        const lang = _lessonLanguage(l); if (lang) langs.add(lang);
+        const src = typeof l.source === "string" ? l.source : ""; if (src) sources.add(src);
+        const cat = _lessonCategory(l); if (cat) cats.add(cat);
+        const diff = _lessonDifficulty(l); if (diff) diffs.add(diff);
+    }
+    function fillSelect(id, values, label) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const current = el.value;
+        el.innerHTML = `<option value="">All ${label}</option>`;
+        for (const v of [...values].sort()) {
+            const opt = document.createElement("option");
+            opt.value = v; opt.textContent = v;
+            if (v === current) opt.selected = true;
+            el.appendChild(opt);
+        }
+    }
+    fillSelect("lessonFilterLanguage", langs, "languages");
+    fillSelect("lessonFilterSource", sources, "sources");
+    fillSelect("lessonFilterCategory", cats, "categories");
+    fillSelect("lessonFilterDifficulty", diffs, "difficulties");
+    const diffEl = document.getElementById("lessonFilterDifficulty");
+    if (diffEl) diffEl.style.display = diffs.size ? "" : "none";
+}
+
+function _applyLessonFilters() {
+    const lang = (document.getElementById("lessonFilterLanguage") || {}).value || "";
+    const src  = (document.getElementById("lessonFilterSource")   || {}).value || "";
+    const cat  = (document.getElementById("lessonFilterCategory") || {}).value || "";
+    const diff = (document.getElementById("lessonFilterDifficulty") || {}).value || "";
+
+    document.querySelectorAll("#lessonsList .lesson-card").forEach(card => {
+        const lessonId = card.dataset.lessonId;
+        const lesson = _lessonsData.find(l => l.id === lessonId);
+        if (!lesson) { card.hidden = false; return; }
+        let show = true;
+        if (lang && _lessonLanguage(lesson) !== lang) show = false;
+        if (src  && (lesson.source || "") !== src)    show = false;
+        if (cat  && _lessonCategory(lesson) !== cat)  show = false;
+        if (diff && _lessonDifficulty(lesson) !== diff) show = false;
+        card.hidden = !show;
+    });
+}
 
 function _lessonRepoPath() {
     const el = document.querySelector("input[name='repo_path']");
@@ -3034,6 +3125,7 @@ function filterLessons(status) {
 }
 
 function _renderLessonsList(lessons) {
+    _lessonsData = lessons;
     const listEl = document.getElementById("lessonsList");
     if (!listEl) return;
     if (!lessons.length) {
@@ -3041,6 +3133,8 @@ function _renderLessonsList(lessons) {
         return;
     }
     listEl.innerHTML = lessons.map(_renderLessonCard).join("");
+    _populateLessonFilterDropdowns(lessons);
+    _applyLessonFilters();
 }
 
 function _renderLessonCard(lesson) {
@@ -3093,7 +3187,7 @@ function _renderLessonCard(lesson) {
         : "";
 
     return `
-      <div class="lesson-card lesson-card--${_escapeHtml(status)}">
+      <div class="lesson-card lesson-card--${_escapeHtml(status)}" data-lesson-id="${idAttr}">
         <div class="lesson-card-header">
           <span class="lesson-title">${_escapeHtml(lesson.title || "Untitled lesson")}</span>
           <span class="lesson-badges">
