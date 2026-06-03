@@ -44,7 +44,31 @@
 
 > **2026-06-02 refresh:** Phase 13.9-13.13 are shipped (see the detailed Phase 13 checklist near the end of this file). The Memory Temperature tie-breaker chain landed as a pure, default-off behavior hook: **13.9** added `core/memory_temperature_retrieval.py` (`apply_memory_temperature_tiebreaker`), which only reorders lessons *within* near-equal relevance groups and is an exact pass-through when disabled; **13.10** added the evidence-only dogfood report (`core/memory_temperature_retrieval_dogfood.py` + CLI); **13.11b** wired that dogfood into the presentation evidence pack as `09_memory_temperature_tiebreaker_dogfood.md`; and **13.11a wired** the tie-breaker into the live `core.lesson_retrieval.find_active_lessons` ordering boundary **behind the disabled-by-default `MEMORY_TEMPERATURE_RETRIEVAL_ENABLED` flag** (with `MEMORY_TEMPERATURE_TIEBREAK_ONLY=true`), so default live behavior and the CONTROL prompt are byte-for-byte unchanged and the matching harness controls stay `READ_ONLY_PLANNED`/`wired=False`. **13.12** was a text/test-only post-cooling audit sweep (`tests/test_post_cooling_brain_audit.py`) that removed stale "unwired" prose and pinned the current truth, and **13.13** added `tests/test_executor_single_file_path.py`, a tests-only characterization of the single-file patch execution path. Cold memories are never hard-filtered (only de-prioritized inside a group) and frozen/audit-only/blocked memories are never revived or surfaced. No model/API, DB, patching, validation, benchmark-scoring, or Docker behavior changed. Full suite 1618 passed; `benchmark --check` 32/0.
 
-> **2026-06-03 refresh:** the Replay Debugger is now partially shipped as three read-only slices, while the retention/janitor half remains pending. **Phase 13R.1** added structured replay bundle writing under `.agent/replays/` via `core/replay_recorder.py` and integrated it into `core.run_lifecycle.run_patch_plan_with_artifacts` without changing patch decisions, validation commands, or the legacy `.agent/debug_last_control_prompt.txt` behavior. **Phase 13R.2** added a read-only web Replay Debugger panel plus `GET /replays`, `GET /replays/<replay_id>`, and safe artifact preview routes. **Phase 13R.3** added `core/replay_compare.py`, `GET /replays/<replay_id>/compare`, and a UI "Compare with current" action that diffs stored replay artifacts against already-saved current debug artifacts only; it never reruns the model, patcher, validation, benchmarks, Dream, or janitor. Artifact janitor / retention cleanup is still future work.
+> **2026-06-03 refresh (replay chain, now complete through 13R.5):** **Phase 13R.1** added structured replay bundle writing under `.agent/replays/` via `core/replay_recorder.py` and integrated it into `core.run_lifecycle.run_patch_plan_with_artifacts` without changing patch decisions, validation commands, or the legacy `.agent/debug_last_control_prompt.txt` behavior. **Phase 13R.2** added a read-only web Replay Debugger panel plus `GET /replays`, `GET /replays/<replay_id>`, and safe artifact preview routes. **Phase 13R.3** added `core/replay_compare.py`, `GET /replays/<replay_id>/compare`, and a UI "Compare with current" action that diffs stored replay artifacts against already-saved current debug artifacts only; it never reruns the model, patcher, validation, benchmarks, Dream, or janitor. **Phase 13R.4** added `core/replay_janitor.py:build_replay_janitor_plan` — a dry-run planner that classifies each bundle as `keep`, `cleanup_candidate`, or `invalid_or_unreadable`; `GET /replays/janitor/plan` exposes it; never deletes. **Phase 13R.5** added `apply_replay_janitor_plan` gated behind the exact confirm-token `DELETE_REPLAY_CANDIDATES`; wrong/missing token is a no-op; pinned bundles are never deleted; `POST /replays/janitor/apply` wired.
+
+> **2026-06-03 refresh — Phase 14 Failure Taxonomy (read-only classifier slices 14.1–14.4 shipped):** A self-contained, display/analysis-only failure-classification stack is shipped. None of it is wired into benchmark scoring, pass/fail logic, patching, validation, lesson promotion, model routing, or CONTROL prompts; every slice carries a verbatim guardrail note and an AST guard test proving no scoring/patch/validation/model/DB/Docker/subprocess/network/lesson-promotion calls. **14.1** `core/failure_taxonomy.py` — `classify_failure()` maps already-loaded failure evidence to one of 13 stable categories via fixed-precedence deterministic rules, returning a frozen `FailureClassification` (category, confidence, evidence, explanation, recommended next action) plus Markdown formatters; inputs never mutated. **14.2** `scripts/create_failure_taxonomy_report.py` — reads an existing `benchmark_report_*.json` (or `--latest`), classifies only failing cases, writes `.agent/failure_taxonomy/<ts>_failure_taxonomy.{json,md}`; source report never mutated. **14.3** `summarize_benchmark_failures` / `render_benchmark_taxonomy_lines` add a read-only `## Failure Taxonomy` section to the benchmark report Markdown (`benchmarks/run_benchmarks.py:write_markdown_report`) and a `failure_taxonomy` block to the web `GET /benchmarks/report` route (returns a new dict; stored file untouched); passing/skipped cases never classified; friendly "No failing cases to classify" empty state; old shapes never crash. **14.4** `core/failure_taxonomy_trends.py:compare_failure_taxonomies` compares two-or-more already-loaded reports (or local paths) and produces per-report identifiers, total failing cases, counts by category, category deltas (latest minus baseline), newly appearing / disappearing categories, and cases whose failure category changed, plus text-only next-action notes; `format_trend_markdown` renders it and `scripts/create_failure_taxonomy_trend_report.py` reads `.agent/benchmarks/benchmark_report_*.json` and writes `.agent/failure_taxonomy/<ts>_failure_taxonomy_trend.{json,md}`. Fewer-than-two reports, zero-failure reports, old shapes, and missing/invalid JSON all degrade gracefully; source reports never mutated. The data-driven taxonomy-design half (derive the fixed enum from accumulated lesson tags + benchmark failure clusters, store `failure_category` on lesson/Dream records, category-boost retrieval) remains future work, still gated on Phase 6.4. Tests: `tests/test_failure_taxonomy.py`, `tests/test_failure_taxonomy_report_export.py`, `tests/test_failure_taxonomy_benchmark_integration.py`, `tests/test_failure_taxonomy_trends.py` (17 new). **Full suite green at 1925 passed; `benchmark --check` 41/0.**
+
+## Current Truth / Start Here
+
+> 2026-06-03. Update this block when the next phase ships.
+
+| What | State |
+|---|---|
+| Benchmark cases | 41 (`benchmark --check` 41 / 0 errors) |
+| Full test suite | 1925 passed, 1 warning |
+| Replay chain | **Complete through 13R.5** — bundle writer, viewer, compare, janitor dry-run, janitor apply gate |
+| Phase 14 | 14.1–14.4 shipped — read-only taxonomy classifier, standalone exporter, benchmark-report display, trend/dogfood report |
+| Phase 14 guardrail | Display/analysis only — no scoring, patching, validation, lesson promotion, or CONTROL behavior changes |
+| Memory Temperature | Tie-breaker wired at `lesson_retrieval` boundary, default off (`MEMORY_TEMPERATURE_RETRIEVAL_ENABLED=false`); CONTROL prompt unchanged |
+| Dream auto-lessonization | Still deferred — human promotion still required before any lesson becomes active |
+
+**Do next:**
+- F.1 Goal Brief Autocomplete (tracked)
+- Phase 15a: lambda complexity classifier only — no decomposition yet (optional)
+- Phase 11c: honeypot benchmark cases — warm-up for Phase 11 (optional)
+- External benchmark sandbox (later, after SSD/Docker)
+
+---
 
 ## Current checkpoint
 
@@ -108,12 +132,9 @@ The project is a coding-agent workspace, not a Gemini patch script. Phase 4.7a-e
   - slowest-case and average-duration summaries
   - temp repo cleanup with retry on Windows
 - Benchmark suite:
-  - 32 cases exist across C++, Go, HTML, JavaScript, Python, Rust, and TypeScript.
-  - `--check`: 32 cases, 0 errors.
-  - Latest full fast run after Phase 12.5k:
-    - latest historical 31/31, current suite 32 cases passed, 100% success rate.
-    - Hard TypeScript nested-dispatch case passed.
-    - Linter fusion preserved correctness but increased fallback pressure, so it is marked cost-sensitive.
+  - 41 cases exist across C++, Go, HTML, JavaScript, Python, Rust, and TypeScript.
+  - `--check`: 41 cases, 0 errors.
+  - Latest full fast run: 1925 passed, 1 warning (`benchmark --check` 41/0 as of 2026-06-03 Phase 14.4).
 - Phase 4.5 CLI background/proposal MVP:
   - Level 1 reporter: `scripts/run_background_reporter.py` runs benchmark checks/runs, writes `.agent/reports/background_report_*.md/json`, includes Brain Stamp, and emits regression alerts.
   - Level 2 planner: `scripts/run_background_dream_planner.py` reads the latest meaningful benchmark report and writes `.agent/reports/background_dream_plan_*.md/json` with failed, flaky, and slow-passing cases.
@@ -1380,9 +1401,9 @@ Phase 12 upgraded AgentBench from a pass/fail runner into an experiment governan
 
 ## Phase 13 — Replay Debugger + Artifact Janitor
 
-**Status: partially shipped as 13R.1-13R.3 on 2026-06-03; janitor / retention half still pending**
+**Status: Replay Debugger + Janitor chain complete through 13R.5 (2026-06-03)**
 
-> Replay is no longer hypothetical. The bundle writer, read-only viewer, and read-only compare mode are now real. What remains is the retention/janitor half plus any richer compare or browsing affordances beyond the current safe slice.
+> The replay chain is complete. Bundle writing (13R.1), read-only viewer (13R.2), read-only compare (13R.3), janitor dry-run planner (13R.4), and the janitor apply gate (13R.5) are all shipped. Future work is optional viewer/compare polish and retention-policy refinements — all subject to the read-only / no-rerun / confirm-token-gated guardrails.
 
 ### Shipped audit / hardening slices
 
@@ -1406,10 +1427,12 @@ Phase 12 upgraded AgentBench from a pass/fail runner into an experiment governan
 - [x] **Phase 13R.1 - Replay Bundle Writer MVP (2026-06-03):** `core/replay_recorder.py` adds `create_replay_bundle`, safe text/JSON artifact writers, manifest finalization, newest-first listing, and manifest reads under `<repo>/.agent/replays/`. `core.run_lifecycle.run_patch_plan_with_artifacts` now writes replay bundles around the existing patch/apply path when artifacts are available: `user_query.txt`, `control_result.json`, `patch_parsed.json`, `patch_plan.json`, `apply_result.json`, `validation_output.txt`, `brain_stamp.json`, `final_status.json`, and compatibility `events.jsonl`. Writes are path-guarded and atomic-ish; partial bundles are allowed; old `.agent/debug_last_control_prompt.txt` behavior is explicitly preserved. No model/API calls, benchmark execution, patch-decision changes, validation-command changes, lesson retrieval changes, DB writes, Docker/subprocess changes, or cleanup behavior were introduced.
 - [x] **Phase 13R.2 - Replay Viewer (2026-06-03):** `web/routes/replay_routes.py` adds read-only `GET /replays`, `GET /replays/<replay_id>`, and `GET /replays/<replay_id>/artifact/<artifact_name>`. The Settings/Health advanced panel now includes a Replay Debugger UI that lists manifests newest-first, opens safe artifact previews, escapes all artifact text, pretty-prints JSON previews when possible, and truncates large previews instead of crashing. The panel is read-only: no rerun, apply, validate, delete, cleanup, or lesson-promotion actions.
 - [x] **Phase 13R.3 - Replay Compare: Current Prompt vs Replay Prompt (2026-06-03):** `core/replay_compare.py` adds bounded, deterministic compare helpers plus a markdown formatter; `GET /replays/<replay_id>/compare` returns a read-only compare result, and the Replay Debugger detail view now exposes a "Compare with current" action. The compare slice diffs stored replay artifacts against already-saved current debug artifacts only; today the default disk-backed current mapping is intentionally narrow (`model_prompt.txt` compares against `.agent/debug_last_control_prompt.txt`, while unavailable current artifacts report `current_missing`). Diff text is escaped in the UI, large comparisons are capped, and replay files are never mutated.
+- [x] **Phase 13R.4 - Replay Janitor Dry-Run Planner (2026-06-03):** `core/replay_janitor.py` (`build_replay_janitor_plan`, `ReplayJanitorPlan`, `ReplayJanitorEntry`) inspects replay bundles under `.agent/replays` and classifies each as `keep`, `cleanup_candidate`, or `invalid_or_unreadable` based on age, count cap, and pinned status. Configurable `max_age_days` / `max_keep` / `include_invalid`; pinned bundles always classify as `keep`. `GET /replays/janitor/plan` exposes the dry-run result. Never deletes files, never mutates manifests; every other system behavior (patching, validation, benchmarks, model, DB, Docker, subprocess, network) unchanged.
+- [x] **Phase 13R.5 - Replay Janitor Apply Gate (2026-06-03):** `apply_replay_janitor_plan` in `core/replay_janitor.py` gates actual bundle deletion behind a `confirm_token` parameter that must equal the exact string `DELETE_REPLAY_CANDIDATES` — wrong or missing token returns `{"ok": False, "error": "confirm_token required"}` and touches nothing. `POST /replays/janitor/apply` wired in `web/routes/replay_routes.py`; Replay Debugger UI exposes a confirmed delete flow. Pinned bundles are never deleted regardless of token. The `GUARDRAIL_NOTE` is carried in every plan and apply result.
 
 ### Goal (Replay half)
 
-The core replay goal is now partially met: structured replay bundles exist, they can be listed and inspected from the web UI, and operators can compare a stored replay against currently saved debug artifacts without rerunning the model. Remaining replay work is optional viewer polish and any future richer compare modes that still honor the read-only guardrail.
+The core replay goal is fully met: structured replay bundles exist, they can be listed and inspected from the web UI, operators can compare a stored replay against currently saved debug artifacts without rerunning the model, and the janitor can dry-run-plan and confirm-gated-apply retention cleanup. Remaining work is optional viewer/compare polish; all future slices must preserve the read-only / no-rerun / confirm-token-gated guardrails.
 
 Layout:
 
@@ -1436,9 +1459,9 @@ Current shipped UI affordances:
 - Replay detail view with manifest summary and read-only artifact previews
 - "Compare with current" action that diffs replay artifacts against current saved debug artifacts only; it does **not** rebuild prompts or rerun any lifecycle step
 
-### Goal (Janitor half)
+### Shipped: Janitor / Retention Policy (13R.4–13R.5)
 
-Retention/cleanup policy **hard-coded from day one** (no "we'll add cleanup later"):
+Retention/cleanup policy as implemented in `core/replay_janitor.py`:
 
 | Artifact | Default policy |
 |---|---|
@@ -1456,17 +1479,29 @@ Retention/cleanup policy **hard-coded from day one** (no "we'll add cleanup late
 - Janitor runs only on user invocation or after a benchmark completes — **never as a background timer**
 - Dry-run mode prints what would be deleted with sizes before doing anything (default mode for first invocation)
 
-### Remaining work / prerequisites
+### Remaining work / optional polish
 
-- Replay writer/viewer/compare no longer need scheduling; they are shipped.
-- Artifact janitor / retention policy is still unimplemented.
-- Optional future compare work can pair naturally with Phase 12 ("compare bundle A vs bundle B" remains a common debug workflow), but the current 13R.3 slice intentionally stops at replay-vs-current saved-artifact comparison.
+- The full replay chain (13R.1–13R.5) is complete. No core replay or janitor work is outstanding.
+- Optional future polish: richer compare modes ("bundle A vs bundle B"), retention-policy configuration in the UI, or additional viewer affordances — all must preserve the read-only / no-rerun / confirm-token-gated guardrails.
 
 ---
 
 ## Phase 14 — Failure Taxonomy
 
-**Status: 🤖 GPT-proposed brainstorm (2026-05-17) + Claude-condensed (2026-05-17), BLOCKED on Phase 6.4 (auto-creation)**
+**Status: 🤖 GPT-proposed brainstorm (2026-05-17) + Claude-condensed (2026-05-17). Read-only classifier slices 14.1–14.4 SHIPPED 2026-06-03; the data-driven taxonomy-design half remains BLOCKED on Phase 6.4 (auto-creation).**
+
+### Shipped: read-only classifier slices 14.1–14.4 (2026-06-03)
+
+A self-contained, display/analysis-only failure-classification stack landed ahead of the data-driven design half below. None of it is wired into benchmark scoring, pass/fail logic, patching, validation, lesson promotion, model routing, or CONTROL prompts — every slice carries a verbatim guardrail note and an AST guard test proving it makes no scoring/patch/validation/model/DB/Docker/subprocess/network/lesson-promotion calls.
+
+- **14.1 Deterministic classifier** — `core/failure_taxonomy.py`: `classify_failure(case_result, *, replay_summary=None, validation_output=None)` maps already-loaded failure evidence to one of 13 stable categories (`environment_issue`, `timeout_or_cost`, `validation_command_failure`, `forbidden_file_temptation`, `no_patch_expected`, `retrieval_miss`, `wrong_file`, `patch_too_large`, `patch_too_small`, `model_fallback_instability`, `validation_gap`, `algorithm_reasoning_failure`, `unknown`) via fixed-precedence rules; returns a frozen `FailureClassification` (category, confidence, evidence, explanation, recommended next action). Plus single-/aggregate-classification Markdown formatters. Inputs never mutated. Tests: `tests/test_failure_taxonomy.py`.
+- **14.2 Standalone exporter** — `scripts/create_failure_taxonomy_report.py` reads an existing `benchmark_report_*.json` (or `--latest`), classifies only the failing cases, and writes `.agent/failure_taxonomy/<ts>_failure_taxonomy.{json,md}`. Never mutates the source report; the only writes are the two artifacts. Tests: `tests/test_failure_taxonomy_report_export.py`.
+- **14.3 Benchmark-report + web display integration** — `summarize_benchmark_failures` / `render_benchmark_taxonomy_lines` add a read-only `## Failure Taxonomy` section to the benchmark report Markdown (`benchmarks/run_benchmarks.py:write_markdown_report`) and a `failure_taxonomy` block to the web `GET /benchmarks/report` route (returns a new dict; the stored report file on disk is untouched). Passing/skipped cases are never classified; a friendly "No failing cases to classify" empty state and old/odd report shapes never crash. Tests: `tests/test_failure_taxonomy_benchmark_integration.py`.
+- **14.4 Trend / dogfood report** — `core/failure_taxonomy_trends.py:compare_failure_taxonomies` compares two or more already-loaded reports (or local paths) and produces per-report identifiers, total failing cases, counts by category, category deltas (latest − baseline), newly appearing / disappearing categories, and cases whose failure category changed, plus text-only next-action notes. `format_trend_markdown` renders it; `scripts/create_failure_taxonomy_trend_report.py` reads `.agent/benchmarks/benchmark_report_*.json` and writes `.agent/failure_taxonomy/<ts>_failure_taxonomy_trend.{json,md}`. Fewer-than-two reports, zero-failure reports, old shapes, and missing/invalid JSON all degrade gracefully; source reports are never mutated. Tests: `tests/test_failure_taxonomy_trends.py`.
+
+### Still future (the data-driven design half)
+
+**Status: BLOCKED on Phase 6.4 (auto-creation)**
 
 ### Why blocked on 6.4 (read this first)
 
@@ -1729,8 +1764,8 @@ A larger brainstorm (11 candidate phases) was condensed into the 3 phases above.
 - [ ] Phase 10: Branched repair / MCTS — **mini-experiment first** (AI Suggestions § I)
 - [ ] **Phase 11: Adversarial Self-Play (Counter-Knowledge + Reverse Dream)** — Claude-proposed 2026-05-17 (AI Suggestions § N). Blocked on § B (held-out eval set) and § C (patch minimality metric); experiment-gated (minimality ≥15% improvement without pass-rate drop). Two smaller alternates: Phase 11b (two-language invariant verification) and Phase 11c (honeypot benchmark cases) can ship independently as warm-ups.
 - [ ] **Phase 12: Experiment Lab / Evaluation Governance** — GPT-proposed brainstorm 2026-05-17 + Claude-condensed. Hard prerequisite for Phase 11, Phase 10, and any speculative comparison. Builds on Brain Stamp; adds paired-run experiments with explicit greenlight rules.
-- [~] **Phase 13: Replay Debugger + Artifact Janitor** — replay half partially shipped on 2026-06-03 as 13R.1 bundle writing, 13R.2 read-only viewer, and 13R.3 read-only compare. Remaining scope is the artifact janitor / retention half plus any future replay-polish slices that preserve the no-rerun guardrails.
-- [ ] **Phase 14: Failure Taxonomy** — GPT-proposed brainstorm 2026-05-17 + Claude-condensed. Blocked on Phase 6.4 auto-creation. Do NOT design the taxonomy upfront; derive it from accumulated lesson tags + benchmark failure clusters.
+- [x] **Phase 13: Replay Debugger + Artifact Janitor** — complete through 13R.5 as of 2026-06-03: 13R.1 bundle writing, 13R.2 read-only viewer, 13R.3 read-only compare, 13R.4 janitor dry-run planner, 13R.5 janitor apply gate (confirm-token gated). Optional future polish (richer compare modes, UI retention config) is possible but not required.
+- [~] **Phase 14: Failure Taxonomy** — GPT-proposed brainstorm 2026-05-17 + Claude-condensed. **Read-only classifier slices 14.1–14.4 shipped 2026-06-03** (deterministic classifier, standalone exporter, benchmark-report/web display integration, and multi-report trend/dogfood report — all display/analysis-only, never wired into scoring/patching/validation/lessons). The original data-driven taxonomy-design half (derive the fixed enum from accumulated lesson tags + benchmark failure clusters, store `failure_category` on lesson/Dream records, category-boost retrieval) remains future work, still gated on Phase 6.4 auto-creation. See the 2026-06-03 Phase 14 refresh near the top and the Phase 14 section below.
 - [ ] Future: Browser agent (after Phase 8; AI Suggestions § J)
 - [ ] Future: Gastown / Mayor pattern reference study (covered by Phase 7; possible MCP/tool-registry inspiration for Phase 8; no new numbered phase)
 ---
