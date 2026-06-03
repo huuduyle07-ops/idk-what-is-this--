@@ -205,6 +205,70 @@ def test_artifact_route_returns_404_for_missing_allowed_artifact(client, repo):
     assert "not captured" in body["error"]
 
 
+def test_janitor_route_returns_dry_run_plan(client, repo):
+    keep = create_replay_bundle(
+        repo,
+        run_kind="new",
+        now=datetime(2026, 5, 1, 0, 0, 1, tzinfo=timezone.utc),
+    )
+    drop = create_replay_bundle(
+        repo,
+        run_kind="old",
+        now=datetime(2026, 5, 1, 0, 0, 0, tzinfo=timezone.utc),
+    )
+
+    response = client.get(
+        "/replays/janitor",
+        query_string={"repo_path": str(repo), "max_keep": "1"},
+    )
+    body = response.get_json()
+
+    assert response.status_code == 200
+    assert body["ok"] is True
+    classifications = {
+        entry["replay_id"]: entry["classification"]
+        for entry in body["plan"]["entries"]
+    }
+    assert classifications[keep.replay_id] == "keep"
+    assert classifications[drop.replay_id] == "cleanup_candidate"
+    assert body["plan"]["guardrail_note"]
+
+
+def test_janitor_route_honors_pinned_and_markdown(client, repo):
+    pinned = create_replay_bundle(
+        repo,
+        run_kind="pinned",
+        now=datetime(2026, 5, 1, 0, 0, 0, tzinfo=timezone.utc),
+    )
+    create_replay_bundle(
+        repo,
+        run_kind="new",
+        now=datetime(2026, 5, 1, 0, 0, 1, tzinfo=timezone.utc),
+    )
+
+    response = client.get(
+        "/replays/janitor",
+        query_string={
+            "repo_path": str(repo),
+            "max_keep": "1",
+            "pinned": pinned.replay_id,
+            "format": "markdown",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.mimetype == "text/markdown"
+    text = response.get_data(as_text=True)
+    assert "# Replay Janitor Dry-Run" in text
+    assert pinned.replay_id in text
+
+
+def test_janitor_route_is_get_only(client, repo):
+    response = client.post("/replays/janitor", query_string={"repo_path": str(repo)})
+
+    assert response.status_code == 405
+
+
 def test_replay_viewer_routes_ast_guard_read_only_scope():
     tree = ast.parse(Path("web/routes/replay_routes.py").read_text(encoding="utf-8"))
     imports = _imported_modules(tree)

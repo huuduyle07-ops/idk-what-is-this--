@@ -12,6 +12,10 @@ from core.replay_compare import (
     compare_replay_to_current,
     format_replay_compare_markdown,
 )
+from core.replay_janitor import (
+    format_replay_janitor_markdown,
+    plan_replay_cleanup,
+)
 from core.replay_recorder import (
     ARTIFACT_NAMES,
     JSON_ARTIFACT_NAMES,
@@ -187,6 +191,67 @@ def replays_list_route():
         "replays": replays,
         "count": len(replays),
         "limit": limit,
+    }
+
+
+def _optional_float(name: str) -> float | None:
+    raw = str(request.values.get(name) or "").strip()
+    if not raw:
+        return None
+    try:
+        return float(raw)
+    except ValueError as exc:
+        raise ValueError(f"invalid {name}: {raw!r}") from exc
+
+
+def _optional_int(name: str) -> int | None:
+    raw = str(request.values.get(name) or "").strip()
+    if not raw:
+        return None
+    try:
+        return int(raw)
+    except ValueError as exc:
+        raise ValueError(f"invalid {name}: {raw!r}") from exc
+
+
+def _bool_flag(name: str) -> bool:
+    raw = str(request.values.get(name) or "").strip().lower()
+    return raw in {"1", "true", "yes", "on"}
+
+
+def _pinned_ids_from_request() -> list[str]:
+    raw = str(request.values.get("pinned") or "").strip()
+    if not raw:
+        return []
+    return [part.strip() for part in raw.split(",") if part.strip()]
+
+
+@bp.route("/replays/janitor", methods=["GET"])
+def replays_janitor_route():
+    try:
+        repo = _repo_from_request()
+        plan = plan_replay_cleanup(
+            repo,
+            max_age_days=_optional_float("max_age_days"),
+            max_keep=_optional_int("max_keep"),
+            include_invalid=_bool_flag("include_invalid"),
+            pinned_ids=_pinned_ids_from_request(),
+        )
+    except ValueError as exc:
+        return {"ok": False, "error": str(exc)}, 400
+    except OSError as exc:
+        return {"ok": False, "error": str(exc)}, 500
+
+    if str(request.values.get("format") or "").strip().lower() == "markdown":
+        return Response(
+            format_replay_janitor_markdown(plan),
+            mimetype="text/markdown",
+        )
+
+    return {
+        "ok": True,
+        "repo_path": str(repo.resolve()),
+        "plan": plan.to_dict(),
     }
 
 
