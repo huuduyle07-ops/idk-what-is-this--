@@ -151,6 +151,11 @@ def create_merge(
     Returns (new_record, superseded_ids).
     Raises ValueError if guards not confirmed; LookupError if any ID not found.
     The merged record is always candidate and never auto-promoted.
+
+    Note: writes the merged record before patching sources. If a source patch
+    fails mid-loop, earlier sources will be marked superseded_by but later ones
+    will not. No rollback is performed — this is a known limitation of the
+    single-file-at-a-time store design.
     """
     if len(source_ids) < 2:
         raise ValueError("create_merge requires at least 2 source IDs")
@@ -189,7 +194,13 @@ def create_merge(
 
     superseded: list[str] = []
     for lid in source_ids:
-        patch_lesson_fields(lid, {"superseded_by": lesson_id}, repo_path=repo_path)
+        patch_lesson_fields(
+            lid,
+            {"superseded_by": lesson_id},
+            repo_path=repo_path,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+        )
         superseded.append(lid)
 
     return record, superseded
