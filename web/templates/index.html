@@ -60,6 +60,11 @@
           <button type="button" class="sidebar-refresh"
                   onclick="refreshDreamRuns()" title="Reload dream-run list">⟳</button>
         </h3>
+        <label class="history-toggle">
+          <input type="checkbox" id="showArchivedDreamRuns"
+                 onchange="refreshDreamRuns()">
+          Show archived runs
+        </label>
         <div id="dreamRuns" class="dream-runs">
           <div class="dream-runs-empty">Set a repo path to load.</div>
         </div>
@@ -2864,6 +2869,8 @@ function _statusesPretty(statuses) {
 }
 
 function refreshDreamRuns() {
+    const toggle = document.getElementById("showArchivedDreamRuns");
+    const includeArchived = toggle ? toggle.checked : false;
     const repoEl = document.querySelector("input[name='repo_path']");
     const repo = repoEl ? repoEl.value.trim() : "";
     const container = document.getElementById("dreamRuns");
@@ -2874,7 +2881,8 @@ function refreshDreamRuns() {
         return;
     }
 
-    fetch(`/dream/reports?repo_path=${encodeURIComponent(repo)}`)
+    const dreamUrl = `/dream/reports?repo_path=${encodeURIComponent(repo)}${includeArchived ? '&include_archived=1' : ''}`;
+    fetch(dreamUrl)
     .then(r => r.json())
     .then(data => {
         if (data.error) {
@@ -2897,9 +2905,29 @@ function refreshDreamRuns() {
             const label = r.run_id ? `${r.date} · ${_escapeHtml(r.run_id)}` : r.date;
             const runArg = r.run_id ? `'${r.run_id}'` : "''";
             return `
-              <a class="session-item dream-run-item" href="javascript:viewDreamRun('${r.date}', ${runArg})">
+              <a class="session-item dream-run-item ${r.archived ? 'session-item--archived' : ''}"
+                 href="javascript:viewDreamRun('${r.date}', ${runArg})"
+                 data-dream-date="${_escapeHtml(r.date)}"
+                 data-dream-run="${_escapeHtml(r.run_id || '')}"
+                 data-dream-repo="${_escapeHtml(repo)}"
+                 data-dream-archived="${r.archived ? '1' : '0'}"
+                 data-dream-pinned="${r.pinned ? '1' : '0'}">
                 <div class="session-title">${label}</div>
                 <div class="session-meta">${meta}</div>
+                <div class="history-actions" data-ui-group="dream-history-actions">
+                  <button class="history-btn"
+                          onclick="event.stopPropagation(); _archiveDreamRun(this)">
+                    ${r.archived ? 'Unarchive' : 'Archive'}
+                  </button>
+                  <button class="history-btn"
+                          onclick="event.stopPropagation(); _pinDreamRun(this)">
+                    ${r.pinned ? 'Unpin' : 'Pin'}
+                  </button>
+                  <button class="history-btn history-btn--danger"
+                          onclick="event.stopPropagation(); _deleteDreamRun(this)">
+                    Delete
+                  </button>
+                </div>
               </a>
             `;
         }).join("");
@@ -2907,6 +2935,65 @@ function refreshDreamRuns() {
     .catch(err => {
         container.innerHTML = `<div class="dream-runs-empty">Load error: ${err}</div>`;
     });
+}
+
+function _archiveDreamRun(btn) {
+    const card = btn.closest('[data-dream-date]');
+    const repoPath = card.dataset.dreamRepo;
+    const date = card.dataset.dreamDate;
+    const run = card.dataset.dreamRun;
+    const archive = card.dataset.dreamArchived !== '1';
+    fetch("/history/dream/update", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({repo_path: repoPath, date, run, archived: archive ? "true" : "false"})
+    })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(data => {
+        if (data.ok) { refreshDreamRuns(); }
+        else { alert(data.error || "Archive failed"); }
+    })
+    .catch(err => console.error("_archiveDreamRun error:", err));
+}
+
+function _pinDreamRun(btn) {
+    const card = btn.closest('[data-dream-date]');
+    const repoPath = card.dataset.dreamRepo;
+    const date = card.dataset.dreamDate;
+    const run = card.dataset.dreamRun;
+    const pin = card.dataset.dreamPinned !== '1';
+    fetch("/history/dream/update", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({repo_path: repoPath, date, run, pinned: pin ? "true" : "false"})
+    })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(data => {
+        if (data.ok) { refreshDreamRuns(); }
+        else { alert(data.error || "Pin failed"); }
+    })
+    .catch(err => console.error("_pinDreamRun error:", err));
+}
+
+function _deleteDreamRun(btn) {
+    const card = btn.closest('[data-dream-date]');
+    if (card.dataset.dreamPinned === '1') { alert("Unpin before deleting"); return; }
+    const input = prompt("Type DELETE_DREAM_RUN to confirm deletion:");
+    if (input !== "DELETE_DREAM_RUN") return;
+    const repoPath = card.dataset.dreamRepo;
+    const date = card.dataset.dreamDate;
+    const run = card.dataset.dreamRun;
+    fetch("/history/dream/delete", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({repo_path: repoPath, date, run, confirm: "DELETE_DREAM_RUN"})
+    })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(data => {
+        if (data.ok) { refreshDreamRuns(); }
+        else { alert(data.error || "Delete failed"); }
+    })
+    .catch(err => console.error("_deleteDreamRun error:", err));
 }
 
 function viewDreamRun(date, runId) {
