@@ -3506,6 +3506,262 @@ function blockLessonById(lessonId, scope, repoScopeId) {
 }
 
 // ============================================================
+// Phase 11-prep-cleanup-b2b — Duplicate hints
+// ============================================================
+
+function loadDuplicateHints(force) {
+    if (_duplicateHintsLoaded && !force) return;
+    _duplicateHintsLoaded = true;
+    const listEl = document.getElementById("duplicateHintsList");
+    if (listEl) listEl.innerHTML = '<div class="health-empty">Loading…</div>';
+    const params = new URLSearchParams();
+    const repo = _lessonRepoPath();
+    if (repo) params.set("repo_path", repo);
+    if (_lessonsCurrentStatus) params.set("status", _lessonsCurrentStatus);
+    fetch("/lessons/duplicates?" + params.toString())
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                if (listEl) listEl.innerHTML = `<div class="health-empty">❌ ${_escapeHtml(data.error || "Failed to load hints")}</div>`;
+                return;
+            }
+            const groups = data.groups || [];
+            if (!groups.length) {
+                if (listEl) listEl.innerHTML = '<div class="health-empty">No duplicate groups found.</div>';
+                return;
+            }
+            if (listEl) listEl.innerHTML = groups.map(_renderDuplicateGroup).join("");
+        })
+        .catch(err => {
+            if (listEl) listEl.innerHTML = `<div class="health-empty">❌ Network error: ${_escapeHtml(String(err))}</div>`;
+        });
+}
+
+function _renderDuplicateGroup(group) {
+    const lessons = Array.isArray(group.lessons) ? group.lessons : [];
+    const reason = group.reason || group.hint || "";
+    const ids = lessons.map(l => l.id || "").filter(Boolean);
+    const idsAttr = _escapeHtml(JSON.stringify(ids));
+    const lessonRows = lessons.map(l => {
+        const st = l.status || "candidate";
+        return `<div class="dup-group__lesson">
+            <span class="lesson-badge lesson-badge--${_escapeHtml(st)}">${_escapeHtml(st)}</span>
+            <span class="dup-group__title">${_escapeHtml(l.title || "Untitled")}</span>
+            <code class="dup-group__id">${_escapeHtml(l.id || "")}</code>
+        </div>`;
+    }).join("");
+    return `<div class="dup-group">
+        ${reason ? `<div class="dup-group__reason">${_escapeHtml(reason)}</div>` : ""}
+        <div class="dup-group__lessons">${lessonRows}</div>
+        <div class="dup-group__actions">
+            <button type="button" data-merge-ids="${idsAttr}"
+                    onclick="selectGroupForMerge(this)">Select group for merge</button>
+        </div>
+    </div>`;
+}
+
+function selectGroupForMerge(btn) {
+    let ids;
+    try { ids = JSON.parse(btn.dataset.mergeIds || "[]"); } catch (e) { return; }
+    if (!Array.isArray(ids) || ids.length < 2) return;
+    _lessonsMergeSelectMode = true;
+    _lessonsMergeSelected = new Set(ids);
+    _updateMergeSelectModeUI();
+    loadLessons(true);
+    const el = document.getElementById("lessonsList");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+}
+
+function toggleMergeSelectMode() {
+    if (_lessonsMergeSelectMode) {
+        exitMergeSelectMode();
+    } else {
+        _lessonsMergeSelectMode = true;
+        _lessonsMergeSelected = new Set();
+        _updateMergeSelectModeUI();
+        loadLessons(true);
+    }
+}
+
+function exitMergeSelectMode() {
+    _lessonsMergeSelectMode = false;
+    _lessonsMergeSelected = new Set();
+    _updateMergeSelectModeUI();
+    loadLessons(true);
+}
+
+function _updateMergeSelectModeUI() {
+    const toggle = document.getElementById("mergeSelectToggle");
+    const bar = document.getElementById("mergeSelectBar");
+    const countEl = document.getElementById("mergeSelectCount");
+    const previewBtn = document.getElementById("previewMergeBtn");
+    if (toggle) toggle.textContent = _lessonsMergeSelectMode ? "Cancel merge" : "Merge lessons";
+    if (bar) {
+        if (_lessonsMergeSelectMode) bar.removeAttribute("hidden");
+        else bar.setAttribute("hidden", "");
+    }
+    const count = _lessonsMergeSelected.size;
+    if (countEl) countEl.textContent = `${count} selected`;
+    if (previewBtn) previewBtn.disabled = count < 2;
+}
+
+function toggleMergeSelection(checkbox) {
+    const lessonId = checkbox.dataset.mergeId;
+    if (!lessonId) return;
+    if (checkbox.checked) {
+        _lessonsMergeSelected.add(lessonId);
+    } else {
+        _lessonsMergeSelected.delete(lessonId);
+    }
+    _updateMergeSelectModeUI();
+}
+
+function previewMergeSelected() {
+    const ids = [..._lessonsMergeSelected];
+    if (ids.length < 2) return;
+    openAppModal("Preview merge", '<div class="health-empty">Loading preview…</div>', "");
+    const payload = { lesson_ids: ids };
+    const repo = _lessonRepoPath();
+    if (repo) payload.repo_path = repo;
+    fetch("/lessons/merge/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                openAppModal("Preview merge", `<div class="health-empty">❌ ${_escapeHtml(data.error || "Preview failed")}</div>`, "");
+                return;
+            }
+            _openMergePreviewModal(data.preview, data.warnings || [], ids);
+        })
+        .catch(err => {
+            openAppModal("Preview merge", `<div class="health-empty">❌ Network error: ${_escapeHtml(String(err))}</div>`, "");
+        });
+}
+
+function _openMergePreviewModal(preview, warnings, lessonIds) {
+    _mergePreviewLessonIds = lessonIds;
+    const hasActive = warnings.some(w => w.includes("active"));
+    const hasMixedKind = warnings.some(w => w.includes("kind") || w.includes("mix"));
+    const warningsHtml = warnings.length
+        ? `<div class="merge-preview__warnings">${warnings.map(w => `<div class="merge-preview__warning">⚠ ${_escapeHtml(w)}</div>`).join("")}</div>`
+        : "";
+    const activeConfirmHtml = hasActive
+        ? `<label class="merge-preview__confirm"><input type="checkbox" id="mergeConfirmSupersede"> I confirm superseding active lesson(s)</label>`
+        : `<input type="hidden" id="mergeConfirmSupersede" value="">`;
+    const sourceRows = (preview.merge_sources || lessonIds).map(id => `<li><code>${_escapeHtml(id)}</code></li>`).join("");
+    const tagsValue = Array.isArray(preview.tags) ? preview.tags.join(", ") : "";
+    const bodyHtml = `
+        <div class="merge-preview">
+            ${warningsHtml}
+            <div class="merge-preview__field">
+                <label for="mergePreviewTitle">Title</label>
+                <input type="text" id="mergePreviewTitle" class="merge-preview__input"
+                       value="${_escapeHtml(preview.title || "")}">
+            </div>
+            <div class="merge-preview__field">
+                <label for="mergePreviewSummary">Summary</label>
+                <textarea id="mergePreviewSummary" class="merge-preview__textarea" rows="3">${_escapeHtml(preview.summary || "")}</textarea>
+            </div>
+            <div class="merge-preview__field">
+                <label for="mergePreviewTags">Tags (comma-separated)</label>
+                <input type="text" id="mergePreviewTags" class="merge-preview__input"
+                       value="${_escapeHtml(tagsValue)}">
+            </div>
+            <div class="merge-preview__sources">
+                <strong>Source lessons:</strong><ul>${sourceRows}</ul>
+            </div>
+            ${activeConfirmHtml}
+        </div>`;
+    const footerHtml = `
+        <button type="button" id="mergeCreateBtn" onclick="createMergedCandidate()">Create merged candidate</button>
+        <button type="button" onclick="closeAppModal()">Cancel</button>
+        <div id="mergeCreateStatus" class="merge-create-status"></div>`;
+    openAppModal("Preview merge", bodyHtml, footerHtml);
+    if (hasMixedKind) {
+        const btn = document.getElementById("mergeCreateBtn");
+        if (btn) { btn.disabled = true; btn.title = "Cannot merge lessons of different kinds"; }
+    }
+}
+
+function createMergedCandidate() {
+    const titleEl = document.getElementById("mergePreviewTitle");
+    const summaryEl = document.getElementById("mergePreviewSummary");
+    const tagsEl = document.getElementById("mergePreviewTags");
+    const confirmEl = document.getElementById("mergeConfirmSupersede");
+    const statusEl = document.getElementById("mergeCreateStatus");
+    const createBtn = document.getElementById("mergeCreateBtn");
+    const title = (titleEl ? titleEl.value : "").trim();
+    if (!title) {
+        if (statusEl) { statusEl.textContent = "❌ Title is required."; statusEl.className = "merge-create-status merge-create-status--error"; }
+        return;
+    }
+    const summary = summaryEl ? summaryEl.value : "";
+    const tagsRaw = tagsEl ? tagsEl.value : "";
+    const tags = tagsRaw.split(",").map(t => t.trim()).filter(Boolean);
+    const confirmSupersede = confirmEl && confirmEl.type === "checkbox" ? confirmEl.checked : false;
+    const payload = {
+        lesson_ids: _mergePreviewLessonIds,
+        title,
+        summary,
+        tags,
+        confirm_supersede_active: confirmSupersede,
+    };
+    const repo = _lessonRepoPath();
+    if (repo) payload.repo_path = repo;
+    if (createBtn) createBtn.disabled = true;
+    if (statusEl) { statusEl.textContent = "Creating…"; statusEl.className = "merge-create-status merge-create-status--running"; }
+    fetch("/lessons/merge/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                if (statusEl) { statusEl.textContent = `❌ ${_escapeHtml(data.error || "Merge failed")}`; statusEl.className = "merge-create-status merge-create-status--error"; }
+                if (createBtn) createBtn.disabled = false;
+                return;
+            }
+            if (statusEl) { statusEl.textContent = "✓ Merged candidate created."; statusEl.className = "merge-create-status merge-create-status--ok"; }
+            exitMergeSelectMode();
+            closeAppModal();
+            loadLessons(true);
+            loadDuplicateHints(true);
+        })
+        .catch(err => {
+            if (statusEl) { statusEl.textContent = `❌ Network error: ${_escapeHtml(String(err))}`; statusEl.className = "merge-create-status merge-create-status--error"; }
+            if (createBtn) createBtn.disabled = false;
+        });
+}
+
+function archiveLessonById(lessonId, scope, repoScopeId) {
+    if (!lessonId) return;
+    if (!confirm("Archive this lesson? It will be hidden from the default view.")) return;
+    const payload = { lesson_id: lessonId };
+    if (scope) payload.scope = scope;
+    if (repoScopeId) payload.repo_scope_id = repoScopeId;
+    const repo = _lessonRepoPath();
+    if (repo) payload.repo_path = repo;
+    fetch("/lessons/archive", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                alert(`❌ Archive failed: ${data.error || "unknown error"}`);
+                return;
+            }
+            loadLessons(true);
+        })
+        .catch(err => alert(`Network error: ${err}`));
+}
+
+// ============================================================
 // Phase 5 Polish — Proposals sub-section (Memory tab)
 // ============================================================
 let _proposalRunsLoaded = false;
