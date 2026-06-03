@@ -1941,6 +1941,25 @@ function _renderActionLevelOptions(dreamType) {
     sel.disabled = allowed.length === 0;
 }
 
+// Phase 11-prep-cleanup-a: collapse research/reference controls for debug work types.
+const _RESEARCH_HEAVY_WORK_TYPES = new Set(["bug_investigation", "debug"]);
+
+function _updateDreamResearchControlsVisibility() {
+    const dreamTypeEl = document.getElementById("dreamType");
+    const workType = dreamTypeEl ? dreamTypeEl.value : "";
+    const referencesSection = document.querySelector(".dream-references-section");
+    const trialsSection = document.getElementById("dreamTrialsSection");
+    const isResearchHeavy = _RESEARCH_HEAVY_WORK_TYPES.has(workType);
+    if (referencesSection) {
+        referencesSection.hidden = isResearchHeavy;
+    }
+    if (trialsSection) {
+        if (isResearchHeavy) {
+            trialsSection.removeAttribute("open");
+        }
+    }
+}
+
 function fetchDreamTaxonomy() {
     return fetch("/dream/taxonomy")
         .then(r => r.json())
@@ -1949,6 +1968,7 @@ function fetchDreamTaxonomy() {
                 _dreamTaxonomy = data;
                 _renderDreamTypeOptions(data);
                 _renderActionLevelOptions(_dreamType());
+                _updateDreamResearchControlsVisibility();
             }
             return data;
         })
@@ -2724,6 +2744,7 @@ document.addEventListener("DOMContentLoaded", () => {
             _updateTrialCreateAvailability();
             _updateTrialPanelVisibility();
         });
+        dreamTypeEl.addEventListener("change", _updateDreamResearchControlsVisibility);
     }
     const dreamLevelEl = document.getElementById("dreamActionLevel");
     if (dreamLevelEl) {
@@ -2814,11 +2835,20 @@ function viewDreamRun(date, runId) {
             (typeof data.morning_report_html === "string" && data.morning_report_html.length > 0)
                 ? `<div class="dream-report-md">${data.morning_report_html}</div>`
                 : `<pre class="dream-report-pre">${_escapeHtml(morning)}</pre>`;
+        const rawSummaryPanel = morning.length > 0
+            ? `<details class="dream-raw-details"><summary>Raw summary (dream_run_summary.md)</summary><pre class="dream-report-pre">${_escapeHtml(morning)}</pre></details>`
+            : "";
+        const rawJsonPanel = (typeof data.list_json_raw === "string" && data.list_json_raw.length > 0)
+            ? `<details class="dream-raw-details"><summary>Raw list.json</summary><pre class="dream-report-pre">${_escapeHtml(data.list_json_raw)}</pre></details>`
+            : "";
+
         const body = `
             <details class="dream-report-summary" open>
-                <summary>Morning report</summary>
+                <summary>Summary</summary>
                 ${morningHtml}
             </details>
+            ${rawSummaryPanel}
+            ${rawJsonPanel}
             ${_renderCaseIdeaCandidates(caseIdeas)}
             <div class="dream-section-heading">Items (${items.length})</div>
             ${items.map(it => _renderDreamItemCard(it, { date, runId })).join("")}
