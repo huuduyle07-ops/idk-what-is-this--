@@ -14,6 +14,40 @@ def dreams_root(repo_path: str) -> Path:
     return get_agent_dir(repo_path) / "dreams"
 
 
+_DREAM_META_FILENAME = "history_meta.json"
+
+
+def _dream_meta_path(repo_path: str) -> Path:
+    return dreams_root(repo_path) / _DREAM_META_FILENAME
+
+
+def read_dream_meta(repo_path: str) -> dict:
+    path = _dream_meta_path(repo_path)
+    if not path.is_file():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def write_dream_meta(repo_path: str, meta: dict) -> None:
+    path = _dream_meta_path(repo_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(path)
+
+
+def update_dream_entry(repo_path: str, run_key: str, **fields) -> dict:
+    meta = read_dream_meta(repo_path)
+    entry = dict(meta.get(run_key, {}))
+    entry.update(fields)
+    meta[run_key] = entry
+    write_dream_meta(repo_path, meta)
+    return entry
+
+
 def queue_path(repo_path: str) -> Path:
     return dreams_root(repo_path) / "queue.json"
 
@@ -162,7 +196,7 @@ def _flaky_case_item(result: dict, report_name: str) -> dict:
     return item
 
 
-def list_all_reports(repo_path: str) -> list[dict]:
+def list_all_reports(repo_path: str, include_archived: bool = False) -> list[dict]:
     """All past dream runs for this repo, newest first.
 
     Slice γ.3.1: each entry now has BOTH `date` (YYYY-MM-DD) and `run_id`
@@ -170,16 +204,27 @@ def list_all_reports(repo_path: str) -> list[dict]:
     sidebar uses both to identify a specific run; the `/dream/report` route
     accepts an optional `run` query param matching `run_id`.
 
-    Each entry is a small summary dict suitable for the sidebar:
-      {date, run_id, report_dir, item_count, statuses: {<status>: <count>},
-       patch_style, dream_mode, completed_at}
+    Entries with deleted=True are always hidden. Entries with archived=True
+    are hidden unless include_archived is set.
     """
+    meta = read_dream_meta(repo_path)
     summaries: list[dict] = []
     for date_str, run_id, report_dir in _iter_report_dirs(repo_path):
         list_path = report_dir / "list.json"
         try:
             data = json.loads(list_path.read_text(encoding="utf-8"))
         except Exception:
+            continue
+
+        run_key = f"{date_str}/{run_id}" if run_id else date_str
+        entry = meta.get(run_key, {})
+        archived = bool(entry.get("archived", False))
+        deleted = bool(entry.get("deleted", False))
+        pinned = bool(entry.get("pinned", False))
+
+        if deleted:
+            continue
+        if archived and not include_archived:
             continue
 
         items = data.get("items", []) or []
@@ -197,6 +242,9 @@ def list_all_reports(repo_path: str) -> list[dict]:
             "patch_style": data.get("patch_style"),
             "dream_mode": data.get("dream_mode"),
             "completed_at": data.get("completed_at"),
+            "archived": archived,
+            "pinned": pinned,
+            "deleted": deleted,
         })
     return summaries
 
