@@ -751,6 +751,13 @@ def dream_report_route():
     report["morning_report_html"] = render_dream_report_markdown(
         report.get("morning_report", "")
     )
+    _list_json_path = report_dir / "list.json"
+    try:
+        report["list_json_raw"] = (
+            _list_json_path.read_text(encoding="utf-8") if _list_json_path.is_file() else ""
+        )
+    except Exception:
+        report["list_json_raw"] = ""
     return report
 
 

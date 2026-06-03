@@ -299,3 +299,27 @@ def test_dream_routes_still_registered():
         "/dream/queue",
     ]:
         assert route in rules, f"route disappeared: {route}"
+
+
+def test_dream_report_route_exposes_list_json_raw(client, tmp_path, monkeypatch):
+    from core import dream_artifacts
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    dreams = tmp_path / "dreams"
+    date = "2026-06-02"
+    run = "030405-run"
+    report_dir = dreams / date / run
+    report_dir.mkdir(parents=True)
+    (report_dir / "dream_run_summary.md").write_text("# summary\n", encoding="utf-8")
+    list_payload = {"items": [{"idx": 1, "title": "x", "status": "planned_no_patch"}], "dream_mode": "plan_only"}
+    (report_dir / "list.json").write_text(json.dumps(list_payload), encoding="utf-8")
+    monkeypatch.setattr(dream_artifacts, "dreams_root", lambda repo_path: dreams)
+
+    resp = client.get(f"/dream/report?repo_path={repo}&date={date}&run={run}")
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert "list_json_raw" in body
+    assert isinstance(body["list_json_raw"], str)
+    parsed = json.loads(body["list_json_raw"])
+    assert "items" in parsed
