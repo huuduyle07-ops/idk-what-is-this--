@@ -3188,6 +3188,12 @@ function promoteDreamArtifact(date, runId, itemIdx, artifact) {
 let _lessonsLoaded = false;
 let _lessonsCurrentStatus = "";
 let _lessonsData = [];
+let _lessonsShowArchived = false;
+let _lessonsShowSuperseded = false;
+let _lessonsMergeSelectMode = false;
+let _lessonsMergeSelected = new Set();
+let _mergePreviewLessonIds = [];
+let _duplicateHintsLoaded = false;
 const _KNOWN_LESSON_LANGUAGES = new Set([
     "python", "go", "javascript", "typescript", "rust", "cpp", "java",
     "html", "ruby", "kotlin", "swift", "c", "bash", "sql"
@@ -3247,6 +3253,9 @@ function _applyLessonFilters() {
     const src  = (document.getElementById("lessonFilterSource")   || {}).value || "";
     const cat  = (document.getElementById("lessonFilterCategory") || {}).value || "";
     const diff = (document.getElementById("lessonFilterDifficulty") || {}).value || "";
+    const kind = (document.getElementById("lessonFilterKind") || {}).value || "";
+    const showArchived   = !!(document.getElementById("showArchivedLessons")   || {}).checked;
+    const showSuperseded = !!(document.getElementById("showSupersededLessons") || {}).checked;
 
     document.querySelectorAll("#lessonsList .lesson-card").forEach(card => {
         const lessonId = card.dataset.lessonId;
@@ -3257,6 +3266,9 @@ function _applyLessonFilters() {
         if (src  && (lesson.source || "") !== src)    show = false;
         if (cat  && _lessonCategory(lesson) !== cat)  show = false;
         if (diff && _lessonDifficulty(lesson) !== diff) show = false;
+        if (kind && (lesson.kind || "lesson") !== kind) show = false;
+        if (!showArchived   && lesson.archived)       show = false;
+        if (!showSuperseded && lesson.superseded_by)  show = false;
         card.hidden = !show;
     });
 }
@@ -3342,6 +3354,10 @@ function _renderLessonCard(lesson) {
     const repoScopeId = typeof lesson.repo_scope_id === "string" ? lesson.repo_scope_id : "";
     const scopeLabel = lessonScope === "repo" && repoScopeId ? `repo:${repoScopeId}` : "global";
     const scopeClass = lessonScope === "repo" ? "lesson-scope-badge--repo" : "lesson-scope-badge--global";
+    const archived = lesson.archived === true;
+    const supersededBy = lesson.superseded_by || null;
+    const mergeSources = Array.isArray(lesson.merge_sources) ? lesson.merge_sources : [];
+    const mergeSourcesCount = mergeSources.length;
 
     const idAttr = _escapeHtml(lesson.id || "");
     const scopeAttr = _escapeHtml(lessonScope);
@@ -3353,9 +3369,17 @@ function _renderLessonCard(lesson) {
     if (status === "candidate") {
         buttons.push(`<button type="button" onclick="promoteLessonById('${idAttr}', '${scopeAttr}', '${repoScopeAttr}')" title="Move to active">Promote</button>`);
         buttons.push(`<button type="button" class="lesson-btn--danger" onclick="blockLessonById('${idAttr}', '${scopeAttr}', '${repoScopeAttr}')" title="Move to blocked">Block</button>`);
+        buttons.push(`<button type="button" class="lesson-btn--secondary" onclick="archiveLessonById('${idAttr}', '${scopeAttr}', '${repoScopeAttr}')" title="Archive this lesson">Archive</button>`);
     } else if (status === "active") {
         buttons.push(`<button type="button" class="lesson-btn--danger" onclick="blockLessonById('${idAttr}', '${scopeAttr}', '${repoScopeAttr}')" title="Move to blocked">Block</button>`);
+        buttons.push(`<button type="button" class="lesson-btn--secondary" disabled title="Active lessons cannot be archived; supersede through merge instead.">Archive</button>`);
+    } else if (status === "blocked") {
+        buttons.push(`<button type="button" class="lesson-btn--secondary" onclick="archiveLessonById('${idAttr}', '${scopeAttr}', '${repoScopeAttr}')" title="Archive this lesson">Archive</button>`);
     }
+
+    const mergeCheckHtml = _lessonsMergeSelectMode
+        ? `<label class="lesson-merge-check"><input type="checkbox" data-merge-id="${idAttr}" ${_lessonsMergeSelected.has(lesson.id) ? "checked" : ""} onchange="toggleMergeSelection(this)"> Select</label>`
+        : "";
 
     const metaRows = [];
     if (lesson.source) metaRows.push(`<div><strong>source:</strong> ${_escapeHtml(lesson.source)}</div>`);
@@ -3382,11 +3406,15 @@ function _renderLessonCard(lesson) {
 
     return `
       <div class="lesson-card lesson-card--${_escapeHtml(status)}" data-lesson-id="${idAttr}">
+        ${mergeCheckHtml}
         <div class="lesson-card-header">
           <span class="lesson-title">${_escapeHtml(lesson.title || "Untitled lesson")}</span>
           <span class="lesson-badges">
             <span class="lesson-scope-badge ${scopeClass}" title="${_escapeHtml(scopeLabel)}">${_escapeHtml(scopeLabel)}</span>
             <span class="lesson-badge lesson-badge--${_escapeHtml(status)}">${_escapeHtml(status)}</span>
+            ${archived ? `<span class="lesson-badge lesson-badge--archived">archived</span>` : ""}
+            ${supersededBy ? `<span class="lesson-badge lesson-badge--superseded" title="Superseded by: ${_escapeHtml(supersededBy)}">superseded</span>` : ""}
+            ${mergeSourcesCount > 0 ? `<span class="lesson-badge lesson-badge--merged" title="Merged from ${mergeSourcesCount} sources">merged from ${mergeSourcesCount}</span>` : ""}
           </span>
         </div>
         ${tagsHtml}
