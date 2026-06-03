@@ -138,28 +138,38 @@ then ask the human before any merge/apply.
 
 ## Track F — Operator Assistant / Prompt Courier
 
+Status: shipped through F.4.
+
 ### Purpose:
 Reduce manual friction in Goal Brief and Mayor Mode by converting messy user intent into structured, reviewable task briefs and handoff notes.
 
-### F.1 Goal Brief Autocomplete
+Guardrail: Track F is draft/suggestion/prompt-generation only. It does not execute patches, validation, benchmarks, Dream runs, handoff creation, model/API calls, DB writes, Docker, subprocesses, or lesson promotion.
+
+### F.1 Goal Brief Autocomplete ✅
 - user writes messy request
 - assistant proposes structured Goal Brief fields
 - user edits/approves
 - no patch/model execution from this step
 
-### F.2 Handoff Composer
+### F.2 Handoff Composer ✅
 - convert Goal Brief into Mayor handoff note
 - fill title, allowed files, validation command, risk notes
 - keep "human_approved_for_proposal=false"
 
-### F.3 Mode Router
+### F.3 Mode Router ✅
 - suggest Debug Mode vs Project Evolution Mode vs Dream Trial
 - explanation only
 - user must confirm
 
-### F.4 Review Pack Generator
+### F.4 Review Pack Generator ✅
 - generate a final prompt for Claude/Codex/Gemini worker
 - include constraints, allowed files, validation, stop conditions
+
+Latest checkpoint:
+- Full pytest: 1993 passed, 1 warning
+- benchmark --check: 41 checked, 0 errors
+
+Future freeze: optional polish only.
 
 ---
 
