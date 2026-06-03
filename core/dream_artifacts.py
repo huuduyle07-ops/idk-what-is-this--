@@ -203,14 +203,18 @@ def list_all_reports(repo_path: str) -> list[dict]:
 
 def read_report(report_dir: Path) -> dict:
     """Full content of one dream run for the report viewer."""
-    morning_path = report_dir / "morning_report.txt"
+    # Prefer the new .md file; fall back to legacy .txt for pre-rename run dirs.
+    _summary_path = report_dir / "dream_run_summary.md"
+    if not _summary_path.exists():
+        _summary_path = report_dir / "morning_report.txt"
+
     list_path = report_dir / "list.json"
     case_ideas_path = report_dir / "case_ideas.json"
 
     morning = ""
-    if morning_path.exists():
+    if _summary_path.exists():
         try:
-            morning = morning_path.read_text(encoding="utf-8")
+            morning = _summary_path.read_text(encoding="utf-8")
         except Exception:
             morning = ""
 
