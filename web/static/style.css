@@ -1331,6 +1331,43 @@ button {
     color: #fde68a;
 }
 
+.handoff-draft-composer {
+    display: grid;
+    gap: 8px;
+    margin: 8px 0 12px;
+    padding: 10px;
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+}
+
+.handoff-draft-preview {
+    display: grid;
+    gap: 7px;
+}
+
+.handoff-draft-field {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 8px;
+    padding: 7px 8px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+}
+
+.handoff-draft-field span {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.handoff-draft-field strong {
+    font-size: 12px;
+    font-weight: 600;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
 .worker-run-detail {
     display: none;
     margin-top: 10px;

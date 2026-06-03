@@ -196,6 +196,19 @@ Reduce manual friction in Goal Brief and Mayor Mode by converting messy user int
 - replay summary
 - benchmark status
 
+### Reference Study: Scrapling + Arkon
+
+#### Goal:
+Evaluate whether Scrapling/WebBridge and Arkon can help C.A.T.T.U.S collect public documentation and build a dynamic AI-readable graph.
+
+#### Rules:
+- no anti-bot evasion goal
+- no scraping behind login
+- no CAPTCHA solving
+- no automatic browsing
+- no automatic patching
+- output only local research notes
+
 ---
 
 ## Deferred Ideas

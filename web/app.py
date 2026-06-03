@@ -2425,6 +2425,7 @@ def upload_folder():
 
 # --- Phase 7.1: Mayor Mode handoff routes ---------------------------------
 from core import handoff_notes as _handoff_notes
+from core import handoff_composer as _handoff_composer
 from scripts import run_subagent_handoff as _handoff_runner
 
 
@@ -2437,6 +2438,32 @@ def _split_csv(value: str | None) -> list[str]:
         if s and s not in out:
             out.append(s)
     return out
+
+
+@app.route("/handoffs/compose", methods=["POST"])
+def handoffs_compose_route():
+    if request.is_json:
+        payload = request.get_json(silent=True)
+        data = payload if isinstance(payload, dict) else {}
+    else:
+        data = request.form.to_dict()
+
+    goal_brief = data.get("goal_brief") if isinstance(data.get("goal_brief"), dict) else {}
+    result = _handoff_composer.compose_handoff_draft(
+        goal_brief=goal_brief,
+        repo_path=(str(data.get("repo_path") or "").strip() or None),
+        allowed_files=data.get("allowed_files"),
+        validation_command=(str(data.get("validation_command") or "").strip() or None),
+        title=data.get("title"),
+        task_summary=data.get("task_summary"),
+        forbidden_files=data.get("forbidden_files"),
+    )
+    draft = result["draft"]
+    return {
+        "ok": True,
+        "draft": draft,
+        "markdown": _handoff_composer.render_handoff_draft_markdown(draft),
+    }
 
 
 @app.route("/handoffs/create", methods=["POST"])

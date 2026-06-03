@@ -748,6 +748,16 @@
             <details class="handoff-create">
               <summary>+ Create new handoff</summary>
               <div class="handoff-create__body">
+                <section class="handoff-draft-composer" aria-label="Handoff composer">
+                  <div class="handoff-actions">
+                    <button type="button" onclick="composeHandoffDraftFromGoalBrief()">Compose handoff draft</button>
+                    <button type="button" id="handoffDraftUse" onclick="useHandoffDraftInForm()" disabled>Use in Handoff form</button>
+                  </div>
+                  <div id="handoffDraftPreview" class="handoff-draft-preview" aria-live="polite">
+                    <span class="goal-brief-muted">No handoff draft composed yet.</span>
+                  </div>
+                </section>
+
                 <label>Title
                   <input type="text" id="handoffTitle" placeholder="Fix flaky fixtures in foo">
                 </label>
@@ -3351,6 +3361,98 @@ async function launchMcpInspector(target) {
 }
 
 // Phase 7.1 — Handoffs (Mayor Mode)
+let _handoffDraftCurrent = null;
+
+function _handoffDraftValue(value) {
+    if (Array.isArray(value)) return value.length ? value.join("\n") : "None";
+    if (value === false) return "false";
+    if (value === true) return "true";
+    return String(value || "").trim() || "Missing";
+}
+
+function _renderHandoffDraftPreview(draft) {
+    const preview = document.getElementById("handoffDraftPreview");
+    const useButton = document.getElementById("handoffDraftUse");
+    if (!preview) return;
+    if (!draft) {
+        preview.innerHTML = '<span class="goal-brief-muted">No handoff draft composed yet.</span>';
+        if (useButton) useButton.disabled = true;
+        return;
+    }
+    const fields = [
+        ["Title", draft.title],
+        ["Summary", draft.task_summary],
+        ["Repo", draft.repo_path],
+        ["Allowed", draft.allowed_files],
+        ["Forbidden", draft.forbidden_files],
+        ["Validation", draft.validation_command],
+        ["Risks", draft.risk_notes],
+        ["Stop", draft.stop_conditions],
+        ["Approved", draft.human_approved_for_proposal],
+        ["Safety", draft.safety_notes],
+        ["Questions", draft.open_questions],
+    ];
+    preview.innerHTML = fields.map(([label, value]) => `
+        <div class="handoff-draft-field">
+          <span>${_escapeHtml(label)}</span>
+          <strong>${_escapeHtml(_handoffDraftValue(value))}</strong>
+        </div>
+    `).join("");
+    if (useButton) useButton.disabled = false;
+}
+
+async function composeHandoffDraftFromGoalBrief() {
+    const status = document.getElementById("handoffCreateStatus");
+    const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
+    const fallbackGoal = {
+        goal: document.getElementById("handoffTitle")?.value.trim() || document.getElementById("goalBriefGoal")?.value.trim() || "",
+        problem_statement: document.getElementById("handoffContext")?.value.trim() || "",
+        constraints: { allowed_files: document.getElementById("handoffAllowed")?.value.trim() || "" },
+        validation: { command: document.getElementById("handoffValidation")?.value.trim() || "" },
+    };
+    const goalBrief = _goalBriefCurrent || fallbackGoal;
+    if (status) status.textContent = "Composing handoff draft...";
+    try {
+        const resp = await fetch("/handoffs/compose", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ goal_brief: goalBrief, repo_path: repo }),
+        });
+        const body = await resp.json();
+        if (!body.ok) {
+            _handoffDraftCurrent = null;
+            _renderHandoffDraftPreview(null);
+            if (status) status.textContent = "Error: " + (body.error || "unknown");
+            return;
+        }
+        _handoffDraftCurrent = body.draft || null;
+        _renderHandoffDraftPreview(_handoffDraftCurrent);
+        if (status) status.textContent = "Handoff draft composed. Review before creating a note.";
+    } catch (e) {
+        if (status) status.textContent = "Error: " + e.message;
+    }
+}
+
+function useHandoffDraftInForm() {
+    const draft = _handoffDraftCurrent;
+    const status = document.getElementById("handoffCreateStatus");
+    if (!draft) {
+        if (status) status.textContent = "Compose handoff draft first.";
+        return;
+    }
+    const title = document.getElementById("handoffTitle");
+    const allowed = document.getElementById("handoffAllowed");
+    const validation = document.getElementById("handoffValidation");
+    const context = document.getElementById("handoffContext");
+    const expected = document.getElementById("handoffExpected");
+    if (title) title.value = draft.title || "";
+    if (allowed) allowed.value = (draft.allowed_files || []).join(",");
+    if (validation) validation.value = draft.validation_command || "";
+    if (context) context.value = draft.task_summary || "";
+    if (expected) expected.value = "proposal.md and patch_plan.json";
+    if (status) status.textContent = "Handoff draft copied into form fields.";
+}
+
 async function refreshHandoffs() {
     const status = document.getElementById("handoffsStatus");
     const list = document.getElementById("handoffsList");
