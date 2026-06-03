@@ -877,11 +877,28 @@
           <div class="memory-section lessons-section">
             <div class="lessons-header">
               <strong>Lessons</strong>
+              <button type="button" class="sidebar-refresh" onclick="loadLessons(true)" title="Refresh lessons list">&#x27F3; Refresh</button>
+              <button type="button" id="mergeSelectToggle" onclick="toggleMergeSelectMode()" title="Select 2+ lessons to merge">Merge lessons</button>
+            </div>
+            <div id="mergeSelectBar" class="lessons-merge-bar" hidden>
+              <span id="mergeSelectCount">0 selected</span>
+              <button type="button" id="previewMergeBtn" onclick="previewMergeSelected()" disabled>Preview merge</button>
+              <button type="button" onclick="exitMergeSelectMode()">Cancel</button>
             </div>
             <div class="lessons-note">
               Only <strong>Active</strong> lessons will be retrieval-eligible in future phases.
               Only Active lessons can be used as patch-prompt hints, and only when LESSON_RETRIEVAL_ENABLED=true.
             </div>
+            <details id="duplicateHintsPanel" class="lesson-duplicate-hints"
+                     ontoggle="if(this.open) loadDuplicateHints(false)">
+              <summary class="lesson-duplicate-hints__summary">Duplicate hints</summary>
+              <div class="lesson-duplicate-hints__toolbar">
+                <button type="button" onclick="loadDuplicateHints(true)" title="Reload duplicate hints">&#x27F3; Refresh hints</button>
+              </div>
+              <div id="duplicateHintsList" class="lesson-duplicate-hints__list">
+                <div class="health-empty">Open to load duplicate hints.</div>
+              </div>
+            </details>
             <div class="lessons-filters" role="group" aria-label="Lesson filter">
               <button type="button" class="lessons-filter lessons-filter--active"
                       data-status="" onclick="filterLessons('')">All</button>
@@ -909,6 +926,20 @@
                       style="display:none">
                 <option value="">All difficulties</option>
               </select>
+              <span class="lessons-filter-sep" aria-hidden="true">|</span>
+              <select id="lessonFilterKind" class="lessons-filter-select"
+                      onchange="_applyLessonFilters()" title="Filter by kind">
+                <option value="">All kinds</option>
+                <option value="lesson">lesson</option>
+                <option value="anti-lesson">anti-lesson</option>
+              </select>
+              <span class="lessons-filter-sep" aria-hidden="true">|</span>
+              <label class="lessons-filter-toggle" title="Show archived lessons (hidden by default)">
+                <input type="checkbox" id="showArchivedLessons" onchange="_applyLessonFilters()"> Show archived
+              </label>
+              <label class="lessons-filter-toggle" title="Show superseded lessons (hidden by default)">
+                <input type="checkbox" id="showSupersededLessons" onchange="_applyLessonFilters()"> Show superseded
+              </label>
             </div>
             <div id="lessonsStatus" class="lessons-status"></div>
             <div id="lessonsList" class="lessons-list">
