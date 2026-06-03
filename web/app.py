@@ -43,6 +43,8 @@ from core import dream_artifacts
 from core import dream_taxonomy
 from core import benchmark_web
 from core import lesson_store
+from core import lesson_duplicates
+from core import lesson_merge
 from core import goal_brief as goal_brief_core
 from core import goal_brief_autocomplete as goal_brief_autocomplete_core
 from core import mode_router as mode_router_core
@@ -2405,6 +2407,143 @@ def lessons_block_route():
         return {"ok": False, "error": str(e)}, 400
     except Exception as e:
         return {"ok": False, "error": f"failed to block lesson: {type(e).__name__}"}, 500
+    return {"ok": True, "lesson": record}
+
+
+@app.route("/lessons/duplicates", methods=["GET"])
+def lessons_duplicates_route():
+    """Return duplicate hint groups for the current lesson set.
+
+    Query params: status?, scope?, repo_path?, repo_scope_id?, include_global?
+    """
+    repo_path = _lesson_repo_path(request.values.get("repo_path"))
+    status = (request.values.get("status") or "").strip() or None
+    scope = _lesson_scope_arg(request.values.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(request.values.get("repo_scope_id"))
+    include_global = (request.values.get("include_global") or "true").lower() != "false"
+    if status is not None and status not in lesson_store.LESSON_STATUSES:
+        return {"ok": False, "error": f"invalid status: {status!r}"}, 400
+    try:
+        lessons = lesson_store.list_lessons(
+            status=status,
+            repo_path=repo_path,
+            include_global=include_global,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+        )
+        groups = lesson_duplicates.find_duplicate_groups(lessons)
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"failed to find duplicates: {type(e).__name__}"}, 500
+    return {"ok": True, "groups": groups}
+
+
+@app.route("/lessons/merge/preview", methods=["POST"])
+def lessons_merge_preview_route():
+    """Preview a merged lesson without writing anything.
+
+    JSON body: {lesson_ids: [str, ...], title?: str, summary?: str, tags?: [str]}
+    """
+    payload = request.get_json(silent=True) or {}
+    repo_path = _lesson_repo_path(payload.get("repo_path"))
+    scope = _lesson_scope_arg(payload.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(payload.get("repo_scope_id"))
+    lesson_ids = payload.get("lesson_ids")
+    if not isinstance(lesson_ids, list) or len(lesson_ids) < 2:
+        return {"ok": False, "error": "lesson_ids must be a list of at least 2 IDs"}, 400
+    title = payload.get("title") or None
+    summary = payload.get("summary") or None
+    raw_tags = payload.get("tags")
+    tags = raw_tags if isinstance(raw_tags, list) else None
+    try:
+        lessons = [
+            lesson_store.get_lesson_by_id(
+                lid, repo_path=repo_path, scope=scope, repo_scope_id=repo_scope_id
+            )
+            for lid in lesson_ids
+        ]
+        record, warnings = lesson_merge.preview_merge(
+            lessons, title=title, summary=summary, tags=tags
+        )
+    except LookupError as e:
+        return {"ok": False, "error": str(e)}, 404
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"preview failed: {type(e).__name__}"}, 500
+    return {"ok": True, "preview": record, "warnings": warnings}
+
+
+@app.route("/lessons/merge/create", methods=["POST"])
+def lessons_merge_create_route():
+    """Create a merged lesson candidate.
+
+    JSON body: {lesson_ids, title, summary, tags,
+                confirm_supersede_active?: bool, confirm_mix_kinds?: bool,
+                scope?, repo_path?, repo_scope_id?}
+    """
+    payload = request.get_json(silent=True) or {}
+    repo_path = _lesson_repo_path(payload.get("repo_path"))
+    scope = _lesson_scope_arg(payload.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(payload.get("repo_scope_id"))
+    lesson_ids = payload.get("lesson_ids")
+    if not isinstance(lesson_ids, list) or len(lesson_ids) < 2:
+        return {"ok": False, "error": "lesson_ids must be a list of at least 2 IDs"}, 400
+    title = (payload.get("title") or "").strip()
+    if not title:
+        return {"ok": False, "error": "title is required"}, 400
+    summary = payload.get("summary") or ""
+    tags = payload.get("tags") if isinstance(payload.get("tags"), list) else []
+    confirm_supersede_active = payload.get("confirm_supersede_active") is True
+    confirm_mix_kinds = payload.get("confirm_mix_kinds") is True
+    try:
+        new_record, superseded = lesson_merge.create_merge(
+            lesson_ids,
+            title,
+            summary,
+            tags,
+            repo_path=repo_path,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+            confirm_supersede_active=confirm_supersede_active,
+            confirm_mix_kinds=confirm_mix_kinds,
+        )
+    except LookupError as e:
+        return {"ok": False, "error": str(e)}, 404
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"merge failed: {type(e).__name__}"}, 500
+    return {"ok": True, "lesson": new_record, "superseded": superseded}
+
+
+@app.route("/lessons/archive", methods=["POST"])
+def lessons_archive_route():
+    """Archive a candidate or blocked lesson (set archived=True).
+
+    JSON body: {lesson_id, scope?, repo_path?, repo_scope_id?}
+    """
+    payload = request.get_json(silent=True) or {}
+    repo_path = _lesson_repo_path(payload.get("repo_path"))
+    scope = _lesson_scope_arg(payload.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(payload.get("repo_scope_id"))
+    lesson_id = (payload.get("lesson_id") or "").strip()
+    if not lesson_id:
+        return {"ok": False, "error": "lesson_id is required"}, 400
+    try:
+        record = lesson_merge.archive_lesson(
+            lesson_id,
+            repo_path=repo_path,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+        )
+    except LookupError as e:
+        return {"ok": False, "error": str(e)}, 404
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"archive failed: {type(e).__name__}"}, 500
     return {"ok": True, "lesson": record}
 
 
