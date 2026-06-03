@@ -20,6 +20,13 @@ NEW_HELD_OUT_CASES = [
     "ts_migration_import_path_case",
 ]
 
+NEW_HELD_OUT_CASES_11PREP = [
+    "cpp_string_view_lifetime_trap",
+    "csharp_linq_deferred_execution_trap",
+    "rust_path_normalization_security_trap",
+    "ts_async_cache_stale_promise_trap",
+]
+
 HELD_OUT_CASES = [
     "ts_nested_dispatch_root_cause",
     "python_multifile_root_cause",
@@ -29,6 +36,7 @@ HELD_OUT_CASES = [
     "ts_callback_dispatch_ambiguity",
     "ts_false_positive_no_patch",
     *NEW_HELD_OUT_CASES,
+    *NEW_HELD_OUT_CASES_11PREP,
 ]
 
 
@@ -202,7 +210,7 @@ def test_full_discovery_matches_full_suite_manifest():
     discovered_names = sorted(runner.load_case(case_file)["name"] for case_file in cases)
     full_manifest = runner.load_suite_manifest("full_v1")
 
-    assert len(discovered_names) == 41
+    assert len(discovered_names) == 50
     assert discovered_names == sorted(full_manifest["case_names"])
 
 

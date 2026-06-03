@@ -1,0 +1,13 @@
+{
+  "name": "rust_path_normalization_security_trap",
+  "language": "rust",
+  "category": "security",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "cargo run",
+  "expected_changed_files": ["src/path_guard.rs"],
+  "forbidden_changed_files": ["src/main.rs", "Cargo.toml"],
+  "allowed_generated_files": [],
+  "prompt": "Fix the Rust path traversal security bug in src/path_guard.rs.\n\nRequirements:\n- Modify src/path_guard.rs only.\n- safe_resolve must return None for any user_input that resolves to a path outside base after normalising '..' components.\n- safe_resolve must return Some(resolved_path) for inputs that stay within base.\n- Do not use std::fs::canonicalize (filesystem access not required).\n- Do not modify src/main.rs or Cargo.toml.\n- Do not create new files.\n- Use patch_candidate if only safe_resolve changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: cargo run"
+}

@@ -590,6 +590,7 @@ LANGUAGE_TOOLCHAINS: dict[str, list[str]] = {
     "c": ["gcc"],
     "javascript": ["node"],
     "typescript": ["node"],
+    "csharp": ["dotnet"],
     "html": [],
 }
 
@@ -599,6 +600,7 @@ LANGUAGE_TOOLCHAINS: dict[str, list[str]] = {
 _VALIDATION_TOOL_ALLOWLIST = {
     "python", "python3", "node", "npm", "npx",
     "go", "cargo", "rustc", "g++", "gcc", "make",
+    "dotnet",
 }
 
 

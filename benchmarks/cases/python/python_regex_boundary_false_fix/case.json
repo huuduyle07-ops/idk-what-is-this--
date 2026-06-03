@@ -1,0 +1,13 @@
+{
+  "name": "python_regex_boundary_false_fix",
+  "language": "python",
+  "category": "logic_error",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python main.py",
+  "expected_changed_files": ["regex_utils.py"],
+  "forbidden_changed_files": ["main.py"],
+  "allowed_generated_files": [],
+  "prompt": "Fix the Python regex word-boundary bug in regex_utils.py.\n\nRequirements:\n- Modify regex_utils.py only.\n- count_word must count occurrences of word only when it appears as a standalone word (not as a substring of a larger word).\n- The match must be case-insensitive.\n- Do not modify main.py.\n- Do not create new files.\n- Use patch_candidate if only count_word changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python main.py"
+}

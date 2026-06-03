@@ -1,0 +1,6 @@
+[package]
+name = "rust_path_normalization_security_trap"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]

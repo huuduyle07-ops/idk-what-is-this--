@@ -167,7 +167,7 @@ Guardrail: Track F is draft/suggestion/prompt-generation only. It does not execu
 
 Latest checkpoint:
 - Full pytest: 1993 passed, 1 warning
-- benchmark --check: 41 checked, 0 errors
+- benchmark --check: 50 checked, 0 errors
 
 Future freeze: optional polish only.
 

@@ -1,0 +1,13 @@
+{
+  "name": "ts_async_cache_stale_promise_trap",
+  "language": "typescript",
+  "category": "async_error",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "node --experimental-strip-types main.ts",
+  "expected_changed_files": ["cache.ts"],
+  "forbidden_changed_files": ["main.ts"],
+  "allowed_generated_files": [],
+  "prompt": "Fix the TypeScript async cache bug in cache.ts.\n\nRequirements:\n- Modify cache.ts only.\n- cachedFetch must return the same value for the same key without calling fetcher again.\n- The cache key must be consistent between storage and lookup.\n- Do not modify main.ts.\n- Do not create new files.\n- Use patch_candidate if only cachedFetch changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: node --experimental-strip-types main.ts"
+}

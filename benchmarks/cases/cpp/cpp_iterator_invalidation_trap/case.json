@@ -1,0 +1,13 @@
+{
+  "name": "cpp_iterator_invalidation_trap",
+  "language": "cpp",
+  "category": "logic_error",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python validate.py",
+  "expected_changed_files": ["filter.cpp"],
+  "forbidden_changed_files": ["main.cpp", "filter.h", "validate.py"],
+  "allowed_generated_files": [],
+  "prompt": "Fix the C++ iterator invalidation bug.\n\nRequirements:\n- Modify filter.cpp only.\n- remove_negatives must erase all negative elements from the vector.\n- remove_negatives must return the count of removed elements.\n- Elements at adjacent positions must all be removed (not skipped).\n- Positive elements must remain unchanged in their original order.\n- Do not modify main.cpp, filter.h, or validate.py.\n- Do not create new files.\n- Use patch_candidate if only remove_negatives changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python validate.py"
+}

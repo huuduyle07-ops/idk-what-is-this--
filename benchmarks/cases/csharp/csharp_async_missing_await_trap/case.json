@@ -1,0 +1,13 @@
+{
+  "name": "csharp_async_missing_await_trap",
+  "language": "csharp",
+  "category": "async_error",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "dotnet run",
+  "expected_changed_files": ["DataService.cs"],
+  "forbidden_changed_files": ["Program.cs", "App.csproj"],
+  "allowed_generated_files": [],
+  "prompt": "Fix the C# async/await bug in DataService.cs.\n\nRequirements:\n- Modify DataService.cs only.\n- SummarizeAsync must return \"Total: 42\" (the integer value, not the Task object).\n- GetCountAsync must be awaited.\n- Do not modify Program.cs or App.csproj.\n- Do not create new files.\n- Use patch_candidate if only SummarizeAsync changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: dotnet run"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "rust_error_context_breaks_matching",
+  "language": "rust",
+  "category": "error_handling",
+  "difficulty": "easy",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "cargo run",
+  "expected_changed_files": ["src/parse.rs"],
+  "forbidden_changed_files": ["src/main.rs", "Cargo.toml"],
+  "allowed_generated_files": [],
+  "prompt": "Fix the Rust error variant bug in src/parse.rs.\n\nRequirements:\n- Modify src/parse.rs only.\n- parse_field must return Err(ParseError::Empty) for empty and whitespace-only input.\n- parse_field must return Err(ParseError::Invalid) for non-numeric input.\n- parse_field must return Ok(value) for valid integer strings (with optional whitespace).\n- Do not modify src/main.rs or Cargo.toml.\n- Do not create new files.\n- Use patch_candidate if only parse_field changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: cargo run"
+}

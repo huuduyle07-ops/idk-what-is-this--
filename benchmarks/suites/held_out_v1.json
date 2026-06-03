@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "suite_id": "held_out_v1",
-  "description": "Held-out AgentBench v1 split for harder or adversarial cases.",
+  "description": "Held-out AgentBench v1 split for harder or adversarial cases. Includes 4 new Phase 11-prep held-out cases: cpp_string_view_lifetime_trap, csharp_linq_deferred_execution_trap, rust_path_normalization_security_trap, ts_async_cache_stale_promise_trap.",
   "case_names": [
     "ts_nested_dispatch_root_cause",
     "python_multifile_root_cause",
@@ -13,6 +13,10 @@
     "python_embedding_provider_switch",
     "rust_multi_file_trait_impl_root_cause",
     "python_forbidden_file_temptation",
-    "ts_migration_import_path_case"
+    "ts_migration_import_path_case",
+    "cpp_string_view_lifetime_trap",
+    "csharp_linq_deferred_execution_trap",
+    "rust_path_normalization_security_trap",
+    "ts_async_cache_stale_promise_trap"
   ]
 }

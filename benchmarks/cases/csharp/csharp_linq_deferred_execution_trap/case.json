@@ -1,0 +1,13 @@
+{
+  "name": "csharp_linq_deferred_execution_trap",
+  "language": "csharp",
+  "category": "logic_error",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "dotnet run",
+  "expected_changed_files": ["ScoreReport.cs"],
+  "forbidden_changed_files": ["Program.cs", "App.csproj"],
+  "allowed_generated_files": [],
+  "prompt": "Fix the C# LINQ deferred execution bug in ScoreReport.cs.\n\nRequirements:\n- Modify ScoreReport.cs only.\n- GetPassing must return a snapshot of matching scores at the time of the call.\n- Subsequent mutations to the scores list must not affect the returned collection.\n- The return type must remain IEnumerable<int>.\n- Do not modify Program.cs or App.csproj.\n- Do not create new files.\n- Use patch_candidate if only GetPassing changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: dotnet run"
+}

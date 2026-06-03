@@ -1,0 +1,13 @@
+{
+  "name": "cpp_string_view_lifetime_trap",
+  "language": "cpp",
+  "category": "logic_error",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "python validate.py",
+  "expected_changed_files": ["processor.cpp"],
+  "forbidden_changed_files": ["main.cpp", "processor.h", "validate.py"],
+  "allowed_generated_files": [],
+  "prompt": "Fix the C++ string_view extraction bug.\n\nRequirements:\n- Modify processor.cpp only.\n- extract_bracket_content must return the content between the outermost '[' and ']' in input.\n- The '[' and ']' delimiters must NOT be included in the return value.\n- If no valid bracket pair exists, return an empty string_view.\n- Do not modify main.cpp, processor.h, or validate.py.\n- Do not create new files.\n- Use patch_candidate if only extract_bracket_content changes.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: python validate.py"
+}
