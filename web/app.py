@@ -57,6 +57,7 @@ from web.routes.dream_trials_routes import bp as dream_trials_routes_bp
 from web.routes.dream_references_routes import bp as dream_references_routes_bp
 from web.routes.harness_controls_routes import bp as harness_controls_routes_bp
 from web.routes.replay_routes import bp as replay_routes_bp
+from web.routes.history_routes import bp as history_routes_bp
 from graph.builder import build_graph_from_repo
 from graph.exporter import safe_id, escape_mermaid_label
 from web.graph_evidence import (
@@ -72,6 +73,7 @@ app.register_blueprint(dream_trials_routes_bp)
 app.register_blueprint(dream_references_routes_bp)
 app.register_blueprint(harness_controls_routes_bp)
 app.register_blueprint(replay_routes_bp)
+app.register_blueprint(history_routes_bp)
 
 WEB_DIR = Path(__file__).parent
 from web.session_store import load_sessions, save_sessions, find_session
@@ -678,7 +680,8 @@ def dream_reports_route():
     repo_path = request.values.get("repo_path", "").strip()
     if not repo_path or not Path(repo_path).is_dir():
         return {"error": f"repo_path is not a directory: {repo_path}"}
-    return {"reports": dream_artifacts.list_all_reports(repo_path)}
+    include_archived = request.values.get("include_archived", "").strip() in {"1", "true", "yes"}
+    return {"reports": dream_artifacts.list_all_reports(repo_path, include_archived=include_archived)}
 
 
 @app.route("/dream/report", methods=["GET"])
@@ -1218,8 +1221,9 @@ def benchmarks_list_route():
     repo_path = request.values.get("repo_path", "").strip()
     if not repo_path or not Path(repo_path).is_dir():
         return {"error": f"repo_path is not a directory: {repo_path}"}
+    include_archived = request.values.get("include_archived", "").strip() in {"1", "true", "yes"}
     from core.benchmarks_view import list_benchmark_reports
-    return {"reports": list_benchmark_reports(repo_path)}
+    return {"reports": list_benchmark_reports(repo_path, include_archived=include_archived)}
 
 
 @app.route("/benchmarks/cases", methods=["GET"])
