@@ -74,6 +74,7 @@ app.register_blueprint(harness_controls_routes_bp)
 app.register_blueprint(replay_routes_bp)
 
 WEB_DIR = Path(__file__).parent
+from scripts.run_patch_proposal_queue import PROPOSAL_ROOT as _DREAM_PROPOSAL_ROOT
 SESSION_FILE = WEB_DIR / "sessions.json"
 BACKUP_DIR = WEB_DIR / "backups"
 BACKUP_DIR.mkdir(exist_ok=True)
@@ -1640,6 +1641,226 @@ def dream_proposals_status():
     """Poll endpoint for the in-flight proposal run."""
     from core.proposal_runner import get_status
     return get_status()
+
+
+@app.route("/dream/create-lesson-candidate", methods=["POST"])
+def dream_create_lesson_candidate_route():
+    """Create a candidate lesson from any eligible Dream item (not just ready_to_apply).
+
+    Never calls any model, patch executor, validation command, or subprocess.
+    Always produces a candidate-bucket lesson with active_knowledge_allowed=False.
+    Promotion requires an explicit Promote click in the Memory tab.
+    """
+    import config as _cfg
+    from core import lesson_store as _ls
+    from core.dream_artifacts import resolve_run_dir, load_item_for_promotion
+    import re as _re
+
+    repo_path = request.form.get("repo_path", "").strip() or None
+    date = request.form.get("date", "").strip()
+    run = request.form.get("run", "").strip()
+    item_idx_raw = request.form.get("item_idx", "").strip()
+
+    if not item_idx_raw:
+        return {"ok": False, "error": "item_idx is required"}, 400
+    try:
+        item_idx = int(item_idx_raw)
+    except ValueError:
+        return {"ok": False, "error": "item_idx must be an integer"}, 400
+
+    if not date or not run:
+        return {"ok": False, "error": "date and run are required"}, 400
+
+    if not _re.match(r"^\d{4}-\d{2}-\d{2}$", date):
+        return {"ok": False, "error": "invalid date format"}, 400
+    if not _re.match(r"^[\w.-]{1,64}$", run):
+        return {"ok": False, "error": "invalid run id format"}, 400
+
+    try:
+        report_dir = dream_artifacts.resolve_run_dir(repo_path or "", date, run)
+    except (ValueError, FileNotFoundError) as e:
+        return {"ok": False, "error": str(e)}, 400
+
+    try:
+        _list_data, item = load_item_for_promotion(report_dir, item_idx)
+    except (LookupError, RuntimeError, FileNotFoundError) as e:
+        return {"ok": False, "error": str(e)}, 404
+
+    candidate = {
+        "title": item.get("title", ""),
+        "hint": item.get("hint", ""),
+        "kind": item.get("kind", ""),
+        "source": "dream",
+        "case_name": item.get("case_name") or None,
+        "language": item.get("language", ""),
+        "category": item.get("category", ""),
+        "item_status": item.get("status", ""),
+        "dream_ref": f"{date}/{run}/{item.get('item_dir_name', str(item_idx))}",
+    }
+
+    # Force LESSON_AUTO_ACTIVE off — candidate must never land in active/.
+    _prev = getattr(_cfg, "LESSON_AUTO_ACTIVE", False)
+    _cfg.LESSON_AUTO_ACTIVE = False
+    try:
+        record = _ls.save_candidate_lesson(
+            candidate,
+            source="dream",
+            source_report=f"{date}/{run}",
+            case_name=candidate["case_name"],
+            title=f"Dream item: {item.get('title', 'untitled')}",
+            summary=item.get("hint", ""),
+            repo_path=repo_path,
+        )
+    except Exception as e:
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}, 500
+    finally:
+        _cfg.LESSON_AUTO_ACTIVE = _prev
+
+    return {
+        "ok": True,
+        "lesson_id": record.get("id"),
+        "status": record.get("status"),
+        "active_knowledge_allowed": record.get("active_knowledge_allowed", False),
+        "scope": record.get("scope"),
+    }
+
+
+@app.route("/dream/create-proposal", methods=["POST"])
+def dream_create_proposal_route():
+    """Write a static proposal draft (proposal.md + proposal.json + item.json)
+    to .agent/proposals/dream-<date>-<run>/<item_dir_name>/.
+
+    No model call, no subprocess, no patch execution.
+    """
+    from core.dream_artifacts import resolve_run_dir, load_item_for_promotion
+    import re as _re
+
+    repo_path = request.form.get("repo_path", "").strip() or None
+    date = request.form.get("date", "").strip()
+    run = request.form.get("run", "").strip()
+    item_idx_raw = request.form.get("item_idx", "").strip()
+
+    if not item_idx_raw:
+        return {"ok": False, "error": "item_idx is required"}, 400
+    try:
+        item_idx = int(item_idx_raw)
+    except ValueError:
+        return {"ok": False, "error": "item_idx must be an integer"}, 400
+
+    if not date or not _re.match(r"^\d{4}-\d{2}-\d{2}$", date):
+        return {"ok": False, "error": "invalid date format"}, 400
+    if not run or not _re.match(r"^[\w.-]{1,64}$", run):
+        return {"ok": False, "error": "invalid run id format"}, 400
+
+    try:
+        report_dir = dream_artifacts.resolve_run_dir(repo_path or "", date, run)
+    except (ValueError, FileNotFoundError) as e:
+        return {"ok": False, "error": str(e)}, 400
+
+    try:
+        _list_data, item = load_item_for_promotion(report_dir, item_idx)
+    except (LookupError, RuntimeError, FileNotFoundError) as e:
+        return {"ok": False, "error": str(e)}, 404
+
+    item_dir_name = item.get("item_dir_name") or dream_artifacts.slugify(
+        f"{item_idx:02d}-{item.get('title', 'item')}"
+    )
+    run_label = f"dream-{date}-{run}"
+    proposal_dir = _DREAM_PROPOSAL_ROOT / run_label / item_dir_name
+    try:
+        proposal_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as e:
+        return {"ok": False, "error": f"could not create proposal dir: {e}"}, 500
+
+    now_iso = datetime.now().isoformat(timespec="seconds")
+    title = item.get("title", "untitled")
+    hint = item.get("hint", "")
+    status = item.get("status", "unknown")
+    kind = item.get("kind", "?")
+    blockers = item.get("patch_blockers") or []
+
+    proposal_json = {
+        "source": "dream",
+        "date": date,
+        "run_id": run,
+        "item_idx": item_idx,
+        "title": title,
+        "hint": hint,
+        "kind": kind,
+        "status": status,
+        "patch_blockers": blockers,
+        "created_at": now_iso,
+        "human_review_required": True,
+    }
+
+    item_json = {
+        "case_name": item.get("case_name") or dream_artifacts.slugify(title),
+        "title": title,
+        "hint": hint,
+        "source": "dream",
+        "created_at": now_iso,
+    }
+
+    blocker_lines = []
+    for b in blockers:
+        code = b.get("code", "unknown")
+        msg = b.get("message", "")
+        hint_text = b.get("override_hint", "")
+        blocker_lines.append(f"- `{code}`: {msg}")
+        if hint_text:
+            blocker_lines.append(f"  - *Override path*: {hint_text}")
+
+    evidence_link = ""
+    if item.get("item_dir_name"):
+        evidence_link = f"\n**Evidence:** [{item['item_dir_name']}/](./{item['item_dir_name']}/)\n"
+
+    proposal_md_lines = [
+        f"# Proposal draft: {title}",
+        "",
+        "> **Human review required.** This is a static draft generated from a Dream",
+        "> item. It has not been validated, patched, or reviewed by any model.",
+        "> Review the content below and decide whether to create a candidate lesson.",
+        "",
+        f"**Kind:** {kind}  ",
+        f"**Status at creation:** {status}  ",
+        f"**Created:** {now_iso}",
+        f"**Dream run:** {date} / {run}",
+        "",
+    ]
+    if hint:
+        proposal_md_lines += [
+            "## Suspected root cause",
+            "",
+            hint,
+            "",
+        ]
+    if blocker_lines:
+        proposal_md_lines += ["## Why no patch", ""] + blocker_lines + [""]
+    if evidence_link:
+        proposal_md_lines.append(evidence_link)
+    proposal_md_lines += [
+        "## Next steps",
+        "",
+        "1. Review this draft.",
+        "2. If the root cause is confirmed, click **Create candidate lesson** on the Dream item card.",
+        "3. Promote the candidate lesson in the Memory → Lessons tab once it looks correct.",
+        "",
+    ]
+
+    try:
+        (proposal_dir / "proposal.json").write_text(
+            json.dumps(proposal_json, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+        (proposal_dir / "item.json").write_text(
+            json.dumps(item_json, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+        (proposal_dir / "proposal.md").write_text(
+            "\n".join(proposal_md_lines), encoding="utf-8"
+        )
+    except OSError as e:
+        return {"ok": False, "error": f"write failed: {e}"}, 500
+
+    return {"ok": True, "proposal_dir": str(proposal_dir)}
 
 
 @app.route("/session/<session_id>")
