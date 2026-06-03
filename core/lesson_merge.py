@@ -10,10 +10,11 @@ from core.lesson_store import (
     _coerce_tags,
     get_lesson_by_id,
     patch_lesson_fields,
-    save_raw_lesson_record,
-    _generate_lesson_id,
-    _lessons_root,
-    _now_iso,
+    # Used by create_merge (Task 4):
+    save_raw_lesson_record,  # noqa: F401
+    _generate_lesson_id,  # noqa: F401
+    _lessons_root,  # noqa: F401
+    _now_iso,  # noqa: F401
 )
 
 
@@ -32,7 +33,7 @@ def _union_tags(lessons: list[dict]) -> list[str]:
 
 
 def _join_summaries(lessons: list[dict]) -> str:
-    parts = [l.get("summary", "").strip() for l in lessons if l.get("summary", "").strip()]
+    parts = [lesson.get("summary", "").strip() for lesson in lessons if lesson.get("summary", "").strip()]
     joined = " | ".join(parts)
     if len(joined) > _MAX_SUMMARY_CHARS:
         return joined[:_MAX_SUMMARY_CHARS] + "…"
@@ -56,24 +57,24 @@ def preview_merge(
 
     warnings: list[str] = []
 
-    active_ids = [l["id"] for l in lessons if l.get("status") == STATUS_ACTIVE]
+    active_ids = [lesson["id"] for lesson in lessons if lesson.get("status") == STATUS_ACTIVE]
     if active_ids:
         warnings.append(f"{len(active_ids)} active lesson(s) will be superseded")
 
-    kinds = {l.get("kind") or "lesson" for l in lessons}
+    kinds = {lesson.get("kind") or "lesson" for lesson in lessons}
     if len(kinds) > 1:
         warnings.append(f"mixing lesson kinds: {sorted(kinds)}")
     resolved_kind = next(iter(kinds)) if len(kinds) == 1 else "mixed"
 
     merged_tags = _union_tags(lessons) if tags is None else _coerce_tags(tags)
-    source_ids = [l["id"] for l in lessons]
+    source_ids = [lesson["id"] for lesson in lessons]
     sources_data = [
         {
-            "id": l["id"],
-            "candidate": l.get("candidate") or {},
-            "evaluation": l.get("evaluation") or {},
+            "id": lesson["id"],
+            "candidate": lesson.get("candidate") or {},
+            "evaluation": lesson.get("evaluation") or {},
         }
-        for l in lessons
+        for lesson in lessons
     ]
 
     record = {

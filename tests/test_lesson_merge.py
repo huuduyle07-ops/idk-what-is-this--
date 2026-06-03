@@ -105,3 +105,11 @@ def test_preview_merge_requires_at_least_two(lessons_repo):
     a = _saved(lessons_repo)
     with pytest.raises(ValueError, match="at least 2"):
         lesson_merge.preview_merge([a])
+
+
+def test_preview_merge_accepts_explicit_title_and_summary(lessons_repo):
+    a = _saved(lessons_repo, title="Original A", summary="summary A")
+    b = _saved(lessons_repo, title="Original B", summary="summary B")
+    record, _ = lesson_merge.preview_merge([a, b], title="Custom title", summary="Custom summary")
+    assert record["title"] == "Custom title"
+    assert record["summary"] == "Custom summary"
