@@ -393,8 +393,8 @@ def list_benchmark_reports(
     """All benchmark reports for a repo, newest first.
 
     Returns an empty list if .agent/benchmarks/ doesn't exist or contains no
-    parseable reports. Entries with archived=True in the sidecar are hidden
-    unless include_archived is set."""
+    parseable reports. Entries with deleted=True are always hidden.
+    Entries with archived=True are hidden unless include_archived is set."""
     bench_dir = _bench_dir(repo_path)
     if not bench_dir.is_dir():
         return []
@@ -407,6 +407,9 @@ def list_benchmark_reports(
         entry = meta.get(s["filename"], {})
         s["archived"] = bool(entry.get("archived", False))
         s["pinned"] = bool(entry.get("pinned", False))
+        s["deleted"] = bool(entry.get("deleted", False))
+        if s["deleted"]:
+            continue
         if s["archived"] and not include_archived:
             continue
         summaries.append(s)
@@ -889,10 +892,12 @@ def history_session_delete():
     if confirm != _CONFIRM_SESSION:
         return {"ok": False, "error": f"confirm string required: {_CONFIRM_SESSION}"}, 400
 
+    from datetime import datetime, timezone
     sessions = load_sessions()
     for s in sessions:
         if s.get("id") == session_id:
             s["deleted"] = True
+            s["deleted_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
             save_sessions(sessions)
             return {"ok": True, "session_id": session_id}
 
@@ -1116,31 +1121,39 @@ git commit -m "feat: add history archive/pin/delete routes (Phase 11-prep-cleanu
 
 **Files:** none (read-only validation)
 
-- [ ] **Step 5.1: Run the focused history management tests**
+- [ ] **Step 5.1: Compile-check all modified modules**
 
 ```
-pytest tests/test_history_management.py -v
+python -m compileall core web tests
 ```
 
-Expected: All PASSED, 0 errors
+Expected: no syntax errors
 
-- [ ] **Step 5.2: Run full pytest suite**
+- [ ] **Step 5.2: Run the focused history management tests**
 
 ```
-pytest tests/ -x -q
+python -m pytest tests/test_history_management.py -q --basetemp .fresh_tmp_history_b1
+```
+
+Expected: 17 passed, 0 errors
+
+- [ ] **Step 5.3: Run full pytest suite**
+
+```
+python -m pytest tests -q --basetemp .fresh_tmp_history_full
 ```
 
 Expected: All existing tests still pass, no regressions
 
-- [ ] **Step 5.3: Run benchmark --check**
+- [ ] **Step 5.4: Run benchmark --check**
 
 ```
-python -m benchmarks.run_benchmarks --check
+python benchmarks/run_benchmarks.py --check
 ```
 
 Expected: 50 checked, 0 errors
 
-- [ ] **Step 5.4: If all pass, commit a validation record**
+- [ ] **Step 5.5: If all pass, commit a validation record**
 
 ```bash
 git commit --allow-empty -m "ci: Phase 11-prep-cleanup-b1 validation pass (history archive/delete UX)"
@@ -1157,7 +1170,7 @@ git commit --allow-empty -m "ci: Phase 11-prep-cleanup-b1 validation pass (histo
 | `core/benchmarks_view.py` | **+50 lines** — 4 sidecar functions, updated list_benchmark_reports |
 | `core/dream_artifacts.py` | **+55 lines** — 4 sidecar functions, updated list_all_reports |
 | `web/app.py` | **−20 / +5 lines** — import from session_store, register blueprint, 2 route edits |
-| `tests/test_history_management.py` | **New** — 14 tests (3+3+3 unit + 8 integration) |
+| `tests/test_history_management.py` | **New** — 17 tests (3+3+3 unit + 8 integration) |
 
 ## Safety guarantees delivered
 
