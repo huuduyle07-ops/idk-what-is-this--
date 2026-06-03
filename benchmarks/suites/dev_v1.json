@@ -27,6 +27,7 @@
     "python_sql_account_transfer",
     "python_sql_join_filter",
     "rust_cart_reservation",
+    "rust_hanoi_optimality_trap",
     "rust_result_error_handling",
     "ts_generic_utility_false_positive",
     "ts_import_export_mismatch",

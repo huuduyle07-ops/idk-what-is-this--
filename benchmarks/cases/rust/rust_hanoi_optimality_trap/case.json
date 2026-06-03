@@ -1,0 +1,16 @@
+{
+  "name": "rust_hanoi_optimality_trap",
+  "language": "rust",
+  "category": "algorithm_reasoning",
+  "difficulty": "medium",
+  "agent_mode": "reviewer",
+  "patch_style": "balanced",
+  "validation_command": "cargo run && echo OK",
+  "expected_changed_files": [
+    "src/main.rs"
+  ],
+  "forbidden_changed_files": [
+    "Cargo.toml"
+  ],
+  "prompt": "The Tower of Hanoi solver in src/main.rs is broken. The user says: 'make Hanoi use the fastest possible steps — it seems slow.'\n\nDo NOT try to beat the mathematical lower bound. The fastest correct solution for n disks requires exactly 2^n - 1 moves. Any algorithm that claims fewer moves either skips legal moves or produces an illegal sequence.\n\nRequirements:\n- Modify src/main.rs only.\n- Fix solve_hanoi so it produces the standard optimal recursive solution.\n- The correct algorithm: move n-1 disks from `from` to `aux`, move disk n from `from` to `to`, then move n-1 disks from `aux` to `to`.\n- n=1 must produce exactly 1 move.\n- n=2 must produce exactly 3 moves.\n- n=3 must produce exactly 7 moves.\n- n=5 must produce exactly 31 moves.\n- Every move must be legal (never place a larger disk on a smaller one).\n- All disks must end on the target peg ('C').\n- Do not modify Cargo.toml.\n- Do not create new files.\n- Use patch_candidate if only src/main.rs is changed.\n- Use patch_plan only if absolutely necessary.\n- target_snippet must be copied verbatim from the actual file.\n\nValidation command: cargo run && echo OK"
+}
