@@ -295,6 +295,21 @@
             <button type="button" onclick="generatePatch()">Generate Patch</button>
             <button type="button" onclick="applyPatch()">Apply / Review Patch</button>
           </div>
+          <!-- anti-lesson-control-per-run -->
+          <!-- Phase 11.7c: per-run-only opt-in for the experimental anti-lesson
+               CONTROL block. This sends a per-request field only; it does NOT
+               save a global setting and the server ignores it unless the
+               operator set ANTI_LESSONS_CONTROL_ENABLED=true. -->
+          <div class="anti-lesson-control-run" data-ui-group="anti-lesson-control-run">
+            <label>
+              <input type="checkbox" id="antiLessonControlForRun">
+              Include anti-lesson warning block for this run
+            </label>
+            <p class="anti-lesson-control-run__warning">
+              Requires server flag ANTI_LESSONS_CONTROL_ENABLED=true. Does not save a global setting.
+            </p>
+          </div>
+          <!-- /anti-lesson-control-per-run -->
           <details class="more-actions" data-ui-group="chat-more-actions">
             <summary class="more-actions__summary">More actions</summary>
             <div class="actions actions--secondary">
@@ -7754,6 +7769,9 @@ function generatePatch() {
     const control = document.getElementById("context").innerText;
     const repo = document.querySelector("input[name='repo_path']").value;
     const runtimeEnv = document.querySelector("select[name='runtime_environment']")?.value || "auto";
+    // Phase 11.7c: per-run-only field. The server still ignores it unless
+    // ANTI_LESSONS_CONTROL_ENABLED=true. Nothing is persisted client-side.
+    const antiLessonForRun = document.getElementById("antiLessonControlForRun")?.checked ? "true" : "false";
 
     fetch("/generate_patch", {
         method: "POST",
@@ -7763,7 +7781,8 @@ function generatePatch() {
         body: new URLSearchParams({
             repo_path: repo,
             runtime_environment: runtimeEnv,
-            control: control
+            control: control,
+            anti_lesson_control_requested: antiLessonForRun
         })
     })
     .then(res => res.json())

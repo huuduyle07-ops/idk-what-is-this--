@@ -321,6 +321,16 @@ LESSON_RETRIEVAL_MAX_CHARS = int(os.getenv("LESSON_RETRIEVAL_MAX_CHARS", "3000")
 # core.lesson_retrieval.list_active_lessons. Leave it false.
 ANTI_LESSONS_ENABLED = os.getenv("ANTI_LESSONS_ENABLED", "false").lower() not in {"0", "false", "no"}
 
+# Phase 11.7c: the FIRST behavior-changing anti-lesson seam. CONTROL anti-lesson
+# injection requires a TWO-KEY gate: this server flag must be true AND the
+# specific request must explicitly pass anti_lesson_control_requested=True. When
+# either key is missing, build_control_prompt output is byte-identical to Phase
+# 11.7b. This is a per-run gate only — there is NO global UI toggle and NO saved
+# setting. It never promotes/creates anti-lessons and never makes them
+# active-retrieval eligible (ANTI_LESSONS_ENABLED above still governs that, and
+# stays independent). Default off; benchmark before any default-on consideration.
+ANTI_LESSONS_CONTROL_ENABLED = os.getenv("ANTI_LESSONS_CONTROL_ENABLED", "false").lower() not in {"0", "false", "no"}
+
 # Phase 13.11a: wire the Phase 13.9 Memory Temperature tie-breaker into the
 # final lesson-candidate ordering boundary (core.lesson_retrieval), behind a
 # disabled-by-default flag so live behavior is exactly unchanged. When false

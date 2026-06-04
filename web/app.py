@@ -436,7 +436,33 @@ def generate_patch():
     if harness_block:
         return harness_block
 
-    prompt = build_control_prompt(control, "Generate patch", repo_path=repo_path or None)
+    # Phase 11.7c: per-run, two-key-gated anti-lesson CONTROL injection. This is a
+    # PER-REQUEST flag only — the server still ignores it unless the operator set
+    # config.ANTI_LESSONS_CONTROL_ENABLED=true. Nothing here writes a global
+    # setting or flips the server flag.
+    anti_lesson_control_raw = request.form.get("anti_lesson_control_requested", "")
+    anti_lesson_control_requested = anti_lesson_control_raw.strip().lower() in {
+        "1", "true", "yes", "on",
+    }
+
+    prompt = build_control_prompt(
+        control,
+        "Generate patch",
+        repo_path=repo_path or None,
+        anti_lesson_control_requested=anti_lesson_control_requested,
+    )
+
+    from core.anti_lesson_control_injection import (
+        summarize_anti_lesson_control_injection,
+    )
+
+    # Per-run metadata only (requested / enabled_by_config / injected /
+    # selected_count). Returned transiently; never persisted as a preference.
+    anti_lesson_control = summarize_anti_lesson_control_injection(
+        repo_path or None,
+        "Generate patch",
+        requested=anti_lesson_control_requested,
+    )
 
     with ModelStatsScope() as model_calls:
         response = run_gemini_request(prompt)
@@ -446,11 +472,13 @@ def generate_patch():
         return {
             "error": "Failed to generate patch",
             "usage": format_usage_report(model_calls),
+            "anti_lesson_control": anti_lesson_control,
         }
 
     return {
         "patch": json.dumps(patch, indent=2, ensure_ascii=False),
         "usage": format_usage_report(model_calls),
+        "anti_lesson_control": anti_lesson_control,
     }
 
 @app.route("/undo_patch", methods=["POST"])

@@ -921,11 +921,51 @@ def _lessons_prompt_block(repo_path: str | None, user_query: str) -> str:
         return ""
 
 
+def _anti_lessons_prompt_block(
+    repo_path: str | None,
+    user_query: str,
+    *,
+    requested: bool,
+    max_items: int = 3,
+) -> str:
+    """Phase 11.7c: return an [ANTI-LESSONS / DO NOT REPEAT — EXPERIMENTAL] block,
+    or "" unless BOTH the server flag and the per-request flag are set.
+
+    Two-key gate (fail-closed). When ``requested`` is false this returns ""
+    *without importing anything*, keeping the default CONTROL prompt
+    byte-identical to Phase 11.7b. When requested, it delegates to
+    ``core.anti_lesson_control_injection.build_anti_lesson_control_block``, which
+    re-checks ``config.ANTI_LESSONS_CONTROL_ENABLED`` and reads anti-lessons
+    read-only. Never raises.
+    """
+    if not requested:
+        return ""
+    try:
+        from core.anti_lesson_control_injection import build_anti_lesson_control_block
+
+        return build_anti_lesson_control_block(
+            repo_path, user_query, requested=True, max_items=max_items
+        )
+    except Exception as exc:
+        # Fail closed: anti-lessons are advisory, never block the patch flow.
+        try:
+            import sys
+            sys.stderr.write(
+                f"[control_engine] anti-lesson control block skipped: "
+                f"{type(exc).__name__}: {exc}\n"
+            )
+        except Exception:
+            pass
+        return ""
+
+
 def build_control_prompt(
     control_result: dict,
     user_query: str,
     *,
     repo_path: str | None = None,
+    anti_lesson_control_requested: bool = False,
+    anti_lesson_control_max_items: int = 3,
 ) -> str:
     context_profile = (
         control_result.get("context_profile")
@@ -942,6 +982,14 @@ def build_control_prompt(
     scout = control_result.get("scout") or {}
     code_dna_block = _resolve_code_dna_block(control_result)
     lessons_block = _lessons_prompt_block(repo_path, user_query)
+    # Phase 11.7c: default-off, two-key-gated. "" unless the server flag AND the
+    # per-request flag are both set — so the default prompt is byte-identical.
+    anti_lessons_block = _anti_lessons_prompt_block(
+        repo_path,
+        user_query,
+        requested=bool(anti_lesson_control_requested),
+        max_items=anti_lesson_control_max_items,
+    )
 
     # Use the canonical schema constant from prompter.py.
     from core.prompter import PATCH_RESPONSE_SCHEMA
@@ -1039,7 +1087,7 @@ language={language}
 
 [PHANTOM LIMB SUGGESTIONS - structural hints, not proof]
 {phantom_block}
-{linter_hints_block}{lessons_block}
+{linter_hints_block}{lessons_block}{anti_lessons_block}
 [USER]
 {user_query}
 
@@ -1114,7 +1162,7 @@ Do not use the top hypothesis as the patch target unless it is directly relevant
 
 [PHANTOM LIMB SUGGESTIONS - structural hints, not proof]
 {phantom_block}
-{linter_hints_block}{lessons_block}
+{linter_hints_block}{lessons_block}{anti_lessons_block}
 [USER]
 {user_query}
 
@@ -1255,7 +1303,7 @@ source_snippet:
 
 [PHANTOM LIMB SUGGESTIONS - structural hints, not proof]
 {phantom_block}
-{linter_hints_block}{lessons_block}
+{linter_hints_block}{lessons_block}{anti_lessons_block}
 [USER]
 {user_query}
 
