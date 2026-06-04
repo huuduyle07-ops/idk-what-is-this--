@@ -1014,6 +1014,19 @@
               </div>
             </details>
             <!-- /memory-anti-lesson-report -->
+            <details id="reverseDreamPlanPanel" class="anti-lesson-report"
+                     data-ui-group="memory-reverse-dream-plan"
+                     ontoggle="if(this.open) loadReverseDreamPlan(false)">
+              <summary class="anti-lesson-report__summary">Reverse Dream Plan (dry run)</summary>
+              <p class="anti-lesson-report__warning">Dry-run only. No adversarial execution or anti-lesson creation happens here.</p>
+              <div class="anti-lesson-report__toolbar">
+                <button type="button" id="reverseDreamPlanRefreshBtn" onclick="loadReverseDreamPlan(true)" title="Refresh Reverse Dream dry-run plan">&#x27F3; Refresh dry-run plan</button>
+              </div>
+              <div id="reverseDreamPlanBody" class="anti-lesson-report__body">
+                <div class="health-empty">Open to load the Reverse Dream dry-run plan.</div>
+              </div>
+            </details>
+            <!-- /memory-reverse-dream-plan -->
             <div class="lessons-filters" role="group" aria-label="Lesson status filter">
               <button type="button" class="lessons-filter lessons-filter--active"
                       data-status="" onclick="filterLessons('')">All</button>
@@ -3697,6 +3710,57 @@ function _renderAntiLessonReport(report) {
         + `<h4 class="anti-lesson-report__heading">Candidate anti-lessons</h4>` + candHtml
         + `<h4 class="anti-lesson-report__heading">Duplicate warnings</h4>` + dupHtml
         + `<h4 class="anti-lesson-report__heading">Weak / incomplete records</h4>` + weakHtml;
+}
+
+function loadReverseDreamPlan(force) {
+    const body = document.getElementById("reverseDreamPlanBody");
+    if (!body) return;
+    if (!force && body.dataset.loaded === "1") return;
+    body.innerHTML = '<div class="health-empty">Loading Reverse Dream dry-run plan…</div>';
+    const params = new URLSearchParams();
+    const repo = _lessonRepoPath();
+    if (repo) params.set("repo_path", repo);
+    const qs = params.toString();
+    fetch("/lessons/anti/reverse-dream-plan" + (qs ? "?" + qs : ""))
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                body.innerHTML = '<div class="health-empty">❌ ' + _escapeHtml(data.error || "Failed to load plan") + '</div>';
+                return;
+            }
+            body.innerHTML = _renderReverseDreamPlan(data.plan);
+            body.dataset.loaded = "1";
+        })
+        .catch(e => { body.innerHTML = '<div class="health-empty">❌ ' + _escapeHtml(String(e)) + '</div>'; });
+}
+
+function _renderReverseDreamPlan(plan) {
+    plan = plan || {};
+    const esc = _escapeHtml;
+    const selected = Array.isArray(plan.selected_targets) ? plan.selected_targets : [];
+    const total = plan.total_candidates || 0;
+    const skipped = Array.isArray(plan.skipped) ? plan.skipped : [];
+
+    const countsHtml = `
+      <div class="anti-lesson-report__counts">
+        <span>candidate targets: <strong>${total}</strong></span>
+        <span>selected: <strong>${selected.length}</strong></span>
+        <span>skipped: <strong>${skipped.length}</strong></span>
+      </div>`;
+
+    const targetsHtml = selected.length
+        ? `<ul class="anti-lesson-report__list">` + selected.map(t => {
+            const signals = Array.isArray(t.risk_signals) ? t.risk_signals.join(", ") : "";
+            const related = Array.isArray(t.related_anti_lessons) ? t.related_anti_lessons.length : 0;
+            return `<li><code>${esc(t.target_id || "")}</code> — ${esc(t.title || "")}`
+                + (signals ? ` <span class="lesson-badge">${esc(signals)}</span>` : "")
+                + (related ? ` <span class="lesson-badge lesson-badge--duplicate" title="related anti-lessons (supporting evidence)">anti×${related}</span>` : "")
+                + `</li>`;
+          }).join("") + `</ul>`
+        : `<div class="health-empty">No targets look worth attacking right now.</div>`;
+
+    return countsHtml
+        + `<h4 class="anti-lesson-report__heading">Selected targets (dry run)</h4>` + targetsHtml;
 }
 
 function _renderLessonsList(lessons) {

@@ -2813,6 +2813,48 @@ def lessons_anti_report_route():
     return result
 
 
+@app.route("/lessons/anti/reverse-dream-plan", methods=["GET"])
+def lessons_reverse_dream_plan_route():
+    """Read-only Reverse Dream / adversarial-replay *dry-run* plan (Phase 11.5).
+
+    Query params: repo_path?, scope?, repo_scope_id?, include_global?, max_items?,
+    format? (``format=markdown``/``md`` adds a rendered Markdown view alongside the
+    JSON plan). ``repo_path`` is path-guarded exactly like the other lesson routes.
+
+    This NEVER executes anything: no Dream run, no mutation oracle, no benchmark,
+    no patch, no model call, and it never creates/promotes/blocks/merges a lesson
+    (including anti-lessons). It only reads from lesson storage and returns a plan
+    describing what a future adversarial run *would* check.
+    """
+    from core import reverse_dream_planner
+
+    repo_path = _lesson_repo_path(request.values.get("repo_path"))
+    scope = _lesson_scope_arg(request.values.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(request.values.get("repo_scope_id"))
+    include_global = (request.values.get("include_global") or "true").lower() != "false"
+    fmt = (request.values.get("format") or "").strip().lower()
+    try:
+        max_items = int(request.values.get("max_items") or 10)
+    except (TypeError, ValueError):
+        max_items = 10
+    try:
+        plan = reverse_dream_planner.load_reverse_dream_plan(
+            repo_path=repo_path,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+            include_global=include_global,
+            max_items=max_items,
+        )
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"reverse dream plan failed: {type(e).__name__}"}, 500
+    result = {"ok": True, "plan": plan}
+    if fmt in {"markdown", "md"}:
+        result["markdown"] = reverse_dream_planner.format_reverse_dream_plan_markdown(plan)
+    return result
+
+
 @app.route("/lessons/create-candidate-from-proposal", methods=["POST"])
 def lessons_create_candidate_from_proposal_route():
     """Create a lesson candidate from a proposal artifact (uniform result).
