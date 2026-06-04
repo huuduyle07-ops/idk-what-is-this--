@@ -543,9 +543,14 @@ def test_secondary_nav_membership():
 # ---------------------------------------------------------------------------
 def test_inspector_reachable_from_secondary_nav():
     t = _template()
+    # The fixed floating toggle remains the always-available entry point.
     assert 'id="inspectorToggle"' in t, "fixed Inspector toggle must remain"
-    secondary = _group_segment(t, "ws-nav-secondary")
-    assert "toggleInspector" in secondary, "Views group should launch the Inspector"
+    # UI.2e: the nav-level Inspector launcher sits beside the tab strip (a
+    # .ws-tabs-row sibling action, not a tablist tab) and still opens the drawer.
+    assert 'class="ws-nav__inspector"' in t, "nav Inspector launcher missing"
+    idx = t.index('class="ws-nav__inspector"')
+    region = t[idx - 80:idx + 200]
+    assert "toggleInspector" in region, "nav Inspector launcher must call toggleInspector"
 
 
 # ---------------------------------------------------------------------------

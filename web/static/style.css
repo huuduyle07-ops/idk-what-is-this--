@@ -504,6 +504,10 @@ button {
     flex-wrap: wrap;
     gap: 10px;
     margin: 12px 0;
+    /* Phase UI.2e: top-align so the inline "Run details" <details> can expand
+       downward without stretching the primary Answer / Patch buttons to its
+       full open height (default align-items:stretch did exactly that). */
+    align-items: flex-start;
 }
 
 .actions {
@@ -1778,11 +1782,18 @@ button {
 /* Workspace tabs (Phase 5 Slice 1)                              */
 /* Top-level tabs above the existing result-tab area.            */
 /* ============================================================ */
+.ws-tabs-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
 .ws-tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
-    margin-top: 16px;
     border-bottom: 2px solid var(--color-border);
     padding-bottom: 0;
 }
@@ -3837,6 +3848,10 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     border-color: var(--color-accent);
 }
 
+#lessonFilterDifficulty {
+    display: none;
+}
+
 .lessons-status {
     font-size: 12px;
     color: var(--color-text-muted);
@@ -4426,6 +4441,11 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
 .run-details {
     margin: 0;
 }
+/* Phase UI.2e: when open, take the full row width so the six secondary tabs
+   wrap onto their own line as a clean strip rather than a cramped column. */
+.run-details[open] {
+    flex-basis: 100%;
+}
 .run-details__summary {
     cursor: pointer;
     font-size: 13px;
@@ -4554,6 +4574,11 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
 .inspector-toggle[aria-expanded="true"] {
     color: var(--color-text);
     border-color: var(--color-accent);
+}
+/* Phase UI.2e: hide the floating toggle while the drawer is open so it does
+   not peek out beside the panel (the drawer has its own close button). */
+body.inspector-open .inspector-toggle {
+    display: none;
 }
 
 .inspector-drawer {
