@@ -943,6 +943,54 @@
               Only <strong>Active</strong> lessons will be retrieval-eligible in future phases.
               Only Active lessons can be used as patch-prompt hints, and only when LESSON_RETRIEVAL_ENABLED=true.
             </div>
+            <!-- Phase 11.2: manual anti-lesson creation. Additive disclosure;
+                 stores a candidate anti_lesson only (never active, never used by
+                 CONTROL yet). -->
+            <details id="antiLessonCreatePanel" class="anti-lesson-create" data-ui-group="memory-anti-lesson-create">
+              <summary class="anti-lesson-create__summary">Create anti-lesson</summary>
+              <div class="anti-lesson-create__body">
+                <p class="anti-lesson-create__warning">
+                  Anti-lessons are stored as candidate memory only and are not used by CONTROL yet.
+                </p>
+                <label class="anti-lesson-field">
+                  <span>Title <em title="required">*</em></span>
+                  <input type="text" id="antiLessonTitle" placeholder="Do NOT … (short name for the trap)">
+                </label>
+                <label class="anti-lesson-field">
+                  <span>Tempting wrong pattern <em title="required">*</em></span>
+                  <textarea id="antiLessonTempting" rows="2" placeholder="The plausible-looking but wrong approach"></textarea>
+                </label>
+                <label class="anti-lesson-field">
+                  <span>Why it's wrong <em title="required">*</em></span>
+                  <textarea id="antiLessonWhyWrong" rows="2" placeholder="What actually breaks / why it only looks right"></textarea>
+                </label>
+                <label class="anti-lesson-field">
+                  <span>Safer alternative <em title="required">*</em></span>
+                  <textarea id="antiLessonSaferAlt" rows="2" placeholder="What to do instead"></textarea>
+                </label>
+                <label class="anti-lesson-field">
+                  <span>Summary (optional)</span>
+                  <textarea id="antiLessonSummary" rows="2" placeholder="Defaults to a composed summary if left blank"></textarea>
+                </label>
+                <label class="anti-lesson-field">
+                  <span>Evidence refs (optional, one per line)</span>
+                  <textarea id="antiLessonEvidence" rows="2" placeholder="reports/run_42.json"></textarea>
+                </label>
+                <label class="anti-lesson-field">
+                  <span>Related lesson IDs (optional, one per line)</span>
+                  <textarea id="antiLessonRelated" rows="2" placeholder="20260604_120000_000000"></textarea>
+                </label>
+                <label class="anti-lesson-field">
+                  <span>Tags (optional, comma or newline separated)</span>
+                  <input type="text" id="antiLessonTags" placeholder="python, testing">
+                </label>
+                <div class="anti-lesson-create__actions">
+                  <button type="button" id="antiLessonCreateBtn" onclick="createAntiLesson()">Create anti-lesson</button>
+                </div>
+                <div id="antiLessonStatus" class="anti-lesson-create__status"></div>
+              </div>
+            </details>
+            <!-- /memory-anti-lesson-create -->
             <details id="duplicateHintsPanel" class="lesson-duplicate-hints"
                      ontoggle="if(this.open) loadDuplicateHints(false)">
               <summary class="lesson-duplicate-hints__summary">Duplicate hints</summary>
@@ -989,7 +1037,7 @@
                         onchange="_applyLessonFilters()" title="Filter by kind">
                   <option value="">All kinds</option>
                   <option value="lesson">lesson</option>
-                  <option value="anti-lesson">anti-lesson</option>
+                  <option value="anti_lesson">anti-lesson</option>
                 </select>
                 <label class="lessons-filter-toggle" title="Show archived lessons (hidden by default)">
                   <input type="checkbox" id="showArchivedLessons" onchange="_applyLessonFilters()"> Show archived
@@ -3499,6 +3547,64 @@ function filterLessons(status) {
     loadLessons(true);
 }
 
+// Phase 11.2 — manual anti-lesson creation. Posts to /lessons/anti/create,
+// which always stores a candidate anti_lesson (never active, never used by
+// CONTROL). The payload intentionally omits status/active_knowledge_allowed/kind.
+function createAntiLesson() {
+    const get = (id) => ((document.getElementById(id) || {}).value || "");
+    const splitLines = (s) => s.split(/[\r\n,]+/).map(x => x.trim()).filter(Boolean);
+    const statusEl = document.getElementById("antiLessonStatus");
+    const setStatus = (msg, cls) => {
+        if (statusEl) {
+            statusEl.textContent = msg;
+            statusEl.className = "anti-lesson-create__status" + (cls ? " " + cls : "");
+        }
+    };
+
+    const title = get("antiLessonTitle").trim();
+    const tempting = get("antiLessonTempting").trim();
+    const why = get("antiLessonWhyWrong").trim();
+    const safer = get("antiLessonSaferAlt").trim();
+    if (!title || !tempting || !why || !safer) {
+        setStatus("Title, tempting pattern, why-wrong and safer-alternative are required.", "is-error");
+        return;
+    }
+
+    const payload = {
+        title: title,
+        tempting_wrong_pattern: tempting,
+        why_wrong: why,
+        safer_alternative: safer,
+        summary: get("antiLessonSummary").trim(),
+        evidence_refs: splitLines(get("antiLessonEvidence")),
+        related_lesson_ids: splitLines(get("antiLessonRelated")),
+        tags: splitLines(get("antiLessonTags")),
+    };
+    const repo = _lessonRepoPath();
+    if (repo) payload.repo_path = repo;
+
+    const btn = document.getElementById("antiLessonCreateBtn");
+    if (btn) btn.disabled = true;
+    setStatus("Creating…", "is-running");
+
+    fetch("/lessons/anti/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) { setStatus("❌ " + (data.error || "Failed to create anti-lesson"), "is-error"); return; }
+            setStatus("✓ Candidate anti-lesson created (candidate memory only; not used by CONTROL).", "is-ok");
+            ["antiLessonTitle", "antiLessonTempting", "antiLessonWhyWrong", "antiLessonSaferAlt",
+             "antiLessonSummary", "antiLessonEvidence", "antiLessonRelated", "antiLessonTags"]
+                .forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+            loadLessons(true);
+        })
+        .catch(e => setStatus("❌ " + e, "is-error"))
+        .finally(() => { if (btn) btn.disabled = false; });
+}
+
 function _renderLessonsList(lessons) {
     _lessonsData = lessons;
     const listEl = document.getElementById("lessonsList");
@@ -3584,6 +3690,7 @@ function _renderLessonCard(lesson) {
             ${archived ? `<span class="lesson-badge lesson-badge--archived">archived</span>` : ""}
             ${supersededBy ? `<span class="lesson-badge lesson-badge--superseded" title="Superseded by: ${_escapeHtml(supersededBy)}">superseded</span>` : ""}
             ${mergeSourcesCount > 0 ? `<span class="lesson-badge lesson-badge--merged" title="Merged from ${mergeSourcesCount} sources">merged from ${mergeSourcesCount}</span>` : ""}
+            ${lesson.kind === "anti_lesson" ? `<span class="lesson-badge lesson-badge--anti" title="Anti-lesson: candidate memory only; not used by CONTROL yet">anti-lesson</span>` : ""}
           </span>
         </div>
         ${tagsHtml}

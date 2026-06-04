@@ -2690,6 +2690,64 @@ def _truthy_form(value) -> bool:
     return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _as_str_list(raw) -> list[str]:
+    """Coerce a JSON list or a newline/comma-delimited string to list[str].
+
+    Used by the manual anti-lesson route so the form can post either a JSON
+    array or a textarea blob for evidence_refs / related_lesson_ids / tags.
+    """
+    if raw is None:
+        return []
+    if isinstance(raw, str):
+        return [part.strip() for part in raw.replace(",", "\n").splitlines() if part.strip()]
+    if isinstance(raw, (list, tuple)):
+        return [item.strip() for item in raw if isinstance(item, str) and item.strip()]
+    return []
+
+
+@app.route("/lessons/anti/create", methods=["POST"])
+def lessons_anti_create_route():
+    """Create a candidate anti-lesson from operator input (manual only).
+
+    JSON/form body: title, tempting_wrong_pattern, why_wrong, safer_alternative
+    (all required); optional summary, evidence_refs, related_lesson_ids, tags,
+    source, source_report, scope, repo_path, repo_scope_id.
+
+    Always produces a *candidate* anti-lesson with active_knowledge_allowed=False
+    (Phase 11.1/11.2 inert guarantee). Any status / active_knowledge_allowed /
+    kind in the payload is ignored — this route cannot create an active lesson.
+    """
+    from core.anti_lessons import create_manual_anti_lesson
+
+    payload = request.get_json(silent=True) or request.form
+    repo_path = _lesson_repo_path(payload.get("repo_path"))
+    scope = _lesson_scope_arg(payload.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(payload.get("repo_scope_id"))
+    try:
+        record = create_manual_anti_lesson(
+            title=payload.get("title"),
+            tempting_wrong_pattern=payload.get("tempting_wrong_pattern"),
+            why_wrong=payload.get("why_wrong"),
+            safer_alternative=payload.get("safer_alternative"),
+            summary=payload.get("summary"),
+            evidence_refs=_as_str_list(payload.get("evidence_refs")),
+            related_lesson_ids=_as_str_list(payload.get("related_lesson_ids")),
+            tags=_as_str_list(payload.get("tags")) or None,
+            source=(payload.get("source") or "manual"),
+            source_report=payload.get("source_report"),
+            repo_path=repo_path,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+        )
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except LookupError as e:
+        return {"ok": False, "error": str(e)}, 404
+    except Exception as e:
+        return {"ok": False, "error": f"anti-lesson creation failed: {type(e).__name__}"}, 500
+    return {"ok": True, "lesson": record}
+
+
 @app.route("/lessons/create-candidate-from-proposal", methods=["POST"])
 def lessons_create_candidate_from_proposal_route():
     """Create a lesson candidate from a proposal artifact (uniform result).
