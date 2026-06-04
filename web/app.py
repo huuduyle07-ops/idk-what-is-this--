@@ -2855,6 +2855,56 @@ def lessons_reverse_dream_plan_route():
     return result
 
 
+@app.route("/lessons/anti/shadow-retrieval", methods=["GET"])
+def lessons_anti_shadow_retrieval_route():
+    """Read-only anti-lesson *shadow* retrieval (Phase 11.6).
+
+    Query params: query (required), max_items? (bounded), repo_path?
+    (path-guarded), scope?, repo_scope_id?, include_global?, format?
+    (``format=markdown``/``md`` adds a rendered Markdown view alongside the JSON
+    result).
+
+    For the given query it reports which anti-lessons *would* be relevant if
+    anti-lessons were enabled later. It NEVER affects the prompt: no CONTROL call,
+    no active-retrieval change, no patch / Dream / benchmark / model / subprocess /
+    Docker, and it never creates/promotes/blocks/merges a lesson. Reads storage
+    only.
+    """
+    from core import anti_lesson_retrieval_shadow
+
+    query = (request.values.get("query") or "").strip()
+    if not query:
+        return {"ok": False, "error": "query is required"}, 400
+
+    repo_path = _lesson_repo_path(request.values.get("repo_path"))
+    scope = _lesson_scope_arg(request.values.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(request.values.get("repo_scope_id"))
+    include_global = (request.values.get("include_global") or "true").lower() != "false"
+    fmt = (request.values.get("format") or "").strip().lower()
+    try:
+        max_items = int(request.values.get("max_items") or 5)
+    except (TypeError, ValueError):
+        max_items = 5
+    max_items = max(1, min(max_items, 50))
+    try:
+        result = anti_lesson_retrieval_shadow.load_anti_lesson_shadow_retrieval(
+            query,
+            repo_path=repo_path,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+            include_global=include_global,
+            max_items=max_items,
+        )
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"shadow retrieval failed: {type(e).__name__}"}, 500
+    payload = {"ok": True, "result": result}
+    if fmt in {"markdown", "md"}:
+        payload["markdown"] = anti_lesson_retrieval_shadow.format_anti_lesson_shadow_retrieval_markdown(result)
+    return payload
+
+
 @app.route("/lessons/create-candidate-from-proposal", methods=["POST"])
 def lessons_create_candidate_from_proposal_route():
     """Create a lesson candidate from a proposal artifact (uniform result).

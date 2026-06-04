@@ -1027,6 +1027,21 @@
               </div>
             </details>
             <!-- /memory-reverse-dream-plan -->
+            <details id="antiShadowRetrievalPanel" class="anti-lesson-report"
+                     data-ui-group="memory-anti-shadow-retrieval">
+              <summary class="anti-lesson-report__summary">Anti-Lesson Shadow Retrieval</summary>
+              <p class="anti-lesson-report__warning">Shadow retrieval is report-only and is not used by CONTROL yet.</p>
+              <div class="anti-lesson-report__toolbar">
+                <input type="text" id="antiShadowRetrievalQuery" class="anti-shadow-retrieval__query" placeholder="query, e.g. swallow exceptions"
+                       onkeydown="if(event.key==='Enter'){event.preventDefault();loadAntiShadowMatches(true);}" />
+                <input type="number" id="antiShadowRetrievalMax" class="anti-shadow-retrieval__max" min="1" max="50" value="5" title="max matches to show" />
+                <button type="button" id="antiShadowRetrievalSearchBtn" onclick="loadAntiShadowMatches(true)" title="Preview matching anti-lessons (shadow, read-only)">Search</button>
+              </div>
+              <div id="antiShadowRetrievalBody" class="anti-lesson-report__body">
+                <div class="health-empty">Enter a query and Search to preview matching anti-lessons (shadow only).</div>
+              </div>
+            </details>
+            <!-- /memory-anti-shadow-retrieval -->
             <div class="lessons-filters" role="group" aria-label="Lesson status filter">
               <button type="button" class="lessons-filter lessons-filter--active"
                       data-status="" onclick="filterLessons('')">All</button>
@@ -3761,6 +3776,64 @@ function _renderReverseDreamPlan(plan) {
 
     return countsHtml
         + `<h4 class="anti-lesson-report__heading">Selected targets (dry run)</h4>` + targetsHtml;
+}
+
+function loadAntiShadowMatches(force) {
+    const body = document.getElementById("antiShadowRetrievalBody");
+    if (!body) return;
+    const queryEl = document.getElementById("antiShadowRetrievalQuery");
+    const maxEl = document.getElementById("antiShadowRetrievalMax");
+    const query = ((queryEl && queryEl.value) || "").trim();
+    if (!query) {
+        body.innerHTML = '<div class="health-empty">Enter a query to preview matching anti-lessons.</div>';
+        return;
+    }
+    body.innerHTML = '<div class="health-empty">Searching anti-lessons (shadow only)…</div>';
+    const params = new URLSearchParams();
+    params.set("query", query);
+    const repo = _lessonRepoPath();
+    if (repo) params.set("repo_path", repo);
+    const maxItems = maxEl && parseInt(maxEl.value, 10);
+    if (maxItems && maxItems > 0) params.set("max_items", String(maxItems));
+    fetch("/lessons/anti/shadow-retrieval?" + params.toString())
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                body.innerHTML = '<div class="health-empty">❌ ' + _escapeHtml(data.error || "Search failed") + '</div>';
+                return;
+            }
+            body.innerHTML = _renderAntiShadowMatches(data.result);
+        })
+        .catch(e => { body.innerHTML = '<div class="health-empty">❌ ' + _escapeHtml(String(e)) + '</div>'; });
+}
+
+function _renderAntiShadowMatches(result) {
+    result = result || {};
+    const esc = _escapeHtml;
+    const matches = Array.isArray(result.selected_matches) ? result.selected_matches : [];
+    const considered = result.total_anti_lessons_considered || 0;
+
+    const countsHtml = `
+      <div class="anti-lesson-report__counts">
+        <span>considered: <strong>${considered}</strong></span>
+        <span>matches: <strong>${matches.length}</strong></span>
+      </div>`;
+
+    const listHtml = matches.length
+        ? `<ul class="anti-lesson-report__list">` + matches.map(m => {
+            const reasons = Array.isArray(m.reasons) ? m.reasons.join(", ") : "";
+            const parts = [];
+            parts.push(`<li><code>${esc(m.lesson_id || "")}</code> — ${esc(m.title || "")} <span class="lesson-badge">score ${esc(String(m.score))}</span>`);
+            if (reasons) parts.push(`<div class="anti-shadow-retrieval__reasons">${esc(reasons)}</div>`);
+            if (m.tempting_wrong_pattern) parts.push(`<div class="anti-shadow-retrieval__field"><em>tempting:</em> ${esc(m.tempting_wrong_pattern)}</div>`);
+            if (m.safer_alternative) parts.push(`<div class="anti-shadow-retrieval__field"><em>safer:</em> ${esc(m.safer_alternative)}</div>`);
+            parts.push(`</li>`);
+            return parts.join("");
+          }).join("") + `</ul>`
+        : `<div class="health-empty">No anti-lessons matched this query.</div>`;
+
+    return countsHtml
+        + `<h4 class="anti-lesson-report__heading">Top matches (shadow only)</h4>` + listHtml;
 }
 
 function _renderLessonsList(lessons) {
