@@ -465,3 +465,130 @@ def test_no_backend_change_in_inspector_drawer():
     for token in ("os.system", "child_process", "eval(", "new Function(", "document.write("):
         assert token not in t, f"unexpected privileged token: {token!r}"
     assert t.count("<script src=") == 2  # mermaid CDN + keybindings.js only
+
+
+# ===========================================================================
+# UI.2d - Primary / Secondary top-nav + dangerous-action cleanup
+#
+#   * The seven workspace tabs are split into two visual groups (no id / key /
+#     label changes): a prominent primary group (Chat/Patch, Benchmarks, Dream,
+#     Memory, Settings/Health) and a quieter "Views" secondary group (Goal
+#     Brief, Graph) plus an Inspector launcher.
+#   * A small "Refine goal in Goal Brief ->" link inside Chat/Patch keeps Goal
+#     Brief discoverable without a primary tab.
+#   * Dangerous controls stay out of the primary nav and the Inspector drawer.
+# ===========================================================================
+WS_TAB_IDS = (
+    "ws-tab-chat", "ws-tab-goal-brief", "ws-tab-benchmarks", "ws-tab-dream",
+    "ws-tab-memory", "ws-tab-graph", "ws-tab-settings",
+)
+WS_TAB_KEYS = ("chat", "goal-brief", "benchmarks", "dream", "memory", "graph", "settings")
+PRIMARY_KEYS = ("chat", "benchmarks", "dream", "memory", "settings")
+SECONDARY_KEYS = ("goal-brief", "graph")
+
+
+# ---------------------------------------------------------------------------
+# 29 - Both nav groups exist with matching sentinels
+# ---------------------------------------------------------------------------
+def test_ws_nav_groups_exist():
+    t = _template()
+    for group in ("ws-nav-primary", "ws-nav-secondary"):
+        assert f'data-ui-group="{group}"' in t, f"missing nav group {group}"
+        assert f"<!-- /{group} -->" in t, f"missing sentinel for {group}"
+
+
+# ---------------------------------------------------------------------------
+# 30 - All seven workspace tab ids survive
+# ---------------------------------------------------------------------------
+def test_all_seven_ws_tab_ids_preserved():
+    t = _template()
+    for tid in WS_TAB_IDS:
+        assert f'id="{tid}"' in t, f"workspace tab id {tid!r} missing"
+
+
+# ---------------------------------------------------------------------------
+# 31 - All seven showWorkspaceTab keys survive
+# ---------------------------------------------------------------------------
+def test_all_showworkspacetab_keys_preserved():
+    t = _template()
+    for key in WS_TAB_KEYS:
+        assert f"showWorkspaceTab('{key}')" in t, f"showWorkspaceTab('{key}') missing"
+
+
+# ---------------------------------------------------------------------------
+# 32 - Primary group holds the five primary destinations (not goal-brief/graph)
+# ---------------------------------------------------------------------------
+def test_primary_nav_membership():
+    t = _template()
+    primary = _group_segment(t, "ws-nav-primary")
+    for key in PRIMARY_KEYS:
+        assert f"showWorkspaceTab('{key}')" in primary, f"{key} must be a primary destination"
+    for key in SECONDARY_KEYS:
+        assert f"showWorkspaceTab('{key}')" not in primary, f"{key} must NOT be primary"
+
+
+# ---------------------------------------------------------------------------
+# 33 - Secondary "Views" group holds Goal Brief + Graph (+ a label)
+# ---------------------------------------------------------------------------
+def test_secondary_nav_membership():
+    t = _template()
+    secondary = _group_segment(t, "ws-nav-secondary")
+    for key in SECONDARY_KEYS:
+        assert f"showWorkspaceTab('{key}')" in secondary, f"{key} must be in the Views group"
+    assert "Views" in secondary, "secondary group needs a small label (e.g. 'Views')"
+
+
+# ---------------------------------------------------------------------------
+# 34 - Inspector stays reachable: fixed toggle + a secondary-nav launcher
+# ---------------------------------------------------------------------------
+def test_inspector_reachable_from_secondary_nav():
+    t = _template()
+    assert 'id="inspectorToggle"' in t, "fixed Inspector toggle must remain"
+    secondary = _group_segment(t, "ws-nav-secondary")
+    assert "toggleInspector" in secondary, "Views group should launch the Inspector"
+
+
+# ---------------------------------------------------------------------------
+# 35 - Goal Brief stays discoverable via a link inside Chat / Patch
+# ---------------------------------------------------------------------------
+def test_goal_brief_discoverability_link():
+    t = _template()
+    assert "Refine goal in Goal Brief" in t, "missing Goal Brief discoverability link"
+    idx = t.index("Refine goal in Goal Brief")
+    region = t[idx - 240:idx + 240]
+    assert "showWorkspaceTab('goal-brief')" in region, "link must open the Goal Brief tab"
+
+
+# ---------------------------------------------------------------------------
+# 36 - Dangerous controls never enter the primary nav or the Inspector drawer
+# ---------------------------------------------------------------------------
+def test_dangerous_controls_not_in_primary_nav_or_drawer():
+    t = _template()
+    primary = _group_segment(t, "ws-nav-primary")
+    drawer = _group_segment(t, "inspector-drawer")
+    for token in DANGEROUS_TOKENS:
+        assert token not in primary, f"dangerous control {token!r} must not be in primary nav"
+        assert token not in drawer, f"dangerous control {token!r} must not be in the drawer"
+
+
+# ---------------------------------------------------------------------------
+# 37 - UI.1 / UI.2 anchors all still present (regression backstop)
+# ---------------------------------------------------------------------------
+def test_existing_anchors_preserved_through_ui2d():
+    t = _template()
+    for group in (
+        "settings-harness", "settings-debug", "chat-more-actions",
+        "chat-run-details", "inspector-drawer", "memory-nav",
+    ):
+        assert f'data-ui-group="{group}"' in t, f"anchor {group} lost"
+        assert f"<!-- /{group} -->" in t, f"sentinel for {group} lost"
+
+
+# ---------------------------------------------------------------------------
+# 38 - Additive only: no new external script; no privileged tokens
+# ---------------------------------------------------------------------------
+def test_no_backend_change_in_top_nav_cleanup():
+    t = _template()
+    for token in ("os.system", "child_process", "eval(", "new Function(", "document.write("):
+        assert token not in t, f"unexpected privileged token: {token!r}"
+    assert t.count("<script src=") == 2  # mermaid CDN + keybindings.js only

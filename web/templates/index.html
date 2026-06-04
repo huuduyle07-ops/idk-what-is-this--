@@ -230,17 +230,38 @@
         <section id="instantModePanel" class="instant-mode-panel" data-mode-panel="instant">
         <!-- Phase 5 Slice 1: workspace tabs (top-level). -->
         <div class="ws-tabs" role="tablist">
-          <button type="button" id="ws-tab-chat"       role="tab" aria-controls="ws-chat"       class="ws-tab" data-ws="chat"       onclick="showWorkspaceTab('chat')">Chat / Patch</button>
-          <button type="button" id="ws-tab-goal-brief" role="tab" aria-controls="ws-goal-brief" class="ws-tab" data-ws="goal-brief" onclick="showWorkspaceTab('goal-brief')">Goal Brief</button>
-          <button type="button" id="ws-tab-benchmarks" role="tab" aria-controls="ws-benchmarks" class="ws-tab" data-ws="benchmarks" onclick="showWorkspaceTab('benchmarks')">Benchmarks</button>
-          <button type="button" id="ws-tab-dream"      role="tab" aria-controls="ws-dream"      class="ws-tab" data-ws="dream"      onclick="showWorkspaceTab('dream')">Dream</button>
-          <button type="button" id="ws-tab-memory"     role="tab" aria-controls="ws-memory"     class="ws-tab" data-ws="memory"     onclick="showWorkspaceTab('memory')">Memory</button>
-          <button type="button" id="ws-tab-graph"      role="tab" aria-controls="ws-graph"      class="ws-tab" data-ws="graph"      onclick="showWorkspaceTab('graph')">Graph</button>
-          <button type="button" id="ws-tab-settings"   role="tab" aria-controls="ws-settings"   class="ws-tab" data-ws="settings"   onclick="showWorkspaceTab('settings')">Settings / Health</button>
+          <!-- Phase UI.2d: primary destinations (prominent). Every id / data-ws
+               / onclick / label is unchanged; the groups use display:contents so
+               the flat tab strip is preserved - the only change is grouping and
+               moving Goal Brief + Graph into the quieter "Views" group below. -->
+          <div class="ws-nav ws-nav--primary" data-ui-group="ws-nav-primary" role="presentation">
+            <button type="button" id="ws-tab-chat"       role="tab" aria-controls="ws-chat"       class="ws-tab" data-ws="chat"       onclick="showWorkspaceTab('chat')">Chat / Patch</button>
+            <button type="button" id="ws-tab-benchmarks" role="tab" aria-controls="ws-benchmarks" class="ws-tab" data-ws="benchmarks" onclick="showWorkspaceTab('benchmarks')">Benchmarks</button>
+            <button type="button" id="ws-tab-dream"      role="tab" aria-controls="ws-dream"      class="ws-tab" data-ws="dream"      onclick="showWorkspaceTab('dream')">Dream</button>
+            <button type="button" id="ws-tab-memory"     role="tab" aria-controls="ws-memory"     class="ws-tab" data-ws="memory"     onclick="showWorkspaceTab('memory')">Memory</button>
+            <button type="button" id="ws-tab-settings"   role="tab" aria-controls="ws-settings"   class="ws-tab" data-ws="settings"   onclick="showWorkspaceTab('settings')">Settings / Health</button>
+          </div>
+          <!-- /ws-nav-primary -->
+          <!-- Phase UI.2d: secondary "Views" destinations (visually quieter).
+               Goal Brief and Graph keep their tabs + ws-* panels; the Inspector
+               launcher opens the UI.2c drawer. Nothing removed or renamed. -->
+          <div class="ws-nav ws-nav--secondary" data-ui-group="ws-nav-secondary" role="presentation">
+            <span class="ws-nav__label" aria-hidden="true">Views</span>
+            <button type="button" id="ws-tab-goal-brief" role="tab" aria-controls="ws-goal-brief" class="ws-tab" data-ws="goal-brief" onclick="showWorkspaceTab('goal-brief')">Goal Brief</button>
+            <button type="button" id="ws-tab-graph"      role="tab" aria-controls="ws-graph"      class="ws-tab" data-ws="graph"      onclick="showWorkspaceTab('graph')">Graph</button>
+            <button type="button" class="ws-nav__inspector" onclick="toggleInspector(true)" title="Inspector &mdash; debug &amp; evidence tools (Ctrl-J)">&#x1F50E; Inspector</button>
+          </div>
+          <!-- /ws-nav-secondary -->
         </div>
 
         <!-- Chat / Patch (default workspace tab) -->
         <div id="ws-chat" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-chat">
+          <!-- Phase UI.2d: Goal Brief is now a secondary "Views" tab, so keep it
+               discoverable from the Run area with a quiet inline link. -->
+          <p class="goal-brief-hint">
+            <button type="button" class="goal-brief-hint__link"
+                    onclick="showWorkspaceTab('goal-brief')">Refine goal in Goal Brief &rarr;</button>
+          </p>
           <!-- Phase UI.2b: Answer + Patch stay primary; the six secondary
                result tabs (Context/State/Validation/Cost/Diff/Candidates)
                fold into a collapsed "Run details" disclosure. Every showTab()

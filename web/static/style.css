@@ -4636,3 +4636,65 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
 .inspector-section__body button:hover {
     border-color: var(--color-accent);
 }
+
+/* ============================================================ */
+/* Phase UI.2d: primary / secondary top-nav grouping.          */
+/* The group wrappers use display:contents so the existing flat */
+/* .ws-tabs strip is preserved exactly - only the secondary     */
+/* "Views" cluster (Goal Brief / Graph / Inspector) is demoted. */
+/* ============================================================ */
+.ws-nav {
+    display: contents;
+}
+/* Push the secondary "Views" cluster to the right of the strip. */
+.ws-nav--secondary .ws-nav__label {
+    margin-left: auto;
+}
+.ws-nav__label {
+    align-self: center;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    padding: 0 6px 6px;
+}
+/* Secondary destinations read as quieter than the primary tabs. */
+.ws-nav--secondary .ws-tab,
+.ws-nav__inspector {
+    font-size: 13px;
+    opacity: 0.82;
+}
+.ws-nav--secondary .ws-tab:hover,
+.ws-nav__inspector:hover {
+    opacity: 1;
+}
+.ws-nav__inspector {
+    background: transparent;
+    color: var(--color-text-muted);
+    padding: 8px 12px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+}
+.ws-nav__inspector:hover {
+    color: var(--color-text);
+}
+
+/* Phase UI.2d: quiet Goal Brief discoverability link in the Run area. */
+.goal-brief-hint {
+    margin: 0 0 8px;
+}
+.goal-brief-hint__link {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.goal-brief-hint__link:hover {
+    color: var(--color-accent);
+}
