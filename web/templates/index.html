@@ -241,15 +241,26 @@
 
         <!-- Chat / Patch (default workspace tab) -->
         <div id="ws-chat" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-chat">
+          <!-- Phase UI.2b: Answer + Patch stay primary; the six secondary
+               result tabs (Context/State/Validation/Cost/Diff/Candidates)
+               fold into a collapsed "Run details" disclosure. Every showTab()
+               handler is preserved verbatim; showTab() auto-opens this group
+               when a secondary tab is selected programmatically. -->
           <div class="tabs">
             <button type="button" onclick="showTab('answer')">Answer</button>
-            <button type="button" onclick="showTab('context')">Context</button>
-            <button type="button" onclick="showTab('state')">State</button>
             <button type="button" onclick="showTab('patch')">Patch</button>
-            <button type="button" onclick="showTab('validation')">Validation</button>
-            <button type="button" onclick="showTab('usage')">Cost</button>
-            <button type="button" onclick="showTab('diff')">Diff</button>
-            <button type="button" onclick="showTab('candidates')">Candidates</button>
+            <details class="run-details" data-ui-group="chat-run-details">
+              <summary class="run-details__summary">Run details</summary>
+              <div class="tabs tabs--secondary">
+                <button type="button" onclick="showTab('context')">Context</button>
+                <button type="button" onclick="showTab('state')">State</button>
+                <button type="button" onclick="showTab('validation')">Validation</button>
+                <button type="button" onclick="showTab('usage')">Cost</button>
+                <button type="button" onclick="showTab('diff')">Diff</button>
+                <button type="button" onclick="showTab('candidates')">Candidates</button>
+              </div>
+            </details>
+            <!-- /chat-run-details -->
           </div>
 
           <!-- Phase UI.1: primary patch actions stay visible; the rest fold
@@ -4676,6 +4687,16 @@ function showTab(id) {
     }
     localStorage.setItem("activeTab", id);
     window.lastAction = id;
+
+    // Phase UI.2b: the six secondary result tabs live inside the collapsed
+    // "Run details" (chat-run-details) disclosure. When one of them is selected
+    // — including a restored/programmatic selection — open the disclosure so the
+    // active tab button is visible. Purely additive; primary tabs are untouched.
+    const runDetailsTabs = ["context", "state", "validation", "usage", "diff", "candidates"];
+    if (runDetailsTabs.includes(id)) {
+        const runDetails = document.querySelector('[data-ui-group="chat-run-details"]');
+        if (runDetails && "open" in runDetails) runDetails.open = true;
+    }
 
     let tabs = document.getElementsByClassName("tab-content");
     for (let t of tabs) t.style.display = "none";

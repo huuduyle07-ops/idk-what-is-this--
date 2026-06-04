@@ -4421,6 +4421,29 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     color: var(--color-text);
 }
 
+/* Phase UI.2b: the "Run details" disclosure sits inline in the result-tab
+   row (Answer / Patch primary, the six secondary tabs folded inside). */
+.run-details {
+    margin: 0;
+}
+.run-details__summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    padding: 4px 8px;
+    list-style: revert;
+}
+.run-details__summary:hover {
+    color: var(--color-text);
+}
+.run-details[open] > .run-details__summary {
+    color: var(--color-text);
+}
+.tabs--secondary {
+    margin: 8px 0 0;
+}
+
 /* Advanced panels (harness controls, tool registry, MCP audit) get a
    subtle inset so it's clear they were intentionally tucked away. */
 .advanced-panel[open],

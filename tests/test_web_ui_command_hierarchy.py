@@ -191,3 +191,111 @@ def test_audit_module_has_no_forbidden_imports():
     allowed_top = {"ast", "pathlib", "__future__"}
     for imp in imported:
         assert imp.split(".")[0] in allowed_top, f"unexpected import: {imp}"
+
+
+# ===========================================================================
+# UI.2b - Chat/Patch Result Inspector
+#
+#   * Answer + Patch stay primary (visible) in the result-tab row.
+#   * The six secondary result tabs (Context / State / Validation / Cost /
+#     Diff / Candidates) are demoted behind a collapsed "Run details"
+#     disclosure (``data-ui-group="chat-run-details"``).
+#   * ``showTab(id)`` is unchanged except for one additive behavior: when the
+#     target tab lives inside Run details, it opens the disclosure first so the
+#     active tab button is reachable.
+#   * All eight result-pane ids survive; the UI.1 ``chat-more-actions`` anchor
+#     and the script-tag count are untouched (strict additive).
+# ===========================================================================
+SECONDARY_RESULT_TABS = ("context", "state", "validation", "usage", "diff", "candidates")
+ALL_RESULT_PANES = ("answer", "context", "state", "patch", "validation", "usage", "diff", "candidates")
+
+
+def _showtab_body(template: str) -> str:
+    """Slice the ``showTab`` function body (up to ``showWorkspaceTab``)."""
+    start = template.index("function showTab(")
+    end = template.index("function showWorkspaceTab(", start)
+    return template[start:end]
+
+
+# ---------------------------------------------------------------------------
+# 10 - Run details disclosure exists with a matching end sentinel
+# ---------------------------------------------------------------------------
+def test_run_details_group_exists():
+    t = _template()
+    assert 'data-ui-group="chat-run-details"' in t
+    assert "<!-- /chat-run-details -->" in t
+    seg = _group_segment(t, "chat-run-details")
+    assert "<summary" in seg and "Run details" in seg, "Run details summary missing"
+
+
+# ---------------------------------------------------------------------------
+# 11 - Answer + Patch stay primary: their tab buttons are OUTSIDE/before the
+#      Run details disclosure
+# ---------------------------------------------------------------------------
+def test_primary_result_tabs_outside_run_details():
+    t = _template()
+    group_at = t.index('data-ui-group="chat-run-details"')
+    for key in ("answer", "patch"):
+        first = t.index(f"showTab('{key}')")
+        assert first < group_at, f"{key} tab must stay primary (before Run details)"
+
+    seg = _group_segment(t, "chat-run-details")
+    assert "showTab('answer')" not in seg, "Answer must not be hidden in Run details"
+    assert "showTab('patch')" not in seg, "Patch must not be hidden in Run details"
+
+
+# ---------------------------------------------------------------------------
+# 12 - The six secondary result tabs live INSIDE the Run details disclosure
+# ---------------------------------------------------------------------------
+def test_secondary_result_tabs_inside_run_details():
+    t = _template()
+    seg = _group_segment(t, "chat-run-details")
+    for key in SECONDARY_RESULT_TABS:
+        assert f"showTab('{key}')" in seg, f"{key} tab should be inside Run details"
+
+
+# ---------------------------------------------------------------------------
+# 13 - All eight result panes still exist (render targets untouched)
+# ---------------------------------------------------------------------------
+def test_all_result_panes_preserved():
+    t = _template()
+    for pane in ALL_RESULT_PANES:
+        assert f'id="{pane}"' in t, f"result pane id={pane!r} missing"
+
+
+# ---------------------------------------------------------------------------
+# 14 - showTab() preserved and additively opens Run details for secondary tabs
+# ---------------------------------------------------------------------------
+def test_showtab_opens_run_details_disclosure():
+    t = _template()
+    assert "function showTab(" in t, "showTab() must be preserved"
+    body = _showtab_body(t)
+    assert "chat-run-details" in body, "showTab must target the Run details group"
+    assert ".open = true" in body or ".open=true" in body, (
+        "showTab must open the Run details disclosure for secondary tabs"
+    )
+    # The auto-open keys cover exactly the six demoted tabs.
+    for key in SECONDARY_RESULT_TABS:
+        assert f'"{key}"' in body, f"showTab auto-open list missing {key!r}"
+
+
+# ---------------------------------------------------------------------------
+# 15 - Existing UI.1 "More actions" anchor + sentinel survive untouched
+# ---------------------------------------------------------------------------
+def test_chat_more_actions_anchor_preserved():
+    t = _template()
+    assert 'data-ui-group="chat-more-actions"' in t
+    assert "<!-- /chat-more-actions -->" in t
+    # Primary patch flow stays put.
+    assert "generatePatch()" in t
+    assert "applyPatch()" in t
+
+
+# ---------------------------------------------------------------------------
+# 16 - Additive only: no new backend/privileged tokens; script count unchanged
+# ---------------------------------------------------------------------------
+def test_no_backend_change_in_run_inspector():
+    t = _template()
+    for token in ("os.system", "child_process", "eval(", "new Function(", "document.write("):
+        assert token not in t, f"unexpected privileged token: {token!r}"
+    assert t.count("<script src=") == 2  # mermaid CDN + keybindings.js only
