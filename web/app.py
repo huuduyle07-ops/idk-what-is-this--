@@ -2716,8 +2716,13 @@ def lessons_anti_create_route():
     Always produces a *candidate* anti-lesson with active_knowledge_allowed=False
     (Phase 11.1/11.2 inert guarantee). Any status / active_knowledge_allowed /
     kind in the payload is ignored — this route cannot create an active lesson.
+
+    Phase 11.3: the response also carries an advisory ``duplicate_warning``
+    ({duplicate_of, possible_duplicates, reasons}). Creation is never blocked; if
+    a strong duplicate exists the new candidate records a ``duplicate_of`` link
+    (metadata only — nothing is promoted, activated, or merged).
     """
-    from core.anti_lessons import create_manual_anti_lesson
+    from core.anti_lessons import create_manual_anti_lesson, find_anti_lesson_duplicates
 
     payload = request.get_json(silent=True) or request.form
     repo_path = _lesson_repo_path(payload.get("repo_path"))
@@ -2745,7 +2750,31 @@ def lessons_anti_create_route():
         return {"ok": False, "error": str(e)}, 404
     except Exception as e:
         return {"ok": False, "error": f"anti-lesson creation failed: {type(e).__name__}"}, 500
-    return {"ok": True, "lesson": record}
+
+    # Phase 11.3: advisory duplicate check. Never blocks creation and never
+    # promotes/activates. If a strong duplicate exists, record the link as
+    # candidate-only metadata so the lesson card can flag it.
+    try:
+        duplicate_warning = find_anti_lesson_duplicates(
+            record, repo_path=repo_path, scope=scope, repo_scope_id=repo_scope_id
+        )
+    except Exception:
+        duplicate_warning = {"duplicate_of": None, "possible_duplicates": [], "reasons": []}
+
+    dup_id = duplicate_warning.get("duplicate_of")
+    if dup_id:
+        try:
+            record = lesson_store.patch_lesson_fields(
+                record["id"],
+                {"duplicate_of": dup_id},
+                repo_path=repo_path,
+                scope=scope,
+                repo_scope_id=repo_scope_id,
+            )
+        except Exception:
+            pass
+
+    return {"ok": True, "lesson": record, "duplicate_warning": duplicate_warning}
 
 
 @app.route("/lessons/create-candidate-from-proposal", methods=["POST"])

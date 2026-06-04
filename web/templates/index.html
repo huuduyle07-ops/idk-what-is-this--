@@ -3595,7 +3595,15 @@ function createAntiLesson() {
         .then(r => r.json())
         .then(data => {
             if (!data.ok) { setStatus("❌ " + (data.error || "Failed to create anti-lesson"), "is-error"); return; }
-            setStatus("✓ Candidate anti-lesson created (candidate memory only; not used by CONTROL).", "is-ok");
+            const dup = data.duplicate_warning || {};
+            const dupCount = Array.isArray(dup.possible_duplicates) ? dup.possible_duplicates.length : 0;
+            if (dup.duplicate_of) {
+                setStatus("⚠ Created, but looks like a duplicate of " + dup.duplicate_of + " (kept as candidate memory only; not used by CONTROL).", "is-warn");
+            } else if (dupCount > 0) {
+                setStatus("⚠ Created; " + dupCount + " possible duplicate(s) found (candidate memory only; not used by CONTROL).", "is-warn");
+            } else {
+                setStatus("✓ Candidate anti-lesson created (candidate memory only; not used by CONTROL).", "is-ok");
+            }
             ["antiLessonTitle", "antiLessonTempting", "antiLessonWhyWrong", "antiLessonSaferAlt",
              "antiLessonSummary", "antiLessonEvidence", "antiLessonRelated", "antiLessonTags"]
                 .forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
@@ -3631,6 +3639,7 @@ function _renderLessonCard(lesson) {
     const scopeClass = lessonScope === "repo" ? "lesson-scope-badge--repo" : "lesson-scope-badge--global";
     const archived = lesson.archived === true;
     const supersededBy = lesson.superseded_by || null;
+    const duplicateOf = typeof lesson.duplicate_of === "string" ? lesson.duplicate_of : null;
     const mergeSources = Array.isArray(lesson.merge_sources) ? lesson.merge_sources : [];
     const mergeSourcesCount = mergeSources.length;
 
@@ -3691,6 +3700,7 @@ function _renderLessonCard(lesson) {
             ${supersededBy ? `<span class="lesson-badge lesson-badge--superseded" title="Superseded by: ${_escapeHtml(supersededBy)}">superseded</span>` : ""}
             ${mergeSourcesCount > 0 ? `<span class="lesson-badge lesson-badge--merged" title="Merged from ${mergeSourcesCount} sources">merged from ${mergeSourcesCount}</span>` : ""}
             ${lesson.kind === "anti_lesson" ? `<span class="lesson-badge lesson-badge--anti" title="Anti-lesson: candidate memory only; not used by CONTROL yet">anti-lesson</span>` : ""}
+            ${duplicateOf ? `<span class="lesson-badge lesson-badge--duplicate" title="Possible duplicate of ${_escapeHtml(duplicateOf)} (advisory only)">duplicate</span>` : ""}
           </span>
         </div>
         ${tagsHtml}

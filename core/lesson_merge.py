@@ -4,6 +4,7 @@ All writes use helpers from core.lesson_store. No model calls anywhere.
 """
 from __future__ import annotations
 
+from core import lesson_duplicates
 from core.lesson_store import (
     KIND_ANTI_LESSON,
     KIND_LESSON,
@@ -68,6 +69,13 @@ def preview_merge(
     if len(kinds) > 1:
         warnings.append(f"mixing lesson kinds: {sorted(kinds)}")
     resolved_kind = next(iter(kinds)) if len(kinds) == 1 else "mixed"
+
+    # Phase 11.3: for an anti+anti merge, surface why the sources overlap so the
+    # candidate-only outcome is auditable in the preview. Advisory text only —
+    # preview_merge still writes nothing and never changes the inert outcome.
+    if resolved_kind == KIND_ANTI_LESSON:
+        for reason in lesson_duplicates.anti_lesson_overlap_reasons_for_group(lessons):
+            warnings.append(f"anti-lesson overlap: {reason}")
 
     merged_tags = _union_tags(lessons) if tags is None else _coerce_tags(tags)
     source_ids = [lesson["id"] for lesson in lessons]

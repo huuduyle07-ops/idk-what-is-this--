@@ -9,13 +9,18 @@ network / subprocess / Docker.
 Anti-lessons stay inert (Phase 11.1): candidate status,
 ``active_knowledge_allowed=False``, and excluded from live retrieval. There is no
 auto-creation path here; a human supplies every field.
+
+Phase 11.3 adds ``find_anti_lesson_duplicates`` — a read-only, advisory wrapper
+that loads existing anti-lessons from the store and delegates to the pure,
+deterministic detector in ``core.lesson_duplicates``. It never blocks, merges,
+promotes, activates, or mutates any record.
 """
 from __future__ import annotations
 
 import re
 from typing import Any
 
-from core import lesson_store
+from core import lesson_duplicates, lesson_store
 
 
 _MAX_SUMMARY_CHARS = 500
@@ -184,3 +189,32 @@ def create_manual_anti_lesson(
         repo_scope_id=repo_scope_id,
         kind=lesson_store.KIND_ANTI_LESSON,
     )
+
+
+def find_anti_lesson_duplicates(
+    record: dict,
+    *,
+    repo_path: str | None = None,
+    scope: str | None = None,
+    repo_scope_id: str | None = None,
+) -> dict:
+    """Advisory duplicate check for an anti-lesson ``record`` against the store.
+
+    Loads existing *anti-lessons* (any status, in the relevant scope) and returns
+    ``lesson_duplicates.detect_anti_lesson_duplicates(record, existing)`` —
+    ``{duplicate_of, possible_duplicates, reasons}``. The record's own id is
+    skipped by the detector, so a freshly-saved record can be passed straight in.
+
+    Read-only and advisory: it never blocks creation, never merges, never
+    promotes/activates, and never mutates any record. Any store read failure is
+    swallowed into an empty (no-duplicate) result so it can never break the
+    creation path.
+    """
+    try:
+        existing = lesson_store.list_lessons(
+            repo_path=repo_path, scope=scope, repo_scope_id=repo_scope_id
+        )
+    except Exception:
+        existing = []
+    anti = [r for r in existing if lesson_store.is_anti_lesson(r)]
+    return lesson_duplicates.detect_anti_lesson_duplicates(record, anti)
