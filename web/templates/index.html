@@ -1042,6 +1042,21 @@
               </div>
             </details>
             <!-- /memory-anti-shadow-retrieval -->
+            <details id="antiControlPreviewPanel" class="anti-lesson-report"
+                     data-ui-group="memory-anti-control-preview">
+              <summary class="anti-lesson-report__summary">Anti-Lesson CONTROL Preview</summary>
+              <p class="anti-lesson-report__warning">Preview only. This block is not injected into CONTROL.</p>
+              <div class="anti-lesson-report__toolbar">
+                <input type="text" id="antiControlPreviewQuery" class="anti-control-preview__query" placeholder="query, e.g. swallow exceptions"
+                       onkeydown="if(event.key==='Enter'){event.preventDefault();loadAntiControlPreview(true);}" />
+                <input type="number" id="antiControlPreviewMax" class="anti-control-preview__max" min="1" max="50" value="3" title="max block items to preview" />
+                <button type="button" id="antiControlPreviewBtn" onclick="loadAntiControlPreview(true)" title="Preview the anti-lesson CONTROL block (read-only)">Preview</button>
+              </div>
+              <div id="antiControlPreviewBody" class="anti-lesson-report__body">
+                <div class="health-empty">Enter a query and Preview to see what the anti-lesson CONTROL block would look like (preview only).</div>
+              </div>
+            </details>
+            <!-- /memory-anti-control-preview -->
             <div class="lessons-filters" role="group" aria-label="Lesson status filter">
               <button type="button" class="lessons-filter lessons-filter--active"
                       data-status="" onclick="filterLessons('')">All</button>
@@ -3834,6 +3849,60 @@ function _renderAntiShadowMatches(result) {
 
     return countsHtml
         + `<h4 class="anti-lesson-report__heading">Top matches (shadow only)</h4>` + listHtml;
+}
+
+function loadAntiControlPreview(force) {
+    const body = document.getElementById("antiControlPreviewBody");
+    if (!body) return;
+    const queryEl = document.getElementById("antiControlPreviewQuery");
+    const maxEl = document.getElementById("antiControlPreviewMax");
+    const query = ((queryEl && queryEl.value) || "").trim();
+    if (!query) {
+        body.innerHTML = '<div class="health-empty">Enter a query to preview the anti-lesson CONTROL block.</div>';
+        return;
+    }
+    body.innerHTML = '<div class="health-empty">Building preview (read-only)…</div>';
+    const params = new URLSearchParams();
+    params.set("query", query);
+    const repo = _lessonRepoPath();
+    if (repo) params.set("repo_path", repo);
+    const maxItems = maxEl && parseInt(maxEl.value, 10);
+    if (maxItems && maxItems > 0) params.set("max_items", String(maxItems));
+    fetch("/lessons/anti/control-preview?" + params.toString())
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                body.innerHTML = '<div class="health-empty">❌ ' + _escapeHtml(data.error || "Preview failed") + '</div>';
+                return;
+            }
+            body.innerHTML = _renderAntiControlPreview(data.preview);
+        })
+        .catch(e => { body.innerHTML = '<div class="health-empty">❌ ' + _escapeHtml(String(e)) + '</div>'; });
+}
+
+function _renderAntiControlPreview(preview) {
+    preview = preview || {};
+    const esc = _escapeHtml;
+    const items = Array.isArray(preview.items) ? preview.items : [];
+    const label = preview.label || "PREVIEW ONLY / NOT INJECTED INTO CONTROL";
+
+    const labelHtml = `<div class="anti-lesson-report__counts"><span><strong>${esc(label)}</strong></span></div>`;
+
+    const listHtml = items.length
+        ? `<ul class="anti-lesson-report__list">` + items.map(it => {
+            const parts = [];
+            parts.push(`<li><code>${esc(it.lesson_id || "")}</code> — ${esc(it.title || "")}`);
+            if (it.tempting_wrong_pattern) parts.push(`<div class="anti-control-preview__field"><em>❌ tempting:</em> ${esc(it.tempting_wrong_pattern)}</div>`);
+            if (it.why_wrong) parts.push(`<div class="anti-control-preview__field"><em>⚠️ why wrong:</em> ${esc(it.why_wrong)}</div>`);
+            if (it.safer_alternative) parts.push(`<div class="anti-control-preview__field"><em>✅ safer:</em> ${esc(it.safer_alternative)}</div>`);
+            if (it.duplicate_of) parts.push(`<div class="anti-control-preview__field"><em>duplicate_of:</em> <code>${esc(it.duplicate_of)}</code></div>`);
+            parts.push(`</li>`);
+            return parts.join("");
+          }).join("") + `</ul>`
+        : `<div class="health-empty">No anti-lessons matched — the preview block would be empty.</div>`;
+
+    return labelHtml
+        + `<h4 class="anti-lesson-report__heading">Anti-lesson CONTROL block (preview)</h4>` + listHtml;
 }
 
 function _renderLessonsList(lessons) {
