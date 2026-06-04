@@ -2959,6 +2959,58 @@ def lessons_anti_control_preview_route():
     return payload
 
 
+@app.route("/lessons/anti/control-preview-report", methods=["GET"])
+def lessons_anti_control_preview_report_route():
+    """Read-only anti-lesson CONTROL preview *report* (Phase 11.7b).
+
+    Query params: query (required), max_items? (bounded), repo_path?
+    (path-guarded), scope?, repo_scope_id?, include_global?, format?
+    (``format=markdown``/``md`` adds a rendered Markdown view alongside the JSON
+    report).
+
+    It loads matching anti-lessons via the existing shadow loader and assembles a
+    report that shows the anti-lesson CONTROL preview *beside* the query/debug
+    context, while stating plainly that the actual CONTROL prompt is unchanged and
+    anti-lessons are not injected. It does NOT call ``build_control_prompt``, does
+    not change active retrieval, and runs no patch / Dream / benchmark / model /
+    subprocess / Docker. It never creates/promotes/blocks/merges a lesson. Reads
+    storage only.
+    """
+    from core import anti_lesson_control_report
+
+    query = (request.values.get("query") or "").strip()
+    if not query:
+        return {"ok": False, "error": "query is required"}, 400
+
+    repo_path = _lesson_repo_path(request.values.get("repo_path"))
+    scope = _lesson_scope_arg(request.values.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(request.values.get("repo_scope_id"))
+    include_global = (request.values.get("include_global") or "true").lower() != "false"
+    fmt = (request.values.get("format") or "").strip().lower()
+    try:
+        max_items = int(request.values.get("max_items") or 3)
+    except (TypeError, ValueError):
+        max_items = 3
+    max_items = max(1, min(max_items, 50))
+    try:
+        report = anti_lesson_control_report.load_anti_lesson_control_preview_report(
+            query,
+            repo_path=repo_path,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+            include_global=include_global,
+            max_items=max_items,
+        )
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"control preview report failed: {type(e).__name__}"}, 500
+    payload = {"ok": True, "report": report}
+    if fmt in {"markdown", "md"}:
+        payload["markdown"] = anti_lesson_control_report.format_anti_lesson_control_preview_report_markdown(report)
+    return payload
+
+
 @app.route("/lessons/create-candidate-from-proposal", methods=["POST"])
 def lessons_create_candidate_from_proposal_route():
     """Create a lesson candidate from a proposal artifact (uniform result).
