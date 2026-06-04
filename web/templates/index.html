@@ -733,10 +733,26 @@
             <div id="memoryStatus" class="memory-status"></div>
           </div>
 
+          <!-- Phase UI.2a: segmented Memory sub-nav. Each section below is
+               tagged data-memory-section and shown one at a time by
+               showMemorySection(). Additive - every id/handler/label preserved.
+               Consolidate (above) stays a visible utility, not a segment. -->
+          <div class="memory-nav" data-ui-group="memory-nav" role="tablist" aria-label="Memory sections">
+            <button type="button" class="memory-nav__tab memory-nav__tab--active" data-memory-nav="lessons"
+                    role="tab" aria-selected="true" onclick="showMemorySection('lessons')">Lessons</button>
+            <button type="button" class="memory-nav__tab" data-memory-nav="proposals"
+                    role="tab" aria-selected="false" onclick="showMemorySection('proposals')">Proposals</button>
+            <button type="button" class="memory-nav__tab" data-memory-nav="handoffs"
+                    role="tab" aria-selected="false" onclick="showMemorySection('handoffs')">Handoffs</button>
+            <button type="button" class="memory-nav__tab" data-memory-nav="worker-runs"
+                    role="tab" aria-selected="false" onclick="showMemorySection('worker-runs')">Worker Runs</button>
+          </div>
+          <!-- /memory-nav -->
+
           <!-- Phase 5 Polish: Proposals sub-section above Lessons.
                Lists .agent/proposals/<run>/<item>/ artifacts; per-item promote
                button wraps scripts/create_lesson_from_proposal.py. -->
-          <div class="memory-section proposals-section">
+          <div class="memory-section proposals-section" data-ui-group="memory-proposals" data-memory-section="proposals">
             <div class="proposals-header">
               <strong>Proposals</strong>
             </div>
@@ -750,10 +766,11 @@
               <div class="health-empty">Click ⟳ Refresh to load proposals.</div>
             </div>
           </div>
+          <!-- /memory-proposals -->
 
           <!-- Sub-agent category: groups Mayor Mode (Handoffs) + Worker Runs as one
                visual category. Both panels still scan their own .agent/ subfolders. -->
-          <div class="memory-section subagent-group">
+          <div class="memory-section subagent-group" data-ui-group="memory-handoffs" data-memory-section="handoffs">
             <div class="subagent-group__header">
               <h3 class="subagent-group__title">Sub-agent</h3>
               <div class="subagent-group__links">
@@ -849,13 +866,15 @@
               <div class="health-empty">Click ⟳ Refresh to load handoffs.</div>
             </div>
           </div>
+          </div>
+          <!-- /memory-handoffs -->
 
           <!-- Phase 7.2: Worker Runs review/import.
                Reads .agent/worker_runs/. Importing a complete run lands a
                fresh artifact in .agent/proposals/<run>/01-<slug>/ which then
                flows through the existing proposal -> lesson review. No
                real-repo writes. -->
-          <div class="memory-section worker-runs-section">
+          <div class="memory-section worker-runs-section" data-ui-group="memory-workerruns" data-memory-section="worker-runs">
             <div class="proposals-header">
               <h3>Worker Runs</h3>
             </div>
@@ -870,11 +889,10 @@
               <div class="health-empty">Click ⟳ Refresh to load worker runs.</div>
             </div>
           </div>
-
-          </div><!-- /.subagent-group -->
+          <!-- /memory-workerruns -->
 
           <!-- Phase 6.1: Lessons (Context Poisoning Guard storage) -->
-          <div class="memory-section lessons-section">
+          <div class="memory-section lessons-section is-active" data-ui-group="memory-lessons" data-memory-section="lessons">
             <div class="lessons-header">
               <strong>Lessons</strong>
               <button type="button" class="sidebar-refresh" onclick="loadLessons(true)" title="Refresh lessons list">&#x27F3; Refresh</button>
@@ -899,7 +917,7 @@
                 <div class="health-empty">Open to load duplicate hints.</div>
               </div>
             </details>
-            <div class="lessons-filters" role="group" aria-label="Lesson filter">
+            <div class="lessons-filters" role="group" aria-label="Lesson status filter">
               <button type="button" class="lessons-filter lessons-filter--active"
                       data-status="" onclick="filterLessons('')">All</button>
               <button type="button" class="lessons-filter"
@@ -908,44 +926,51 @@
                       data-status="active" onclick="filterLessons('active')">Active</button>
               <button type="button" class="lessons-filter"
                       data-status="blocked" onclick="filterLessons('blocked')">Blocked</button>
-              <span class="lessons-filter-sep" aria-hidden="true">|</span>
-              <select id="lessonFilterLanguage" class="lessons-filter-select"
-                      onchange="_applyLessonFilters()" title="Filter by language">
-                <option value="">All languages</option>
-              </select>
-              <select id="lessonFilterSource" class="lessons-filter-select"
-                      onchange="_applyLessonFilters()" title="Filter by source">
-                <option value="">All sources</option>
-              </select>
-              <select id="lessonFilterCategory" class="lessons-filter-select"
-                      onchange="_applyLessonFilters()" title="Filter by category">
-                <option value="">All categories</option>
-              </select>
-              <select id="lessonFilterDifficulty" class="lessons-filter-select"
-                      onchange="_applyLessonFilters()" title="Filter by difficulty"
-                      style="display:none">
-                <option value="">All difficulties</option>
-              </select>
-              <span class="lessons-filter-sep" aria-hidden="true">|</span>
-              <select id="lessonFilterKind" class="lessons-filter-select"
-                      onchange="_applyLessonFilters()" title="Filter by kind">
-                <option value="">All kinds</option>
-                <option value="lesson">lesson</option>
-                <option value="anti-lesson">anti-lesson</option>
-              </select>
-              <span class="lessons-filter-sep" aria-hidden="true">|</span>
-              <label class="lessons-filter-toggle" title="Show archived lessons (hidden by default)">
-                <input type="checkbox" id="showArchivedLessons" onchange="_applyLessonFilters()"> Show archived
-              </label>
-              <label class="lessons-filter-toggle" title="Show superseded lessons (hidden by default)">
-                <input type="checkbox" id="showSupersededLessons" onchange="_applyLessonFilters()"> Show superseded
-              </label>
             </div>
+            <!-- Phase UI.2a: metadata filters demoted behind a disclosure. Ids and
+                 onchange handlers are unchanged so _applyLessonFilters() still
+                 finds every control whether the disclosure is open or closed. -->
+            <details class="lessons-more-filters" data-ui-group="lessons-more-filters">
+              <summary class="lessons-more-filters__summary">More filters</summary>
+              <div class="lessons-filters lessons-filters--more" role="group" aria-label="Lesson metadata filters">
+                <select id="lessonFilterLanguage" class="lessons-filter-select"
+                        onchange="_applyLessonFilters()" title="Filter by language">
+                  <option value="">All languages</option>
+                </select>
+                <select id="lessonFilterSource" class="lessons-filter-select"
+                        onchange="_applyLessonFilters()" title="Filter by source">
+                  <option value="">All sources</option>
+                </select>
+                <select id="lessonFilterCategory" class="lessons-filter-select"
+                        onchange="_applyLessonFilters()" title="Filter by category">
+                  <option value="">All categories</option>
+                </select>
+                <select id="lessonFilterDifficulty" class="lessons-filter-select"
+                        onchange="_applyLessonFilters()" title="Filter by difficulty"
+                        style="display:none">
+                  <option value="">All difficulties</option>
+                </select>
+                <select id="lessonFilterKind" class="lessons-filter-select"
+                        onchange="_applyLessonFilters()" title="Filter by kind">
+                  <option value="">All kinds</option>
+                  <option value="lesson">lesson</option>
+                  <option value="anti-lesson">anti-lesson</option>
+                </select>
+                <label class="lessons-filter-toggle" title="Show archived lessons (hidden by default)">
+                  <input type="checkbox" id="showArchivedLessons" onchange="_applyLessonFilters()"> Show archived
+                </label>
+                <label class="lessons-filter-toggle" title="Show superseded lessons (hidden by default)">
+                  <input type="checkbox" id="showSupersededLessons" onchange="_applyLessonFilters()"> Show superseded
+                </label>
+              </div>
+            </details>
+            <!-- /lessons-more-filters -->
             <div id="lessonsStatus" class="lessons-status"></div>
             <div id="lessonsList" class="lessons-list">
               <div class="health-empty">Click ⟳ Refresh to load lessons.</div>
             </div>
           </div>
+          <!-- /memory-lessons -->
         </div>
 
         <!-- Graph (no longer a result-tab; lives in its own workspace tab) -->
@@ -3512,8 +3537,8 @@ function blockLessonById(lessonId, scope, repoScopeId) {
 function loadDuplicateHints(force) {
     if (_duplicateHintsLoaded && !force) return;
     _duplicateHintsLoaded = true;
-    const listEl = document.getElementById("duplicateHintsList");
-    if (listEl) listEl.innerHTML = '<div class="health-empty">Loading…</div>';
+    const container = document.getElementById("duplicateHintsList");
+    if (container) container.innerHTML = '<div class="health-empty">Loading…</div>';
     const params = new URLSearchParams();
     const repo = _lessonRepoPath();
     if (repo) params.set("repo_path", repo);
@@ -3522,36 +3547,56 @@ function loadDuplicateHints(force) {
         .then(r => r.json())
         .then(data => {
             if (!data.ok) {
-                if (listEl) listEl.innerHTML = `<div class="health-empty">❌ ${_escapeHtml(data.error || "Failed to load hints")}</div>`;
+                if (container) container.innerHTML = `<div class="health-empty">❌ ${_escapeHtml(data.error || "Failed to load hints")}</div>`;
                 return;
             }
             const groups = data.groups || [];
+            if (container) container.innerHTML = "";
             if (!groups.length) {
-                if (listEl) listEl.innerHTML = '<div class="health-empty">No duplicate groups found.</div>';
+                if (container) container.innerHTML = '<div class="health-empty">No duplicate hints found.</div>';
                 return;
             }
-            if (listEl) listEl.innerHTML = groups.map(_renderDuplicateGroup).join("");
+            if (container) container.innerHTML = groups.map((group, index) => _renderDuplicateGroup(group, index)).join("");
         })
         .catch(err => {
-            if (listEl) listEl.innerHTML = `<div class="health-empty">❌ Network error: ${_escapeHtml(String(err))}</div>`;
+            if (container) container.innerHTML = `<div class="health-empty">❌ Network error: ${_escapeHtml(String(err))}</div>`;
         });
 }
 
-function _renderDuplicateGroup(group) {
-    const lessons = Array.isArray(group.lessons) ? group.lessons : [];
-    const reason = group.reason || group.hint || "";
-    const ids = lessons.map(l => l.id || "").filter(Boolean);
+function _renderDuplicateGroup(group, index) {
+    const groupIds = Array.isArray(group.lesson_ids) ? group.lesson_ids.filter(Boolean) : [];
+    const rawLessons = Array.isArray(group.lessons) ? group.lessons : [];
+    const lessons = rawLessons.length
+        ? rawLessons
+        : groupIds.map(id => _lessonsData.find(l => l.id === id) || { id });
+    const ids = (groupIds.length ? groupIds : lessons.map(l => l.id || "")).filter(Boolean);
     const idsAttr = _escapeHtml(JSON.stringify(ids));
+    const reasons = Array.isArray(group.hint_reasons)
+        ? group.hint_reasons
+        : [group.reason, group.hint].filter(Boolean);
+    const reasonRows = reasons.length
+        ? reasons.map(r => `<li>${_escapeHtml(r)}</li>`).join("")
+        : "<li>No hint reasons supplied.</li>";
     const lessonRows = lessons.map(l => {
         const st = l.status || "candidate";
         return `<div class="dup-group__lesson">
+            <span class="dup-group__lesson-main">
+                <span class="dup-group__title">${_escapeHtml(l.title || "Untitled lesson")}</span>
+                <code class="dup-group__id">${_escapeHtml(l.id || "")}</code>
+            </span>
             <span class="lesson-badge lesson-badge--${_escapeHtml(st)}">${_escapeHtml(st)}</span>
-            <span class="dup-group__title">${_escapeHtml(l.title || "Untitled")}</span>
-            <code class="dup-group__id">${_escapeHtml(l.id || "")}</code>
         </div>`;
     }).join("");
     return `<div class="dup-group">
-        ${reason ? `<div class="dup-group__reason">${_escapeHtml(reason)}</div>` : ""}
+        <div class="dup-group__header">
+            <strong>Duplicate group ${index + 1}</strong>
+            <span>${lessons.length} lesson(s)</span>
+        </div>
+        <div class="dup-group__reasons">
+            <div class="dup-group__label">Hint reasons</div>
+            <ul>${reasonRows}</ul>
+        </div>
+        <div class="dup-group__label">Source lessons</div>
         <div class="dup-group__lessons">${lessonRows}</div>
         <div class="dup-group__actions">
             <button type="button" data-merge-ids="${idsAttr}"
@@ -4666,6 +4711,7 @@ function showWorkspaceTab(id) {
     const autoLoad = {
         benchmarks: () => { loadBenchmarksPanel(false); refreshBenchmarkStatus(); },
         memory:     () => {
+            showMemorySection(localStorage.getItem("activeMemorySection") || "lessons");
             loadProposalRuns(false);
             if (typeof refreshHandoffs === "function") refreshHandoffs();
             if (typeof refreshWorkerRuns === "function") refreshWorkerRuns();
@@ -4682,6 +4728,25 @@ function showWorkspaceTab(id) {
         graph:      () => {},
     };
     if (autoLoad[id]) autoLoad[id]();
+}
+
+// Phase UI.2a: segmented Memory sub-nav. Shows one of the Lessons / Proposals /
+// Handoffs / Worker Runs sections at a time. The section data are still loaded
+// by the memory tab's autoLoad above; this is purely visual + persisted, with
+// no backend calls. Consolidate memory (no data-memory-section) stays visible.
+function showMemorySection(key) {
+    const valid = ["lessons", "proposals", "handoffs", "worker-runs"];
+    if (!valid.includes(key)) key = "lessons";
+    localStorage.setItem("activeMemorySection", key);
+
+    document.querySelectorAll("#ws-memory [data-memory-section]").forEach(el => {
+        el.classList.toggle("is-active", el.dataset.memorySection === key);
+    });
+    document.querySelectorAll(".memory-nav__tab").forEach(btn => {
+        const on = btn.dataset.memoryNav === key;
+        btn.classList.toggle("memory-nav__tab--active", on);
+        btn.setAttribute("aria-selected", on ? "true" : "false");
+    });
 }
 
 // Phase 5 Slice 2: Health panel — fetches /health, renders status rows.

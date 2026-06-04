@@ -28,6 +28,14 @@ def test_duplicate_hints_panel_exists():
     assert 'id="duplicateHintsPanel"' in _TMPL
 
 
+def test_duplicate_group_renderer_contract():
+    assert "function _renderDuplicateGroup(" in _TMPL
+    assert "Duplicate group" in _TMPL
+    assert "Select group for merge" in _TMPL
+    assert 'container.innerHTML = ""' in _TMPL
+    assert "No duplicate hints found." in _TMPL
+
+
 # ---------------------------------------------------------------------------
 # 3. Preview merge modal fields exist
 # ---------------------------------------------------------------------------

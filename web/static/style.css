@@ -3715,6 +3715,100 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     margin-bottom: 8px;
 }
 
+.lesson-duplicate-hints {
+    margin-bottom: 10px;
+}
+
+.lesson-duplicate-hints__summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.lesson-duplicate-hints__toolbar {
+    margin: 8px 0;
+}
+
+.lesson-duplicate-hints__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dup-group {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 8px 10px;
+}
+
+.dup-group__header,
+.dup-group__lesson {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.dup-group__header {
+    margin-bottom: 6px;
+}
+
+.dup-group__header span,
+.dup-group__label {
+    font-size: 11px;
+    color: var(--color-text-muted);
+}
+
+.dup-group__reasons {
+    margin-bottom: 6px;
+}
+
+.dup-group__reasons ul {
+    margin: 3px 0 0 16px;
+    padding: 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.dup-group__lessons {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.dup-group__lesson {
+    min-height: 28px;
+}
+
+.dup-group__lesson-main {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.dup-group__title {
+    color: var(--color-text);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dup-group__id {
+    color: var(--color-text-muted);
+    font-size: 11px;
+}
+
+.dup-group__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
 .lessons-filters {
     display: flex;
     gap: 6px;
@@ -4351,4 +4445,60 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
 .harness-composeapply__btn:focus-visible {
     outline: 2px solid var(--color-danger);
     outline-offset: 2px;
+}
+
+/* ── Phase UI.2a: Memory segmentation ─────────────────────────────────────
+   A segmented sub-nav switches between the Lessons / Proposals / Handoffs /
+   Worker Runs sections so they no longer all stack at once. Additive: only
+   visibility + a thin tab bar; every section's ids/handlers are untouched. */
+.memory-nav {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    margin: 0 0 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+}
+.memory-nav__tab {
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: none;
+    color: var(--color-text-muted);
+    padding: 0.35rem 0.8rem;
+    margin-bottom: -1px;
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+.memory-nav__tab:hover { color: var(--color-text); }
+.memory-nav__tab--active {
+    color: var(--color-text);
+    border-color: var(--color-border);
+    border-bottom-color: var(--color-surface);
+    background: var(--color-surface);
+    font-weight: 600;
+}
+
+/* Only the active segment renders. Consolidate memory (no data-memory-section)
+   is intentionally excluded, so it stays visible above the nav as a utility. */
+#ws-memory [data-memory-section] { display: none; }
+#ws-memory [data-memory-section].is-active { display: block; }
+
+/* Lessons "More filters" disclosure: keep the metadata filters compact. */
+.lessons-more-filters { margin: 0 0 0.5rem; }
+.lessons-more-filters__summary {
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    padding: 0.2rem 0;
+    list-style: none;
+}
+.lessons-more-filters__summary::-webkit-details-marker { display: none; }
+.lessons-more-filters__summary::before { content: "\25B8  "; }
+.lessons-more-filters[open] .lessons-more-filters__summary::before { content: "\25BE  "; }
+.lessons-filters--more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+    margin-top: 0.4rem;
 }
