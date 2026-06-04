@@ -167,22 +167,30 @@ def test_create_merge_active_with_confirm_succeeds(lessons_repo):
     assert new["active_knowledge_allowed"] is False
 
 
-def test_create_merge_mixed_kinds_without_confirm_raises(lessons_repo):
+def test_create_merge_normal_plus_anti_is_blocked(lessons_repo):
+    """Phase 11.1: a normal lesson and an anti-lesson can never be merged.
+
+    Supersedes the prior 'mixed kinds need confirm_mix_kinds' behavior — since
+    `lesson` and `anti_lesson` are the only kinds, the only possible mix is
+    normal+anti, which is now hard-blocked.
+    """
     a = _saved(lessons_repo)
     b = _saved(lessons_repo)
     lesson_store.patch_lesson_fields(b["id"], {"kind": "anti_lesson"})
-    with pytest.raises(ValueError, match="confirm_mix_kinds"):
+    with pytest.raises(ValueError, match="anti-lesson"):
         lesson_merge.create_merge([a["id"], b["id"]], title="M", summary="", tags=[])
 
 
-def test_create_merge_mixed_kinds_with_confirm_succeeds(lessons_repo):
+def test_create_merge_normal_plus_anti_blocked_even_with_confirm(lessons_repo):
+    """The normal+anti block is hard: confirm_mix_kinds is now vestigial and
+    cannot override it."""
     a = _saved(lessons_repo)
     b = _saved(lessons_repo)
     lesson_store.patch_lesson_fields(b["id"], {"kind": "anti_lesson"})
-    new, _ = lesson_merge.create_merge(
-        [a["id"], b["id"]], title="M", summary="", tags=[], confirm_mix_kinds=True
-    )
-    assert new["status"] == "candidate"
+    with pytest.raises(ValueError, match="anti-lesson"):
+        lesson_merge.create_merge(
+            [a["id"], b["id"]], title="M", summary="", tags=[], confirm_mix_kinds=True
+        )
 
 
 def test_create_merge_preserves_sources_data(lessons_repo):

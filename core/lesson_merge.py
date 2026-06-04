@@ -5,10 +5,13 @@ All writes use helpers from core.lesson_store. No model calls anywhere.
 from __future__ import annotations
 
 from core.lesson_store import (
+    KIND_ANTI_LESSON,
+    KIND_LESSON,
     STATUS_ACTIVE,
     STATUS_CANDIDATE,
     _coerce_tags,
     get_lesson_by_id,
+    normalize_lesson_kind,
     patch_lesson_fields,
     # Used by create_merge (Task 4):
     save_raw_lesson_record,  # noqa: F401
@@ -152,6 +155,12 @@ def create_merge(
     Raises ValueError if guards not confirmed; LookupError if any ID not found.
     The merged record is always candidate and never auto-promoted.
 
+    Phase 11.1: merging a normal lesson with an anti-lesson is a HARD block and
+    raises ValueError regardless of `confirm_mix_kinds` (now vestigial — kept
+    only so existing callers/routes that pass it keep working). An anti+anti
+    merge is allowed and produces a candidate anti-lesson with
+    `active_knowledge_allowed=False`.
+
     Note: writes the merged record before patching sources. If a source patch
     fails mid-loop, earlier sources will be marked superseded_by but later ones
     will not. No rollback is performed — this is a known limitation of the
@@ -173,10 +182,17 @@ def create_merge(
             f"active lessons require confirm_supersede_active=True: {active_ids}"
         )
 
-    kinds = {lesson.get("kind") or "lesson" for lesson in lessons}
-    if len(kinds) > 1 and not confirm_mix_kinds:
+    # Phase 11.1: a normal lesson and an anti-lesson are semantic opposites
+    # ("do X" vs "do NOT do X") and must never be merged. This is a HARD block:
+    # `confirm_mix_kinds` cannot override it (the flag is retained only for API
+    # compatibility — since `lesson` and `anti_lesson` are the only kinds, the
+    # only possible mix is normal+anti, so it is now vestigial). An anti+anti
+    # merge is allowed and yields a candidate anti-lesson (see preview_merge).
+    kinds = {normalize_lesson_kind(lesson.get("kind")) for lesson in lessons}
+    if KIND_LESSON in kinds and KIND_ANTI_LESSON in kinds:
         raise ValueError(
-            f"mixed lesson kinds require confirm_mix_kinds=True: {sorted(kinds)}"
+            "cannot merge a normal lesson with an anti-lesson "
+            "(anti-lessons may only be merged with other anti-lessons)"
         )
 
     record, _ = preview_merge(lessons, title=title, summary=summary, tags=tags)

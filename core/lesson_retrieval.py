@@ -16,7 +16,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from core.lesson_store import STATUS_ACTIVE, list_lessons
+from core.lesson_store import STATUS_ACTIVE, is_anti_lesson, list_lessons
 from core.memory_temperature_retrieval import (
     TIEBREAK_METADATA_KEY,
     apply_memory_temperature_tiebreaker,
@@ -109,15 +109,24 @@ def list_active_lessons(repo_path: str | None = None) -> list[dict]:
     top-level `active_knowledge_allowed` is not True. The storage layer
     enforces the invariant, but a corrupted file or future bug must not
     leak a candidate or tampered record into context.
+
+    Phase 11.1: anti-lessons (`kind == "anti_lesson"`) are excluded here even
+    if a record somehow reaches the active bucket, unless the reserved
+    `ANTI_LESSONS_ENABLED` placeholder flag is set (default off). This is the
+    single chokepoint feeding `find_active_lessons` and the CONTROL prompt, so
+    anti-lessons stay inert until a future Phase 11 slice opts them in.
     """
     out: list[dict] = []
     seen_ids: set[str] = set()
+    anti_allowed = _anti_lessons_retrieval_enabled()
     for record in list_lessons(status=STATUS_ACTIVE, repo_path=repo_path):
         if not isinstance(record, dict):
             continue
         if record.get("status") != STATUS_ACTIVE:
             continue
         if record.get("active_knowledge_allowed") is not True:
+            continue
+        if not anti_allowed and is_anti_lesson(record):
             continue
         lesson_id = record.get("id")
         if not isinstance(lesson_id, str) or lesson_id in seen_ids:
@@ -191,6 +200,23 @@ def find_active_lessons(
         decorated["_match_score"] = score
         out.append(decorated)
     return _maybe_apply_temperature_tiebreaker(out)
+
+
+def _anti_lessons_retrieval_enabled() -> bool:
+    """Phase 11.1: anti-lessons are NOT retrieval-eligible yet (fail-closed).
+
+    Reads the reserved `ANTI_LESSONS_ENABLED` placeholder flag fail-closed; the
+    default — and the fallback on any import/attribute error — is False, so
+    active anti-lessons are excluded from live retrieval. The flag is a forward
+    seam for a later Phase 11 slice and is not wired into CONTROL, promotion,
+    the UI, or any automation. Read here at the call site, never inside a pure
+    helper, mirroring `_temperature_tiebreaker_flags`.
+    """
+    try:
+        import config as _config
+    except Exception:
+        return False
+    return bool(getattr(_config, "ANTI_LESSONS_ENABLED", False))
 
 
 def _temperature_tiebreaker_flags() -> tuple[bool, bool]:

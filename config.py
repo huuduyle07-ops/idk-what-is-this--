@@ -312,6 +312,15 @@ LESSON_RETRIEVAL_ENABLED = os.getenv("LESSON_RETRIEVAL_ENABLED", "false").lower(
 LESSON_RETRIEVAL_LIMIT = int(os.getenv("LESSON_RETRIEVAL_LIMIT", "5"))
 LESSON_RETRIEVAL_MAX_CHARS = int(os.getenv("LESSON_RETRIEVAL_MAX_CHARS", "3000"))
 
+# Phase 11.1: reserved placeholder. Anti-lessons are stored as a first-class
+# lesson kind but stay INERT — never auto-activated, never merged with normal
+# lessons, and never retrieval-eligible. This flag is the (default-off) seam a
+# later Phase 11 slice will use to make active anti-lessons retrieval-eligible.
+# It is NOT wired into CONTROL prompts, promotion, the UI, or any automation;
+# the only thing it gates today is the fail-closed exclusion in
+# core.lesson_retrieval.list_active_lessons. Leave it false.
+ANTI_LESSONS_ENABLED = os.getenv("ANTI_LESSONS_ENABLED", "false").lower() not in {"0", "false", "no"}
+
 # Phase 13.11a: wire the Phase 13.9 Memory Temperature tie-breaker into the
 # final lesson-candidate ordering boundary (core.lesson_retrieval), behind a
 # disabled-by-default flag so live behavior is exactly unchanged. When false

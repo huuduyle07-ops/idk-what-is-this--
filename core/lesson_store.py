@@ -35,6 +35,14 @@ SCOPE_GLOBAL = "global"
 SCOPE_REPO = "repo"
 LESSON_SCOPES = {SCOPE_GLOBAL, SCOPE_REPO}
 
+# Phase 11.1 — lesson kind. A normal lesson says "do this pattern when this
+# evidence appears"; an anti-lesson says "do NOT do this tempting but wrong
+# pattern". Anti-lessons are stored as first-class records but stay inert:
+# never auto-activated and never retrieval-eligible (see core.lesson_retrieval).
+KIND_LESSON = "lesson"
+KIND_ANTI_LESSON = "anti_lesson"
+LESSON_KINDS = {KIND_LESSON, KIND_ANTI_LESSON}
+
 _BUCKET_DIRS = {
     STATUS_CANDIDATE: "candidate",
     STATUS_ACTIVE: "active",
@@ -65,6 +73,44 @@ _TAG_MAX_TEXT_TOKENS = 3
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def validate_lesson_kind(kind: Any) -> str:
+    """Return `kind` unchanged if it is a recognized lesson kind, else raise.
+
+    Unlike `normalize_lesson_kind`, this supplies NO default — a missing or
+    unknown value (including None) raises ValueError. Use it to reject bad
+    kinds on write paths.
+    """
+    if kind not in LESSON_KINDS:
+        raise ValueError(f"invalid lesson kind: {kind!r}")
+    return kind
+
+
+def normalize_lesson_kind(kind: Any) -> str:
+    """Coerce a lesson `kind` to a canonical value.
+
+    Missing / None / blank string → "lesson" (legacy records predate `kind` and
+    are normal lessons). A recognized kind is returned unchanged. Any other
+    value raises ValueError via `validate_lesson_kind`.
+    """
+    if kind is None:
+        return KIND_LESSON
+    if isinstance(kind, str) and not kind.strip():
+        return KIND_LESSON
+    return validate_lesson_kind(kind)
+
+
+def is_anti_lesson(record: Any) -> bool:
+    """True iff `record` is a dict whose kind is the anti-lesson kind.
+
+    Lenient and side-effect-free: never raises. A missing or unrecognized kind
+    is treated as a normal lesson (returns False), so this is safe to call on
+    arbitrary/legacy records in read and retrieval paths.
+    """
+    if not isinstance(record, dict):
+        return False
+    return record.get("kind") == KIND_ANTI_LESSON
 
 
 def _lessons_root(repo_path: str | None = None) -> Path:
@@ -316,6 +362,11 @@ def _normalize_record(
     normalized["scope"] = scope
     normalized["repo_scope_id"] = repo_scope_id if scope == SCOPE_REPO else None
     normalized["repo_path_hint"] = repo_path_hint if scope == SCOPE_REPO else None
+    # Phase 11.1: keep `kind` canonical on read. Tolerate legacy (missing) and
+    # corrupt values by defaulting to "lesson" rather than raising in a read
+    # path — only write paths reject unknown kinds.
+    raw_kind = record.get("kind")
+    normalized["kind"] = raw_kind if raw_kind in LESSON_KINDS else KIND_LESSON
     if bucket_status == STATUS_ACTIVE:
         normalized["active_knowledge_allowed"] = (
             normalized.get("active_knowledge_allowed") is True
@@ -503,16 +554,30 @@ def save_candidate_lesson(
     repo_path: str | None = None,
     scope: str | None = None,
     repo_scope_id: str | None = None,
+    kind: str = KIND_LESSON,
 ) -> dict:
     """Evaluate `candidate` via lesson_quality and persist as a lesson record.
 
     If `tags` is None, tags are auto-derived via `derive_lesson_tags(...)`.
     Pass `tags=[]` to explicitly save with no tags.
+
+    `kind` defaults to "lesson". Pass `kind="anti_lesson"` to store an
+    anti-lesson; unknown kinds are rejected. Anti-lessons are inert (Phase
+    11.1): they never auto-activate even when the quality guard auto-approved
+    and `LESSON_AUTO_ACTIVE` is on, and `active_knowledge_allowed` is forced
+    false. A blocked verdict still routes an anti-lesson to the blocked bucket.
     """
+    resolved_kind = normalize_lesson_kind(kind)
     evaluation = evaluate_lesson_candidate(candidate)
     promotion = evaluation.get("promotion")
     auto_active = bool(getattr(config, "LESSON_AUTO_ACTIVE", False))
-    status = _status_routing(promotion, auto_active=auto_active)
+    if resolved_kind == KIND_ANTI_LESSON:
+        # Anti-lessons never auto-activate. A blocked verdict still routes to
+        # blocked (anti-lessons may be blocked); everything else stays a
+        # candidate awaiting an explicit, future-gated activation path.
+        status = STATUS_BLOCKED if promotion == BLOCKED else STATUS_CANDIDATE
+    else:
+        status = _status_routing(promotion, auto_active=auto_active)
     scope_name, resolved_repo_scope_id, repo_path_hint = _resolve_save_scope(
         candidate,
         source=source,
@@ -559,7 +624,7 @@ def save_candidate_lesson(
         # field instead of checking the bucket can never pull a candidate.
         "active_knowledge_allowed": status == STATUS_ACTIVE,
         # Phase b2 additions
-        "kind": "lesson",
+        "kind": resolved_kind,
         "archived": False,
         "superseded_by": None,
         "supersedes": [],
@@ -883,6 +948,11 @@ def save_raw_lesson_record(
     _validate_lesson_id(lesson_id)
     if record.get("status") != STATUS_CANDIDATE:
         raise ValueError("save_raw_lesson_record: status must be 'candidate'")
+    # Copy before mutating so the caller's dict is untouched; canonicalize the
+    # kind (missing → "lesson", unknown → ValueError) so raw writes can't smuggle
+    # in an invalid kind.
+    record = dict(record)
+    record["kind"] = normalize_lesson_kind(record.get("kind"))
     scope_name = record.get("scope", SCOPE_GLOBAL)
     _validate_scope(scope_name)
     resolved_repo_scope_id = record.get("repo_scope_id")
