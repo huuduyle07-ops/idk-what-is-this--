@@ -100,16 +100,108 @@ def test_low_shared_case_ratio_is_inconclusive_but_keeps_partial_rows():
 
 
 def test_previously_passing_hard_case_failure_needs_review():
-    baseline = _report([
-        _case("hard_case", success=True, difficulty="hard"),
-        _case("normal_case", success=True),
-    ])
-    experiment = _report([
-        _case("hard_case", success=False, difficulty="hard"),
-        _case("normal_case", success=True),
-    ])
+    baseline = _report(
+        [_case("hard_case", success=True, difficulty="hard")]
+        + [_case(f"normal_case_{i}", success=True) for i in range(39)]
+    )
+    experiment = _report(
+        [_case("hard_case", success=False, difficulty="hard")]
+        + [_case(f"normal_case_{i}", success=True) for i in range(39)]
+    )
 
     report = dogfood.build_anti_lesson_dogfood_report(baseline, experiment)
 
     assert report["decision"]["status"] == "needs_review_regression"
     assert any("hard_case" in reason for reason in report["decision"]["reasons"])
+
+
+def test_pass_rate_reject_takes_precedence_over_hard_case_review():
+    baseline = _report(
+        [_case("hard_case", success=True, difficulty="hard")]
+        + [_case(f"normal_case_{i}", success=True) for i in range(19)]
+    )
+    experiment = _report(
+        [_case("hard_case", success=False, difficulty="hard")]
+        + [_case(f"normal_case_{i}", success=True) for i in range(19)]
+    )
+
+    report = dogfood.build_anti_lesson_dogfood_report(baseline, experiment)
+
+    assert report["decision"]["status"] == "reject_correctness_regression"
+    assert report["pass_rate"]["delta_percentage_points"] == -5.0
+
+
+def test_small_negative_pass_rate_delta_needs_review_instead_of_greenlight():
+    baseline = _report([_case(f"case_{i}", success=True) for i in range(40)])
+    experiment = _report(
+        [_case("case_0", success=False)]
+        + [_case(f"case_{i}", success=True) for i in range(1, 40)]
+    )
+
+    report = dogfood.build_anti_lesson_dogfood_report(baseline, experiment)
+
+    assert report["decision"]["status"] == "needs_review_regression"
+    assert report["pass_rate"]["delta_percentage_points"] == -2.5
+    assert any("pass rate" in reason.lower() for reason in report["decision"]["reasons"])
+
+
+def test_malformed_truthy_skipped_and_flaky_values_do_not_change_case_status():
+    baseline = {
+        "filename": "baseline.json",
+        "suite_id": "dev_v1",
+        "total": 1,
+        "passed": 1,
+        "results": [{"name": "case_a", "success": True, "skipped": "yes", "flaky": "yes"}],
+    }
+    experiment = {
+        "filename": "experiment.json",
+        "suite_id": "dev_v1",
+        "total": 1,
+        "passed": 1,
+        "results": [{"name": "case_a", "success": True, "skipped": 1, "flaky": ["yes"]}],
+    }
+
+    report = dogfood.build_anti_lesson_dogfood_report(baseline, experiment)
+
+    assert report["per_case"][0]["baseline_status"] == "passed"
+    assert report["per_case"][0]["experiment_status"] == "passed"
+    assert report["per_case"][0]["outcome"] == "unchanged"
+
+
+def test_zero_baseline_positive_usage_increase_needs_review():
+    baseline = _report([_case("case_a", success=True)])
+    baseline["model_calls"] = 0
+    baseline["total_fallbacks"] = 0
+    experiment = _report([_case("case_a", success=True)])
+    experiment["model_calls"] = 5
+    experiment["total_fallbacks"] = 2
+
+    report = dogfood.build_anti_lesson_dogfood_report(baseline, experiment)
+
+    assert report["decision"]["status"] == "needs_review_regression"
+    assert any("model_calls" in reason for reason in report["decision"]["reasons"])
+    assert any("total_fallbacks" in reason for reason in report["decision"]["reasons"])
+
+
+def test_zero_baseline_positive_token_increase_needs_review():
+    baseline = _report([_case("case_a", success=True)])
+    baseline["total_tokens"] = 0
+    experiment = _report([_case("case_a", success=True)])
+    experiment["total_tokens"] = 100
+
+    report = dogfood.build_anti_lesson_dogfood_report(baseline, experiment)
+
+    assert report["decision"]["status"] == "needs_review_regression"
+    assert any("total_tokens" in reason for reason in report["decision"]["reasons"])
+
+
+def test_missing_baseline_usage_value_does_not_count_as_zero_increase():
+    baseline = _report([_case("case_a", success=True)])
+    baseline.pop("total_tokens")
+    experiment = _report([_case("case_a", success=True)])
+    experiment["total_tokens"] = 100
+
+    report = dogfood.build_anti_lesson_dogfood_report(baseline, experiment)
+
+    assert report["decision"]["status"] == "greenlight_default_off_experiment_path"
+    assert report["summary"]["total_tokens"]["baseline"] is None
