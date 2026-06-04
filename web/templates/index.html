@@ -1198,6 +1198,69 @@
 
 </div>
 
+<!-- Phase UI.2c: right-side Inspector / Debug drawer. Collapsed by default; a
+     single home for debug / evidence / inspection LAUNCHERS that reuse existing
+     handlers (no new routes, no duplicate render targets). Dangerous controls
+     (.env / compose apply, deletes, block, Dream apply) never live here - they
+     stay in Settings / Harness. Toggle: the Inspector button or Ctrl-J. -->
+<button type="button" id="inspectorToggle" class="inspector-toggle"
+        aria-controls="inspectorDrawer" aria-expanded="false"
+        onclick="toggleInspector()" title="Inspector — debug &amp; evidence tools (Ctrl-J)">
+  &#x1F50E; Inspector
+</button>
+<aside id="inspectorDrawer" class="inspector-drawer" data-ui-group="inspector-drawer"
+       role="complementary" aria-label="Inspector — debug and evidence tools"
+       aria-hidden="true" hidden>
+  <div class="inspector-drawer__head">
+    <strong class="inspector-drawer__title">Inspector</strong>
+    <span class="inspector-drawer__hint">Debug &amp; evidence &middot; Ctrl-J</span>
+    <button type="button" class="inspector-drawer__close"
+            onclick="toggleInspector(false)" aria-label="Close inspector">&#x2715;</button>
+  </div>
+
+  <!-- Graph evidence: reuse the existing Graph-tab debug render + scope spread. -->
+  <details class="inspector-section" data-ui-group="inspector-graph" open>
+    <summary class="inspector-section__summary">Graph evidence</summary>
+    <div class="inspector-section__body">
+      <button type="button" onclick="viewGraph('debug')">Debug Graph</button>
+      <button type="button" onclick="showWorkspaceTab('graph'); explainEvidenceSpread('graph')">Scope Spread</button>
+    </div>
+  </details>
+  <!-- /inspector-graph -->
+
+  <!-- Replay debugger: launch the existing list in Settings (not duplicated). -->
+  <details class="inspector-section" data-ui-group="inspector-replay">
+    <summary class="inspector-section__summary">Replay debugger</summary>
+    <div class="inspector-section__body">
+      <button type="button" onclick="showWorkspaceTab('settings'); loadReplays(true)">Open Replay Debugger</button>
+    </div>
+  </details>
+  <!-- /inspector-replay -->
+
+  <!-- Raw JSON / state: jump to (and open) the existing raw &lt;details&gt; panels. -->
+  <details class="inspector-section" data-ui-group="inspector-raw">
+    <summary class="inspector-section__summary">Raw JSON / state</summary>
+    <div class="inspector-section__body">
+      <button type="button" onclick="inspectorJumpTo('chat','patchRawJson','patch')">Patch raw JSON</button>
+      <button type="button" onclick="inspectorJumpTo('chat','localCritiqueThought')">Local critique raw</button>
+    </div>
+  </details>
+  <!-- /inspector-raw -->
+
+  <!-- Tools &amp; MCP: reuse launchMcpInspector; launchers to the freeze-pinned
+       Tool Registry / MCP Audit which stay physically in Settings. -->
+  <details class="inspector-section" data-ui-group="inspector-tools">
+    <summary class="inspector-section__summary">Tools &amp; MCP</summary>
+    <div class="inspector-section__body">
+      <button type="button" onclick="launchMcpInspector('read_only')">MCP Inspector (read-only)</button>
+      <button type="button" onclick="inspectorJumpTo('settings','toolRegistryList')">Tool Registry &rarr;</button>
+      <button type="button" onclick="inspectorJumpTo('settings','mcpAuditList')">MCP Audit &rarr;</button>
+    </div>
+  </details>
+  <!-- /inspector-tools -->
+</aside>
+<!-- /inspector-drawer -->
+
 <!-- Phase 5 Slice 4: shared modal component (used by Dream UI; available for
      future panels). Singleton: one instance reused per call. -->
 <div id="appModal" class="app-modal" hidden>
@@ -1590,6 +1653,52 @@ document.addEventListener("keydown", e => {
     const modal = document.getElementById("appModal");
     if (modal && !modal.hasAttribute("hidden")) closeAppModal();
 });
+
+// ============================================================
+// Phase UI.2c: right-side Inspector / Debug drawer.
+// Collapsed by default; a single home for debug/evidence LAUNCHERS that reuse
+// existing handlers. Purely additive: no new routes, no duplicate render
+// targets, dangerous controls stay in Settings/Harness.
+// ============================================================
+function toggleInspector(forceOpen) {
+    const drawer = document.getElementById("inspectorDrawer");
+    const toggle = document.getElementById("inspectorToggle");
+    if (!drawer) return;
+    const willOpen = (typeof forceOpen === "boolean") ? forceOpen : drawer.hasAttribute("hidden");
+    if (willOpen) {
+        drawer.removeAttribute("hidden");
+        drawer.setAttribute("aria-hidden", "false");
+        document.body.classList.add("inspector-open");
+    } else {
+        drawer.setAttribute("hidden", "");
+        drawer.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("inspector-open");
+    }
+    if (toggle) toggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
+}
+
+// Phase UI.2c: Ctrl-J (or Cmd-J) toggles the Inspector drawer. Inline handler
+// (no new external script); 'j' is not in keybindings.js DEFAULT_MAP so there
+// is no dispatch conflict. preventDefault overrides the browser's Ctrl-J.
+document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "j") {
+        e.preventDefault();
+        toggleInspector();
+    }
+});
+
+// Phase UI.2c: jump to an existing panel without duplicating its id. Switches
+// to the owning workspace tab (and result tab, if given), opens the enclosing
+// <details>, and scrolls the target into view.
+function inspectorJumpTo(tabKey, targetId, resultTab) {
+    if (tabKey && typeof showWorkspaceTab === "function") showWorkspaceTab(tabKey);
+    if (resultTab && typeof showTab === "function") showTab(resultTab);
+    const el = document.getElementById(targetId);
+    if (!el) return;
+    const details = el.closest("details");
+    if (details && "open" in details) details.open = true;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+}
 
 // Phase 5 Slice 4: status string → CSS class for Dream items.
 // Covers run-time statuses (core/dream_artifacts.py STATUS_LEGEND) plus the

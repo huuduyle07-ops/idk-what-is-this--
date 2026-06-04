@@ -4525,3 +4525,114 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     align-items: center;
     margin-top: 0.4rem;
 }
+
+/* ============================================================ */
+/* Phase UI.2c: right-side Inspector / Debug drawer.            */
+/* Collapsed by default (the `hidden` attr); a fixed right-side */
+/* panel that never affects page layout when closed and reads  */
+/* as a secondary/debug surface, not a primary workflow.        */
+/* ============================================================ */
+.inspector-toggle {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 60;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+}
+.inspector-toggle:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+}
+.inspector-toggle[aria-expanded="true"] {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+}
+
+.inspector-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 340px;
+    max-width: 92vw;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 70;
+    padding: 14px 16px 28px;
+    background: var(--color-surface);
+    border-left: 1px solid var(--color-border);
+    box-shadow: -10px 0 28px rgba(0, 0, 0, 0.30);
+}
+/* Collapsed by default: no layout break, fully removed from flow. */
+.inspector-drawer[hidden] {
+    display: none;
+}
+.inspector-drawer__head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+}
+.inspector-drawer__title {
+    font-size: 14px;
+}
+.inspector-drawer__hint {
+    font-size: 11px;
+    color: var(--color-text-muted);
+}
+.inspector-drawer__close {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+}
+.inspector-drawer__close:hover {
+    color: var(--color-text);
+}
+
+.inspector-section {
+    margin: 6px 0;
+    border-top: 1px solid var(--color-border);
+}
+.inspector-section > .inspector-section__summary {
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    padding: 8px 0 4px;
+    list-style: revert;
+}
+.inspector-section[open] > .inspector-section__summary,
+.inspector-section > .inspector-section__summary:hover {
+    color: var(--color-text);
+}
+.inspector-section__body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 4px 0 8px;
+}
+.inspector-section__body button {
+    font-size: 12px;
+    padding: 5px 9px;
+    color: var(--color-text);
+    background: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    cursor: pointer;
+}
+.inspector-section__body button:hover {
+    border-color: var(--color-accent);
+}

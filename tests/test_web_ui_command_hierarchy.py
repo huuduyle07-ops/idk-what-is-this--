@@ -299,3 +299,169 @@ def test_no_backend_change_in_run_inspector():
     for token in ("os.system", "child_process", "eval(", "new Function(", "document.write("):
         assert token not in t, f"unexpected privileged token: {token!r}"
     assert t.count("<script src=") == 2  # mermaid CDN + keybindings.js only
+
+
+# ===========================================================================
+# UI.2c - Right-side Inspector / Debug Drawer
+#
+#   * A right-side drawer (id="inspectorDrawer", data-ui-group="inspector-drawer")
+#     is the single home for debug/evidence/inspection LAUNCHERS. Collapsed by
+#     default; toggled by a visible Inspector button (id="inspectorToggle") and
+#     by Ctrl-J. All surfaces reuse existing handlers - no new routes, no
+#     duplicate render targets.
+#   * Four tagged sections: inspector-graph (viewGraph('debug') / Scope Spread),
+#     inspector-replay (loadReplays launcher), inspector-raw (jump to existing
+#     raw <details>), inspector-tools (launchMcpInspector + Tool Registry / MCP
+#     Audit launchers).
+#   * Dangerous controls (.env / compose apply, deletes, block, Dream apply)
+#     NEVER live in the drawer; freeze-pinned Tool Registry / MCP Audit DOM and
+#     the harness apply controls stay physically in Settings.
+# ===========================================================================
+INSPECTOR_SECTIONS = ("inspector-graph", "inspector-replay", "inspector-raw", "inspector-tools")
+DANGEROUS_TOKENS = (
+    "harnessEnvApply",
+    "harnessComposeApply",
+    "applyEnvFiles",
+    "applyComposePatch",
+    "applyDream",
+    "blockLessonById",
+    "deleteLesson",
+    "deleteBenchmark",
+)
+
+
+# ---------------------------------------------------------------------------
+# 17 - Drawer shell exists: group anchor + sentinel + toggle + function
+# ---------------------------------------------------------------------------
+def test_inspector_drawer_shell_exists():
+    t = _template()
+    assert 'data-ui-group="inspector-drawer"' in t
+    assert "<!-- /inspector-drawer -->" in t
+    assert 'id="inspectorDrawer"' in t
+    assert 'id="inspectorToggle"' in t
+    assert "function toggleInspector" in t
+
+
+# ---------------------------------------------------------------------------
+# 18 - Drawer is collapsed/closed by default
+# ---------------------------------------------------------------------------
+def test_inspector_drawer_default_collapsed():
+    t = _template()
+    drawer = _group_segment(t, "inspector-drawer")
+    # The <aside> carries the group anchor; hidden + aria-hidden mark it closed.
+    assert "hidden" in drawer, "drawer must be hidden by default"
+    assert 'aria-hidden="true"' in drawer, "drawer must be aria-hidden by default"
+    # The visible toggle reports the collapsed state.
+    assert 'aria-expanded="false"' in t, "inspector toggle must start collapsed"
+
+
+# ---------------------------------------------------------------------------
+# 19 - Ctrl-J toggles the drawer (inline keybinding, no new external script)
+# ---------------------------------------------------------------------------
+def test_inspector_ctrl_j_keybinding():
+    t = _template()
+    assert "Ctrl-J" in t, "Ctrl-J intent comment/label missing"
+    idx = t.index("Ctrl-J (or Cmd-J)")
+    region = t[idx:idx + 560]
+    assert "toggleInspector()" in region, "Ctrl-J must call toggleInspector()"
+    assert '"j"' in region, "Ctrl-J handler must match the 'j' key"
+    assert "ctrlKey" in region and "metaKey" in region, "must gate on Ctrl/Cmd"
+
+
+# ---------------------------------------------------------------------------
+# 20 - All four inspector sections exist, tagged + sentinelled, inside drawer
+# ---------------------------------------------------------------------------
+def test_inspector_sections_have_sentinels():
+    t = _template()
+    drawer = _group_segment(t, "inspector-drawer")
+    for group in INSPECTOR_SECTIONS:
+        assert f'data-ui-group="{group}"' in t, f"missing group {group}"
+        assert f"<!-- /{group} -->" in t, f"missing sentinel for {group}"
+        assert f'data-ui-group="{group}"' in drawer, f"{group} must live inside the drawer"
+
+
+# ---------------------------------------------------------------------------
+# 21 - Graph section reuses existing debug handlers (no duplicate canvas)
+# ---------------------------------------------------------------------------
+def test_inspector_graph_reuses_handlers():
+    t = _template()
+    drawer = _group_segment(t, "inspector-drawer")
+    assert "viewGraph('debug')" in drawer, "Debug Graph launcher missing"
+    assert "explainEvidenceSpread('graph')" in drawer, "Scope Spread launcher missing"
+    # No second graph canvas is introduced; the drawer only launches.
+    assert 'id="graphCanvas"' not in drawer, "drawer must not duplicate the graph canvas"
+
+
+# ---------------------------------------------------------------------------
+# 22 - Replay section reuses loadReplays (launcher into Settings)
+# ---------------------------------------------------------------------------
+def test_inspector_replay_reuses_handler():
+    t = _template()
+    replay = _group_segment(t, "inspector-replay")
+    assert "loadReplays" in replay, "replay launcher must reuse loadReplays"
+    # The real replay list lives in Settings - not duplicated in the drawer.
+    assert 'id="replayList"' not in replay, "replayList must not be duplicated"
+
+
+# ---------------------------------------------------------------------------
+# 23 - Raw section jumps to existing raw panels (no duplicate ids)
+# ---------------------------------------------------------------------------
+def test_inspector_raw_jumps_to_existing_panels():
+    t = _template()
+    raw = _group_segment(t, "inspector-raw")
+    assert "patchRawJson" in raw, "raw section should reach the patch raw JSON"
+    assert "localCritiqueThought" in raw, "raw section should reach local critique raw"
+    # Jump-only: the actual panes keep their single id elsewhere.
+    assert 'id="patchRawJson"' not in raw, "patch raw pane id must not be duplicated"
+    assert 'id="localCritiqueThought"' not in raw, "critique raw id must not be duplicated"
+
+
+# ---------------------------------------------------------------------------
+# 24 - Tools section: MCP Inspector launcher + Tool Registry / MCP Audit jumps
+# ---------------------------------------------------------------------------
+def test_inspector_tools_launchers():
+    t = _template()
+    tools = _group_segment(t, "inspector-tools")
+    assert "launchMcpInspector" in tools, "MCP Inspector launcher missing"
+    assert "toolRegistryList" in tools, "Tool Registry launcher missing"
+    assert "mcpAuditList" in tools, "MCP Audit launcher missing"
+
+
+# ---------------------------------------------------------------------------
+# 25 - Freeze-pinned debug DOM stays physically in Settings (settings-debug)
+# ---------------------------------------------------------------------------
+def test_tool_registry_and_mcp_audit_stay_in_settings():
+    t = _template()
+    debug = _group_segment(t, "settings-debug")
+    assert 'id="toolRegistryList"' in debug, "toolRegistryList must stay in settings-debug"
+    assert 'id="mcpAuditList"' in debug, "mcpAuditList must stay in settings-debug"
+
+
+# ---------------------------------------------------------------------------
+# 26 - Harness apply controls stay in Settings (settings-harness), not in drawer
+# ---------------------------------------------------------------------------
+def test_harness_apply_stays_in_settings_harness():
+    t = _template()
+    harness = _group_segment(t, "settings-harness")
+    assert 'id="harnessEnvApply"' in harness, "harnessEnvApply must stay in settings-harness"
+    assert 'id="harnessComposeApply"' in harness, "harnessComposeApply must stay in settings-harness"
+
+
+# ---------------------------------------------------------------------------
+# 27 - Dangerous controls never appear inside the Inspector drawer
+# ---------------------------------------------------------------------------
+def test_dangerous_controls_not_in_inspector_drawer():
+    t = _template()
+    drawer = _group_segment(t, "inspector-drawer")
+    for token in DANGEROUS_TOKENS:
+        assert token not in drawer, f"dangerous control {token!r} must not be in the drawer"
+
+
+# ---------------------------------------------------------------------------
+# 28 - Additive only: no new external script; no privileged tokens
+# ---------------------------------------------------------------------------
+def test_no_backend_change_in_inspector_drawer():
+    t = _template()
+    for token in ("os.system", "child_process", "eval(", "new Function(", "document.write("):
+        assert token not in t, f"unexpected privileged token: {token!r}"
+    assert t.count("<script src=") == 2  # mermaid CDN + keybindings.js only
