@@ -1001,6 +1001,19 @@
                 <div class="health-empty">Open to load duplicate hints.</div>
               </div>
             </details>
+            <details id="antiLessonReportPanel" class="anti-lesson-report"
+                     data-ui-group="memory-anti-lesson-report"
+                     ontoggle="if(this.open) loadAntiLessonReport(false)">
+              <summary class="anti-lesson-report__summary">Anti-lesson report</summary>
+              <p class="anti-lesson-report__warning">Anti-lessons are report-only and are not used by CONTROL yet.</p>
+              <div class="anti-lesson-report__toolbar">
+                <button type="button" id="antiLessonReportRefreshBtn" onclick="loadAntiLessonReport(true)" title="Refresh anti-lesson report">&#x27F3; Refresh anti-lesson report</button>
+              </div>
+              <div id="antiLessonReportBody" class="anti-lesson-report__body">
+                <div class="health-empty">Open to load the anti-lesson report.</div>
+              </div>
+            </details>
+            <!-- /memory-anti-lesson-report -->
             <div class="lessons-filters" role="group" aria-label="Lesson status filter">
               <button type="button" class="lessons-filter lessons-filter--active"
                       data-status="" onclick="filterLessons('')">All</button>
@@ -3611,6 +3624,79 @@ function createAntiLesson() {
         })
         .catch(e => setStatus("❌ " + e, "is-error"))
         .finally(() => { if (btn) btn.disabled = false; });
+}
+
+// Phase 11.4: read-only anti-lesson report (shadow visibility). Fetches the
+// GET /lessons/anti/report route and renders summary counts + candidate /
+// duplicate / weak sections. It never mutates anything.
+function loadAntiLessonReport(force) {
+    const body = document.getElementById("antiLessonReportBody");
+    if (!body) return;
+    if (!force && body.dataset.loaded === "1") return;
+    body.innerHTML = '<div class="health-empty">Loading anti-lesson report…</div>';
+    const params = new URLSearchParams();
+    const repo = _lessonRepoPath();
+    if (repo) params.set("repo_path", repo);
+    const qs = params.toString();
+    fetch("/lessons/anti/report" + (qs ? "?" + qs : ""))
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                body.innerHTML = '<div class="health-empty">❌ ' + _escapeHtml(data.error || "Failed to load report") + '</div>';
+                return;
+            }
+            body.innerHTML = _renderAntiLessonReport(data.report);
+            body.dataset.loaded = "1";
+        })
+        .catch(e => { body.innerHTML = '<div class="health-empty">❌ ' + _escapeHtml(String(e)) + '</div>'; });
+}
+
+function _renderAntiLessonReport(report) {
+    report = report || {};
+    const esc = _escapeHtml;
+    const counts = report.counts || {};
+    const byStatus = counts.by_status || {};
+    const byScope = counts.by_scope || {};
+    const candidates = Array.isArray(report.candidates) ? report.candidates : [];
+    const weak = Array.isArray(report.weak_records) ? report.weak_records : [];
+    const dupLinks = Array.isArray(report.duplicate_links) ? report.duplicate_links : [];
+    const dupGroups = Array.isArray(report.duplicate_groups) ? report.duplicate_groups : [];
+
+    const countsHtml = `
+      <div class="anti-lesson-report__counts">
+        <span>total: <strong>${counts.total || 0}</strong></span>
+        <span>candidate: <strong>${byStatus.candidate || 0}</strong></span>
+        <span>active: <strong>${byStatus.active || 0}</strong></span>
+        <span>blocked: <strong>${byStatus.blocked || 0}</strong></span>
+        <span>global: <strong>${byScope.global || 0}</strong></span>
+        <span>repo: <strong>${byScope.repo || 0}</strong></span>
+        <span>weak: <strong>${counts.weak || 0}</strong></span>
+        <span>duplicates: <strong>${counts.with_duplicate_of || 0}</strong></span>
+      </div>`;
+
+    const candHtml = candidates.length
+        ? `<ul class="anti-lesson-report__list">` + candidates.map(c =>
+            `<li><code>${esc(c.id || "")}</code> — ${esc(c.title || "")}`
+            + (c.duplicate_of ? ` <span class="lesson-badge lesson-badge--duplicate" title="Possible duplicate of ${esc(c.duplicate_of)}">duplicate</span>` : "")
+            + `</li>`).join("") + `</ul>`
+        : `<div class="health-empty">No candidate anti-lessons.</div>`;
+
+    const dupHtml = (dupLinks.length || dupGroups.length)
+        ? `<ul class="anti-lesson-report__list">`
+            + dupLinks.map(l => `<li><code>${esc(l.id || "")}</code> duplicate_of <code>${esc(l.duplicate_of || "")}</code></li>`).join("")
+            + dupGroups.map(g => `<li>group: ${(g.lesson_ids || []).map(i => `<code>${esc(i)}</code>`).join(", ")}</li>`).join("")
+            + `</ul>`
+        : `<div class="health-empty">No duplicate signals.</div>`;
+
+    const weakHtml = weak.length
+        ? `<ul class="anti-lesson-report__list">` + weak.map(w =>
+            `<li><code>${esc(w.id || "")}</code> — ${esc((w.reasons || w.missing || []).join("; "))}</li>`).join("") + `</ul>`
+        : `<div class="health-empty">No weak or incomplete records.</div>`;
+
+    return countsHtml
+        + `<h4 class="anti-lesson-report__heading">Candidate anti-lessons</h4>` + candHtml
+        + `<h4 class="anti-lesson-report__heading">Duplicate warnings</h4>` + dupHtml
+        + `<h4 class="anti-lesson-report__heading">Weak / incomplete records</h4>` + weakHtml;
 }
 
 function _renderLessonsList(lessons) {

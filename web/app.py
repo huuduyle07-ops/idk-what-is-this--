@@ -2777,6 +2777,42 @@ def lessons_anti_create_route():
     return {"ok": True, "lesson": record, "duplicate_warning": duplicate_warning}
 
 
+@app.route("/lessons/anti/report", methods=["GET"])
+def lessons_anti_report_route():
+    """Read-only anti-lesson report (Phase 11.4 shadow visibility).
+
+    Query params: repo_path?, scope?, repo_scope_id?, include_global?, format?
+    (``format=markdown``/``md`` adds a rendered Markdown view alongside the JSON
+    report). ``repo_path`` is path-guarded exactly like the other lesson routes.
+
+    Reads only from lesson storage. It never promotes/blocks/archives/merges and
+    never calls CONTROL / Dream / patching / benchmark / model / subprocess /
+    Docker / network.
+    """
+    from core import anti_lesson_reports
+
+    repo_path = _lesson_repo_path(request.values.get("repo_path"))
+    scope = _lesson_scope_arg(request.values.get("scope"))
+    repo_scope_id = _lesson_repo_scope_id_arg(request.values.get("repo_scope_id"))
+    include_global = (request.values.get("include_global") or "true").lower() != "false"
+    fmt = (request.values.get("format") or "").strip().lower()
+    try:
+        report = anti_lesson_reports.load_anti_lesson_report(
+            repo_path=repo_path,
+            scope=scope,
+            repo_scope_id=repo_scope_id,
+            include_global=include_global,
+        )
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+    except Exception as e:
+        return {"ok": False, "error": f"anti-lesson report failed: {type(e).__name__}"}, 500
+    result = {"ok": True, "report": report}
+    if fmt in {"markdown", "md"}:
+        result["markdown"] = anti_lesson_reports.format_anti_lesson_report_markdown(report)
+    return result
+
+
 @app.route("/lessons/create-candidate-from-proposal", methods=["POST"])
 def lessons_create_candidate_from_proposal_route():
     """Create a lesson candidate from a proposal artifact (uniform result).
