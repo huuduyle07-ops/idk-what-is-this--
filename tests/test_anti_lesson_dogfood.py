@@ -254,6 +254,37 @@ def test_per_case_file_comparison_tracks_added_removed_and_unchanged_files():
     }
 
 
+def test_markdown_includes_guardrail_decision_and_per_case_table():
+    baseline = _report([_case("case_a", success=True)])
+    experiment = _report([_case("case_a", success=True)])
+    report = dogfood.build_anti_lesson_dogfood_report(
+        baseline,
+        experiment,
+        generated_at="2026-06-04T00:00:00+00:00",
+    )
+
+    markdown = dogfood.format_anti_lesson_dogfood_markdown(report)
+
+    assert "# Anti-Lesson CONTROL Dogfood Evaluation Report" in markdown
+    assert dogfood.GUARDRAIL_NOTE in markdown
+    assert "greenlight_default_off_experiment_path" in markdown
+    assert "default-off" in markdown
+    assert "| case | baseline | experiment | outcome |" in markdown
+    assert "Not safe to make anti-lesson CONTROL injection default-on" in markdown
+
+
+def test_markdown_escapes_per_case_table_cells():
+    case_name = "case|pipe\nline"
+    baseline = _report([_case(case_name, success=True)])
+    experiment = _report([_case(case_name, success=True)])
+    report = dogfood.build_anti_lesson_dogfood_report(baseline, experiment)
+
+    markdown = dogfood.format_anti_lesson_dogfood_markdown(report)
+
+    assert "case\\|pipe<br>line" in markdown
+    assert f"| {case_name} |" not in markdown
+
+
 @pytest.mark.parametrize(
     ("baseline", "experiment", "expected"),
     [

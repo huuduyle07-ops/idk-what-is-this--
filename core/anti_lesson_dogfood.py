@@ -373,3 +373,107 @@ def build_anti_lesson_dogfood_report(
         "per_case": per_case,
         "decision": decision,
     }
+
+
+def _markdown_cell(value: Any) -> str:
+    if value is None:
+        text = ""
+    elif isinstance(value, float):
+        text = f"{value:g}"
+    elif isinstance(value, list):
+        text = ", ".join(str(item) for item in value)
+    else:
+        text = str(value)
+    return text.replace("\\", "\\\\").replace("|", "\\|").replace("\r\n", "<br>").replace("\n", "<br>")
+
+
+def _metric_markdown(name: str, entry: dict[str, Any]) -> str:
+    return (
+        f"| {_markdown_cell(name)} | {_markdown_cell(entry.get('baseline'))} | "
+        f"{_markdown_cell(entry.get('experiment'))} | {_markdown_cell(entry.get('delta'))} | "
+        f"{_markdown_cell(entry.get('delta_ratio'))} |"
+    )
+
+
+def format_anti_lesson_dogfood_markdown(report: dict[str, Any]) -> str:
+    """Format an anti-lesson dogfood report as evidence-only Markdown."""
+    safe_report = report if isinstance(report, dict) else {}
+    title = safe_report.get("title") or REPORT_TITLE
+    guardrail = safe_report.get("guardrail") or GUARDRAIL_NOTE
+    decision = safe_report.get("decision") if isinstance(safe_report.get("decision"), dict) else {}
+    pass_rate = safe_report.get("pass_rate") if isinstance(safe_report.get("pass_rate"), dict) else {}
+    matching = (
+        safe_report.get("case_matching") if isinstance(safe_report.get("case_matching"), dict) else {}
+    )
+    summary = safe_report.get("summary") if isinstance(safe_report.get("summary"), dict) else {}
+    per_case = safe_report.get("per_case") if isinstance(safe_report.get("per_case"), list) else []
+
+    lines = [
+        f"# {title}",
+        "",
+        "## Guardrail",
+        "",
+        str(guardrail),
+        "",
+        "## Decision",
+        "",
+        f"- Status: {_markdown_cell(decision.get('status'))}",
+    ]
+    for reason in _as_list(decision.get("reasons")):
+        lines.append(f"- {reason}")
+
+    lines.extend(
+        [
+            "",
+            "## Pass Rate",
+            "",
+            "| baseline | experiment | delta percentage points |",
+            "| --- | --- | --- |",
+            (
+                f"| {_markdown_cell(pass_rate.get('baseline'))} | "
+                f"{_markdown_cell(pass_rate.get('experiment'))} | "
+                f"{_markdown_cell(pass_rate.get('delta_percentage_points'))} |"
+            ),
+            "",
+            "## Shared Cases",
+            "",
+            "| baseline cases | experiment cases | shared cases | shared case ratio |",
+            "| --- | --- | --- | --- |",
+            (
+                f"| {_markdown_cell(matching.get('baseline_cases'))} | "
+                f"{_markdown_cell(matching.get('experiment_cases'))} | "
+                f"{_markdown_cell(matching.get('shared_cases'))} | "
+                f"{_markdown_cell(matching.get('shared_case_ratio'))} |"
+            ),
+            "",
+            "## Summary",
+            "",
+            "| metric | baseline | experiment | delta | delta ratio |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    )
+    for name in sorted(summary):
+        entry = summary.get(name)
+        if isinstance(entry, dict):
+            lines.append(_metric_markdown(name, entry))
+
+    lines.extend(
+        [
+            "",
+            "## Per-Case Comparison",
+            "",
+            "| case | baseline | experiment | outcome |",
+            "| --- | --- | --- | --- |",
+        ]
+    )
+    for row in per_case:
+        if not isinstance(row, dict):
+            continue
+        lines.append(
+            f"| {_markdown_cell(row.get('case_name'))} | "
+            f"{_markdown_cell(row.get('baseline_status'))} | "
+            f"{_markdown_cell(row.get('experiment_status'))} | "
+            f"{_markdown_cell(row.get('outcome'))} |"
+        )
+
+    return "\n".join(lines).rstrip() + "\n"
