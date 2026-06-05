@@ -70,7 +70,7 @@
         </div>
     </aside>
 
-    <main class="main">
+    <main class="main operator-workflow">
         <header class="main-header">
             <div class="main-header__eyebrow">AI Coding Agent</div>
             <h1 id="modeTitle">{{ 'Chat' if page_web_mode == 'chat' else 'Instant Run' }}</h1>
@@ -98,7 +98,7 @@
 
             <textarea name="query" placeholder="Enter your query..." required>{{ current.query if current else '' }}</textarea>
 
-            <details class="instant-run-controls" data-mode-panel="instant-controls" open>
+            <details class="instant-run-controls" data-mode-panel="instant-controls">
             <summary class="instant-run-summary">Options</summary>
             <label for="modeSelect">Mode:</label>
             <select id="modeSelect" name="mode">

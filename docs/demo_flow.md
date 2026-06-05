@@ -61,3 +61,25 @@ Prepare these screenshots before the demo. Each one covers a key demo stop.
 - [ ] **Benchmarks — result 32 / 0** — detail panel showing 32 checked, 0 errors.
 - [ ] **Memory — Lessons list or Cooling Brain toggle** — either the lessons list with at least one entry, or the Cooling Brain toggle visible inside the Harness Controls panel.
 - [ ] **Settings — Harness Controls collapsed** — Advanced disclosure closed, showing only the summary label ("Advanced — Harness Controls, .env, docker-compose").
+
+---
+
+## UI-Cutoff.1 demo policy
+
+UI-Cutoff.1 is visual/workflow cleanup only. The demo should emphasize the main
+operator workflow: repo path, query, Run, Answer/Patch review, Generate Patch,
+Apply / Review Patch, and optional evidence review.
+
+Dangerous-action policy: dangerous controls are reachable but never primary.
+Harness writes, compose apply, Dream apply, benchmark delete, lesson block, and
+run-subagent controls stay behind disclosure, warning styling, or existing
+confirmation paths.
+
+Preserved DOM contracts: the demo depends on stable ids and handlers including
+`repoPathInput`, `primarySubmit`, the `ws-*` tabs and panels, result pane ids,
+`showTab`, `showWorkspaceTab`, `generatePatch`, `applyPatch`, harness targets,
+Tool Registry/MCP Audit targets, and Inspector targets.
+
+Advanced/debug/dangerous panels are collapsed by default: Options, Run details,
+More actions, Harness, Tool Registry / MCP Audit, Prompt/Cost, Inspector/debug
+surfaces, and raw state views should not compete with the first-run workflow.
