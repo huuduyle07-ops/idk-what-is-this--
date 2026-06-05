@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import json
 from pathlib import Path
 
@@ -7,6 +8,83 @@ import pytest
 
 from core import anti_lesson_dogfood as dogfood
 from scripts import create_anti_lesson_dogfood_report as report_cli
+
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+CORE_SOURCE = REPO_ROOT / "core" / "anti_lesson_dogfood.py"
+CLI_SOURCE = REPO_ROOT / "scripts" / "create_anti_lesson_dogfood_report.py"
+
+FORBIDDEN_IMPORT_ROOTS = {
+    "agents",
+    "aiohttp",
+    "anthropic",
+    "benchmarks",
+    "database",
+    "docker",
+    "google",
+    "httpx",
+    "openai",
+    "patching",
+    "requests",
+    "socket",
+    "subprocess",
+    "urllib",
+}
+FORBIDDEN_IMPORTS = {
+    "benchmarks.run_benchmarks",
+    "core.control_engine",
+    "core.dream_artifacts",
+    "core.dream_references",
+    "core.dream_trials",
+    "core.lesson_retrieval",
+    "core.mutation_oracle",
+    "core.prompter",
+    "core.proposal_runner",
+    "core.run_lifecycle",
+    "core.sleeping_consultant",
+    "patching.patch_plan_executor",
+}
+FORBIDDEN_MUTATION_CALLS = {
+    "apply_patch",
+    "apply_patch_plan",
+    "archive_lesson",
+    "block_lesson",
+    "build_control_prompt",
+    "build_deepseek_review",
+    "build_prompt",
+    "call_api",
+    "call_model",
+    "check_call",
+    "check_output",
+    "ChatCompletion",
+    "create_merge",
+    "create_manual_anti_lesson",
+    "create_mutation_oracle",
+    "generate_content",
+    "generate_patch",
+    "patch_lesson_fields",
+    "Popen",
+    "promote_lesson",
+    "run_benchmark",
+    "run_benchmarks",
+    "run_deepseek",
+    "run_dream",
+    "run_gemini",
+    "run_gemini_request_2",
+    "run_mutation_oracle",
+    "run_ollama",
+    "run_patch_plan_with_artifacts",
+    "run_reverse_dream",
+    "save_candidate_lesson",
+    "save_raw_lesson_record",
+    "system",
+}
+DOGFOOD_MODULE_NAME = "anti_lesson_dogfood"
+SENSITIVE_SOURCE_PATHS = (
+    REPO_ROOT / "core" / "control_engine.py",
+    REPO_ROOT / "core" / "prompter.py",
+    REPO_ROOT / "core" / "lesson_retrieval.py",
+)
 
 
 @pytest.fixture
@@ -50,6 +128,61 @@ def _case(
     return out
 
 
+def _parse_source(path: Path) -> ast.AST:
+    return ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+
+
+def _imported_modules(tree: ast.AST) -> set[str]:
+    modules: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            modules.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            modules.add(node.module)
+    return modules
+
+
+def _import_roots(tree: ast.AST) -> set[str]:
+    return {name.split(".", maxsplit=1)[0] for name in _imported_modules(tree)}
+
+
+def _dogfood_references(tree: ast.AST) -> set[str]:
+    references: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name.split(".")[-1] == DOGFOOD_MODULE_NAME:
+                    references.add(alias.name)
+                if alias.asname == DOGFOOD_MODULE_NAME:
+                    references.add(alias.asname)
+        elif isinstance(node, ast.ImportFrom):
+            if node.module and node.module.split(".")[-1] == DOGFOOD_MODULE_NAME:
+                references.add(node.module)
+            for alias in node.names:
+                if alias.name == DOGFOOD_MODULE_NAME:
+                    references.add(alias.name)
+                if alias.asname == DOGFOOD_MODULE_NAME:
+                    references.add(alias.asname)
+        elif isinstance(node, ast.Name) and node.id == DOGFOOD_MODULE_NAME:
+            references.add(node.id)
+        elif isinstance(node, ast.Attribute) and node.attr == DOGFOOD_MODULE_NAME:
+            references.add(node.attr)
+    return references
+
+
+def _called_names(tree: ast.AST) -> set[str]:
+    names: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if isinstance(func, ast.Name):
+            names.add(func.id)
+        elif isinstance(func, ast.Attribute):
+            names.add(func.attr)
+    return names
+
+
 def _report(
     cases: list[dict],
     *,
@@ -72,6 +205,27 @@ def _report(
         "total_fallbacks": sum(c.get("fallback_count", 0) for c in cases),
         "results": cases,
     }
+
+
+def test_core_module_has_no_forbidden_control_model_patch_or_network_edges():
+    tree = _parse_source(CORE_SOURCE)
+
+    assert _imported_modules(tree) & FORBIDDEN_IMPORTS == set()
+    assert _import_roots(tree) & FORBIDDEN_IMPORT_ROOTS == set()
+    assert _called_names(tree) & FORBIDDEN_MUTATION_CALLS == set()
+
+
+def test_cli_has_no_benchmark_model_patch_lesson_mutation_or_subprocess_edges():
+    tree = _parse_source(CLI_SOURCE)
+
+    assert _imported_modules(tree) & FORBIDDEN_IMPORTS == set()
+    assert _import_roots(tree) & FORBIDDEN_IMPORT_ROOTS == set()
+    assert _called_names(tree) & FORBIDDEN_MUTATION_CALLS == set()
+
+
+@pytest.mark.parametrize("source_path", SENSITIVE_SOURCE_PATHS)
+def test_sensitive_control_prompt_and_retrieval_modules_do_not_reference_dogfood(source_path):
+    assert _dogfood_references(_parse_source(source_path)) == set()
 
 
 def test_pass_rate_unchanged_greenlights_default_off_experiment_path():
