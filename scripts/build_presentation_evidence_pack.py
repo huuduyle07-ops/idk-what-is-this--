@@ -638,6 +638,7 @@ def _format_minimality(
     experiment: dict[str, Any] | None,
     source_path: Path | None,
     include_raw_paths: bool,
+    current_full_report: dict[str, Any] | None = None,
 ) -> str:
     if experiment is None:
         return (
@@ -651,6 +652,14 @@ def _format_minimality(
     result = experiment.get("result") or {}
     decision = result.get("decision") or {}
     metrics = result.get("metrics") or {}
+    total_metric = metrics.get("total") if isinstance(metrics.get("total"), dict) else {}
+    baseline_total = total_metric.get("baseline", UNKNOWN)
+    variant_total = total_metric.get("variant", UNKNOWN)
+    current_total = (
+        current_full_report.get("total")
+        if isinstance(current_full_report, dict)
+        else None
+    )
 
     def _delta(key: str) -> Any:
         entry = metrics.get(key)
@@ -666,12 +675,23 @@ def _format_minimality(
         f"- Status: `{experiment.get('status', UNKNOWN)}`",
         f"- Decision: `{decision.get('status', UNKNOWN)}`",
         f"- Human review required: {decision.get('human_review_required', UNKNOWN)}",
-        "",
-        "## Correctness metrics",
-        "",
-        "| metric | baseline | variant | delta | status |",
-        "|---|---:|---:|---:|---|",
+        f"- Experiment case scope: {baseline_total} baseline cases / {variant_total} variant cases",
     ]
+    if current_total is not None:
+        lines.append(f"- Current presentation full-suite size: {current_total} cases")
+    lines.extend(
+        [
+            "",
+            "> Current full-suite size can change independently. The metrics below",
+            "> describe the baseline and variant reports captured for this experiment,",
+            "> not a fixed global benchmark size.",
+            "",
+            "## Correctness metrics",
+            "",
+            "| metric | baseline | variant | delta | status |",
+            "|---|---:|---:|---:|---|",
+        ]
+    )
     for key in ("total", "passed", "failed", "flaky"):
         entry = metrics.get(key)
         if isinstance(entry, dict):
@@ -728,8 +748,9 @@ def _format_trends(
         "",
         "> Same-suite grouping protects against fake comparisons: reports that",
         "> share the same `total` but use different case names are kept in",
-        "> separate groups. A 31-case run is never compared against a different",
-        "> 31-case run.",
+        "> separate groups.",
+        "> A run is only compared with reports that share the same case-set fingerprint,",
+        "> so this remains valid as case counts grow.",
         "",
     ]
     if warnings:
@@ -957,7 +978,12 @@ def build_evidence_pack(
     )
     _write(
         "04_patch_minimality_experiment.md",
-        _format_minimality(minimality_data, minimality_path, include_raw_paths),
+        _format_minimality(
+            minimality_data,
+            minimality_path,
+            include_raw_paths,
+            full_picked[2] if full_picked else None,
+        ),
     )
     _write(
         "05_same_suite_trends.md",

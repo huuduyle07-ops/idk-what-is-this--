@@ -83,3 +83,24 @@ Tool Registry/MCP Audit targets, and Inspector targets.
 Advanced/debug/dangerous panels are collapsed by default: Options, Run details,
 More actions, Harness, Tool Registry / MCP Audit, Prompt/Cost, Inspector/debug
 surfaces, and raw state views should not compete with the first-run workflow.
+
+---
+
+## UI-Cutoff.1c presentation flow
+
+1. open app
+2. choose repo
+3. enter query
+4. run
+5. show Answer
+6. show Patch
+7. open Run details only if needed
+8. show Benchmarks/Evidence briefly
+
+### tomorrow's demo checklist
+
+- run app
+- prepare repo path
+- prepare one safe query
+- prepare one existing benchmark/evidence report
+- keep advanced panels collapsed unless asked
