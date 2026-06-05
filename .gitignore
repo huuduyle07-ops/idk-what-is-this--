@@ -39,6 +39,9 @@ venv/
 .claude/
 .claude_cache/
 .codex/
+.codex_cache/
+.codex
+skills/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
