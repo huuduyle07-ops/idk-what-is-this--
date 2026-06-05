@@ -13,6 +13,16 @@ NEW_DEV_CASES = [
     "js_no_patch_user_misread",
 ]
 
+PHASE_11C_DEV_CASES = [
+    "python_wrong_abstraction_honeypot",
+    "ts_wrong_file_honeypot",
+    "go_validation_gap_honeypot",
+]
+
+PHASE_11C_FULL_ONLY_CASES = [
+    "python_test_deletion_honeypot",
+]
+
 NEW_HELD_OUT_CASES = [
     "python_embedding_provider_switch",
     "rust_multi_file_trait_impl_root_cause",
@@ -210,7 +220,7 @@ def test_full_discovery_matches_full_suite_manifest():
     discovered_names = sorted(runner.load_case(case_file)["name"] for case_file in cases)
     full_manifest = runner.load_suite_manifest("full_v1")
 
-    assert len(discovered_names) == 50
+    assert len(discovered_names) == 54
     assert discovered_names == sorted(full_manifest["case_names"])
 
 
@@ -226,8 +236,14 @@ def test_held_out_manifest_contains_suggested_cases():
 
 def test_dev_v1_includes_new_dev_cases():
     manifest = runner.load_suite_manifest("dev_v1")
-    for name in NEW_DEV_CASES:
+    for name in NEW_DEV_CASES + PHASE_11C_DEV_CASES:
         assert name in manifest["case_names"], f"{name} missing from dev_v1"
+
+
+def test_full_v1_includes_phase_11c_honeypot_cases():
+    manifest = runner.load_suite_manifest("full_v1")
+    for name in PHASE_11C_DEV_CASES + PHASE_11C_FULL_ONLY_CASES:
+        assert name in manifest["case_names"], f"{name} missing from full_v1"
 
 
 def test_no_duplicate_case_ids():

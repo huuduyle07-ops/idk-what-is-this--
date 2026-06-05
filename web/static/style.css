@@ -3463,7 +3463,7 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
 
 .patch-confidence-bar__fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--color-accent), #60a5fa);
+    background: var(--color-accent);
     transition: width 0.2s;
 }
 
@@ -3643,7 +3643,9 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     color: var(--color-text);
     white-space: pre-wrap;
     word-break: break-word;
+    max-width: 100%;
     max-height: 50vh;
+    overflow-x: auto;
     overflow-y: auto;
 }
 
@@ -4722,4 +4724,541 @@ body.inspector-open .inspector-toggle {
 }
 .goal-brief-hint__link:hover {
     color: var(--color-accent);
+}
+
+/* ============================================================ */
+/* UI-Cutoff.1: calm operator-console visual cleanup.           */
+/* Visual/workflow only: no route, handler, id, or backend       */
+/* behavior changes. Keep primary workflow visible and tuck      */
+/* advanced/debug/dangerous choices behind existing disclosures. */
+/* ============================================================ */
+.operator-workflow {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.operator-workflow .main-header {
+    text-align: left;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.operator-workflow .main-header h1 {
+    font-size: 26px;
+    line-height: 1.15;
+}
+
+.operator-workflow .main-header__eyebrow,
+.operator-workflow .mode-subtitle,
+.operator-workflow .field-help,
+.operator-workflow .help-note {
+    color: var(--color-text-muted);
+}
+
+.operator-workflow .agent-form {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+}
+
+.operator-workflow .agent-form textarea {
+    min-height: 116px;
+    resize: vertical;
+}
+
+.operator-workflow .instant-run-controls,
+.operator-workflow .more-actions,
+.operator-workflow .advanced-panel,
+.operator-workflow .reports-panel,
+.operator-workflow .run-details {
+    border-radius: var(--radius-md);
+}
+
+.operator-workflow .instant-run-summary,
+.operator-workflow .more-actions > summary,
+.operator-workflow .advanced-panel > summary,
+.operator-workflow .reports-panel > summary,
+.operator-workflow .run-details__summary {
+    color: var(--color-text-muted);
+}
+
+.operator-workflow .instant-run-controls[open],
+.operator-workflow .more-actions[open],
+.operator-workflow .advanced-panel[open],
+.operator-workflow .reports-panel[open],
+.operator-workflow .run-details[open] {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    padding: 10px;
+}
+
+.operator-workflow .tabs,
+.operator-workflow .actions,
+.operator-workflow .ws-tabs-row,
+.operator-workflow .memory-nav {
+    gap: 6px;
+}
+
+.actions--primary > button,
+#primarySubmit {
+    min-height: 36px;
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-accent-fg);
+    font-weight: 700;
+}
+
+.actions--secondary > button,
+.ws-nav--secondary .ws-tab,
+.ws-nav__inspector,
+.goal-brief-hint__link {
+    font-weight: 500;
+}
+
+button,
+summary,
+a,
+select,
+input,
+textarea {
+    transition:
+        background-color 160ms ease,
+        border-color 160ms ease,
+        color 160ms ease,
+        opacity 160ms ease;
+}
+
+button:hover,
+summary:hover {
+    border-color: var(--color-accent);
+}
+
+button:focus-visible,
+summary:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+button:disabled,
+button[disabled],
+select:disabled,
+input:disabled,
+textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.56;
+    filter: grayscale(0.25);
+}
+
+pre, code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.55;
+    tab-size: 2;
+    overflow-wrap: anywhere;
+}
+
+.tab-content,
+.patch-raw,
+.review-pack-preview,
+.goal-brief-pre,
+.chat-spread-debug,
+.evidence-viewer,
+.bench-detail,
+.patch-card {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+}
+
+.tab-content {
+    min-height: 180px;
+    max-height: 62vh;
+    line-height: 1.6;
+}
+
+.patch-card {
+    padding: 14px;
+}
+
+.patch-card__row {
+    grid-template-columns: minmax(120px, 180px) minmax(0, 1fr);
+}
+
+.patch-card__value,
+.bench-detail,
+.bench-run-status,
+.health-empty {
+    line-height: 1.5;
+}
+
+.bench-detail {
+    padding: 14px;
+}
+
+.lesson-btn--danger,
+.history-btn--danger,
+.harness-envapply__btn,
+.harness-composeapply__btn,
+.handoff-run-btn--warning-outline {
+    border-color: var(--color-danger);
+}
+
+.advanced-panel[data-ui-group="settings-harness"] > summary,
+.anti-lesson-control-run__warning,
+.harness-composeapply__notice {
+    color: var(--color-warning);
+}
+
+.inspector-drawer {
+    width: 360px;
+}
+
+@media (max-width: 760px) {
+    .operator-workflow {
+        max-width: none;
+    }
+
+    .operator-workflow .main-header h1 {
+        font-size: 22px;
+    }
+
+    .patch-card__row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .tab-content {
+        max-height: 58vh;
+    }
+}
+
+/* ============================================================ */
+/* UI-Cutoff.1c: result/report readability pass.                */
+/* CSS-only readability layer for existing result, report, raw, */
+/* Markdown, benchmark, diff, and debug surfaces.               */
+/* ============================================================ */
+.result-panel,
+.report-card,
+.patch-card,
+.bench-detail,
+.evidence-viewer,
+.dream-report-md,
+.anti-lesson-report__body,
+.replay-detail,
+.replay-compare,
+.review-pack-preview,
+.goal-brief-summary,
+.goal-brief-pre {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+    box-shadow: none;
+}
+
+.report-card {
+    padding: 14px;
+    margin: 10px 0;
+}
+
+.report-card__heading,
+.bench-section-heading,
+.patch-card__section-heading,
+.anti-lesson-report__heading {
+    margin: 14px 0 8px;
+    color: var(--color-text);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.report-prose,
+.markdown-report,
+.evidence-markdown,
+.dream-report-md,
+.anti-lesson-report__body {
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.report-prose p,
+.markdown-report p,
+.evidence-markdown p,
+.dream-report-md p,
+.anti-lesson-report__body p {
+    margin: 0 0 10px;
+}
+
+.report-prose ul,
+.report-prose ol,
+.markdown-report ul,
+.markdown-report ol,
+.evidence-markdown ul,
+.evidence-markdown ol,
+.dream-report-md ul,
+.dream-report-md ol {
+    margin: 8px 0 12px;
+    padding-left: 22px;
+}
+
+.report-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.report-table-scroll table,
+.bench-detail table,
+.bench-table,
+.prompt-cost-table table,
+.evidence-markdown table,
+.dream-report-md table,
+.anti-lesson-report__body table,
+.tool-registry__table {
+    min-width: 100%;
+    width: max-content;
+    max-width: none;
+    border-collapse: collapse;
+}
+
+.report-table-scroll th,
+.report-table-scroll td,
+.bench-detail th,
+.bench-detail td,
+.bench-table th,
+.bench-table td,
+.prompt-cost-table th,
+.prompt-cost-table td,
+.evidence-markdown th,
+.evidence-markdown td,
+.dream-report-md th,
+.dream-report-md td,
+.anti-lesson-report__body th,
+.anti-lesson-report__body td {
+    padding: 7px 10px;
+    vertical-align: top;
+    line-height: 1.45;
+}
+
+.report-table-scroll thead th,
+.bench-detail thead th,
+.bench-table thead th,
+.prompt-cost-table thead th,
+.dream-report-md thead th,
+.anti-lesson-report__body thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-surface);
+}
+
+.report-status--success,
+.report-status--warning,
+.report-status--error,
+.report-status--muted,
+.report-status--raw,
+.empty-state,
+.health-empty {
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+}
+
+.report-status--success {
+    color: #bbf7d0;
+    background: var(--color-success-bg);
+    border: 1px solid #166534;
+}
+
+.report-status--warning {
+    color: #fde68a;
+    background: var(--color-warning-bg);
+    border: 1px solid #92400e;
+}
+
+.report-status--error,
+.error-banner {
+    color: #fecaca;
+    background: var(--color-danger-bg);
+    border: 1px solid #7f1d1d;
+}
+
+.report-status--muted,
+.empty-state,
+.health-empty {
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border);
+    font-style: normal;
+}
+
+.report-status--raw {
+    color: var(--color-text-muted);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+}
+
+.raw-output,
+.bench-raw-json-body,
+.patch-raw,
+.chat-spread-debug,
+.local-critique-section pre,
+.replay-artifact pre,
+.mcp-audit-event pre {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+    line-height: 1.55;
+}
+
+.diff-output,
+#diff.tab-content,
+.replay-compare__diff {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    white-space: pre;
+    font-family: var(--font-mono);
+    line-height: 1.5;
+    tab-size: 2;
+}
+
+.patch-output,
+.patch-card pre,
+.patch-card code,
+.patch-card__value {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+    line-height: 1.5;
+}
+
+.raw-output {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: var(--font-mono);
+}
+
+.diff-output {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    white-space: pre;
+    font-family: var(--font-mono);
+}
+
+.patch-output {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+}
+
+.diff-add,
+.diff-del,
+.diff-ctx,
+.diff-hunk {
+    display: block;
+    min-width: max-content;
+    padding: 1px 6px;
+    line-height: 1.5;
+}
+
+.diff-add {
+    background: #052e16;
+    color: #bbf7d0;
+}
+
+.diff-del {
+    background: #450a0a;
+    color: #fecaca;
+}
+
+.diff-ctx {
+    color: var(--color-text);
+}
+
+.diff-hunk {
+    color: #bfdbfe;
+    background: var(--color-surface);
+    font-style: normal;
+}
+
+.tab-content:empty::before,
+#candidates:empty::before,
+#diff:empty::before {
+    content: "No output yet.";
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+@media (max-width: 760px) {
+    .report-card,
+    .patch-card,
+    .bench-detail,
+    .evidence-viewer {
+        padding: 10px;
+    }
+
+    .report-table-scroll,
+    .bench-detail,
+    .evidence-viewer {
+        max-width: calc(100vw - 28px);
+    }
+
+    .diff-output,
+    #diff.tab-content,
+    .patch-raw {
+        font-size: 11px;
+    }
+}
+
+/* Presentation evidence Markdown contrast guard.
+   The evidence viewer intentionally uses a light GitHub-style Markdown
+   surface inside the dark operator console. Keep this after the generic
+   UI-Cutoff report-card rules so dark report backgrounds never override it. */
+.evidence-viewer {
+    background: #ffffff;
+    color: #1f2328;
+    border-color: #d0d7de;
+}
+
+.evidence-viewer .evidence-markdown,
+.evidence-viewer .evidence-markdown h1,
+.evidence-viewer .evidence-markdown h2,
+.evidence-viewer .evidence-markdown h3,
+.evidence-viewer .evidence-markdown p,
+.evidence-viewer .evidence-markdown li,
+.evidence-viewer .evidence-markdown th,
+.evidence-viewer .evidence-markdown td {
+    color: #1f2328;
+}
+
+.evidence-viewer .evidence-markdown thead,
+.evidence-viewer .evidence-markdown tbody tr:nth-child(2n),
+.evidence-viewer .evidence-markdown pre {
+    background: #f6f8fa;
+}
+
+.evidence-viewer .evidence-markdown code {
+    background: #eff1f3;
+    color: #1f2328;
 }

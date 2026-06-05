@@ -338,8 +338,77 @@ def test_summarizes_patch_minimality_experiment(tmp_path):
     assert "-5.61" in md
     assert "-2" in md
     assert "model_calls unknown" in md
+    assert "Experiment case scope: 31 baseline cases / 31 variant cases" in md
     # the older unrelated experiment should NOT be the selected one
     assert "Unrelated experiment" not in md
+
+
+def test_patch_minimality_scope_is_derived_from_experiment_totals(tmp_path):
+    project = tmp_path / "project"
+    _write_benchmark_report(
+        project / ".agent" / "benchmarks",
+        "benchmark_report_current.json",
+        total=54,
+        passed=50,
+        failed=4,
+        created_at="2026-06-05T00:00:00+00:00",
+    )
+    exp_dir = project / ".agent" / "experiments"
+    _write_json(
+        exp_dir / "20260605_patch-minimality-metric-check.json",
+        {
+            "experiment_id": "20260605_patch-minimality-metric-check",
+            "title": "Patch minimality metric report check",
+            "status": "compared",
+            "result": {
+                "decision": {
+                    "status": "greenlight",
+                    "warnings": [],
+                    "human_review_required": False,
+                },
+                "metrics": {
+                    "total": {"baseline": 54, "variant": 54, "delta": 0, "status": "unchanged"},
+                    "passed": {"baseline": 50, "variant": 50, "delta": 0, "status": "unchanged"},
+                    "failed": {"baseline": 4, "variant": 4, "delta": 0, "status": "unchanged"},
+                    "flaky": {"baseline": 1, "variant": 1, "delta": 0, "status": "unchanged"},
+                },
+            },
+            "created_at": "2026-06-05T00:00:00+00:00",
+        },
+    )
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / "04_patch_minimality_experiment.md").read_text(encoding="utf-8")
+
+    assert "Experiment case scope: 54 baseline cases / 54 variant cases" in md
+    assert "Current presentation full-suite size: 54 cases" in md
+    assert "Current full-suite size can change independently" in md
+
+
+def test_same_suite_trends_copy_does_not_hard_code_case_count(tmp_path):
+    project = tmp_path / "project"
+    trends_dir = project / ".agent" / "benchmarks" / "trends"
+    _write_json(
+        trends_dir / "benchmark_trend_index.json",
+        {
+            "groups": [
+                {
+                    "suite_fingerprint": "suite-54",
+                    "total": 54,
+                    "runs": ["benchmark_report_a.json", "benchmark_report_b.json"],
+                }
+            ],
+            "warnings": [],
+            "skipped_reports": [],
+        },
+    )
+
+    result = pack.build_evidence_pack(project)
+    md = (result["output_dir"] / "05_same_suite_trends.md").read_text(encoding="utf-8")
+
+    assert "A run is only compared with reports that share the same case-set fingerprint" in md
+    assert "31-case run" not in md
+    assert "Case count: 54" in md
 
 
 def test_index_links_all_generated_files(tmp_path):

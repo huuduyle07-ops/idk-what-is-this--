@@ -230,3 +230,11 @@ Evaluate whether Scrapling/WebBridge and Arkon can help C.A.T.T.U.S collect publ
 - Rollback report generator
 - Compatibility report generator
 - Chat app intergration (like OpenClaw/n8n)
+
+Phase 7      → Deferred/reference research
+Phase 10     → Deferred/research-only branched repair idea
+Phase 10.5   → Migrated as possible Track A graph-role/evidence idea
+Phase 15     → Migrated as possible later lambda/complexity research thread
+Reverse Dream execution → Deferred until stronger eval/minimality proof
+Mutation-oracle anti-lesson minting → Deferred
+Default-on anti-lesson CONTROL → Not approved

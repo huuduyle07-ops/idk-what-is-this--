@@ -38,6 +38,7 @@ build/
 venv/
 .claude/
 .claude_cache/
+.codex/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/

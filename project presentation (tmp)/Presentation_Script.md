@@ -1,6 +1,6 @@
 # Presentation Script — AI-Powered Code Analysis & Auto-Patching Agent
 > Spoken script for each slide. Estimated total time: ~15 minutes.
-> Narrative thread: We built the graph system → The benchmark exposed weaknesses → We improved the backend → The system reached 32 benchmark cases → We measured cost tradeoffs honestly.
+> Narrative thread: We built the graph system → The benchmark exposed weaknesses → We improved the backend → The system reached 54 benchmark cases → We measured cost and failure tradeoffs honestly.
 
 ---
 
@@ -115,7 +115,11 @@ This is unvalidated. Before replacing the current scorer, the plan is to run a c
 
 ## Slide 10 — Conclusion
 
-"The system now has 32 benchmark cases across 7 languages. The latest benchmark check reports 32 checked and 0 errors, and the full pytest suite reports 1207 passed. The most recent graph feature, Evidence Spread, is explain-only: it improves debugging and reporting without changing patch behavior."
+"The system now has 54 benchmark cases across 8 language families. The latest fast benchmark run passed 50 out of 54 cases, a 92.6 percent success rate, with one flaky case passing on retry. That is a stronger and more honest result than a perfect small-suite claim: the suite now includes harder migration, callback dispatch, validation-command, and C++ lifetime traps.
+
+The four remaining failures were `cpp_string_view_lifetime_trap`, `go_validation_command_misleading_success`, `python_embedding_provider_switch`, and `ts_callback_dispatch_ambiguity`. The report classifies three of them as likely model-fallback instability and one as unknown, which gives us a concrete next investigation path instead of a vague failure bucket.
+
+The full pytest suite is green at 2436 passed with one warning. The benchmark run used about 225 thousand tokens, estimated API cost was about 6.5 cents where known, and there were 8 model fallbacks. So the conclusion is: the core system is stable under unit/integration tests, benchmark coverage is broader, and the remaining gaps are visible enough to prioritize."
 
 ---
 

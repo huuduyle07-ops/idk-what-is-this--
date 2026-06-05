@@ -260,3 +260,67 @@ open or closed.
    anchors for `tests/test_web_ui_information_architecture.py`; keep them when
    moving a panel.
 5. Read-only/inert panels keep their safety copy verbatim (it is asserted).
+
+---
+
+## UI-Cutoff.1 operator workflow cleanup
+
+UI-Cutoff.1 is visual/workflow cleanup only. It does not change backend
+behavior, routes, agent features, benchmark scoring, CONTROL prompts, lessons,
+Dream, anti-lessons, harness controls, or Memory Temperature defaults.
+
+### main operator workflow
+
+1. Choose Chat or Instant Run, then choose or start a session.
+2. Enter `repoPathInput`, optional tag, and the query.
+3. Click `primarySubmit` to run.
+4. Review `Answer` and `Patch` as the primary result surfaces.
+5. Use `generatePatch()` and then `applyPatch()` for the main patch loop.
+6. Open `Run details`, `More actions`, Benchmarks, Memory, Dream, Graph,
+   Settings, or Inspector only when the operator needs evidence, diagnostics,
+   or advanced controls.
+
+### Button hierarchy
+
+- Primary: `primarySubmit`, `generatePatch()`, `applyPatch()`,
+  `runAllBenchmarks()`, `openPresentationEvidenceIndex()`, and the primary
+  workspace destinations Chat/Patch, Benchmarks, Dream, Memory, and Settings.
+- Secondary: mode switching, new session, refresh, view, filter, report helper,
+  and normal Memory/Benchmark navigation controls.
+- Advanced/debug: `chat-run-details`, `chat-more-actions`, Inspector, graph
+  debug, raw state, Tool Registry, MCP Audit, prompt/cost, candidate generation,
+  test-run patch, undo, and local critique.
+- Dangerous: `applyDream()`, `applyEnvFiles()`, `applyComposePatch()`,
+  lesson block/delete/promote-allow-failed controls, benchmark delete, and
+  run-subagent controls.
+
+### Default visibility
+
+The first screen keeps the happy path visible: repo, query, Run, Answer, Patch,
+Generate Patch, and Apply / Review Patch. Options, Run details, More actions,
+Harness, Tool Registry / MCP Audit, Prompt/Cost, Inspector/debug surfaces, raw
+JSON/log views, and other advanced/debug/dangerous panels are collapsed by
+default.
+Invariant: advanced/debug/dangerous panels are collapsed by default.
+
+### dangerous-action policy
+
+Dangerous actions must not appear in primary action groups, the primary
+workspace navigation, or the Inspector drawer. They remain behind disclosure,
+warning styling, or existing confirmation paths. UI-Cutoff.1 may restyle those
+controls but must not make them easier to trigger.
+
+### Visual style
+
+The app should read as a calm operator console: dark charcoal surfaces, compact
+spacing, restrained accent color for primary actions, muted secondary controls,
+visible focus/hover/disabled states, and readable code/report blocks. Avoid
+marketing hero treatment, gradients, decorative blobs, and new visible choices.
+
+### preserved DOM contracts
+
+Preserved DOM contracts include all existing `id` values, `onclick` handlers,
+`data-ui-group` anchors, and sentinel comments used by the UI tests. In
+particular, preserve the workspace `ws-*` ids, result pane ids, `showTab`,
+`showWorkspaceTab`, `setProductMode`, patch handlers, harness render targets,
+Tool Registry/MCP Audit targets, and Inspector targets.
