@@ -52,15 +52,17 @@
 
 > **2026-06-05 refresh — Phase 11.8 Anti-Lesson CONTROL dogfood evaluation shipped (report/CLI only; evaluates the default-off 11.7c two-key path; does not expand CONTROL injection, enable it by default, or recommend default-on behavior):** Added `core/anti_lesson_dogfood.py` and `scripts/create_anti_lesson_dogfood_report.py` to compare an existing baseline benchmark report against an explicitly requested 11.7c experiment report and write `.agent/experiments/<timestamp>_anti-lesson-control-dogfood.{json,md}`. The safest positive decision is `greenlight_default_off_experiment_path`, meaning "keep the explicitly requested default-off experiment path"; it is not a default-on greenlight. Suite mismatch is guarded by `shared_cases / max(total_baseline,total_experiment) < 0.80` -> `inconclusive_missing_matching_cases`, while still reporting partial shared-case deltas. CLI source paths must be existing `.json` files inside `.agent/benchmarks/` or `.agent/experiments/`, reject traversal/input-as-output/existing-output cases, and leave input reports byte-identical. No web route was added; web display is deferred to later UI cleanup. Tests: `tests/test_anti_lesson_dogfood.py` (34). Validation after 11.8: `compileall core scripts tests`, focused 34 passed, full suite 2392 passed, `benchmark --check` 50/0.
 
+> **2026-06-05 refresh — Phase 11.c Honeypot Benchmark Cases shipped (benchmark-only; no anti-lesson behavior change):** Added four adversarial benchmark cases for future Phase 11 evaluation evidence: `python_wrong_abstraction_honeypot`, `ts_wrong_file_honeypot`, `go_validation_gap_honeypot`, and `python_test_deletion_honeypot`. Each case names a tempting wrong fix (broad helper/API rewrite, UI/display patch, validation loosening, or test deletion) while the validation evidence requires a smaller source-only fix with explicit `expected_changed_files` and useful `forbidden_changed_files`. Registered all four in `full_v1`; registered the first three in `dev_v1`; `python_test_deletion_honeypot` remains full-only as a stronger safety probe. This slice does not modify CONTROL prompts, lesson retrieval, anti-lesson storage/retrieval, Reverse Dream execution, mutation-oracle anti-lesson minting, benchmark scoring, model/API code, or web UI. Design/checkpoint: `docs/superpowers/designs/2026-06-04-phase11c-honeypot-benchmark-cases.md`. Tests: `tests/test_honeypot_benchmark_cases.py` (6). Validation after 11.c: `compileall benchmarks tests`, focused 6 passed, full suite 2399 passed, `benchmark --check` 54/0.
+
 ## Current Truth / Start Here
 
 > 2026-06-05. Update this block when the next phase ships.
 
 | What | State |
 |---|---|
-| Benchmark cases | 50 (`benchmark --check` 50 / 0 errors) |
-| Full test suite | 2392 passed |
-| Phase 11 (anti-lessons) | **11.1–11.8 shipped — default-off CONTROL warning path plus report-only dogfood evaluation** (storage, manual create, duplicate/merge, report, Reverse Dream dry-run planner, query shadow retrieval, CONTROL preview, CONTROL preview report, two-key gated per-run injection, and CLI/Markdown dogfood comparison). Anti-lessons remain excluded from normal active retrieval; default CONTROL prompt is byte-identical unless both `ANTI_LESSONS_CONTROL_ENABLED=true` and `anti_lesson_control_requested=True`. 11.8 can greenlight only the explicitly requested default-off experiment path, not default-on behavior. Mutation-oracle/Reverse-Dream *execution*, default-on behavior, activation/promotion, and auto-demotion remain future (gated on §B held-out set + §C minimality). |
+| Benchmark cases | 54 (`benchmark --check` 54 / 0 errors) |
+| Full test suite | 2399 passed |
+| Phase 11 (anti-lessons) | **11.1–11.8 plus 11.c shipped — default-off CONTROL warning path, report-only dogfood evaluation, and benchmark-only honeypots** (storage, manual create, duplicate/merge, report, Reverse Dream dry-run planner, query shadow retrieval, CONTROL preview, CONTROL preview report, two-key gated per-run injection, CLI/Markdown dogfood comparison, and four adversarial temptation benchmark cases). Anti-lessons remain excluded from normal active retrieval; default CONTROL prompt is byte-identical unless both `ANTI_LESSONS_CONTROL_ENABLED=true` and `anti_lesson_control_requested=True`. 11.8 can greenlight only the explicitly requested default-off experiment path, not default-on behavior; 11.c adds evaluation evidence only. Mutation-oracle/Reverse-Dream *execution*, default-on behavior, activation/promotion, and auto-demotion remain future (gated on §B held-out set + §C minimality). |
 | Phase 12 | **Shipped through 12.15c** — experiment registry/decision reports, presentation proof UI, generated-artifact ledger, runtime/harness modes, explainability/dogfood layers, memory-temperature experiment planning, and harness controls with `.env` / compose preview-apply. |
 | Replay chain | **Complete through 13R.5** — bundle writer, viewer, compare, janitor dry-run, janitor apply gate |
 | Phase 14 | 14.1–14.4 shipped — read-only taxonomy classifier, standalone exporter, benchmark-report display, trend/dogfood report |
@@ -71,7 +73,6 @@
 **Do next:**
 - F.1 Goal Brief Autocomplete (tracked)
 - Phase 15a: lambda complexity classifier only — no decomposition yet (optional)
-- Phase 11c: honeypot benchmark cases — warm-up for Phase 11 (optional)
 - External benchmark sandbox (later, after SSD/Docker)
 
 ---

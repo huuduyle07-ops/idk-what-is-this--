@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "suite_id": "full_v1",
-  "description": "All 50 AgentBench cases present in the v1 suite (32 original + 8 added in Phase 12.6 + 1 added in Phase 12.7 + 1 added in Phase 13 + 8 added in Phase 11-prep).",
+  "description": "All 54 AgentBench cases present in the v1 suite (32 original + 8 added in Phase 12.6 + 1 added in Phase 12.7 + 1 added in Phase 13 + 8 added in Phase 11-prep + 4 added in Phase 11.c honeypots).",
   "case_names": [
     "cpp_account_interest",
     "cpp_boundary_check",
@@ -12,6 +12,7 @@
     "go_logging_side_effect",
     "go_missing_import_error",
     "go_multifile_root_cause",
+    "go_validation_gap_honeypot",
     "go_validation_command_misleading_success",
     "go_wallet_transfer",
     "go_wrong_file_temptation",
@@ -38,6 +39,8 @@
     "python_rubiks_inverse_sequence_trap",
     "python_sql_account_transfer",
     "python_sql_join_filter",
+    "python_test_deletion_honeypot",
+    "python_wrong_abstraction_honeypot",
     "rust_cart_reservation",
     "rust_error_context_breaks_matching",
     "rust_hanoi_optimality_trap",
@@ -52,6 +55,7 @@
     "ts_inventory_restock",
     "ts_migration_import_path_case",
     "ts_nested_dispatch_root_cause",
-    "ts_optional_property_guard"
+    "ts_optional_property_guard",
+    "ts_wrong_file_honeypot"
   ]
 }
