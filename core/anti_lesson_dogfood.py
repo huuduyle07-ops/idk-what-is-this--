@@ -171,6 +171,28 @@ def _case_file_summary(result: dict[str, Any]) -> dict[str, list[str]]:
     }
 
 
+def _file_list_comparison(baseline: list[str], experiment: list[str]) -> dict[str, list[str]]:
+    base = set(baseline)
+    exp = set(experiment)
+    return {
+        "baseline_only": sorted(base - exp),
+        "experiment_only": sorted(exp - base),
+        "shared": sorted(base & exp),
+    }
+
+
+def _case_file_comparison(
+    baseline: dict[str, Any],
+    experiment: dict[str, Any],
+) -> dict[str, dict[str, list[str]]]:
+    baseline_files = _case_file_summary(baseline)
+    experiment_files = _case_file_summary(experiment)
+    return {
+        name: _file_list_comparison(baseline_files[name], experiment_files[name])
+        for name in baseline_files
+    }
+
+
 def _case_usage_delta(
     baseline: dict[str, Any],
     experiment: dict[str, Any],
@@ -206,6 +228,7 @@ def _per_case_rows(baseline: dict[str, Any], experiment: dict[str, Any]) -> list
                 "outcome": _case_outcome(base_status, exp_status),
                 "baseline_files": _case_file_summary(base),
                 "experiment_files": _case_file_summary(exp),
+                "file_comparison": _case_file_comparison(base, exp),
                 "usage_delta": _case_usage_delta(base, exp),
             }
         )

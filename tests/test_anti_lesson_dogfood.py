@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from core import anti_lesson_dogfood as dogfood
 
 
@@ -205,3 +207,87 @@ def test_missing_baseline_usage_value_does_not_count_as_zero_increase():
 
     assert report["decision"]["status"] == "greenlight_default_off_experiment_path"
     assert report["summary"]["total_tokens"]["baseline"] is None
+
+
+def test_per_case_file_comparison_tracks_added_removed_and_unchanged_files():
+    baseline = _report(
+        [
+            _case(
+                "case_a",
+                success=True,
+                changed_files=["shared.py", "baseline_only.py"],
+                patched_files=["patch_shared.py", "patch_removed.py"],
+                unexpected_mutations=["mutation_shared.py", "mutation_removed.py"],
+            )
+        ]
+    )
+    experiment = _report(
+        [
+            _case(
+                "case_a",
+                success=True,
+                changed_files=["shared.py", "experiment_only.py"],
+                patched_files=["patch_shared.py", "patch_added.py"],
+                unexpected_mutations=["mutation_shared.py", "mutation_added.py"],
+            )
+        ]
+    )
+
+    report = dogfood.build_anti_lesson_dogfood_report(baseline, experiment)
+
+    assert report["per_case"][0]["file_comparison"] == {
+        "changed_files": {
+            "baseline_only": ["baseline_only.py"],
+            "experiment_only": ["experiment_only.py"],
+            "shared": ["shared.py"],
+        },
+        "patched_files": {
+            "baseline_only": ["patch_removed.py"],
+            "experiment_only": ["patch_added.py"],
+            "shared": ["patch_shared.py"],
+        },
+        "unexpected_mutations": {
+            "baseline_only": ["mutation_removed.py"],
+            "experiment_only": ["mutation_added.py"],
+            "shared": ["mutation_shared.py"],
+        },
+    }
+
+
+@pytest.mark.parametrize(
+    ("baseline", "experiment", "expected"),
+    [
+        (_case("case_a", success=False), _case("case_a", success=True), "improved"),
+        (_case("case_a", success=True), _case("case_a", success=False), "regressed"),
+        (_case("case_a", success=True), _case("case_a", success=True), "unchanged"),
+        (_case("case_a", success=True), {"name": "case_a"}, "inconclusive"),
+    ],
+)
+def test_per_case_outcome_classification(baseline, experiment, expected):
+    report = dogfood.build_anti_lesson_dogfood_report(
+        _report([baseline]),
+        _report([experiment]),
+    )
+
+    assert report["per_case"][0]["outcome"] == expected
+
+
+def test_missing_optional_per_case_cost_and_token_fields_are_unknown_without_error():
+    report = dogfood.build_anti_lesson_dogfood_report(
+        _report([_case("case_a", success=True)]),
+        _report([_case("case_a", success=True)]),
+    )
+
+    usage_delta = report["per_case"][0]["usage_delta"]
+    assert usage_delta["total_tokens"] == {
+        "baseline": None,
+        "experiment": None,
+        "delta": None,
+        "delta_ratio": None,
+    }
+    assert usage_delta["estimated_cost_usd"] == {
+        "baseline": None,
+        "experiment": None,
+        "delta": None,
+        "delta_ratio": None,
+    }
