@@ -1,8 +1,19 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pytest
 
 from core import anti_lesson_dogfood as dogfood
+from scripts import create_anti_lesson_dogfood_report as report_cli
+
+
+@pytest.fixture
+def tmp_repo(tmp_path):
+    path = tmp_path / "repo"
+    path.mkdir(parents=True)
+    return path
 
 
 def _case(
@@ -322,3 +333,211 @@ def test_missing_optional_per_case_cost_and_token_fields_are_unknown_without_err
         "delta": None,
         "delta_ratio": None,
     }
+
+
+def _write_report(path: Path, report: dict) -> bytes:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data = json.dumps(report, indent=2, sort_keys=True).encode("utf-8")
+    path.write_bytes(data)
+    return data
+
+
+def _run_cli(repo_path: Path, *args: str) -> int:
+    return report_cli.main(
+        [
+            "--repo-path",
+            str(repo_path),
+            *args,
+        ]
+    )
+
+
+def test_cli_writes_json_and_markdown_under_experiments_without_mutating_sources(
+    tmp_repo,
+):
+    baseline_path = tmp_repo / ".agent" / "benchmarks" / "baseline.json"
+    experiment_path = tmp_repo / ".agent" / "experiments" / "experiment.json"
+    baseline_bytes = _write_report(baseline_path, _report([_case("case_a", success=True)]))
+    experiment_bytes = _write_report(experiment_path, _report([_case("case_a", success=True)]))
+
+    result = _run_cli(
+        tmp_repo,
+        "--baseline-report",
+        str(baseline_path),
+        "--experiment-report",
+        str(experiment_path),
+    )
+
+    assert result == 0
+    outputs = sorted((tmp_repo / ".agent" / "experiments").glob("*_anti-lesson-control-dogfood.*"))
+    assert {path.suffix for path in outputs} == {".json", ".md"}
+    output_json = next(path for path in outputs if path.suffix == ".json")
+    output_md = next(path for path in outputs if path.suffix == ".md")
+    assert output_json.parent == tmp_repo / ".agent" / "experiments"
+    assert output_md.parent == tmp_repo / ".agent" / "experiments"
+    assert output_json.stem == output_md.stem
+    assert json.loads(output_json.read_text(encoding="utf-8"))["decision"]["status"] == (
+        "greenlight_default_off_experiment_path"
+    )
+    assert "# Anti-Lesson CONTROL Dogfood Evaluation Report" in output_md.read_text(encoding="utf-8")
+    assert baseline_path.read_bytes() == baseline_bytes
+    assert experiment_path.read_bytes() == experiment_bytes
+
+
+def test_cli_requires_repo_path(tmp_repo, capsys):
+    baseline_path = tmp_repo / ".agent" / "benchmarks" / "baseline.json"
+    experiment_path = tmp_repo / ".agent" / "experiments" / "experiment.json"
+    _write_report(baseline_path, _report([_case("case_a", success=True)]))
+    _write_report(experiment_path, _report([_case("case_a", success=True)]))
+
+    with pytest.raises(SystemExit) as excinfo:
+        report_cli.main(
+            [
+                "--baseline-report",
+                str(baseline_path),
+                "--experiment-report",
+                str(experiment_path),
+            ]
+        )
+
+    assert excinfo.value.code == 2
+    assert "--repo-path" in capsys.readouterr().err
+
+
+def test_cli_rejects_source_report_outside_allowed_agent_report_dirs(tmp_repo, capsys):
+    baseline_path = tmp_repo / "reports" / "baseline.json"
+    experiment_path = tmp_repo / ".agent" / "experiments" / "experiment.json"
+    _write_report(baseline_path, _report([_case("case_a", success=True)]))
+    _write_report(experiment_path, _report([_case("case_a", success=True)]))
+
+    result = _run_cli(
+        tmp_repo,
+        "--baseline-report",
+        str(baseline_path),
+        "--experiment-report",
+        str(experiment_path),
+    )
+
+    assert result == 2
+    err = capsys.readouterr().err
+    assert "benchmarks" in err
+    assert "experiments" in err
+
+
+@pytest.mark.parametrize(
+    "extra_args",
+    [
+        ("--output-json", ".agent/experiments/../report.json"),
+        ("--output-json", ".agent/experiments/report.txt"),
+        ("--output-md", ".agent/experiments/../report.md"),
+        ("--output-md", ".agent/experiments/report.json"),
+        ("--baseline-report", ".agent/benchmarks/../benchmarks/baseline.json"),
+    ],
+)
+def test_cli_rejects_traversal_and_non_json_non_md_output_suffixes(
+    tmp_repo,
+    extra_args,
+):
+    baseline_path = tmp_repo / ".agent" / "benchmarks" / "baseline.json"
+    experiment_path = tmp_repo / ".agent" / "experiments" / "experiment.json"
+    _write_report(baseline_path, _report([_case("case_a", success=True)]))
+    _write_report(experiment_path, _report([_case("case_a", success=True)]))
+
+    args = [
+        "--baseline-report",
+        str(baseline_path),
+        "--experiment-report",
+        str(experiment_path),
+        *extra_args,
+    ]
+    result = _run_cli(tmp_repo, *args)
+
+    assert result == 2
+    assert not list((tmp_repo / ".agent" / "experiments").glob("*_anti-lesson-control-dogfood.*"))
+
+
+def test_cli_does_not_overwrite_input_reports(tmp_repo, capsys):
+    baseline_path = tmp_repo / ".agent" / "benchmarks" / "baseline.json"
+    experiment_path = tmp_repo / ".agent" / "experiments" / "experiment.json"
+    baseline_bytes = _write_report(baseline_path, _report([_case("case_a", success=True)]))
+    experiment_bytes = _write_report(experiment_path, _report([_case("case_a", success=True)]))
+
+    result = _run_cli(
+        tmp_repo,
+        "--baseline-report",
+        str(baseline_path),
+        "--experiment-report",
+        str(experiment_path),
+        "--output-json",
+        str(experiment_path),
+    )
+
+    assert result == 2
+    assert "input report" in capsys.readouterr().err
+    assert baseline_path.read_bytes() == baseline_bytes
+    assert experiment_path.read_bytes() == experiment_bytes
+
+
+def test_cli_rejects_existing_output_paths_without_mutating_sources(tmp_repo, capsys):
+    baseline_path = tmp_repo / ".agent" / "benchmarks" / "baseline.json"
+    experiment_path = tmp_repo / ".agent" / "experiments" / "experiment.json"
+    output_json = tmp_repo / ".agent" / "experiments" / "existing.json"
+    output_md = tmp_repo / ".agent" / "experiments" / "new.md"
+    baseline_bytes = _write_report(baseline_path, _report([_case("case_a", success=True)]))
+    experiment_bytes = _write_report(experiment_path, _report([_case("case_a", success=True)]))
+    output_bytes = _write_report(output_json, {"already": "there"})
+
+    result = _run_cli(
+        tmp_repo,
+        "--baseline-report",
+        str(baseline_path),
+        "--experiment-report",
+        str(experiment_path),
+        "--output-json",
+        str(output_json),
+        "--output-md",
+        str(output_md),
+    )
+
+    assert result == 2
+    assert "already exists" in capsys.readouterr().err
+    assert baseline_path.read_bytes() == baseline_bytes
+    assert experiment_path.read_bytes() == experiment_bytes
+    assert output_json.read_bytes() == output_bytes
+    assert not output_md.exists()
+
+
+def test_cli_removes_partial_artifacts_when_markdown_write_fails(tmp_repo, monkeypatch, capsys):
+    baseline_path = tmp_repo / ".agent" / "benchmarks" / "baseline.json"
+    experiment_path = tmp_repo / ".agent" / "experiments" / "experiment.json"
+    output_json = tmp_repo / ".agent" / "experiments" / "partial.json"
+    output_md = tmp_repo / ".agent" / "experiments" / "partial.md"
+    baseline_bytes = _write_report(baseline_path, _report([_case("case_a", success=True)]))
+    experiment_bytes = _write_report(experiment_path, _report([_case("case_a", success=True)]))
+    original_write = report_cli._write_text_artifact
+
+    def fail_markdown_write(path: Path, text: str) -> None:
+        if path.suffix == ".md":
+            raise OSError("simulated markdown write failure")
+        original_write(path, text)
+
+    monkeypatch.setattr(report_cli, "_write_text_artifact", fail_markdown_write)
+
+    result = _run_cli(
+        tmp_repo,
+        "--baseline-report",
+        str(baseline_path),
+        "--experiment-report",
+        str(experiment_path),
+        "--output-json",
+        str(output_json),
+        "--output-md",
+        str(output_md),
+    )
+
+    assert result == 1
+    assert "simulated markdown write failure" in capsys.readouterr().err
+    assert baseline_path.read_bytes() == baseline_bytes
+    assert experiment_path.read_bytes() == experiment_bytes
+    assert not output_json.exists()
+    assert not output_md.exists()
