@@ -604,6 +604,22 @@ _VALIDATION_TOOL_ALLOWLIST = {
 }
 
 
+def with_failure_kind_fields(result: dict[str, Any]) -> dict[str, Any]:
+    """Add display-only failure kind fields without changing scoring fields."""
+    enriched = dict(result)
+    if enriched.get("success") is True:
+        return enriched
+
+    from core.failure_taxonomy import classify_benchmark_failure_kind
+
+    kind = classify_benchmark_failure_kind(enriched)
+    enriched["failure_kind"] = kind["kind"]
+    enriched["failure_kind_display"] = kind["display"]
+    enriched["failure_cause"] = kind["cause"]
+    enriched["failure_evidence"] = kind["evidence"]
+    return enriched
+
+
 def required_tools(case: dict) -> list[str]:
     """CLI tools that must resolve on PATH for the case to validate.
 
@@ -1439,8 +1455,12 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
 
     # Read-only failure taxonomy section (Phase 14.3). Classification of the
     # already-computed results only; does not change scoring or pass/fail.
-    from core.failure_taxonomy import render_benchmark_taxonomy_lines
+    from core.failure_taxonomy import (
+        render_benchmark_environment_failure_lines,
+        render_benchmark_taxonomy_lines,
+    )
 
+    lines.extend(render_benchmark_environment_failure_lines(report))
     lines.extend(render_benchmark_taxonomy_lines(report))
 
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -1832,6 +1852,7 @@ def main(argv: list[str] | None = None) -> int:
             res.setdefault("flaky", False)
             res.setdefault("retry_results", [])
 
+        res = with_failure_kind_fields(res)
         results.append(res)
 
         if not quiet:

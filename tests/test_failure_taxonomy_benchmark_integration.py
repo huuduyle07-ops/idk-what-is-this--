@@ -57,6 +57,26 @@ def _failing_forbidden_case(name: str = "touched_forbidden") -> dict:
     }
 
 
+def _failing_security_tool_case(name: str = "go_access_denied") -> dict:
+    return {
+        "name": name,
+        "success": False,
+        "language": "go",
+        "validation_output": (
+            "go test: fork/exec C:\\Users\\Admin\\AppData\\Local\\Temp\\"
+            "go-build123\\b001\\exe\\pkg.test.exe: Access is denied."
+        ),
+    }
+
+
+def _failing_assertion_case(name: str = "logic_failure") -> dict:
+    return {
+        "name": name,
+        "success": False,
+        "validation_output": "AssertionError: expected 5, got 4",
+    }
+
+
 # --- core display-only summary ----------------------------------------------
 
 
@@ -90,8 +110,31 @@ def test_summarize_classifies_only_failing_cases():
             "confidence",
             "explanation",
             "recommended_next_action",
+            "failure_kind",
+            "failure_kind_display",
+            "failure_cause",
+            "failure_evidence",
         }
     assert summary["guardrail_note"] == REQUIRED_GUARDRAIL
+
+
+def test_summarize_includes_failure_kind_display_without_changing_counts():
+    report = _report(
+        [
+            {"name": "ok", "success": True},
+            _failing_security_tool_case(),
+            _failing_assertion_case(),
+        ]
+    )
+    summary = ft.summarize_benchmark_failures(report)
+
+    by_name = {item["name"]: item for item in summary["classifications"]}
+    assert by_name["go_access_denied"]["failure_kind"] == "security_tool"
+    assert by_name["go_access_denied"]["failure_kind_display"] == "SECURITY TOOL"
+    assert by_name["logic_failure"]["failure_kind"] == "code_unknown"
+    assert by_name["logic_failure"]["failure_kind_display"] == "CODE / UNKNOWN"
+    assert report["passed"] == 1
+    assert report["failed"] == 2
 
 
 def test_summarize_empty_when_no_failing_cases():
@@ -151,6 +194,27 @@ def test_markdown_report_old_shape_does_not_crash(tmp_path):
     assert "No failing cases to classify" in text
 
 
+def test_markdown_report_includes_environment_toolchain_section_when_relevant(tmp_path):
+    report = _report([{"name": "ok", "success": True}, _failing_security_tool_case()])
+    md_path = tmp_path / "benchmark_report_env.md"
+    run_benchmarks.write_markdown_report(report, md_path)
+    text = md_path.read_text(encoding="utf-8")
+
+    assert "## Environment / Toolchain failures" in text
+    assert "`go_access_denied`" in text
+    assert "SECURITY TOOL" in text
+    assert "Access is denied" in text
+
+
+def test_markdown_report_omits_environment_toolchain_section_when_not_relevant(tmp_path):
+    report = _report([_failing_assertion_case()])
+    md_path = tmp_path / "benchmark_report_code.md"
+    run_benchmarks.write_markdown_report(report, md_path)
+    text = md_path.read_text(encoding="utf-8")
+
+    assert "## Environment / Toolchain failures" not in text
+
+
 # --- display-only / scoring untouched ---------------------------------------
 
 
@@ -176,6 +240,19 @@ def test_scoring_fields_unchanged_by_markdown_and_summary(tmp_path):
     assert scoring_before == scoring_after
     # The per-case success flags must be untouched too.
     assert [r.get("success") for r in report["results"]] == [True, False, False]
+    assert "failure_kind" not in report["results"][1]
+
+
+def test_runner_failure_kind_annotation_does_not_change_scoring_fields():
+    result = _failing_security_tool_case()
+    before = dict(result)
+    annotated = run_benchmarks.with_failure_kind_fields(result)
+
+    assert before["success"] is False
+    assert annotated["success"] is False
+    assert annotated["failure_kind"] == "security_tool"
+    assert annotated["failure_kind_display"] == "SECURITY TOOL"
+    assert result == before
 
 
 # --- web route integration --------------------------------------------------
@@ -219,10 +296,36 @@ def test_web_report_route_includes_taxonomy_counts(client, tmp_path):
     assert "confidence" in item
     assert "explanation" in item
     assert "recommended_next_action" in item
+    assert item["failure_kind_display"] == "CODE / UNKNOWN"
     # Scoring fields are still present and unchanged in the response.
     assert body["passed"] == 1
     assert body["failed"] == 1
     assert body["total"] == 2
+
+
+def test_web_report_route_exposes_environment_failure_badge_fields(client, tmp_path):
+    bench_dir = tmp_path / ".agent" / "benchmarks"
+    bench_dir.mkdir(parents=True)
+    report = _report([_failing_security_tool_case()])
+    source = bench_dir / "benchmark_report_124.json"
+    source.write_text(json.dumps(report), encoding="utf-8")
+    before = source.read_text(encoding="utf-8")
+
+    resp = client.get(
+        "/benchmarks/report",
+        query_string={
+            "repo_path": str(tmp_path),
+            "filename": "benchmark_report_124.json",
+        },
+    )
+    assert resp.status_code == 200
+    body = resp.get_json()
+    item = body["failure_taxonomy"]["classifications"][0]
+
+    assert item["failure_kind"] == "security_tool"
+    assert item["failure_kind_display"] == "SECURITY TOOL"
+    assert "Go temp executable blocked on Windows" in item["failure_cause"]
+    assert source.read_text(encoding="utf-8") == before
 
 
 def test_web_report_route_does_not_write_taxonomy_artifacts(client, tmp_path):

@@ -194,3 +194,48 @@ def test_benchmark_case_defaults_route(tmp_path):
     assert body["ok"] is True
     assert body["expected_changed_files"] == ["main.py"]
     assert body["validation_command"] == "python main.py"
+
+
+def test_benchmark_report_route_handles_old_reports_without_failure_kind(tmp_path):
+    from web import app as web_app
+
+    bench_dir = tmp_path / ".agent" / "benchmarks"
+    bench_dir.mkdir(parents=True)
+    report = {
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "total": 1,
+        "results": [
+            {
+                "name": "old_logic_failure",
+                "success": False,
+                "validation_output": "AssertionError: expected 5, got 4",
+            }
+        ],
+    }
+    source = bench_dir / "benchmark_report_321.json"
+    source.write_text(json.dumps(report), encoding="utf-8")
+    before = source.read_text(encoding="utf-8")
+
+    resp = web_app.app.test_client().get(
+        "/benchmarks/report",
+        query_string={
+            "repo_path": str(tmp_path),
+            "filename": "benchmark_report_321.json",
+        },
+    )
+
+    assert resp.status_code == 200
+    body = resp.get_json()
+    item = body["failure_taxonomy"]["classifications"][0]
+    assert item["failure_kind_display"] == "CODE / UNKNOWN"
+    assert source.read_text(encoding="utf-8") == before
+
+
+def test_benchmark_template_contains_failure_kind_badge_renderer():
+    template = Path("web/templates/index.html").read_text(encoding="utf-8")
+
+    assert "_benchFailureKindBadge" in template
+    assert "failure_kind_display" in template
+    assert "CODE / UNKNOWN" in template

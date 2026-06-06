@@ -10,6 +10,7 @@ from core.failure_taxonomy import (
     CATEGORIES,
     GUARDRAIL_NOTE,
     FailureClassification,
+    classify_benchmark_failure_kind,
     classify_failure,
     format_failure_taxonomy_markdown,
     format_failure_taxonomy_report,
@@ -155,6 +156,68 @@ def test_algorithm_reasoning_failure():
 def test_unknown_when_no_signal():
     result = classify_failure({})
     _assert_basic(result, "unknown")
+
+
+# --- benchmark failure kind display ----------------------------------------
+
+
+def test_benchmark_failure_kind_security_tool_from_fork_exec_access_denied():
+    result = classify_benchmark_failure_kind(
+        {
+            "name": "go_case",
+            "success": False,
+            "validation_output": (
+                "fork/exec C:\\Users\\Admin\\AppData\\Local\\Temp\\"
+                "go-build123\\b001\\exe\\main.exe: Access is denied."
+            ),
+        }
+    )
+    assert result["kind"] == "security_tool"
+    assert result["display"] == "SECURITY TOOL"
+    assert "Access is denied" in result["evidence"]
+
+
+def test_benchmark_failure_kind_go_temp_executable_blocked_on_windows():
+    result = classify_benchmark_failure_kind(
+        {
+            "name": "go_case",
+            "success": False,
+            "language": "go",
+            "validation_output": (
+                "go test: fork/exec C:\\Users\\Admin\\AppData\\Local\\Temp\\"
+                "go-build456\\b001\\exe\\pkg.test.exe: Access is denied."
+            ),
+        }
+    )
+    assert result["kind"] == "security_tool"
+    assert result["display"] == "SECURITY TOOL"
+    assert "Go temp executable blocked on Windows" in result["cause"]
+
+
+def test_benchmark_failure_kind_missing_compiler_maps_to_toolchain():
+    result = classify_benchmark_failure_kind(
+        {
+            "name": "cpp_case",
+            "success": False,
+            "validation_output": "g++: command not found",
+        }
+    )
+    assert result["kind"] == "toolchain"
+    assert result["display"] == "TOOLCHAIN"
+    assert "missing toolchain" in result["cause"]
+
+
+def test_benchmark_failure_kind_assertion_failure_remains_code_unknown():
+    result = classify_benchmark_failure_kind(
+        {
+            "name": "logic_case",
+            "success": False,
+            "validation_output": "AssertionError: expected 5, got 4",
+        }
+    )
+    assert result["kind"] == "code_unknown"
+    assert result["display"] == "CODE / UNKNOWN"
+    assert result["cause"] == "no environment/toolchain signal detected"
 
 
 # --- behaviour --------------------------------------------------------------

@@ -2662,6 +2662,43 @@ button {
     color: var(--color-text-muted);
 }
 
+.bench-failure-kind-badge {
+    display: inline-block;
+    max-width: 140px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.5;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+.bench-failure-kind-badge--environment {
+    color: #38bdf8;
+    border-color: #0ea5e9;
+}
+
+.bench-failure-kind-badge--toolchain {
+    color: #fbbf24;
+    border-color: #d97706;
+}
+
+.bench-failure-kind-badge--security_tool {
+    color: #f0abfc;
+    border-color: #c026d3;
+}
+
+.bench-failure-kind-badge--code_unknown,
+.bench-failure-kind-badge--empty {
+    color: var(--color-text-muted);
+}
+
 .bench-raw-json {
     margin-top: 16px;
     font-size: 12px;

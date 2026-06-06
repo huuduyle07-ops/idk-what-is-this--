@@ -7378,6 +7378,39 @@ function _benchCaseStatus(result) {
     return result.success ? "pass" : "fail";
 }
 
+function _benchFailureKindMap(report) {
+    const items = report?.failure_taxonomy?.classifications || [];
+    const byName = {};
+    items.forEach(item => {
+        if (item && item.name) byName[item.name] = item;
+    });
+    return byName;
+}
+
+function _benchFailureKindInfo(result, byName) {
+    if (!result || result.success === true) return null;
+    const name = result.name || "";
+    const fromTaxonomy = (byName && byName[name]) || {};
+    const display = result.failure_kind_display || fromTaxonomy.failure_kind_display;
+    const kind = result.failure_kind || fromTaxonomy.failure_kind;
+    const cause = result.failure_cause || fromTaxonomy.failure_cause || "";
+    const evidence = result.failure_evidence || fromTaxonomy.failure_evidence || "";
+    if (display) return { display, kind: kind || "code_unknown", cause, evidence };
+    return {
+        display: "CODE / UNKNOWN",
+        kind: "code_unknown",
+        cause: "no environment/toolchain signal detected",
+        evidence: "",
+    };
+}
+
+function _benchFailureKindBadge(info) {
+    if (!info) return `<span class="bench-failure-kind-badge bench-failure-kind-badge--empty">&mdash;</span>`;
+    const kindClass = String(info.kind || "code_unknown").replace(/[^a-z0-9_-]/gi, "_");
+    const title = [info.cause, info.evidence].filter(Boolean).join(" | ");
+    return `<span class="bench-failure-kind-badge bench-failure-kind-badge--${_escapeHtml(kindClass)}" title="${_escapeHtml(title)}">${_escapeHtml(info.display)}</span>`;
+}
+
 function _benchModelLabel(result) {
     // Selected model for this case, or a literal "unknown" when the report
     // predates model-stats capture or the field is empty/null. Never throws on
@@ -7473,6 +7506,7 @@ function _renderCompactCasesTable(report) {
     // gracefully (unknown / em-dash) so older reports never crash the panel.
     const results = (report && report.results) || [];
     if (results.length === 0) return "";
+    const failureByName = _benchFailureKindMap(report);
     const rows = results.map(r => {
         const status = _benchCaseStatus(r);
         const lang = (r && r.language) || "unknown";
@@ -7486,6 +7520,7 @@ function _renderCompactCasesTable(report) {
         const tokensCell = hasTokens ? String(_benchInt(r.total_tokens, 0)) : "—";
         const costCell = (r && r.estimated_cost_usd != null) ? _benchFmtCost(r.estimated_cost_usd) : "—";
         const modelTitle = calls != null ? ` title="${calls} model call(s)"` : "";
+        const failureKind = _benchFailureKindInfo(r, failureByName);
         return `
             <tr class="bench-case-compact-row bench-case-compact-row--${status}"
                 data-bench-lang="${_escapeHtml(lang)}"
@@ -7493,6 +7528,7 @@ function _renderCompactCasesTable(report) {
                 data-bench-diff="${_escapeHtml(diff)}"
                 data-bench-status="${status}">
                 <td><span class="bench-status-badge bench-status-badge--${status}">${status}</span></td>
+                <td>${_benchFailureKindBadge(failureKind)}</td>
                 <td><code>${_escapeHtml((r && r.name) || "?")}</code></td>
                 <td class="bench-case-tags">${_escapeHtml(lang)} / ${_escapeHtml(cat)} / ${_escapeHtml(diff)}</td>
                 <td class="right">${dur.toFixed(2)}s</td>
@@ -7509,6 +7545,7 @@ function _renderCompactCasesTable(report) {
             <thead>
                 <tr>
                     <th>Status</th>
+                    <th>Failure kind</th>
                     <th>Case</th>
                     <th>Lang / Cat / Diff</th>
                     <th class="right">Duration</th>
@@ -7578,19 +7615,24 @@ function _renderBenchmarkDetail(report, filename) {
 
     const flakyHtml = flaky > 0 ? _renderFlakyCasesTable(report) : "";
 
+    const failureByName = _benchFailureKindMap(report);
     const failures = (report.results || []).filter(r => !r.success);
     const failuresHtml = failures.length === 0 ? "" : `
         <div class="bench-section-heading">Failed cases (${failures.length})</div>
-        ${failures.map(f => `
+        ${failures.map(f => {
+            const failureKind = _benchFailureKindInfo(f, failureByName);
+            return `
             <div class="bench-fail-row">
-                <div class="bench-fail-name">${_escapeHtml(f.name || "?")} <span class="bench-fail-meta">· ${_escapeHtml(f.language || "?")}/${_escapeHtml(f.category || "?")}</span></div>
+                <div class="bench-fail-name">${_escapeHtml(f.name || "?")} ${_benchFailureKindBadge(failureKind)} <span class="bench-fail-meta">· ${_escapeHtml(f.language || "?")}/${_escapeHtml(f.category || "?")}</span></div>
                 <div class="bench-fail-detail">
+                    ${failureKind?.cause ? `cause: ${_escapeHtml(failureKind.cause)}` : ""}
+                    ${failureKind?.evidence ? `evidence: ${_escapeHtml(String(failureKind.evidence).slice(0, 240))}` : ""}
                     ${f.validation_output && f.validation_output !== "OK" ? `validation: ${_escapeHtml(String(f.validation_output).slice(0, 240))}` : ""}
                     ${f.toolchain_issue ? `toolchain: ${_escapeHtml(f.toolchain_issue)}` : ""}
                     ${(f.missing_expected_files || []).length ? `missing: ${_escapeHtml(JSON.stringify(f.missing_expected_files))}` : ""}
                 </div>
             </div>
-        `).join("")}
+        `}).join("")}
     `;
 
     const actionsHtml = `

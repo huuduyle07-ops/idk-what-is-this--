@@ -77,14 +77,22 @@ DEFAULT_SMALL_PATCH_LINES = 2
 # Lowercased substrings that indicate a broken toolchain / OS / dependency.
 ENVIRONMENT_MARKERS: tuple[str, ...] = (
     "0xc0000005",
+    "anti-virus",
+    "antivirus",
     "modulenotfounderror",
     "no module named",
     "importerror",
     "command not found",
     "is not recognized",
+    "not recognized as an internal or external command",
     "no such file or directory",
+    "executable file not found",
+    "executable not found",
     "permission denied",
     "access is denied",
+    "security tool",
+    "blocked executable",
+    "evo-gen",
     ".dll",
     "dll load failed",
     "toolchain",
@@ -114,6 +122,69 @@ VALIDATION_COMMAND_MARKERS: tuple[str, ...] = (
     "validation command failed to start",
     "failed to start validation",
     "invalid validation command",
+)
+
+BENCHMARK_FAILURE_KIND_ENVIRONMENT = "environment"
+BENCHMARK_FAILURE_KIND_TOOLCHAIN = "toolchain"
+BENCHMARK_FAILURE_KIND_SECURITY_TOOL = "security_tool"
+BENCHMARK_FAILURE_KIND_CODE_UNKNOWN = "code_unknown"
+
+BENCHMARK_FAILURE_KIND_DISPLAYS: dict[str, str] = {
+    BENCHMARK_FAILURE_KIND_ENVIRONMENT: "ENVIRONMENT",
+    BENCHMARK_FAILURE_KIND_TOOLCHAIN: "TOOLCHAIN",
+    BENCHMARK_FAILURE_KIND_SECURITY_TOOL: "SECURITY TOOL",
+    BENCHMARK_FAILURE_KIND_CODE_UNKNOWN: "CODE / UNKNOWN",
+}
+
+_BENCHMARK_ENVIRONMENT_KINDS = {
+    BENCHMARK_FAILURE_KIND_ENVIRONMENT,
+    BENCHMARK_FAILURE_KIND_TOOLCHAIN,
+    BENCHMARK_FAILURE_KIND_SECURITY_TOOL,
+}
+
+_SECURITY_TOOL_MARKERS: tuple[str, ...] = (
+    "anti-virus",
+    "antivirus",
+    "security tool",
+    "blocked executable",
+    "blocked by",
+    "evo-gen",
+    "avg",
+    "quarantine",
+    "threat detected",
+)
+_TOOLCHAIN_MARKERS: tuple[str, ...] = (
+    "command not found",
+    "is not recognized",
+    "not recognized as an internal or external command",
+    "executable file not found",
+    "executable not found",
+    "compiler not found",
+    "python was not found",
+    "node not available",
+    "npm not available",
+    "g++ not available",
+    "gcc not available",
+    "cargo not available",
+    "go not available",
+    "dotnet not available",
+    "missing tools:",
+    "missing toolchain",
+)
+_EXECUTION_PERMISSION_MARKERS: tuple[str, ...] = (
+    "fork/exec",
+    "exec:",
+    "spawn ",
+    "executable",
+    ".exe",
+    ".test",
+    ".sh",
+)
+_GO_TEMP_EXECUTABLE_MARKERS: tuple[str, ...] = (
+    "go-build",
+    "\\exe\\",
+    "/exe/",
+    ".test.exe",
 )
 
 _CONFIDENCE: dict[str, float] = {
@@ -362,6 +433,127 @@ def classify_failure(
     return _build(UNKNOWN, [])
 
 
+def classify_benchmark_failure_kind(
+    case_result: dict[str, Any] | None = None,
+    *,
+    validation_output: Any = None,
+) -> dict[str, str]:
+    """Return a display-only failure kind for benchmark case output.
+
+    The result is observational metadata for reports and UI badges only. It is
+    intentionally coarser than the main failure taxonomy: it separates local
+    environment/toolchain/security-tool failures from code-or-unknown failures
+    without changing benchmark scoring or patch behavior.
+    """
+    case = dict(case_result or {})
+    raw_text = _raw_failure_text(case, validation_output)
+    text = raw_text.lower()
+    toolchain_issue = case.get("toolchain_issue")
+
+    if _is_go_temp_executable_block(text):
+        return _benchmark_kind(
+            BENCHMARK_FAILURE_KIND_SECURITY_TOOL,
+            "Go temp executable blocked on Windows",
+            _evidence_snippet(raw_text, ("access is denied", "go-build")),
+        )
+
+    if "access is denied" in text and (
+        _contains_any(text, _SECURITY_TOOL_MARKERS)
+        or _contains_any(text, _EXECUTION_PERMISSION_MARKERS)
+    ):
+        return _benchmark_kind(
+            BENCHMARK_FAILURE_KIND_SECURITY_TOOL,
+            "security tool or OS policy blocked executable execution",
+            _evidence_snippet(
+                raw_text,
+                ("access is denied",) + _SECURITY_TOOL_MARKERS,
+            ),
+        )
+
+    if _contains_any(text, _SECURITY_TOOL_MARKERS):
+        return _benchmark_kind(
+            BENCHMARK_FAILURE_KIND_SECURITY_TOOL,
+            "security tool blocked validation execution",
+            _evidence_snippet(raw_text, _SECURITY_TOOL_MARKERS),
+        )
+
+    if isinstance(toolchain_issue, str) and toolchain_issue.strip():
+        return _benchmark_kind(
+            BENCHMARK_FAILURE_KIND_TOOLCHAIN,
+            toolchain_issue.strip(),
+            _evidence_snippet(toolchain_issue, (toolchain_issue.lower(),)),
+        )
+
+    if _contains_any(text, _TOOLCHAIN_MARKERS):
+        return _benchmark_kind(
+            BENCHMARK_FAILURE_KIND_TOOLCHAIN,
+            "missing toolchain or executable",
+            _evidence_snippet(raw_text, _TOOLCHAIN_MARKERS),
+        )
+
+    if "access is denied" in text or _looks_like_execution_permission_issue(text):
+        return _benchmark_kind(
+            BENCHMARK_FAILURE_KIND_ENVIRONMENT,
+            "environment permission denied during validation execution",
+            _evidence_snippet(raw_text, ("access is denied", "permission denied")),
+        )
+
+    return _benchmark_kind(
+        BENCHMARK_FAILURE_KIND_CODE_UNKNOWN,
+        "no environment/toolchain signal detected",
+        _evidence_snippet(raw_text, ()),
+    )
+
+
+def summarize_benchmark_environment_failures(report: Any) -> dict[str, Any]:
+    """Summarize failed cases whose failure kind is environment-like.
+
+    Display-only: reads already-loaded report data and never mutates it.
+    """
+    items: list[dict[str, str]] = []
+    for index, case in enumerate(_benchmark_results(report)):
+        if not _is_failing_case(case):
+            continue
+        kind = classify_benchmark_failure_kind(case)
+        if kind["kind"] not in _BENCHMARK_ENVIRONMENT_KINDS:
+            continue
+        name = str(case.get("name") or "").strip() or f"case_{index}"
+        items.append(
+            {
+                "name": name,
+                "failure_kind": kind["kind"],
+                "failure_kind_display": kind["display"],
+                "failure_cause": kind["cause"],
+                "failure_evidence": kind["evidence"],
+            }
+        )
+    return {"count": len(items), "items": items}
+
+
+def render_benchmark_environment_failure_lines(report: Any) -> list[str]:
+    """Return Markdown lines for environment/toolchain/security failures."""
+    summary = summarize_benchmark_environment_failures(report)
+    if not summary["items"]:
+        return []
+
+    lines = [
+        "## Environment / Toolchain failures",
+        "",
+        "| Case | Kind | Detected cause | Evidence |",
+        "|---|---|---|---|",
+    ]
+    for item in summary["items"]:
+        lines.append(
+            "| "
+            f"`{_md_escape(item['name'])}` | "
+            f"{_md_escape(item['failure_kind_display'])} | "
+            f"{_md_escape(item['failure_cause'])} | "
+            f"{_md_escape(item['failure_evidence'])} |"
+        )
+    lines.append("")
+    return lines
+
+
 def format_failure_taxonomy_markdown(
     classification: FailureClassification,
 ) -> str:
@@ -456,6 +648,7 @@ def summarize_benchmark_failures(report: Any) -> dict[str, Any]:
             continue
         # classify_failure copies its input and never mutates it.
         result = classify_failure(case)
+        failure_kind = classify_benchmark_failure_kind(case)
         counts[result.category] = counts.get(result.category, 0) + 1
         name = str(case.get("name") or "").strip() or f"case_{index}"
         classifications.append(
@@ -465,6 +658,10 @@ def summarize_benchmark_failures(report: Any) -> dict[str, Any]:
                 "confidence": result.confidence,
                 "explanation": result.explanation,
                 "recommended_next_action": result.recommended_next_action,
+                "failure_kind": failure_kind["kind"],
+                "failure_kind_display": failure_kind["display"],
+                "failure_cause": failure_kind["cause"],
+                "failure_evidence": failure_kind["evidence"],
             }
         )
 
@@ -583,6 +780,81 @@ def _text_blob(
         if isinstance(value, str):
             parts.append(value)
     return "\n".join(parts).lower()
+
+
+def _raw_failure_text(case: dict[str, Any], validation_output: Any) -> str:
+    parts: list[str] = []
+    for key in (
+        "validation",
+        "validation_output",
+        "agent_validation",
+        "error_text",
+        "stderr",
+        "stdout",
+        "error",
+        "toolchain_issue",
+    ):
+        value = case.get(key)
+        if isinstance(value, str):
+            parts.append(value)
+    if isinstance(validation_output, str):
+        parts.append(validation_output)
+    elif isinstance(validation_output, dict):
+        for key in ("text", "stdout", "stderr", "output", "message"):
+            value = validation_output.get(key)
+            if isinstance(value, str):
+                parts.append(value)
+    return "\n".join(parts)
+
+
+def _benchmark_kind(kind: str, cause: str, evidence: str) -> dict[str, str]:
+    return {
+        "kind": kind,
+        "display": BENCHMARK_FAILURE_KIND_DISPLAYS.get(
+            kind,
+            BENCHMARK_FAILURE_KIND_DISPLAYS[BENCHMARK_FAILURE_KIND_CODE_UNKNOWN],
+        ),
+        "cause": cause,
+        "evidence": evidence,
+    }
+
+
+def _contains_any(text: str, markers: tuple[str, ...]) -> bool:
+    return any(marker in text for marker in markers)
+
+
+def _is_go_temp_executable_block(text: str) -> bool:
+    return "access is denied" in text and _contains_any(
+        text,
+        _GO_TEMP_EXECUTABLE_MARKERS,
+    )
+
+
+def _looks_like_execution_permission_issue(text: str) -> bool:
+    return (
+        "permission denied" in text
+        and _contains_any(text, _EXECUTION_PERMISSION_MARKERS)
+    )
+
+
+def _evidence_snippet(raw_text: str, markers: tuple[str, ...]) -> str:
+    compact = " ".join(str(raw_text or "").split())
+    if not compact:
+        return ""
+
+    lowered_markers = tuple(marker.lower() for marker in markers if marker)
+    if lowered_markers:
+        for line in str(raw_text or "").splitlines():
+            line_compact = " ".join(line.split())
+            line_lower = line_compact.lower()
+            if any(marker in line_lower for marker in lowered_markers):
+                return line_compact[:240]
+
+    return compact[:240]
+
+
+def _md_escape(value: Any) -> str:
+    return str(value).replace("|", "\\|").replace("\n", " ")
 
 
 def _produced_patch(case: dict[str, Any]) -> bool:
