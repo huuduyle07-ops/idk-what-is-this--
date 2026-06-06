@@ -24,6 +24,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 EDITABLE_WIRED = {
     "LESSON_RETRIEVAL_ENABLED",
+    "ANTI_LESSONS_CONTROL_ENABLED",
     "MUTATION_ORACLE_ENABLED",
     "OLLAMA_ENABLED",
     "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED",
@@ -66,6 +67,7 @@ def _fake_config() -> types.SimpleNamespace:
         MUTATION_ORACLE_ENABLED=False,
         OLLAMA_ENABLED=False,
         MEMORY_TEMPERATURE_RETRIEVAL_ENABLED=False,
+        ANTI_LESSONS_CONTROL_ENABLED=False,
         AUTO_PATCH_ENABLED=True,
         DB_ENABLED=True,
     )
@@ -107,7 +109,12 @@ def test_control_type_and_source_of_truth_are_correct():
         "MEMORY_TEMPERATURE_RETRIEVAL_ENABLED",
     ):
         assert by_id[cid]["control_type"] == "editable_live"
-    for cid in ("AUTO_PATCH_ENABLED", "DB_ENABLED", "EMBEDDING_PROVIDER"):
+    for cid in (
+        "ANTI_LESSONS_CONTROL_ENABLED",
+        "AUTO_PATCH_ENABLED",
+        "DB_ENABLED",
+        "EMBEDDING_PROVIDER",
+    ):
         assert by_id[cid]["control_type"] == "editable_restart_required"
 
     for cid in PLANNED:
@@ -123,6 +130,43 @@ def test_control_type_and_source_of_truth_are_correct():
 
     assert by_id["EMBEDDING_PROVIDER"]["value_kind"] == "enum"
     assert tuple(by_id["EMBEDDING_PROVIDER"]["enum_options"]) == ("off", "local_minilm", "gemini")
+
+
+def test_anti_lessons_control_server_flag_registry_contract():
+    by_id = {c["id"]: c for c in hc.list_controls(config_module=_fake_config())}
+    control = by_id["ANTI_LESSONS_CONTROL_ENABLED"]
+
+    assert control["label"] == "Anti-lesson CONTROL warnings"
+    assert control["env_var"] == "ANTI_LESSONS_CONTROL_ENABLED"
+    assert control["current_effective"] == "false"
+    assert control["control_type"] == "editable_restart_required"
+    assert control["source_of_truth"] == "env"
+    assert control["wired"] is True
+    assert control["risk"] in {"medium", "high"}
+    assert control["category"] == "gates"
+    assert control["value_kind"] == "bool"
+    assert control["env_targets"] == [".env"]
+    assert "docker-compose.yml" not in control["env_targets"]
+
+    description = control["description"].lower()
+    assert "per-run" in description
+    assert "anti-lesson" in description
+    assert "control warning block" in description
+    assert "must still opt in per run" in description
+    assert "active retrieval knowledge" in description
+    assert "restart" in description
+
+
+def test_planned_and_locked_invariants_remain_unchanged():
+    by_id = {c["id"]: c for c in hc.list_controls(config_module=_fake_config())}
+    planned = {
+        cid for cid, c in by_id.items() if c["control_type"] == "read_only_planned"
+    }
+    locked = {
+        cid for cid, c in by_id.items() if c["control_type"] == "locked_invariant"
+    }
+    assert planned == PLANNED
+    assert locked == LOCKED
 
 
 def test_compose_and_env_apply_functions_exist():
@@ -185,6 +229,45 @@ def test_restart_required_control_does_not_claim_live_effect(tmp_path):
     assert cfg.AUTO_PATCH_ENABLED == before
     assert result["applied_live"] is False
     assert result["restart_required"] is True
+
+
+def test_anti_lessons_control_overlay_and_env_diff_is_restart_required(tmp_path):
+    env_path = tmp_path / ".env"
+    env_path.write_text("ANTI_LESSONS_CONTROL_ENABLED=false\n", encoding="utf-8")
+    overlay = tmp_path / "harness_overrides.json"
+    cfg = _fake_config()
+
+    result = hc.set_override(
+        "ANTI_LESSONS_CONTROL_ENABLED", "true", overlay_path=overlay, config_module=cfg
+    )
+
+    assert hc.load_overlay(overlay_path=overlay)["ANTI_LESSONS_CONTROL_ENABLED"] == "true"
+    assert cfg.ANTI_LESSONS_CONTROL_ENABLED is False
+    assert result["applied_live"] is False
+    assert result["restart_required"] is True
+
+    diff = hc.pending_env_diff(
+        control_ids=["ANTI_LESSONS_CONTROL_ENABLED"],
+        repo_path=tmp_path,
+        overlay_path=overlay,
+    )
+    assert diff == [
+        {
+            "control_id": "ANTI_LESSONS_CONTROL_ENABLED",
+            "env_var": "ANTI_LESSONS_CONTROL_ENABLED",
+            "old": "false",
+            "new": "true",
+            "control_type": "editable_restart_required",
+            "restart_required": True,
+        }
+    ]
+
+    with pytest.raises(hc.HarnessControlError):
+        hc.preview_compose_patch(
+            control_ids=["ANTI_LESSONS_CONTROL_ENABLED"],
+            repo_path=tmp_path,
+            overlay_path=overlay,
+        )
 
 
 def test_enum_control_validates_member(tmp_path):
@@ -259,7 +342,11 @@ def _imports_and_calls(path: Path) -> tuple[list[str], list[str]]:
 def test_module_has_no_forbidden_imports_or_calls():
     imported, calls = _imports_and_calls(PROJECT_ROOT / "core" / "harness_controls.py")
 
-    forbidden_areas = ("patching", "validation", "validator", "run_benchmarks", "model", "api")
+    forbidden_areas = (
+        "patching", "validation", "validator", "run_benchmarks", "benchmark",
+        "model", "api", "dream_trials", "dream_artifacts", "dream_references",
+        "mutation_oracle",
+    )
     for imp in imported:
         parts = imp.split(".")
         for area in forbidden_areas:
@@ -274,5 +361,7 @@ def test_module_has_no_forbidden_imports_or_calls():
     forbidden_calls = {
         "call_model", "call_api", "run_gemini_request", "validate",
         "run_benchmarks", "start_benchmark_run_async", "connect",
+        "run_patch_plan_with_artifacts", "apply_patch_plan", "Popen",
+        "check_call", "check_output", "system", "promote_lesson",
     }
     assert forbidden_calls.isdisjoint(calls)

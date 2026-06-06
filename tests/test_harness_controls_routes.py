@@ -45,6 +45,7 @@ def test_get_controls_returns_categories_and_docker_status(client):
     assert "gates" in cats and "invariants" in cats
     all_ids = {c["id"] for group in cats.values() for c in group}
     assert "LESSON_RETRIEVAL_ENABLED" in all_ids
+    assert "ANTI_LESSONS_CONTROL_ENABLED" in all_ids
     assert "quote_grounding" in all_ids
     # docker status present (read-only probe; value not asserted)
     assert "docker_status" in body
@@ -82,6 +83,52 @@ def test_overlay_route_restart_required_does_not_patch_live(client, monkeypatch)
     assert body["control"]["restart_required"] is True
     # live config untouched
     assert config_module.AUTO_PATCH_ENABLED is True
+
+
+def test_overlay_route_anti_lessons_server_flag_is_restart_required(client, monkeypatch):
+    import config as config_module
+
+    monkeypatch.setattr(config_module, "ANTI_LESSONS_CONTROL_ENABLED", False, raising=False)
+    resp = client.post(
+        "/harness/controls/overlay",
+        json={"control_id": "ANTI_LESSONS_CONTROL_ENABLED", "value": "true"},
+    )
+    assert resp.status_code == 200, resp.get_data(as_text=True)
+    body = resp.get_json()
+    assert body["ok"] is True
+    assert body["control"]["control_type"] == "editable_restart_required"
+    assert body["control"]["applied_live"] is False
+    assert body["control"]["restart_required"] is True
+    assert config_module.ANTI_LESSONS_CONTROL_ENABLED is False
+
+
+def test_get_controls_reports_anti_lessons_pending_env_diff(client, tmp_path, monkeypatch):
+    from core import harness_controls as hc
+
+    env_path = tmp_path / ".env"
+    env_path.write_text("ANTI_LESSONS_CONTROL_ENABLED=false\n", encoding="utf-8")
+    monkeypatch.setattr(hc, "default_env_path", lambda: env_path)
+    hc.save_overlay(
+        {"ANTI_LESSONS_CONTROL_ENABLED": "true"},
+        overlay_path=hc.default_overlay_path(),
+    )
+
+    resp = client.get("/harness/controls")
+    assert resp.status_code == 200
+    body = resp.get_json()
+    diff_by_id = {d["control_id"]: d for d in body["env_diff"]}
+    assert diff_by_id["ANTI_LESSONS_CONTROL_ENABLED"] == {
+        "control_id": "ANTI_LESSONS_CONTROL_ENABLED",
+        "env_var": "ANTI_LESSONS_CONTROL_ENABLED",
+        "old": "false",
+        "new": "true",
+        "control_type": "editable_restart_required",
+        "restart_required": True,
+    }
+    assert all(
+        d["control_id"] != "ANTI_LESSONS_CONTROL_ENABLED"
+        for d in body["compose_diff"]
+    )
 
 
 def test_overlay_route_rejects_planned_control(client):

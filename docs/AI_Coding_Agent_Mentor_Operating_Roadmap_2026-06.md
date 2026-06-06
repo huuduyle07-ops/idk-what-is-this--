@@ -40,7 +40,43 @@ The current system is optimized for small, evidence-first repair tasks. Creation
 
 Keep improving the existing debug/repair workflow.
 
-Goals:
+### A.1: Benchmark Failure Cause Classification / Environment-aware Summary
+
+New observational per-case fields: 
+- failure_kind 
+- failure_kind_display 
+- failure_cause 
+- failure_evidence 
+
+Examples now classified: 
+- fork/exec ... Access is denied -> security_tool / SECURITY TOOL 
+- Go temp executable blocked on Windows -> security_tool / SECURITY TOOL 
+- g++: command not found -> toolchain / TOOLCHAIN - ordinary AssertionError -> code_unknown / CODE / UNKNOWN 
+
+Scoring is unchanged: the runner only adds display fields after retry/skipped state is settled, and pass/fail still derives from the existing success / skipped logic. Tests also assert scoring fields and source benchmark reports are not mutated by summary/web rendering.
+
+### A.2: Debug Workflow Stage Map and Contract
+Stage list: Intake -> Context -> Proposal -> Safety -> Execution -> Validation -> Evidence -> Learning 
+
+What changed: 
+- Added immutable DebugWorkflowStage frozen dataclass metadata. 
+- Added DEBUG_WORKFLOW_STAGES, get_debug_workflow_stages(), and canonical_stage_names(). 
+- Added the full debug workflow map doc with modules, artifacts, approvals, guardrails, Replay, Benchmarks, Lessons, Anti-lessons, Harness Controls, and Failure Taxonomy coverage. 
+- Added contract tests including unique names, exact order, doc phrase coverage, and AST import/call guard. 
+
+UI changed: no. Behavior changed: no. The helper is not wired into runtime behavior and imports only __future__, dataclasses, and typing.
+
+### A.3: Patch Minimality / Changed-files Visibility in Benchmark Tab
+
+Goal: make benchmark reports answer:
+
+Did it pass?
+What source files were patched?
+What generated artifacts were produced?
+Were there unexpected mutations?
+Was the patch minimal or suspiciously broad?
+
+### Goals:
 
 - keep patches small
 - preserve evidence grounding

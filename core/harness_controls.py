@@ -134,6 +134,25 @@ REGISTRY: tuple[HarnessControl, ...] = (
         config_default=True,
     ),
     HarnessControl(
+        id="ANTI_LESSONS_CONTROL_ENABLED",
+        label="Anti-lesson CONTROL warnings",
+        env_var="ANTI_LESSONS_CONTROL_ENABLED",
+        category="gates",
+        control_type=EDITABLE_RESTART_REQUIRED,
+        source_of_truth=SRC_ENV,
+        wired=True,
+        risk="medium",
+        value_kind="bool",
+        description=(
+            "Allows per-run anti-lesson CONTROL warning block injection only "
+            "when the run checkbox is also enabled. This does not make "
+            "anti-lessons active retrieval knowledge. The user must still opt "
+            "in per run. Restart required."
+        ),
+        env_targets=(".env",),
+        config_default=False,
+    ),
+    HarnessControl(
         id="DB_ENABLED",
         label="Database persistence (Postgres)",
         env_var="DB_ENABLED",
