@@ -114,6 +114,11 @@ def _open_tag_for_group(template: str, group: str) -> str:
     return template[tag_start : tag_end + 1]
 
 
+def _css_block(styles: str, selector: str) -> str:
+    start = styles.index(f"\n{selector} {{")
+    return styles[start : styles.index("}", start)]
+
+
 def test_root_route_renders_operator_console():
     with web_app.app.test_client() as client:
         resp = client.get("/")
@@ -224,6 +229,43 @@ def test_css_supports_calm_operator_console_and_readable_results():
         assert selector in styles, f"missing visual contract selector {selector!r}"
 
     assert "linear-gradient" not in styles, "UI-Cutoff.1 must avoid gradient treatment"
+
+
+def test_ui2_form_controls_have_explicit_dark_contrast_rules():
+    styles = _styles()
+
+    form_block = _css_block(styles, 'input:not([type="checkbox"]), textarea, select')
+    assert "background:" in form_block
+    assert "border:" in form_block
+    assert "border: none" not in form_block
+    assert "color: var(--color-text)" in form_block
+
+    for selector in (
+        "input::placeholder",
+        "textarea::placeholder",
+        'input:not([type="checkbox"]):focus',
+        "textarea:focus",
+        "select:focus",
+        'input:not([type="checkbox"]):disabled',
+        "textarea:disabled",
+        "select:disabled",
+        "#repoPathInput",
+        'textarea[name="query"]',
+    ):
+        assert selector in styles, f"missing UI-2 form contrast selector {selector!r}"
+
+
+def test_ui2_harness_pending_panels_do_not_use_near_white_backgrounds():
+    styles = _styles()
+    forbidden = ("background: #fff", "background: white", "background: #f8fafc", "background: #eff6ff")
+
+    for selector in (".harness-envapply__box", ".harness-composeapply__box"):
+        block = _css_block(styles, selector)
+        assert "background:" in block, f"{selector} needs an explicit dark background"
+        assert "border:" in block, f"{selector} needs an explicit card border"
+        lowered = block.lower()
+        for token in forbidden:
+            assert token not in lowered, f"{selector} regressed to a near-white background: {token}"
 
 
 def test_template_has_no_new_privileged_or_external_script_behavior():

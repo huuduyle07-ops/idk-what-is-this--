@@ -54,6 +54,13 @@ def _group_segment(template: str, group: str) -> str:
     return template[start:end]
 
 
+def _open_tag_for_id(template: str, element_id: str) -> str:
+    start = template.index(f'id="{element_id}"')
+    tag_start = template.rfind("<", 0, start)
+    tag_end = template.index(">", start)
+    return template[tag_start : tag_end + 1]
+
+
 # ---------------------------------------------------------------------------
 # 1 - Segmented Memory sub-nav exists and routes to all four sections
 # ---------------------------------------------------------------------------
@@ -96,6 +103,51 @@ def test_duplicate_hints_inside_lessons_segment():
         assert 'id="duplicateHintsPanel"' not in _group_segment(t, other), (
             f"duplicate hints leaked into {other}"
         )
+
+
+def test_memory_anti_lessons_are_grouped_as_counter_knowledge_card():
+    t = _template()
+    lessons = _group_segment(t, "memory-lessons")
+    assert 'data-ui-group="memory-anti-lessons-counter-knowledge"' in lessons
+
+    card = _group_segment(t, "memory-anti-lessons-counter-knowledge")
+    assert "Anti-lessons / Counter-knowledge" in card
+    for phrase in (
+        "Anti-lessons record tempting wrong patterns.",
+        "They are not active retrieval knowledge by default.",
+        "CONTROL warnings require both the server flag and the per-run checkbox.",
+        "shadow-only",
+        "default-off",
+        "requires server flag + per-run checkbox",
+    ):
+        assert phrase in card
+
+    for element_id in (
+        "antiLessonCreatePanel",
+        "antiLessonReportPanel",
+        "reverseDreamPlanPanel",
+        "antiShadowRetrievalPanel",
+        "antiControlPreviewPanel",
+        "antiControlPreviewReportPanel",
+        "antiLessonCreateBtn",
+        "antiShadowRetrievalSearchBtn",
+        "antiControlPreviewBtn",
+        "antiControlPreviewReportBtn",
+    ):
+        assert f'id="{element_id}"' in card, f"missing anti-lesson control {element_id!r}"
+
+    assert 'id="duplicateHintsPanel"' not in card
+    assert 'id="duplicateHintsPanel"' in lessons
+
+    for panel_id in (
+        "antiLessonCreatePanel",
+        "antiLessonReportPanel",
+        "reverseDreamPlanPanel",
+        "antiShadowRetrievalPanel",
+        "antiControlPreviewPanel",
+        "antiControlPreviewReportPanel",
+    ):
+        assert " open" not in _open_tag_for_id(t, panel_id), f"{panel_id} must stay collapsed"
 
 
 # ---------------------------------------------------------------------------

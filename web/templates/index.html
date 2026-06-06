@@ -958,6 +958,22 @@
               Only <strong>Active</strong> lessons will be retrieval-eligible in future phases.
               Only Active lessons can be used as patch-prompt hints, and only when LESSON_RETRIEVAL_ENABLED=true.
             </div>
+            <div class="anti-lessons-card" data-ui-group="memory-anti-lessons-counter-knowledge">
+              <div class="anti-lessons-card__header">
+                <div>
+                  <strong>Anti-lessons / Counter-knowledge</strong>
+                  <p class="anti-lessons-card__copy">
+                    Anti-lessons record tempting wrong patterns.
+                    They are not active retrieval knowledge by default.
+                    CONTROL warnings require both the server flag and the per-run checkbox.
+                  </p>
+                </div>
+                <div class="anti-lessons-card__pills" aria-label="Anti-lesson status">
+                  <span class="anti-lessons-card__pill">shadow-only</span>
+                  <span class="anti-lessons-card__pill">default-off</span>
+                  <span class="anti-lessons-card__pill">requires server flag + per-run checkbox</span>
+                </div>
+              </div>
             <!-- Phase 11.2: manual anti-lesson creation. Additive disclosure;
                  stores a candidate anti_lesson only (never active, never used by
                  CONTROL yet). -->
@@ -1006,16 +1022,6 @@
               </div>
             </details>
             <!-- /memory-anti-lesson-create -->
-            <details id="duplicateHintsPanel" class="lesson-duplicate-hints"
-                     ontoggle="if(this.open) loadDuplicateHints(false)">
-              <summary class="lesson-duplicate-hints__summary">Duplicate hints</summary>
-              <div class="lesson-duplicate-hints__toolbar">
-                <button type="button" onclick="loadDuplicateHints(true)" title="Reload duplicate hints">&#x27F3; Refresh hints</button>
-              </div>
-              <div id="duplicateHintsList" class="lesson-duplicate-hints__list">
-                <div class="health-empty">Open to load duplicate hints.</div>
-              </div>
-            </details>
             <details id="antiLessonReportPanel" class="anti-lesson-report"
                      data-ui-group="memory-anti-lesson-report"
                      ontoggle="if(this.open) loadAntiLessonReport(false)">
@@ -1087,6 +1093,18 @@
               </div>
             </details>
             <!-- /memory-anti-control-preview-report -->
+            </div>
+            <!-- /memory-anti-lessons-counter-knowledge -->
+            <details id="duplicateHintsPanel" class="lesson-duplicate-hints"
+                     ontoggle="if(this.open) loadDuplicateHints(false)">
+              <summary class="lesson-duplicate-hints__summary">Duplicate hints</summary>
+              <div class="lesson-duplicate-hints__toolbar">
+                <button type="button" onclick="loadDuplicateHints(true)" title="Reload duplicate hints">&#x27F3; Refresh hints</button>
+              </div>
+              <div id="duplicateHintsList" class="lesson-duplicate-hints__list">
+                <div class="health-empty">Open to load duplicate hints.</div>
+              </div>
+            </details>
             <div class="lessons-filters" role="group" aria-label="Lesson status filter">
               <button type="button" class="lessons-filter lessons-filter--active"
                       data-status="" onclick="filterLessons('')">All</button>

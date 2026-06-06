@@ -15,6 +15,10 @@
   --color-success-bg:  #052e16;
   --color-warning:     #f59e0b;
   --color-warning-bg:  #422006;
+  --color-form-bg:     #111827;
+  --color-form-bg-strong: #0f172a;
+  --color-form-border: #3f3f46;
+  --color-form-placeholder: #9ca3af;
   --font-ui:           system-ui, -apple-system, sans-serif;
   --font-mono:         'Courier New', Consolas, monospace;
   --radius-sm:         4px;
@@ -32,6 +36,10 @@
   --color-accent:      #3b82f6;
   --color-accent-hov:  #2563eb;
   --color-accent-fg:   #eff6ff;
+  --color-form-bg:     #162033;
+  --color-form-bg-strong: #111827;
+  --color-form-border: #475569;
+  --color-form-placeholder: #cbd5e1;
   --font-ui:           system-ui, -apple-system, sans-serif;
   --font-mono:         'Courier New', Consolas, monospace;
 }
@@ -46,6 +54,10 @@
   --color-accent:      #6366f1;
   --color-accent-hov:  #4f46e5;
   --color-accent-fg:   #eef2ff;
+  --color-form-bg:     #111827;
+  --color-form-bg-strong: #0f172a;
+  --color-form-border: #3f3f46;
+  --color-form-placeholder: #9ca3af;
   --font-ui:           system-ui, -apple-system, sans-serif;
   --font-mono:         'Courier New', Consolas, monospace;
 }
@@ -60,6 +72,10 @@
   --color-accent:      #10b981;
   --color-accent-hov:  #059669;
   --color-accent-fg:   #f0fdf4;
+  --color-form-bg:     #07111f;
+  --color-form-bg-strong: #0b1220;
+  --color-form-border: #374151;
+  --color-form-placeholder: #9ca3af;
   --font-ui:           'Courier New', Consolas, monospace;
   --font-mono:         'Courier New', Consolas, monospace;
 }
@@ -315,10 +331,49 @@ input:not([type="checkbox"]), textarea, select {
     width: 100%;
     margin: 10px 0;
     padding: 12px;
-    background: var(--color-surface);
-    border: none;
-    color: white;
+    background: var(--color-form-bg);
+    border: 1px solid var(--color-form-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
     box-sizing: border-box;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--color-form-placeholder);
+    opacity: 1;
+}
+
+input:not([type="checkbox"]):focus,
+textarea:focus,
+select:focus {
+    background: var(--color-form-bg-strong);
+    border-color: var(--color-accent);
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+}
+
+input:not([type="checkbox"]):disabled,
+textarea:disabled,
+select:disabled {
+    background: var(--color-surface-2);
+    border-color: var(--color-border);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+}
+
+#repoPathInput,
+textarea[name="query"] {
+    background: var(--color-form-bg-strong);
+    border-color: var(--color-form-border);
+    color: var(--color-text);
+    font-size: 14px;
+}
+
+textarea[name="query"] {
+    min-height: 108px;
+    line-height: 1.55;
 }
 
 .checkbox-label {
@@ -4270,9 +4325,9 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
 }
 .harness-controls__docker-detail { color: var(--color-text-muted, #666); }
 .harness-controls__flash {
-    background: #e6f4ea;
-    border: 1px solid #9bd3ab;
-    color: #1f6f3a;
+    background: var(--color-success-bg);
+    border: 1px solid #166534;
+    color: #bbf7d0;
     border-radius: 6px;
     padding: 6px 10px;
     font-size: 12px;
@@ -4294,6 +4349,7 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     align-items: center;
     padding: 8px 10px;
     border: 1px solid var(--color-border, #d0d7de);
+    background: var(--color-surface-2);
     border-radius: 8px;
     margin-bottom: 6px;
 }
@@ -4308,11 +4364,13 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     cursor: pointer;
     border-radius: 6px;
     border: 1px solid var(--color-border, #d0d7de);
+    background: var(--color-form-bg);
+    color: var(--color-text);
     padding: 5px 10px;
     font-size: 12px;
 }
-.harness-row__toggle.is-on { background: #1f6f3a; color: #fff; border-color: #1f6f3a; }
-.harness-row__toggle.is-off { background: #f6f8fa; color: #1f2328; }
+.harness-row__toggle.is-on { background: #166534; color: #dcfce7; border-color: #22c55e; }
+.harness-row__toggle.is-off { background: var(--color-form-bg); color: var(--color-text-muted); }
 .harness-row__select { font-size: 12px; padding: 4px 6px; border-radius: 6px; }
 .harness-chip {
     display: inline-block;
@@ -4323,64 +4381,64 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     border: 1px solid transparent;
     white-space: nowrap;
 }
-.harness-chip--live { background: #dcfce7; color: #166534; }
-.harness-chip--restart { background: #fef9c3; color: #854d0e; }
-.harness-chip--planned { background: #e5e7eb; color: #374151; }
-.harness-chip--locked { background: #e0e7ff; color: #3730a3; }
-.harness-chip--src { background: #f1f5f9; color: #475569; }
-.harness-chip--pending { background: #fee2e2; color: #991b1b; }
-.harness-chip--readonly { background: #f1f5f9; color: #475569; }
-.harness-chip--risk-low { background: #f1f5f9; color: #475569; }
-.harness-chip--risk-medium { background: #fef9c3; color: #854d0e; }
-.harness-chip--risk-high { background: #fee2e2; color: #991b1b; }
+.harness-chip--live { background: #052e16; color: #bbf7d0; border-color: #166534; }
+.harness-chip--restart { background: #422006; color: #fde68a; border-color: #92400e; }
+.harness-chip--planned { background: var(--color-form-bg); color: #d4d4d8; border-color: var(--color-border); }
+.harness-chip--locked { background: #1e1b4b; color: #c7d2fe; border-color: #4338ca; }
+.harness-chip--src { background: var(--color-form-bg); color: var(--color-text-muted); border-color: var(--color-border); }
+.harness-chip--pending { background: #450a0a; color: #fecaca; border-color: #991b1b; }
+.harness-chip--readonly { background: var(--color-form-bg); color: var(--color-text-muted); border-color: var(--color-border); }
+.harness-chip--risk-low { background: var(--color-form-bg); color: var(--color-text-muted); border-color: var(--color-border); }
+.harness-chip--risk-medium { background: #422006; color: #fde68a; border-color: #92400e; }
+.harness-chip--risk-high { background: #450a0a; color: #fecaca; border-color: #991b1b; }
 .harness-envapply__box {
-    border: 1px solid #f0c987;
-    background: #fffaf0;
+    border: 1px solid #92400e;
+    background: #1c1917;
     border-radius: 8px;
     padding: 8px 12px;
     margin-bottom: 12px;
-    color: #b91c1c;
+    color: #fed7aa;
 }
 .harness-envapply__box code,
 .harness-envapply__box strong,
-.harness-envapply__box em { color: #991b1b; }
-.harness-envapply__title { font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #b91c1c; }
-.harness-envapply__list { margin: 4px 0 8px; padding-left: 18px; font-size: 12px; color: #b91c1c; }
+.harness-envapply__box em { color: #fde68a; }
+.harness-envapply__title { font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #fbbf24; }
+.harness-envapply__list { margin: 4px 0 8px; padding-left: 18px; font-size: 12px; color: #fed7aa; }
 .harness-envapply__btn {
     cursor: pointer;
     border-radius: 6px;
-    border: 1px solid #d98a16;
-    background: #f6a623;
-    color: #1f2328;
+    border: 1px solid #b45309;
+    background: #78350f;
+    color: #fffbeb;
     padding: 5px 12px;
     font-size: 12px;
     font-weight: 600;
 }
-.harness-envapply__hint { font-size: 11px; color: #c2410c; margin-left: 8px; }
+.harness-envapply__hint { font-size: 11px; color: #fdba74; margin-left: 8px; }
 .harness-composeapply__box {
-    border: 1px solid #93c5fd;
-    background: #f0f7ff;
+    border: 1px solid #1d4ed8;
+    background: #0f172a;
     border-radius: 8px;
     padding: 8px 12px;
     margin-bottom: 12px;
-    color: #1e3a8a;
+    color: #bfdbfe;
 }
 .harness-composeapply__box code,
 .harness-composeapply__box strong,
-.harness-composeapply__box em { color: #1e40af; }
-.harness-composeapply__title { font-weight: 600; font-size: 13px; margin-bottom: 2px; color: #1e3a8a; }
-.harness-composeapply__sub { font-size: 11px; color: #2563eb; margin-bottom: 4px; }
-.harness-composeapply__list { margin: 4px 0 8px; padding-left: 18px; font-size: 12px; color: #1e3a8a; }
+.harness-composeapply__box em { color: #dbeafe; }
+.harness-composeapply__title { font-weight: 600; font-size: 13px; margin-bottom: 2px; color: #93c5fd; }
+.harness-composeapply__sub { font-size: 11px; color: #bfdbfe; margin-bottom: 4px; }
+.harness-composeapply__list { margin: 4px 0 8px; padding-left: 18px; font-size: 12px; color: #bfdbfe; }
 .harness-composeapply__preview {
-    cursor: pointer; border-radius: 6px; border: 1px solid #93c5fd;
-    background: #e0edff; color: #1e3a8a; padding: 5px 12px; font-size: 12px; margin-right: 6px;
+    cursor: pointer; border-radius: 6px; border: 1px solid #2563eb;
+    background: #172554; color: #dbeafe; padding: 5px 12px; font-size: 12px; margin-right: 6px;
 }
 .harness-composeapply__btn {
-    cursor: pointer; border-radius: 6px; border: 1px solid #2563eb;
-    background: #3b82f6; color: #fff; padding: 5px 12px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border-radius: 6px; border: 1px solid #60a5fa;
+    background: #1d4ed8; color: #eff6ff; padding: 5px 12px; font-size: 12px; font-weight: 600;
 }
 .harness-composeapply__notice {
-    font-size: 11px; color: #b45309; margin-top: 6px; line-height: 1.5;
+    font-size: 11px; color: #fcd34d; margin-top: 6px; line-height: 1.5;
 }
 
 /* ── Phase UI.1: Web Information Architecture ──────────────────
@@ -4490,6 +4548,139 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
 .harness-composeapply__btn:focus-visible {
     outline: 2px solid var(--color-danger);
     outline-offset: 2px;
+}
+
+.anti-lesson-control-run {
+    margin: 10px 0;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.anti-lesson-control-run label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text);
+}
+
+.anti-lesson-control-run__warning {
+    margin: 6px 0 0;
+}
+
+.anti-lessons-card {
+    margin: 12px 0;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-2);
+}
+
+.anti-lessons-card__header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px 14px;
+    align-items: flex-start;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.anti-lessons-card__copy {
+    max-width: 720px;
+    margin: 5px 0 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.anti-lessons-card__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.anti-lessons-card__pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 2px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-form-bg);
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.anti-lessons-card .anti-lesson-create,
+.anti-lessons-card .anti-lesson-report {
+    margin: 8px 0 0;
+    padding: 9px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+}
+
+.anti-lesson-create__summary,
+.anti-lesson-report__summary {
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.anti-lesson-create[open] > .anti-lesson-create__summary,
+.anti-lesson-report[open] > .anti-lesson-report__summary,
+.anti-lesson-create__summary:hover,
+.anti-lesson-report__summary:hover {
+    color: var(--color-text);
+}
+
+.anti-lesson-create__body {
+    display: grid;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.anti-lesson-create__warning,
+.anti-lesson-report__warning {
+    margin: 7px 0;
+    color: var(--color-warning);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.anti-lesson-field {
+    display: grid;
+    gap: 4px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.anti-lesson-field span {
+    color: var(--color-text);
+}
+
+.anti-lesson-create__actions,
+.anti-lesson-report__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.anti-lesson-create__status {
+    min-height: 18px;
+    color: var(--color-text-muted);
+    font-size: 12px;
 }
 
 /* ── Phase UI.2a: Memory segmentation ─────────────────────────────────────
