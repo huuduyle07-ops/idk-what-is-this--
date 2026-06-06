@@ -1221,6 +1221,65 @@ def _md_file_list(value: Any) -> str:
     return ", ".join(f"`{_md_cell(file)}`" for file in files)
 
 
+def _md_file_list_field(result: dict[str, Any], key: str) -> str:
+    if key not in result:
+        return "-"
+    return _md_file_list(result.get(key))
+
+
+def _md_count(value: Any) -> str:
+    if isinstance(value, int):
+        return str(value)
+    return "-"
+
+
+def _md_run_health_counts(counts: dict[str, Any]) -> str:
+    parts = [
+        f"{label}: {count}"
+        for label, count in sorted(counts.items())
+        if isinstance(count, int) and count > 0
+    ]
+    return ", ".join(parts) if parts else "none"
+
+
+def _md_run_health_scope(summary: dict[str, Any]) -> str:
+    return (
+        f"CLEAN: {summary.get('clean_scope_count', 0)}, "
+        f"GENERATED: {summary.get('generated_scope_count', 0)}, "
+        f"UNEXPECTED: {summary.get('unexpected_scope_count', 0)}, "
+        f"UNKNOWN: {summary.get('unknown_scope_count', 0)}"
+    )
+
+
+def _md_run_health_cases(
+    cases: list[dict[str, Any]],
+    duration_key: str,
+    unit: str,
+    *,
+    limit: int = 3,
+) -> str:
+    parts: list[str] = []
+    for case in cases[:limit]:
+        name = case.get("name") or "(unknown)"
+        value = case.get(duration_key)
+        if not isinstance(value, (int, float)):
+            continue
+        parts.append(f"`{_md_cell(name)}` {value:.2f}{unit}")
+    return ", ".join(parts) if parts else "none"
+
+
+def _md_run_health_cost_tokens(summary: dict[str, Any]) -> str:
+    tokens = summary.get("total_tokens")
+    cost = summary.get("estimated_cost_usd")
+    if isinstance(tokens, int) and isinstance(cost, (int, float)):
+        return f"{tokens} total tokens / ${float(cost):.4f} estimated"
+    if isinstance(tokens, int):
+        return f"{tokens} total tokens / cost unknown"
+    if isinstance(cost, (int, float)):
+        return f"tokens unknown / ${float(cost):.4f} estimated"
+    return "-"
+
+
 def _format_patch_minimality_case(entry: dict[str, Any] | None) -> str:
     if not entry:
         return "unknown"
@@ -1287,6 +1346,27 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
         if report.get("unknown_cost_calls"):
             lines.append(f"- Cost unknown calls: {report['unknown_cost_calls']}")
     lines.append("")
+
+    from core.benchmarks_view import summarize_run_health
+
+    run_health = summarize_run_health(report)
+    lines.append("## Run Health")
+    lines.append(f"- Status: {run_health['health_label']}")
+    lines.append(f"- Pass rate: {run_health['pass_rate_display']}")
+    lines.append(
+        f"- Failure kinds: {_md_run_health_counts(run_health['failure_kind_counts'])}"
+    )
+    lines.append(f"- File-change scope: {_md_run_health_scope(run_health)}")
+    lines.append(
+        "- Slowest cases: "
+        f"{_md_run_health_cases(run_health['slowest_cases'], 'duration_sec', 's')}"
+    )
+    lines.append(f"- Cost/tokens: {_md_run_health_cost_tokens(run_health)}")
+    fallback_count = run_health.get("fallback_count")
+    if isinstance(fallback_count, int):
+        lines.append(f"- Fallbacks: {fallback_count}")
+    lines.append("")
+
     lines.append(format_brain_stamp_markdown(report.get('brain_stamp', {})))
     lines.append("")
 
@@ -1343,13 +1423,15 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
         )
     ]
     if file_change_results:
+        from core.benchmarks_view import summarize_file_change_scope
+
         lines.append("## File Changes")
         lines.append("")
         lines.append(
-            "| Name | Status | Changed | Patched | Generated Artifacts | "
-            "Unexpected Mutations |"
+            "| Name | Status | Scope | Changed Files Total | Changed Files | "
+            "Patched Files | Generated Artifacts | Unexpected Mutations |"
         )
-        lines.append("|---|---|---|---|---|---|")
+        lines.append("|---|---|---|---|---|---|---|---|")
         for r in file_change_results:
             name = r.get("name") or "(unknown)"
             status = (
@@ -1357,13 +1439,16 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
                 if r.get("skipped")
                 else ("PASS" if r.get("success") else "FAIL")
             )
+            file_summary = summarize_file_change_scope(r)
             lines.append(
                 f"| `{_md_cell(name)}` | "
                 f"{status} | "
-                f"{_md_file_list(r.get('changed_files'))} | "
-                f"{_md_file_list(r.get('patched_files'))} | "
-                f"{_md_file_list(r.get('generated_artifacts'))} | "
-                f"{_md_file_list(r.get('unexpected_mutations'))} |"
+                f"{file_summary['scope']} | "
+                f"{_md_count(file_summary.get('changed_total'))} | "
+                f"{_md_file_list_field(r, 'changed_files')} | "
+                f"{_md_file_list_field(r, 'patched_files')} | "
+                f"{_md_file_list_field(r, 'generated_artifacts')} | "
+                f"{_md_file_list_field(r, 'unexpected_mutations')} |"
             )
         lines.append("")
 

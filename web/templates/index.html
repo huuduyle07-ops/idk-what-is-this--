@@ -6965,6 +6965,7 @@ function _renderBenchmarkList(reports) {
              onclick="viewBenchmarkReport(this.dataset.benchFilename)">
             <div class="bench-list-item-date">${_benchFmtDate(r.timestamp_iso)}</div>
             <div class="bench-list-item-summary">
+                ${r.health_label ? _benchRunHealthBadge(r.health_label) : ""}
                 ${r.passed}/${r.total} / ${_benchFmtRate(r.success_rate)} / ${(r.duration_sec || 0).toFixed(1)}s / ${_benchFmtCost(r.total_estimated_cost_usd)}
             </div>
             <div class="history-actions" data-ui-group="benchmark-history-actions">
@@ -7411,6 +7412,229 @@ function _benchFailureKindBadge(info) {
     return `<span class="bench-failure-kind-badge bench-failure-kind-badge--${_escapeHtml(kindClass)}" title="${_escapeHtml(title)}">${_escapeHtml(info.display)}</span>`;
 }
 
+function _benchArrayField(obj, key) {
+    const value = obj && obj[key];
+    if (!Array.isArray(value)) return [];
+    return value.map(item => String(item));
+}
+
+function _benchHasOwn(obj, key) {
+    return !!obj && Object.prototype.hasOwnProperty.call(obj, key);
+}
+
+function _benchFileSummary(result) {
+    const summary = result && typeof result.file_change_summary === "object"
+        ? result.file_change_summary
+        : null;
+    const patched = summary ? _benchArrayField(summary, "patched_files") : _benchArrayField(result, "patched_files");
+    const generated = summary ? _benchArrayField(summary, "generated_artifacts") : _benchArrayField(result, "generated_artifacts");
+    const unexpected = summary ? _benchArrayField(summary, "unexpected_mutations") : _benchArrayField(result, "unexpected_mutations");
+    const hasLedger = summary
+        ? summary.has_artifact_ledger === true
+        : ["patched_files", "generated_artifacts", "unexpected_mutations"].some(key => _benchHasOwn(result, key));
+    let scope = summary && summary.scope ? String(summary.scope).toUpperCase() : "";
+    if (!scope) {
+        if (!hasLedger) scope = "UNKNOWN";
+        else if (unexpected.length > 0) scope = "UNEXPECTED";
+        else if (generated.length > 0) scope = "GENERATED";
+        else scope = "CLEAN";
+    }
+    if (!["CLEAN", "GENERATED", "UNEXPECTED", "UNKNOWN"].includes(scope)) {
+        scope = "UNKNOWN";
+    }
+    let changedTotal = null;
+    if (summary && Number.isFinite(Number(summary.changed_total))) {
+        changedTotal = Number(summary.changed_total);
+    } else if (result && Array.isArray(result.changed_files)) {
+        changedTotal = result.changed_files.length;
+    } else if (hasLedger) {
+        changedTotal = new Set([...patched, ...generated, ...unexpected]).size;
+    }
+    return { scope, changedTotal, patched, generated, unexpected, hasLedger };
+}
+
+function _benchFileChangeScope(result) {
+    return _benchFileSummary(result).scope;
+}
+
+function _benchFileScopeBadge(summaryOrResult) {
+    const summary = summaryOrResult && summaryOrResult.scope
+        ? summaryOrResult
+        : _benchFileSummary(summaryOrResult);
+    const scope = summary.scope || "UNKNOWN";
+    const cls = scope.toLowerCase().replace(/[^a-z0-9_-]/g, "_");
+    return `<span class="bench-file-scope-badge bench-file-scope-badge--${_escapeHtml(cls)}">${_escapeHtml(scope)}</span>`;
+}
+
+function _benchFileList(files, known) {
+    if (!known) return "&mdash;";
+    if (!Array.isArray(files) || files.length === 0) return "none";
+    return files.map(file => `<code>${_escapeHtml(file)}</code>`).join(", ");
+}
+
+function _benchChangedTotalCell(summary) {
+    return Number.isFinite(Number(summary.changedTotal))
+        ? _escapeHtml(String(summary.changedTotal))
+        : "&mdash;";
+}
+
+function _benchRunHealthSummary(report) {
+    const serverSummary = report && typeof report.run_health_summary === "object"
+        ? report.run_health_summary
+        : null;
+    if (serverSummary) return serverSummary;
+
+    const results = Array.isArray(report && report.results) ? report.results : [];
+    const totalCases = Number.isFinite(Number(report && report.total))
+        ? Number(report.total)
+        : results.length;
+    const skipped = Number.isFinite(Number(report && report.skipped))
+        ? Number(report.skipped)
+        : results.filter(r => r && r.skipped).length;
+    const passed = Number.isFinite(Number(report && report.passed))
+        ? Number(report.passed)
+        : results.filter(r => r && r.success === true).length;
+    const failed = Number.isFinite(Number(report && report.failed))
+        ? Number(report.failed)
+        : Math.max(0, totalCases - passed - skipped);
+    const runnable = Math.max(0, totalCases - skipped);
+    const passRate = runnable ? passed / runnable : null;
+    const failureByName = _benchFailureKindMap(report);
+    const failureKindCounts = {};
+    results.forEach(r => {
+        if (!r || r.success === true || r.skipped) return;
+        const info = _benchFailureKindInfo(r, failureByName);
+        const display = (info && info.display) || "CODE / UNKNOWN";
+        failureKindCounts[display] = (failureKindCounts[display] || 0) + 1;
+    });
+    const scopeCounts = { CLEAN: 0, GENERATED: 0, UNEXPECTED: 0, UNKNOWN: 0 };
+    results.forEach(r => {
+        const scope = _benchFileChangeScope(r);
+        scopeCounts[scope] = (scopeCounts[scope] || 0) + 1;
+    });
+    const modern = results.some(r => r && (
+        r.file_change_summary ||
+        r.failure_kind ||
+        r.failure_kind_display ||
+        ["patched_files", "generated_artifacts", "unexpected_mutations"].some(key => _benchHasOwn(r, key))
+    ));
+    const environmentCount =
+        (failureKindCounts["ENVIRONMENT"] || 0) +
+        (failureKindCounts["TOOLCHAIN"] || 0) +
+        (failureKindCounts["SECURITY TOOL"] || 0);
+    const codeUnknownCount = failureKindCounts["CODE / UNKNOWN"] || 0;
+    let healthLabel = "UNKNOWN";
+    if (totalCases > 0 && modern) {
+        if (scopeCounts.UNEXPECTED > 0 || environmentCount > 0) healthLabel = "ATTENTION";
+        else if (runnable > 0 && failed >= Math.max(3, Math.floor(runnable * 0.2))) healthLabel = "ATTENTION";
+        else if (failed === 0 && skipped === 0) healthLabel = "GREEN";
+        else if (codeUnknownCount > 0) healthLabel = "MIXED";
+        else if (passRate != null && passRate >= 0.9 && failed <= 2) healthLabel = "MOSTLY GREEN";
+        else if (failed > 0) healthLabel = "MIXED";
+        else healthLabel = "MOSTLY GREEN";
+    }
+    return {
+        total_cases: totalCases,
+        passed,
+        failed,
+        skipped,
+        pass_rate: passRate,
+        pass_rate_display: passRate == null ? `${passed}/${runnable} (-)` : `${passed}/${runnable} (${(passRate * 100).toFixed(1)}%)`,
+        health_label: healthLabel,
+        failure_kind_counts: failureKindCounts,
+        environment_or_toolchain_failure_count: environmentCount,
+        code_unknown_failure_count: codeUnknownCount,
+        clean_scope_count: scopeCounts.CLEAN || 0,
+        generated_scope_count: scopeCounts.GENERATED || 0,
+        unexpected_scope_count: scopeCounts.UNEXPECTED || 0,
+        unknown_scope_count: scopeCounts.UNKNOWN || 0,
+        slowest_cases: results
+            .filter(r => r && Number.isFinite(Number(r.duration_sec)))
+            .map(r => ({ name: r.name || "?", duration_sec: Number(r.duration_sec) }))
+            .sort((a, b) => b.duration_sec - a.duration_sec)
+            .slice(0, 5),
+        highest_cost_cases: results
+            .filter(r => r && Number.isFinite(Number(r.estimated_cost_usd)))
+            .map(r => ({ name: r.name || "?", estimated_cost_usd: Number(r.estimated_cost_usd) }))
+            .sort((a, b) => b.estimated_cost_usd - a.estimated_cost_usd)
+            .slice(0, 5),
+        total_tokens: Number.isFinite(Number(report && report.total_tokens)) ? Number(report.total_tokens) : null,
+        estimated_cost_usd: Number.isFinite(Number(report && report.total_estimated_cost_usd)) ? Number(report.total_estimated_cost_usd) : null,
+        fallback_count: Number.isFinite(Number(report && report.total_fallbacks)) ? Number(report.total_fallbacks) : null,
+    };
+}
+
+function _benchRunHealthBadge(label) {
+    const text = String(label || "UNKNOWN").toUpperCase();
+    const cls = text.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+    return `<span class="bench-run-health-badge bench-run-health-badge--${_escapeHtml(cls)}">${_escapeHtml(text)}</span>`;
+}
+
+function _benchRunHealthKindClass(label) {
+    const text = String(label || "").toUpperCase();
+    if (["ENVIRONMENT", "TOOLCHAIN", "SECURITY TOOL"].includes(text)) return "environment";
+    if (text === "CODE / UNKNOWN") return "code";
+    return "mixed";
+}
+
+function _benchRunHealthCounts(counts) {
+    const entries = Object.entries(counts || {})
+        .filter(([, count]) => Number(count) > 0)
+        .sort((a, b) => a[0].localeCompare(b[0]));
+    if (entries.length === 0) return `<span class="muted">none</span>`;
+    return entries.map(([label, count]) => {
+        const kindClass = _benchRunHealthKindClass(label);
+        return `<span class="bench-run-health-kind bench-run-health-kind--${kindClass}">${_escapeHtml(label)}: ${_escapeHtml(String(count))}</span>`;
+    }).join(" ");
+}
+
+function _benchRunHealthScopeCounts(summary) {
+    return [
+        ["CLEAN", summary.clean_scope_count],
+        ["GENERATED", summary.generated_scope_count],
+        ["UNEXPECTED", summary.unexpected_scope_count],
+        ["UNKNOWN", summary.unknown_scope_count],
+    ].map(([label, count]) => `${label}: ${Number(count || 0)}`).join(", ");
+}
+
+function _benchRunHealthCaseList(cases, valueKey, formatter) {
+    if (!Array.isArray(cases) || cases.length === 0) return "&mdash;";
+    const parts = cases.slice(0, 3).map(item => {
+        const value = Number(item && item[valueKey]);
+        if (!Number.isFinite(value)) return "";
+        return `<code>${_escapeHtml((item && item.name) || "?")}</code> ${formatter(value)}`;
+    }).filter(Boolean);
+    return parts.length ? parts.join(", ") : "&mdash;";
+}
+
+function _renderBenchRunHealth(report) {
+    const summary = _benchRunHealthSummary(report);
+    const tokens = summary.total_tokens == null ? "&mdash;" : _escapeHtml(String(_benchInt(summary.total_tokens, 0)));
+    const cost = summary.estimated_cost_usd == null ? "&mdash;" : _benchFmtCost(summary.estimated_cost_usd);
+    const fallbacks = summary.fallback_count == null ? "&mdash;" : _escapeHtml(String(_benchInt(summary.fallback_count, 0)));
+    return `
+        <div class="bench-run-health-card">
+            <div class="bench-run-health-card__head">
+                <div class="bench-section-heading">Run Health</div>
+                ${_benchRunHealthBadge(summary.health_label)}
+            </div>
+            <div class="bench-run-health-metrics">
+                <div><span>Pass rate</span><strong>${_escapeHtml(summary.pass_rate_display || "&mdash;")}</strong></div>
+                <div><span>Cases</span><strong>${_escapeHtml(String(summary.passed ?? 0))}/${_escapeHtml(String(summary.total_cases ?? 0))}</strong></div>
+                <div><span>Failed</span><strong>${_escapeHtml(String(summary.failed ?? 0))}</strong></div>
+                <div><span>Skipped</span><strong>${_escapeHtml(String(summary.skipped ?? 0))}</strong></div>
+            </div>
+            <div class="bench-run-health-lines">
+                <div><span>Failure kinds</span><div>${_benchRunHealthCounts(summary.failure_kind_counts)}</div></div>
+                <div><span>File scope</span><div>${_escapeHtml(_benchRunHealthScopeCounts(summary))}</div></div>
+                <div><span>Slowest</span><div>${_benchRunHealthCaseList(summary.slowest_cases, "duration_sec", value => `${value.toFixed(2)}s`)}</div></div>
+                <div><span>Cost/tokens</span><div>${tokens} tokens / ${cost}</div></div>
+                <div><span>Fallbacks</span><div>${fallbacks}</div></div>
+            </div>
+        </div>
+    `;
+}
+
 function _benchModelLabel(result) {
     // Selected model for this case, or a literal "unknown" when the report
     // predates model-stats capture or the field is empty/null. Never throws on
@@ -7521,6 +7745,7 @@ function _renderCompactCasesTable(report) {
         const costCell = (r && r.estimated_cost_usd != null) ? _benchFmtCost(r.estimated_cost_usd) : "—";
         const modelTitle = calls != null ? ` title="${calls} model call(s)"` : "";
         const failureKind = _benchFailureKindInfo(r, failureByName);
+        const fileSummary = _benchFileSummary(r);
         return `
             <tr class="bench-case-compact-row bench-case-compact-row--${status}"
                 data-bench-lang="${_escapeHtml(lang)}"
@@ -7529,6 +7754,7 @@ function _renderCompactCasesTable(report) {
                 data-bench-status="${status}">
                 <td><span class="bench-status-badge bench-status-badge--${status}">${status}</span></td>
                 <td>${_benchFailureKindBadge(failureKind)}</td>
+                <td>${_benchFileScopeBadge(fileSummary)}</td>
                 <td><code>${_escapeHtml((r && r.name) || "?")}</code></td>
                 <td class="bench-case-tags">${_escapeHtml(lang)} / ${_escapeHtml(cat)} / ${_escapeHtml(diff)}</td>
                 <td class="right">${dur.toFixed(2)}s</td>
@@ -7546,6 +7772,7 @@ function _renderCompactCasesTable(report) {
                 <tr>
                     <th>Status</th>
                     <th>Failure kind</th>
+                    <th>Scope</th>
                     <th>Case</th>
                     <th>Lang / Cat / Diff</th>
                     <th class="right">Duration</th>
@@ -7553,6 +7780,41 @@ function _renderCompactCasesTable(report) {
                     <th class="right" title="Model fallbacks for this case">Fallbacks</th>
                     <th class="right">Tokens</th>
                     <th class="right">Cost</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+    `;
+}
+
+function _renderBenchFileChanges(report) {
+    const results = (report && report.results) || [];
+    if (results.length === 0) return "";
+    const rows = results.map(r => {
+        const summary = _benchFileSummary(r);
+        const scopeClass = summary.scope.toLowerCase();
+        return `
+            <tr class="bench-file-change-row bench-file-change-row--${_escapeHtml(scopeClass)}">
+                <td><code>${_escapeHtml((r && r.name) || "?")}</code></td>
+                <td>${_benchFileScopeBadge(summary)}</td>
+                <td class="right">${_benchChangedTotalCell(summary)}</td>
+                <td>${_benchFileList(summary.patched, summary.hasLedger)}</td>
+                <td>${_benchFileList(summary.generated, summary.hasLedger)}</td>
+                <td class="${summary.unexpected.length ? "bench-file-list--unexpected" : ""}">${_benchFileList(summary.unexpected, summary.hasLedger)}</td>
+            </tr>
+        `;
+    }).join("");
+    return `
+        <div class="bench-section-heading">File changes</div>
+        <table class="bench-table bench-file-changes">
+            <thead>
+                <tr>
+                    <th>Case</th>
+                    <th>Scope</th>
+                    <th class="right">Changed files total</th>
+                    <th>Patched</th>
+                    <th>Generated</th>
+                    <th>Unexpected</th>
                 </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -7646,7 +7908,9 @@ function _renderBenchmarkDetail(report, filename) {
 
     const modelsLine = _benchModelsUsedLine(report);
     const filtersHtml = _renderBenchFilters(report);
+    const runHealthHtml = _renderBenchRunHealth(report);
     const compactHtml = _renderCompactCasesTable(report);
+    const fileChangesHtml = _renderBenchFileChanges(report);
 
     // Raw report JSON stays behind a collapsed <details> so it never overwhelms
     // the panel; escaped so it can't inject markup.
@@ -7665,9 +7929,11 @@ function _renderBenchmarkDetail(report, filename) {
             <code>${_escapeHtml(filename)}</code>
         </div>
         ${totalsHtml}
+        ${runHealthHtml}
         ${modelsLine}
         ${filtersHtml}
         ${compactHtml}
+        ${fileChangesHtml}
         ${groupsHtml}
         ${flakyHtml}
         ${slowestHtml}
