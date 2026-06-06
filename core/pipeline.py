@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -433,6 +434,96 @@ def finalize_answer(state: AgentState, answer: str) -> None:
     reject_schema_drift(state)
     _enforce_safe_minimal(state)
 
+_FUNCTION_KEYWORD_PREFIXES = (
+    "func ",
+    "pub fn ", "pub(crate) fn ", "pub async fn ", "async fn ", "fn ",
+    "def ", "async def ",
+    "function ", "async function ",
+    "export function ", "export async function ",
+    "export default function ", "export default async function ",
+)
+
+
+def _first_nonblank_line(text: str) -> str:
+    return next((ln for ln in text.splitlines() if ln.strip()), "")
+
+
+def _looks_like_complete_function(snippet: str, target_node_name: str = "") -> bool:
+    first_line = _first_nonblank_line(snippet).strip()
+    if not first_line:
+        return False
+    if first_line.startswith(_FUNCTION_KEYWORD_PREFIXES):
+        return True
+    if target_node_name:
+        return (
+            re.search(rf"\b{re.escape(target_node_name)}\s*\(", first_line) is not None
+            and "{" in snippet
+        )
+    return False
+
+
+def _indent_of(line: str) -> str:
+    return line[: len(line) - len(line.lstrip(" \t"))]
+
+
+def _apply_indent_if_needed(lines: list[str], indent: str) -> list[str]:
+    first = next((ln for ln in lines if ln.strip()), "")
+    if not first or first.startswith((" ", "\t")):
+        return lines
+    return [(indent + ln if ln.strip() else ln) for ln in lines]
+
+
+def _graft_statement_level_patch_into_function(target: str, patched: str) -> str | None:
+    """Turn a model's statement-level replacement into a whole-function patch.
+
+    This handles the common reviewer-output shape where target_snippet is the
+    entire function, but patched_snippet contains only the corrected trailing
+    return statement. The executor should still receive a whole-function patch.
+    """
+    patched_lines = patched.splitlines()
+    patched_nonblank = [ln for ln in patched_lines if ln.strip()]
+    if not patched_nonblank:
+        return None
+
+    # If the patch already has braces or a declaration, it is not a simple
+    # statement-level replacement; leave it for the normal executor gates.
+    if _looks_like_complete_function(patched) or any(ln.strip() == "}" for ln in patched_lines):
+        return None
+
+    target_lines = target.splitlines()
+    if not target_lines:
+        return None
+
+    search_end = len(target_lines)
+    for i in range(len(target_lines) - 1, -1, -1):
+        if target_lines[i].strip() == "}":
+            search_end = i
+            break
+
+    statement_idx = None
+    for i in range(search_end - 1, -1, -1):
+        stripped = target_lines[i].strip()
+        if stripped.startswith("return ") or stripped == "return;":
+            statement_idx = i
+            break
+    if statement_idx is None:
+        return None
+
+    start_idx = statement_idx
+    comment_prefixes = ("//", "#")
+    if (
+        patched_nonblank[0].lstrip().startswith(comment_prefixes)
+        and statement_idx > 0
+        and target_lines[statement_idx - 1].strip().startswith(comment_prefixes)
+    ):
+        start_idx = statement_idx - 1
+
+    indent = _indent_of(target_lines[start_idx] or target_lines[statement_idx])
+    final_patch_lines = _apply_indent_if_needed(patched_lines, indent)
+    merged = target_lines[:start_idx] + final_patch_lines + target_lines[statement_idx + 1 :]
+    return "\n".join(merged)
+
+
 def normalize_patch_candidate_with_control_source(state: AgentState) -> None:
     if not state.json_block:
         return
@@ -463,27 +554,28 @@ def normalize_patch_candidate_with_control_source(state: AgentState) -> None:
     # body, and otherwise risks introducing whitespace/newline drift
     # between `source` and the actual file bytes (which makes the
     # downstream literal apply silently miss).
-    target_stripped = target.strip()
-    function_keyword_prefixes = (
-        "func ",
-        "pub fn ", "pub(crate) fn ", "pub async fn ", "async fn ", "fn ",
-        "def ", "async def ",
-        "function ", "async function ",
-        "export function ", "export async function ",
-        "export default function ", "export default async function ",
-    )
-    if target_stripped.startswith(function_keyword_prefixes):
+    target_node_name = patch.get("target_node_name") or ""
+    target_is_complete = _looks_like_complete_function(target, target_node_name)
+    patched_is_complete = _looks_like_complete_function(patched, target_node_name)
+
+    if target_is_complete and not patched_is_complete and (target == source or target in source):
+        full_patched = _graft_statement_level_patch_into_function(target, patched)
+        if full_patched:
+            patch["patched_snippet"] = full_patched
+            patch["__normalized_from_statement_level_patch"] = True
+            print("🧩 Normalized statement-level function patch to full target_snippet")
+        return
+
+    if target_is_complete:
         return
 
     # C/C++/Java/C#-style: declaration is `<type/qualifiers> name(args) {`
     # with no anchor keyword. Treat as already-complete if the declared
     # `target_node_name` appears followed by `(` on the first non-blank
     # line and the snippet has an opening brace.
-    target_node_name = patch.get("target_node_name") or ""
     if target_node_name:
-        import re as _re
         first_line = next((ln.strip() for ln in target.splitlines() if ln.strip()), "")
-        if _re.search(rf"\b{_re.escape(target_node_name)}\s*\(", first_line) and "{" in target:
+        if re.search(rf"\b{re.escape(target_node_name)}\s*\(", first_line) and "{" in target:
             return
 
     if target not in source:

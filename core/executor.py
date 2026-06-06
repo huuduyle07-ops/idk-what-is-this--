@@ -164,9 +164,9 @@ class Executor:
             # but a literal match against a complete named function body with a
             # runnable validation command is exactly the safe case — the snippet
             # is unambiguous and the result will be checked. Don't reject those.
-            if self._is_verbatim_named_function_patch(patch) and validation_command:
+            if self._is_verbatim_named_literal_patch(patch) and validation_command:
                 print(
-                    "⚠️ Literal match allowed: target is a verbatim named full-function "
+                    "⚠️ Literal match allowed: target is a verbatim named "
                     "snippet and validation command is available."
                 )
             else:
@@ -421,6 +421,40 @@ class Executor:
 
         return False
 
+    def _is_verbatim_named_assignment_patch(self, patch: Dict[str, Any]) -> bool:
+        """Allow exact validated replacements of named top-level assignments.
+
+        Reviewer models sometimes tag module constants/maps as ``class`` because
+        the JSON schema only advertises function/class node kinds. A byte-exact
+        target for a named assignment plus validation is still an unambiguous
+        patch, so it should not be blocked solely for that schema mismatch.
+        """
+        target_snippet = str(patch.get("target_snippet") or "")
+        target_node_name = str(patch.get("target_node_name") or "")
+        if not target_snippet or not target_node_name:
+            return False
+
+        first_line = ""
+        for line in target_snippet.splitlines():
+            if line.strip():
+                first_line = line.strip()
+                break
+        if not first_line:
+            return False
+
+        name = re.escape(target_node_name)
+        assignment_patterns = (
+            rf"^{name}\b\s*(?::[^=]+)?=",
+            rf"^(?:export\s+)?(?:const|let|var)\s+{name}\b[^=]*=",
+        )
+        return any(re.match(pattern, first_line) for pattern in assignment_patterns)
+
+    def _is_verbatim_named_literal_patch(self, patch: Dict[str, Any]) -> bool:
+        return (
+            self._is_verbatim_named_function_patch(patch)
+            or self._is_verbatim_named_assignment_patch(patch)
+        )
+
     def _adjust_risk_by_match_source(self, risk: PatchRisk, matched_by: Optional[str]) -> PatchRisk:
         score = risk.score
         reasons = list(risk.reasons)
@@ -467,8 +501,10 @@ class Executor:
             score += 2
             reasons.append("Deletion heavy.")
 
-        # Class-level
-        if node_kind == "class":
+        # Class-level. Models may mislabel module constants/maps as class nodes;
+        # only apply this penalty when the target actually declares a class-like
+        # structure.
+        if node_kind == "class" and self._looks_like_class_declaration(target_snippet):
             score += 2
             reasons.append("Patch touches class.")
 
@@ -497,6 +533,14 @@ class Executor:
             level = "low"
 
         return PatchRisk(level=level, score=score, reasons=reasons)
+
+    def _looks_like_class_declaration(self, text: str) -> bool:
+        for line in text.splitlines():
+            stripped = line.strip()
+            if not stripped or stripped.startswith(_COMMENT_PREFIXES):
+                continue
+            return any(pattern.search(line) for pattern in _CLASS_KW_PATTERNS)
+        return False
 
     def _is_signature_changed(self, old: str, new: str) -> bool:
         """Detect if a function/class signature changed.

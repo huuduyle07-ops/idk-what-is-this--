@@ -145,6 +145,30 @@ def _native_toolchain_env() -> Optional[dict]:
     return None
 
 
+def _looks_like_go_validation_command(command: str) -> bool:
+    return re.match(r"^\s*(?:go|go\.exe)\b", command or "", flags=re.IGNORECASE) is not None
+
+
+def _validation_command_env(command: str, cwd: str) -> Optional[dict]:
+    env = _native_toolchain_env()
+
+    if sys.platform != "win32" or not _looks_like_go_validation_command(command):
+        return env
+
+    env = dict(env) if env is not None else os.environ.copy()
+    try:
+        go_root = Path(cwd) / ".agent" / "validation_go"
+        tmp_dir = go_root / "tmp"
+        cache_dir = go_root / "cache"
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        env["GOTMPDIR"] = str(tmp_dir)
+        env["GOCACHE"] = str(cache_dir)
+    except OSError:
+        pass
+    return env
+
+
 def run_validation_command(command: str, cwd: str, timeout: int = 30) -> tuple[bool, str]:
     if not command:
         return True, ""
@@ -175,7 +199,7 @@ def run_validation_command(command: str, cwd: str, timeout: int = 30) -> tuple[b
             timeout=timeout,
             encoding="utf-8",
             errors="replace",
-            env=_native_toolchain_env(),
+            env=_validation_command_env(command, cwd),
         )
 
         output = (result.stdout or "") + (result.stderr or "")
@@ -607,6 +631,15 @@ def classify_validation_output(output: str) -> Dict[str, str]:
             "category": "unknown",
             "reason": "No validation output.",
             "hint": "Validation command returned no useful output."
+        }
+
+    if "fork/exec" in text and (
+        "access is denied" in text or "permission denied" in text
+    ):
+        return {
+            "category": "validation_environment",
+            "reason": "The validation command could not execute the compiled child process.",
+            "hint": "Use repo-local build/cache directories or check OS permissions for temporary executables.",
         }
 
     # Rust runtime panic — catch before generic test_failure so the hint is specific.

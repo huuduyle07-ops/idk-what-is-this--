@@ -111,6 +111,32 @@ def _looks_like_whole_node(snippet: str, name: str, kind: str, language: str) ->
 
     return False
 
+
+def _expand_js_export_modifier_start(
+    code_bytes: bytes,
+    node_start: int,
+    patched_snippet: str,
+    language: str,
+) -> int:
+    """Include a preceding JS/TS export modifier when patched snippet has one.
+
+    Some tree-sitter grammars slice a function node after the ``export`` token.
+    Replacing that range with ``export function ...`` otherwise leaves the
+    original modifier in place and produces ``export export function``.
+    """
+    if language not in {"javascript", "typescript"}:
+        return node_start
+    if not (patched_snippet or "").lstrip().startswith("export "):
+        return node_start
+
+    line_start = code_bytes.rfind(b"\n", 0, node_start) + 1
+    prefix = code_bytes[line_start:node_start].decode("utf-8", "replace")
+    match = re.search(r"(export\s+(?:default\s+)?)$", prefix)
+    if not match or prefix[: match.start()].strip():
+        return node_start
+    return line_start + len(prefix[: match.start()].encode("utf-8"))
+
+
 def _apply_indent_to_snippet(snippet: str, base_indent: str) -> str:
     """
     Only apply base_indent if the snippet seems to be unindented.
@@ -333,12 +359,22 @@ def apply_patch_from_json(project_root: str, patch: dict) -> Dict[str, Any]:
             # Fall through to fuzzy/literal matching instead.
             if target_norm == node_content_norm or patched_is_whole_node:
                 backup_path = backup_file(target_file)
+                replace_start = _expand_js_export_modifier_start(
+                    code_bytes=code_bytes,
+                    node_start=node["start"],
+                    patched_snippet=patched_snippet,
+                    language=language,
+                )
+                replacement_source = code_bytes[replace_start:node["end"]].decode(
+                    "utf-8",
+                    "replace",
+                )
 
-                orig_indent = _indent_of(_first_nonempty_line(node_content))
+                orig_indent = _indent_of(_first_nonempty_line(replacement_source))
                 final_patched = _apply_indent_to_snippet(patched_snippet, orig_indent)
 
                 new_bytes = (
-                    code_bytes[:node["start"]]
+                    code_bytes[:replace_start]
                     + final_patched.encode("utf-8")
                     + code_bytes[node["end"]:]
                 )
@@ -347,7 +383,7 @@ def apply_patch_from_json(project_root: str, patch: dict) -> Dict[str, Any]:
                 result.update({
                     "success": True,
                     "target_file": target_file,
-                    "old_snippet": node_content,
+                    "old_snippet": replacement_source,
                     "new_snippet": final_patched,
                     "backup_path": backup_path,
                     "matched_by": "ast",
