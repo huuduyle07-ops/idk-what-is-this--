@@ -40,7 +40,7 @@ The current system is optimized for small, evidence-first repair tasks. Creation
 
 Keep improving the existing debug/repair workflow.
 
-### A.1: Benchmark Failure Cause Classification / Environment-aware Summary
+### A.1: Benchmark Failure Cause Classification / Environment-aware Summary ✅
 
 New observational per-case fields: 
 - failure_kind 
@@ -55,7 +55,7 @@ Examples now classified:
 
 Scoring is unchanged: the runner only adds display fields after retry/skipped state is settled, and pass/fail still derives from the existing success / skipped logic. Tests also assert scoring fields and source benchmark reports are not mutated by summary/web rendering.
 
-### A.2: Debug Workflow Stage Map and Contract
+### A.2: Debug Workflow Stage Map and Contract ✅
 Stage list: Intake -> Context -> Proposal -> Safety -> Execution -> Validation -> Evidence -> Learning 
 
 What changed: 
@@ -66,7 +66,7 @@ What changed:
 
 UI changed: no. Behavior changed: no. The helper is not wired into runtime behavior and imports only __future__, dataclasses, and typing.
 
-### A.3: Patch Minimality / Changed-files Visibility in Benchmark Tab
+### A.3: Patch Minimality / Changed-files Visibility in Benchmark Tab ✅
 
 Goal: make benchmark reports answer:
 
@@ -76,7 +76,7 @@ What generated artifacts were produced?
 Were there unexpected mutations?
 Was the patch minimal or suspiciously broad?
 
-### A.4:  Latest Run Health Summary
+### A.4:  Latest Run Health Summary ✅
 
 Goal:
 Add a compact latest-run health summary for benchmark reports so operators can understand benchmark health at a glance.
@@ -96,7 +96,7 @@ A.3 surfaced file-change scope fields:
 - UNEXPECTED
 - UNKNOWN
 
-A.4 should combine these into a clear “Run Health” summary.
+A.4 should combine these into a clear “Run Health” summary. ✅
 
 Scope:
 - Add summary computation helper if useful.
@@ -152,7 +152,7 @@ Evolution Mode can read more files, but only when explicitly selected.
 
 ---
 
-### B.1: Project Evolution Mode Contract + Project Map Upgrade Plan.
+### B.1: Project Evolution Mode Contract + Project Map Upgrade Plan. ✅
 
 Goal:
 Define Project Evolution Mode as a separate broad-change workflow for migrations, architecture changes, dependency/provider swaps, and multi-file feature evolution.
@@ -258,7 +258,7 @@ Required boundaries:
 - No lesson/anti-lesson behavior changes.
 - No model/API/subprocess/Docker behavior.
 
-### B.2: Project Map v2 Builder for Evolution Mode.
+### B.2: Project Map v2 Builder for Evolution Mode. ✅
 
 Goal:
 Build read-only Project Map v2 artifacts for Project Evolution Mode.
@@ -283,17 +283,6 @@ Scope:
 - Add tests.
 
 ---
-### B.2a — Heuristic Graph/Project Node Summaries
-
----
-
-## Track C — External Benchmark Sandbox
-
-- C.1 Public benchmark survey
-- C.2 Manual import of 3–5 small real-world cases
-- C.3 Dependency sandbox design
-- C.4 Explicit package-install approval gate
-- C.5 Real-world benchmark trial report
 
 ### B.2a through B.8 addendum
 Added the Project Evolution milestone chain from B.2a through B.8:
@@ -306,6 +295,18 @@ Added the Project Evolution milestone chain from B.2a through B.8:
 - B.6: Approval-gated patch candidate package with grouped candidate change areas.
 - B.7: Narrative patch text draft package with no executable diff.
 - B.8: Sandbox/temp-clone validation that verifies the approved chain without generating, applying, or validating a real patch.
+
+---
+
+## Track C — External Benchmark Sandbox
+
+- C.1 Public benchmark survey
+- C.2 Manual import of 3–5 small real-world cases
+- C.3 Dependency sandbox design
+- C.4 Explicit package-install approval gate
+- C.5 Real-world benchmark trial report
+
+
 
 ---
 
