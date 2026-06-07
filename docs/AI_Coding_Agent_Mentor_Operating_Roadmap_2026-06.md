@@ -36,7 +36,7 @@ The current system is optimized for small, evidence-first repair tasks. Creation
 
 ---
 
-## Track A — Stabilized Debug Agent
+## Track A — Stabilized Debug Agent: cycle 1 complete
 
 Keep improving the existing debug/repair workflow.
 
@@ -75,6 +75,36 @@ What source files were patched?
 What generated artifacts were produced?
 Were there unexpected mutations?
 Was the patch minimal or suspiciously broad?
+
+### A.4:  Latest Run Health Summary
+
+Goal:
+Add a compact latest-run health summary for benchmark reports so operators can understand benchmark health at a glance.
+
+This is a reporting/UI slice. Do not change benchmark scoring, benchmark execution, patch behavior, validation behavior, CONTROL prompts, model routing, lessons, anti-lessons, or harness behavior.
+
+Background:
+A.1 added observational failure taxonomy fields:
+- failure_kind
+- failure_kind_display
+- failure_cause
+- failure_evidence
+
+A.3 surfaced file-change scope fields:
+- CLEAN
+- GENERATED
+- UNEXPECTED
+- UNKNOWN
+
+A.4 should combine these into a clear “Run Health” summary.
+
+Scope:
+- Add summary computation helper if useful.
+- Improve Markdown benchmark report summary.
+- Improve web Benchmark tab latest/detail summary.
+- Reuse existing benchmark report JSON fields.
+- Gracefully support old reports missing new fields.
+- Add tests.
 
 ### Goals:
 
@@ -119,6 +149,141 @@ Project Evolution Mode should be separate from Debug Mode.
 
 Debug Mode should stay small, fast, and evidence-first.
 Evolution Mode can read more files, but only when explicitly selected.
+
+---
+
+### B.1: Project Evolution Mode Contract + Project Map Upgrade Plan.
+
+Goal:
+Define Project Evolution Mode as a separate broad-change workflow for migrations, architecture changes, dependency/provider swaps, and multi-file feature evolution.
+
+This is a docs/metadata/test slice only.
+Do not wire Project Evolution Mode into runtime patch generation yet.
+
+Important:
+C.A.T.T.U.S already has project-map / repo-map / repo-librarian / indexer / graph capability.
+B.1 must not create a competing second project-map system.
+B.1 should document how existing mapping/search components will be reused or upgraded for Evolution Mode.
+
+Debug Mode vs Project Evolution Mode:
+
+Debug Mode:
+- small
+- evidence-first
+- bug/patch oriented
+- minimal context
+- minimal file reads
+- does not read broad/full-project files by default
+
+Project Evolution Mode:
+- broad project map
+- architecture understanding
+- selected full-file reading when justified
+- impact analysis before patching
+- migration plan before patching
+- human approval before multi-file patch generation
+
+Scope:
+- Add docs/project_evolution_mode.md.
+- Add docs/project_map_upgrade_plan.md if useful.
+- Add pure metadata helper if useful:
+  core/project_evolution_mode.py
+- Add tests:
+  tests/test_project_evolution_mode_contract.py
+- No UI changes.
+- No runtime route changes.
+- No model/API calls.
+- No patch generation changes.
+- No benchmark scoring changes.
+- No lesson/anti-lesson behavior changes.
+
+Required Project Evolution stages:
+1. Intake
+   Capture evolution request, repo path, goal, constraints, risk tolerance.
+
+2. Existing Map Inventory
+   Identify current repo-map/project-map/indexer/repo-librarian/graph/search capabilities.
+   Decide reuse / extend / leave unchanged.
+
+3. Project Map
+   Identify structure, languages, dependency files, config files, test roots, docs, entrypoints, generated/build folders to ignore.
+
+4. Architecture Read
+   Select relevant full files for broad understanding.
+   Do not blindly read every file.
+
+5. Impact Analysis
+   Identify affected modules, dependency edges, compatibility risks, tests needed, rollout/rollback points.
+
+6. Migration Plan
+   Produce a human-readable plan with likely changed files, reason, risk, tests, and rollback notes.
+
+7. Approval Gate
+   Human must approve before patch generation.
+
+8. Patch Execution
+   Later phase only.
+   Multi-file patches must be controlled, minimal, and validated.
+
+9. Evidence
+   Store plan, project map, selected files, approvals, validation, replay/debug artifacts.
+
+Required retrieval/search architecture notes:
+Document these layers clearly:
+- Tree-sitter: structural reader for symbols/imports/classes/functions.
+- Existing project map / repo librarian / indexer: repo layout and ownership.
+- Graph builder / graph weights: relationship and evidence graph.
+- Grep/ripgrep fallback: exact text search.
+- MiniLM / embeddings: semantic similarity.
+- Semble: optional future fast local code-search backend, candidate only.
+- Gemini/model2vec/Semble migration ideas: future provider evaluation, not required in B.1.
+- LLM: summarizer/planner only after selected files/snippets are chosen.
+
+Important Semble rule:
+Semble is a candidate retrieval/search backend, not the summarizer.
+Do not add Semble as a dependency in B.1.
+Do not require Semble for tests.
+Only document where it could fit later.
+
+Required boundaries:
+- Project Evolution Mode must not replace Debug Mode.
+- Normal Debug Mode must not start reading broad/full-project files by default.
+- No automatic multi-file patching in B.1.
+- No automatic dependency upgrades.
+- No automatic GitHub writes.
+- No n8n/remote worker integration yet.
+- No Dream/research auto-ingestion yet.
+- No CONTROL prompt changes.
+- No benchmark scoring changes.
+- No lesson/anti-lesson behavior changes.
+- No model/API/subprocess/Docker behavior.
+
+### B.2: Project Map v2 Builder for Evolution Mode.
+
+Goal:
+Build read-only Project Map v2 artifacts for Project Evolution Mode.
+
+Project Map v2 helps broad migration/planning tasks understand repo structure, dependencies, configs, tests, entrypoints, docs, integration boundaries, external services/env vars, full-file-read candidates, and migration risks.
+
+This is read-only map generation.
+Do not generate patches.
+Do not call models.
+Do not run validation.
+Do not change Debug Mode behavior.
+
+Background:
+B.1 defined Project Evolution Mode as separate from Debug Mode.
+B.1 also said C.A.T.T.U.S must reuse/upgrade existing project-map/repo-librarian/indexer/graph/search components instead of building a competing second map system.
+
+Scope:
+- Add a Project Map v2 builder for Evolution Mode.
+- Reuse existing repo-librarian/indexer/project-map/graph helpers where possible.
+- Produce JSON and Markdown artifacts.
+- Add CLI script or core helper for building the map manually.
+- Add tests.
+
+---
+### B.2a — Heuristic Graph/Project Node Summaries
 
 ---
 
