@@ -58,6 +58,7 @@ from web.routes.patch_routes import bp as patch_routes_bp
 from web.routes.dream_trials_routes import bp as dream_trials_routes_bp
 from web.routes.dream_references_routes import bp as dream_references_routes_bp
 from web.routes.harness_controls_routes import bp as harness_controls_routes_bp
+from web.routes.project_evolution_approval_routes import bp as project_evolution_approval_routes_bp
 from web.routes.replay_routes import bp as replay_routes_bp
 from web.routes.history_routes import bp as history_routes_bp
 from graph.builder import build_graph_from_repo
@@ -74,6 +75,7 @@ app.register_blueprint(patch_routes_bp)
 app.register_blueprint(dream_trials_routes_bp)
 app.register_blueprint(dream_references_routes_bp)
 app.register_blueprint(harness_controls_routes_bp)
+app.register_blueprint(project_evolution_approval_routes_bp)
 app.register_blueprint(replay_routes_bp)
 app.register_blueprint(history_routes_bp)
 

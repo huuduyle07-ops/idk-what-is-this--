@@ -5677,3 +5677,65 @@ pre, code {
     background: #eff1f3;
     color: #1f2328;
 }
+
+/* ---- Phase B.4a: Project Evolution Plan Review panel ---- */
+.project-evolution-approval__note {
+    font-size: 12px;
+    color: var(--color-text-muted, #666);
+    margin: 6px 0 10px;
+    line-height: 1.5;
+}
+.project-evolution-approval__warning-text {
+    color: #fbbf24;
+    font-weight: 600;
+}
+.project-evolution-approval__summary,
+.project-evolution-approval__result {
+    margin: 8px 0 12px;
+}
+.project-evolution-approval__card,
+.project-evolution-approval__result-card {
+    border: 1px solid var(--color-border, #d0d7de);
+    background: var(--color-surface-2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+}
+.project-evolution-approval__result-card {
+    border-color: #2563eb;
+    background: #0f172a;
+}
+.project-evolution-approval__result-note {
+    color: #bfdbfe;
+}
+.project-evolution-approval__form {
+    display: grid;
+    gap: 10px;
+}
+.project-evolution-approval__field {
+    display: grid;
+    gap: 4px;
+    font-size: 12px;
+}
+.project-evolution-approval__field span {
+    color: var(--color-text-muted, #666);
+    font-weight: 600;
+}
+.project-evolution-approval__field input,
+.project-evolution-approval__field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 6px;
+    border: 1px solid var(--color-border, #d0d7de);
+    background: var(--color-form-bg);
+    color: var(--color-text);
+    padding: 6px 8px;
+    font: inherit;
+}
+.project-evolution-approval__actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}

@@ -9,6 +9,7 @@ from typing import Any
 
 MODE = "project_evolution"
 SCHEMA_VERSION = "evolution_plan_review_v1"
+PANEL_SCHEMA_VERSION = "evolution_plan_review_panel_v1"
 VALID_DECISIONS = {"approve", "reject", "needs_revision"}
 SOURCE_PLAN_SCHEMA_VERSION = "migration_plan_dry_run_v1"
 
@@ -152,6 +153,85 @@ def write_project_evolution_approval_artifacts(
         "record": record,
         "json_path": str(json_path),
         "md_path": str(md_path),
+    }
+
+
+def load_latest_project_evolution_plan(repo_path: str) -> dict[str, Any]:
+    repo_root = Path(repo_path).expanduser().resolve()
+    source_path = repo_root / ".agent" / "project_evolution" / "migration_plan_dry_run.json"
+    source_load = _load_source_plan(source_path)
+    if source_load["status"] != "ok":
+        return {
+            "status": source_load["status"],
+            "repo_path": str(repo_root),
+            "source_plan_path": str(source_path),
+            "source_plan_hash": "",
+            "source_plan": None,
+            "plan_present": False,
+            "message": source_load["message"],
+        }
+
+    source_plan = source_load["record"]
+    return {
+        "status": "ok",
+        "repo_path": str(repo_root),
+        "source_plan_path": str(source_path),
+        "source_plan_hash": _hash_source_plan(source_plan),
+        "source_plan": source_plan,
+        "plan_present": True,
+        "message": "",
+    }
+
+
+def build_project_evolution_approval_panel_record(repo_path: str) -> dict[str, Any]:
+    loaded = load_latest_project_evolution_plan(repo_path)
+    repo_root = Path(repo_path).expanduser().resolve()
+    base_limitations = [
+        "This panel is read-only and never generates or applies patches.",
+        "Approval buttons create manual approval records only; no automatic B.5 trigger occurs.",
+        "No model/API calls, validation execution, benchmark execution, Docker/subprocess behavior, or lesson mutation occurs here.",
+    ]
+
+    if loaded["status"] != "ok" or not loaded.get("source_plan"):
+        return {
+            "generated_at": _utc_now_iso(),
+            "repo_path": str(repo_root),
+            "mode": MODE,
+            "schema_version": PANEL_SCHEMA_VERSION,
+            "status": "error",
+            "plan_present": False,
+            "source_plan_path": loaded.get("source_plan_path", ""),
+            "source_plan_hash": "",
+            "source_plan_generated_at": "",
+            "migration_goal": "",
+            "patch_generation_allowed": False,
+            "human_approval_required": True,
+            "approval_warning": "Approval only applies to this exact plan hash.",
+            "buttons_enabled": False,
+            "message": loaded.get("message", "migration plan is unavailable"),
+            "limitations": base_limitations + [
+                "A readable migration_plan_dry_run.json is required before the review panel can be used.",
+            ],
+        }
+
+    source_plan = loaded["source_plan"]
+    return {
+        "generated_at": _utc_now_iso(),
+        "repo_path": str(repo_root),
+        "mode": MODE,
+        "schema_version": PANEL_SCHEMA_VERSION,
+        "status": "ok",
+        "plan_present": True,
+        "source_plan_path": loaded["source_plan_path"],
+        "source_plan_hash": loaded["source_plan_hash"],
+        "source_plan_generated_at": source_plan.get("generated_at", ""),
+        "migration_goal": source_plan.get("migration_goal", ""),
+        "patch_generation_allowed": bool(source_plan.get("patch_generation_allowed", False)),
+        "human_approval_required": bool(source_plan.get("human_approval_required", True)),
+        "approval_warning": "Approval only applies to this exact plan hash.",
+        "buttons_enabled": True,
+        "message": "",
+        "limitations": base_limitations,
     }
 
 

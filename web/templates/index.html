@@ -1286,6 +1286,66 @@
           </details>
           <!-- /settings-harness -->
 
+          <!-- Phase B.4a: Project Evolution Plan Review.
+               Read-only dry-run preview plus manual approval records under
+               .agent/project_evolution/approvals/. This panel never generates
+               or applies patches and never triggers a follow-up phase. -->
+          <details class="advanced-panel" data-ui-group="settings-project-evolution">
+            <summary class="advanced-panel__summary">Advanced â€” Project Evolution Plan Review</summary>
+          <div class="health-section project-evolution-approval-section">
+            <div class="health-header">
+              <strong>Project Evolution Plan Review</strong>
+              <button type="button" class="sidebar-refresh"
+                      onclick="loadProjectEvolutionApproval(true)"
+                      title="Re-fetch /project-evolution/approval-panel">âŸ³ Refresh</button>
+            </div>
+            <div class="project-evolution-approval__note">
+              Shows the latest <code>.agent/project_evolution/migration_plan_dry_run.json</code>.
+              <span class="project-evolution-approval__warning-text">Approval only applies to this exact plan hash.</span>
+            </div>
+            <div id="projectEvolutionApprovalSummary" class="project-evolution-approval__summary">
+              <div class="health-empty">Loadingâ€¦</div>
+            </div>
+            <div id="projectEvolutionApprovalWarning" class="project-evolution-approval__warning"></div>
+            <div class="project-evolution-approval__form">
+              <label class="project-evolution-approval__field">
+                <span>Reviewer</span>
+                <input id="projectEvolutionReviewer" type="text" placeholder="Optional reviewer label">
+              </label>
+              <label class="project-evolution-approval__field">
+                <span>Notes</span>
+                <textarea id="projectEvolutionNotes" rows="3" placeholder="Optional reviewer notes"></textarea>
+              </label>
+              <label class="project-evolution-approval__field">
+                <span>Approved scope</span>
+                <textarea id="projectEvolutionApprovedScope" rows="3" placeholder="One item per line"></textarea>
+              </label>
+              <label class="project-evolution-approval__field">
+                <span>Blocked scope</span>
+                <textarea id="projectEvolutionBlockedScope" rows="3" placeholder="One item per line"></textarea>
+              </label>
+              <input type="hidden" id="projectEvolutionSourcePlanPath">
+              <input type="hidden" id="projectEvolutionSourcePlanHash">
+              <div class="project-evolution-approval__actions">
+                <button type="button" id="projectEvolutionApproveBtn"
+                        onclick="submitProjectEvolutionApproval('approve')" disabled>
+                  Approve this exact plan hash
+                </button>
+                <button type="button" id="projectEvolutionRejectBtn"
+                        onclick="submitProjectEvolutionApproval('reject')" disabled>
+                  Reject plan
+                </button>
+                <button type="button" id="projectEvolutionNeedsRevisionBtn"
+                        onclick="submitProjectEvolutionApproval('needs_revision')" disabled>
+                  Mark needs revision
+                </button>
+              </div>
+            </div>
+            <div id="projectEvolutionApprovalResult" class="project-evolution-approval__result"></div>
+          </div>
+          </details>
+          <!-- /settings-project-evolution -->
+
           <!-- Help / README viewer -->
           <div class="health-section">
             <div class="health-header">
@@ -5406,6 +5466,7 @@ function showWorkspaceTab(id) {
         settings:   () => {
             loadHealthPanel(false);
             if (typeof loadHarnessControls === "function") loadHarnessControls(false);
+            if (typeof loadProjectEvolutionApproval === "function") loadProjectEvolutionApproval(true);
             if (typeof loadToolRegistry === "function") loadToolRegistry(false);
             if (typeof loadMcpAudit === "function") loadMcpAudit(false);
             if (typeof loadReplays === "function") loadReplays(false);
@@ -6142,6 +6203,169 @@ function _harnessFlash(msg) {
     note.innerHTML = msg;
     el.parentNode.insertBefore(note, el);
     setTimeout(() => { if (note.parentNode) note.parentNode.removeChild(note); }, 6000);
+}
+
+// Phase B.4a: Project Evolution Plan Review.
+// Read-only GET of the latest migration plan plus manual approval POSTs.
+let _projectEvolutionApprovalLoadedRepo = "";
+
+function _projectEvolutionRepoPath() {
+    return document.getElementById("repoPathInput")?.value.trim()
+        || document.querySelector("input[name='repo_path']")?.value.trim()
+        || "";
+}
+
+function _projectEvolutionScopeValues(id) {
+    const el = document.getElementById(id);
+    if (!el) return [];
+    const seen = new Set();
+    const values = [];
+    for (const line of String(el.value || "").split(/\r?\n/)) {
+        for (const piece of line.split(",")) {
+            const value = piece.trim();
+            if (!value || seen.has(value)) continue;
+            seen.add(value);
+            values.push(value);
+        }
+    }
+    return values;
+}
+
+function _projectEvolutionApprovalButtons(enabled) {
+    for (const id of [
+        "projectEvolutionApproveBtn",
+        "projectEvolutionRejectBtn",
+        "projectEvolutionNeedsRevisionBtn",
+    ]) {
+        const btn = document.getElementById(id);
+        if (btn) btn.disabled = !enabled;
+    }
+}
+
+function _renderProjectEvolutionApproval(data) {
+    const summary = document.getElementById("projectEvolutionApprovalSummary");
+    const warning = document.getElementById("projectEvolutionApprovalWarning");
+    const result = document.getElementById("projectEvolutionApprovalResult");
+    const planPath = document.getElementById("projectEvolutionSourcePlanPath");
+    const planHash = document.getElementById("projectEvolutionSourcePlanHash");
+    if (!summary) return;
+
+    if (!data || data.ok === false) {
+        const err = (data && data.error) || data?.message || "unknown error";
+        summary.innerHTML = `<div class="health-empty">${_escapeHtml(err)}</div>`;
+        if (warning) warning.innerHTML = "";
+        if (result) result.innerHTML = "";
+        if (planPath) planPath.value = "";
+        if (planHash) planHash.value = "";
+        _projectEvolutionApprovalButtons(false);
+        return;
+    }
+
+    if (planPath) planPath.value = data.source_plan_path || "";
+    if (planHash) planHash.value = data.source_plan_hash || "";
+
+    if (!data.plan_present) {
+        summary.innerHTML = `<div class="health-empty">${_escapeHtml(data.message || "No migration_plan_dry_run.json found. Run Project Evolution dry-run first.")}</div>`;
+        if (warning) warning.innerHTML = "";
+        if (result) result.innerHTML = "";
+        _projectEvolutionApprovalButtons(false);
+        return;
+    }
+
+    const patchAllowed = String(data.patch_generation_allowed).toLowerCase() === "true";
+    summary.innerHTML = `
+        <div class="project-evolution-approval__card">
+          <div><strong>Latest plan</strong> <code>${_escapeHtml(data.source_plan_path || "")}</code></div>
+          <div><strong>Migration goal</strong> ${_escapeHtml(data.migration_goal || "")}</div>
+          <div><strong>Source plan hash</strong> <code>${_escapeHtml(data.source_plan_hash || "")}</code></div>
+          <div><strong>Generated at</strong> ${_escapeHtml(data.source_plan_generated_at || "")}</div>
+          <div><strong>Current plan patch_generation_allowed</strong> <span class="health-badge ${patchAllowed ? "health-badge--ok" : "health-badge--off"}">${patchAllowed ? "true" : "false"}</span></div>
+        </div>`;
+    if (warning) {
+        warning.innerHTML = `<div class="harness-controls__flash">${_escapeHtml(data.approval_warning || "Approval only applies to this exact plan hash.")}</div>`;
+    }
+    if (result) result.innerHTML = "";
+    _projectEvolutionApprovalButtons(true);
+}
+
+function loadProjectEvolutionApproval(force = false) {
+    const repo = _projectEvolutionRepoPath();
+    const summary = document.getElementById("projectEvolutionApprovalSummary");
+    if (!repo) {
+        _projectEvolutionApprovalLoadedRepo = "";
+        _renderProjectEvolutionApproval({
+            ok: true,
+            plan_present: false,
+            message: "Set a repo path to load the latest migration plan.",
+        });
+        return;
+    }
+    if (!force && _projectEvolutionApprovalLoadedRepo === repo) return;
+    if (summary) summary.innerHTML = `<div class="health-empty">Loadingâ€¦</div>`;
+    fetch(`/project-evolution/approval-panel?repo_path=${encodeURIComponent(repo)}`)
+        .then(r => r.json())
+        .then(data => {
+            _projectEvolutionApprovalLoadedRepo = repo;
+            _renderProjectEvolutionApproval(data);
+        })
+        .catch(err => {
+            _projectEvolutionApprovalLoadedRepo = "";
+            _renderProjectEvolutionApproval({
+                ok: false,
+                error: String(err),
+            });
+        });
+}
+
+function submitProjectEvolutionApproval(decision) {
+    const repo = _projectEvolutionRepoPath();
+    const sourceHash = document.getElementById("projectEvolutionSourcePlanHash")?.value.trim() || "";
+    const result = document.getElementById("projectEvolutionApprovalResult");
+    if (!repo) {
+        if (result) result.innerHTML = `<div class="health-empty">Set a repo path first.</div>`;
+        return;
+    }
+    if (!sourceHash) {
+        if (result) result.innerHTML = `<div class="health-empty">Load the latest plan before approving.</div>`;
+        return;
+    }
+
+    if (result) result.innerHTML = `<div class="health-empty">Recording approvalâ€¦</div>`;
+    fetch("/project-evolution/approval-panel/review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            repo_path: repo,
+            decision: decision,
+            reviewer: document.getElementById("projectEvolutionReviewer")?.value || "",
+            notes: document.getElementById("projectEvolutionNotes")?.value || "",
+            approved_scope: _projectEvolutionScopeValues("projectEvolutionApprovedScope"),
+            blocked_scope: _projectEvolutionScopeValues("projectEvolutionBlockedScope"),
+            source_plan_hash: sourceHash,
+        }),
+    })
+        .then(r => r.json().then(body => ({ ok: r.ok, body })))
+        .then(({ ok, body }) => {
+            if (!ok || !body.ok) {
+                if (result) {
+                    result.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml((body && body.error) || "unknown error")}</div>`;
+                }
+                return;
+            }
+            if (result) {
+                result.innerHTML = `
+                    <div class="project-evolution-approval__result-card">
+                      <div><strong>Decision</strong> <code>${_escapeHtml(body.decision || decision)}</code></div>
+                      <div><strong>Approval record path</strong> <code>${_escapeHtml(body.approval_record_path || "")}</code></div>
+                      <div><strong>Approved source hash</strong> <code>${_escapeHtml(body.approved_source_hash || "")}</code></div>
+                      <div><strong>Patch generation allowed</strong> <span class="health-badge ${String(body.patch_generation_allowed).toLowerCase() === "true" ? "health-badge--ok" : "health-badge--off"}">${_escapeHtml(String(body.patch_generation_allowed))}</span></div>
+                      <div class="project-evolution-approval__result-note">${_escapeHtml(body.message || "No patch was generated.")}</div>
+                    </div>`;
+            }
+        })
+        .catch(err => {
+            if (result) result.innerHTML = `<div class="health-empty">Failed: ${_escapeHtml(err)}</div>`;
+        });
 }
 
 // Phase 8-prep.1: Tool Registry viewer.
