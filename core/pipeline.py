@@ -937,7 +937,7 @@ def maybe_run_auto_patch(state: AgentState, interactive: bool = True) -> None:
             refresh_memory_block(state)
             return None
 
-        if result.phase in {"dry_run_blocked", "post_apply_blocked"}:
+        if result.phase in {"dry_run_blocked", "post_apply_blocked", "patch_safety_blocked"}:
             save_engineering_memory(
                 session_id=state.session_id,
                 memory_type="bug_pattern",

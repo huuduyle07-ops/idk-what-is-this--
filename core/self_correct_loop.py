@@ -23,6 +23,10 @@ def _result_to_attempt_record(idx: int, result: ExecutionResult) -> Dict[str, An
         "rollback_performed": result.rollback_performed,
         "failure_info": result.failure_info,
         "target_file": result.target_file,
+        "patch_safety": result.patch_safety,
+        "patch_safety_blocked": result.patch_safety_blocked,
+        "patch_safety_reasons": result.patch_safety_reasons,
+        "blocked_reason": result.blocked_reason,
     }
 
 
@@ -110,7 +114,7 @@ def run_self_correct_loop(
             }
 
         # Hard policy blocks: re-prompting won't help.
-        if result.phase in {"dry_run_blocked", "post_apply_blocked"}:
+        if result.phase in {"dry_run_blocked", "post_apply_blocked", "patch_safety_blocked"}:
             return {
                 "success": False,
                 "chosen_patch": None,

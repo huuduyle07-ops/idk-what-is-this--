@@ -298,7 +298,7 @@ Added the Project Evolution milestone chain from B.2a through B.8:
 - Generate a patch draft in .agent\project_evolution\patch_drafts\*
 - Currently, it cannot apply without human approval
 
-### B.10 Project Evolution Review Gate
+### B.10 Project Evolution Review Gate ✅
 - Workflow:
 project map
 → upgrade plan
@@ -313,6 +313,99 @@ project map
 - full pytest 2631 passed
 - benchmark --check 54/54
 
+### B.11 — README Operating Modes / Permission Matrix ✅
+- Added Operating Modes / Permission Matrix to README.
+- Clarifies which modes can call models, write artifacts, modify the real repo, apply patches, and require human approval.
+- Establishes the power leakage rule:
+  Mode decides permission.
+  Gate decides escalation.
+  Human decides activation.
+- Documentation-only.
+- No code behavior change.
+- Validation:
+  - compileall clean
+  - B.10 tests 20/20 passed
+
+### B.12 — External Queue Import Contract ✅
+- Added review-only import contract for external Discord/n8n/Zalo/webhook/manual items.
+- Artifacts:
+  .agent/external_queue/<queue_id>/external_queue_item.json
+  .agent/external_queue/<queue_id>/external_queue_item.md
+- Hardcoded gates:
+  auto_dream_allowed: false
+  human_review_required: true
+  import_status: pending_review
+- Secrets are redacted/flagged.
+- No live external integration.
+- No Dream trigger.
+- No patch/apply behavior.
+- Validation:
+  - B.12 tests 37/37 passed
+  - full pytest 2668/2668 passed
+  - benchmark --check 54/54 PASS
+
+### B.13 — External Queue Operator Workflow ✅
+- Documented how to manually import Discord/n8n/Zalo/webhook research output into C.A.T.T.U.S.
+- Added example JSON fixture:
+  docs/examples/external_queue_item.example.json
+- Importing creates artifacts only.
+- No auto-Dream, no patch/apply, no live integration.
+- Validation:
+  - fixture import succeeded
+  - B.12 tests 37/37 passed
+  - compileall clean
+
+### B.14 — External Queue Review Recommendation ✅
+- Added review-only recommendation layer for imported external queue items.
+- Reads:
+  .agent/external_queue/<queue_id>/external_queue_item.json
+- Writes:
+  external_queue_review.json
+  external_queue_review.md
+- Recommendations:
+  reject
+  needs_more_evidence
+  convert_to_goal_brief_seed
+  convert_to_dream_candidate
+  convert_to_project_evolution_candidate
+- Hardcoded gates:
+  human_approval_required: true
+  action_performed: false
+- No conversion performed.
+- No Dream item created.
+- No Goal Brief created.
+- No Project Evolution plan created.
+- No patch/apply.
+- No model calls/subprocess/live integration.
+- Validation:
+  - B.14 tests 32/32 passed
+  - full pytest 2700/2700 passed
+
+### B.15 — External Queue Index/List CLI
+Goal:
+Make imported/reviewed external queue items easy to inspect.
+
+Planned behavior:
+- Scan .agent/external_queue/
+- List queue_id, source, kind, query preview, risk, import_status, review status, recommendation, confidence.
+- Support filters:
+  --source
+  --kind
+  --risk
+  --recommendation
+  --unreviewed
+  --reviewed
+  --limit
+  --json
+
+Rules:
+- Read-only.
+- No import.
+- No review.
+- No conversion.
+- No Dream trigger.
+- No patch/apply.
+- No live external integration.
 ---
 
 ## Track C — External Benchmark Sandbox
@@ -466,6 +559,101 @@ Evaluate whether Scrapling/WebBridge and Arkon can help C.A.T.T.U.S collect publ
 - no automatic patching
 - output only local research notes
 
+---
+## Track H — Cost Pressure / Model Budget Control
+
+Purpose:
+C.A.T.T.U.S must reduce dependence on expensive AI model usage. Recent usage patterns show token/model limits are becoming the bottleneck, so the system should become stronger at local/rule-based decisions, cheap-first routing, and explicit expensive-model approval.
+
+Main principle:
+Expensive AI should be a specialist, not oxygen.
+
+### H.1 — Cost Pressure / Token Burden Report
+Goal:
+Produce a local report showing where C.A.T.T.U.S is likely causing unnecessary model usage.
+
+Questions:
+- Which modes call models?
+- Which flows can be local/rule-based?
+- Which artifacts duplicate each other?
+- Which tasks should never use expensive models?
+- Which tasks require human approval before expensive model calls?
+
+Rules:
+- Report-only.
+- No model calls.
+- No routing behavior change.
+- No patch/apply.
+
+### H.2 — Model Budget Gate Contract
+Goal:
+Define a permission model for local / cheap / expensive / blocked model usage.
+
+Possible categories:
+- local_only
+- cheap_model_allowed
+- expensive_model_requires_approval
+- blocked
+
+Rules:
+- Contract/metadata/tests only.
+- No automatic routing change yet.
+- No provider-specific lock-in.
+
+### H.3 — Cheap-First Router Policy
+Goal:
+Route simple classification/listing/review/report tasks away from expensive models.
+
+Cheap/local candidates:
+- external queue import
+- external queue review
+- external queue index
+- review gate risk classification
+- mode matrix/doc generation
+- artifact summaries
+- path safety
+- benchmark check parsing
+
+Expensive model candidates:
+- hard root-cause analysis
+- architecture audit
+- broad migration planning
+- final review for dangerous changes
+
+Rules:
+- Preserve human approval for expensive runs.
+- Never let n8n/Discord trigger expensive model usage directly.
+
+### H.4 — Model Usage Ledger
+Goal:
+Record model calls by mode, task type, provider, estimated cost/tokens when available, and outcome usefulness.
+
+Purpose:
+Allow future decisions like:
+- which model saved time
+- which model produced generic output
+- which flow burned tokens
+- which mode should be downgraded to local rules
+
+### H.5 — Expensive Audit Scorecard
+Goal:
+Evaluate expensive architecture audits using a fixed rubric.
+
+Score dimensions:
+- file-specific insight
+- real redundancy found
+- safe simplification path
+- respects Mode Matrix
+- no hallucinated modules/features
+- cheaper-model comparison
+
+3. In Current Position, add a short note:
+C.A.T.T.U.S is also now being optimized to reduce operator burden and external model dependence:
+- fewer repeated audits
+- fewer expensive model calls
+- more local/rule-based review
+- stronger artifact visibility
+- explicit budget gates before expensive reasoning
 ---
 
 ## Deferred Ideas

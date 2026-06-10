@@ -8,9 +8,11 @@ import re
 
 from patching.patch_engine import (
     apply_patch_from_json,
+    find_target_file,
     restore_backup,
     cleanup_backup,
 )
+from core.patch_safety import evaluate_patch_safety
 from core.validator import run_validation_command, classify_validation_output
 
 # Markup / style files have no function-signature semantics, so risk heuristics
@@ -70,6 +72,10 @@ class ExecutionResult:
     applied_patch: Optional[Dict[str, Any]] = None
     failure_info: Optional[Dict[str, str]] = None
     matched_by: Optional[str] = None
+    patch_safety: Optional[Dict[str, Any]] = None
+    patch_safety_blocked: bool = False
+    patch_safety_reasons: List[str] = field(default_factory=list)
+    blocked_reason: Optional[str] = None
 
     # Mutation oracle (Phase 2). Populated only on successful validation when
     # the oracle is enabled. None means "not run" or "no mutants applicable" —
@@ -135,6 +141,30 @@ class Executor:
                 diff=dry["diff"],
                 risk=dry["risk"],
                 applied_patch=patch,
+            )
+
+        patch_safety = evaluate_patch_safety(
+            self._single_file_patch_candidate_files(patch),
+            project_root=self.project_root,
+        )
+        if not patch_safety["ok"]:
+            message = "Patch blocked by safety gate: " + "; ".join(
+                patch_safety["reasons"]
+            )
+            return ExecutionResult(
+                success=False,
+                phase="patch_safety_blocked",
+                message=message,
+                target_file=self._single_file_patch_target(patch) or None,
+                validation_ok=None,
+                diff=dry["diff"],
+                risk=dry["risk"],
+                applied_patch=patch,
+                matched_by=None,
+                patch_safety=patch_safety,
+                patch_safety_blocked=True,
+                patch_safety_reasons=list(patch_safety["reasons"]),
+                blocked_reason=message,
             )
 
         if dry["risk"].level == "high":
@@ -354,6 +384,56 @@ class Executor:
             "diff": diff,
             "risk": risk,
         }
+
+    def _single_file_patch_target(self, patch: Dict[str, Any]) -> str:
+        relative_path = patch.get("relative_path")
+        if relative_path and relative_path != "<relative path if known>":
+            return str(relative_path)
+        return str(patch.get("file") or "")
+
+    def _single_file_patch_candidate_files(self, patch: Dict[str, Any]) -> List[str]:
+        """Return candidate touched files for the shared patch-safety gate.
+
+        The patch engine accepts either a concrete ``relative_path`` or a
+        basename-ish ``file`` fallback that it resolves before writing. Check
+        both the raw candidate and, when discoverable without writing, the same
+        resolved relative path the engine would target.
+        """
+        touched: List[str] = []
+        raw_target = self._single_file_patch_target(patch)
+        if raw_target:
+            touched.append(raw_target)
+
+        resolved = self._resolve_single_file_patch_target_for_safety(patch)
+        if resolved is not None:
+            try:
+                relative = str(resolved.relative_to(self.project_root)).replace("\\", "/")
+            except ValueError:
+                relative = str(resolved)
+            if relative not in touched:
+                touched.append(relative)
+
+        return touched or [""]
+
+    def _resolve_single_file_patch_target_for_safety(
+        self,
+        patch: Dict[str, Any],
+    ) -> Optional[Path]:
+        relative_path = patch.get("relative_path")
+        if relative_path and relative_path != "<relative path if known>":
+            try:
+                candidate = (self.project_root / str(relative_path)).resolve()
+                candidate.relative_to(self.project_root)
+            except (ValueError, OSError):
+                return None
+            if candidate.exists() and candidate.is_file():
+                return candidate
+
+        file_name = patch.get("file")
+        if file_name:
+            return find_target_file(str(self.project_root), str(file_name))
+        return None
+
     def _is_verbatim_named_function_patch(self, patch: Dict[str, Any]) -> bool:
         """Whitelist for the literal-medium-risk block.
 
