@@ -179,6 +179,46 @@ def test_validated_proposal_creates_lesson_candidate(proposals_repo):
     assert candidate["diff_stats"]["removed"] == 1
 
 
+def test_auto_active_true_still_creates_proposal_lesson_candidate(
+    proposals_repo, monkeypatch
+):
+    item_dir = _item_dir(proposals_repo)
+    _write_artifacts(item_dir)
+    monkeypatch.setattr(lesson_store.config, "LESSON_AUTO_ACTIVE", True)
+
+    lesson = cl.create_lesson_from_proposal(item_dir)
+
+    assert lesson_store.config.LESSON_AUTO_ACTIVE is True
+    assert lesson["evaluation"]["promotion"] == "auto_approved"
+    assert lesson["status"] == "candidate"
+    assert lesson["active_knowledge_allowed"] is False
+    assert [rec["id"] for rec in lesson_store.list_lessons(status="candidate")] == [
+        lesson["id"]
+    ]
+    assert lesson_store.list_lessons(status="active") == []
+
+
+def test_auto_active_true_restored_after_save_error(
+    proposals_repo, monkeypatch
+):
+    item_dir = _item_dir(proposals_repo)
+    _write_artifacts(item_dir)
+    monkeypatch.setattr(lesson_store.config, "LESSON_AUTO_ACTIVE", True)
+    observed_auto_active = []
+
+    def fail_save_candidate_lesson(*args, **kwargs):
+        observed_auto_active.append(lesson_store.config.LESSON_AUTO_ACTIVE)
+        raise RuntimeError("save failed")
+
+    monkeypatch.setattr(lesson_store, "save_candidate_lesson", fail_save_candidate_lesson)
+
+    with pytest.raises(RuntimeError, match="save failed"):
+        cl.create_lesson_from_proposal(item_dir)
+
+    assert observed_auto_active == [False]
+    assert lesson_store.config.LESSON_AUTO_ACTIVE is True
+
+
 def test_validated_proposal_with_repo_path_creates_repo_scoped_candidate(
     proposals_repo, tmp_path
 ):
