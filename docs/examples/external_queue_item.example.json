@@ -1,0 +1,10 @@
+{
+  "source": "discord",
+  "kind": "research_wishlist",
+  "query": "Find recent tools for codebase mapping in AI coding agents",
+  "result": "Paste reviewed n8n output here.",
+  "submitted_by": "operator",
+  "metadata": {
+    "discord_channel": "research-output"
+  }
+}

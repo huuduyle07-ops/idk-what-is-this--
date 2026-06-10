@@ -656,6 +656,150 @@ Core rule:
 
 > **The subagent is not the boss. The Mentor is not certain. The human decides what becomes a lesson and what becomes active.**
 
+### Operating Modes / Permission Matrix
+
+The mode matrix is the permission map for C.A.T.T.U.S. It prevents power leakage between modes — a mode may only do what its row allows. If a future feature needs more power, it must pass through a stricter mode or gate rather than silently expanding the current mode.
+
+It tells the operator which modes may call models, write artifacts, modify the real repo, apply patches, or require human approval.
+
+Column guide:
+
+- **Can call model?** — may the mode send a request to an AI model API.
+- **Can write artifacts?** — may it write files under `.agent/`.
+- **Can modify real repo?** — may it change source files outside `.agent/`.
+- **Can apply patch?** — may it write a code patch to the real working tree.
+- **Human approval?** — is an explicit human action required before anything consequential happens.
+- **Main safety gate** — the mechanism that enforces the mode's limits.
+
+| Mode | Purpose | Typical input | Typical output | Can call model? | Can write artifacts? | Can modify real repo? | Can apply patch? | Human approval? | Main safety gate |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **Chat / Understanding** | Explain code, answer questions, plan | Question or code snippet | Text answer, context | Yes | No | No | No | N/A | No write path exists |
+| **Goal Brief Builder** | Turn vague goals into evidence-based task briefs | Vague goal, pasted command output | `goal_brief.json`, optional `.md` | Yes (interviewer only) | Yes (`.agent/goal_briefs/`) | No | No | No (collector only) | Collector-only guardrail; no patch, no run, no promote |
+| **Debug / Patch Flow** | Propose and apply a single targeted patch | Repo path, question | Patch card, diff, validation result | Yes | Yes (`.agent/`) | Yes (with gate) | Yes (with gate) | Patch Safety gate auto-runs | `patch_safety.evaluate_patch_safety` blocks unsafe paths |
+| **Dream / Sleeping Consultant** | Overnight planning, research, debt exploration | Queued items | Dream report, optional `patch_plan.json` | Yes | Yes (`.agent/dream/`) | Temp clone only | Temp clone only | `human_approved_for_proposal=true` required | Temp-clone isolation; real repo unchanged |
+| **Proposal → Lesson Flow** | Convert a validated dream result into a lesson candidate | `proposal.md` + `patch_plan.json` | Lesson candidate under `.agent/lessons/candidate/` | No | Yes (`.agent/lessons/candidate/`) | No | No | Human creates candidate; human promotes | Candidate-only write; does not activate without Promote |
+| **Lesson Mode** | Advisory hints to the CONTROL prompt | Active lesson files | Retrieved lesson text in prompt | No | No | No | No | Human promoted it to active | Advisory-only; never overrides user, repo state, validation, or Patch Safety gate |
+| **Anti-Lesson Mode** | Block a lesson from prompt retrieval | Lesson to block | Moved to `.agent/lessons/blocked/` | No | Yes (moves file within `.agent/lessons/`) | No | No | Human blocks it | Block-only write; blocked lessons add penalty weight to graph nodes |
+| **Project Evolution Mode** | Plan large migrations or provider changes | Repo path, migration goal | `migration_plan_dry_run.json`, `.md` | No | Yes (`.agent/project_evolution/`) | No | No | Human reviews plan before next phase | Dry-run only; no source mutation, no model call, no patch apply |
+| **Executable Patch Draft** | Produce structured placeholder edit units from an approved plan chain | Approval + draft + candidates + text draft chain | `executable_patch_draft.json`, `.md` | No | Yes (`.agent/project_evolution/executable_patch_drafts/`) | No | No | Full chain approval required; `apply_allowed: false` | All edit units have `apply_allowed: false`; `old_text`/`new_text` are `null` placeholders |
+| **Project Evolution Review Gate** | Human-facing risk summary and approval gate for an executable patch draft | Executable patch draft path | `review_gate.json`, `.md` | No | Yes (`.agent/project_evolution/review_gates/`) | No | No | **Required before any apply step** | `apply_allowed: false` locked; `human_approval_required: true`; `approval_status` starts as `pending` |
+| **Mayor Mode / Handoff** | Send a bounded task to an external coding agent | Task description, allowed files, validation command | `handoff.md` under `.agent/handoffs/`; optional worker run under `.agent/worker_runs/` | No | Yes (`.agent/handoffs/`, `.agent/worker_runs/`) | No | No | Explicit "Allow run" checkbox to run worker | Temp-clone isolation; real repo bytes unchanged (verified by test) |
+| **Worker Run Import / Validation** | Import a worker's output and validate it in a temp clone | Worker run directory | Imported proposal, `apply_result.json` | No | Yes (`.agent/proposals/`) | No | No | Human imports; human validates; human creates lesson | Temp-clone validation only; real repo unchanged; does not auto-promote |
+| **MCP Read-only Server** | Let an MCP client inspect evidence and reports | MCP tool call | Evidence JSON | No | No | No | No | N/A | 10-tool read-only allowlist; no write tools exposed |
+| **MCP Artifact-write Server** | Let an MCP client create handoffs or validate proposals | MCP tool call | Artifact JSON, validation result | No | Yes (`.agent/` scoped) | No | No | Explicit tool call per action | Audit ledger; no real-repo patch apply; validation is temp-clone only |
+| **External Queue / n8n / Discord** | Receive item candidates from external automation | Webhook payload | Dream candidate or Project Evolution candidate | No | Candidate only | No | No | Human approval before any run or apply | Candidate-only write; no auto-execute; webhook cannot reach real-repo patch path |
+
+#### Allowed transitions
+
+- Goal Brief → Debug/Patch Flow ✅
+- Goal Brief → Dream ✅
+- Dream → Proposal ✅
+- Proposal → Candidate Lesson ✅
+- Candidate Lesson → Active Lesson only after human Promote ✅
+- Project Evolution Plan → Executable Patch Draft ✅
+- Executable Patch Draft → Review Gate ✅
+- External Queue → Dream Candidate / Project Evolution Candidate ✅
+- Worker Run → Imported Proposal → Temp-clone validation ✅
+
+#### Forbidden transitions
+
+- External Queue / n8n → real repo patch ❌
+- Dream → direct real repo apply ❌
+- Project Evolution Review Gate → apply patch ❌
+- MCP Read-only → write artifact or mutate repo ❌
+- MCP Artifact-write → real repo patch apply ❌
+- Worker Run → active lesson without proposal review ❌
+- Lesson → override user request, repo state, validation, or Patch Safety gate ❌
+
+#### Power leakage rule
+
+A mode may only do what its row allows. If a future feature needs more power, it must pass through a stricter mode or gate instead of silently expanding the current mode.
+
+#### Current B.10 status
+
+Project Evolution Review Gate is review-only (Phase B.10):
+
+- `apply_allowed` is always `false`.
+- `human_approval_required` is always `true`.
+- `approval_status` starts as `pending`.
+- A review gate report is not permission to mutate the repository.
+- No apply button exists yet. No automatic approval exists.
+
+### External Queue import workflow
+
+The External Queue is a **review-only inbox** for outside research or wishlist items arriving from Discord, n8n, Zalo, or any webhook. Importing creates artifacts only — it does not run Dream, patch the repo, or modify source files.
+
+#### What it does
+
+- Accepts text items from `discord`, `n8n`, `zalo`, `webhook`, or `manual` sources.
+- Normalises the item, redacts obvious secrets, classifies risk, and writes two artifact files.
+- All hardcoded gates: `import_status: pending_review`, `auto_dream_allowed: false`, `human_review_required: true`.
+
+#### Manual CLI import
+
+```bash
+python scripts/import_external_queue_item.py \
+  --repo-path . \
+  --source discord \
+  --kind research_wishlist \
+  --query "Find recent tools for codebase mapping in AI coding agents" \
+  --result "Short sourced result pasted from n8n/Discord"
+```
+
+#### JSON file import
+
+Create a file, e.g. `docs/examples/external_queue_item.example.json`:
+
+```json
+{
+  "source": "discord",
+  "kind": "research_wishlist",
+  "query": "Find recent tools for codebase mapping in AI coding agents",
+  "result": "Paste reviewed n8n output here.",
+  "submitted_by": "operator",
+  "metadata": {
+    "discord_channel": "research-output"
+  }
+}
+```
+
+Then import it:
+
+```bash
+python scripts/import_external_queue_item.py \
+  --repo-path . \
+  --input-json docs/examples/external_queue_item.example.json
+```
+
+#### Expected output
+
+```
+json_path: .agent/external_queue/<queue_id>/external_queue_item.json
+md_path:   .agent/external_queue/<queue_id>/external_queue_item.md
+import_status:        pending_review
+auto_dream_allowed:   false
+human_review_required: true
+```
+
+#### Human review checklist
+
+- Read `query` and `result` in the artifact markdown.
+- Check source quality (was the result reviewed by a human before import?).
+- Confirm no secrets appear in the stored artifact (check `risk_reasons`).
+- Decide: **reject**, convert to Goal Brief seed, convert to Dream candidate, or convert to Project Evolution candidate.
+- Do not auto-apply, auto-commit, or auto-promote anything.
+
+#### Forbidden actions
+
+- Do not pipe n8n output directly into Dream apply.
+- Do not let Discord commands patch the repo.
+- Do not promote lessons from the external queue without proposal evidence.
+- Do not treat imported research as verified truth until reviewed.
+
+#### Secret note
+
+If a secret is detected the importer redacts obvious secret-like values (e.g. `sk-…`, Bearer tokens, `password=…`) and raises risk to `high`. The raw token is never written to disk — but still **rotate any exposed credential manually**.
+
 ### Decision tree — which tab for which job
 
 | Goal | Use | Don't use |
