@@ -150,7 +150,7 @@ Project Evolution Mode should be separate from Debug Mode.
 Debug Mode should stay small, fast, and evidence-first.
 Evolution Mode can read more files, but only when explicitly selected.
 
----
+> **Status: planning, approval, draft, and sandbox-gate pipeline shipped.** Real executable patch generation/apply deferred. 
 
 ### B.1: Project Evolution Mode Contract + Project Map Upgrade Plan. ✅
 
@@ -282,9 +282,7 @@ Scope:
 - Add CLI script or core helper for building the map manually.
 - Add tests.
 
----
-
-### B.2a through B.8 addendum
+### B.2a through B.8 addendum ✅
 Added the Project Evolution milestone chain from B.2a through B.8:
 
 - B.2a: Heuristic read-only summaries for high-value Project Map and graph nodes.
@@ -296,6 +294,25 @@ Added the Project Evolution milestone chain from B.2a through B.8:
 - B.7: Narrative patch text draft package with no executable diff.
 - B.8: Sandbox/temp-clone validation that verifies the approved chain without generating, applying, or validating a real patch.
 
+### B.9 — Executable Patch Draft Format ✅
+- Generate a patch draft in .agent\project_evolution\patch_drafts\*
+- Currently, it cannot apply without human approval
+
+### B.10 Project Evolution Review Gate
+- Workflow:
+project map
+→ upgrade plan
+→ executable patch draft
+→ review gate
+→ approval_status: pending
+→ apply_allowed: false
+
+- review-only
+- apply_allowed false
+- human_approval_required true
+- full pytest 2631 passed
+- benchmark --check 54/54
+
 ---
 
 ## Track C — External Benchmark Sandbox
@@ -305,8 +322,6 @@ Added the Project Evolution milestone chain from B.2a through B.8:
 - C.3 Dependency sandbox design
 - C.4 Explicit package-install approval gate
 - C.5 Real-world benchmark trial report
-
-
 
 ---
 
@@ -419,6 +434,24 @@ Future freeze: optional polish only.
 - approve/reject buttons
 - replay summary
 - benchmark status
+
+**Ideal workflow:**
+Stage 1 — Safe now
+n8n research scout
+→ Tavily/Perplexity result
+→ Zalo/Discord review message
+→ you decide manually
+Stage 2 — Safer automation later
+n8n research scout
+→ POST to C.A.T.T.U.S dream inbox
+→ C.A.T.T.U.S saves .agent/dream_inbox/*.json
+→ no Dream run yet
+→ human review in UI
+Stage 3 — risky future
+n8n
+→ C.A.T.T.U.S endpoint
+→ Dream run / proposal generation
+→ still no patch/apply
 
 ### Reference Study: Scrapling + Arkon
 
