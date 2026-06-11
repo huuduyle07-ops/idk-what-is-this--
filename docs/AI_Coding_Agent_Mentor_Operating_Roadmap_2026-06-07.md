@@ -137,11 +137,26 @@ Scope:
 - `main.py` and `web/runner.py` call the shared helper.
 - Caller-specific behavior, including web harness decisions and missing-JSON callbacks, remains outside the helper.
 
-### A.9: Docs Truth Pass 🔄 current phase
+### A.9: Docs Truth Pass ✅
 
 - Refresh README safety, proposal-to-lesson, post-processing, and benchmark wording after A.5-A.8.
 - Refresh this roadmap and the architecture audit triage record.
 - Documentation-only: no runtime code, tests, patch safety behavior, lesson behavior, benchmark logic, or model routing changes.
+
+### Track A cleansing checkpoint (A.5-A.15) ✅
+
+A.5-A.15 are closed as the Track A cleansing pass. The checkpoint includes:
+
+- single-file patch safety through the universal patch safety chokepoint
+- proposal candidate-only guard for proposal-created lessons
+- shared postprocess gate battery used by CLI and web postprocessing paths
+- proposal lesson canonical source identity and dedupe wiring
+- deprecated proposal route verification
+- benchmark generated-artifact ignore rules
+
+Current benchmark truth remains:
+
+- `benchmark --check`: 54 checked, 0 errors
 
 ### Goals:
 
@@ -418,30 +433,28 @@ project map
   - B.14 tests 32/32 passed
   - full pytest 2700/2700 passed
 
-### B.15 — External Queue Index/List CLI
-Goal:
-Make imported/reviewed external queue items easy to inspect.
+### B.15 — External Queue Index/List CLI ✅
 
-Planned behavior:
-- Scan .agent/external_queue/
-- List queue_id, source, kind, query preview, risk, import_status, review status, recommendation, confidence.
-- Support filters:
-  --source
-  --kind
-  --risk
-  --recommendation
-  --unreviewed
-  --reviewed
-  --limit
-  --json
+Implemented read-only index/list layer for imported/reviewed external queue artifacts.
 
-Rules:
+- Core helper: `core/external_queue_index.py`
+- CLI: `scripts/list_external_queue.py`
+- Scans `.agent/external_queue/**/external_queue_item.json`
+- Lists queue id, path, title/summary, source kind, created/modified time, status, risk, gate status, recommendation, linked paths, validation/error summary, display safety, and promotable/executable eligibility.
+- Handles invalid JSON, wrong schema, missing optional fields, partial artifacts, missing linked paths, and invalid review files without crashing.
+- Supports filters:
+  `--status`, `--source`, `--kind`, `--risk`, `--recommendation`, `--reviewed`, `--unreviewed`, `--limit`, `--json`
+- Default output is a compact table; `--json` emits deterministic sorted-key JSON.
+- No External Queue web UI exists yet; web listing remains deferred.
+
+Rules preserved:
 - Read-only.
-- No import.
-- No review.
+- No import/review writes.
 - No conversion.
 - No Dream trigger.
 - No patch/apply.
+- No model calls.
+- No Discord/n8n/webhook calls.
 - No live external integration.
 ---
 

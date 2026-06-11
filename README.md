@@ -734,6 +734,7 @@ The External Queue is a **review-only inbox** for outside research or wishlist i
 - Accepts text items from `discord`, `n8n`, `zalo`, `webhook`, or `manual` sources.
 - Normalises the item, redacts obvious secrets, classifies risk, and writes two artifact files.
 - All hardcoded gates: `import_status: pending_review`, `auto_dream_allowed: false`, `human_review_required: true`.
+- Read-only index/list CLI: `python scripts/list_external_queue.py --repo-path .` (add `--json`, `--status queued`, or `--limit N` as needed).
 
 #### Manual CLI import
 
