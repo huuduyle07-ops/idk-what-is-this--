@@ -61,6 +61,8 @@ Status: `accepted_later`
 - Move toward one creation function.
 - Use a unified source label and `source_key` dedup scheme.
 - Do not merge the dual Dream lesson endpoints.
+- **A.11 consolidation plan**: see `.agent/audits/*_proposal-lesson-consolidation-plan.{json,md}`
+  — canonical target selected (`create_lesson_from_proposal`); future phases A.12/A.13/A.14 defined.
 
 ### Track F Consolidation
 
