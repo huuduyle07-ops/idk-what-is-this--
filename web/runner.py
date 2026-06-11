@@ -20,6 +20,7 @@ from core.pipeline import (
     run_draft_pipeline,
     run_review_pipeline,
 )
+from core.postprocess_gates import run_postprocess_gate_battery
 from core.harness_modes import (
     HarnessModeDecision,
     decide_harness_mode,
@@ -46,12 +47,7 @@ from database.memory import (
     save_message,
 )
 from patching.patch_gates import (
-    collect_patch_repair_reasons,
-    reject_ungrounded_patch,
-    reject_ungrounded_candidate_quotes,
     retry_structured_patch_json,
-    normalize_patch_plan_schema,
-    promote_go_missing_import_candidate_to_patch_plan,
     promote_ts_duplicate_import_candidate_to_patch_plan,
     promote_ts_missing_import_candidate_to_patch_plan,
 )
@@ -201,6 +197,16 @@ def _harness_block_answer(decision: HarnessModeDecision) -> str:
         lines.append("Warnings:")
         lines.extend(f"- {warning}" for warning in decision.warnings)
     return "\n".join(lines)
+
+
+def _write_debug_no_json_answer(_state: AgentState, reviewed_answer: str) -> None:
+    debug_dir = Path(".agent")
+    debug_dir.mkdir(exist_ok=True)
+    (debug_dir / "debug_no_json_answer.txt").write_text(
+        reviewed_answer or "",
+        encoding="utf-8",
+    )
+    print("⚠️ No structured patch JSON. Raw answer saved to .agent/debug_no_json_answer.txt")
 
 
 def run_agent_web(
@@ -474,45 +480,14 @@ def run_agent_web(
         draft = run_draft_pipeline(state)
         reviewed = run_review_pipeline(state, draft)
         finalize_answer(state, reviewed)
-        promote_go_missing_import_candidate_to_patch_plan(state)
-        promote_ts_duplicate_import_candidate_to_patch_plan(state)
-        promote_ts_missing_import_candidate_to_patch_plan(state)
-
-        repair_reasons = collect_patch_repair_reasons(state)
-        if repair_reasons:
-            print("🔁 Patch issue detected → retrying JSON repair once:")
-            for reason in repair_reasons:
-                print(reason)
-
-            repaired = retry_structured_patch_json(
-                state,
-                state.final_answer + "\n\n" + "\n\n".join(repair_reasons),
-            )
-            finalize_answer(state, repaired)
-            promote_go_missing_import_candidate_to_patch_plan(state)
-        promote_ts_duplicate_import_candidate_to_patch_plan(state)
-        promote_ts_missing_import_candidate_to_patch_plan(state)
-
-        if state.mode == "reviewer" and not state.json_block:
-            print("🔁 No JSON found → retrying structured JSON repair once...")
-            repaired = retry_structured_patch_json(state, reviewed)
-            finalize_answer(state, repaired)
-            promote_go_missing_import_candidate_to_patch_plan(state)
-        promote_ts_duplicate_import_candidate_to_patch_plan(state)
-        promote_ts_missing_import_candidate_to_patch_plan(state)
-
-        if not state.json_block:
-            debug_dir = Path(".agent")
-            debug_dir.mkdir(exist_ok=True)
-            (debug_dir / "debug_no_json_answer.txt").write_text(
-                reviewed or "",
-                encoding="utf-8",
-            )
-            print("⚠️ No structured patch JSON. Raw answer saved to .agent/debug_no_json_answer.txt")
-
-        normalize_patch_plan_schema(state)
-        reject_ungrounded_patch(state)
-        reject_ungrounded_candidate_quotes(state)
+        run_postprocess_gate_battery(
+            state,
+            reviewed_answer=reviewed,
+            retry_structured_patch_json_fn=retry_structured_patch_json,
+            finalize_answer_fn=finalize_answer,
+            on_missing_json_after_retries_fn=_write_debug_no_json_answer,
+            mode_label="web",
+        )
         grounding_failed = _grounding_failed(state.json_block)
         post_gate_decision = decide_harness_mode(
             repo_root=state.repo_path or repo_path or ".",
