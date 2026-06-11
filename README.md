@@ -736,6 +736,18 @@ The External Queue is a **review-only inbox** for outside research or wishlist i
 - All hardcoded gates: `import_status: pending_review`, `auto_dream_allowed: false`, `human_review_required: true`.
 - Read-only index/list CLI: `python scripts/list_external_queue.py --repo-path .` (add `--json`, `--status queued`, or `--limit N` as needed).
 
+#### List queue items
+
+Listing is read-only. It does not import, review, convert, execute, promote, patch, call models, or contact Discord, n8n, or webhooks. Invalid artifacts appear as `invalid` or `unknown` rows instead of crashing the listing command. The web list UI is deferred.
+
+```bash
+python scripts/list_external_queue.py --repo-path .
+python scripts/list_external_queue.py --repo-path . --unreviewed
+python scripts/list_external_queue.py --repo-path . --risk high
+python scripts/list_external_queue.py --repo-path . --json
+python scripts/list_external_queue.py --repo-path . --limit 10
+```
+
 #### Manual CLI import
 
 ```bash

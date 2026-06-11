@@ -456,6 +456,17 @@ Rules preserved:
 - No model calls.
 - No Discord/n8n/webhook calls.
 - No live external integration.
+
+### B.15a — External Queue List Smoke + README Usage Examples ✅
+
+Added operator-facing README examples for the read-only External Queue list CLI and smoke coverage for help text, basic listing, unreviewed filtering, JSON output, limit handling, and README example flag validity.
+
+Rules preserved:
+- Listing remains read-only.
+- No import, review, conversion, execution, promotion, patch/apply, model calls, Discord/n8n/webhook calls, Dream item creation, Goal Brief creation, or Project Evolution plan creation.
+- Invalid artifacts remain tolerated as invalid/unknown rows.
+- Web list UI remains deferred.
+
 ---
 
 ## Track C — External Benchmark Sandbox
@@ -699,7 +710,7 @@ Score dimensions:
 - no hallucinated modules/features
 - cheaper-model comparison
 
-3. In Current Position, add a short note:
+Current optimization note:
 C.A.T.T.U.S is also now being optimized to reduce operator burden and external model dependence:
 - fewer repeated audits
 - fewer expensive model calls

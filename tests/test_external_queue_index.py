@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import ast
 import json
+import shlex
 import shutil
 import tempfile
 from pathlib import Path
@@ -12,6 +13,7 @@ import pytest
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+README_PATH = PROJECT_ROOT / "README.md"
 MODULE_PATH = PROJECT_ROOT / "core" / "external_queue_index.py"
 SCRIPT_PATH = PROJECT_ROOT / "scripts" / "list_external_queue.py"
 
@@ -315,6 +317,110 @@ def test_cli_table_and_json_are_read_only(tmp_path, capsys):
     assert item_path.read_text(encoding="utf-8") == before
 
 
+def test_cli_help_keeps_operator_example_flags_available():
+    from scripts import list_external_queue as cli
+
+    help_text = cli.build_parser().format_help()
+
+    for flag in (
+        "--repo-path",
+        "--json",
+        "--status",
+        "--source",
+        "--kind",
+        "--risk",
+        "--recommendation",
+        "--reviewed",
+        "--unreviewed",
+        "--limit",
+    ):
+        assert flag in help_text
+
+
+def test_cli_basic_list_smoke_on_fixture_queue(tmp_path, capsys):
+    from scripts import list_external_queue as cli
+
+    repo, _item_path, queue_id = _seed_queue_item(tmp_path, queue_id="a-cli-smoke")
+
+    rc = cli.main(["--repo-path", str(repo)])
+    table_output = capsys.readouterr().out
+
+    assert rc == 0
+    assert "QUEUE ID" in table_output
+    assert queue_id in table_output
+    assert "queued" in table_output
+
+
+def test_cli_unreviewed_lists_only_queued_items(tmp_path, capsys):
+    from scripts import list_external_queue as cli
+
+    repo, _queued_path, _ = _seed_queue_item(tmp_path, queue_id="a-queued")
+    reviewed_path = _seed_second_item(repo, queue_id="b-reviewed")
+    _seed_review(reviewed_path.parent, queue_id="b-reviewed")
+
+    rc = cli.main(["--repo-path", str(repo), "--unreviewed"])
+    table_output = capsys.readouterr().out
+
+    assert rc == 0
+    assert "a-queued" in table_output
+    assert "b-reviewed" not in table_output
+
+
+def test_cli_json_smoke_returns_valid_json(tmp_path, capsys):
+    from scripts import list_external_queue as cli
+
+    repo, _item_path, queue_id = _seed_queue_item(tmp_path, queue_id="a-json-smoke")
+
+    rc = cli.main(["--repo-path", str(repo), "--json"])
+    json_output = capsys.readouterr().out
+
+    assert rc == 0
+    data = json.loads(json_output)
+    assert isinstance(data, list)
+    assert data[0]["queue_id"] == queue_id
+
+
+def test_cli_limit_1_limits_json_output(tmp_path, capsys):
+    from scripts import list_external_queue as cli
+
+    repo, _item_path, _ = _seed_queue_item(tmp_path, queue_id="a-first")
+    _seed_second_item(repo, queue_id="b-second")
+
+    rc = cli.main(["--repo-path", str(repo), "--json", "--limit", "1"])
+    json_output = capsys.readouterr().out
+
+    assert rc == 0
+    data = json.loads(json_output)
+    assert len(data) == 1
+    assert data[0]["queue_id"] == "a-first"
+
+
+def test_readme_external_queue_list_examples_use_supported_cli_flags():
+    from scripts import list_external_queue as cli
+
+    section = _markdown_section(
+        README_PATH.read_text(encoding="utf-8"),
+        "#### List queue items",
+        "#### Manual CLI import",
+    )
+    commands = [
+        line.strip()
+        for line in section.splitlines()
+        if line.strip().startswith("python scripts/list_external_queue.py")
+    ]
+
+    assert len(commands) >= 5
+    assert any("--unreviewed" in command for command in commands)
+    assert any("--risk high" in command for command in commands)
+    assert any("--json" in command for command in commands)
+    assert any("--limit 10" in command for command in commands)
+
+    parser = cli.build_parser()
+    for command in commands:
+        argv = shlex.split(command)[2:]
+        parser.parse_args(argv)
+
+
 def test_listing_does_not_mutate_source_files(tmp_path):
     from core.external_queue_index import build_external_queue_index
 
@@ -474,3 +580,9 @@ def _called_names(tree: ast.AST) -> set[str]:
             elif isinstance(node.func, ast.Attribute):
                 names.add(node.func.attr)
     return names
+
+
+def _markdown_section(text: str, start_heading: str, end_heading: str) -> str:
+    start = text.index(start_heading)
+    end = text.index(end_heading, start)
+    return text[start:end]
