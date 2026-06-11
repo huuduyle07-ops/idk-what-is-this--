@@ -131,6 +131,9 @@ Status: `needs_verification`
 ### `/lessons/create-candidate-from-proposal` Has No UI Caller
 
 - Verify no external or manual client relies on it before cutting.
+- A.14 verified as `manual_legacy_surface`.
+- Recommendation: `freeze_and_deprecate_later`.
+- No deletion in A.14.
 
 ### `repo_inventory` Orphan Claim
 
