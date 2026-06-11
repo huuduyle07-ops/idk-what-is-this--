@@ -23,7 +23,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import web.runner  # noqa: E402  (patched in integration tests)
 from benchmarks import run_benchmarks as rb  # noqa: E402
-from benchmarks.artifact_ledger import classify_changed_files  # noqa: E402
+from benchmarks.artifact_ledger import (  # noqa: E402
+    classify_changed_files,
+    is_generated_artifact_path,
+)
 
 
 # --------------------------------------------------------------------------
@@ -103,6 +106,78 @@ def test_no_default_glob_patterns():
     led = classify_changed_files(case, ["app.py", "customers.csv"])
     assert led["generated_artifacts"] == []
     assert led["unexpected_mutations"] == ["customers.csv"]
+
+
+def test_dotnet_bin_obj_artifacts_are_generated_artifact_paths():
+    generated_paths = [
+        "buggy_repo/obj/Debug/net10.0/App.AssemblyInfo.cs",
+        "buggy_repo/obj/Debug/net10.0/App.AssemblyInfoInputs.cache",
+        "buggy_repo/obj/Debug/net10.0/App.GeneratedMSBuildEditorConfig.editorconfig",
+        "buggy_repo/obj/project.assets.json",
+        "buggy_repo/bin/Debug/net10.0/App.dll",
+        "buggy_repo/bin/Debug/net10.0/App.pdb",
+        "buggy_repo/bin/Debug/net10.0/apphost.exe",
+    ]
+
+    for path in generated_paths:
+        assert is_generated_artifact_path(path), path
+
+
+def test_dotnet_generated_artifact_matching_is_path_normalized():
+    assert is_generated_artifact_path(
+        r"buggy_repo\obj\Debug\net10.0\App.AssemblyInfo.cs"
+    )
+    assert is_generated_artifact_path(
+        r"buggy_repo\bin\Debug\net10.0\App.dll"
+    )
+
+
+def test_dotnet_source_files_outside_build_outputs_are_not_generated():
+    for path in [
+        "buggy_repo/DataService.cs",
+        "buggy_repo/ScoreReport.cs",
+        "buggy_repo/Program.cs",
+        "src/App.AssemblyInfo.cs",
+    ]:
+        assert not is_generated_artifact_path(path), path
+
+
+def test_csharp_build_outputs_are_reported_as_generated_not_unexpected():
+    case = _case(expected=["DataService.cs"])
+    changed = [
+        "DataService.cs",
+        "obj/Debug/net10.0/App.AssemblyInfo.cs",
+        "obj/Debug/net10.0/App.AssemblyInfoInputs.cache",
+        "obj/Debug/net10.0/App.GeneratedMSBuildEditorConfig.editorconfig",
+        "obj/project.assets.json",
+        "bin/Debug/net10.0/App.dll",
+        "bin/Debug/net10.0/App.pdb",
+        "bin/Debug/net10.0/apphost.exe",
+    ]
+
+    led = classify_changed_files(case, changed)
+
+    assert led["patched_files"] == ["DataService.cs"]
+    assert led["generated_artifacts"] == sorted(changed[1:])
+    assert led["unexpected_mutations"] == []
+
+
+def test_real_non_generated_wrong_file_still_reports_unexpected():
+    case = _case(expected=["DataService.cs"])
+    led = classify_changed_files(
+        case,
+        [
+            "DataService.cs",
+            "Program.cs",
+            "obj/Debug/net10.0/App.AssemblyInfo.cs",
+        ],
+    )
+
+    assert led["patched_files"] == ["DataService.cs"]
+    assert led["generated_artifacts"] == [
+        "obj/Debug/net10.0/App.AssemblyInfo.cs"
+    ]
+    assert led["unexpected_mutations"] == ["Program.cs"]
 
 
 def test_check_case_rejects_non_list_allowed_generated_files(tmp_path):
