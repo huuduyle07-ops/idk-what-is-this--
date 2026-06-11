@@ -35,22 +35,22 @@ Status: `already_fixed`
 - `create_lesson_from_proposal` forces `LESSON_AUTO_ACTIVE` off around `save_candidate_lesson`.
 - Proposal lessons cannot bypass the human Promote step.
 
+### A.8 Shared Post-processing Gate Battery
+
+- `main.py` and `web/runner.py` now call `core.postprocess_gates.run_postprocess_gate_battery(...)`.
+- The shared helper preserves the former post-processing gate order.
+- Caller-specific behavior, including web harness decisions, remains outside the shared helper.
+
 ## Accepted Now
 
 Status: `accepted_now`
-
-### A.8 Shared Post-processing Gate Battery
-
-- The post-processing gate battery is duplicated between `main.py` and `web/runner.py`.
-- The ordering is safety-relevant.
-- Extract only behind characterization tests that preserve the current order and outcomes.
 
 ### A.9 Docs Truth Pass
 
 - Update README/debug matrix wording after A.5.
 - Correct benchmark count truth.
-- Refresh technical debt or blueprint status if stale.
-- Exclude `.tmp` or pytest junk from project map output if applicable.
+- Refresh technical debt or blueprint status only if stale.
+- Confirm this phase changes docs only.
 
 ## Accepted Later
 
@@ -152,7 +152,6 @@ Status: `needs_verification`
 
 ## Recommended Next Track A Phases
 
-1. A.8 Shared Post-processing Gate Battery.
-2. A.9 Docs Truth Pass.
-3. A.10 Proposal/Lesson Entry Dedup Audit, report-only.
-4. Decide whether to move to consolidation or H.1 cost pressure.
+1. A.9 Docs Truth Pass.
+2. A.10 Proposal/Lesson Entry Dedup Audit, report-only.
+3. Decide whether to move to consolidation or H.1 cost pressure.

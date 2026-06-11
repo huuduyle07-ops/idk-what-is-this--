@@ -17,7 +17,7 @@ Eight stops. Each stop has a *click* action and a *say* line.
 | 3 | **Graph** tab | Click **Clean Graph**, then click **Scope Spread** | "This is the explainability layer — every node is a code file, edges are evidence links." |
 | 4 | **Chat / Patch** tab | Click **Generate Patch** | "Based on that graph evidence, it proposes a targeted patch." |
 | 5 | **Chat / Patch** tab | Click **Apply / Review Patch** | "Apply writes the patch to disk; the diff is shown immediately for review." |
-| 6 | **Benchmarks** tab | Click on the latest run in the past-runs list | "32 checks, 0 errors — the safety suite runs after every patch." |
+| 6 | **Benchmarks** tab | Click on the latest run in the past-runs list | "54 checked, 0 errors — the current benchmark catalog loads cleanly." |
 | 7 | **Benchmarks** tab | Click **Open evidence index** | "This is the full audit trail — every benchmark result linked to its evidence pack." |
 | 8 | **Settings / Health** tab | Point at the **Advanced** disclosure (do not open) | "Harness controls, .env apply, and docker-compose are all here — available but collapsed. Nothing dangerous runs automatically." |
 
@@ -58,7 +58,7 @@ Prepare these screenshots before the demo. Each one covers a key demo stop.
 - [ ] **Graph — clean graph** — at least one rendered graph with nodes and edges; zoom controls visible.
 - [ ] **Graph — evidence spread** — Scope Spread output panel open and showing spread data.
 - [ ] **Benchmarks — runner with options collapsed** — "Run all" and "Run selected" visible; ⚙ Options disclosure closed (default state).
-- [ ] **Benchmarks — result 32 / 0** — detail panel showing 32 checked, 0 errors.
+- [ ] **Benchmarks — result 54 / 0** — detail panel showing 54 checked, 0 errors.
 - [ ] **Memory — Lessons list or Cooling Brain toggle** — either the lessons list with at least one entry, or the Cooling Brain toggle visible inside the Harness Controls panel.
 - [ ] **Settings — Harness Controls collapsed** — Advanced disclosure closed, showing only the summary label ("Advanced — Harness Controls, .env, docker-compose").
 

@@ -23,6 +23,11 @@ C.A.T.T.U.S is currently strongest at:
 - evidence-grounded patching
 - benchmark-based safety checks
 
+Current benchmark catalog truth:
+
+- 54 benchmark cases
+- `benchmark --check`: 54 checked, 0 errors
+
 It is weaker at:
 
 - project creation
@@ -36,7 +41,7 @@ The current system is optimized for small, evidence-first repair tasks. Creation
 
 ---
 
-## Track A — Stabilized Debug Agent: cycle 1 complete
+## Track A — Stabilized Debug Agent: safety closures current
 
 Keep improving the existing debug/repair workflow.
 
@@ -105,6 +110,38 @@ Scope:
 - Reuse existing benchmark report JSON fields.
 - Gracefully support old reports missing new fields.
 - Add tests.
+
+### A.5: Universal Patch Safety Chokepoint for Single-file Apply ✅
+
+- Single-file `patch_candidate` real applies now call `core.patch_safety.evaluate_patch_safety` inside `core.executor.Executor.run(...)` before `apply_patch_from_json(...)`.
+- `patch_plan` apply paths continue to call `evaluate_patch_safety` through `core.run_lifecycle.run_patch_plan_with_artifacts(...)`.
+- The path traversal guard remains a second layer.
+- Validation command safety remains separate.
+
+### A.6: LESSON_AUTO_ACTIVE Candidate-only Guard ✅
+
+- `scripts/create_lesson_from_proposal.py` force-disables `LESSON_AUTO_ACTIVE` around `save_candidate_lesson(...)`.
+- The previous flag value is restored in `finally`.
+- Proposal-created lessons require human Promote before active retrieval.
+- `lesson_quality` still routes blocked evidence to `blocked`.
+
+### A.7: Architecture Audit Triage Record ✅
+
+- Added `docs/audits/2026-06-11-architecture-audit-triage.md`.
+- Classified audit findings into `already_fixed`, `accepted_now`, `accepted_later`, `rejected`, `frozen`, and `needs_verification`.
+- Keeps safety fixes ahead of consolidation and freezes report-only/test-pinned surfaces unless a future phase accepts redesign work.
+
+### A.8: Shared Post-processing Gate Battery ✅
+
+- `core.postprocess_gates.run_postprocess_gate_battery(...)` now owns the shared CLI/web post-processing gate sequence.
+- `main.py` and `web/runner.py` call the shared helper.
+- Caller-specific behavior, including web harness decisions and missing-JSON callbacks, remains outside the helper.
+
+### A.9: Docs Truth Pass 🔄 current phase
+
+- Refresh README safety, proposal-to-lesson, post-processing, and benchmark wording after A.5-A.8.
+- Refresh this roadmap and the architecture audit triage record.
+- Documentation-only: no runtime code, tests, patch safety behavior, lesson behavior, benchmark logic, or model routing changes.
 
 ### Goals:
 
@@ -487,9 +524,11 @@ Guardrail: Track F is draft/suggestion/prompt-generation only. It does not execu
 - generate a final prompt for Claude/Codex/Gemini worker
 - include constraints, allowed files, validation, stop conditions
 
-Latest checkpoint:
+F.4 shipment checkpoint:
 - Full pytest: 1993 passed, 1 warning
-- benchmark --check: 50 checked, 0 errors
+
+Current benchmark catalog:
+- benchmark --check: 54 checked, 0 errors
 
 Future freeze: optional polish only.
 

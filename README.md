@@ -500,7 +500,7 @@ Or:
 python -m web.app
 ```
 
-`python main.py --web` and `python -m web.app` both route through the same web runner. When the Flask server exits from a normal terminal shutdown path such as `Ctrl+C`, it also attempts to stop matching local MCP Inspector process trees.
+`python main.py --web` and `python -m web.app` both route through the same web runner. CLI and web patch-result post-processing now share `core.postprocess_gates.run_postprocess_gate_battery(...)`; caller-specific behavior such as web harness decisions remains outside that helper. When the Flask server exits from a normal terminal shutdown path such as `Ctrl+C`, it also attempts to stop matching local MCP Inspector process trees.
 
 Index a repository:
 
@@ -675,7 +675,7 @@ Column guide:
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | **Chat / Understanding** | Explain code, answer questions, plan | Question or code snippet | Text answer, context | Yes | No | No | No | N/A | No write path exists |
 | **Goal Brief Builder** | Turn vague goals into evidence-based task briefs | Vague goal, pasted command output | `goal_brief.json`, optional `.md` | Yes (interviewer only) | Yes (`.agent/goal_briefs/`) | No | No | No (collector only) | Collector-only guardrail; no patch, no run, no promote |
-| **Debug / Patch Flow** | Propose and apply a single targeted patch | Repo path, question | Patch card, diff, validation result | Yes | Yes (`.agent/`) | Yes (with gate) | Yes (with gate) | Patch Safety gate auto-runs | `patch_safety.evaluate_patch_safety` blocks unsafe paths |
+| **Debug / Patch Flow** | Propose and apply a single targeted patch | Repo path, question | Patch card, diff, validation result | Yes | Yes (`.agent/`) | Yes (with gate) | Yes (with gate) | Apply action plus Patch Safety gate | `patch_plan` applies call `evaluate_patch_safety` through `run_lifecycle`; single-file `patch_candidate` real applies call it through `Executor.run`; path traversal guard remains a second layer; validation command safety is separate |
 | **Dream / Sleeping Consultant** | Overnight planning, research, debt exploration | Queued items | Dream report, optional `patch_plan.json` | Yes | Yes (`.agent/dream/`) | Temp clone only | Temp clone only | `human_approved_for_proposal=true` required | Temp-clone isolation; real repo unchanged |
 | **Proposal → Lesson Flow** | Convert a validated dream result into a lesson candidate | `proposal.md` + `patch_plan.json` | Lesson candidate under `.agent/lessons/candidate/` | No | Yes (`.agent/lessons/candidate/`) | No | No | Human creates candidate; human promotes | Candidate-only write; does not activate without Promote |
 | **Lesson Mode** | Advisory hints to the CONTROL prompt | Active lesson files | Retrieved lesson text in prompt | No | No | No | No | Human promoted it to active | Advisory-only; never overrides user, repo state, validation, or Patch Safety gate |
@@ -831,14 +831,17 @@ The model may guide the next question, but it must not invent command output. Mi
 
 ### Patch flow safety gate
 
-The Patch Safety gate (`core/patch_safety.evaluate_patch_safety`) is wired into all patch execution routes, including both test/dry-run routes and real-apply routes:
-- `POST /test_patch` (in `web/routes/patch_routes.py`)
-- `POST /apply_patch`
-- `POST /test_patch_plan`
-- `POST /apply_patch_plan`
-- `POST /dream/apply` (still in `web/app.py`)
+The Patch Safety gate (`core/patch_safety.evaluate_patch_safety`) is the write gate for real patch application, not a correctness proof and not a replacement for grounding gates.
 
-A patch is blocked before it writes if it touches forbidden files (`.env`, `.agent`, `.git`, `node_modules`, `target`, tests/benchmark validation files), uses unsafe paths, or shows other safety reasons. Validation command safety is handled separately by the validation/runner layer. The web UI surfaces the block reason; the CLI propagates it through `apply_result`.
+Current write paths:
+
+- `patch_plan` apply paths call `evaluate_patch_safety` through `core.run_lifecycle.run_patch_plan_with_artifacts(...)` before `patching.patch_plan_executor.apply_patch_plan(...)`.
+- Single-file `patch_candidate` real applies call `evaluate_patch_safety` through `core.executor.Executor.run(...)` before `patching.patch_engine.apply_patch_from_json(...)`.
+- Web patch routes surface the same safety block reasons for patch-card and patch-plan apply/test actions.
+- The path traversal guard in the patch engine remains a second layer.
+- Validation command safety is separate in the validation/runner layer; passing Patch Safety does not approve a validation command or prove patch correctness.
+
+A patch is blocked before it writes if it touches forbidden files (`.env`, `.agent`, `.git`, `node_modules`, `target`, tests/benchmark validation files), uses unsafe paths, or shows other safety reasons. The web UI surfaces the block reason; the CLI propagates it through `apply_result`.
 
 Don't bypass the gate. If you find yourself wanting to, fix the patch instead.
 
@@ -863,6 +866,8 @@ Lessons live globally under `.agent/lessons/{candidate,active,blocked}/`. They a
 2. **Inspect the proposal.** Memory tab → Proposals → View. Read `proposal.md` and `patch_plan.json`. The artifact lives under `.agent/proposals/<run>/<item>/`.
 3. **Create a lesson candidate.** Web: "Create candidate lesson" on the proposal card. CLI: `python scripts/create_lesson_from_proposal.py --proposal-dir .agent/proposals/<run>/<item>` (or add `--create-lesson-candidates` to the proposal queue command).
 4. **Promote candidate → active.** Memory tab → Lessons → Candidate filter → Promote. This is the only step that makes the lesson retrieval-eligible.
+
+Proposal-created lessons are candidate-only by default. `scripts/create_lesson_from_proposal.py` force-disables `LESSON_AUTO_ACTIVE` around `save_candidate_lesson(...)` and restores the previous value in `finally`, so proposal-created lessons still require human Promote before they can become active. `lesson_quality` still routes blocked evidence to `blocked`, and retrieval still reads active lessons only.
 
 A candidate lesson is **not** used by the prompt. Active is required.
 
@@ -973,11 +978,11 @@ Audit and Inspector:
 
 | Situation | Command |
 | --- | --- |
-| Sanity-check that all 31 cases load | `python benchmarks/run_benchmarks.py --check --quiet` |
+| Sanity-check that all 54 benchmark cases load | `python benchmarks/run_benchmarks.py --check --quiet` |
 | Iterate on one case | `python benchmarks/run_benchmarks.py --fast --summary --case cpp_account_interest` |
 | Full milestone confirmation | `python benchmarks/run_benchmarks.py --fast --summary --skip-toolchain-failures --markdown --retry-failed 1` |
 
-Rule of thumb: after a small code change, run the targeted unit tests. After a milestone, run the full benchmark. Don't claim "31/31" in a roadmap entry until a fresh full run has actually passed.
+Rule of thumb: after a small code change, run the targeted unit tests. After a milestone, run the full benchmark. Don't claim a full-suite pass in a roadmap entry until a fresh full run has actually passed.
 
 ### Daily workflow
 
@@ -1010,10 +1015,10 @@ This is an active AI engineering project, not a tiny demo. The code already incl
 - automatic patch execution
 - validation and rollback
 - memory storage
-- 31 benchmark cases across several languages, all passing (report `benchmark_report_1779784439`: 31/31, avg 42.27 s, fallback count 12, ~181 K tokens, ~$0.22 per full run)
+- 54 benchmark cases across several languages; `python benchmarks/run_benchmarks.py --check` reports 54 checked, 0 errors
 - held-out evaluation split (`held_out_v1`): 7 adversarial cases (multi-file root cause, callback dispatch ambiguity, false-positive suppression) kept separate from the main benchmark — latest result 7/7 passed, avg 50.31 s, fallback count 5
 - watchlist tracking for held-out instability: `go_multifile_root_cause` flagged at 0.50 historical failure rate; currently passing; watchlist is observational only and does not affect pass/fail scoring
-- patch minimality experiment (greenlighted): variant pipeline matched 31/31 correctness, ran 5.6 s faster per run, and used 2 fewer fallbacks versus baseline
+- patch minimality experiment (greenlighted; historical 31-case suite): variant pipeline matched 31/31 correctness, ran 5.6 s faster per run, and used 2 fewer fallbacks versus baseline
 - same-suite trend tracking: benchmark comparisons are grouped by case-set fingerprint so same-total / different-case reports are never compared against each other
 - benchmark reports with summary, latest, compare, markdown, and web viewing support
 - model-call statistics for benchmark runs
