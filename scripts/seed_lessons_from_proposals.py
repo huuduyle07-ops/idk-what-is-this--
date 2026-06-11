@@ -564,6 +564,23 @@ def seed_lessons_from_proposals(
             )
             continue
 
+        # A.12: compat check — detect lessons created by P1/P2/P3 paths (which
+        # use source='patch_proposal' and source_report rather than source_key).
+        # Old records may have no source_key so the check above misses them.
+        from core.lesson_store import find_lesson_by_source_report as _find_by_sr
+
+        compat_existing = _find_by_sr("patch_proposal", str(proposal_dir))
+        if compat_existing:
+            summary["counts"]["duplicates"] += 1
+            summary["duplicates"].append(
+                {
+                    "proposal_ref": proposal_ref,
+                    "source_key": source_key,
+                    "compatibility_duplicate": True,
+                }
+            )
+            continue
+
         evaluation = _quality_evaluation(candidate)
         candidate["lesson_quality"] = evaluation
         if include_failed and (

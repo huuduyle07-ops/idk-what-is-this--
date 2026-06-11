@@ -198,6 +198,65 @@ def _project_tag_for_repo(repo_path: str | None) -> str | None:
         return None
 
 
+def _canonical_proposal_source_key(
+    proposal_dir: Path,
+    artifacts: dict,
+    *,
+    proposals_root: Path | None = None,
+) -> str:
+    """Return the canonical source_key for this proposal dir.
+
+    Uses the same algorithm as seed_lessons_from_proposals so a key computed
+    by P1 and a key computed by P4 for the same proposal_dir are identical.
+    Lazily imports from seed_lessons_from_proposals to avoid a circular import
+    (P4 already lazy-imports P1; P1 lazy-imports P4's hash helpers here).
+    """
+    root = (proposals_root if proposals_root is not None else _default_proposals_root()).resolve()
+    try:
+        proposal_ref = proposal_dir.resolve().relative_to(root).as_posix()
+    except ValueError:
+        proposal_ref = proposal_dir.resolve().as_posix()
+
+    from scripts.seed_lessons_from_proposals import _as_str_list, _proposal_source_hash
+
+    candidate_data = _build_candidate(artifacts)
+    proposal = artifacts["patch_proposal.json"]
+    validation = artifacts["validation.json"]
+    changed_files = _as_str_list(candidate_data.get("changed_files"))
+    _, _, _, source_key_tail = _proposal_source_hash(proposal, changed_files, validation)
+    return f"{proposal_ref}:{source_key_tail}"
+
+
+def _find_existing_proposal_candidate_globally(
+    source_key: str,
+    proposal_dir: Path,
+) -> tuple[dict | None, str | None]:
+    """Look for an existing lesson matching this proposal via either identity.
+
+    Checks both:
+    - New canonical identity: candidate.source_key == source_key
+    - Legacy identity: source='patch_proposal', source_report=str(proposal_dir)
+
+    Returns (existing_lesson_or_None, identity_type_or_None).
+    identity_type is "source_key" (new) or "source_report" (legacy).
+    Never rewrites existing records.
+    """
+    from core.lesson_store import find_lesson_by_source_report, list_lessons
+
+    # Check new canonical identity across all scopes and statuses
+    for lesson in list_lessons():
+        cand = lesson.get("candidate") or {}
+        if cand.get("source_key") == source_key:
+            return lesson, "source_key"
+
+    # Check legacy patch_proposal/source_report identity
+    existing = find_lesson_by_source_report("patch_proposal", str(proposal_dir))
+    if existing:
+        return existing, "source_report"
+
+    return None, None
+
+
 def create_lesson_from_proposal(
     proposal_dir: Path,
     *,
@@ -237,6 +296,16 @@ def create_lesson_from_proposal(
         lesson_repo_path = None
         candidate.update({"scope": "global", "repo_path": None, "project_tag": None})
 
+    # A.12: compute canonical source_key for cross-path duplicate detection.
+    source_key = _canonical_proposal_source_key(proposal_dir, artifacts)
+    existing, identity_type = _find_existing_proposal_candidate_globally(source_key, proposal_dir)
+    if existing is not None:
+        result = dict(existing)
+        result["already_exists"] = True
+        if identity_type == "source_report":
+            result["compatibility_duplicate"] = True
+        return result
+
     apply_success = bool(artifacts["apply_result.json"].get("success"))
     validation_ok = candidate["validation_ok"]
 
@@ -250,6 +319,9 @@ def create_lesson_from_proposal(
     # Lazy import: keeps the path-traversal helper testable without
     # requiring lesson_store to be importable (e.g., during CI without DB).
     from core import lesson_store
+
+    # Embed canonical source_key so future dedup checks (by any path) find it.
+    candidate["source_key"] = source_key
 
     case_name = candidate.get("case_name") or None
     title = _generate_title(
