@@ -553,6 +553,14 @@ def _maybe_create_lesson_candidate(
     from scripts.create_lesson_from_proposal import create_lesson_from_proposal
 
     lesson = create_lesson_from_proposal(item_dir)
+    if lesson.get("already_exists"):
+        return {
+            "lesson_candidate_created": False,
+            "lesson_already_exists": True,
+            "lesson_message": "lesson already exists",
+            "lesson_id": lesson.get("id"),
+            "lesson_status": lesson.get("status"),
+        }
     return {
         "lesson_candidate_created": True,
         "lesson_already_exists": False,

@@ -161,7 +161,7 @@ def test_validated_proposal_creates_lesson_candidate(proposals_repo):
     assert lesson["status"] == "candidate"
     assert lesson["active_knowledge_allowed"] is False
     assert lesson["evaluation"]["promotion"] == "auto_approved"
-    assert lesson["source"] == "patch_proposal"
+    assert lesson["source"] == "proposal_artifact"  # A.13: new records use canonical source
     assert lesson["case_name"] == "python_discount_validation"
     assert lesson["title"].startswith("Patch proposal:")
     assert "discount validation" in lesson["summary"].lower()

@@ -709,7 +709,7 @@ def test_create_lesson_from_proposal_works_after_validate(env, monkeypatch, tmp_
     lesson = create_lesson_from_proposal(proposal_dir)
 
     assert lesson["status"] == "candidate"
-    assert lesson["source"] == "patch_proposal"
+    assert lesson["source"] == "proposal_artifact"  # A.13: new records use canonical source
     assert lesson["active_knowledge_allowed"] is False  # candidate, not active
     # The lesson summary picks up our synthesized patch_proposal.summary,
     # which came from the first useful line of proposal.md ("Do X.").

@@ -173,8 +173,8 @@ def test_proposal_queue_flag_on_creates_candidate_lesson_for_validated_proposal(
     assert len(lessons) == 1
     lesson = lessons[0]
     assert lesson["id"] == result["lesson_id"]
-    assert lesson["source"] == "patch_proposal"
-    assert lesson["source_report"] == str(item_dir)
+    assert lesson["source"] == "proposal_artifact"  # A.13: new records use canonical source
+    assert lesson["source_report"] == str(item_dir)  # source_report retained as compat metadata
     assert lesson["status"] == "candidate"
     assert lesson["active_knowledge_allowed"] is False
 

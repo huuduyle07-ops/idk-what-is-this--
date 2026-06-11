@@ -311,8 +311,8 @@ def test_p1_legacy_dedup_does_not_rewrite_old_record(proposals_repo):
 def test_p2_delegates_to_p1_create_lesson_from_proposal(proposals_repo):
     """P2's _maybe_create_lesson_candidate delegates to create_lesson_from_proposal (P1).
 
-    Verified by observing that the created lesson carries source='patch_proposal',
-    which is set by P1 and not by any P2-private code.
+    Verified by observing that the created lesson carries source='proposal_artifact',
+    which is set by P1 (A.13) and not by any P2-private code.
     """
     from scripts import run_patch_proposal_queue as queue
 
@@ -330,8 +330,8 @@ def test_p2_delegates_to_p1_create_lesson_from_proposal(proposals_repo):
     assert result.get("lesson_candidate_created") is True
     lessons = lesson_store.list_lessons()
     assert len(lessons) == 1
-    assert lessons[0]["source"] == "patch_proposal", (
-        "P2 must create a lesson via P1 (source='patch_proposal')"
+    assert lessons[0]["source"] == "proposal_artifact", (
+        "P2 must create a lesson via P1 (source='proposal_artifact' after A.13)"
     )
 
 

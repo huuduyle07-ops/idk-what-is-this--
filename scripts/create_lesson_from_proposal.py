@@ -30,6 +30,11 @@ _REQUIRED_FILES = (
 # Keep lesson record compact: never embed full validation logs or huge diffs.
 _MAX_SUMMARY_CHARS = 600
 
+# A.13: canonical source identity for new proposal lesson candidates.
+# New records use CANONICAL_PROPOSAL_SOURCE; old records used LEGACY_PATCH_PROPOSAL_SOURCE.
+CANONICAL_PROPOSAL_SOURCE = "proposal_artifact"
+LEGACY_PATCH_PROPOSAL_SOURCE = "patch_proposal"
+
 
 def _default_proposals_root() -> Path:
     """Return the canonical `<repo_root>/.agent/proposals/` directory."""
@@ -250,7 +255,7 @@ def _find_existing_proposal_candidate_globally(
             return lesson, "source_key"
 
     # Check legacy patch_proposal/source_report identity
-    existing = find_lesson_by_source_report("patch_proposal", str(proposal_dir))
+    existing = find_lesson_by_source_report(LEGACY_PATCH_PROPOSAL_SOURCE, str(proposal_dir))
     if existing:
         return existing, "source_report"
 
@@ -346,8 +351,8 @@ def create_lesson_from_proposal(
     try:
         return lesson_store.save_candidate_lesson(
             candidate,
-            source="patch_proposal",
-            source_report=str(proposal_dir),
+            source=CANONICAL_PROPOSAL_SOURCE,
+            source_report=str(proposal_dir),  # retained as compatibility/debug metadata
             case_name=case_name,
             title=title,
             summary=summary,
