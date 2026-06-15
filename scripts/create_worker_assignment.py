@@ -51,6 +51,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--allowed-file", action="append", default=[], help="Extra allowed file.")
     parser.add_argument("--forbidden-file", action="append", default=[], help="Extra forbidden file.")
     parser.add_argument("--validation-command", action="append", default=[], help="Extra validation command to preserve.")
+    parser.add_argument("--assignment-id", default="", help="Optional stable assignment id for smoke tests or reruns.")
+    parser.add_argument("--created-at", default="", help="Optional ISO timestamp for deterministic JSON output.")
     parser.add_argument(
         "--output-root",
         default="",
@@ -76,6 +78,8 @@ def main(argv: list[str] | None = None) -> int:
         validation_commands=args.validation_command,
         dry_run=args.dry_run,
         output_root=args.output_root,
+        assignment_id=args.assignment_id or None,
+        created_at=args.created_at or None,
     )
 
     if args.json:

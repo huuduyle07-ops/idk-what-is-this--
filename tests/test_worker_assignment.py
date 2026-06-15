@@ -154,6 +154,32 @@ def test_markdown_contains_copy_paste_sections(tmp_path):
         assert heading in markdown
     assert "human approval required" in markdown.lower()
     assert "apply_allowed: false" in markdown
+    assert "Do not apply patches unless" in markdown
+    assert "outside allowed scope" in markdown
+    assert "visual evidence is required but unavailable" in markdown
+
+
+def test_inert_flags_regression(tmp_path):
+    repo = _repo(tmp_path)
+    source = _write_goal_brief(repo)
+
+    record = worker_assignment.create_worker_assignment(
+        repo_path=str(repo),
+        goal_brief_path=str(source),
+        dry_run=True,
+    )["record"]
+
+    expected_flags = {
+        "human_approval_required": True,
+        "apply_allowed": False,
+        "worker_launch_allowed": False,
+        "model_call_performed": False,
+        "patch_applied": False,
+        "validation_run": False,
+        "promotion_performed": False,
+    }
+    for key, expected in expected_flags.items():
+        assert record[key] is expected
 
 
 def test_dry_run_writes_nothing(tmp_path):
@@ -388,6 +414,95 @@ def test_cli_json_dry_run_and_missing_source(capsys, tmp_path):
     assert "source_not_found" in captured.err
 
 
+def test_cli_creates_json_and_markdown_from_goal_brief(capsys, tmp_path):
+    repo = _repo(tmp_path)
+    source = _write_goal_brief(repo)
+
+    rc = cli.main([
+        "--repo-path",
+        str(repo),
+        "--goal-brief",
+        str(source),
+        "--mode",
+        "debug",
+        "--role",
+        "implementer",
+        "--assignment-id",
+        "cli-smoke",
+        "--created-at",
+        "2026-01-01T00:00:00Z",
+        "--json",
+    ])
+    output = capsys.readouterr().out
+
+    assert rc == 0
+    parsed = json.loads(output)
+    assert parsed["status"] == "draft_created"
+    assert parsed["record"]["assignment_id"] == "cli-smoke"
+    assert Path(parsed["json_path"]).is_file()
+    assert Path(parsed["md_path"]).is_file()
+    markdown = Path(parsed["md_path"]).read_text(encoding="utf-8")
+    assert "## Stop Conditions" in markdown
+    assert "Do not apply patches unless" in markdown
+
+
+def test_cli_json_output_is_deterministic_with_fixed_metadata(capsys, tmp_path):
+    repo = _repo(tmp_path)
+    source = _write_goal_brief(repo)
+    argv = [
+        "--repo-path",
+        str(repo),
+        "--goal-brief",
+        str(source),
+        "--assignment-id",
+        "stable-cli",
+        "--created-at",
+        "2026-01-01T00:00:00Z",
+        "--dry-run",
+        "--json",
+    ]
+
+    first_rc = cli.main(argv)
+    first = capsys.readouterr().out
+    second_rc = cli.main(argv)
+    second = capsys.readouterr().out
+
+    assert first_rc == 0
+    assert second_rc == 0
+    assert first == second
+    assert json.loads(first)["record"]["assignment_id"] == "stable-cli"
+
+
+def test_cli_existing_assignment_does_not_overwrite(capsys, tmp_path):
+    repo = _repo(tmp_path)
+    source = _write_goal_brief(repo)
+    argv = [
+        "--repo-path",
+        str(repo),
+        "--goal-brief",
+        str(source),
+        "--assignment-id",
+        "no-overwrite",
+        "--created-at",
+        "2026-01-01T00:00:00Z",
+        "--json",
+    ]
+
+    first_rc = cli.main(argv)
+    first = json.loads(capsys.readouterr().out)
+    json_path = Path(first["json_path"])
+    original = json_path.read_text(encoding="utf-8")
+    json_path.write_text(original + "\n", encoding="utf-8")
+    changed = json_path.read_text(encoding="utf-8")
+    second_rc = cli.main(argv)
+    second = json.loads(capsys.readouterr().out)
+
+    assert first_rc == 0
+    assert second_rc == 1
+    assert second["status"] == "already_exists"
+    assert json_path.read_text(encoding="utf-8") == changed
+
+
 def test_no_forbidden_imports_or_calls_in_worker_assignment_layers():
     module_tree = ast.parse(Path(worker_assignment.__file__).read_text(encoding="utf-8"))
     script_tree = ast.parse(Path(cli.__file__).read_text(encoding="utf-8"))
@@ -410,6 +525,7 @@ def test_no_forbidden_imports_or_calls_in_worker_assignment_layers():
         "n8n",
         "openai",
         "patching",
+        "project_evolution_mode",
         "requests",
         "socket",
         "subprocess",
@@ -452,6 +568,8 @@ def test_no_forbidden_imports_or_calls_in_worker_assignment_layers():
         "run",
         "run_benchmark",
         "run_benchmarks",
+        "run_handoff",
+        "run_overnight",
         "run_validation_command",
         "system",
         "urlopen",
@@ -492,9 +610,13 @@ def test_web_route_creates_assignment_artifact(client, tmp_path):
     assert body["ok"] is True
     assert Path(body["json_path"]).is_file()
     assert Path(body["md_path"]).is_file()
+    assert body["record"]["assignment_id"]
+    assert body["json_path"].endswith("worker_assignment.json")
+    assert body["md_path"].endswith("worker_assignment.md")
     assert body["markdown"].startswith("# Worker Assignment")
     assert body["record"]["worker_launch_allowed"] is False
     assert body["record"]["apply_allowed"] is False
+    assert body["record"]["validation_run"] is False
 
 
 def test_web_button_is_draft_only(client):
@@ -502,6 +624,8 @@ def test_web_button_is_draft_only(client):
 
     assert "Create Worker Assignment" in html
     assert 'id="workerAssignmentPreview"' in html
+    assert 'id="workerAssignmentMarkdownText"' in html
+    assert ">Copy assignment</button>" in html
     start = html.index("async function createWorkerAssignmentFromGoalBrief()")
     end = html.index("function _renderWorkerAssignmentPreview", start)
     function_body = html[start:end]
@@ -519,6 +643,19 @@ def test_web_button_is_draft_only(client):
     ]
     for endpoint in forbidden_endpoints:
         assert endpoint not in function_body
+
+
+def test_web_preview_renders_assignment_paths_and_copyable_markdown(client):
+    html = client.get("/").get_data(as_text=True)
+    start = html.index("function _renderWorkerAssignmentPreview")
+    end = html.index("function copyWorkerAssignmentMarkdown", start)
+    function_body = html[start:end]
+
+    assert "Assignment ID" in function_body
+    assert "JSON path" in function_body
+    assert "Markdown path" in function_body
+    assert "workerAssignmentMarkdownText" in function_body
+    assert ".value = _workerAssignmentMarkdown" in function_body
 
 
 def test_web_route_source_is_not_worker_launch_apply_validate_or_promote():

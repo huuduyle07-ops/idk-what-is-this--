@@ -404,10 +404,11 @@
               <button type="button" onclick="updateGoalBrief()">Send reply</button>
               <button type="button" onclick="copyGoalBriefFinalPrompt()">Copy final prompt</button>
               <button type="button" onclick="createWorkerAssignmentFromGoalBrief()">Create Worker Assignment</button>
-              <button type="button" id="workerAssignmentCopy" onclick="copyWorkerAssignmentMarkdown()" disabled>Copy Assignment Markdown</button>
+              <button type="button" id="workerAssignmentCopy" onclick="copyWorkerAssignmentMarkdown()" disabled>Copy assignment</button>
               <button type="button" disabled title="Placeholder for a later gated handoff.">Send to Dream later</button>
             </div>
             <pre id="workerAssignmentPreview" class="review-pack-preview" aria-live="polite">No worker assignment created yet.</pre>
+            <textarea id="workerAssignmentMarkdownText" class="review-pack-preview" readonly rows="12" aria-label="Copyable Worker Assignment Markdown">No worker assignment Markdown yet.</textarea>
 
             <div class="goal-brief-main">
               <div class="goal-brief-conversation">
@@ -5726,23 +5727,24 @@ async function createWorkerAssignmentFromGoalBrief() {
 
 function _renderWorkerAssignmentPreview(data) {
     const preview = document.getElementById("workerAssignmentPreview");
+    const markdownText = document.getElementById("workerAssignmentMarkdownText");
     const copyButton = document.getElementById("workerAssignmentCopy");
     if (!preview) return;
     if (!data || !data.ok) {
         preview.textContent = "No worker assignment created yet.";
+        if (markdownText) markdownText.value = "No worker assignment Markdown yet.";
         if (copyButton) copyButton.disabled = true;
         return;
     }
     const record = data.record || {};
     preview.textContent = [
-        `JSON: ${data.json_path || ""}`,
-        `Markdown: ${data.md_path || ""}`,
-        "",
-        data.markdown || "",
-        "",
+        `Assignment ID: ${record.assignment_id || ""}`,
+        `JSON path: ${data.json_path || ""}`,
+        `Markdown path: ${data.md_path || ""}`,
         `apply_allowed: ${record.apply_allowed === true ? "true" : "false"}`,
         `worker_launch_allowed: ${record.worker_launch_allowed === true ? "true" : "false"}`,
     ].join("\n").trim();
+    if (markdownText) markdownText.value = _workerAssignmentMarkdown;
     if (copyButton) copyButton.disabled = !_workerAssignmentMarkdown;
 }
 

@@ -92,7 +92,7 @@ python scripts/create_worker_assignment.py --repo-path . --goal-brief .agent/goa
 python scripts/create_worker_assignment.py --repo-path . --seed-draft .agent/external_queue_exports/<id>/goal_brief_seed_draft.json --mode documentation --role documenter --dry-run --json
 ```
 
-In the web UI, create or update a Goal Brief, then click **Create Worker Assignment**. Copy the Markdown to Codex / Claude / Gemini / Ollama manually. The route card keeps `human_approval_required=true`, `apply_allowed=false`, and `worker_launch_allowed=false`.
+In the web UI, create or update a Goal Brief, then click **Create Worker Assignment**. The UI shows the assignment id, JSON path, Markdown path, and a read-only Markdown box with a **Copy assignment** button. Copy the Markdown to Codex / Claude / Gemini / Ollama manually. The route card keeps `human_approval_required=true`, `apply_allowed=false`, and `worker_launch_allowed=false`; no worker is launched automatically.
 
 Important files:
 

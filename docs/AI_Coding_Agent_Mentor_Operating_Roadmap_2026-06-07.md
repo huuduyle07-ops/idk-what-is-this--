@@ -732,6 +732,12 @@ Guardrail: Track F is draft/suggestion/prompt-generation only. It does not execu
 F.5 shipment checkpoint:
 - Targeted pytest: `tests/test_worker_assignment.py`
 
+### F.5a Worker Assignment Smoke + Copy UX Polish
+- add web and CLI smoke coverage for Worker Assignment artifact creation, dry-run, JSON output, missing source, and no-overwrite behavior
+- show assignment id, JSON path, Markdown path, and copyable Markdown in the Goal Brief UI
+- keep the flow draft-only and inert
+- no worker/model/patch/validation/Dream/Project Evolution/webhook/promotion behavior
+
 Current benchmark catalog:
 - benchmark --check: 54 checked, 0 errors
 
