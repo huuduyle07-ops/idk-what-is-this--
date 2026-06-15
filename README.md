@@ -105,6 +105,43 @@ Important files:
 - `core/health.py`
 - `core/benchmarks_view.py`
 
+### 1.7. Driver Model Routing Contract (H.1)
+
+Worker Assignment tells the human *what* task to send. The Driver tells them *what model level* ("vehicle") is appropriate — but it does not drive yet. H.1 is **contract/report-only**: it reads a worker assignment and recommends the safest allowed vehicle. No model is called, no provider is switched, no worker is launched, no patch is applied, no validation runs, and no Dream / Project Evolution / lesson-promotion path starts.
+
+Vehicle levels (stable string constants):
+
+- `local_only` — a local/free model is enough
+- `free_model_ok` — a free model is fine
+- `cheap_api_ok` — a cheap API is okay
+- `strong_model_recommended` — a stronger API is recommended
+- `strong_model_requires_approval` — strong model, only after explicit human approval
+- `vision_or_human_caption_required` — a vision model or a human caption summary is required
+- `human_only` — a human must handle it
+- `blocked` — not permitted in this contract
+
+Default output:
+
+- `.agent/driver_decisions/<driver_decision_id>/driver_decision.json`
+- `.agent/driver_decisions/<driver_decision_id>/driver_decision.md`
+
+CLI — create a Worker Assignment, then evaluate the Driver Decision and copy the route manually:
+
+```bash
+python scripts/create_worker_assignment.py --repo-path . --goal-brief .agent/goal_briefs/<timestamp>/goal_brief.json
+python scripts/evaluate_driver_route.py --worker-assignment .agent/worker_assignments/<assignment_id>/worker_assignment.json
+```
+
+Optional flags: `--json`, `--dry-run`, `--output-root`, plus deterministic `--driver-decision-id` / `--created-at` hooks. The two steps stay separate: F.5 does not auto-run H.1, and H.1 never executes anything — copy the recommended vehicle from the decision and route the work yourself. The decision JSON always carries inert flags `model_call_performed`, `provider_switch_performed`, `worker_launch_performed`, `patch_applied`, `validation_run`, and `promotion_performed`, all `false`.
+
+Routing highlights: Review-only → `local_only`/`free_model_ok`; narrow Debug with validation → `free_model_ok`; missing validation → at least `cheap_api_ok` + `missing_validation` flag; Project Evolution → `strong_model_recommended` + approval; Dream Trial → experimental flag + approval (Dream does not start); visual evidence (screenshot / UI layout / chart / OCR / design) → `vision_or_human_caption_required`; security-sensitive work (secrets / API key / auth / token / credential / webhook security) → `strong_model_requires_approval`; `apply_allowed` / `worker_launch_allowed` → `blocked`; missing allowed files → `scope_unclear`; External Queue source → `external_untrusted_source` and never below `free_model_ok`. This contract is the routing foundation for the future A.16 Visual Evidence Intake Contract.
+
+Important files:
+
+- `core/driver_model_routing.py`
+- `scripts/evaluate_driver_route.py`
+- `tests/test_driver_model_routing.py`
+
 ### 2. Task Router
 
 Before the agent can help, it tries to understand what kind of request it received.
@@ -706,6 +743,7 @@ Column guide:
 | **MCP Read-only Server** | Let an MCP client inspect evidence and reports | MCP tool call | Evidence JSON | No | No | No | No | N/A | 10-tool read-only allowlist; no write tools exposed |
 | **MCP Artifact-write Server** | Let an MCP client create handoffs or validate proposals | MCP tool call | Artifact JSON, validation result | No | Yes (`.agent/` scoped) | No | No | Explicit tool call per action | Audit ledger; no real-repo patch apply; validation is temp-clone only |
 | **External Queue / n8n / Discord** | Receive item candidates from external automation | Webhook payload | Dream candidate or Project Evolution candidate | No | Candidate only | No | No | Human approval before any run or apply | Candidate-only write; no auto-execute; webhook cannot reach real-repo patch path |
+| **Driver Model Routing (H.1)** | Recommend the safest allowed model "vehicle" for a worker assignment | `worker_assignment.json` (F.5) | `driver_decision.json`, `.md` | No | Yes (`.agent/driver_decisions/`) | No | No | Recommend-only; `approval_required` set per task; never executes | Contract/report-only; no model call, provider switch, worker launch, patch, validation, Dream, or promotion |
 
 #### Allowed transitions
 
@@ -718,6 +756,7 @@ Column guide:
 - Executable Patch Draft → Review Gate ✅
 - External Queue → Dream Candidate / Project Evolution Candidate ✅
 - Worker Run → Imported Proposal → Temp-clone validation ✅
+- Worker Assignment → Driver Decision (recommend-only) ✅
 
 #### Forbidden transitions
 
@@ -728,6 +767,7 @@ Column guide:
 - MCP Artifact-write → real repo patch apply ❌
 - Worker Run → active lesson without proposal review ❌
 - Lesson → override user request, repo state, validation, or Patch Safety gate ❌
+- Driver Decision → model call / provider switch / worker launch / patch apply ❌
 
 #### Power leakage rule
 
@@ -1124,6 +1164,7 @@ This is an active AI engineering project, not a tiny demo. The code already incl
 - read-only and artifact-write MCP servers with a narrow allowlist, including temp-clone imported-proposal validation
 - MCP audit route and local MCP Inspector shortcuts
 - universal node weights with a lesson-history penalty term that biases CONTROL DFS, project-map rankings, and Obsidian AI_READ_FIRST toward files and symbols with prior failures; explainability CLI (`scripts/explain_graph_weights.py`) audits each node's topology, complexity, and penalty contributions
+- **H.1 Driver Model Routing Contract — complete (contract/report-only).** Evaluates a Worker Assignment (F.5) and recommends the safest allowed vehicle (`local_only` → `blocked`) into `.agent/driver_decisions/`, via `python scripts/evaluate_driver_route.py --worker-assignment <path>`. No real model switching yet — it never calls a model, switches providers, launches a worker, applies a patch, runs validation, triggers Dream / Project Evolution execution, calls webhooks, or promotes lessons (guardrail-tested). Lays the routing foundation for the future A.16 Visual Evidence Intake Contract.
 
 ## Short Summary
 

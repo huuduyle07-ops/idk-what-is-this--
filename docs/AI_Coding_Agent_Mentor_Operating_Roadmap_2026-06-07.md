@@ -722,7 +722,7 @@ Guardrail: Track F is draft/suggestion/prompt-generation only. It does not execu
 - generate a final prompt for Claude/Codex/Gemini worker
 - include constraints, allowed files, validation, stop conditions
 
-### F.5 One-click Worker Assignment / Route Card
+### F.5 One-click Worker Assignment / Route Card ✅
 - create a draft Worker Assignment from a Goal Brief, Handoff, Review Pack, or External Queue seed draft
 - write `.agent/worker_assignments/<assignment_id>/worker_assignment.json` and `.md`
 - include mode, worker role, allowed/forbidden files, validation commands, stop conditions, safety rules, and final summary format
@@ -732,7 +732,7 @@ Guardrail: Track F is draft/suggestion/prompt-generation only. It does not execu
 F.5 shipment checkpoint:
 - Targeted pytest: `tests/test_worker_assignment.py`
 
-### F.5a Worker Assignment Smoke + Copy UX Polish
+### F.5a Worker Assignment Smoke + Copy UX Polish ✅
 - add web and CLI smoke coverage for Worker Assignment artifact creation, dry-run, JSON output, missing source, and no-overwrite behavior
 - show assignment id, JSON path, Markdown path, and copyable Markdown in the Goal Brief UI
 - keep the flow draft-only and inert
@@ -810,101 +810,49 @@ Evaluate whether Scrapling/WebBridge and Arkon can help C.A.T.T.U.S collect publ
 - output only local research notes
 
 ---
-## Track H — Cost Pressure / Model Budget Control
+## Track H — Driver Model Routing
 
 Purpose:
-C.A.T.T.U.S must reduce dependence on expensive AI model usage. Recent usage patterns show token/model limits are becoming the bottleneck, so the system should become stronger at local/rule-based decisions, cheap-first routing, and explicit expensive-model approval.
+Tell the operator which model "vehicle" level a task deserves *before* any model is called. The Driver recommends the safest allowed vehicle; it never auto-spends, auto-escalates, or executes. Expensive AI should be a specialist, not oxygen.
 
 Main principle:
-Expensive AI should be a specialist, not oxygen.
+The Driver does not drive yet. It only recommends the safest allowed vehicle.
 
-### H.1 — Cost Pressure / Token Burden Report
+### H.1 — Driver Model Routing Contract ✅
 Goal:
-Produce a local report showing where C.A.T.T.U.S is likely causing unnecessary model usage.
+Evaluate a Worker Assignment (F.5) and recommend the safest allowed vehicle level.
 
-Questions:
-- Which modes call models?
-- Which flows can be local/rule-based?
-- Which artifacts duplicate each other?
-- Which tasks should never use expensive models?
-- Which tasks require human approval before expensive model calls?
+Vehicle levels (stable string constants):
+- `local_only`
+- `free_model_ok`
+- `cheap_api_ok`
+- `strong_model_recommended`
+- `strong_model_requires_approval`
+- `vision_or_human_caption_required`
+- `human_only`
+- `blocked`
 
-Rules:
-- Report-only.
-- No model calls.
-- No routing behavior change.
-- No patch/apply.
+Behaviour:
+- Reads a `worker_assignment.json` (or a plain dict) and inspects mode, worker role, allowed/forbidden files, validation commands, stop conditions, safety rules, expected output, source type, and the apply / worker-launch / approval flags.
+- Writes inert `.agent/driver_decisions/<driver_decision_id>/driver_decision.json` and `.md`.
+- Recommends per task: Review-only → local/free; narrow Debug with validation → free; missing validation → at least cheap API + `missing_validation`; Project Evolution → strong + approval (`broad_change`); Dream Trial → cheap/strong + approval (`experimental_workflow`, Dream does not start); visual evidence → `vision_or_human_caption_required`; security-sensitive → `strong_model_requires_approval`; `apply_allowed` / `worker_launch_allowed` → `blocked`; missing allowed files → `scope_unclear`; External Queue source → `external_untrusted_source`, never below free.
 
-### H.2 — Model Budget Gate Contract
-Goal:
-Define a permission model for local / cheap / expensive / blocked model usage.
+Rules (contract/report-only — verified by guardrail tests):
+- No model call. No provider switch. No API spend.
+- No worker launch. No patch apply. No validation run.
+- No Dream. No Project Evolution execution. No webhook/network. No lesson promotion.
 
-Possible categories:
-- local_only
-- cheap_model_allowed
-- expensive_model_requires_approval
-- blocked
+Status:
+- Complete. Contract/report-only — no real model switching yet.
+- CLI: `python scripts/evaluate_driver_route.py --worker-assignment <path>` (optional `--json`, `--dry-run`, `--output-root`, deterministic `--driver-decision-id` / `--created-at`).
+- Files: `core/driver_model_routing.py`, `scripts/evaluate_driver_route.py`, `tests/test_driver_model_routing.py`.
+- Shipment checkpoint: `python -m pytest tests/test_driver_model_routing.py -q` (23 cases) — also covered by `python -m compileall` and the existing `benchmarks/run_benchmarks.py --check`.
 
-Rules:
-- Contract/metadata/tests only.
-- No automatic routing change yet.
-- No provider-specific lock-in.
+### H.2 — Model Budget / Provider Switch (future)
+- Turn the H.1 recommendation into an actual, approval-gated model/provider choice.
+- Deferred: H.1 stays recommend-only until a separate human-approved execution phase exists.
 
-### H.3 — Cheap-First Router Policy
-Goal:
-Route simple classification/listing/review/report tasks away from expensive models.
-
-Cheap/local candidates:
-- external queue import
-- external queue review
-- external queue index
-- review gate risk classification
-- mode matrix/doc generation
-- artifact summaries
-- path safety
-- benchmark check parsing
-
-Expensive model candidates:
-- hard root-cause analysis
-- architecture audit
-- broad migration planning
-- final review for dangerous changes
-
-Rules:
-- Preserve human approval for expensive runs.
-- Never let n8n/Discord trigger expensive model usage directly.
-
-### H.4 — Model Usage Ledger
-Goal:
-Record model calls by mode, task type, provider, estimated cost/tokens when available, and outcome usefulness.
-
-Purpose:
-Allow future decisions like:
-- which model saved time
-- which model produced generic output
-- which flow burned tokens
-- which mode should be downgraded to local rules
-
-### H.5 — Expensive Audit Scorecard
-Goal:
-Evaluate expensive architecture audits using a fixed rubric.
-
-Score dimensions:
-- file-specific insight
-- real redundancy found
-- safe simplification path
-- respects Mode Matrix
-- no hallucinated modules/features
-- cheaper-model comparison
-
-Current optimization note:
-C.A.T.T.U.S is also now being optimized to reduce operator burden and external model dependence:
-- fewer repeated audits
-- fewer expensive model calls
-- more local/rule-based review
-- stronger artifact visibility
-- explicit budget gates before expensive reasoning
----
+H.1 supports the future **A.16 Visual Evidence Intake Contract**: when a task needs visual evidence, H.1 already routes to `vision_or_human_caption_required` instead of letting a text-only model pretend it verified a screenshot.
 
 ---
 
@@ -989,7 +937,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | Track | Feature | Purpose |
 | --- | --- | --- |
 | **F.5** | One-click Worker Assignment / Route Card | Shipped draft route card for manual worker assignment |
-| **H.1** | Driver Model Routing Contract | Contract-only definition of local/cheap/strong/blocked model tiers |
+| **H.1** ✅ | Driver Model Routing Contract | Shipped contract that recommends the safest model vehicle for a worker assignment (report-only) |
 | **A.16** | Visual Evidence Intake Contract | How screenshots/visual output enters the evidence chain |
 | **F.6** | Lesson Teaching Card / Teacher Mode | Present lessons in a teaching-friendly format |
 
@@ -1024,3 +972,35 @@ Possible later phases for the District Model. **Do not implement any of these ye
 - **D.3** City Hall Router Draft
 - **D.4** Research / Journalist District Brief
 - **D.5** Teacher District Teaching Card
+
+#### District: Admission Guidance District
+
+>Project status: **hibernation / data collection mode**.
+The system will collect market signal history until the next admission cycle.
+Planned resume window: April 2027.
+Current priority is C.A.T.T.U.S / Coding District.
+
+Purpose:
+- Estimate high-school admission risk/probability.
+- Explain score gap versus historical cutoff.
+- Classify student planning posture into 4 practical groups.
+- Read market/exam-season signals.
+- Help students/families make safer NV1/NV2 decisions.
+
+Hard limits:
+- No guaranteed admission claims.
+- No mental-health diagnosis.
+- No shaming students.
+- No storing sensitive student data without clear consent.
+- No public ranking of individual students.
+- No fully automated advice without uncertainty display.
+
+Outputs:
+- risk band
+- admission probability estimate
+- persona/planning group
+- recommended next action
+- uncertainty explanation
+- family-pressure warning, if relevant
+
+
