@@ -182,6 +182,7 @@ def _modern_report_signal(result: dict[str, Any]) -> bool:
         )
         or "failure_kind" in result
         or "failure_kind_display" in result
+        or "failure_category" in result
     )
 
 
@@ -195,6 +196,17 @@ def _failure_kind_display(result: dict[str, Any]) -> str:
         if mapped:
             return mapped
     return "CODE / UNKNOWN"
+
+
+def failure_category_display(result: dict[str, Any]) -> str:
+    """Return a display string for failure_category (backward-compatible).
+
+    Falls back to empty string when the field is absent (old reports).
+    """
+    cat = result.get("failure_category")
+    if isinstance(cat, str) and cat.strip():
+        return cat.strip().replace("_", " ").upper()
+    return ""
 
 
 def _top_duration_cases(results: list[dict[str, Any]], limit: int = 5) -> list[dict[str, Any]]:
@@ -337,11 +349,15 @@ def summarize_run_health(report: dict[str, Any] | None) -> dict[str, Any]:
     )
 
     failure_kind_counts: dict[str, int] = {}
+    failure_category_counts: dict[str, int] = {}
     for result in results:
         if result.get("success") is True or result.get("skipped"):
             continue
         display = _failure_kind_display(result)
         failure_kind_counts[display] = failure_kind_counts.get(display, 0) + 1
+        cat = result.get("failure_category")
+        if isinstance(cat, str) and cat:
+            failure_category_counts[cat] = failure_category_counts.get(cat, 0) + 1
 
     scope_counts = {scope: 0 for scope in _FILE_CHANGE_SCOPES}
     for result in results:
@@ -380,6 +396,7 @@ def summarize_run_health(report: dict[str, Any] | None) -> dict[str, Any]:
         "pass_rate_display": pass_rate_display,
         "health_label": health_label,
         "failure_kind_counts": dict(sorted(failure_kind_counts.items())),
+        "failure_category_counts": dict(sorted(failure_category_counts.items())),
         "environment_or_toolchain_failure_count": environment_or_toolchain_failure_count,
         "code_unknown_failure_count": code_unknown_failure_count,
         "clean_scope_count": scope_counts["CLEAN"],

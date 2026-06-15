@@ -49,6 +49,7 @@ from core import goal_brief as goal_brief_core
 from core import goal_brief_autocomplete as goal_brief_autocomplete_core
 from core import mode_router as mode_router_core
 from core import review_pack_generator as review_pack_generator_core
+from core import worker_assignment as worker_assignment_core
 from core.patch_safety import evaluate_patch_safety
 from core.mcp_audit import list_mcp_invocations
 from database.memory_consolidator import consolidate_all
@@ -3186,6 +3187,31 @@ def _split_csv(value: str | None) -> list[str]:
         if s and s not in out:
             out.append(s)
     return out
+
+
+@app.route("/worker-assignments/create", methods=["POST"])
+def worker_assignments_create_route():
+    if request.is_json:
+        payload = request.get_json(silent=True)
+        data = payload if isinstance(payload, dict) else {}
+    else:
+        data = request.form.to_dict()
+
+    result = worker_assignment_core.create_worker_assignment(
+        repo_path=(str(data.get("repo_path") or "").strip() or "."),
+        goal_brief_path=(str(data.get("goal_brief_path") or "").strip() or None),
+        handoff_path=(str(data.get("handoff_path") or "").strip() or None),
+        seed_draft_path=(str(data.get("seed_draft_path") or "").strip() or None),
+        review_pack_path=(str(data.get("review_pack_path") or "").strip() or None),
+        mode=(str(data.get("mode") or "debug").strip() or "debug"),
+        worker_role=(str(data.get("role") or data.get("worker_role") or "implementer").strip() or "implementer"),
+        allowed_files=data.get("allowed_files"),
+        forbidden_files=data.get("forbidden_files"),
+        validation_commands=data.get("validation_commands"),
+    )
+    if not result.get("ok"):
+        return result, 400
+    return result
 
 
 @app.route("/handoffs/compose", methods=["POST"])

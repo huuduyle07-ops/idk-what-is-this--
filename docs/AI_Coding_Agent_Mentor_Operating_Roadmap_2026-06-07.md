@@ -158,6 +158,32 @@ Current benchmark truth remains:
 
 - `benchmark --check`: 54 checked, 0 errors
 
+### A.10d: Failure Category Fresh Run Smoke (Phase 14.7a) ✅
+
+Smoke verification that `failure_category` metadata and all display layers work correctly on a real benchmark report — not only in fixture tests.
+
+Changed files:
+- `scripts/create_failure_category_smoke_report.py` — read-only smoke script: loads the latest benchmark report, re-enriches failing cases through `with_failure_category_fields()`, checks all display layers (Run Health, Markdown, web render, backward compat), and writes two audit artifacts to `.agent/audits/`
+
+New file: `tests/test_failure_category_smoke.py` — 5 tests (category fields detected, missing fields no crash, web render with category row, old report no category row, AST guardrail on smoke script)
+
+Audit artifacts generated: `.agent/audits/20260613_081410_failure-category-fresh-run-smoke.json/.md` — ALL CHECKS PASSED
+
+Validation: 3033 tests, compileall OK, benchmark --check 54/0.
+
+### A.10c: Failure Category Trend Display (Phase 14.7) ✅
+
+Makes `failure_category` metadata useful to the operator through display in benchmark reports and UI.
+
+Changed files:
+- `benchmarks/run_benchmarks.py` — Markdown Run Health section now includes optional "Failure categories" compact line; Failed Cases section now includes `category: <cat> / <confidence> / <rule>` per case (only when field is present)
+- `core/failure_taxonomy_trends.py` — added `extract_failure_category_counts(report)` helper; `compare_failure_taxonomies` per-report entries now optionally include `failure_category_counts` when present in case records
+- `web/templates/index.html` — added `_benchFailureCategoryText()` JS helper; `_benchRunHealthSummary` computes `failure_category_counts` from results and includes it in the return; `_renderBenchRunHealth` shows a "Failure categories" row when data exists; failing case detail shows category text if present
+
+New test file: `tests/test_failure_category_trend.py` — 18 tests (4 run health, 2 Markdown, 3 web/view, 2 trends/evidence, 7 AST-based guardrails)
+
+Guardrails: old benchmark reports without `failure_category` render without error. Scoring, retrieval, patch behavior, prompts, lessons, Dream, and Project Evolution are unchanged. `failure_category` metadata remains observational only.
+
 ### Goals:
 
 - keep patches small
@@ -165,6 +191,44 @@ Current benchmark truth remains:
 - improve speed/cost
 - reduce UI complexity
 - expand benchmark coverage
+
+### A.10: Failure Taxonomy Derivation Report (Phase 14.5) ✅
+
+Read-only scan of existing `.agent/` benchmark artifacts that derives a stable 13-category failure taxonomy without changing runtime behavior.
+
+New files:
+- `core/failure_taxonomy_derivation.py` — stdlib-only mapper with `DERIVATION_CATEGORIES` (13 categories), `classify_benchmark_case()`, and `derive_taxonomy_report()`
+- `scripts/create_failure_taxonomy_derivation_report.py` — CLI that writes `<stamp>_failure-taxonomy-derivation.json/.md` to `.agent/audits/`
+- `tests/test_failure_taxonomy_derivation.py` — 39 tests (AST-based import guard)
+
+Categories (stable, ordered): `toolchain_environment`, `security_tool_or_permission`, `validation_command_gap`, `wrong_file_or_decoy`, `forbidden_file_or_scope_violation`, `missing_import_or_dependency`, `async_or_lifecycle_bug`, `state_mutation_or_side_effect`, `data_validation_or_boundary`, `root_cause_multifile`, `false_positive_no_patch`, `insufficient_evidence`, `unknown`.
+
+Guardrails: no model calls, no Flask, no DB, no subprocess, no patch apply, no lesson promotion. Report-only; does not change scoring, retrieval, patching, or lessons.
+
+### A.10a: Unknown Failure Category Review (Phase 14.5a) ✅
+
+Read-only review of unknown/unmapped cases from the Phase 14.5 derivation artifact. Proposes rule improvements without applying them.
+
+New files:
+- `core/failure_unknown_review.py` — stdlib-only reviewer with `REVIEW_OUTCOMES` (5 outcomes), `review_unknown_case()`, `build_unknown_review()`, and Phase 14.6 readiness computation
+- `scripts/create_failure_unknown_review.py` — CLI that reads latest derivation artifact and writes `<stamp>_failure-unknown-review.json/.md`
+- `tests/test_failure_unknown_review.py` — 37 tests
+
+Review outcomes: `candidate_mapping_rule`, `candidate_new_category`, `environment_or_tool_noise`, `insufficient_evidence`, `leave_unknown`. Phase 14.6 readiness: `ready_with_unknown_bucket` (unknown is valid — do not force-map).
+
+### A.10b: failure_category Metadata on New Reports (Phase 14.6) ✅
+
+Adds four display-only `failure_category` fields to newly generated benchmark case results using a deterministic priority-ordered mapper.
+
+New files:
+- `core/failure_category.py` — stdlib-only mapper with `FAILURE_CATEGORIES` (same 13 categories) and `derive_failure_category(case_record)` returning `failure_category`, `failure_category_confidence`, `failure_category_rule`, `failure_category_reason`
+- `tests/test_failure_category.py` — 37 tests (10 mapper rules, 7 report integration, 7 guardrails + extra bench_cat coverage)
+
+Changed files:
+- `benchmarks/run_benchmarks.py` — added `with_failure_category_fields()` (parallel to `with_failure_kind_fields()`), called at enrichment point after `with_failure_kind_fields`
+- `core/benchmarks_view.py` — added `failure_category_display()` (backward-compatible, empty string on old reports), added `failure_category_counts` to `summarize_run_health()`, updated `_modern_report_signal()` to include `failure_category` key
+
+Guardrails: scoring, pass/fail, retries, patch generation, patch safety, validation, retrieval, lessons, anti-lessons, Dream, Project Evolution, model prompts, and routing are unchanged. `failure_category` is added after scoring is settled and does not affect any existing fields.
 
 ---
 
@@ -469,6 +533,116 @@ Rules preserved:
 
 ---
 
+### B.16 - External Queue Detail/View CLI shipped
+
+Added a read-only detail command for inspecting one External Queue item by queue id.
+
+- Core helper: `load_external_queue_item_detail(...)` in `core/external_queue_index.py`
+- CLI: `scripts/show_external_queue_item.py`
+- Shows identity, content summary, gate status, risk/safety warnings, linked artifacts, and review metadata.
+- `--json` emits deterministic sorted-key JSON; `--include-raw` can include parsed raw item/review JSON.
+- Handles missing queue ids, invalid item JSON, invalid review JSON, missing optional fields, missing linked paths, and ambiguous duplicate queue ids without crashing.
+
+Rules preserved:
+- Viewing remains read-only.
+- No import/review writes.
+- No conversion.
+- No Dream item creation.
+- No Goal Brief creation.
+- No Project Evolution plan creation.
+- No lesson promotion.
+- No patch/apply.
+- No model calls.
+- No Discord/n8n/Zalo/webhook/network calls.
+- No live external integration.
+
+### B.17 - External Queue Export Draft shipped
+
+Added a draft-only bridge from a reviewed External Queue item into inert seed artifacts for later human review.
+
+- Core helper: `core/external_queue_export.py`
+- CLI: `scripts/export_external_queue_item.py`
+- Supported targets:
+  `goal_brief_seed`, `dream_candidate_seed`, `project_evolution_seed`
+- Output path:
+  `.agent/external_queue_exports/<queue_id>/<target>_draft.{json,md}`
+- Requires a valid `external_queue_review.json` by default.
+- Review recommendation must match the requested target.
+- Existing draft files return `already_exists` and are not overwritten.
+- `--dry-run` reports the draft without writing files.
+- `--json` emits deterministic sorted-key JSON status output.
+
+Rules preserved:
+- Export creates draft artifacts only.
+- No real Goal Brief is created.
+- No Dream item is created and no Dream run starts.
+- No Project Evolution plan is created.
+- No model calls.
+- No webhook/network/Discord/n8n/Zalo calls.
+- No patch/apply.
+- No lesson promotion.
+- No validation command is run.
+- Human approval remains required before any target workflow starts.
+
+### B.17a - External Queue Export Smoke + Operator Examples ✅
+
+Smoke coverage and operator examples proving all three B.17 export targets work safely.
+
+- README "Export reviewed item as draft" section now shows examples for all three targets (`goal_brief_seed`, `dream_candidate_seed`, `project_evolution_seed`) plus `--dry-run` and `--json`.
+- Added `test_dream_candidate_seed_smoke_inert_flags_and_no_dream_artifact` — verifies all inert safety flags and confirms no Dream inbox directory is created.
+- Added `test_project_evolution_seed_smoke_inert_flags_and_no_plan_artifact` — verifies all inert safety flags and confirms no Project Evolution directory is created.
+- Added `test_readme_export_examples_cover_all_three_targets` — asserts all three `SUPPORTED_TARGETS` appear in the README export section.
+- No export behavior changed. Still draft-only, still requires human approval before any target workflow.
+
+### B.17b — External Queue Slice Closure Note ✅
+
+**B.12 through B.17a is complete and safe. The External Queue slice is closed.**
+
+#### Complete operator pipeline
+
+```
+import inert item
+  └─ scripts/import_external_queue_item.py  (B.12)
+       .agent/external_queue/<queue_id>/external_queue_item.{json,md}
+
+review recommendation
+  └─ scripts/create_external_queue_review.py  (B.14)
+       .agent/external_queue/<queue_id>/external_queue_review.{json,md}
+       recommendation: reject | needs_more_evidence
+                     | convert_to_goal_brief_seed
+                     | convert_to_dream_candidate
+                     | convert_to_project_evolution_candidate
+
+list / index
+  └─ scripts/list_external_queue.py  (B.15, B.15a)
+       read-only compact table or --json
+
+detail / view
+  └─ scripts/show_external_queue_item.py  (B.16)
+       read-only identity + content + risk + review metadata
+
+export inert seed draft
+  └─ scripts/export_external_queue_item.py  (B.17, B.17a)
+       .agent/external_queue_exports/<queue_id>/<target>_draft.{json,md}
+       target: goal_brief_seed | dream_candidate_seed | project_evolution_seed
+```
+
+#### What this slice never does
+
+- No auto Dream run.
+- No Goal Brief activation or creation.
+- No Project Evolution plan creation.
+- No patch or apply on any file.
+- No lesson promotion.
+- No model calls.
+- No webhooks, live Discord, n8n, or Zalo calls.
+- No subprocess or network calls from core export helper.
+- Human approval is required before any target workflow starts.
+
+#### Suggested next future phase
+
+**B.18 — Human-approved seed promotion gate** (deferred): a CLI or web action that takes a reviewed export draft and hands it to the appropriate target workflow (Goal Brief, Dream, or Project Evolution) after explicit operator confirmation. Not implemented in this slice.
+
 ## Track C — External Benchmark Sandbox
 
 - C.1 Public benchmark survey
@@ -521,12 +695,12 @@ then ask the human before any merge/apply.
 
 ## Track F — Operator Assistant / Prompt Courier
 
-Status: shipped through F.4.
+Status: shipped through F.5.
 
 ### Purpose:
 Reduce manual friction in Goal Brief and Mayor Mode by converting messy user intent into structured, reviewable task briefs and handoff notes.
 
-Guardrail: Track F is draft/suggestion/prompt-generation only. It does not execute patches, validation, benchmarks, Dream runs, handoff creation, model/API calls, DB writes, Docker, subprocesses, or lesson promotion.
+Guardrail: Track F is draft/suggestion/prompt-generation only. It does not execute patches, validation, benchmarks, Dream runs, handoff creation, worker launch, model/API calls, DB writes, Docker, subprocesses, or lesson promotion.
 
 ### F.1 Goal Brief Autocomplete ✅
 - user writes messy request
@@ -548,8 +722,15 @@ Guardrail: Track F is draft/suggestion/prompt-generation only. It does not execu
 - generate a final prompt for Claude/Codex/Gemini worker
 - include constraints, allowed files, validation, stop conditions
 
-F.4 shipment checkpoint:
-- Full pytest: 1993 passed, 1 warning
+### F.5 One-click Worker Assignment / Route Card
+- create a draft Worker Assignment from a Goal Brief, Handoff, Review Pack, or External Queue seed draft
+- write `.agent/worker_assignments/<assignment_id>/worker_assignment.json` and `.md`
+- include mode, worker role, allowed/forbidden files, validation commands, stop conditions, safety rules, and final summary format
+- keep `human_approval_required=true`, `apply_allowed=false`, and `worker_launch_allowed=false`
+- no worker/model/patch/validation/Dream/Project Evolution/promotion behavior
+
+F.5 shipment checkpoint:
+- Targeted pytest: `tests/test_worker_assignment.py`
 
 Current benchmark catalog:
 - benchmark --check: 54 checked, 0 errors
@@ -719,6 +900,97 @@ C.A.T.T.U.S is also now being optimized to reduce operator burden and external m
 - explicit budget gates before expensive reasoning
 ---
 
+---
+
+## Long-term Framing: District Model
+
+> **This is long-term framing, not an implementation commitment. Do not build any of this yet.**
+
+C.A.T.T.U.S is not the whole AI society. It is the **Coding / Engineering District** of a possible future AI city. It specializes in debugging, patch safety, benchmarks, evidence, lessons, and operator workflow. It should not try to become every possible AI system.
+
+**Core principle:** One city, many districts. Shared roads, separate laws. Artifacts travel, permissions do not.
+
+### What C.A.T.T.U.S Is
+
+The Coding / Engineering District. Its laws:
+
+- patch safety
+- validation evidence
+- benchmark grounding
+- lesson quality
+- human approval for any real-repo change
+
+C.A.T.T.U.S does not expand into research, teaching, math, physics, or biology by absorbing those concerns. It routes to other districts when those concerns arise.
+
+### Possible Future Districts
+
+Future specialized agents could become separate districts. Each district keeps its own laws, gates, and evaluation. Districts communicate through artifacts and shared protocols. Permissions do not transfer between districts.
+
+| District | Purpose | Key laws |
+| --- | --- | --- |
+| **Coding / Engineering** | Current C.A.T.T.U.S. Debugging, repair, patch safety, benchmarks, evidence, lessons, operator workflow. | Patch safety, validation, benchmark evidence, lesson quality, human approval |
+| **Research / Journalist** | Searches external public sources. Produces cited briefings. | Cannot trigger Dream/patch/workers automatically |
+| **Teacher** | Teaches from existing lessons, anti-lessons, benchmark cases, and failure reports. | Cannot promote lessons or modify repo |
+| **Math** | Proof checking, calculation validation, counterexample search. | Separate from coding patch safety |
+| **Physics** | Units, equations, assumptions, simulation validation. | Domain-specific rigor gates |
+| **Biology** | Citation quality, uncertainty, safety/ethics boundaries. | No unsafe lab/procedure instructions |
+| **Visual Inspector** | Screenshot/visual evidence handling. If vision unavailable, requires human caption. Does not claim validation proves a visual issue is fixed unless visual verification exists. | Vision-or-human-caption required |
+
+n8n or similar workflow tools can act as roads/transport between districts. Artifacts travel between districts; permissions do not.
+
+### City Hall / Router
+
+The City Hall Router:
+
+- Routes tasks to the appropriate district.
+- May ask multiple districts to collaborate on a single task.
+- Does not bypass district laws.
+- Human remains final authority.
+
+The City Hall Router is a concept, not a component. Do not implement it yet.
+
+### Driver
+
+The Driver chooses the model/vehicle level for a task:
+
+- `local_free` — local model or rule-based, no cost
+- `cheap_api` — inexpensive API call
+- `strong_api` — expensive API, requires operator approval
+- `human_only` — blocked; human must act directly
+
+The Driver recommends escalation. It does not auto-spend or auto-escalate without operator approval.
+
+The H.1 Driver Model Routing Contract is the near-term step toward this concept.
+
+### Do Not Build Yet
+
+All of the following are **deferred**. Do not implement:
+
+- Autonomous AI society or agent-to-agent chat running 24/7
+- Automatic n8n-to-Dream routing
+- Automatic patch/apply from any district
+- Automatic model escalation
+- Autonomous cross-district workflows
+- Math, Physics, or Biology districts
+- City Hall Router implementation
+- Driver auto-escalation
+- Any inter-district artifact exchange protocol
+
+### Near-term Roadmap Implications
+
+The District Model framing does not change the near-term roadmap. The next practical features remain small and self-contained:
+
+| Track | Feature | Purpose |
+| --- | --- | --- |
+| **F.5** | One-click Worker Assignment / Route Card | Shipped draft route card for manual worker assignment |
+| **H.1** | Driver Model Routing Contract | Contract-only definition of local/cheap/strong/blocked model tiers |
+| **A.16** | Visual Evidence Intake Contract | How screenshots/visual output enters the evidence chain |
+| **F.6** | Lesson Teaching Card / Teacher Mode | Present lessons in a teaching-friendly format |
+
+These features are additive. They do not require implementing any district infrastructure.
+
+---
+
 ## Deferred Ideas
 
 - Migration Planner
@@ -736,3 +1008,13 @@ Phase 15     → Migrated as possible later lambda/complexity research thread
 Reverse Dream execution → Deferred until stronger eval/minimality proof
 Mutation-oracle anti-lesson minting → Deferred
 Default-on anti-lesson CONTROL → Not approved
+
+### Future District Protocol (Track D — all deferred)
+
+Possible later phases for the District Model. **Do not implement any of these yet.**
+
+- **D.1** District Manifest Schema
+- **D.2** Artifact Exchange Protocol
+- **D.3** City Hall Router Draft
+- **D.4** Research / Journalist District Brief
+- **D.5** Teacher District Teaching Card

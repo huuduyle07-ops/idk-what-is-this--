@@ -620,6 +620,22 @@ def with_failure_kind_fields(result: dict[str, Any]) -> dict[str, Any]:
     return enriched
 
 
+def with_failure_category_fields(result: dict[str, Any]) -> dict[str, Any]:
+    """Add display-only failure category fields without changing scoring fields."""
+    enriched = dict(result)
+    if enriched.get("success") is True:
+        return enriched
+
+    from core.failure_category import derive_failure_category
+
+    cat = derive_failure_category(enriched)
+    enriched["failure_category"] = cat["failure_category"]
+    enriched["failure_category_confidence"] = cat["failure_category_confidence"]
+    enriched["failure_category_rule"] = cat["failure_category_rule"]
+    enriched["failure_category_reason"] = cat["failure_category_reason"]
+    return enriched
+
+
 def required_tools(case: dict) -> list[str]:
     """CLI tools that must resolve on PATH for the case to validate.
 
@@ -1356,6 +1372,11 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
     lines.append(
         f"- Failure kinds: {_md_run_health_counts(run_health['failure_kind_counts'])}"
     )
+    _cat_counts = run_health.get("failure_category_counts") or {}
+    if _cat_counts:
+        lines.append(
+            f"- Failure categories: {_md_run_health_counts(_cat_counts)}"
+        )
     lines.append(f"- File-change scope: {_md_run_health_scope(run_health)}")
     lines.append(
         "- Slowest cases: "
@@ -1536,6 +1557,16 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
                 lines.append(
                     f"- attempts: {r['attempts']} (all failed)"
                 )
+            fc = r.get("failure_category")
+            if fc:
+                conf = r.get("failure_category_confidence") or ""
+                rule = r.get("failure_category_rule") or ""
+                parts: list[str] = [fc]
+                if conf:
+                    parts.append(conf)
+                if rule:
+                    parts.append(rule)
+                lines.append(f"- category: {' / '.join(parts)}")
             lines.append("")
 
     # Read-only failure taxonomy section (Phase 14.3). Classification of the
@@ -1938,6 +1969,7 @@ def main(argv: list[str] | None = None) -> int:
             res.setdefault("retry_results", [])
 
         res = with_failure_kind_fields(res)
+        res = with_failure_category_fields(res)
         results.append(res)
 
         if not quiet:

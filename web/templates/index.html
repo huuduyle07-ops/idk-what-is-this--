@@ -403,8 +403,11 @@
               <button type="button" onclick="startGoalBrief()">Start brief</button>
               <button type="button" onclick="updateGoalBrief()">Send reply</button>
               <button type="button" onclick="copyGoalBriefFinalPrompt()">Copy final prompt</button>
+              <button type="button" onclick="createWorkerAssignmentFromGoalBrief()">Create Worker Assignment</button>
+              <button type="button" id="workerAssignmentCopy" onclick="copyWorkerAssignmentMarkdown()" disabled>Copy Assignment Markdown</button>
               <button type="button" disabled title="Placeholder for a later gated handoff.">Send to Dream later</button>
             </div>
+            <pre id="workerAssignmentPreview" class="review-pack-preview" aria-live="polite">No worker assignment created yet.</pre>
 
             <div class="goal-brief-main">
               <div class="goal-brief-conversation">
@@ -5681,6 +5684,78 @@ function _appendGoalBriefMessage(kind, text) {
     chat.scrollTop = chat.scrollHeight;
 }
 
+let _workerAssignmentMarkdown = "";
+
+async function createWorkerAssignmentFromGoalBrief() {
+    const briefRef = document.getElementById("goalBriefRef")?.value.trim() || "";
+    const repo = document.querySelector("input[name='repo_path']")?.value.trim() || "";
+    const mode = _modeRouterCurrent?.suggested_mode || "debug";
+    const role = mode === "review_only" || mode === "review-only" ? "reviewer" : "implementer";
+    if (!briefRef) {
+        _goalBriefStatus("Start or update a Goal Brief first.", "failed");
+        return;
+    }
+    _goalBriefStatus("Creating worker assignment draft...", "draft");
+    try {
+        const resp = await fetch("/worker-assignments/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                repo_path: repo || ".",
+                goal_brief_path: briefRef,
+                mode,
+                role,
+            }),
+        });
+        const body = await resp.json();
+        if (!body.ok) {
+            _workerAssignmentMarkdown = "";
+            _renderWorkerAssignmentPreview(null);
+            _goalBriefStatus("Error: " + (body.error?.message || body.error || "unknown"), "failed");
+            return;
+        }
+        _workerAssignmentMarkdown = body.markdown || "";
+        _renderWorkerAssignmentPreview(body);
+        _goalBriefStatus(`Worker assignment draft created - ${body.md_path || ""}`, "ready");
+    } catch (e) {
+        _workerAssignmentMarkdown = "";
+        _renderWorkerAssignmentPreview(null);
+        _goalBriefStatus("Error: " + e.message, "failed");
+    }
+}
+
+function _renderWorkerAssignmentPreview(data) {
+    const preview = document.getElementById("workerAssignmentPreview");
+    const copyButton = document.getElementById("workerAssignmentCopy");
+    if (!preview) return;
+    if (!data || !data.ok) {
+        preview.textContent = "No worker assignment created yet.";
+        if (copyButton) copyButton.disabled = true;
+        return;
+    }
+    const record = data.record || {};
+    preview.textContent = [
+        `JSON: ${data.json_path || ""}`,
+        `Markdown: ${data.md_path || ""}`,
+        "",
+        data.markdown || "",
+        "",
+        `apply_allowed: ${record.apply_allowed === true ? "true" : "false"}`,
+        `worker_launch_allowed: ${record.worker_launch_allowed === true ? "true" : "false"}`,
+    ].join("\n").trim();
+    if (copyButton) copyButton.disabled = !_workerAssignmentMarkdown;
+}
+
+function copyWorkerAssignmentMarkdown() {
+    if (!_workerAssignmentMarkdown) {
+        _goalBriefStatus("Create Worker Assignment first.", "failed");
+        return;
+    }
+    navigator.clipboard.writeText(_workerAssignmentMarkdown)
+        .then(() => _goalBriefStatus("Worker Assignment Markdown copied.", "ready"))
+        .catch(err => _goalBriefStatus(`Copy failed: ${err}`, "failed"));
+}
+
 function _renderGoalBriefResponse(data, userText = "") {
     if (!data || !data.ok) {
         _goalBriefStatus(data?.error || "Goal brief request failed.", "failed");
@@ -7636,6 +7711,18 @@ function _benchFailureKindBadge(info) {
     return `<span class="bench-failure-kind-badge bench-failure-kind-badge--${_escapeHtml(kindClass)}" title="${_escapeHtml(title)}">${_escapeHtml(info.display)}</span>`;
 }
 
+function _benchFailureCategoryText(result) {
+    if (!result || result.success === true) return "";
+    const cat = result.failure_category;
+    if (!cat) return "";
+    const conf = result.failure_category_confidence || "";
+    const rule = result.failure_category_rule || "";
+    const parts = [cat];
+    if (conf) parts.push(conf);
+    if (rule) parts.push(rule);
+    return parts.join(" / ");
+}
+
 function _benchArrayField(obj, key) {
     const value = obj && obj[key];
     if (!Array.isArray(value)) return [];
@@ -7736,10 +7823,17 @@ function _benchRunHealthSummary(report) {
         const scope = _benchFileChangeScope(r);
         scopeCounts[scope] = (scopeCounts[scope] || 0) + 1;
     });
+    const failureCategoryCounts = {};
+    results.forEach(r => {
+        if (!r || r.success === true || r.skipped) return;
+        const cat = r.failure_category;
+        if (cat) failureCategoryCounts[cat] = (failureCategoryCounts[cat] || 0) + 1;
+    });
     const modern = results.some(r => r && (
         r.file_change_summary ||
         r.failure_kind ||
         r.failure_kind_display ||
+        r.failure_category ||
         ["patched_files", "generated_artifacts", "unexpected_mutations"].some(key => _benchHasOwn(r, key))
     ));
     const environmentCount =
@@ -7785,6 +7879,7 @@ function _benchRunHealthSummary(report) {
         total_tokens: Number.isFinite(Number(report && report.total_tokens)) ? Number(report.total_tokens) : null,
         estimated_cost_usd: Number.isFinite(Number(report && report.total_estimated_cost_usd)) ? Number(report.total_estimated_cost_usd) : null,
         fallback_count: Number.isFinite(Number(report && report.total_fallbacks)) ? Number(report.total_fallbacks) : null,
+        failure_category_counts: failureCategoryCounts,
     };
 }
 
@@ -7836,6 +7931,9 @@ function _renderBenchRunHealth(report) {
     const tokens = summary.total_tokens == null ? "&mdash;" : _escapeHtml(String(_benchInt(summary.total_tokens, 0)));
     const cost = summary.estimated_cost_usd == null ? "&mdash;" : _benchFmtCost(summary.estimated_cost_usd);
     const fallbacks = summary.fallback_count == null ? "&mdash;" : _escapeHtml(String(_benchInt(summary.fallback_count, 0)));
+    const catCounts = summary.failure_category_counts || {};
+    const hasCatData = Object.values(catCounts).some(c => Number(c) > 0);
+    const catRow = hasCatData ? `<div><span>Failure categories</span><div>${_benchRunHealthCounts(catCounts)}</div></div>` : "";
     return `
         <div class="bench-run-health-card">
             <div class="bench-run-health-card__head">
@@ -7850,6 +7948,7 @@ function _renderBenchRunHealth(report) {
             </div>
             <div class="bench-run-health-lines">
                 <div><span>Failure kinds</span><div>${_benchRunHealthCounts(summary.failure_kind_counts)}</div></div>
+                ${catRow}
                 <div><span>File scope</span><div>${_escapeHtml(_benchRunHealthScopeCounts(summary))}</div></div>
                 <div><span>Slowest</span><div>${_benchRunHealthCaseList(summary.slowest_cases, "duration_sec", value => `${value.toFixed(2)}s`)}</div></div>
                 <div><span>Cost/tokens</span><div>${tokens} tokens / ${cost}</div></div>
@@ -8107,10 +8206,12 @@ function _renderBenchmarkDetail(report, filename) {
         <div class="bench-section-heading">Failed cases (${failures.length})</div>
         ${failures.map(f => {
             const failureKind = _benchFailureKindInfo(f, failureByName);
+            const catText = _benchFailureCategoryText(f);
             return `
             <div class="bench-fail-row">
                 <div class="bench-fail-name">${_escapeHtml(f.name || "?")} ${_benchFailureKindBadge(failureKind)} <span class="bench-fail-meta">· ${_escapeHtml(f.language || "?")}/${_escapeHtml(f.category || "?")}</span></div>
                 <div class="bench-fail-detail">
+                    ${catText ? `<span class="bench-fail-category">category: ${_escapeHtml(catText)}</span>` : ""}
                     ${failureKind?.cause ? `cause: ${_escapeHtml(failureKind.cause)}` : ""}
                     ${failureKind?.evidence ? `evidence: ${_escapeHtml(String(failureKind.evidence).slice(0, 240))}` : ""}
                     ${f.validation_output && f.validation_output !== "OK" ? `validation: ${_escapeHtml(String(f.validation_output).slice(0, 240))}` : ""}

@@ -76,6 +76,24 @@ Important files:
 - `scripts/create_goal_brief.py`
 - `web/app.py`
 
+### 1.6. Worker Assignment / Route Card
+
+Worker Assignment creates a ready-to-copy route card from an existing artifact. It is draft-only: no worker is launched, no model is called, no patch is applied, no validation command runs, and no Dream / Project Evolution / lesson promotion path starts.
+
+Default output:
+
+- `.agent/worker_assignments/<assignment_id>/worker_assignment.json`
+- `.agent/worker_assignments/<assignment_id>/worker_assignment.md`
+
+CLI:
+
+```bash
+python scripts/create_worker_assignment.py --repo-path . --goal-brief .agent/goal_briefs/<timestamp>/goal_brief.json --mode debug --role implementer
+python scripts/create_worker_assignment.py --repo-path . --seed-draft .agent/external_queue_exports/<id>/goal_brief_seed_draft.json --mode documentation --role documenter --dry-run --json
+```
+
+In the web UI, create or update a Goal Brief, then click **Create Worker Assignment**. Copy the Markdown to Codex / Claude / Gemini / Ollama manually. The route card keeps `human_approval_required=true`, `apply_allowed=false`, and `worker_launch_allowed=false`.
+
 Important files:
 
 - `main.py`
@@ -735,6 +753,35 @@ The External Queue is a **review-only inbox** for outside research or wishlist i
 - Normalises the item, redacts obvious secrets, classifies risk, and writes two artifact files.
 - All hardcoded gates: `import_status: pending_review`, `auto_dream_allowed: false`, `human_review_required: true`.
 - Read-only index/list CLI: `python scripts/list_external_queue.py --repo-path .` (add `--json`, `--status queued`, or `--limit N` as needed).
+- Read-only detail/view CLI: `python scripts/show_external_queue_item.py --repo-path . --queue-id <id>` (add `--json`, `--show-review`, or `--include-raw` as needed).
+- Draft-only export CLI: `python scripts/export_external_queue_item.py --repo-path . --queue-id <id> --target goal_brief_seed` (or `dream_candidate_seed` / `project_evolution_seed`) writes inert review drafts only.
+
+#### Operator pipeline (complete)
+
+```
+import inert item
+  scripts/import_external_queue_item.py
+  → .agent/external_queue/<queue_id>/external_queue_item.{json,md}
+
+review recommendation
+  scripts/create_external_queue_review.py
+  → .agent/external_queue/<queue_id>/external_queue_review.{json,md}
+  recommendation: reject | needs_more_evidence
+                | convert_to_goal_brief_seed
+                | convert_to_dream_candidate
+                | convert_to_project_evolution_candidate
+
+list / view
+  scripts/list_external_queue.py       (read-only table or --json)
+  scripts/show_external_queue_item.py  (read-only detail for one item)
+
+export inert seed draft
+  scripts/export_external_queue_item.py --target <target>
+  → .agent/external_queue_exports/<queue_id>/<target>_draft.{json,md}
+  targets: goal_brief_seed | dream_candidate_seed | project_evolution_seed
+```
+
+This pipeline **never**: auto-runs Dream, creates a Goal Brief, creates a Project Evolution plan, calls models, calls webhooks, applies patches, promotes lessons, or runs validation commands. Human approval is required before any target workflow starts.
 
 #### List queue items
 
@@ -746,6 +793,39 @@ python scripts/list_external_queue.py --repo-path . --unreviewed
 python scripts/list_external_queue.py --repo-path . --risk high
 python scripts/list_external_queue.py --repo-path . --json
 python scripts/list_external_queue.py --repo-path . --limit 10
+```
+
+#### View one queue item
+
+Viewing one item is read-only. It shows item identity, content summary, gate status, risk/safety warnings, linked artifacts, and review metadata when present. It does not import, review, convert, execute, promote, patch, call models, or contact Discord, n8n, or webhooks. Invalid item/review JSON and missing linked paths are reported instead of crashing the command.
+
+```bash
+python scripts/show_external_queue_item.py --repo-path . --queue-id <id>
+python scripts/show_external_queue_item.py --repo-path . --queue-id <id> --json
+python scripts/show_external_queue_item.py --repo-path . --queue-id <id> --show-review
+```
+
+#### Export reviewed item as draft
+
+Exporting creates an inert draft artifact under `.agent/external_queue_exports/<queue_id>/`. It requires a valid review recommendation matching the requested target. It does not create a real Goal Brief, start Dream, create a Project Evolution plan, call models/webhooks, promote lessons, run validation commands, or apply patches.
+
+Three supported targets (one per review recommendation):
+
+```bash
+# Goal Brief seed (review recommendation: convert_to_goal_brief_seed)
+python scripts/export_external_queue_item.py --repo-path . --queue-id <id> --target goal_brief_seed
+
+# Dream candidate seed (review recommendation: convert_to_dream_candidate)
+python scripts/export_external_queue_item.py --repo-path . --queue-id <id> --target dream_candidate_seed
+
+# Project Evolution seed (review recommendation: convert_to_project_evolution_candidate)
+python scripts/export_external_queue_item.py --repo-path . --queue-id <id> --target project_evolution_seed
+
+# Dry-run: preview what would be written without creating files
+python scripts/export_external_queue_item.py --repo-path . --queue-id <id> --target goal_brief_seed --dry-run
+
+# JSON output: print the full result as JSON
+python scripts/export_external_queue_item.py --repo-path . --queue-id <id> --target goal_brief_seed --json
 ```
 
 #### Manual CLI import

@@ -26,6 +26,25 @@ from core.failure_taxonomy import (
     summarize_benchmark_failures,
 )
 
+def extract_failure_category_counts(report: dict[str, Any]) -> dict[str, int]:
+    """Return counts of failure_category values from case records in a report.
+
+    Reads the Phase-14.6 ``failure_category`` field added by
+    ``with_failure_category_fields()``.  Returns an empty dict for old reports
+    that pre-date Phase 14.6 (backward-compatible, never raises).
+    """
+    counts: dict[str, int] = {}
+    for case in (report.get("results") or []):
+        if not isinstance(case, dict):
+            continue
+        if case.get("success") is True or case.get("skipped"):
+            continue
+        cat = case.get("failure_category")
+        if isinstance(cat, str) and cat:
+            counts[cat] = counts.get(cat, 0) + 1
+    return counts
+
+
 TREND_GUARDRAIL_NOTE = (
     "Failure taxonomy trend report is read-only: it only compares already "
     "computed benchmark results and does not affect benchmark scoring, "
@@ -60,13 +79,15 @@ def compare_failure_taxonomies(
     for index, item in enumerate(items):
         report = _as_report_dict(item)
         summary = summarize_benchmark_failures(report)
-        per_report.append(
-            {
-                "identifier": ids[index],
-                "total_failing": summary["total_failing"],
-                "counts_by_category": dict(summary["counts_by_category"]),
-            }
-        )
+        fc_counts = extract_failure_category_counts(report)
+        entry: dict[str, Any] = {
+            "identifier": ids[index],
+            "total_failing": summary["total_failing"],
+            "counts_by_category": dict(summary["counts_by_category"]),
+        }
+        if fc_counts:
+            entry["failure_category_counts"] = fc_counts
+        per_report.append(entry)
         case_categories.append(
             {c["name"]: c["category"] for c in summary["classifications"]}
         )
