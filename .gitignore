@@ -48,6 +48,8 @@ skills/
 
 # Build artifacts inside benchmark fixtures
 benchmarks/**/target/
+benchmarks/**/bin/
+benchmarks/**/obj/
 benchmarks/**/*.exe
 benchmarks/**/*.dll
 benchmarks/**/*.pdb
