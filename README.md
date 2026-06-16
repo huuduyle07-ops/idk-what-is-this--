@@ -171,6 +171,32 @@ Important files:
 - `scripts/create_visual_evidence_contract.py`
 - `tests/test_visual_evidence_contract.py`
 
+### 1.9. Lesson Teaching Card / Teacher Mode (F.6)
+
+Lesson Teaching Card turns existing evidence into a study-friendly card. It is local and artifact-based: given a lesson, anti-lesson, benchmark case, or failure report JSON, it writes a concise teaching card for human review. It does not invent new lessons, promote lessons, create anti-lessons, modify repo source files, apply patches, run validation, launch workers, trigger Dream / Project Evolution, or call models/webhooks/network.
+
+Default output:
+
+- `.agent/teaching_cards/<teaching_card_id>/teaching_card.json`
+- `.agent/teaching_cards/<teaching_card_id>/teaching_card.md`
+
+CLI examples:
+
+```bash
+python scripts/create_lesson_teaching_card.py --lesson .agent/lessons/active/<lesson_id>.json
+python scripts/create_lesson_teaching_card.py --anti-lesson .agent/lessons/blocked/<lesson_id>.json
+python scripts/create_lesson_teaching_card.py --benchmark-case benchmarks/cases/python/python_config_env_mismatch/case.json
+python scripts/create_lesson_teaching_card.py --failure-report .agent/audits/<report>.json
+```
+
+Optional flags: `--json`, `--dry-run`, `--output-root`, plus deterministic `--teaching-card-id` / `--created-at` hooks. The card JSON always carries inert flags `model_call_performed`, `lesson_promotion_performed`, `anti_lesson_created`, `patch_applied`, `validation_run`, `worker_launch_performed`, `dream_triggered`, and `project_evolution_triggered`, all `false`.
+
+Important files:
+
+- `core/lesson_teaching_card.py`
+- `scripts/create_lesson_teaching_card.py`
+- `tests/test_lesson_teaching_card.py`
+
 ### 2. Task Router
 
 Before the agent can help, it tries to understand what kind of request it received.
@@ -774,6 +800,7 @@ Column guide:
 | **External Queue / n8n / Discord** | Receive item candidates from external automation | Webhook payload | Dream candidate or Project Evolution candidate | No | Candidate only | No | No | Human approval before any run or apply | Candidate-only write; no auto-execute; webhook cannot reach real-repo patch path |
 | **Driver Model Routing (H.1)** | Recommend the safest allowed model "vehicle" for a worker assignment | `worker_assignment.json` (F.5) | `driver_decision.json`, `.md` | No | Yes (`.agent/driver_decisions/`) | No | No | Recommend-only; `approval_required` set per task; never executes | Contract/report-only; no model call, provider switch, worker launch, patch, validation, Dream, or promotion |
 | **Visual Evidence Intake (A.16)** | Record whether a visual/UI issue is verifiable before a resolution claim | `worker_assignment.json` (F.5) or `driver_decision.json` (H.1) | `visual_evidence_contract.json`, `.md` | No | Yes (`.agent/visual_evidence/`) | No | No | Report-only; `resolution_claim_allowed` set per task; needs human summary or vision model + validation coverage | Contract-only; no OCR, vision model, model call, worker launch, patch, validation, Dream, or promotion; image bytes never read |
+| **Lesson Teaching Card (F.6)** | Turn existing learning evidence into a human study card | Lesson, anti-lesson, benchmark case, or failure report JSON | `teaching_card.json`, `.md` | No | Yes (`.agent/teaching_cards/`) | No | No | Human reviews the card before applying ideas | Artifact-only; no model call, lesson promotion, anti-lesson creation, patch, validation, worker launch, Dream, Project Evolution, webhook, or source mutation |
 
 #### Allowed transitions
 
@@ -789,6 +816,8 @@ Column guide:
 - Worker Assignment → Driver Decision (recommend-only) ✅
 - Worker Assignment / Driver Decision → Visual Evidence Contract (report-only) ✅
 
+- Lesson / Anti-Lesson / Benchmark Case / Failure Report → Teaching Card (artifact-only) ✅
+
 #### Forbidden transitions
 
 - External Queue / n8n → real repo patch ❌
@@ -800,6 +829,8 @@ Column guide:
 - Lesson → override user request, repo state, validation, or Patch Safety gate ❌
 - Driver Decision → model call / provider switch / worker launch / patch apply ❌
 - Visual Evidence Contract → OCR / vision model / model call / resolution claim without verification ❌
+
+- Teaching Card → model call / lesson promotion / anti-lesson creation / patch / validation / worker launch / Dream / Project Evolution ❌
 
 #### Power leakage rule
 
@@ -1197,6 +1228,8 @@ This is an active AI engineering project, not a tiny demo. The code already incl
 - MCP audit route and local MCP Inspector shortcuts
 - universal node weights with a lesson-history penalty term that biases CONTROL DFS, project-map rankings, and Obsidian AI_READ_FIRST toward files and symbols with prior failures; explainability CLI (`scripts/explain_graph_weights.py`) audits each node's topology, complexity, and penalty contributions
 - **H.1 Driver Model Routing Contract — complete (contract/report-only).** Evaluates a Worker Assignment (F.5) and recommends the safest allowed vehicle (`local_only` → `blocked`) into `.agent/driver_decisions/`, via `python scripts/evaluate_driver_route.py --worker-assignment <path>`. No real model switching yet — it never calls a model, switches providers, launches a worker, applies a patch, runs validation, triggers Dream / Project Evolution execution, calls webhooks, or promotes lessons (guardrail-tested). Lays the routing foundation for the future A.16 Visual Evidence Intake Contract.
+
+- **F.6 Lesson Teaching Card / Teacher Mode v0 complete.** Creates local teaching cards from lesson, anti-lesson, benchmark case, or failure report JSON via `python scripts/create_lesson_teaching_card.py --lesson <path>`. Output lives under `.agent/teaching_cards/`; no model call, lesson promotion, anti-lesson creation, patch, validation, worker launch, Dream, Project Evolution, webhook, or source mutation is performed.
 
 ## Short Summary
 

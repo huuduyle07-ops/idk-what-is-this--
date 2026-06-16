@@ -718,7 +718,7 @@ then ask the human before any merge/apply.
 
 ## Track F — Operator Assistant / Prompt Courier
 
-Status: shipped through F.5.
+Status: shipped through F.6.
 
 ### Purpose:
 Reduce manual friction in Goal Brief and Mayor Mode by converting messy user intent into structured, reviewable task briefs and handoff notes.
@@ -760,6 +760,16 @@ F.5 shipment checkpoint:
 - show assignment id, JSON path, Markdown path, and copyable Markdown in the Goal Brief UI
 - keep the flow draft-only and inert
 - no worker/model/patch/validation/Dream/Project Evolution/webhook/promotion behavior
+
+### F.6 Lesson Teaching Card / Teacher Mode v0 complete
+- create local teaching cards from existing lesson, anti-lesson, benchmark case, or failure report JSON
+- write `.agent/teaching_cards/<teaching_card_id>/teaching_card.json` and `.md`
+- include summary, what happened, why it matters, common trap, safe fix strategy, anti-pattern warning, mini quiz, mini exercise, related artifacts, uncertainty notes, and execution boundary
+- preserve uncertainty; visual sources warn that visual claims need visual verification; security/auth/secrets/API key/env sources warn as security-sensitive; external/untrusted sources warn about source trust
+- keep all inert flags false: no model call, lesson promotion, anti-lesson creation, patch, validation, worker launch, Dream, Project Evolution, webhook, or source mutation
+
+F.6 shipment checkpoint:
+- Targeted pytest: `tests/test_lesson_teaching_card.py`
 
 Current benchmark catalog:
 - benchmark --check: 54 checked, 0 errors
@@ -962,7 +972,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **F.5** | One-click Worker Assignment / Route Card | Shipped draft route card for manual worker assignment |
 | **H.1** ✅ | Driver Model Routing Contract | Shipped contract that recommends the safest model vehicle for a worker assignment (report-only) |
 | **A.16** ✅ | Visual Evidence Intake Contract | Shipped contract that records whether a visual/UI issue is verifiable before a resolution claim (report-only; no OCR/vision/model) |
-| **F.6** | Lesson Teaching Card / Teacher Mode | Present lessons in a teaching-friendly format |
+| **F.6** complete | Lesson Teaching Card / Teacher Mode | Shipped local teaching cards for lessons, anti-lessons, benchmark cases, and failure reports (artifact-only; no model/patch/validation/promotion) |
 
 These features are additive. They do not require implementing any district infrastructure.
 
