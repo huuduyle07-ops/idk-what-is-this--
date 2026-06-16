@@ -142,6 +142,35 @@ Important files:
 - `scripts/evaluate_driver_route.py`
 - `tests/test_driver_model_routing.py`
 
+### 1.8. Visual Evidence Intake Contract (A.16)
+
+Text and code validation can pass while nobody has confirmed that a visual / UI / design issue was actually fixed. The Visual Evidence Intake Contract closes that gap. It is **contract-only**: given a Worker Assignment (F.5) or a Driver Decision (H.1) it records whether a visual issue is referenced, whether visual evidence or a human caption summary exists, whether a model could even read that evidence, and whether validation explicitly covers the visual issue — then it decides whether a "resolution claim" is allowed.
+
+**Core rule: a visual/UI/design issue is not "resolved" just because text tests passed.** A claim that the visual issue is fixed requires *either* a human caption summary *or* a vision-capable model, **plus** explicit validation coverage of the visual issue. Validation passing on its own does not prove a visual/UI issue is fixed.
+
+A.16 performs no OCR, calls no vision model, calls no model, and never inspects image bytes. `visual_evidence_readable_by_model` and `validation_covers_visual_issue` are only ever true when the operator passes them explicitly — they are never inferred from a file being present.
+
+Default output:
+
+- `.agent/visual_evidence/<visual_evidence_id>/visual_evidence_contract.json`
+- `.agent/visual_evidence/<visual_evidence_id>/visual_evidence_contract.md`
+
+CLI — manual sequence (each step stays separate; A.16 does not auto-run inside F.5 or H.1):
+
+```bash
+python scripts/create_worker_assignment.py --repo-path . --goal-brief .agent/goal_briefs/<timestamp>/goal_brief.json
+python scripts/evaluate_driver_route.py --worker-assignment .agent/worker_assignments/<assignment_id>/worker_assignment.json
+python scripts/create_visual_evidence_contract.py --source .agent/worker_assignments/<assignment_id>/worker_assignment.json --human-summary "Before: chart bars overlap the legend. After: bars are spaced."
+```
+
+Optional flags: `--visual-path` (repeatable), `--human-summary`, `--visual-readable-by-model true`, `--validation-covers-visual true`, `--json`, `--dry-run`, `--output-root`, plus deterministic `--visual-evidence-id` / `--created-at` hooks. The contract JSON always carries inert flags `model_call_performed`, `ocr_performed`, `vision_model_called`, `worker_launch_performed`, `patch_applied`, `validation_run`, and `promotion_performed`, all `false`. A.16 supports the H.1 `vision_or_human_caption_required` vehicle: when a task needs visual evidence, A.16 is where the human records the caption summary (or asserts a vision model) before any resolution claim is allowed.
+
+Important files:
+
+- `core/visual_evidence_contract.py`
+- `scripts/create_visual_evidence_contract.py`
+- `tests/test_visual_evidence_contract.py`
+
 ### 2. Task Router
 
 Before the agent can help, it tries to understand what kind of request it received.
@@ -744,6 +773,7 @@ Column guide:
 | **MCP Artifact-write Server** | Let an MCP client create handoffs or validate proposals | MCP tool call | Artifact JSON, validation result | No | Yes (`.agent/` scoped) | No | No | Explicit tool call per action | Audit ledger; no real-repo patch apply; validation is temp-clone only |
 | **External Queue / n8n / Discord** | Receive item candidates from external automation | Webhook payload | Dream candidate or Project Evolution candidate | No | Candidate only | No | No | Human approval before any run or apply | Candidate-only write; no auto-execute; webhook cannot reach real-repo patch path |
 | **Driver Model Routing (H.1)** | Recommend the safest allowed model "vehicle" for a worker assignment | `worker_assignment.json` (F.5) | `driver_decision.json`, `.md` | No | Yes (`.agent/driver_decisions/`) | No | No | Recommend-only; `approval_required` set per task; never executes | Contract/report-only; no model call, provider switch, worker launch, patch, validation, Dream, or promotion |
+| **Visual Evidence Intake (A.16)** | Record whether a visual/UI issue is verifiable before a resolution claim | `worker_assignment.json` (F.5) or `driver_decision.json` (H.1) | `visual_evidence_contract.json`, `.md` | No | Yes (`.agent/visual_evidence/`) | No | No | Report-only; `resolution_claim_allowed` set per task; needs human summary or vision model + validation coverage | Contract-only; no OCR, vision model, model call, worker launch, patch, validation, Dream, or promotion; image bytes never read |
 
 #### Allowed transitions
 
@@ -757,6 +787,7 @@ Column guide:
 - External Queue → Dream Candidate / Project Evolution Candidate ✅
 - Worker Run → Imported Proposal → Temp-clone validation ✅
 - Worker Assignment → Driver Decision (recommend-only) ✅
+- Worker Assignment / Driver Decision → Visual Evidence Contract (report-only) ✅
 
 #### Forbidden transitions
 
@@ -768,6 +799,7 @@ Column guide:
 - Worker Run → active lesson without proposal review ❌
 - Lesson → override user request, repo state, validation, or Patch Safety gate ❌
 - Driver Decision → model call / provider switch / worker launch / patch apply ❌
+- Visual Evidence Contract → OCR / vision model / model call / resolution claim without verification ❌
 
 #### Power leakage rule
 

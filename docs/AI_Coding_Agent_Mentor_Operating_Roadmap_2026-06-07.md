@@ -230,6 +230,29 @@ Changed files:
 
 Guardrails: scoring, pass/fail, retries, patch generation, patch safety, validation, retrieval, lessons, anti-lessons, Dream, Project Evolution, model prompts, and routing are unchanged. `failure_category` is added after scoring is settled and does not affect any existing fields.
 
+### A.16 — Visual Evidence Intake Contract ✅
+Goal:
+Stop the system from claiming a visual/UI/design issue is resolved just because text/code tests passed. A.16 is a pure contract that records whether a visual issue is actually verifiable before a resolution claim is allowed. It supports the H.1 `vision_or_human_caption_required` vehicle.
+
+Behaviour:
+- Reads a `worker_assignment.json` (F.5) or a `driver_decision.json` (H.1) — a JSON file or a plain dict — and inspects title, expected output, stop conditions, safety rules, worker role, source context, and (for driver decisions) reasons / risk flags / recommended vehicle. F.5 boilerplate ("Stop if visual evidence is required but unavailable.") is excluded so it never false-positives.
+- Writes inert `.agent/visual_evidence/<visual_evidence_id>/visual_evidence_contract.json` and `.md`.
+- Detection: visual reference (screenshot / image / visual / UI / layout / OCR / chart / poster / design) → `visual_evidence_referenced` + `source_mentions_visual_issue`; `--visual-path` or embedded paths → `visual_evidence_present`; no path and no summary → `visual_paths_missing` + `visual_evidence_path_or_caption`; no readable vision model → `vision_model_unavailable`, and with no summary → `human_visual_summary_required` + `human_visual_summary_or_vision_model`; no explicit validation coverage → `validation_does_not_cover_visual_issue` + `explicit_visual_validation_coverage`.
+- Resolution claim: allowed only when (a human summary OR a vision-capable model) AND explicit visual validation coverage are present; otherwise `visual_verification_required = true`, `resolution_claim_allowed = false`, `visual_evidence_unverified` + `resolution_claim_not_allowed` + `visual_verification_step`. A non-visual source always allows the claim.
+- `visual_evidence_readable_by_model` and `validation_covers_visual_issue` default false and are only ever set true when explicitly passed — never inferred from file presence, never by inspecting images.
+
+Rules (contract-only — verified by guardrail tests):
+- No OCR. No vision model. No model call. Image bytes are never read.
+- No provider switch. No worker launch. No patch apply. No validation run.
+- No Dream. No Project Evolution execution. No webhook/network. No lesson promotion.
+
+Status:
+- Complete. Contract-only — no OCR / vision / model execution yet.
+- CLI: `python scripts/create_visual_evidence_contract.py --source <worker_assignment_or_driver_decision_json>` (optional `--visual-path`, `--human-summary`, `--visual-readable-by-model true`, `--validation-covers-visual true`, `--json`, `--dry-run`, `--output-root`, deterministic `--visual-evidence-id` / `--created-at`).
+- A.16 does not auto-run inside F.5 or H.1; the operator runs the three steps (assignment → driver route → visual evidence contract) manually.
+- Files: `core/visual_evidence_contract.py`, `scripts/create_visual_evidence_contract.py`, `tests/test_visual_evidence_contract.py`.
+- Shipment checkpoint: `python -m pytest tests/test_visual_evidence_contract.py -q` — also covered by `python -m compileall` and the existing `benchmarks/run_benchmarks.py --check`.
+
 ---
 
 ## Track B — Project Evolution Mode
@@ -852,7 +875,7 @@ Status:
 - Turn the H.1 recommendation into an actual, approval-gated model/provider choice.
 - Deferred: H.1 stays recommend-only until a separate human-approved execution phase exists.
 
-H.1 supports the future **A.16 Visual Evidence Intake Contract**: when a task needs visual evidence, H.1 already routes to `vision_or_human_caption_required` instead of letting a text-only model pretend it verified a screenshot.
+H.1 supports the **A.16 Visual Evidence Intake Contract** (shipped): when a task needs visual evidence, H.1 routes to `vision_or_human_caption_required` instead of letting a text-only model pretend it verified a screenshot, and A.16 is where the human records the caption summary (or asserts a vision model) plus validation coverage before any resolution claim is allowed.
 
 ---
 
@@ -938,7 +961,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | --- | --- | --- |
 | **F.5** | One-click Worker Assignment / Route Card | Shipped draft route card for manual worker assignment |
 | **H.1** ✅ | Driver Model Routing Contract | Shipped contract that recommends the safest model vehicle for a worker assignment (report-only) |
-| **A.16** | Visual Evidence Intake Contract | How screenshots/visual output enters the evidence chain |
+| **A.16** ✅ | Visual Evidence Intake Contract | Shipped contract that records whether a visual/UI issue is verifiable before a resolution claim (report-only; no OCR/vision/model) |
 | **F.6** | Lesson Teaching Card / Teacher Mode | Present lessons in a teaching-friendly format |
 
 These features are additive. They do not require implementing any district infrastructure.
