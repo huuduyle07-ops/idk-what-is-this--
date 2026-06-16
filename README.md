@@ -189,7 +189,7 @@ python scripts/create_lesson_teaching_card.py --benchmark-case benchmarks/cases/
 python scripts/create_lesson_teaching_card.py --failure-report .agent/audits/<report>.json
 ```
 
-Teaching Card smoke/copy usage: the default CLI output prints the teaching card id, JSON path, Markdown path, and a `Copy this Markdown:` hint. Use `--json` for deterministic machine-readable output with no extra human text.
+Teaching Card smoke/copy usage: the Markdown file is the copy/study artifact. The default CLI output prints the teaching card id, JSON path, Markdown path, and a `Copy this Markdown:` hint. Use `--json` for deterministic machine-readable output with no extra human text.
 
 Optional flags: `--json`, `--dry-run`, `--output-root`, plus deterministic `--teaching-card-id` / `--created-at` hooks. The card JSON always carries inert flags `model_call_performed`, `lesson_promotion_performed`, `anti_lesson_created`, `patch_applied`, `validation_run`, `worker_launch_performed`, `dream_triggered`, and `project_evolution_triggered`, all `false`.
 
@@ -198,6 +198,29 @@ Important files:
 - `core/lesson_teaching_card.py`
 - `scripts/create_lesson_teaching_card.py`
 - `tests/test_lesson_teaching_card.py`
+
+### 1.10. Worker Result Review Stub (F.7)
+
+Worker Result Review Stub records output from an external worker for human review. It is local and artifact-only: a human runs the worker elsewhere, then imports the result text or result file against an existing Worker Assignment. The review remains untrusted until a human inspects it. It does not call models, launch workers, apply patches, run validation, import proposals, promote lessons, create teaching cards, trigger Dream / Project Evolution, or call webhooks/network.
+
+Default output:
+
+- `.agent/worker_result_reviews/<review_id>/worker_result_review.json`
+- `.agent/worker_result_reviews/<review_id>/worker_result_review.md`
+
+CLI example:
+
+```bash
+python scripts/import_worker_result_review.py --worker-assignment .agent/worker_assignments/<assignment_id>/worker_assignment.json --result-file worker_result.md
+```
+
+Optional links: `--driver-decision <path>` and `--visual-evidence-contract <path>`. Use `--result-text "<text>"` for a direct paste, `--dry-run` to write nothing, and `--json` for deterministic machine-readable output. The Markdown review summarizes the worker excerpt, claimed changed files, claimed validation, risk flags, missing requirements, recommended next actions, review status, and execution boundary.
+
+Important files:
+
+- `core/worker_result_review.py`
+- `scripts/import_worker_result_review.py`
+- `tests/test_worker_result_review.py`
 
 ### 2. Task Router
 
@@ -803,6 +826,7 @@ Column guide:
 | **Driver Model Routing (H.1)** | Recommend the safest allowed model "vehicle" for a worker assignment | `worker_assignment.json` (F.5) | `driver_decision.json`, `.md` | No | Yes (`.agent/driver_decisions/`) | No | No | Recommend-only; `approval_required` set per task; never executes | Contract/report-only; no model call, provider switch, worker launch, patch, validation, Dream, or promotion |
 | **Visual Evidence Intake (A.16)** | Record whether a visual/UI issue is verifiable before a resolution claim | `worker_assignment.json` (F.5) or `driver_decision.json` (H.1) | `visual_evidence_contract.json`, `.md` | No | Yes (`.agent/visual_evidence/`) | No | No | Report-only; `resolution_claim_allowed` set per task; needs human summary or vision model + validation coverage | Contract-only; no OCR, vision model, model call, worker launch, patch, validation, Dream, or promotion; image bytes never read |
 | **Lesson Teaching Card (F.6)** | Turn existing learning evidence into a human study card | Lesson, anti-lesson, benchmark case, or failure report JSON | `teaching_card.json`, `.md` | No | Yes (`.agent/teaching_cards/`) | No | No | Human reviews the card before applying ideas | Artifact-only; no model call, lesson promotion, anti-lesson creation, patch, validation, worker launch, Dream, Project Evolution, webhook, or source mutation |
+| **Worker Result Review Stub (F.7)** | Record external worker output for human review | `worker_assignment.json` + pasted/file worker result, optional driver/visual links | `worker_result_review.json`, `.md` | No | Yes (`.agent/worker_result_reviews/`) | No | No | Human review required; result remains untrusted | Artifact-only; no model call, worker launch, patch, validation, proposal import, lesson promotion, teaching card creation, Dream, Project Evolution, webhook, or source mutation |
 
 #### Allowed transitions
 
@@ -817,6 +841,7 @@ Column guide:
 - Worker Run → Imported Proposal → Temp-clone validation ✅
 - Worker Assignment → Driver Decision (recommend-only) ✅
 - Worker Assignment / Driver Decision → Visual Evidence Contract (report-only) ✅
+- Worker Assignment + manual external worker result → Worker Result Review Stub (artifact-only) ✅
 
 - Lesson / Anti-Lesson / Benchmark Case / Failure Report → Teaching Card (artifact-only) ✅
 
@@ -831,6 +856,7 @@ Column guide:
 - Lesson → override user request, repo state, validation, or Patch Safety gate ❌
 - Driver Decision → model call / provider switch / worker launch / patch apply ❌
 - Visual Evidence Contract → OCR / vision model / model call / resolution claim without verification ❌
+- Worker Result Review Stub → patch / validation / proposal import / lesson promotion / teaching card creation / worker launch ❌
 
 - Teaching Card → model call / lesson promotion / anti-lesson creation / patch / validation / worker launch / Dream / Project Evolution ❌
 
@@ -1233,6 +1259,7 @@ This is an active AI engineering project, not a tiny demo. The code already incl
 
 - **F.6 Lesson Teaching Card / Teacher Mode v0 complete.** Creates local teaching cards from lesson, anti-lesson, benchmark case, or failure report JSON via `python scripts/create_lesson_teaching_card.py --lesson <path>`. Output lives under `.agent/teaching_cards/`; no model call, lesson promotion, anti-lesson creation, patch, validation, worker launch, Dream, Project Evolution, webhook, or source mutation is performed.
 - **F.6a Teaching Card Smoke + Copy Polish complete.** Adds fixture smoke coverage for lesson, anti-lesson, benchmark case, and failure report cards; keeps Markdown compact and copy-friendly; default CLI text now includes a `Copy this Markdown:` hint while `--json` remains deterministic and plain JSON.
+- **F.7 Worker Result Import / Review Stub complete.** Imports pasted or file-based external worker output against a Worker Assignment into `.agent/worker_result_reviews/`. The result stays untrusted and human-review-only; no model call, worker launch, patch, validation, proposal import, lesson promotion, teaching card creation, Dream, Project Evolution, or webhook/network behavior is performed.
 
 ## Short Summary
 
