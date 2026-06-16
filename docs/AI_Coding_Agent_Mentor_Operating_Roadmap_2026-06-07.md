@@ -1048,6 +1048,37 @@ These features are additive. They do not require implementing any district infra
 
 ---
 
+## Track GOV — Persona Governance
+
+Purpose:
+Keep the District Model framing from turning into uncontrolled architecture
+sprawl. Track GOV defines and **limits** the governance vocabulary (personas,
+layers, transitions) instead of building new personas. It is docs/governance
+only.
+
+### GOV.1 — Persona Governance Manifest ✅
+
+Status: **Complete / docs-only.**
+
+Notes:
+- defines City / District / Persona / Artifact / Button boundaries
+- defines Explorer / Verifier / Arbiter / Courier / Human
+- adds persona anti-inflation rules (a new persona needs a distinct responsibility, permissions, forbidden actions, artifact boundary, and a failure mode worth governing)
+- parks Neural Lesson Graph / nano-agent ideas for a future report-only **GOV.2 — Neural Lesson Graph Activation Preview** (see the Parking Lot note under Track D)
+- no backend execution power added
+
+Core principle: **GOV.1 does not build new personas. GOV.1 limits and defines personas.**
+
+Files:
+- `docs/governance/persona_governance_manifest.md`
+- README "Persona governance (GOV.1)" section links to the manifest
+- `tests/test_persona_governance_manifest.py` (docs guardrail — content only, no execution)
+
+Guardrail (docs-only — nothing below was added):
+- no new agent, nano-agent execution, model call, worker launch, patch/apply, validation run, Dream, Project Evolution, webhook/network, lesson promotion, proposal import, database migration, new backend route, or new UI panel.
+
+---
+
 ## Deferred Ideas
 
 - Migration Planner
@@ -1113,6 +1144,9 @@ Treat lessons as knowledge nodes, anti-lessons as inhibition nodes, benchmark/ev
 
 Potential future phase:
 GOV.2 — Neural Lesson Graph Activation Preview.
+
+Parked by:
+GOV.1 — Persona Governance Manifest (`docs/governance/persona_governance_manifest.md`, §5). GOV.1 records this idea as parked and explicitly forbids autonomous nano-agent execution.
 
 Boundary:
 Report-only. No patch/apply, no model call, no lesson promotion, no autonomous worker spawning.

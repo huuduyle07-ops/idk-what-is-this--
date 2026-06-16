@@ -793,6 +793,14 @@ Core rule:
 
 > **The subagent is not the boss. The Mentor is not certain. The human decides what becomes a lesson and what becomes active.**
 
+### Persona governance (GOV.1)
+
+- C.A.T.T.U.S uses governance personas as **bounded roles, not autonomous personalities**.
+- **Explorer / Verifier / Arbiter / Courier / Human** are reusable roles across districts.
+- **GOV.1 is docs-only and adds no execution power.**
+
+See the [Persona Governance Manifest](docs/governance/persona_governance_manifest.md) for the four architecture layers (City / District / Persona / Artifact), each persona's permissions and forbidden actions, the anti-inflation rules for adding a new persona, and the forbidden/allowed persona transitions. Core rule: **District = profession. Persona = governance role. Artifact = transferable record. Button = user action.** And: **Human approval is the final activation gate, but evidence remains the judge.**
+
 ### Operating Modes / Permission Matrix
 
 The mode matrix is the permission map for C.A.T.T.U.S. It prevents power leakage between modes — a mode may only do what its row allows. If a future feature needs more power, it must pass through a stricter mode or gate rather than silently expanding the current mode.
