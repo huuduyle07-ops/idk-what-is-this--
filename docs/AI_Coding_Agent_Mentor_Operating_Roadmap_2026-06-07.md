@@ -718,7 +718,7 @@ then ask the human before any merge/apply.
 
 ## Track F — Operator Assistant / Prompt Courier
 
-Status: shipped through F.6a.
+Status: shipped through F.7.
 
 ### Purpose:
 Reduce manual friction in Goal Brief and Mayor Mode by converting messy user intent into structured, reviewable task briefs and handoff notes.
@@ -774,12 +774,23 @@ F.6 shipment checkpoint:
 ### F.6a Teaching Card Smoke + Copy Polish complete
 - improve smoke coverage so representative lesson, anti-lesson, benchmark case, and failure report fixtures assert the generated Markdown is useful to read, not just structurally present
 - keep Markdown compact: required teaching sections, short paragraphs/bullets, mini quiz with exactly three questions, mini exercise, uncertainty notes, and no raw JSON blob dumps
-- make default CLI output copy-friendly with teaching card id, JSON path, Markdown path, and a `Copy this Markdown:` hint
+- make default CLI output copy-friendly with teaching card id, JSON path, Markdown path, and a `Copy this Markdown:` hint; Markdown is the copy/study artifact
 - keep `--json` deterministic and free of extra human text
 - preserve guardrails: no model/provider imports, patch/apply path, validation subprocess call, worker launch, Dream runner, Project Evolution execution, webhook/network call, lesson promotion, or anti-lesson creation
 
 F.6a shipment checkpoint:
 - Targeted pytest: `tests/test_lesson_teaching_card.py`
+
+### F.7 Worker Result Import / Review Stub complete
+- import pasted or file-based external worker output against an existing Worker Assignment
+- write `.agent/worker_result_reviews/<review_id>/worker_result_review.json` and `.md`
+- optionally link a Driver Decision and Visual Evidence Contract, but never create or execute them
+- keep the result untrusted: `review_status=pending_review`, `trust_level=untrusted`, `human_review_required=true`
+- extract claimed changed files, claimed validation commands, visual/security-sensitive claims, missing visual evidence requirements, truncation, and recommended next manual actions
+- preserve guardrails: no model/provider import, worker launch, patch/apply path, validation subprocess call, proposal import, lesson promotion, teaching card creation, Dream runner, Project Evolution execution, or webhook/network call
+
+F.7 shipment checkpoint:
+- Targeted pytest: `tests/test_worker_result_review.py`
 
 Current benchmark catalog:
 - benchmark --check: 54 checked, 0 errors
@@ -984,6 +995,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **A.16** ✅ | Visual Evidence Intake Contract | Shipped contract that records whether a visual/UI issue is verifiable before a resolution claim (report-only; no OCR/vision/model) |
 | **F.6** complete | Lesson Teaching Card / Teacher Mode | Shipped local teaching cards for lessons, anti-lessons, benchmark cases, and failure reports (artifact-only; no model/patch/validation/promotion) |
 | **F.6a** complete | Teaching Card Smoke + Copy Polish | Shipped fixture smoke tests and copy-friendly CLI text while keeping the flow inert |
+| **F.7** complete | Worker Result Import / Review Stub | Shipped untrusted worker-output intake artifact for manual review; no patch, validation, proposal import, worker launch, model call, promotion, Dream, or Project Evolution behavior |
 
 These features are additive. They do not require implementing any district infrastructure.
 
