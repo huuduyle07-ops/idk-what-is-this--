@@ -1106,4 +1106,16 @@ Outputs:
 - uncertainty explanation
 - family-pressure warning, if relevant
 
+Parking Lot — Neural Lesson Graph Activation
 
+Idea:
+Treat lessons as knowledge nodes, anti-lessons as inhibition nodes, benchmark/evidence links as grounding edges, and bounded courier/nano-agents as activation pulses.
+
+Potential future phase:
+GOV.2 — Neural Lesson Graph Activation Preview.
+
+Boundary:
+Report-only. No patch/apply, no model call, no lesson promotion, no autonomous worker spawning.
+
+Reason to defer:
+The current priority is keeping Mayor Mode simple and usable after F.8a/F.8b/F.8c.
