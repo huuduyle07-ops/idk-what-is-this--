@@ -2160,6 +2160,78 @@ button {
     padding: 8px 9px;
 }
 
+/* F.8c: assistive intake — staged flow, primary intake box, collapsed helpers. */
+.goal-brief-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 10px;
+    padding: 0;
+    list-style: none;
+    counter-reset: none;
+}
+
+.goal-brief-step {
+    flex: 1 1 0;
+    min-width: 120px;
+    padding: 6px 9px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    font-size: 0.85em;
+    text-align: center;
+}
+
+.goal-brief-step--active {
+    color: var(--color-text);
+    border-color: var(--color-text-muted);
+    font-weight: 600;
+}
+
+.goal-brief-intake__label {
+    display: block;
+    margin: 2px 0 4px;
+    font-weight: 600;
+}
+
+.goal-brief-intake__actions {
+    margin-top: 6px;
+}
+
+.goal-brief-optional,
+.goal-brief-advanced {
+    margin-top: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface-2);
+}
+
+.goal-brief-optional > summary,
+.goal-brief-advanced > summary {
+    cursor: pointer;
+    padding: 6px 9px;
+    color: var(--color-text-muted);
+    font-size: 0.9em;
+}
+
+.goal-brief-optional[open] > summary,
+.goal-brief-advanced[open] > summary {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.goal-brief-optional > .goal-brief-autocomplete,
+.goal-brief-advanced > .mode-router-panel,
+.goal-brief-advanced > .review-pack-panel {
+    padding: 8px 9px;
+}
+
+.worker-assignment-note {
+    margin: 0 0 6px;
+    color: var(--color-text-muted);
+    font-size: 0.82em;
+}
+
 .goal-brief-chips {
     display: flex;
     flex-wrap: wrap;
@@ -2234,8 +2306,15 @@ button {
     border-color: #166534;
 }
 
-.goal-brief-checklist-row--missing {
-    border-color: #7f1d1d;
+/* F.8c: non-blocking checklist. "Needed" gets a soft amber accent (not a red
+   error wall); "optional" stays neutral so the brief feels assistive. */
+.goal-brief-checklist-row--needed {
+    border-color: var(--color-border);
+    border-left: 3px solid #b45309;
+}
+
+.goal-brief-checklist-row--optional {
+    border-color: var(--color-border);
 }
 
 .goal-brief-checklist-row__main {
@@ -2256,8 +2335,12 @@ button {
     overflow-wrap: anywhere;
 }
 
-.goal-brief-checklist-row--missing strong {
-    color: #fca5a5;
+.goal-brief-checklist-row--needed strong {
+    color: #fcd34d;
+}
+
+.goal-brief-checklist-row--optional strong {
+    color: var(--color-text-muted);
 }
 
 .goal-brief-checklist-row button {

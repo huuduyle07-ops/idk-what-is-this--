@@ -167,10 +167,14 @@ const html = _renderDreamItemCard({{
 }});
 console.log(html);
 """
+    # Feed the script via stdin (`node -`) rather than `node -e <script>`: the
+    # extracted region spans the whole UI helper block, and on Windows a large
+    # `-e` argument can exceed the command-line length limit (WinError 206).
     result = subprocess.run(
-        ["node", "-e", script],
+        ["node", "-"],
+        input=script,
         check=True,
-        text=True,
+        encoding="utf-8",
         capture_output=True,
         cwd=PROJECT_ROOT,
     )

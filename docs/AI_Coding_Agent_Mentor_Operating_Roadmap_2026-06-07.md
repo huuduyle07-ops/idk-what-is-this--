@@ -819,6 +819,23 @@ F.8b shipment checkpoint:
 - Targeted pytest: `tests/test_worker_assignment.py` (28 passed)
 - `python benchmarks/run_benchmarks.py --check`: 54 checked, 0 errors
 
+### F.8c Goal Brief assistive intake simplification complete
+- UX / template / JS / CSS only; no backend permission, no Worker Assignment JSON schema change, and no new capability
+- core principle: the system assists the operator instead of forcing a strict interview
+- merge the intake surfaces into one Step 1 box ("What do you want help with?") with rough notes (messy intent + "Help me structure this") collapsed into an optional detail
+- add a three-step stage indicator (Step 1 Describe -> Step 2 Refine -> Step 3 Handoff) with one stage primary at a time, driven by `_setGoalBriefStage()`
+- make the checklist non-blocking: soft labels ("Not provided yet", "Needed before worker assignment") via `_goalBriefMissingLabel()` instead of a blunt red "Missing" wall, with a soft amber accent only on readiness-gating fields
+- add friendly "good enough" guidance before handoff ("You can continue with a rough brief, but Worker Assignment will be safer with allowed files + validation.")
+- assistive button wording: "Start assisted brief", "Help me structure this", "Suggest workflow mode"
+- move advanced helpers (mode routing, review pack, raw details) into one collapsed `<details class="goal-brief-advanced">` so they stay available but secondary
+- preserve F.8b gating: Create Worker Assignment stays disabled until the final prompt is ready, Copy assignment stays hidden until Markdown exists, and there are no empty worker-assignment boxes or duplicate action bars
+- preserve guardrails: no model call beyond the existing Goal Brief interview route, worker launch, patch/apply, validation run, Dream, Project Evolution, webhook/network, lesson promotion, or proposal import was added
+
+F.8c shipment checkpoint:
+- Targeted pytest: `tests/test_worker_assignment.py` (35 passed)
+- Related UI suites: `tests/test_goal_brief_routes.py`, `tests/test_goal_brief_autocomplete_routes.py`, `tests/test_mode_router_routes.py`, `tests/test_mayor_mode_ui.py` (green)
+- `python benchmarks/run_benchmarks.py --check`: 54 checked, 0 errors
+
 Current benchmark catalog:
 - benchmark --check: 54 checked, 0 errors
 
@@ -1025,6 +1042,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **F.7** complete | Worker Result Import / Review Stub | Shipped untrusted worker-output intake artifact for manual review; no patch, validation, proposal import, worker launch, model call, promotion, Dream, or Project Evolution behavior |
 | **F.8a** complete | Worker Assignment prompt compacting + Goal Brief UI de-dup | UX-only: compact six-section route-card Markdown (safety stated once, JSON record + inert flags unchanged) and a de-duplicated Goal Brief tab that gates Create Worker Assignment behind a usable brief; no new execution power |
 | **F.8b** complete | Goal Brief action-bar cleanup | UX-only: staged Goal Brief actions (one primary per stage), Worker Assignment handoff moved below the checklist and gated on a ready brief, single compact card hidden until creation, Review Pack demoted to a collapsed secondary section; no backend/schema/execution change |
+| **F.8c** complete | Goal Brief assistive intake simplification | UX-only: one primary intake box + optional details, 3-step stage indicator (Describe/Refine/Handoff), non-blocking checklist wording, friendly "good enough" guidance, assistive button labels, advanced helpers (mode routing/review pack/raw details) collapsed; F.8b gating preserved; no backend/schema/execution change |
 
 These features are additive. They do not require implementing any district infrastructure.
 

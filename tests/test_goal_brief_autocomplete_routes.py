@@ -68,8 +68,8 @@ def test_goal_brief_autocomplete_panel_is_rendered(client):
     assert resp.status_code == 200
     html = resp.get_data(as_text=True)
     assert 'id="goalBriefMessyIntent"' in html
-    assert "Messy intent" in html
-    assert "Draft Goal Brief" in html
+    assert "Add logs, likely files, validation ideas, or rough notes" in html
+    assert "Help me structure this" in html
     assert "Use this in Goal Brief" in html
     assert "goalBriefAutocompletePreview" in html
 

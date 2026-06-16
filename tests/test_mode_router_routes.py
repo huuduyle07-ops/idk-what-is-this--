@@ -70,7 +70,7 @@ def test_mode_router_route_accepts_goal_and_handoff_context(client):
 def test_mode_router_panel_is_rendered(client):
     html = client.get("/").get_data(as_text=True)
 
-    assert "Suggest mode" in html
+    assert "Suggest workflow mode" in html
     assert 'id="modeRouterIntent"' in html
     assert 'id="modeRouterPreview"' in html
     assert "suggestModeRoute" in html

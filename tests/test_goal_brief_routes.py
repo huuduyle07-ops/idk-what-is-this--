@@ -85,7 +85,7 @@ def test_goal_brief_panel_is_rendered(client):
     assert resp.status_code == 200
     html = resp.get_data(as_text=True)
     assert "ws-tab-goal-brief" in html
-    assert "Start brief" in html
+    assert "Start assisted brief" in html
     assert "goalBriefSummary" in html
     assert "Reply or paste command output" in html
     assert "Bug fix" in html

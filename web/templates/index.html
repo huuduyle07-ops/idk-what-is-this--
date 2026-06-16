@@ -357,39 +357,42 @@
             </div>
 
             <input type="hidden" id="goalBriefRef" value="">
-            <textarea id="goalBriefGoal" class="goal-brief-goal" placeholder="What are you trying to get done?"></textarea>
 
-            <section class="goal-brief-autocomplete" aria-label="Goal Brief autocomplete">
-              <label for="goalBriefMessyIntent">Messy intent</label>
-              <textarea id="goalBriefMessyIntent" class="goal-brief-autocomplete-input" placeholder="Paste rough notes, errors, desired behavior, likely files, and validation ideas."></textarea>
-              <div class="goal-brief-actions">
-                <button type="button" onclick="draftGoalBriefAutocomplete()">Draft Goal Brief</button>
-                <button type="button" id="goalBriefAutocompleteUse" onclick="useGoalBriefAutocompleteDraft()" disabled>Use this in Goal Brief</button>
-              </div>
-              <div id="goalBriefAutocompletePreview" class="goal-brief-autocomplete-preview" aria-live="polite">
-                <span class="goal-brief-muted">No autocomplete draft yet.</span>
+            <!-- F.8c: assistive intake. One main task input is primary; rough notes,
+                 mode routing, review pack, and raw details are optional/collapsed so
+                 the flow assists the operator instead of forcing a strict interview.
+                 Stages: Describe -> Refine -> Handoff (one primary at a time). -->
+            <ol id="goalBriefSteps" class="goal-brief-steps" data-active-step="describe" aria-label="Goal Brief stages">
+              <li class="goal-brief-step" data-step="describe" aria-current="step">Step 1: Describe</li>
+              <li class="goal-brief-step" data-step="refine">Step 2: Refine</li>
+              <li class="goal-brief-step" data-step="handoff">Step 3: Handoff</li>
+            </ol>
+
+            <!-- Step 1 — Describe: one main intake box; details are optional/collapsed. -->
+            <section class="goal-brief-intake" aria-label="Describe the task">
+              <label for="goalBriefGoal" class="goal-brief-intake__label">What do you want help with?</label>
+              <textarea id="goalBriefGoal" class="goal-brief-goal" placeholder="Describe the task in your own words. Rough is fine - the assistant helps structure it."></textarea>
+
+              <details class="goal-brief-optional">
+                <summary>Add logs, likely files, validation ideas, or rough notes</summary>
+                <section class="goal-brief-autocomplete" aria-label="Optional details and structuring helper">
+                  <textarea id="goalBriefMessyIntent" class="goal-brief-autocomplete-input" placeholder="Paste rough notes, errors, desired behavior, likely files, and validation ideas."></textarea>
+                  <div class="goal-brief-actions">
+                    <button type="button" onclick="draftGoalBriefAutocomplete()">Help me structure this</button>
+                    <button type="button" id="goalBriefAutocompleteUse" onclick="useGoalBriefAutocompleteDraft()" disabled>Use this in Goal Brief</button>
+                  </div>
+                  <div id="goalBriefAutocompletePreview" class="goal-brief-autocomplete-preview" aria-live="polite">
+                    <span class="goal-brief-muted">No autocomplete draft yet.</span>
+                  </div>
+                </section>
+              </details>
+
+              <div class="goal-brief-actions goal-brief-intake__actions">
+                <button type="button" id="goalBriefStart" class="goal-brief-primary" onclick="startGoalBrief()">Start assisted brief</button>
               </div>
             </section>
 
-            <section class="mode-router-panel" aria-label="Mode router">
-              <label for="modeRouterIntent">Mode routing intent</label>
-              <textarea id="modeRouterIntent" class="mode-router-input" placeholder="Paste the request to classify, or leave blank to use the current Goal Brief/Handoff draft."></textarea>
-              <div class="goal-brief-actions">
-                <button type="button" onclick="suggestModeRoute()">Suggest mode</button>
-              </div>
-              <div id="modeRouterPreview" class="mode-router-preview" aria-live="polite">
-                <span class="goal-brief-muted">No mode suggestion yet.</span>
-              </div>
-            </section>
-
-            <!-- F.8b: conversation actions drive the interview. One primary action
-                 per stage; the handoff (Copy final prompt / Create Worker Assignment)
-                 moves below the checklist so it reads as the post-interview step. -->
-            <div class="goal-brief-actions">
-              <button type="button" onclick="startGoalBrief()">Start brief</button>
-              <button type="button" onclick="updateGoalBrief()">Send reply</button>
-            </div>
-
+            <!-- Step 2 — Refine: assisted conversation + a non-blocking checklist. -->
             <div class="goal-brief-main">
               <div class="goal-brief-conversation">
                 <div id="goalBriefChat" class="goal-brief-chat">
@@ -407,6 +410,9 @@
                 </div>
 
                 <textarea id="goalBriefAnswer" class="goal-brief-answer" placeholder="Reply or paste command output"></textarea>
+                <div class="goal-brief-actions">
+                  <button type="button" onclick="updateGoalBrief()">Send reply</button>
+                </div>
               </div>
 
               <section id="goalBriefSummary" class="goal-brief-summary" aria-live="polite">
@@ -419,12 +425,12 @@
               </section>
             </div>
 
-            <!-- F.8a/F.8b: Worker Assignment is the post-interview handoff stage. It is
-                 gated on a ready brief, sits below the checklist, and shows one compact
-                 card (id + paths + one copyable Markdown box). No duplicate action bars
-                 and no empty boxes before an assignment exists. -->
+            <!-- Step 3 — Handoff (F.8a/F.8b). Gated on a ready brief, below the
+                 checklist, one compact card, no empty boxes or duplicate action bars.
+                 F.8c adds friendly "good enough" guidance. -->
             <section class="worker-assignment-panel" id="workerAssignmentPanel" data-brief-state="none" aria-label="Worker assignment">
               <p id="workerAssignmentHelp" class="worker-assignment-help">Start or load a Goal Brief before creating a Worker Assignment.</p>
+              <p class="worker-assignment-note">You can continue with a rough brief, but Worker Assignment will be safer with allowed files + validation.</p>
               <div class="goal-brief-actions worker-assignment-handoff">
                 <button type="button" id="goalBriefCopyFinalPrompt" onclick="copyGoalBriefFinalPrompt()" disabled>Copy final prompt</button>
                 <button type="button" id="workerAssignmentCreate" class="goal-brief-primary" onclick="createWorkerAssignmentFromGoalBrief()" disabled>Create Worker Assignment</button>
@@ -437,10 +443,22 @@
               </div>
             </section>
 
-            <!-- F.8b: Review Pack stays available but secondary (collapsed). Its Copy
-                 button no longer competes with the primary Create Worker Assignment. -->
-            <details class="goal-brief-secondary">
-              <summary>Review pack (optional)</summary>
+            <!-- F.8c: advanced helpers stay available but secondary and collapsed so
+                 they do not compete with the assisted intake flow. -->
+            <details class="goal-brief-advanced">
+              <summary>Advanced helpers (mode routing, review pack, raw details)</summary>
+
+              <section class="mode-router-panel" aria-label="Mode router">
+                <label for="modeRouterIntent">Mode routing intent</label>
+                <textarea id="modeRouterIntent" class="mode-router-input" placeholder="Paste the request to classify, or leave blank to use the current Goal Brief/Handoff draft."></textarea>
+                <div class="goal-brief-actions">
+                  <button type="button" onclick="suggestModeRoute()">Suggest workflow mode</button>
+                </div>
+                <div id="modeRouterPreview" class="mode-router-preview" aria-live="polite">
+                  <span class="goal-brief-muted">No mode suggestion yet.</span>
+                </div>
+              </section>
+
               <section class="review-pack-panel" aria-label="Review pack generator">
                 <div class="review-pack-row">
                   <label for="reviewPackWorkerTarget">Review pack target</label>
@@ -457,28 +475,28 @@
                 </div>
                 <pre id="reviewPackPreview" class="review-pack-preview" aria-live="polite">No review pack generated yet.</pre>
               </section>
-            </details>
 
-            <details class="goal-brief-raw-details">
-            <summary>Raw details</summary>
-            <div class="goal-brief-grid">
-              <section>
-                <h3>Known Evidence</h3>
-                <pre id="goalBriefEvidence" class="goal-brief-pre">No evidence yet.</pre>
-              </section>
-              <section>
-                <h3>Missing Information</h3>
-                <div id="goalBriefMissing" class="goal-brief-list">None</div>
-              </section>
-              <section>
-                <h3>Suggested Commands</h3>
-                <div id="goalBriefCommands" class="goal-brief-list">None</div>
-              </section>
-              <section>
-                <h3>Final Prompt</h3>
-                <pre id="goalBriefFinalPrompt" class="goal-brief-pre">Not ready.</pre>
-              </section>
-            </div>
+              <details class="goal-brief-raw-details">
+                <summary>Raw details</summary>
+                <div class="goal-brief-grid">
+                  <section>
+                    <h3>Known Evidence</h3>
+                    <pre id="goalBriefEvidence" class="goal-brief-pre">No evidence yet.</pre>
+                  </section>
+                  <section>
+                    <h3>Missing Information</h3>
+                    <div id="goalBriefMissing" class="goal-brief-list">None</div>
+                  </section>
+                  <section>
+                    <h3>Suggested Commands</h3>
+                    <div id="goalBriefCommands" class="goal-brief-list">None</div>
+                  </section>
+                  <section>
+                    <h3>Final Prompt</h3>
+                    <pre id="goalBriefFinalPrompt" class="goal-brief-pre">Not ready.</pre>
+                  </section>
+                </div>
+              </details>
             </details>
           </section>
         </div>
@@ -5629,6 +5647,30 @@ const GOAL_BRIEF_CHECKLIST = [
     },
 ];
 
+// F.8c: the brief is assistive, not a strict form. These keys gate brief
+// readiness (mirrors core/goal_brief._has_enough_evidence); everything else is a
+// friendly nudge rather than a blocking error.
+const GOAL_BRIEF_REQUIRED_KEYS = new Set([
+    "problem_type",
+    "evidence.command_run",
+    "evidence.expected_result",
+    "evidence.actual_result_or_error_output",
+    "validation.command",
+    "validation.success_criteria",
+]);
+
+function _goalBriefMissingLabel(key) {
+    // Softer, non-blocking wording instead of a blunt "Missing" wall.
+    return GOAL_BRIEF_REQUIRED_KEYS.has(key) ? "Needed before worker assignment" : "Not provided yet";
+}
+
+function _goalBriefRowClass(item) {
+    if (item.complete) return "goal-brief-checklist-row--complete";
+    return GOAL_BRIEF_REQUIRED_KEYS.has(item.key)
+        ? "goal-brief-checklist-row--needed"
+        : "goal-brief-checklist-row--optional";
+}
+
 function _goalBriefChecklistRows(brief) {
     const source = brief || {};
     return GOAL_BRIEF_CHECKLIST.map(group => ({
@@ -5663,10 +5705,10 @@ function _renderGoalBriefChecklist(brief) {
         <div class="goal-brief-checklist-group">
           <div class="goal-brief-checklist-group__title">${_escapeHtml(group.group)}</div>
           ${group.items.map(item => `
-            <div class="goal-brief-checklist-row ${item.complete ? "goal-brief-checklist-row--complete" : "goal-brief-checklist-row--missing"}">
+            <div class="goal-brief-checklist-row ${_goalBriefRowClass(item)}">
               <div class="goal-brief-checklist-row__main">
                 <span>${_escapeHtml(item.label)}</span>
-                <strong>${_escapeHtml(item.value || "Missing")}</strong>
+                <strong>${_escapeHtml(item.value || _goalBriefMissingLabel(item.key))}</strong>
               </div>
               <button type="button" class="goal-brief-checklist-insert" data-goal-brief-template="${_escapeHtml(item.template)}">Insert</button>
             </div>
@@ -5823,6 +5865,24 @@ function _updateWorkerAssignmentAvailability() {
             help.hidden = true;
         }
     }
+    _setGoalBriefStage(state);
+}
+
+function _setGoalBriefStage(state) {
+    // F.8c: show one stage at a time — describe -> refine -> handoff.
+    const steps = document.getElementById("goalBriefSteps");
+    if (!steps) return;
+    const stage = state === "ready" ? "handoff" : (state === "draft" ? "refine" : "describe");
+    steps.dataset.activeStep = stage;
+    steps.querySelectorAll(".goal-brief-step").forEach(step => {
+        const active = step.dataset.step === stage;
+        step.classList.toggle("goal-brief-step--active", active);
+        if (active) {
+            step.setAttribute("aria-current", "step");
+        } else {
+            step.removeAttribute("aria-current");
+        }
+    });
 }
 
 function _renderGoalBriefResponse(data, userText = "") {

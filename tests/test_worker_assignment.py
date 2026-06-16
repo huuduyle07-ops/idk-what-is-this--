@@ -767,20 +767,117 @@ def test_web_handoff_actions_disabled_until_brief_ready(client):
 
 
 def test_web_review_pack_is_secondary_collapsed(client):
-    """F.8b: Review Pack stays available but visually secondary (collapsed details)."""
+    """F.8b/F.8c: Review Pack stays available but secondary (inside Advanced helpers)."""
     html = client.get("/").get_data(as_text=True)
 
-    details = html.index('<details class="goal-brief-secondary"')
-    summary_end = html.index("</summary>", details)
+    advanced = html.index('<details class="goal-brief-advanced"')
     review_copy = html.index('id="reviewPackCopy"')
     review_preview = html.index('id="reviewPackPreview"')
 
-    # Review pack controls live inside the collapsed secondary section.
-    assert summary_end < review_copy
-    assert summary_end < review_preview
-    details_close = html.index("</details>", review_preview)
-    assert review_copy < details_close
-    assert review_preview < details_close
+    # Review pack controls live inside the collapsed advanced-helpers section...
+    assert advanced < review_copy
+    assert advanced < review_preview
+    # ...which sits below the primary Worker Assignment handoff (secondary position).
+    assert html.index('id="workerAssignmentPanel"') < advanced
+
+
+def test_web_goal_brief_single_primary_intake(client):
+    """F.8c: one main task input is primary; messy intent is collapsed/optional."""
+    html = client.get("/").get_data(as_text=True)
+
+    assert "What do you want help with?" in html
+    goal_box = html.index('id="goalBriefGoal"')
+    optional = html.index('<details class="goal-brief-optional"')
+    # The main goal box is primary (appears before / outside the optional details).
+    assert goal_box < optional
+    # The messy-intent box is now inside the collapsed optional details.
+    messy = html.index('id="goalBriefMessyIntent"')
+    optional_close = html.index("</details>", messy)
+    assert optional < messy < optional_close
+
+
+def test_web_advanced_helpers_are_collapsed(client):
+    """F.8c: mode routing, review pack, and raw details live in Advanced helpers."""
+    html = client.get("/").get_data(as_text=True)
+
+    advanced = html.index('<details class="goal-brief-advanced"')
+    summary_end = html.index("</summary>", advanced)
+    assert "Advanced helpers" in html[advanced:summary_end]
+    # The advanced block is secondary (below the worker-assignment handoff)...
+    assert html.index('id="workerAssignmentPanel"') < advanced
+    # ...and holds the previously top-level helper surfaces.
+    for anchor in ['id="modeRouterIntent"', 'id="reviewPackCopy"', 'id="goalBriefFinalPrompt"']:
+        assert advanced < html.index(anchor), anchor
+
+
+def test_web_checklist_uses_soft_nonblocking_wording(client):
+    """F.8c: checklist drops the blunt 'Missing' wall for softer guidance."""
+    html = client.get("/").get_data(as_text=True)
+
+    # Scope to the checklist renderer: the blunt placeholder is gone there...
+    start = html.index("function _renderGoalBriefChecklist")
+    checklist_js = html[start:html.index("\nfunction ", start + 1)]
+    assert '"Missing"' not in checklist_js
+    assert "_goalBriefMissingLabel(item.key)" in checklist_js
+    # ...replaced by softer, non-blocking labels.
+    assert "Needed before worker assignment" in html
+    assert "Not provided yet" in html
+    # Friendly "good enough" guidance before handoff.
+    assert "You can continue with a rough brief" in html
+
+
+def test_web_goal_brief_stage_indicator_present(client):
+    """F.8c: a three-step stage indicator (Describe / Refine / Handoff)."""
+    html = client.get("/").get_data(as_text=True)
+
+    assert "Step 1: Describe" in html
+    assert "Step 2: Refine" in html
+    assert "Step 3: Handoff" in html
+    assert 'id="goalBriefSteps"' in html
+    # The stage is recomputed as the brief progresses.
+    assert "_setGoalBriefStage" in html
+
+
+def test_web_goal_brief_button_wording_is_assistive(client):
+    """F.8c: assistive button wording replaces the strict-interview labels."""
+    html = client.get("/").get_data(as_text=True)
+
+    assert "Start assisted brief" in html
+    assert "Help me structure this" in html
+    assert "Suggest workflow mode" in html
+    # Old blunt labels are gone.
+    assert ">Start brief</button>" not in html
+    assert ">Draft Goal Brief</button>" not in html
+    assert ">Suggest mode</button>" not in html
+
+
+def test_web_no_duplicate_worker_assignment_action_bars(client):
+    """F.8c: each handoff / intake action exists exactly once (no duplicate bars)."""
+    html = client.get("/").get_data(as_text=True)
+
+    assert html.count(">Create Worker Assignment</button>") == 1
+    assert html.count(">Copy assignment</button>") == 1
+    assert html.count('onclick="startGoalBrief()"') == 1
+
+
+def test_web_goal_brief_anchors_and_handlers_preserved(client):
+    """F.8c: simplification keeps every DOM anchor and existing handler."""
+    html = client.get("/").get_data(as_text=True)
+
+    for anchor in [
+        'id="goalBriefGoal"', 'id="goalBriefMessyIntent"', 'id="modeRouterIntent"',
+        'id="modeRouterPreview"', 'id="reviewPackPreview"', 'id="goalBriefEvidence"',
+        'id="goalBriefFinalPrompt"', 'id="goalBriefChecklist"', 'id="goalBriefChat"',
+        'id="goalBriefAutocompleteUse"',
+    ]:
+        assert anchor in html, anchor
+    for handler in [
+        "startGoalBrief()", "updateGoalBrief()", "draftGoalBriefAutocomplete()",
+        "useGoalBriefAutocompleteDraft()", "suggestModeRoute()", "generateReviewPack()",
+        "copyReviewPackMarkdown()", "createWorkerAssignmentFromGoalBrief()",
+        "copyWorkerAssignmentMarkdown()", "copyGoalBriefFinalPrompt()",
+    ]:
+        assert handler in html, handler
 
 
 def test_web_no_empty_worker_assignment_box_before_creation(client):
