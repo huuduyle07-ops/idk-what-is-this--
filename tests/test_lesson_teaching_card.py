@@ -484,6 +484,7 @@ def test_cli_text_output_is_copy_friendly(capsys: Any, tmp_path: Path):
     assert "JSON path:" in output
     assert "Markdown path:" in output
     assert "Copy this Markdown" in output
+    assert "copy/study artifact" in output
     assert str(repo / ".agent" / "teaching_cards" / "copy-card" / "teaching_card.md") in output
 
 
