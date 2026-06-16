@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import importlib
 import json
+import re
 import shutil
 import tempfile
 from pathlib import Path
@@ -379,6 +380,113 @@ def test_markdown_includes_required_sections(tmp_path: Path):
     assert "No validation was run" in markdown
 
 
+def test_markdown_smoke_fixtures_are_study_friendly_and_not_raw_json(tmp_path: Path):
+    mod = _module()
+    repo = _repo(tmp_path)
+    sources = [
+        (
+            "lesson",
+            "lesson_path",
+            _write_json(
+                repo / ".agent" / "lessons" / "active" / "lesson.json",
+                _lesson_source(),
+            ),
+            ["money helper", "core/checkout.py"],
+        ),
+        (
+            "anti_lesson",
+            "anti_lesson_path",
+            _write_json(
+                repo / ".agent" / "lessons" / "blocked" / "anti.json",
+                _anti_lesson_source(),
+            ),
+            ["Do not delete failing tests", "Delete the failing regression test"],
+        ),
+        (
+            "benchmark_case",
+            "benchmark_case_path",
+            _write_json(
+                repo / "benchmarks" / "cases" / "python" / "case.json",
+                {
+                    "name": "python_config_env_mismatch",
+                    "language": "python",
+                    "category": "config_mismatch",
+                    "validation_command": "python main.py",
+                    "expected_changed_files": ["config.py"],
+                    "forbidden_changed_files": ["main.py"],
+                    "prompt": "Fix the Python config environment variable mismatch.",
+                },
+            ),
+            ["Benchmark case: python_config_env_mismatch", "config.py"],
+        ),
+        (
+            "failure_report",
+            "failure_report_path",
+            _write_json(
+                repo / ".agent" / "audits" / "failure-report.json",
+                {
+                    "phase": "14.7a",
+                    "guardrail_note": "Read-only verification report.",
+                    "run_health": {
+                        "passed": 53,
+                        "failed": 1,
+                        "failure_category_counts": {"security_tool_or_permission": 1},
+                    },
+                },
+            ),
+            ["Failure report: 14.7a", "security_tool_or_permission"],
+        ),
+    ]
+
+    for source_type, arg_name, source_path, expected_bits in sources:
+        result = mod.create_lesson_teaching_card(
+            repo_path=str(repo),
+            dry_run=True,
+            created_at="2026-01-01T00:00:00Z",
+            teaching_card_id=f"{source_type}-card",
+            **{arg_name: str(source_path)},
+        )
+        markdown = result["markdown"]
+
+        assert result["record"]["source_type"] == source_type
+        assert markdown.startswith("# Teaching Card")
+        assert markdown.count("## Mini Quiz") == 1
+        quiz = markdown.split("## Mini Quiz", 1)[1].split("## Mini Exercise", 1)[0]
+        assert quiz.count("\n- ") == 3
+        assert "## Execution Boundary" in markdown
+        assert "No model was called" in markdown
+        for bit in expected_bits:
+            assert bit in markdown
+        assert not _looks_like_raw_json_blob(markdown)
+
+
+def test_cli_text_output_is_copy_friendly(capsys: Any, tmp_path: Path):
+    cli = _cli_module()
+    repo = _repo(tmp_path)
+    source_path = _write_json(repo / ".agent" / "lessons" / "active" / "lesson.json", _lesson_source())
+
+    rc = cli.main(
+        [
+            "--repo-path",
+            str(repo),
+            "--lesson",
+            str(source_path),
+            "--teaching-card-id",
+            "copy-card",
+            "--created-at",
+            "2026-01-01T00:00:00Z",
+        ]
+    )
+    output = capsys.readouterr().out
+
+    assert rc == 0
+    assert "Teaching card id: copy-card" in output
+    assert "JSON path:" in output
+    assert "Markdown path:" in output
+    assert "Copy this Markdown" in output
+    assert str(repo / ".agent" / "teaching_cards" / "copy-card" / "teaching_card.md") in output
+
+
 def test_cli_creates_json_and_markdown(tmp_path: Path, capsys: Any):
     cli = _cli_module()
     repo = _repo(tmp_path)
@@ -405,6 +513,35 @@ def test_cli_creates_json_and_markdown(tmp_path: Path, capsys: Any):
     assert parsed["record"]["teaching_card_id"] == "cli-card"
     assert Path(parsed["json_path"]).is_file()
     assert Path(parsed["md_path"]).is_file()
+
+
+def test_cli_json_output_is_deterministic_and_has_no_copy_hint(tmp_path: Path, capsys: Any):
+    cli = _cli_module()
+    repo = _repo(tmp_path)
+    source_path = _write_json(repo / ".agent" / "lessons" / "active" / "lesson.json", _lesson_source())
+    argv = [
+        "--repo-path",
+        str(repo),
+        "--lesson",
+        str(source_path),
+        "--teaching-card-id",
+        "stable-cli-json",
+        "--created-at",
+        "2026-01-01T00:00:00Z",
+        "--dry-run",
+        "--json",
+    ]
+
+    first_rc = cli.main(argv)
+    first = capsys.readouterr().out
+    second_rc = cli.main(argv)
+    second = capsys.readouterr().out
+
+    assert first_rc == 0
+    assert second_rc == 0
+    assert first == second
+    assert "Copy this Markdown" not in first
+    assert json.loads(first)["record"]["teaching_card_id"] == "stable-cli-json"
 
 
 def test_cli_dry_run_writes_nothing(tmp_path: Path, capsys: Any):
@@ -592,3 +729,14 @@ def _called_names(tree: ast.AST) -> set[str]:
             elif isinstance(node.func, ast.Attribute):
                 names.add(node.func.attr)
     return names
+
+
+def _looks_like_raw_json_blob(markdown: str) -> bool:
+    lines = markdown.splitlines()
+    jsonish_lines = [
+        line
+        for line in lines
+        if line.strip().startswith(("{", "}", '"', "],", "},", "["))
+        or re.match(r'\s*"[^"]+"\s*:', line)
+    ]
+    return len(jsonish_lines) >= 4

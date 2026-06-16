@@ -189,6 +189,8 @@ python scripts/create_lesson_teaching_card.py --benchmark-case benchmarks/cases/
 python scripts/create_lesson_teaching_card.py --failure-report .agent/audits/<report>.json
 ```
 
+Teaching Card smoke/copy usage: the default CLI output prints the teaching card id, JSON path, Markdown path, and a `Copy this Markdown:` hint. Use `--json` for deterministic machine-readable output with no extra human text.
+
 Optional flags: `--json`, `--dry-run`, `--output-root`, plus deterministic `--teaching-card-id` / `--created-at` hooks. The card JSON always carries inert flags `model_call_performed`, `lesson_promotion_performed`, `anti_lesson_created`, `patch_applied`, `validation_run`, `worker_launch_performed`, `dream_triggered`, and `project_evolution_triggered`, all `false`.
 
 Important files:
@@ -1230,6 +1232,7 @@ This is an active AI engineering project, not a tiny demo. The code already incl
 - **H.1 Driver Model Routing Contract — complete (contract/report-only).** Evaluates a Worker Assignment (F.5) and recommends the safest allowed vehicle (`local_only` → `blocked`) into `.agent/driver_decisions/`, via `python scripts/evaluate_driver_route.py --worker-assignment <path>`. No real model switching yet — it never calls a model, switches providers, launches a worker, applies a patch, runs validation, triggers Dream / Project Evolution execution, calls webhooks, or promotes lessons (guardrail-tested). Lays the routing foundation for the future A.16 Visual Evidence Intake Contract.
 
 - **F.6 Lesson Teaching Card / Teacher Mode v0 complete.** Creates local teaching cards from lesson, anti-lesson, benchmark case, or failure report JSON via `python scripts/create_lesson_teaching_card.py --lesson <path>`. Output lives under `.agent/teaching_cards/`; no model call, lesson promotion, anti-lesson creation, patch, validation, worker launch, Dream, Project Evolution, webhook, or source mutation is performed.
+- **F.6a Teaching Card Smoke + Copy Polish complete.** Adds fixture smoke coverage for lesson, anti-lesson, benchmark case, and failure report cards; keeps Markdown compact and copy-friendly; default CLI text now includes a `Copy this Markdown:` hint while `--json` remains deterministic and plain JSON.
 
 ## Short Summary
 

@@ -226,6 +226,10 @@ def render_lesson_teaching_card_text(result: dict[str, Any]) -> str:
         lines.append(f"JSON path: {_text(result.get('json_path'))}")
     if result.get("md_path"):
         lines.append(f"Markdown path: {_text(result.get('md_path'))}")
+        if result.get("dry_run"):
+            lines.append("Copy this Markdown: rerun without --dry-run, then copy the Markdown path above.")
+        else:
+            lines.append(f"Copy this Markdown: {_text(result.get('md_path'))}")
     if result.get("dry_run"):
         lines.append("Dry run: True")
     error = result.get("error") if isinstance(result.get("error"), dict) else {}
