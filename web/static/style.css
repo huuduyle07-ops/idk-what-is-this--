@@ -2107,6 +2107,59 @@ button {
     cursor: not-allowed;
 }
 
+/* F.8a: Worker Assignment is a single gated card under the brief actions. */
+.worker-assignment-panel {
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-border);
+}
+
+.worker-assignment-help {
+    margin: 4px 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.85em;
+}
+
+.review-pack-preview[hidden],
+.worker-assignment-markdown[hidden] {
+    display: none;
+}
+
+/* F.8b: stage the Goal Brief actions — primary handoff vs secondary review pack. */
+.goal-brief-primary {
+    font-weight: 600;
+}
+
+.worker-assignment-panel[data-brief-state="ready"] .goal-brief-primary:not(:disabled) {
+    outline: 1px solid var(--color-text-muted);
+}
+
+.worker-assignment-result {
+    margin: 6px 0 0;
+}
+
+.goal-brief-secondary {
+    margin-top: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface-2);
+}
+
+.goal-brief-secondary > summary {
+    cursor: pointer;
+    padding: 6px 9px;
+    color: var(--color-text-muted);
+    font-size: 0.9em;
+}
+
+.goal-brief-secondary[open] > summary {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.goal-brief-secondary .review-pack-panel {
+    padding: 8px 9px;
+}
+
 .goal-brief-chips {
     display: flex;
     flex-wrap: wrap;

@@ -39,6 +39,8 @@ Reason:
 
 The current system is optimized for small, evidence-first repair tasks. Creation and migration tasks require broader project understanding and full-file planning.
 
+Checkpoint: after F.5/F.5a, H.1, A.16, F.6/F.6a, F.7 — benchmark 54/54, flaky 3, unexpected mutations 0.
+
 ---
 
 ## Track A — Stabilized Debug Agent: safety closures current
@@ -718,7 +720,7 @@ then ask the human before any merge/apply.
 
 ## Track F — Operator Assistant / Prompt Courier
 
-Status: shipped through F.7.
+Status: shipped through F.8a.
 
 ### Purpose:
 Reduce manual friction in Goal Brief and Mayor Mode by converting messy user intent into structured, reviewable task briefs and handoff notes.
@@ -791,6 +793,31 @@ F.6a shipment checkpoint:
 
 F.7 shipment checkpoint:
 - Targeted pytest: `tests/test_worker_result_review.py`
+
+### F.8a Worker Assignment prompt compacting + Goal Brief UI de-dup complete
+- UX / prompt-format polish only; no backend permission change and no new capability
+- compact the route-card Markdown to six sections (Objective, Source, Scope, Task Rules, Validation, Expected Output)
+- state the no-apply / no-launch / no-real-repo-mutation rule once (in Task Rules) instead of repeating the same safety statement across Context, Constraints, Stop Conditions, Safety Rules, and a Final Summary
+- keep the JSON record unchanged: inert flags (`human_approval_required=true`, `apply_allowed=false`, `worker_launch_allowed=false`, `model_call_performed=false`, `patch_applied=false`, `validation_run=false`, `promotion_performed=false`) and the full stop_conditions / safety_rules arrays still ship in JSON; Markdown stays deterministic
+- de-dup the Goal Brief tab: gate **Create Worker Assignment** behind a usable brief (disabled + helper text until a brief exists), and collapse the duplicate summary / Markdown / empty-state boxes into one compact card (id + JSON path + Markdown path, with the Markdown box hidden until an assignment exists)
+- preserve guardrails: no model/provider client, worker launch, patch/apply module, validation subprocess, Dream runner, Project Evolution execution, webhook/network, lesson promotion, or proposal import was added
+
+F.8a shipment checkpoint:
+- Targeted pytest: `tests/test_worker_assignment.py` (24 passed)
+- `python benchmarks/run_benchmarks.py --check`: 54 checked, 0 errors
+
+### F.8b Goal Brief action-bar cleanup complete
+- UX / template / JS / CSS only; no backend permission, no Worker Assignment JSON schema change, and no new capability
+- stage the Goal Brief tab top-to-bottom with one primary action per stage: conversation actions (Start brief / Send reply) -> chat + checklist -> Worker Assignment handoff -> collapsed Review Pack
+- move the Worker Assignment handoff (Copy final prompt + Create Worker Assignment) *below* the chat/checklist so it reads as the post-interview step instead of crowding the top
+- gate Copy final prompt and Create Worker Assignment on brief readiness (disabled with helper text until the brief's final prompt is built); `_updateWorkerAssignmentAvailability()` drives a `none|draft|ready` panel state
+- show one compact Worker Assignment card: id + JSON path + Markdown path + copyable Markdown textarea + Copy assignment, all hidden until an assignment exists (no empty "no assignment yet" boxes, no duplicate action bars)
+- demote the Review Pack to a collapsed secondary `<details>` so its Copy Markdown button no longer competes with the primary Create Worker Assignment
+- preserve guardrails: no model call, worker launch, patch/apply, validation run, Dream, Project Evolution, webhook/network, lesson promotion, or proposal import was added
+
+F.8b shipment checkpoint:
+- Targeted pytest: `tests/test_worker_assignment.py` (28 passed)
+- `python benchmarks/run_benchmarks.py --check`: 54 checked, 0 errors
 
 Current benchmark catalog:
 - benchmark --check: 54 checked, 0 errors
@@ -996,6 +1023,8 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **F.6** complete | Lesson Teaching Card / Teacher Mode | Shipped local teaching cards for lessons, anti-lessons, benchmark cases, and failure reports (artifact-only; no model/patch/validation/promotion) |
 | **F.6a** complete | Teaching Card Smoke + Copy Polish | Shipped fixture smoke tests and copy-friendly CLI text while keeping the flow inert |
 | **F.7** complete | Worker Result Import / Review Stub | Shipped untrusted worker-output intake artifact for manual review; no patch, validation, proposal import, worker launch, model call, promotion, Dream, or Project Evolution behavior |
+| **F.8a** complete | Worker Assignment prompt compacting + Goal Brief UI de-dup | UX-only: compact six-section route-card Markdown (safety stated once, JSON record + inert flags unchanged) and a de-duplicated Goal Brief tab that gates Create Worker Assignment behind a usable brief; no new execution power |
+| **F.8b** complete | Goal Brief action-bar cleanup | UX-only: staged Goal Brief actions (one primary per stage), Worker Assignment handoff moved below the checklist and gated on a ready brief, single compact card hidden until creation, Review Pack demoted to a collapsed secondary section; no backend/schema/execution change |
 
 These features are additive. They do not require implementing any district infrastructure.
 

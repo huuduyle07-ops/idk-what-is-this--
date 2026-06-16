@@ -141,22 +141,68 @@ def test_markdown_contains_copy_paste_sections(tmp_path):
     for heading in [
         "# Worker Assignment",
         "## Objective",
-        "## Context / Source Artifact",
-        "## Allowed Files",
-        "## Forbidden Files",
-        "## Constraints",
-        "## Validation Commands",
-        "## Stop Conditions",
-        "## Safety Rules",
+        "## Source",
+        "## Scope",
+        "## Task Rules",
+        "## Validation",
         "## Expected Output",
-        "## Final Summary Format",
     ]:
         assert heading in markdown
-    assert "human approval required" in markdown.lower()
-    assert "apply_allowed: false" in markdown
-    assert "Do not apply patches unless" in markdown
-    assert "outside allowed scope" in markdown
-    assert "visual evidence is required but unavailable" in markdown
+    lower = markdown.lower()
+    # The compact route card must still carry no-apply / no-launch / no-mutation meaning.
+    assert "apply" in lower
+    assert "launch workers" in lower
+    assert "mutate the real repo" in lower
+    # Scope and stop guidance survive in compact form.
+    assert "outside scope" in lower
+    assert "visual evidence" in lower
+
+
+def test_markdown_does_not_repeat_safety_phrases(tmp_path):
+    repo = _repo(tmp_path)
+    source = _write_goal_brief(repo)
+
+    markdown = worker_assignment.create_worker_assignment(
+        repo_path=str(repo),
+        goal_brief_path=str(source),
+        dry_run=True,
+        created_at="2026-01-01T00:00:00Z",
+        assignment_id="dedup-check",
+    )["markdown"]
+
+    # Raw inert-flag tokens belong in JSON, not sprayed across every Markdown section.
+    assert markdown.count("apply_allowed") <= 1
+    assert markdown.count("worker_launch_allowed") <= 1
+    assert markdown.count("human_approval_required") <= 1
+    # The core no-mutation rule should be stated once, not echoed per section.
+    assert markdown.count("mutate the real repo") == 1
+    # The old repetitive section headings are gone.
+    for legacy in [
+        "## Constraints",
+        "## Stop Conditions",
+        "## Safety Rules",
+        "## Final Summary Format",
+        "## Allowed Files",
+        "## Forbidden Files",
+        "## Context / Source Artifact",
+    ]:
+        assert legacy not in markdown
+
+
+def test_markdown_validation_fallback_when_no_commands(tmp_path):
+    repo = _repo(tmp_path)
+    source = _write_goal_brief(repo, validation={})
+
+    markdown = worker_assignment.create_worker_assignment(
+        repo_path=str(repo),
+        goal_brief_path=str(source),
+        dry_run=True,
+        created_at="2026-01-01T00:00:00Z",
+        assignment_id="no-validation",
+    )["markdown"]
+
+    assert "## Validation" in markdown
+    assert "None declared. Recommend validation before trusting the result." in markdown
 
 
 def test_inert_flags_regression(tmp_path):
@@ -442,8 +488,8 @@ def test_cli_creates_json_and_markdown_from_goal_brief(capsys, tmp_path):
     assert Path(parsed["json_path"]).is_file()
     assert Path(parsed["md_path"]).is_file()
     markdown = Path(parsed["md_path"]).read_text(encoding="utf-8")
-    assert "## Stop Conditions" in markdown
-    assert "Do not apply patches unless" in markdown
+    assert "## Task Rules" in markdown
+    assert "mutate the real repo" in markdown
 
 
 def test_cli_json_output_is_deterministic_with_fixed_metadata(capsys, tmp_path):
@@ -656,6 +702,95 @@ def test_web_preview_renders_assignment_paths_and_copyable_markdown(client):
     assert "Markdown path" in function_body
     assert "workerAssignmentMarkdownText" in function_body
     assert ".value = _workerAssignmentMarkdown" in function_body
+
+
+def test_web_create_worker_assignment_disabled_until_brief(client):
+    html = client.get("/").get_data(as_text=True)
+
+    # Helper text steers the operator to a brief before the route card.
+    assert "Start or load a Goal Brief before creating a Worker Assignment." in html
+
+    # The Create button is disabled in the initial (no-brief) render.
+    create_start = html.index('id="workerAssignmentCreate"')
+    create_tag = html[create_start:html.index(">", create_start) + 1]
+    assert "disabled" in create_tag
+
+    # Availability is recomputed (definition + at least one call) when a brief exists.
+    assert html.count("_updateWorkerAssignmentAvailability") >= 2
+
+    # The Markdown box is hidden until an assignment exists (single empty-state box).
+    md_start = html.index('id="workerAssignmentMarkdownText"')
+    md_tag = html[md_start:html.index(">", md_start) + 1]
+    assert "hidden" in md_tag
+
+
+def test_web_goal_brief_action_layout_is_staged(client):
+    """F.8b: one primary action per stage, in top-to-bottom workflow order."""
+    html = client.get("/").get_data(as_text=True)
+
+    # Conversation actions (Start brief / Send reply) sit with the chat...
+    start_brief = html.index("startGoalBrief()")
+    chat = html.index('id="goalBriefChat"')
+    checklist = html.index('id="goalBriefChecklist"')
+    panel = html.index('id="workerAssignmentPanel"')
+
+    assert start_brief < chat
+    # ...and the Worker Assignment handoff panel comes AFTER the chat/checklist,
+    # not above it (fixes "Create Worker Assignment near the top").
+    assert checklist < panel
+
+    # Copy final prompt + Create Worker Assignment are grouped as the handoff stage,
+    # ahead of the (hidden) result card.
+    copy_final = html.index('id="goalBriefCopyFinalPrompt"')
+    create = html.index('id="workerAssignmentCreate"')
+    markdown_box = html.index('id="workerAssignmentMarkdownText"')
+    assert panel < copy_final < markdown_box
+    assert panel < create < markdown_box
+
+
+def test_web_handoff_actions_disabled_until_brief_ready(client):
+    """F.8b: Copy final prompt + Create Worker Assignment gate on brief readiness."""
+    html = client.get("/").get_data(as_text=True)
+
+    for button_id in ["goalBriefCopyFinalPrompt", "workerAssignmentCreate", "workerAssignmentCopy"]:
+        start = html.index(f'id="{button_id}"')
+        tag = html[start:html.index(">", start) + 1]
+        assert "disabled" in tag, button_id
+
+    # The availability helper gates on the brief's ready / final-prompt state and
+    # drives both handoff buttons.
+    fn_start = html.index("function _updateWorkerAssignmentAvailability")
+    fn_body = html[fn_start:html.index("\n}", fn_start)]
+    assert "ready" in fn_body
+    assert "workerAssignmentCreate" in fn_body
+    assert "goalBriefCopyFinalPrompt" in fn_body
+
+
+def test_web_review_pack_is_secondary_collapsed(client):
+    """F.8b: Review Pack stays available but visually secondary (collapsed details)."""
+    html = client.get("/").get_data(as_text=True)
+
+    details = html.index('<details class="goal-brief-secondary"')
+    summary_end = html.index("</summary>", details)
+    review_copy = html.index('id="reviewPackCopy"')
+    review_preview = html.index('id="reviewPackPreview"')
+
+    # Review pack controls live inside the collapsed secondary section.
+    assert summary_end < review_copy
+    assert summary_end < review_preview
+    details_close = html.index("</details>", review_preview)
+    assert review_copy < details_close
+    assert review_preview < details_close
+
+
+def test_web_no_empty_worker_assignment_box_before_creation(client):
+    """F.8b: the preview + Markdown boxes are hidden until an assignment exists."""
+    html = client.get("/").get_data(as_text=True)
+
+    for box_id in ["workerAssignmentPreview", "workerAssignmentMarkdownText"]:
+        start = html.index(f'id="{box_id}"')
+        tag = html[start:html.index(">", start) + 1]
+        assert "hidden" in tag, box_id
 
 
 def test_web_route_source_is_not_worker_launch_apply_validate_or_promote():

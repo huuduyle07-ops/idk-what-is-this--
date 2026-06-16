@@ -382,33 +382,13 @@
               </div>
             </section>
 
-            <section class="review-pack-panel" aria-label="Review pack generator">
-              <div class="review-pack-row">
-                <label for="reviewPackWorkerTarget">Review pack target</label>
-                <select id="reviewPackWorkerTarget">
-                  <option value="generic">generic</option>
-                  <option value="codex">codex</option>
-                  <option value="claude">claude</option>
-                  <option value="gemini">gemini</option>
-                </select>
-              </div>
-              <div class="goal-brief-actions">
-                <button type="button" onclick="generateReviewPack()">Generate review pack</button>
-                <button type="button" id="reviewPackCopy" onclick="copyReviewPackMarkdown()" disabled>Copy Markdown</button>
-              </div>
-              <pre id="reviewPackPreview" class="review-pack-preview" aria-live="polite">No review pack generated yet.</pre>
-            </section>
-
+            <!-- F.8b: conversation actions drive the interview. One primary action
+                 per stage; the handoff (Copy final prompt / Create Worker Assignment)
+                 moves below the checklist so it reads as the post-interview step. -->
             <div class="goal-brief-actions">
               <button type="button" onclick="startGoalBrief()">Start brief</button>
               <button type="button" onclick="updateGoalBrief()">Send reply</button>
-              <button type="button" onclick="copyGoalBriefFinalPrompt()">Copy final prompt</button>
-              <button type="button" onclick="createWorkerAssignmentFromGoalBrief()">Create Worker Assignment</button>
-              <button type="button" id="workerAssignmentCopy" onclick="copyWorkerAssignmentMarkdown()" disabled>Copy assignment</button>
-              <button type="button" disabled title="Placeholder for a later gated handoff.">Send to Dream later</button>
             </div>
-            <pre id="workerAssignmentPreview" class="review-pack-preview" aria-live="polite">No worker assignment created yet.</pre>
-            <textarea id="workerAssignmentMarkdownText" class="review-pack-preview" readonly rows="12" aria-label="Copyable Worker Assignment Markdown">No worker assignment Markdown yet.</textarea>
 
             <div class="goal-brief-main">
               <div class="goal-brief-conversation">
@@ -438,6 +418,46 @@
                 </div>
               </section>
             </div>
+
+            <!-- F.8a/F.8b: Worker Assignment is the post-interview handoff stage. It is
+                 gated on a ready brief, sits below the checklist, and shows one compact
+                 card (id + paths + one copyable Markdown box). No duplicate action bars
+                 and no empty boxes before an assignment exists. -->
+            <section class="worker-assignment-panel" id="workerAssignmentPanel" data-brief-state="none" aria-label="Worker assignment">
+              <p id="workerAssignmentHelp" class="worker-assignment-help">Start or load a Goal Brief before creating a Worker Assignment.</p>
+              <div class="goal-brief-actions worker-assignment-handoff">
+                <button type="button" id="goalBriefCopyFinalPrompt" onclick="copyGoalBriefFinalPrompt()" disabled>Copy final prompt</button>
+                <button type="button" id="workerAssignmentCreate" class="goal-brief-primary" onclick="createWorkerAssignmentFromGoalBrief()" disabled>Create Worker Assignment</button>
+                <button type="button" disabled title="Placeholder for a later gated handoff.">Send to Dream later</button>
+              </div>
+              <pre id="workerAssignmentPreview" class="review-pack-preview worker-assignment-card" aria-live="polite" hidden></pre>
+              <textarea id="workerAssignmentMarkdownText" class="review-pack-preview worker-assignment-markdown" readonly rows="12" aria-label="Copyable Worker Assignment Markdown" hidden></textarea>
+              <div class="goal-brief-actions worker-assignment-result">
+                <button type="button" id="workerAssignmentCopy" onclick="copyWorkerAssignmentMarkdown()" disabled hidden>Copy assignment</button>
+              </div>
+            </section>
+
+            <!-- F.8b: Review Pack stays available but secondary (collapsed). Its Copy
+                 button no longer competes with the primary Create Worker Assignment. -->
+            <details class="goal-brief-secondary">
+              <summary>Review pack (optional)</summary>
+              <section class="review-pack-panel" aria-label="Review pack generator">
+                <div class="review-pack-row">
+                  <label for="reviewPackWorkerTarget">Review pack target</label>
+                  <select id="reviewPackWorkerTarget">
+                    <option value="generic">generic</option>
+                    <option value="codex">codex</option>
+                    <option value="claude">claude</option>
+                    <option value="gemini">gemini</option>
+                  </select>
+                </div>
+                <div class="goal-brief-actions">
+                  <button type="button" onclick="generateReviewPack()">Generate review pack</button>
+                  <button type="button" id="reviewPackCopy" onclick="copyReviewPackMarkdown()" disabled>Copy Markdown</button>
+                </div>
+                <pre id="reviewPackPreview" class="review-pack-preview" aria-live="polite">No review pack generated yet.</pre>
+              </section>
+            </details>
 
             <details class="goal-brief-raw-details">
             <summary>Raw details</summary>
@@ -5731,21 +5751,37 @@ function _renderWorkerAssignmentPreview(data) {
     const copyButton = document.getElementById("workerAssignmentCopy");
     if (!preview) return;
     if (!data || !data.ok) {
-        preview.textContent = "No worker assignment created yet.";
-        if (markdownText) markdownText.value = "No worker assignment Markdown yet.";
-        if (copyButton) copyButton.disabled = true;
+        // No assignment yet: hide the whole result card so there is no empty box.
+        preview.textContent = "";
+        preview.hidden = true;
+        if (markdownText) {
+            markdownText.value = "";
+            markdownText.hidden = true;
+        }
+        if (copyButton) {
+            copyButton.disabled = true;
+            copyButton.hidden = true;
+        }
         return;
     }
     const record = data.record || {};
+    // One compact card: where the artifacts landed. Inert flags live in the JSON
+    // record and the no-apply/no-launch rule lives in the copyable Markdown below.
     preview.textContent = [
         `Assignment ID: ${record.assignment_id || ""}`,
         `JSON path: ${data.json_path || ""}`,
         `Markdown path: ${data.md_path || ""}`,
-        `apply_allowed: ${record.apply_allowed === true ? "true" : "false"}`,
-        `worker_launch_allowed: ${record.worker_launch_allowed === true ? "true" : "false"}`,
     ].join("\n").trim();
-    if (markdownText) markdownText.value = _workerAssignmentMarkdown;
-    if (copyButton) copyButton.disabled = !_workerAssignmentMarkdown;
+    preview.hidden = false;
+    const hasMarkdown = !!_workerAssignmentMarkdown;
+    if (markdownText) {
+        markdownText.value = _workerAssignmentMarkdown;
+        markdownText.hidden = !hasMarkdown;
+    }
+    if (copyButton) {
+        copyButton.disabled = !hasMarkdown;
+        copyButton.hidden = !hasMarkdown;
+    }
 }
 
 function copyWorkerAssignmentMarkdown() {
@@ -5758,6 +5794,37 @@ function copyWorkerAssignmentMarkdown() {
         .catch(err => _goalBriefStatus(`Copy failed: ${err}`, "failed"));
 }
 
+function _updateWorkerAssignmentAvailability() {
+    // F.8b: stage the handoff. The brief must exist AND be ready (final prompt built)
+    // before "Copy final prompt" / "Create Worker Assignment" become actionable.
+    const briefRef = document.getElementById("goalBriefRef")?.value.trim() || "";
+    const brief = _goalBriefCurrent || {};
+    const hasBrief = !!briefRef;
+    const finalPrompt = String(brief.final_prompt || "").trim();
+    const isReady = hasBrief && (brief.status === "ready" || !!finalPrompt);
+    const state = !hasBrief ? "none" : (isReady ? "ready" : "draft");
+
+    const panel = document.getElementById("workerAssignmentPanel");
+    const createButton = document.getElementById("workerAssignmentCreate");
+    const copyFinalButton = document.getElementById("goalBriefCopyFinalPrompt");
+    const help = document.getElementById("workerAssignmentHelp");
+
+    if (panel) panel.dataset.briefState = state;
+    if (createButton) createButton.disabled = !isReady;
+    if (copyFinalButton) copyFinalButton.disabled = !isReady;
+    if (help) {
+        if (state === "none") {
+            help.textContent = "Start or load a Goal Brief before creating a Worker Assignment.";
+            help.hidden = false;
+        } else if (state === "draft") {
+            help.textContent = "Keep answering the brief. Create Worker Assignment unlocks when the final prompt is ready.";
+            help.hidden = false;
+        } else {
+            help.hidden = true;
+        }
+    }
+}
+
 function _renderGoalBriefResponse(data, userText = "") {
     if (!data || !data.ok) {
         _goalBriefStatus(data?.error || "Goal brief request failed.", "failed");
@@ -5768,6 +5835,7 @@ function _renderGoalBriefResponse(data, userText = "") {
     const brief = data.brief || {};
     document.getElementById("goalBriefRef").value = data.brief_path || "";
     if (brief.goal) document.getElementById("goalBriefGoal").value = brief.goal;
+    _updateWorkerAssignmentAvailability();
 
     if (userText) _appendGoalBriefMessage("user", userText);
     if (data.assistant_message) _appendGoalBriefMessage("assistant", data.assistant_message);

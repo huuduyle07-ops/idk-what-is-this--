@@ -217,40 +217,52 @@ def render_worker_assignment_text(result: dict[str, Any]) -> str:
 
 
 def render_worker_assignment_markdown(record: dict[str, Any]) -> str:
+    """Render a compact, copy-pasteable route card.
+
+    The Markdown is intentionally shorter than the JSON record: it states the
+    no-apply / no-launch / no-real-repo-mutation rule once (in Task Rules)
+    instead of repeating the same safety statement across Context, Constraints,
+    Stop Conditions, Safety Rules, and a Final Summary. The full safety arrays
+    (stop_conditions, safety_rules, inert flags) still live in the JSON record.
+    """
+    objective = _text(record.get("title")) or "Untitled worker assignment"
     return (
         "# Worker Assignment\n\n"
-        f"Assignment ID: `{_text(record.get('assignment_id'))}`\n\n"
         "## Objective\n\n"
-        f"{_text(record.get('title')) or 'Untitled worker assignment'}\n\n"
-        "## Context / Source Artifact\n\n"
+        f"{objective}\n\n"
+        "## Source\n\n"
         f"- Source type: `{_text(record.get('source_type'))}`\n"
         f"- Source path: `{_text(record.get('source_path'))}`\n"
         f"- Repo path: `{_text(record.get('repo_path'))}`\n"
-        f"- Selected mode: `{_text(record.get('mode'))}`\n"
-        f"- Worker role: `{_text(record.get('worker_role'))}`\n"
-        f"- Human approval required: `{record.get('human_approval_required', True)}`\n"
-        f"- apply_allowed: {str(record.get('apply_allowed', False)).lower()}\n"
-        f"- worker_launch_allowed: {str(record.get('worker_launch_allowed', False)).lower()}\n\n"
-        "## Allowed Files\n\n"
+        f"- Mode: `{_text(record.get('mode'))}`\n"
+        f"- Worker role: `{_text(record.get('worker_role'))}`\n\n"
+        "## Scope\n\n"
+        "Allowed files:\n\n"
         f"{_bullet_list(_strings(record.get('allowed_files')))}\n\n"
-        "## Forbidden Files\n\n"
+        "Forbidden:\n\n"
         f"{_bullet_list(_strings(record.get('forbidden_files')))}\n\n"
-        "## Constraints\n\n"
-        f"- Mode: {_text(record.get('mode'))}\n"
-        f"- Worker role: {_text(record.get('worker_role'))}\n"
-        "- This assignment is a draft route card only.\n"
-        "- Do not apply patches unless a separate human approval explicitly changes apply_allowed.\n\n"
-        "## Validation Commands\n\n"
-        f"{_bullet_list(_strings(record.get('validation_commands')))}\n\n"
-        "## Stop Conditions\n\n"
-        f"{_bullet_list(_strings(record.get('stop_conditions')))}\n\n"
-        "## Safety Rules\n\n"
-        f"{_bullet_list(_strings(record.get('safety_rules')))}\n\n"
+        "## Task Rules\n\n"
+        "- Inspect only the allowed scope.\n"
+        "- Propose changes only unless explicit human approval says otherwise.\n"
+        "- Do not edit, apply, commit, push, launch workers, call tools, or mutate the real repo from this route card.\n"
+        "- Stop if the task needs files outside scope, secrets/protected files, unavailable validation, or missing visual evidence.\n\n"
+        "## Validation\n\n"
+        f"{_validation_block(_strings(record.get('validation_commands')))}\n\n"
         "## Expected Output\n\n"
-        f"{_text(record.get('expected_output')) or 'A concise worker report.'}\n\n"
-        "## Final Summary Format\n\n"
-        f"{_bullet_list(_strings(record.get('expected_summary_format')))}\n"
+        "Return:\n\n"
+        "- files inspected\n"
+        "- findings\n"
+        "- proposed change\n"
+        "- validation evidence or recommendation\n"
+        "- blockers / risks\n"
+        "- next human approval needed\n"
     )
+
+
+def _validation_block(commands: list[str]) -> str:
+    if not commands:
+        return "None declared. Recommend validation before trusting the result."
+    return _bullet_list(commands)
 
 
 def _selected_source(
