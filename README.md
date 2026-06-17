@@ -732,6 +732,60 @@ On Windows, if emoji output causes an encoding error, run:
 $env:PYTHONIOENCODING='utf-8'
 ```
 
+### Flaky Case Review (A.17)
+
+When a benchmark run produces flaky cases (cases that failed an early attempt
+but passed on retry), the **Flaky Case Review** tool turns the raw report into
+an operator-readable review:
+
+```bash
+python scripts/create_flaky_case_review.py --latest
+# or an explicit report:
+python scripts/create_flaky_case_review.py --report .agent/benchmarks/benchmark_report_<ts>.json
+```
+
+It is **report-only**. It reads an existing benchmark report (it never runs the
+suite), finds the flaky cases, classifies *why* each one may be flaky using
+deterministic rules (no model calls), and recommends one next human action per
+case (e.g. `add_stability_replay`, `inspect_validation_environment`,
+`manual_review_required`). It writes JSON + Markdown review artifacts to
+`.agent/reliability/flaky_case_reviews/<review_id>/`. It **recommends** next
+actions but does **not** fix flakes, change benchmark cases, prompts, patch
+generation, or validation, call any model, or apply patches. Deterministic
+`--review-id` / `--created-at` hooks make the artifact reproducible.
+
+### Sandbox Self-Evolution Trial (AUTO.1a)
+
+Before C.A.T.T.U.S is ever allowed to attempt a small self-improvement task on
+its own, the **Sandbox Self-Evolution Trial Contract** scores whether that
+attempt would even be safe to try:
+
+```bash
+python scripts/create_sandbox_self_evolution_trial.py \
+    --phase-id AUTO.1a --phase-title "Tidy a helper" \
+    --automation-level SANDBOX_2_DRAFT_PATCH \
+    --allowed-files core/foo.py --validation "python -m pytest -q"
+```
+
+- It is **report-only**: it scores whether a self-evolution attempt would be
+  safe to try; it does **not** run any automation.
+- It defines five automation levels — `LOCAL_0_OBSERVE`, `LOCAL_1_PREPARE`,
+  `SANDBOX_2_DRAFT_PATCH`, `REMOTE_3_DRAFT_PR` (future only), and the forbidden
+  `AUTO_4_AUTO_MERGE` — and only defines/scores them; it never executes them.
+- It scores an attempt on five deterministic dimensions — safety, scope
+  control, validation plan, budget, and reviewability — into a verdict
+  (`eligible_for_review`, `not_eligible_for_review`, or `blocked`) plus one next
+  safe step, and writes JSON + Markdown to
+  `.agent/self_evolution_trials/<trial_id>/`.
+- **Self-evolution may be tested in a sandbox; self-approval is forbidden** and
+  auto-merge is always blocked. No model / external coding agent launch, no
+  real-repo edit, no push / merge / PR, no validation or benchmark run, and no
+  Dream / Project Evolution.
+
+It is the **first step** before any n8n / Telegram / GitHub / Claude / Codex
+automation is given more power. Deterministic `--trial-id` / `--created-at`
+hooks make the artifact reproducible.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:

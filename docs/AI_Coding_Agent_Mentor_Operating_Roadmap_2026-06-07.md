@@ -257,6 +257,31 @@ Status:
 
 ---
 
+### A.17 — Flaky Case Review Report ✅
+Goal:
+Turn flaky benchmark runs into an explainable, report-only reliability artifact. When a run passes overall but some cases needed a retry (flaky), A.17 explains *which* cases were flaky, *why* they may be flaky, and *what the next human action is* — without fixing anything.
+
+Behaviour:
+- Reads an existing benchmark report JSON (the file the benchmark runner writes into `.agent/benchmarks/`) via `--report <path>` or `--latest`. It never runs the benchmark suite.
+- Detects a case as flaky when any of: the report marks it `flaky`; `attempts > 1` with a final pass; an early attempt failed then a later attempt passed; retry metadata indicates recovery; or a report-level flaky list names the case.
+- Classifies each flaky case with deterministic rules (no model calls) into one of: `model_variance_or_prompt_instability`, `validation_timing_or_environment`, `generated_artifact_scope_noise`, `unexpected_mutation_noise`, `fallback_or_provider_variance`, `test_harness_or_report_shape_issue`, `safety_gate_boundary_case`, `unknown_flake`. Import / timing / toolchain output → environment; unexpected mutation → mutation noise; generated artifacts (no mutation) → scope noise; fallback/provider change → provider variance; an inconsistently-firing safety blocker → safety-gate boundary; clean fail-then-pass with no other signal → model variance.
+- Recommends one next human action per case (`add_stability_replay`, `tighten_allowed_files_or_generated_ignore`, `inspect_validation_environment`, `inspect_model_fallback_path`, `add_report_schema_guard`, `promote_to_honeypot_or_regression_case`, `manual_review_required`, `no_action_yet_monitor_only`) plus a confidence level.
+- Writes `.agent/reliability/flaky_case_reviews/<review_id>/flaky_case_review.json` and `.md` (operator-readable: Summary, a compact Flaky Cases table, per-case Details, and a Boundaries section). The summary always records `source_report_modified: false` and `benchmarks_run_by_tool: false`.
+
+Rules (report-only — verified by guardrail tests):
+- No model call. No patch apply. No validation execution. No benchmark execution inside the tool.
+- No Dream. No Project Evolution execution. No webhook/network. No lesson promotion. No proposal import. No worker launch.
+- No benchmark case edits, no prompt changes, no patch-generation or validation changes. The source report is read, never written.
+
+Status:
+- Complete. Report-only reliability artifact; classifies flaky benchmark cases deterministically; no benchmark execution, no patching, no model calls.
+- Intended next step after F.8a/F.8b/F.8c and GOV.1.
+- CLI: `python scripts/create_flaky_case_review.py --latest` (or `--report <path>`; optional `--repo-path`, `--json`, deterministic `--review-id` / `--created-at`, `--output-root`).
+- Files: `core/flaky_case_review.py`, `scripts/create_flaky_case_review.py`, `tests/test_flaky_case_review.py`.
+- Shipment checkpoint: `python -m pytest tests/test_flaky_case_review.py -q` — also covered by `python -m compileall` and the existing `benchmarks/run_benchmarks.py --check`.
+
+---
+
 ## Track B — Project Evolution Mode
 
 New idea, not part of the frozen historical roadmap.
@@ -1037,12 +1062,14 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **F.5** | One-click Worker Assignment / Route Card | Shipped draft route card for manual worker assignment |
 | **H.1** ✅ | Driver Model Routing Contract | Shipped contract that recommends the safest model vehicle for a worker assignment (report-only) |
 | **A.16** ✅ | Visual Evidence Intake Contract | Shipped contract that records whether a visual/UI issue is verifiable before a resolution claim (report-only; no OCR/vision/model) |
+| **A.17** ✅ | Flaky Case Review Report | Report-only reliability artifact that reads an existing benchmark report, deterministically classifies flaky cases and recommends a next human action (no benchmark execution, no patching, no model calls) |
 | **F.6** complete | Lesson Teaching Card / Teacher Mode | Shipped local teaching cards for lessons, anti-lessons, benchmark cases, and failure reports (artifact-only; no model/patch/validation/promotion) |
 | **F.6a** complete | Teaching Card Smoke + Copy Polish | Shipped fixture smoke tests and copy-friendly CLI text while keeping the flow inert |
 | **F.7** complete | Worker Result Import / Review Stub | Shipped untrusted worker-output intake artifact for manual review; no patch, validation, proposal import, worker launch, model call, promotion, Dream, or Project Evolution behavior |
 | **F.8a** complete | Worker Assignment prompt compacting + Goal Brief UI de-dup | UX-only: compact six-section route-card Markdown (safety stated once, JSON record + inert flags unchanged) and a de-duplicated Goal Brief tab that gates Create Worker Assignment behind a usable brief; no new execution power |
 | **F.8b** complete | Goal Brief action-bar cleanup | UX-only: staged Goal Brief actions (one primary per stage), Worker Assignment handoff moved below the checklist and gated on a ready brief, single compact card hidden until creation, Review Pack demoted to a collapsed secondary section; no backend/schema/execution change |
 | **F.8c** complete | Goal Brief assistive intake simplification | UX-only: one primary intake box + optional details, 3-step stage indicator (Describe/Refine/Handoff), non-blocking checklist wording, friendly "good enough" guidance, assistive button labels, advanced helpers (mode routing/review pack/raw details) collapsed; F.8b gating preserved; no backend/schema/execution change |
+| **AUTO.1a** ✅ | Sandbox Self-Evolution Trial Contract | Report-only safety contract that defines five automation levels and scores whether a self-evolution attempt is safe to try (safety/scope/validation/budget/reviewability); blocks self-approval and auto-merge; no model/agent launch, repo edit, push/merge/PR, or validation/benchmark run |
 
 These features are additive. They do not require implementing any district infrastructure.
 
@@ -1076,6 +1103,69 @@ Files:
 
 Guardrail (docs-only — nothing below was added):
 - no new agent, nano-agent execution, model call, worker launch, patch/apply, validation run, Dream, Project Evolution, webhook/network, lesson promotion, proposal import, database migration, new backend route, or new UI panel.
+
+---
+
+## Track AUTO — Sandbox Self-Evolution
+
+Purpose:
+Define the safety contract for future automation in which C.A.T.T.U.S tests
+small self-improvement tasks in a disposable sandbox **before** any real repo,
+remote git branch, Telegram approval, or external coding agent is given more
+power. Track AUTO defines and **scores** self-evolution attempts; it does not
+run them.
+
+Core principle: **Self-evolution may be tested in a sandbox. Self-approval is
+forbidden.**
+
+### AUTO.1a — Sandbox Self-Evolution Trial Contract ✅
+
+Status: **Complete when implemented — report-only; no execution power added.**
+
+Goal:
+Define and score a single sandbox self-evolution attempt and decide whether it
+would be safe to try and reviewable by a human — without running anything.
+
+Behaviour:
+- Defines five automation levels and only defines/scores them: `LOCAL_0_OBSERVE`
+  (read-only checks + report), `LOCAL_1_PREPARE` (planning artifacts only),
+  `SANDBOX_2_DRAFT_PATCH` (a proposed patch inside a disposable sandbox only;
+  real repo untouched), `REMOTE_3_DRAFT_PR` (future only — not implemented in
+  AUTO.1a), and `AUTO_4_AUTO_MERGE` (forbidden). None are executed.
+- Scores the attempt on five deterministic dimensions — safety, scope control,
+  validation plan, budget, reviewability — and produces a verdict
+  (`eligible_for_review`, `not_eligible_for_review`, `blocked`) plus one next
+  safe step (`keep_report_only`, `create_worker_assignment`,
+  `run_sandbox_trial_manually`, `request_human_approval_for_external_model`,
+  `blocked_until_scope_is_narrowed`, `blocked_until_validation_is_declared`).
+- Blocks self-approval and auto-merge: `self_approval_allowed=true` or an
+  auto-merge level always scores a safety fail → `blocked`.
+- Writes `.agent/self_evolution_trials/<trial_id>/self_evolution_trial.json` and
+  `.md` (operator-readable: Summary, Scorecard, Automation Levels, Boundaries,
+  Next Safe Step), plus `selected_phase.md` and `trial_contract.md` companions.
+
+Rules (report-only — verified by guardrail tests):
+- No model or external coding agent launch. No real-repo edit. No push, merge,
+  or PR. No validation run. No benchmark run inside the tool.
+- No Dream. No Project Evolution execution. No webhook/network. No lesson
+  promotion. No proposal import. No worker launch. No database migration. No new
+  UI panel.
+
+Status:
+- Complete. Report-only self-evolution safety contract; defines automation
+  levels; scores safety/scope/validation/budget/reviewability; blocks
+  self-approval and auto-merge; no execution power added.
+- First step before any n8n / Telegram / GitHub / Claude / Codex automation.
+- CLI: `python scripts/create_sandbox_self_evolution_trial.py --phase-id <id> --automation-level <level>`
+  (optional `--phase-title`, `--phase-summary`, `--allowed-files`,
+  `--validation`, `--budget-tier`, `--json`, `--repo-path`, `--output-root`,
+  deterministic `--trial-id` / `--created-at`).
+- Files: `core/sandbox_self_evolution_trial.py`,
+  `scripts/create_sandbox_self_evolution_trial.py`,
+  `tests/test_sandbox_self_evolution_trial.py`.
+- Shipment checkpoint: `python -m pytest tests/test_sandbox_self_evolution_trial.py -q`
+  — also covered by `python -m compileall` and the existing
+  `benchmarks/run_benchmarks.py --check`.
 
 ---
 
