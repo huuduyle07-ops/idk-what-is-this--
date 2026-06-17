@@ -924,6 +924,44 @@ It writes JSON + Markdown next to the source evaluation when possible
 Human Review Packet (touched files, patch size, validation status, side-effect
 summary, and what to inspect manually) so a person can make the call.
 
+### Sandbox Self-Evolution Evidence Pack (AUTO.1e)
+
+AUTO.1e packages the AUTO.1a–1d artifacts into **one** human-readable evidence
+pack, so an operator does not have to open four separate files before deciding
+what to do next.
+
+```bash
+python scripts/create_self_evolution_evidence_pack.py \
+    --trial-dir .agent/self_evolution_trials/<id>
+```
+
+- It is **report-only**: it reads the AUTO.1a contract, AUTO.1b dry run, AUTO.1c
+  patch evaluation, and AUTO.1d graduation review and bundles them. It **does not
+  execute, approve, apply patches, run validation or benchmarks, or call models**,
+  and it never touches the real repo, pushes, merges, or opens a PR.
+- `--trial-dir` auto-discovers the known artifact filenames in a trial directory;
+  explicit `--trial-contract` / `--dry-run` / `--patch-evaluation` /
+  `--graduation-review` paths override discovery.
+- It decides deterministically. Any artifact reporting a hard breach
+  (self-approval, auto-merge, real-repo modification, real-repo patch apply, push,
+  or merge) forces `blocked`. Otherwise the graduation review drives the verdict:
+  `eligible_for_human_review` → `ready_for_human_review`, `needs_more_validation`
+  → `needs_more_validation`, `blocked_by_safety` / `not_reviewable` → `blocked`. A
+  missing graduation review (or patch evaluation) → `incomplete_pack` (a
+  contract-only pack is valid as `incomplete_pack`, not a failure). Recommended
+  next steps: `review_patch_candidate`, `request_more_validation`,
+  `reject_candidate`, `complete_missing_artifacts`, `keep_report_only`.
+- The Markdown bundles a Summary, a Timeline (contract → dry run → patch
+  evaluation → graduation review), a Verdicts table, a Risk Summary
+  (safety / scope / validation / side effects / budget / human gate), a Human
+  Review Packet, Blockers, and Warnings.
+
+It writes JSON + Markdown under the trial directory when possible
+(`.agent/self_evolution_trials/<trial_id>/self_evolution_evidence_pack.json` and
+`.md`), otherwise under a folder named for the pack id. AUTO.1e is the **bridge
+toward future Telegram / GitHub / n8n review summaries — but it does not contact
+them**; it only packages the evidence a human needs.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:

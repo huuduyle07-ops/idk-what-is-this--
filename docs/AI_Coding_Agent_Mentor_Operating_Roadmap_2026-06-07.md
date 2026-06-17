@@ -1117,6 +1117,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **AUTO.1b** ✅ | Sandbox Self-Evolution Dry-Run Runner | First executable sandbox layer: copies the repo to a disposable managed sandbox and runs only declared safe validation (A.18) there, reports A.19 side effects, gates on the AUTO.1a contract; no model call, patch generation, real-repo mutation, push/merge/PR, or auto-merge |
 | **AUTO.1c** ✅ | Sandbox Patch Candidate Evaluation | Writes a provided patch candidate into the disposable sandbox only (never the real repo), rejects forbidden/traversal/empty/oversized patches, runs A.18 validation + reports A.19 side effects around apply and validation; no patch generation, real-repo write, push/merge/PR, or auto-merge — human review required before graduation |
 | **AUTO.1d** ✅ | Sandbox Patch Graduation Review | Review-only gate that consumes an AUTO.1c evaluation artifact and decides whether the candidate is eligible for human review (separates "passed in sandbox" from "ready for human review"); deterministic safety/sandbox/human-gate/patch-safety/validation/side-effect checks; blocks self-approval and auto-merge; no patch apply, validation run, benchmark run, model call, real-repo write, push/merge/PR, or auto-merge |
+| **AUTO.1e** ✅ | Sandbox Self-Evolution Evidence Pack | Report-only builder that bundles the AUTO.1a/1b/1c/1d artifacts into one human-readable review package (summary, timeline, verdicts table, risk summary, human review packet); `--trial-dir` auto-discovery; deterministic final verdict (`ready_for_human_review` / `needs_more_validation` / `blocked` / `incomplete_pack`); any hard breach in any artifact blocks; bridge toward future Telegram/GitHub/n8n summaries but contacts none; no execution, patch apply, validation/benchmark run, model call, real-repo write, push/merge/PR, or auto-merge |
 
 These features are additive. They do not require implementing any district infrastructure.
 
@@ -1388,6 +1389,67 @@ Status:
   `scripts/create_sandbox_patch_graduation_review.py`,
   `tests/test_sandbox_patch_graduation_review.py`.
 - Shipment checkpoint: `python -m pytest tests/test_sandbox_patch_graduation_review.py -q`
+  — also covered by `python -m compileall` and the existing
+  `benchmarks/run_benchmarks.py --check`.
+
+### AUTO.1e — Sandbox Self-Evolution Evidence Pack ✅
+
+Status: **Complete when implemented — report-only; no execution power added.**
+
+Goal:
+Bundle the AUTO.1a/1b/1c/1d sandbox self-evolution artifacts into one
+human-readable evidence pack, so an operator does not need to inspect four
+separate files before deciding what to do next. AUTO.1e packages evidence; it
+does not execute, approve, apply, push, merge, or contact external systems.
+
+Behaviour:
+- Consumes the four artifacts (parsed dicts): the AUTO.1a contract
+  (`self_evolution_trial.json`), the AUTO.1b dry run (`sandbox_dry_run.json`), the
+  AUTO.1c patch evaluation (`patch_candidate_evaluation.json`), and the AUTO.1d
+  graduation review (`patch_graduation_review.json`). A `--trial-dir` shortcut
+  auto-discovers those filenames; explicit per-artifact paths override discovery.
+  A slot whose `report_kind` does not match is treated as absent (and warned).
+- Decides deterministically. Any source artifact that reports a hard breach
+  (`self_approval_allowed`, `eligible_for_auto_merge`, `real_repo_modified`,
+  `patch_applied_to_real_repo`, `push_performed`, `merge_performed`,
+  `model_call_performed`, `worker_launch_performed`, or non-sandbox-only side
+  effects) forces `blocked`. Otherwise the graduation review drives the verdict:
+  `eligible_for_human_review` → `ready_for_human_review`, `needs_more_validation`
+  → `needs_more_validation`, `blocked_by_safety` / `not_reviewable` → `blocked`.
+  A missing graduation review (or patch evaluation) → `incomplete_pack`; a
+  contract-only pack is valid as `incomplete_pack`, not a failure.
+- Final verdicts: `ready_for_human_review`, `needs_more_validation`, `blocked`,
+  `incomplete_pack`. Recommended next steps: `review_patch_candidate`,
+  `request_more_validation`, `reject_candidate`, `complete_missing_artifacts`,
+  `keep_report_only`. Skipped validation anywhere relevant adds a warning.
+- Produces one record + Markdown (Summary, Timeline, Verdicts table, Risk Summary,
+  Human Review Packet, Blockers, Warnings, Boundaries) and keeps its own guardrail
+  booleans inert (`human_review_required=true`, everything else `false`). Writes
+  `.agent/self_evolution_trials/<trial_id>/self_evolution_evidence_pack.json` and
+  `.md`, or under `<pack_id>` when no trial directory is available.
+
+Rules (report-only — verified by guardrail tests):
+- No execution. No patch apply. No sandbox patch application. No validation run.
+  No benchmark run. No model call. No real-repo mutation. No push, merge, or PR.
+  No auto-merge. Source artifacts are never modified.
+- No subprocess, repo clone, or git. Does not inspect secrets.
+- No Dream. No Project Evolution execution. No webhook/network. No lesson
+  promotion. No proposal import. No worker launch. No remote git host / chat /
+  external automation contact. No database migration. No new UI panel.
+
+Status:
+- Complete. Report-only evidence bundle; consumes AUTO.1a/1b/1c/1d artifacts;
+  creates one human-readable review packet; separates evidence packaging from
+  approval/execution; the bridge toward future Telegram / GitHub / n8n summaries
+  without contacting them; no execution power added.
+- CLI: `python scripts/create_self_evolution_evidence_pack.py --trial-dir <dir>`
+  (or explicit `--trial-contract`, `--dry-run`, `--patch-evaluation`,
+  `--graduation-review`; optional `--pack-id`, `--created-at`, `--output-root`,
+  `--json`).
+- Files: `core/self_evolution_evidence_pack.py`,
+  `scripts/create_self_evolution_evidence_pack.py`,
+  `tests/test_self_evolution_evidence_pack.py`.
+- Shipment checkpoint: `python -m pytest tests/test_self_evolution_evidence_pack.py -q`
   — also covered by `python -m compileall` and the existing
   `benchmarks/run_benchmarks.py --check`.
 
