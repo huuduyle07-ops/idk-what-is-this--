@@ -23,6 +23,11 @@ import difflib
 from pathlib import Path
 from typing import Any
 
+from core.validation_execution import (
+    SafeValidationCommand,
+    run_safe_validation_command,
+)
+
 
 # Each rollback entry is (path, original_text_or_None).
 # original_text=None means the op was a CREATE → rollback = delete the file.
@@ -102,6 +107,8 @@ def apply_patch_plan(
     project_root: str,
     plan: list[dict],
     validation_command: str | None = None,
+    safe_validation_command: SafeValidationCommand | None = None,
+    require_safe_validation: bool = False,
 ) -> dict[str, Any]:
     """Apply a list of ops atomically. Returns a result dict; never raises.
 
@@ -134,6 +141,27 @@ def apply_patch_plan(
             "diffs": [],
             "rollback_performed": False,
             "message": "Bad project_root.",
+        }
+
+    if require_safe_validation and validation_command and safe_validation_command is None:
+        message = (
+            "Unsafe legacy shell validation is blocked: automation requires "
+            "safe validation argv."
+        )
+        return {
+            "success": False,
+            "applied_ops": [],
+            "diffs": [],
+            "rollback_performed": False,
+            "failed_op_index": None,
+            "failed_op": None,
+            "error": message,
+            "validation_ok": None,
+            "validation_command": validation_command,
+            "validation_output": "",
+            "validation_mode": "blocked_unsafe_legacy_shell",
+            "unsafe_validation_blocked": True,
+            "message": message,
         }
 
     rollbacks: list[RollbackEntry] = []
@@ -235,7 +263,50 @@ def apply_patch_plan(
     validation_output = ""
     validation_ok = None
 
-    if validation_command:
+    if safe_validation_command:
+        safe_result = run_safe_validation_command(safe_validation_command)
+        validation_ok = safe_result.ok
+        validation_output = safe_result.output or safe_result.block_reason
+        validation_command_label = " ".join(safe_validation_command.command)
+
+        if not validation_ok:
+            from core.validator import classify_validation_output
+
+            info = (
+                {
+                    "category": "unsafe_validation_command",
+                    "reason": safe_result.block_reason,
+                }
+                if safe_result.blocked
+                else classify_validation_output(validation_output)
+            )
+
+            return _rollback_and_fail(
+                rollbacks=rollbacks,
+                op={
+                    "op": "validation",
+                    "command": validation_command_label,
+                    "category": info.get("category", "unknown"),
+                    "validation_mode": "safe_argv",
+                },
+                idx=len(plan),
+                error=(
+                    f"validation failed ({info.get('category', 'unknown')}): "
+                    f"{info.get('reason', '')}"
+                ),
+                diffs=diffs,
+                applied_ops=applied_ops,
+            ) | {
+                "validation_ok": False,
+                "validation_command": validation_command_label,
+                "validation_output": validation_output,
+                "validation_info": info,
+                "validation_mode": "safe_argv",
+                "safe_validation_blocked": safe_result.blocked,
+                "message": "Patch plan applied, safe validation failed, rollback performed.",
+            }
+
+    elif validation_command:
         try:
             from core.validator import run_validation_command, classify_validation_output
 
@@ -266,6 +337,7 @@ def apply_patch_plan(
                     "validation_command": validation_command,
                     "validation_output": validation_output,
                     "validation_info": info,
+                    "validation_mode": "legacy_shell",
                     "message": "Patch plan applied, validation failed, rollback performed.",
                 }
 
@@ -281,6 +353,7 @@ def apply_patch_plan(
                 "validation_ok": False,
                 "validation_command": validation_command,
                 "validation_output": validation_output,
+                "validation_mode": "legacy_shell",
                 "message": "Patch plan validation crashed, rollback performed.",
             }
     return {
@@ -292,11 +365,18 @@ def apply_patch_plan(
         "failed_op": None,
         "error": None,
         "validation_ok": validation_ok,
-        "validation_command": validation_command or "",
+        "validation_command": (
+            " ".join(safe_validation_command.command)
+            if safe_validation_command
+            else validation_command or ""
+        ),
         "validation_output": validation_output,
+        "validation_mode": "safe_argv" if safe_validation_command else (
+            "legacy_shell" if validation_command else ""
+        ),
         "message": (
             "Patch plan applied and validation passed."
-            if validation_command
+            if validation_command or safe_validation_command
             else "Patch plan applied."
         ),
     }

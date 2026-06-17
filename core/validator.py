@@ -170,6 +170,12 @@ def _validation_command_env(command: str, cwd: str) -> Optional[dict]:
 
 
 def run_validation_command(command: str, cwd: str, timeout: int = 30) -> tuple[bool, str]:
+    """Run a legacy/manual shell validation command.
+
+    This is retained for backwards-compatible human/manual validation flows.
+    Automation and self-evolution callers must use
+    core.validation_execution.SafeValidationCommand instead.
+    """
     if not command:
         return True, ""
 
@@ -211,6 +217,9 @@ def run_validation_command(command: str, cwd: str, timeout: int = 30) -> tuple[b
 
     except Exception as e:
         return False, f"❌ Execution Error: {e}"
+
+
+run_legacy_validation_command = run_validation_command
 
 SOURCE_EXTENSIONS = {
     ".py", ".rs", ".js", ".jsx", ".ts", ".tsx", ".go", ".java",

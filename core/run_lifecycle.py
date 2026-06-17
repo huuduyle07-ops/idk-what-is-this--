@@ -7,6 +7,7 @@ from typing import Any
 
 from core.brain_stamp import collect_brain_stamp
 from core.patch_safety import evaluate_patch_safety
+from core.validation_execution import SafeValidationCommand
 from core.replay_recorder import (
     create_replay_bundle,
     finalize_replay_bundle,
@@ -29,6 +30,8 @@ def run_patch_plan_with_artifacts(
     project_root: str,
     plan: list[dict],
     validation_command: str | None = None,
+    safe_validation_command: SafeValidationCommand | None = None,
+    require_safe_validation: bool = False,
     user_query: str = "",
     control_result: dict[str, Any] | None = None,
     source: str = "pipeline",
@@ -109,7 +112,51 @@ def run_patch_plan_with_artifacts(
             except OSError:
                 pass
 
-    append_event("started", {"validation_command": validation_command or ""})
+    append_event(
+        "started",
+        {
+            "validation_command": validation_command or "",
+            "validation_mode": "safe_argv" if safe_validation_command else (
+                "safe_required" if require_safe_validation else "legacy_shell"
+            ),
+        },
+    )
+
+    if require_safe_validation and validation_command and safe_validation_command is None:
+        message = (
+            "Unsafe legacy shell validation is blocked: automation requires "
+            "safe validation argv."
+        )
+        result = with_replay_fields(
+            {
+                "success": False,
+                "applied_ops": [],
+                "diffs": [],
+                "rollback_performed": False,
+                "failed_op_index": None,
+                "failed_op": None,
+                "error": message,
+                "validation_ok": None,
+                "validation_command": validation_command,
+                "validation_output": "",
+                "validation_mode": "blocked_unsafe_legacy_shell",
+                "unsafe_validation_blocked": True,
+                "message": message,
+            }
+        )
+        if bundle is not None:
+            safe_write_json("apply_result.json", result)
+            safe_write_artifact("validation_output.txt", "")
+        append_event(
+            "unsafe_validation_blocked",
+            {
+                "success": False,
+                "validation_command": validation_command,
+                "reason": message,
+            },
+        )
+        finish("failed", result)
+        return result
 
     patch_safety = evaluate_patch_safety(
         _patch_plan_files(plan),
@@ -149,10 +196,16 @@ def run_patch_plan_with_artifacts(
         finish("failed", result)
         return result
 
+    apply_kwargs: dict[str, Any] = {"validation_command": validation_command}
+    if safe_validation_command is not None:
+        apply_kwargs["safe_validation_command"] = safe_validation_command
+    if require_safe_validation:
+        apply_kwargs["require_safe_validation"] = require_safe_validation
+
     result = apply_patch_plan(
         project_root,
         plan,
-        validation_command=validation_command,
+        **apply_kwargs,
     )
     result = with_replay_fields(result)
 

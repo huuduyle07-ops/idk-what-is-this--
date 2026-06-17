@@ -13,6 +13,7 @@ from patching.patch_engine import (
     cleanup_backup,
 )
 from core.patch_safety import evaluate_patch_safety
+from core.validation_execution import SafeValidationCommand, run_safe_validation_command
 from core.validator import run_validation_command, classify_validation_output
 
 # Markup / style files have no function-signature semantics, so risk heuristics
@@ -124,6 +125,8 @@ class Executor:
         patch: Dict[str, Any],
         language: str,
         validation_command: Optional[str] = None,
+        safe_validation_command: SafeValidationCommand | None = None,
+        require_safe_validation: bool = False,
         dry_run_only: bool = False,
     ) -> ExecutionResult:
 
@@ -141,6 +144,25 @@ class Executor:
                 diff=dry["diff"],
                 risk=dry["risk"],
                 applied_patch=patch,
+            )
+
+        if require_safe_validation and validation_command and safe_validation_command is None:
+            message = (
+                "Unsafe legacy shell validation is blocked: automation requires "
+                "safe validation argv."
+            )
+            return ExecutionResult(
+                success=False,
+                phase="unsafe_validation_blocked",
+                message=message,
+                target_file=self._single_file_patch_target(patch) or None,
+                validation_ok=None,
+                validation_output="",
+                diff=dry["diff"],
+                risk=dry["risk"],
+                applied_patch=patch,
+                matched_by=None,
+                blocked_reason=message,
             )
 
         patch_safety = evaluate_patch_safety(
@@ -231,7 +253,7 @@ class Executor:
         diff = self._generate_diff(old_snippet or "", new_snippet or "")
 
         # 3. NO VALIDATION MODE
-        if not validation_command:
+        if not validation_command and safe_validation_command is None:
             cleanup_backup(backup_path)
             return ExecutionResult(
                 success=True,
@@ -245,12 +267,26 @@ class Executor:
             )
 
         # 4. VALIDATION
-        print(f"🧪 Executor validation command: {validation_command}")
-        print(f"🧪 Executor cwd: {self.project_root}")
-        ok, output = run_validation_command(
-            validation_command,
-            cwd=str(self.project_root),
+        print(
+            "🧪 Executor validation command: "
+            + (
+                " ".join(safe_validation_command.command)
+                if safe_validation_command
+                else str(validation_command)
+            )
         )
+        print(f"🧪 Executor cwd: {self.project_root}")
+        safe_validation_block_reason = ""
+        if safe_validation_command:
+            safe_result = run_safe_validation_command(safe_validation_command)
+            ok = safe_result.ok
+            output = safe_result.output or safe_result.block_reason
+            safe_validation_block_reason = safe_result.block_reason if safe_result.blocked else ""
+        else:
+            ok, output = run_validation_command(
+                validation_command,
+                cwd=str(self.project_root),
+            )
 
         if ok:
             oracle_strength: Optional[float] = None
@@ -263,7 +299,7 @@ class Executor:
                 MUTATION_ORACLE_ENABLED = False
                 MUTATION_ORACLE_MAX_MUTANTS = 0
 
-            if MUTATION_ORACLE_ENABLED and new_snippet:
+            if MUTATION_ORACLE_ENABLED and new_snippet and safe_validation_command is None:
                 try:
                     from core.mutation_oracle import run_mutation_oracle
                     print(f"🧬 Running mutation oracle (max={MUTATION_ORACLE_MAX_MUTANTS})...")
@@ -303,7 +339,15 @@ class Executor:
             )
         print("🧪 Executor validation output:")
         print(output or "<empty>") 
-        failure_info = classify_validation_output(output)
+        failure_info = (
+            {
+                "category": "unsafe_validation_command",
+                "reason": safe_validation_block_reason,
+                "hint": "Use SafeValidationCommand for automation-safe validation.",
+            }
+            if safe_validation_block_reason
+            else classify_validation_output(output)
+        )
 
         # Save patched file BEFORE rollback
         try:
