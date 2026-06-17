@@ -1114,6 +1114,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **F.8b** complete | Goal Brief action-bar cleanup | UX-only: staged Goal Brief actions (one primary per stage), Worker Assignment handoff moved below the checklist and gated on a ready brief, single compact card hidden until creation, Review Pack demoted to a collapsed secondary section; no backend/schema/execution change |
 | **F.8c** complete | Goal Brief assistive intake simplification | UX-only: one primary intake box + optional details, 3-step stage indicator (Describe/Refine/Handoff), non-blocking checklist wording, friendly "good enough" guidance, assistive button labels, advanced helpers (mode routing/review pack/raw details) collapsed; F.8b gating preserved; no backend/schema/execution change |
 | **AUTO.1a** ✅ | Sandbox Self-Evolution Trial Contract | Report-only safety contract that defines five automation levels and scores whether a self-evolution attempt is safe to try (safety/scope/validation/budget/reviewability); blocks self-approval and auto-merge; no model/agent launch, repo edit, push/merge/PR, or validation/benchmark run |
+| **AUTO.1b** ✅ | Sandbox Self-Evolution Dry-Run Runner | First executable sandbox layer: copies the repo to a disposable managed sandbox and runs only declared safe validation (A.18) there, reports A.19 side effects, gates on the AUTO.1a contract; no model call, patch generation, real-repo mutation, push/merge/PR, or auto-merge |
 
 These features are additive. They do not require implementing any district infrastructure.
 
@@ -1208,6 +1209,60 @@ Status:
   `scripts/create_sandbox_self_evolution_trial.py`,
   `tests/test_sandbox_self_evolution_trial.py`.
 - Shipment checkpoint: `python -m pytest tests/test_sandbox_self_evolution_trial.py -q`
+  — also covered by `python -m compileall` and the existing
+  `benchmarks/run_benchmarks.py --check`.
+
+### AUTO.1b — Sandbox Self-Evolution Dry-Run Runner ✅
+
+Status: **Complete when implemented — first executable sandbox layer; no model
+calls, no patch generation, no real-repo mutation.**
+
+Goal:
+Copy the current repo into a disposable managed sandbox, run only explicitly
+declared safe validation commands there, record side effects, and write a review
+artifact. The runner may test the sandbox; it may not evolve the real repo.
+
+Behaviour:
+- Creates a disposable, managed sandbox copy (marked with a marker file) that
+  excludes `.git`, `.agent`, `.tmp`, `tmp_tests`, `__pycache__`, `.pytest_cache`,
+  virtualenvs, `node_modules`, build outputs, and local env / secrets.
+- Gates on an AUTO.1a trial contract (path or equivalent CLI args). Refuses to
+  run when the contract verdict is `blocked`, `self_approval_allowed` is true,
+  `eligible_for_auto_merge` is true, the level is `AUTO_4_AUTO_MERGE` or
+  `REMOTE_3_DRAFT_PR`, `sandbox_required` is false, or `human_approval_required`
+  is false → `blocked_by_contract`.
+- Runs only declared safe validation commands inside the sandbox through the
+  A.18 safe path (`SafeValidationCommand`: argv, shell disabled, required bounded
+  timeout, scrubbed environment — no raw shell fallback, no legacy shell
+  validation). No command declared → `validation_skipped`. No full test suite or
+  benchmark check runs unless explicitly declared.
+- Reports A.19 before/after side effects (created / modified / deleted), confirms
+  they were sandbox-only, and keeps `real_repo_modified` false. Side effects are
+  reported, never auto-cleaned; only `--cleanup` deletes the whole managed
+  sandbox (and cleanup refuses any unmanaged path).
+- Verdicts: `dry_run_passed`, `dry_run_failed`, `blocked_by_contract`,
+  `validation_skipped`, `sandbox_setup_failed`. Writes
+  `.agent/self_evolution_trials/<trial_id>/sandbox_dry_run.json` and `.md`.
+
+Rules (verified by guardrail tests):
+- No model call. No patch generation. No patch apply to the real repo. No real
+  repo mutation. No push, merge, or PR. No auto-merge.
+- No Dream. No Project Evolution execution. No webhook/network. No lesson
+  promotion. No proposal import. No worker launch. No remote git host / chat /
+  external automation contact.
+
+Status:
+- Complete. First executable sandbox layer; uses A.18 safe validation; reports
+  A.19 validation side effects; blocks self-approval and auto-merge; no model
+  calls, no patch generation, no real-repo mutation.
+- CLI: `python scripts/run_sandbox_self_evolution_dry_run.py --repo-path . --validation-json '["python","-m","compileall","-q","core"]'`
+  (optional `--trial-contract`, `--validation` text, `--automation-level`,
+  `--cleanup`, `--timeout`, `--sandbox-root`, `--output-root`, `--json`,
+  deterministic `--trial-id` / `--created-at`).
+- Files: `core/sandbox_self_evolution_runner.py`,
+  `scripts/run_sandbox_self_evolution_dry_run.py`,
+  `tests/test_sandbox_self_evolution_runner.py`.
+- Shipment checkpoint: `python -m pytest tests/test_sandbox_self_evolution_runner.py -q`
   — also covered by `python -m compileall` and the existing
   `benchmarks/run_benchmarks.py --check`.
 

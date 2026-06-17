@@ -825,6 +825,38 @@ It is the **first step** before any n8n / Telegram / GitHub / Claude / Codex
 automation is given more power. Deterministic `--trial-id` / `--created-at`
 hooks make the artifact reproducible.
 
+### Sandbox Self-Evolution Dry Run (AUTO.1b)
+
+AUTO.1b is the **first executable sandbox layer** — and it is **sandbox
+dry-run only**:
+
+```bash
+python scripts/run_sandbox_self_evolution_dry_run.py --repo-path . \
+    --automation-level LOCAL_0_OBSERVE \
+    --validation-json '["python","-m","compileall","-q","core"]' --cleanup
+```
+
+- It copies the repo into a disposable, managed sandbox (excluding `.git`,
+  `.agent`, caches, temp dirs, virtualenvs, `node_modules`, build outputs, and
+  local env / secrets) and runs **only explicitly declared safe validation
+  commands** there, via the A.18 safe path (argv, shell disabled, required
+  bounded timeout, scrubbed environment — no raw shell, no legacy shell
+  validation).
+- It records A.19 before/after side effects (created / modified / deleted files)
+  and confirms they were sandbox-only; `real_repo_modified` stays `false`.
+- It **refuses to run** when the AUTO.1a contract is `blocked`, allows
+  self-approval, is eligible for auto-merge, or targets `AUTO_4_AUTO_MERGE` /
+  `REMOTE_3_DRAFT_PR`. Verdicts: `dry_run_passed`, `dry_run_failed`,
+  `blocked_by_contract`, `validation_skipped`, `sandbox_setup_failed`.
+- It **does not generate patches or call models** — and it never applies a patch
+  to the real repo, pushes, merges, opens a PR, or contacts GitHub / Telegram /
+  n8n. Side effects are never auto-cleaned during the trial; only `--cleanup`
+  deletes the whole managed sandbox.
+
+It writes JSON + Markdown to `.agent/self_evolution_trials/<trial_id>/sandbox_dry_run.json`
+(and `.md`). Deterministic `--trial-id` / `--created-at` hooks make the artifact
+reproducible.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
