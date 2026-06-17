@@ -1118,6 +1118,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **AUTO.1c** ✅ | Sandbox Patch Candidate Evaluation | Writes a provided patch candidate into the disposable sandbox only (never the real repo), rejects forbidden/traversal/empty/oversized patches, runs A.18 validation + reports A.19 side effects around apply and validation; no patch generation, real-repo write, push/merge/PR, or auto-merge — human review required before graduation |
 | **AUTO.1d** ✅ | Sandbox Patch Graduation Review | Review-only gate that consumes an AUTO.1c evaluation artifact and decides whether the candidate is eligible for human review (separates "passed in sandbox" from "ready for human review"); deterministic safety/sandbox/human-gate/patch-safety/validation/side-effect checks; blocks self-approval and auto-merge; no patch apply, validation run, benchmark run, model call, real-repo write, push/merge/PR, or auto-merge |
 | **AUTO.1e** ✅ | Sandbox Self-Evolution Evidence Pack | Report-only builder that bundles the AUTO.1a/1b/1c/1d artifacts into one human-readable review package (summary, timeline, verdicts table, risk summary, human review packet); `--trial-dir` auto-discovery; deterministic final verdict (`ready_for_human_review` / `needs_more_validation` / `blocked` / `incomplete_pack`); any hard breach in any artifact blocks; bridge toward future Telegram/GitHub/n8n summaries but contacts none; no execution, patch apply, validation/benchmark run, model call, real-repo write, push/merge/PR, or auto-merge |
+| **AUTO.1f** ✅ | End-to-End Sandbox Self-Evolution Smoke Scenario | Deterministic single-trial smoke runner that drives the AUTO.1a→1e chain over one harmless explicit literal patch (creates `pkg/auto1f_smoke_demo.txt` in the sandbox copy only) inside one shared trial directory and `trial_id`; the only execution is declared safe validation (`compileall -q core`) inside a disposable managed sandbox; explicit cleanup (removes the sandbox by default, `--keep-sandbox` keeps it); clean smoke ends at `ready_for_human_review`; no patch generation, real-repo write, model call, push/merge/PR, auto-merge, worker launch, lesson promotion, proposal import, or external automation |
 
 These features are additive. They do not require implementing any district infrastructure.
 
@@ -1453,6 +1454,449 @@ Status:
   — also covered by `python -m compileall` and the existing
   `benchmarks/run_benchmarks.py --check`.
 
+### AUTO.1f — End-to-End Sandbox Self-Evolution Smoke Scenario ✅
+
+Status: **Complete when implemented — orchestration only; no execution power added beyond declared sandboxed validation.**
+
+Goal:
+Provide one deterministic single-trial smoke scenario where all AUTO.1 artifacts
+share the same `trial_id` and output directory, exercising the AUTO.1a→1e chain
+over one harmless patch candidate before any future Telegram / n8n / GitHub
+automation is wired in.
+
+Behaviour:
+- Uses one deterministic `trial_id` and `created_at` across every step, so the
+  resulting artifacts form one coherent single-trial bundle.
+- 1a builds a contract (`SANDBOX_2_DRAFT_PATCH`) for a harmless text patch; 1b
+  runs a sandbox dry run; 1c evaluates a **fixed, explicit literal** patch
+  candidate (creates `pkg/auto1f_smoke_demo.txt` in the sandbox copy only — never
+  generated, never written to the real repo); 1d reviews graduation; 1e packages
+  the evidence pack. The four chain artifacts are discovered in the shared trial
+  directory.
+- The only execution is declared safe validation (`python -m compileall -q core`)
+  inside a disposable managed sandbox (the AUTO.1b/1c path).
+- Cleanup is explicit: the managed sandbox is removed by default and kept with
+  `--keep-sandbox`; the result reports `sandbox_exists_after` either way.
+- All ten artifacts (five JSON + five Markdown) land under
+  `.agent/self_evolution_trials/<trial_id>/`; the clean smoke ends at
+  `ready_for_human_review`.
+- Operational note: keep the managed sandbox **outside the repo working tree**
+  (`--sandbox-root`) when an IDE/language-server builder is active — a repo-local
+  copy of a foreign-language project (e.g. a `.csproj` under `benchmarks/cases/`)
+  can be rebuilt by an external watcher that races the A.19 side-effect snapshot,
+  which the chain honestly reports and downgrades to `needs_more_validation`.
+
+Rules (orchestration only — verified by guardrail tests):
+- No model call. No Claude/Codex/Gemini launch. No patch generation. No patch
+  apply to the real repo. No validation outside the sandbox. No benchmark
+  execution. No real-repo mutation. No push, merge, or PR. No auto-merge.
+- No Dream. No Project Evolution execution. No webhook/network. No Telegram / n8n
+  / GitHub contact. No lesson promotion. No proposal import. No worker launch. No
+  autonomous retry loop. No database migration. No new UI panel.
+
+Status:
+- Complete. Deterministic single-trial smoke runner over the AUTO.1a→1e chain;
+  one `trial_id` and output directory; one harmless explicit literal candidate;
+  explicit sandbox cleanup; clean smoke verdict `ready_for_human_review`; no
+  external automation or real-repo mutation power added.
+- CLI: `python scripts/run_self_evolution_smoke.py` (optional `--repo-path`,
+  `--trial-id`, `--created-at`, `--output-root`, `--sandbox-root`,
+  `--keep-sandbox`, `--json`).
+- Files: `scripts/run_self_evolution_smoke.py`,
+  `tests/test_self_evolution_smoke.py`.
+- Shipment checkpoint: `python -m pytest tests/test_self_evolution_smoke.py -q`
+  — also covered by `python -m compileall` and the existing
+  `benchmarks/run_benchmarks.py --check`.
+
+---
+## Future Roadmap Notes — ROAD / AUTO / MODEL
+
+These tracks are future-facing architecture tracks. They should not be treated as immediate implementation unless explicitly promoted into the active roadmap.
+
+Core rule:
+
+> Do not automate “thinking harder.” Automate “choosing safer.”
+
+---
+
+## Track ROAD — Machine-Readable Roadmap
+
+Purpose: make the roadmap readable by both humans and C.A.T.T.U.S.
+
+The current roadmap is mostly prose. Future automation needs structured phase metadata so C.A.T.T.U.S can safely decide what can be prepared, sandboxed, deferred, or escalated.
+
+### ROAD.1 — Machine-Readable Phase Registry
+
+Goal: define a structured registry for roadmap phases.
+
+Example fields:
+
+```yaml
+phase_id: AUTO.2a
+title: Telegram Evidence Summary Contract
+track: AUTO
+status: proposed
+automation_level: LOCAL_1_PREPARE
+budget_tier: local_only
+allowed_files:
+  - core/...
+  - scripts/...
+  - tests/...
+forbidden_files:
+  - .env
+  - .git
+  - .agent/private
+validation:
+  - python -m pytest tests/test_x.py -q
+human_approval_required: true
+merge_allowed: false
+```
+
+Boundary:
+
+* Registry only.
+* No execution.
+* No model calls.
+* No automatic phase selection yet.
+
+### ROAD.2 — Phase Picker / Night Candidate Report
+
+Goal: read the phase registry and produce a report of safe candidate work.
+
+Example output:
+
+* Safe tonight: docs-only/report-only/sandbox-only phases
+* Needs human approval: strong model / broad refactor / missing allowed files
+* Blocked: no validation plan / unsafe scope / auto-merge requested
+
+Boundary:
+
+* Report-only.
+* Does not run phases.
+* Does not call models.
+* Does not create branches or PRs.
+
+---
+
+## Track AUTO (continue) — Controlled Automation
+
+Purpose: gradually reduce biological coordination load while preserving human approval and evidence boundaries.
+
+AUTO.1 establishes local sandbox evidence. Later AUTO.2 may define remote/Telegram/GitHub contracts.
+
+### AUTO.1a–AUTO.1f — Local Sandbox Self-Evolution Chain
+
+Status: active/current near-term chain.
+
+* AUTO.1a: Sandbox Self-Evolution Trial Contract
+* AUTO.1b: Sandbox Self-Evolution Dry-Run Runner
+* AUTO.1c: Sandbox Patch Candidate Evaluation
+* AUTO.1d: Sandbox Patch Graduation Review
+* AUTO.1e: Sandbox Self-Evolution Evidence Pack
+* AUTO.1f: End-to-End Sandbox Self-Evolution Smoke Scenario
+
+Rule:
+
+> Self-evolution may be tested in a sandbox. Self-approval is forbidden.
+
+### AUTO.2a — Telegram Evidence Summary Contract
+
+Goal: define how C.A.T.T.U.S evidence packs are summarized for Telegram.
+
+Telegram may present:
+
+* phase
+* verdict
+* tests
+* risks
+* touched files
+* recommended next step
+* human action options
+
+Telegram must not:
+
+* bypass branch protection
+* approve unsupported claims
+* merge failed work
+* override C.A.T.T.U.S safety gates
+
+Boundary:
+
+* Contract only.
+* No Telegram API integration yet.
+
+### AUTO.2b — GitHub Remote PR Safety Contract
+
+Goal: define branch/PR rules before remote automation.
+
+Rules:
+
+* no push to main
+* no auto-merge
+* required evidence pack
+* required checks
+* no secrets
+* branch naming convention
+* labels/comments only after safety checks
+
+Boundary:
+
+* Contract only.
+* No remote worker execution yet.
+
+### AUTO.2c — n8n Orchestration Dry Run
+
+Goal: simulate n8n orchestration using existing evidence packs.
+
+Allowed:
+
+* read a sample evidence pack
+* produce a fake/limited notification payload
+* verify approval wording
+
+Forbidden:
+
+* repo mutation
+* external coding agent launch
+* GitHub push/PR/merge
+* Telegram live action unless explicitly promoted later
+
+---
+
+## Track MODEL — C.A.T.T.U.S-Native Specialist Models
+
+Purpose: reduce cost and improve speed by training small specialist models on C.A.T.T.U.S artifacts.
+
+This track is not about training a general coding model. It is about training small models that help C.A.T.T.U.S route, activate lessons, and decide when expensive external models are worth using.
+
+Core rule:
+
+> The learned model may recommend. Deterministic Driver rules may veto.
+
+---
+
+### MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder
+
+Goal: export C.A.T.T.U.S artifacts into a clean training/evaluation dataset.
+
+Sources:
+
+* Goal Briefs
+* Worker Assignments
+* Driver Decisions
+* Worker Result Reviews
+* Teaching Cards
+* A.17 Flaky Reviews
+* AUTO.1 evidence packs
+* patch safety outputs
+* lessons / anti-lessons
+* benchmark outcomes
+
+Example record:
+
+```json
+{
+  "input_text": "...",
+  "artifact_type": "worker_assignment",
+  "label_mode": "Debug",
+  "label_risk": "medium",
+  "label_vehicle": "cheap_api_allowed",
+  "label_next_step": "create_worker_assignment"
+}
+```
+
+Boundary:
+
+* Dataset/export only.
+* No training yet.
+* No model authority.
+
+---
+
+### MODEL.2 — Driver Classifier Baseline
+
+Goal: train a small cheap model that predicts Driver-like recommendations.
+
+Possible baseline:
+
+* TF-IDF text features
+* logistic regression
+* decision tree / random forest
+
+Predicted fields:
+
+* mode
+* risk
+* vehicle
+* missing artifacts
+* recommended next step
+
+Boundary:
+
+* Model recommends only.
+* Deterministic Driver remains final safety gate.
+* No automatic execution.
+
+---
+
+### MODEL.3 — Lesson Graph Activation Dataset
+
+Goal: build dataset for lesson/anti-lesson activation.
+
+Metaphor:
+
+* lesson = neuron
+* anti-lesson = inhibition node
+* evidence/benchmark/replay = grounding signal
+* edge = synapse
+* current task = input current
+* activation score = which lessons should enter context
+
+Example output:
+
+```json
+{
+  "activated_lessons": [
+    {
+      "lesson_id": "lesson_allowed_files_scope",
+      "activation_score": 0.91,
+      "reason": "Task is broad and file scope is unclear"
+    }
+  ],
+  "activated_anti_lessons": [
+    {
+      "anti_lesson_id": "anti_wrong_file_assumption",
+      "inhibition_score": 0.84,
+      "reason": "Task may touch similar-looking files"
+    }
+  ]
+}
+```
+
+Boundary:
+
+* Dataset/report-only.
+* No auto-promotion.
+* No auto-deletion.
+* No silent graph mutation.
+
+---
+
+### MODEL.4 — Lesson Activation Scorer Baseline
+
+Goal: train a small model to predict which lessons/anti-lessons should activate for a task.
+
+Possible features:
+
+* task text similarity
+* lesson confidence
+* lesson recency
+* benchmark links
+* anti-lesson links
+* past success/failure
+* mode match
+* scope match
+
+Possible baseline:
+
+* rules + weighted scoring
+* TF-IDF + logistic regression
+* graph-weighted ranker
+
+Boundary:
+
+* Produces activation preview only.
+* Arbiter limits top-k context.
+* Verifier checks grounding evidence.
+* Human or approved process handles persistent graph changes.
+
+---
+
+### MODEL.5 — Edge Recommendation Preview
+
+Goal: recommend possible new lesson/evidence/benchmark edges.
+
+Example:
+
+* lesson A should link to benchmark B
+* anti-lesson C should inhibit lesson D
+* replay E supports lesson F
+
+Boundary:
+
+* Preview-only.
+* No graph mutation without approval.
+* No lesson promotion.
+
+---
+
+## Parking Lot:
+
+### GOV.2 / Neural Lesson Graph Activation Preview
+
+GOV.2 remains parked until ROAD/AUTO/MODEL foundations are stable.
+
+Parked by:
+GOV.1 — Persona Governance Manifest (`docs/governance/persona_governance_manifest.md`, §5). GOV.1 records this idea as parked and explicitly forbids autonomous nano-agent execution.
+
+Idea:
+Treat lessons as knowledge nodes, anti-lessons as inhibition nodes, evidence/benchmark links as grounding edges, and bounded courier/nano-agent behavior as activation pulses.
+
+Boundary:
+
+* Report-only when implemented.
+* No autonomous nano-agent execution.
+* No unlimited context injection.
+* No auto-promotion.
+* No patch/apply behavior.
+
+### Future District — Model Lab District
+
+Purpose:
+Build and evaluate C.A.T.T.U.S-native specialist models.
+
+Initial targets:
+- Driver Classifier
+- Lesson Graph Activation Scorer
+- Risk / budget classifier
+- Artifact completeness classifier
+
+Research targets:
+- graph-based lesson activation
+- predictive coding-inspired error signals
+- non-transformer toy experiments
+- small local specialist models
+
+Boundary:
+Research and recommendation only. No model produced by this district receives execution authority without Driver, Verifier, sandbox evidence, and human approval.
+
+### Future Cross-District Council — Model Lab Support
+
+Model Lab District may request support from:
+- Math District: formalize objectives, labels, scoring, optimization, and evaluation metrics.
+- Biology District: provide inspiration from memory, inhibition, replay, pruning, and predictive coding.
+- Physics District: check plausibility, resource limits, feedback loops, signal storm risk, and cost/latency constraints.
+- Coding District: implement sandboxed experiments and evaluation harnesses.
+
+Boundary:
+Biology and physics metaphors are inspiration, not proof. Any Model Lab idea must become a testable artifact before entering production. No trained model or activation scorer receives execution authority without Driver, Verifier, sandbox evidence, and human approval.
+---
+
+## Priority Recommendation
+
+After AUTO.1f, preferred order:
+
+1. ROAD.1 — Machine-Readable Phase Registry
+2. ROAD.2 — Phase Picker / Night Candidate Report
+3. AUTO.2a — Telegram Evidence Summary Contract
+4. AUTO.2b — GitHub Remote PR Safety Contract
+5. AUTO.2c — n8n Orchestration Dry Run
+6. MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder
+7. MODEL.2 — Driver Classifier Baseline
+8. MODEL.3 — Lesson Graph Activation Dataset
+
+Do not start MODEL-G or GOV.2 before the roadmap becomes machine-readable.
+
 ---
 
 ## Deferred Ideas
@@ -1513,19 +1957,3 @@ Outputs:
 - uncertainty explanation
 - family-pressure warning, if relevant
 
-Parking Lot — Neural Lesson Graph Activation
-
-Idea:
-Treat lessons as knowledge nodes, anti-lessons as inhibition nodes, benchmark/evidence links as grounding edges, and bounded courier/nano-agents as activation pulses.
-
-Potential future phase:
-GOV.2 — Neural Lesson Graph Activation Preview.
-
-Parked by:
-GOV.1 — Persona Governance Manifest (`docs/governance/persona_governance_manifest.md`, §5). GOV.1 records this idea as parked and explicitly forbids autonomous nano-agent execution.
-
-Boundary:
-Report-only. No patch/apply, no model call, no lesson promotion, no autonomous worker spawning.
-
-Reason to defer:
-The current priority is keeping Mayor Mode simple and usable after F.8a/F.8b/F.8c.

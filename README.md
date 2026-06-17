@@ -962,6 +962,45 @@ It writes JSON + Markdown under the trial directory when possible
 toward future Telegram / GitHub / n8n review summaries — but it does not contact
 them**; it only packages the evidence a human needs.
 
+### End-to-End Sandbox Self-Evolution Smoke (AUTO.1f)
+
+AUTO.1f is a **deterministic single-trial smoke scenario** that drives the
+AUTO.1a → 1e chain over **one** harmless patch candidate inside **one** trial
+directory, so every artifact shares the same `trial_id` and output folder before
+any future external review automation is wired in.
+
+```bash
+python scripts/run_self_evolution_smoke.py
+python scripts/run_self_evolution_smoke.py --trial-id auto1f_smoke --keep-sandbox
+```
+
+- It **orchestrates the existing AUTO.1a–1e tools in-process**: it builds the 1a
+  contract, runs the 1b dry run, evaluates a 1c patch candidate, reviews 1d
+  graduation, and packages the 1e evidence pack — all under one deterministic
+  `trial_id`, `created_at`, and output directory.
+- The candidate is a **fixed, explicit literal diff it consumes** (it never
+  generates a patch) that creates one harmless text file
+  (`pkg/auto1f_smoke_demo.txt`) **inside the sandbox copy only**.
+- The **only execution** it triggers is declared safe validation
+  (`python -m compileall -q core`) inside a disposable managed sandbox. It **does
+  not** write to the real repo, generate a patch, call a model, push, merge, open
+  a PR, promote a lesson, import a proposal, launch a worker, or contact external
+  automation.
+- Cleanup is **explicit**: managed sandboxes are removed by default and kept with
+  `--keep-sandbox`; the result reports `sandbox_exists_after` either way.
+- The clean smoke ends at `ready_for_human_review`. After the run,
+  `.agent/self_evolution_trials/<trial_id>/` holds all ten artifacts (the five
+  JSON + five Markdown files of the 1a–1e chain).
+
+> **Operational note.** Keep the managed sandbox **outside the repo working
+> tree** (`--sandbox-root <dir outside the repo>`) when an IDE/language-server
+> builder is active. A repo-local sandbox copy of a foreign-language project
+> (e.g. a `.csproj` under `benchmarks/cases/`) can be rebuilt by an external
+> watcher that races the A.19 side-effect snapshot — which the chain honestly
+> reports as a non-sandbox side effect and downgrades to `needs_more_validation`.
+> The smoke itself writes nothing outside the sandbox; the interference is
+> external.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
