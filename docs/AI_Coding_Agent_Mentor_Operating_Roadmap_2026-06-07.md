@@ -309,6 +309,20 @@ Status:
 
 ---
 
+### A.21 - Upload Temp Repo Lifecycle complete
+Goal:
+Add an explicit lifecycle policy for `/upload_folder` temp repos before stronger automation exists.
+
+Status:
+- Complete. Uploaded folders are staged into managed temp repos with a `cattus-upload-` temp-root prefix and metadata recording creation time, source route, repo path, cleanup policy, last access time, and lifecycle status.
+- Failed upload temp dirs with zero indexable files are cleaned up when the path is inside the managed temp root boundary.
+- The cleanup helper refuses unmanaged paths, project roots, `.git`, home directories, drive roots, temp-base roots, and paths outside the expected temp base.
+- Missing managed temp dirs are handled idempotently.
+- Future automation/sandbox/self-evolution runners must not treat upload temp repos as durable project state.
+- No automation, model call, worker launch, Dream execution, Project Evolution execution, webhook/network behavior, lesson promotion, proposal import, benchmark execution, or auto-merge power was added.
+
+---
+
 ## Track B — Project Evolution Mode
 
 New idea, not part of the frozen historical roadmap.
@@ -1092,6 +1106,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **A.17** ✅ | Flaky Case Review Report | Report-only reliability artifact that reads an existing benchmark report, deterministically classifies flaky cases and recommends a next human action (no benchmark execution, no patching, no model calls) |
 | **A.18** complete | Validation Execution Safety | Safe argv validation boundary with legacy shell validation explicit/manual only; automation-safe callers can require safe validation before patch ops |
 | **A.19** complete | Patch Plan Atomicity Boundary | Patch rollback is patch-op scoped; validation side effects are reported, not auto-cleaned, and future automation must prefer sandbox validation |
+| **A.21** complete | Upload Temp Repo Lifecycle | Uploads stage into managed temp repos with metadata; zero-indexable failures are cleaned or reported, and cleanup refuses unmanaged paths |
 | **F.6** complete | Lesson Teaching Card / Teacher Mode | Shipped local teaching cards for lessons, anti-lessons, benchmark cases, and failure reports (artifact-only; no model/patch/validation/promotion) |
 | **F.6a** complete | Teaching Card Smoke + Copy Polish | Shipped fixture smoke tests and copy-friendly CLI text while keeping the flow inert |
 | **F.7** complete | Worker Result Import / Review Stub | Shipped untrusted worker-output intake artifact for manual review; no patch, validation, proposal import, worker launch, model call, promotion, Dream, or Project Evolution behavior |

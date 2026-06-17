@@ -375,6 +375,21 @@ described as fully rolled back. Future automation/self-evolution paths must
 require safe validation execution and prefer sandbox validation before trusting
 validation results.
 
+### 8.2. Upload Temp Repo Lifecycle
+
+Uploaded folders are staged into C.A.T.T.U.S-managed temp repos, not permanent
+project repos. Each temp repo is marked with minimal lifecycle metadata
+(`created_at`, source route, repo path, cleanup policy, last access time, and
+status) without storing secrets or uploaded file contents in metadata.
+
+Failed upload temp dirs with zero indexable files are cleaned up when safely
+possible, or reported as cleanup-eligible if cleanup is refused. Cleanup is constrained to managed temp roots only: arbitrary paths, project roots, `.git`,
+home directories, drive roots, and unmanaged repos are refused.
+
+This Upload Temp Repo Lifecycle is a pre-automation guardrail. Future
+automation, sandbox, and self-evolution runners must not treat uploaded temp
+repos as durable state.
+
 ### 9. Memory System
 
 The project can store sessions, messages, code units, patch attempts, dependency edges, and engineering notes in PostgreSQL with pgvector.

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json, shutil, subprocess, sys, tempfile
+import json, shutil, subprocess, sys
 import markdown as _markdown_lib
 from datetime import datetime
 from pathlib import Path
@@ -23,6 +23,12 @@ from agents.deepseek_client import run_deepseek_review
 from config import get_agent_dir, FOLDER_BLACKLIST
 from core.project_tag import build_project_tag, fingerprint_repo  # re-exported for legacy callers
 from core.repo_librarian import inspect_repo_inventory
+from core.upload_temp_repos import (
+    cleanup_managed_upload_temp_repo,
+    create_managed_upload_temp_repo,
+    mark_upload_temp_repo_status,
+    upload_temp_repo_response,
+)
 from core.runtime_environment import (
     build_runtime_environment_state,
     describe_runtime_environment,
@@ -3107,9 +3113,9 @@ def upload_folder():
 
     top_folder = Path(files[0].filename).parts[0] if files[0].filename else "repo"
 
-    temp_dir = tempfile.mkdtemp()
-    repo_path = Path(temp_dir) / top_folder
-    repo_path.mkdir(parents=True, exist_ok=True)
+    upload_temp_repo = create_managed_upload_temp_repo(top_folder)
+    repo_path = upload_temp_repo.repo_path
+    temp_root = upload_temp_repo.temp_root
     repo_root = repo_path.resolve()
 
     saved = 0
@@ -3154,11 +3160,19 @@ def upload_folder():
     inventory = inspect_repo_inventory(str(repo_path))
 
     if inventory["indexable_count"] == 0:
+        mark_upload_temp_repo_status(repo_path, "failed_upload", temp_root=temp_root)
+        cleanup_result = cleanup_managed_upload_temp_repo(repo_path)
         return {
             "error": "Upload created a repo with 0 indexable files.",
             "repo_path": str(repo_path),
             "saved_raw_files": saved,
             "skipped": skipped[:20],
+            "upload_temp_repo": upload_temp_repo_response(
+                repo_path,
+                temp_root=temp_root,
+                status="failed_upload",
+            ),
+            "upload_temp_repo_cleanup": cleanup_result,
             **inventory,
         }, 400
 
@@ -3169,6 +3183,7 @@ def upload_folder():
         "project_tag": project_tag,
         "saved_raw_files": saved,
         "skipped": skipped[:20],
+        "upload_temp_repo": upload_temp_repo.to_response(),
         **inventory,
     }
 
