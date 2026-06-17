@@ -889,6 +889,41 @@ It writes JSON + Markdown to
 `.agent/self_evolution_trials/<trial_id>/patch_candidate_evaluation.json` (and
 `.md`). A failed apply is reported, never retried or auto-fixed.
 
+### Sandbox Patch Graduation Review (AUTO.1d)
+
+AUTO.1d is a **review-only** graduation gate. It consumes an AUTO.1c patch
+candidate evaluation artifact and decides whether the candidate deserves human
+review — *passing in a sandbox is not the same as being safe to graduate.*
+
+```bash
+python scripts/create_sandbox_patch_graduation_review.py \
+    --evaluation .agent/self_evolution_trials/<id>/patch_candidate_evaluation.json
+```
+
+- It is **review-only**: it reads the evaluation record and decides; it **does
+  not apply patches, run validation, run a benchmark check, or call models**, and
+  it never touches the real repo, pushes, merges, or opens a PR.
+- It checks the source evaluation deterministically: the source verdict is
+  acceptable, the real repo is unchanged
+  (`real_repo_modified` / `patch_applied_to_real_repo` are `false`), effects were
+  sandbox-only, the human gate is intact (no self-approval, no auto-merge), no
+  forbidden path was touched, the patch is reviewable in size, and validation
+  passed (or, if skipped, more validation is needed).
+- It **blocks self-approval and auto-merge**: a candidate may be recommended for
+  human review, but it may not approve itself
+  (`human_review_required=true`, `self_approval_allowed=false`,
+  `eligible_for_auto_merge=false`). Graduation verdicts:
+  `eligible_for_human_review`, `needs_more_validation`, `blocked_by_safety`,
+  `not_reviewable`; recommended next steps: `prepare_human_review_packet`,
+  `request_more_validation`, `reject_candidate`, `narrow_patch_scope`,
+  `manual_review_required`.
+
+It writes JSON + Markdown next to the source evaluation when possible
+(`.agent/self_evolution_trials/<trial_id>/patch_graduation_review.json` and
+`.md`), otherwise under a folder named for the review id. The Markdown includes a
+Human Review Packet (touched files, patch size, validation status, side-effect
+summary, and what to inspect manually) so a person can make the call.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:

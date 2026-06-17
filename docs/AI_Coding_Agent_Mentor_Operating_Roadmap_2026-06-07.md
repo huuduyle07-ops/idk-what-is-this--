@@ -1116,6 +1116,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **AUTO.1a** ✅ | Sandbox Self-Evolution Trial Contract | Report-only safety contract that defines five automation levels and scores whether a self-evolution attempt is safe to try (safety/scope/validation/budget/reviewability); blocks self-approval and auto-merge; no model/agent launch, repo edit, push/merge/PR, or validation/benchmark run |
 | **AUTO.1b** ✅ | Sandbox Self-Evolution Dry-Run Runner | First executable sandbox layer: copies the repo to a disposable managed sandbox and runs only declared safe validation (A.18) there, reports A.19 side effects, gates on the AUTO.1a contract; no model call, patch generation, real-repo mutation, push/merge/PR, or auto-merge |
 | **AUTO.1c** ✅ | Sandbox Patch Candidate Evaluation | Writes a provided patch candidate into the disposable sandbox only (never the real repo), rejects forbidden/traversal/empty/oversized patches, runs A.18 validation + reports A.19 side effects around apply and validation; no patch generation, real-repo write, push/merge/PR, or auto-merge — human review required before graduation |
+| **AUTO.1d** ✅ | Sandbox Patch Graduation Review | Review-only gate that consumes an AUTO.1c evaluation artifact and decides whether the candidate is eligible for human review (separates "passed in sandbox" from "ready for human review"); deterministic safety/sandbox/human-gate/patch-safety/validation/side-effect checks; blocks self-approval and auto-merge; no patch apply, validation run, benchmark run, model call, real-repo write, push/merge/PR, or auto-merge |
 
 These features are additive. They do not require implementing any district infrastructure.
 
@@ -1327,6 +1328,66 @@ Status:
   `scripts/evaluate_sandbox_patch_candidate.py`,
   `tests/test_sandbox_patch_candidate_evaluation.py`.
 - Shipment checkpoint: `python -m pytest tests/test_sandbox_patch_candidate_evaluation.py -q`
+  — also covered by `python -m compileall` and the existing
+  `benchmarks/run_benchmarks.py --check`.
+
+### AUTO.1d — Sandbox Patch Graduation Review ✅
+
+Status: **Complete when implemented — review-only; no execution power added.**
+
+Goal:
+Consume an AUTO.1c sandbox patch candidate evaluation artifact and decide whether
+the candidate is eligible for human review. Passing in a sandbox is not the same
+as being safe to graduate: a candidate may be recommended for human review, but
+it may not approve itself.
+
+Behaviour:
+- Reads a parsed evaluation record (a plain dict) and emits a deterministic
+  graduation decision — it reads no files itself in the core and runs nothing.
+- Runs eight deterministic checks over the source artifact: the source verdict is
+  acceptable (`patch_candidate_passed` acceptable; `validation_skipped`
+  conditional; failed-validation / failed-apply / rejected-by-safety /
+  blocked-by-contract / sandbox-setup-failed reject or block); the real repo is
+  unchanged; effects were sandbox-only; the human gate is intact (human approval
+  required, no self-approval, no auto-merge); patch safety (no forbidden /
+  traversal path, a provided candidate within a reviewable size, no generated
+  patch); validation passed (or, if skipped, more is needed); side effects are
+  not suspicious (generated / noisy effects are warnings only; any real repo
+  effect blocks); and the candidate is reviewable (touched files recorded).
+- Graduation verdicts: `eligible_for_human_review`, `needs_more_validation`,
+  `blocked_by_safety`, `not_reviewable`. Recommended next steps:
+  `prepare_human_review_packet`, `request_more_validation`, `reject_candidate`,
+  `narrow_patch_scope`, `manual_review_required`. Any hard safety failure →
+  `blocked_by_safety`; a missing / malformed source artifact → `not_reviewable`.
+- Keeps its own guardrail booleans inert (`human_review_required=true`,
+  `self_approval_allowed=false`, `eligible_for_auto_merge=false`,
+  `real_repo_modified=false`, `patch_applied_to_real_repo=false`,
+  `push_performed=false`, `merge_performed=false`, `model_call_performed=false`,
+  `validation_run_by_tool=false`, `benchmark_run_by_tool=false`,
+  `worker_launch_performed=false`). Writes
+  `.agent/self_evolution_trials/<trial_id>/patch_graduation_review.json` and
+  `.md` (Summary, Graduation Checks, Blockers, Warnings, Human Review Packet,
+  Boundaries), or under `<review_id>` when the source reveals no trial directory.
+
+Rules (review-only — verified by guardrail tests):
+- No patch apply. No sandbox patch application. No validation run. No benchmark
+  run. No model call. No real-repo mutation. No push, merge, or PR. No auto-merge.
+- No subprocess, repo clone, or git. Does not modify the source evaluation
+  artifact or inspect secrets.
+- No Dream. No Project Evolution execution. No webhook/network. No lesson
+  promotion. No proposal import. No worker launch. No remote git host / chat /
+  external automation contact. No database migration. No new UI panel.
+
+Status:
+- Complete. Review-only graduation gate; consumes sandbox patch evaluation
+  artifacts; separates "passed in sandbox" from "ready for human review"; blocks
+  self-approval and auto-merge; no execution power added.
+- CLI: `python scripts/create_sandbox_patch_graduation_review.py --evaluation <path>`
+  (optional `--review-id`, `--created-at`, `--output-root`, `--json`).
+- Files: `core/sandbox_patch_graduation_review.py`,
+  `scripts/create_sandbox_patch_graduation_review.py`,
+  `tests/test_sandbox_patch_graduation_review.py`.
+- Shipment checkpoint: `python -m pytest tests/test_sandbox_patch_graduation_review.py -q`
   — also covered by `python -m compileall` and the existing
   `benchmarks/run_benchmarks.py --check`.
 
