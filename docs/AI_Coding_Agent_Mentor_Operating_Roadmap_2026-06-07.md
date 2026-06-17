@@ -1115,6 +1115,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **F.8c** complete | Goal Brief assistive intake simplification | UX-only: one primary intake box + optional details, 3-step stage indicator (Describe/Refine/Handoff), non-blocking checklist wording, friendly "good enough" guidance, assistive button labels, advanced helpers (mode routing/review pack/raw details) collapsed; F.8b gating preserved; no backend/schema/execution change |
 | **AUTO.1a** ✅ | Sandbox Self-Evolution Trial Contract | Report-only safety contract that defines five automation levels and scores whether a self-evolution attempt is safe to try (safety/scope/validation/budget/reviewability); blocks self-approval and auto-merge; no model/agent launch, repo edit, push/merge/PR, or validation/benchmark run |
 | **AUTO.1b** ✅ | Sandbox Self-Evolution Dry-Run Runner | First executable sandbox layer: copies the repo to a disposable managed sandbox and runs only declared safe validation (A.18) there, reports A.19 side effects, gates on the AUTO.1a contract; no model call, patch generation, real-repo mutation, push/merge/PR, or auto-merge |
+| **AUTO.1c** ✅ | Sandbox Patch Candidate Evaluation | Writes a provided patch candidate into the disposable sandbox only (never the real repo), rejects forbidden/traversal/empty/oversized patches, runs A.18 validation + reports A.19 side effects around apply and validation; no patch generation, real-repo write, push/merge/PR, or auto-merge — human review required before graduation |
 
 These features are additive. They do not require implementing any district infrastructure.
 
@@ -1263,6 +1264,69 @@ Status:
   `scripts/run_sandbox_self_evolution_dry_run.py`,
   `tests/test_sandbox_self_evolution_runner.py`.
 - Shipment checkpoint: `python -m pytest tests/test_sandbox_self_evolution_runner.py -q`
+  — also covered by `python -m compileall` and the existing
+  `benchmarks/run_benchmarks.py --check`.
+
+### AUTO.1c — Sandbox Patch Candidate Evaluation ✅
+
+Status: **Complete when implemented — sandbox-only patch evaluation; no model
+calls, no patch generation, no real-repo mutation.**
+
+Goal:
+Evaluate a *provided* patch candidate inside a disposable managed sandbox. The
+evaluator may write the candidate into the sandbox copy only; it must never write
+to the real repo, and it never generates a patch itself. Patch candidates may be
+tested in a sandbox; they may not graduate without human review.
+
+Behaviour:
+- Takes an explicit patch file (unified diff). Rejects, before applying, any
+  candidate that touches a forbidden path (`.env`, `.git`, `.agent/private`,
+  secrets), an absolute or parent-traversal path, is empty, or is oversized
+  (above a conservative line/file ceiling) unless explicitly marked for manual
+  review → `patch_candidate_rejected_by_safety`. Path safety reuses the shared
+  `evaluate_patch_safety` gate plus a secrets check; it never auto-fixes or
+  regenerates the patch.
+- Gates on an AUTO.1a trial contract (path or built from args). Refuses to run
+  when the verdict is `blocked`, `self_approval_allowed` is true,
+  `eligible_for_auto_merge` is true, the level is `AUTO_4_AUTO_MERGE` /
+  `REMOTE_3_DRAFT_PR`, `sandbox_required`/`human_approval_required` is false, or
+  the level is below the sandbox patch level (unless an explicit evaluation-only
+  test mode is set) → `blocked_by_contract`.
+- Copies the repo into a managed sandbox (AUTO.1b rules), writes the candidate
+  into the sandbox copy only (all-or-nothing; a failed apply is reported, never
+  retried → `patch_candidate_failed_apply`), then runs only declared A.18-safe
+  validation inside the sandbox. No command → `validation_skipped`.
+- Reports A.19 side effects around both the patch apply and the validation
+  (files changed by the patch; files created/modified/deleted by validation;
+  generated/noisy flags), confirms all effects were sandbox-only, and keeps
+  `real_repo_modified` / `patch_applied_to_real_repo` false. Only `--cleanup`
+  deletes the managed sandbox.
+- Verdicts: `patch_candidate_passed`, `patch_candidate_failed_validation`,
+  `patch_candidate_failed_apply`, `patch_candidate_rejected_by_safety`,
+  `blocked_by_contract`, `validation_skipped`, `sandbox_setup_failed`. Writes
+  `.agent/self_evolution_trials/<trial_id>/patch_candidate_evaluation.json` and
+  `.md`.
+
+Rules (verified by guardrail tests):
+- No model call. No patch generation. No patch write to the real repo. No real
+  repo mutation. No push, merge, or PR. No auto-merge.
+- No Dream. No Project Evolution execution. No webhook/network. No lesson
+  promotion. No proposal import. No worker launch. No remote git host / chat /
+  external automation contact.
+
+Status:
+- Complete. Sandbox-only patch candidate evaluation; applies provided candidates
+  to a disposable sandbox; uses A.18 safe validation; reports A.19 side effects;
+  blocks self-approval and auto-merge; no model, no patch generation, no real
+  repo mutation.
+- CLI: `python scripts/evaluate_sandbox_patch_candidate.py --repo-path . --patch-file candidate.patch --validation-json '["python","-m","compileall","-q","core"]'`
+  (optional `--trial-contract`, `--automation-level`, `--allow-large`,
+  `--cleanup`, `--timeout`, `--sandbox-root`, `--output-root`, `--json`,
+  deterministic `--trial-id` / `--created-at`).
+- Files: `core/sandbox_patch_candidate_evaluation.py`,
+  `scripts/evaluate_sandbox_patch_candidate.py`,
+  `tests/test_sandbox_patch_candidate_evaluation.py`.
+- Shipment checkpoint: `python -m pytest tests/test_sandbox_patch_candidate_evaluation.py -q`
   — also covered by `python -m compileall` and the existing
   `benchmarks/run_benchmarks.py --check`.
 

@@ -857,6 +857,38 @@ It writes JSON + Markdown to `.agent/self_evolution_trials/<trial_id>/sandbox_dr
 (and `.md`). Deterministic `--trial-id` / `--created-at` hooks make the artifact
 reproducible.
 
+### Sandbox Patch Candidate Evaluation (AUTO.1c)
+
+AUTO.1c is the next sandbox-only executable layer: it evaluates a **provided**
+patch candidate in a disposable sandbox.
+
+```bash
+python scripts/evaluate_sandbox_patch_candidate.py --repo-path . \
+    --patch-file candidate.patch \
+    --validation-json '["python","-m","compileall","-q","core"]' --cleanup
+```
+
+- It evaluates provided patch candidates **in the sandbox only** — it writes the
+  patch into the managed sandbox copy, never to the real repo.
+- It **does not generate patches** itself, and it **does not touch the real
+  repo** (`real_repo_modified` and `patch_applied_to_real_repo` stay `false`;
+  tests assert the repo is byte-identical before/after).
+- It rejects unsafe candidates before applying: forbidden paths (`.env`, `.git`,
+  `.agent/private`, secrets), absolute / parent-traversal paths, empty patches,
+  and oversized patches (unless explicitly marked for manual review). After a
+  successful sandbox apply it runs only declared A.18-safe validation and reports
+  A.19 side effects around both the patch apply and the validation.
+- It **requires human review before any graduation**: it blocks self-approval
+  and auto-merge, refuses a `blocked` contract, and never pushes / merges / opens
+  a PR or contacts GitHub / Telegram / n8n. Verdicts: `patch_candidate_passed`,
+  `patch_candidate_failed_validation`, `patch_candidate_failed_apply`,
+  `patch_candidate_rejected_by_safety`, `blocked_by_contract`,
+  `validation_skipped`, `sandbox_setup_failed`.
+
+It writes JSON + Markdown to
+`.agent/self_evolution_trials/<trial_id>/patch_candidate_evaluation.json` (and
+`.md`). A failed apply is reported, never retried or auto-fixed.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
