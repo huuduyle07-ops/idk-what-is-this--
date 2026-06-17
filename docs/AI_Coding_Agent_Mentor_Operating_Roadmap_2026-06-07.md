@@ -282,6 +282,33 @@ Status:
 
 ---
 
+### A.18 - Validation Execution Safety complete
+Goal:
+Reduce pre-automation risk from validation commands running through legacy shell validation on real repo paths.
+
+Status:
+- Complete. Safe validation execution exists through `SafeValidationCommand`: argv command, `shell=False`, explicit cwd, required bounded timeout, and scrubbed environment.
+- Safe mode rejects shell metacharacters, shell interpreters, arbitrary `python -c`, destructive filesystem/git commands, and direct env-dumping tools.
+- Legacy shell validation remains explicit/manual and backward-compatible only.
+- Automation-safe callers can pass `require_safe_validation=True` to reject raw shell validation before patch operations run.
+- No automation, model call, worker launch, Dream execution, Project Evolution execution, webhook/network behavior, lesson promotion, proposal import, benchmark execution, or auto-merge power was added.
+
+---
+
+### A.19 - Patch Plan Atomicity & Validation Side-Effect Boundary complete
+Goal:
+Make patch-plan atomicity truthful and visible before stronger automation exists.
+
+Status:
+- Complete. Patch-plan atomicity is now explicitly patch-operation scoped: patch operations are rollback-protected, but validation side effects are outside patch rollback scope unless sandbox validation or a future explicit side-effect rollback mechanism is used.
+- Patch-plan, lifecycle, and single-file executor results expose metadata including `atomicity_scope="patch_ops_only"`, `patch_ops_rollback_protected=true`, `validation_side_effects_in_rollback_scope=false`, `validation_side_effect_policy="reported_not_rolled_back"`, and `sandbox_validation_recommended=true`.
+- Validation runs are surrounded by lightweight repo snapshots when supported. Created, modified, and deleted files are reported with patch-touched-scope and generated/noisy flags.
+- A.19 reports validation side effects; it does not auto-delete them.
+- Future automation/self-evolution paths must require safe validation execution and prefer sandbox validation before trusting validation output.
+- No automation, model call, worker launch, Dream execution, Project Evolution execution, webhook/network behavior, lesson promotion, proposal import, benchmark execution, or auto-merge power was added.
+
+---
+
 ## Track B — Project Evolution Mode
 
 New idea, not part of the frozen historical roadmap.
@@ -1063,6 +1090,8 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **H.1** ✅ | Driver Model Routing Contract | Shipped contract that recommends the safest model vehicle for a worker assignment (report-only) |
 | **A.16** ✅ | Visual Evidence Intake Contract | Shipped contract that records whether a visual/UI issue is verifiable before a resolution claim (report-only; no OCR/vision/model) |
 | **A.17** ✅ | Flaky Case Review Report | Report-only reliability artifact that reads an existing benchmark report, deterministically classifies flaky cases and recommends a next human action (no benchmark execution, no patching, no model calls) |
+| **A.18** complete | Validation Execution Safety | Safe argv validation boundary with legacy shell validation explicit/manual only; automation-safe callers can require safe validation before patch ops |
+| **A.19** complete | Patch Plan Atomicity Boundary | Patch rollback is patch-op scoped; validation side effects are reported, not auto-cleaned, and future automation must prefer sandbox validation |
 | **F.6** complete | Lesson Teaching Card / Teacher Mode | Shipped local teaching cards for lessons, anti-lessons, benchmark cases, and failure reports (artifact-only; no model/patch/validation/promotion) |
 | **F.6a** complete | Teaching Card Smoke + Copy Polish | Shipped fixture smoke tests and copy-friendly CLI text while keeping the flow inert |
 | **F.7** complete | Worker Result Import / Review Stub | Shipped untrusted worker-output intake artifact for manual review; no patch, validation, proposal import, worker launch, model call, promotion, Dream, or Project Evolution behavior |

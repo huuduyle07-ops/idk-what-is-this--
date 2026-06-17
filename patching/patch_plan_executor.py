@@ -1,12 +1,14 @@
-"""Atomic executor for multi-op patch plans.
+"""Rollback-protected executor for multi-op patch plans.
 
 Used when the AI returns `patch_plan` instead of `patch_candidate` — usually
 for feature work that touches multiple files or creates new ones (only
 permitted under balanced/vibe vibecoding styles).
 
 Design rules:
-- Atomicity: if ANY op fails, ALL prior ops are rolled back. The repo is left
-  exactly as it was found.
+- Atomicity scope: patch operations are rolled back on apply or validation
+  failure. Validation side effects are outside patch rollback scope unless
+  validation runs in a disposable sandbox or a future explicit side-effect
+  rollback mechanism is used.
 - Security: every relative_path must resolve INSIDE project_root. Absolute
   paths and `..` traversal are rejected up front.
 - Order matters: ops apply top-to-bottom. AI is responsible for ordering
@@ -27,6 +29,12 @@ from core.validation_execution import (
     SafeValidationCommand,
     run_safe_validation_command,
 )
+from core.validation_side_effects import (
+    diff_validation_side_effects,
+    empty_validation_side_effect_report,
+    snapshot_repo_files,
+    with_atomicity_metadata,
+)
 
 
 # Each rollback entry is (path, original_text_or_None).
@@ -42,8 +50,9 @@ def _rollback_and_fail(
     error: str,
     diffs: list[str],
     applied_ops: list[dict],
+    validation_side_effects: dict[str, Any] | None = None,
 ) -> dict:
-    """Reverse every applied op in LIFO order and return a failure result."""
+    """Reverse every applied patch op in LIFO order and return failure metadata."""
     for path, original in reversed(rollbacks):
         try:
             if original is None:
@@ -56,15 +65,18 @@ def _rollback_and_fail(
         except Exception as e:
             print(f"⚠️ Rollback warning on {path}: {e}")
 
-    return {
-        "success": False,
-        "failed_op_index": idx,
-        "failed_op": op,
-        "error": error,
-        "rollback_performed": True,
-        "applied_ops": applied_ops,
-        "diffs": diffs,
-    }
+    return with_atomicity_metadata(
+        {
+            "success": False,
+            "failed_op_index": idx,
+            "failed_op": op,
+            "error": error,
+            "rollback_performed": True,
+            "applied_ops": applied_ops,
+            "diffs": diffs,
+        },
+        validation_side_effects,
+    )
 
 
 def _is_inside(child: Path, parent: Path) -> bool:
@@ -103,6 +115,33 @@ def _make_diff(original: str, modified: str, label: str) -> str:
     )
 
 
+def _validation_failed_message(kind: str) -> str:
+    return (
+        f"Patch plan applied, {kind} validation failed. "
+        "Patch operations rolled back. "
+        "Validation side effects are outside patch rollback scope; "
+        "see validation_side_effects."
+    )
+
+
+def _validation_crashed_message() -> str:
+    return (
+        "Patch plan validation crashed. Patch operations rolled back. "
+        "Validation side effects are outside patch rollback scope; "
+        "see validation_side_effects."
+    )
+
+
+def _patch_touched_paths(root: Path, rollbacks: list[RollbackEntry]) -> list[str]:
+    paths: list[str] = []
+    for path, _original in rollbacks:
+        try:
+            paths.append(path.resolve().relative_to(root).as_posix())
+        except ValueError:
+            paths.append(str(path))
+    return paths
+
+
 def apply_patch_plan(
     project_root: str,
     plan: list[dict],
@@ -110,45 +149,46 @@ def apply_patch_plan(
     safe_validation_command: SafeValidationCommand | None = None,
     require_safe_validation: bool = False,
 ) -> dict[str, Any]:
-    """Apply a list of ops atomically. Returns a result dict; never raises.
+    """Apply a list of ops with patch-operation rollback; never raises.
 
     Result shape:
         success            : bool
         applied_ops        : list of ops that were applied (or rolled back)
         diffs              : list of unified-diff strings (one per replace_snippet)
         rollback_performed : bool
+        atomicity_scope     : "patch_ops_only"
         failed_op_index    : int | None  (only on failure)
         failed_op          : dict | None
         error              : str | None
         message            : human-readable summary
     """
     if not isinstance(plan, list) or not plan:
-        return {
+        return with_atomicity_metadata({
             "success": False,
             "error": "patch_plan must be a non-empty list of ops",
             "applied_ops": [],
             "diffs": [],
             "rollback_performed": False,
             "message": "Empty or invalid patch_plan.",
-        }
+        })
 
     root = Path(project_root).resolve()
     if not root.is_dir():
-        return {
+        return with_atomicity_metadata({
             "success": False,
             "error": f"project_root is not a directory: {project_root}",
             "applied_ops": [],
             "diffs": [],
             "rollback_performed": False,
             "message": "Bad project_root.",
-        }
+        })
 
     if require_safe_validation and validation_command and safe_validation_command is None:
         message = (
             "Unsafe legacy shell validation is blocked: automation requires "
             "safe validation argv."
         )
-        return {
+        return with_atomicity_metadata({
             "success": False,
             "applied_ops": [],
             "diffs": [],
@@ -162,7 +202,7 @@ def apply_patch_plan(
             "validation_mode": "blocked_unsafe_legacy_shell",
             "unsafe_validation_blocked": True,
             "message": message,
-        }
+        })
 
     rollbacks: list[RollbackEntry] = []
     diffs: list[str] = []
@@ -262,9 +302,18 @@ def apply_patch_plan(
     # ---- validation after all ops ----
     validation_output = ""
     validation_ok = None
+    validation_side_effects = empty_validation_side_effect_report()
 
     if safe_validation_command:
+        before_validation = snapshot_repo_files(root)
         safe_result = run_safe_validation_command(safe_validation_command)
+        after_validation = snapshot_repo_files(root)
+        validation_side_effects = diff_validation_side_effects(
+            root,
+            before_validation,
+            after_validation,
+            _patch_touched_paths(root, rollbacks),
+        )
         validation_ok = safe_result.ok
         validation_output = safe_result.output or safe_result.block_reason
         validation_command_label = " ".join(safe_validation_command.command)
@@ -296,6 +345,7 @@ def apply_patch_plan(
                 ),
                 diffs=diffs,
                 applied_ops=applied_ops,
+                validation_side_effects=validation_side_effects,
             ) | {
                 "validation_ok": False,
                 "validation_command": validation_command_label,
@@ -303,16 +353,24 @@ def apply_patch_plan(
                 "validation_info": info,
                 "validation_mode": "safe_argv",
                 "safe_validation_blocked": safe_result.blocked,
-                "message": "Patch plan applied, safe validation failed, rollback performed.",
+                "message": _validation_failed_message("safe"),
             }
 
     elif validation_command:
         try:
             from core.validator import run_validation_command, classify_validation_output
 
+            before_validation = snapshot_repo_files(root)
             validation_ok, validation_output = run_validation_command(
                 validation_command,
                 cwd=str(root),
+            )
+            after_validation = snapshot_repo_files(root)
+            validation_side_effects = diff_validation_side_effects(
+                root,
+                before_validation,
+                after_validation,
+                _patch_touched_paths(root, rollbacks),
             )
 
             if not validation_ok:
@@ -332,13 +390,14 @@ def apply_patch_plan(
                     ),
                     diffs=diffs,
                     applied_ops=applied_ops,
+                    validation_side_effects=validation_side_effects,
                 ) | {
                     "validation_ok": False,
                     "validation_command": validation_command,
                     "validation_output": validation_output,
                     "validation_info": info,
                     "validation_mode": "legacy_shell",
-                    "message": "Patch plan applied, validation failed, rollback performed.",
+                    "message": _validation_failed_message("legacy shell"),
                 }
 
         except Exception as e:
@@ -349,34 +408,38 @@ def apply_patch_plan(
                 error=f"validation runner crashed: {e}",
                 diffs=diffs,
                 applied_ops=applied_ops,
+                validation_side_effects=validation_side_effects,
             ) | {
                 "validation_ok": False,
                 "validation_command": validation_command,
                 "validation_output": validation_output,
                 "validation_mode": "legacy_shell",
-                "message": "Patch plan validation crashed, rollback performed.",
+                "message": _validation_crashed_message(),
             }
-    return {
-        "success": True,
-        "applied_ops": applied_ops,
-        "diffs": diffs,
-        "rollback_performed": False,
-        "failed_op_index": None,
-        "failed_op": None,
-        "error": None,
-        "validation_ok": validation_ok,
-        "validation_command": (
-            " ".join(safe_validation_command.command)
-            if safe_validation_command
-            else validation_command or ""
-        ),
-        "validation_output": validation_output,
-        "validation_mode": "safe_argv" if safe_validation_command else (
-            "legacy_shell" if validation_command else ""
-        ),
-        "message": (
-            "Patch plan applied and validation passed."
-            if validation_command or safe_validation_command
-            else "Patch plan applied."
-        ),
-    }
+    return with_atomicity_metadata(
+        {
+            "success": True,
+            "applied_ops": applied_ops,
+            "diffs": diffs,
+            "rollback_performed": False,
+            "failed_op_index": None,
+            "failed_op": None,
+            "error": None,
+            "validation_ok": validation_ok,
+            "validation_command": (
+                " ".join(safe_validation_command.command)
+                if safe_validation_command
+                else validation_command or ""
+            ),
+            "validation_output": validation_output,
+            "validation_mode": "safe_argv" if safe_validation_command else (
+                "legacy_shell" if validation_command else ""
+            ),
+            "message": (
+                "Patch plan applied and validation passed."
+                if validation_command or safe_validation_command
+                else "Patch plan applied."
+            ),
+        },
+        validation_side_effects,
+    )

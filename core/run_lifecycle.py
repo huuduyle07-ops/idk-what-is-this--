@@ -8,6 +8,7 @@ from typing import Any
 from core.brain_stamp import collect_brain_stamp
 from core.patch_safety import evaluate_patch_safety
 from core.validation_execution import SafeValidationCommand
+from core.validation_side_effects import with_atomicity_metadata
 from core.replay_recorder import (
     create_replay_bundle,
     finalize_replay_bundle,
@@ -71,6 +72,7 @@ def run_patch_plan_with_artifacts(
     safe_write_json("patch_plan.json", plan)
 
     def with_replay_fields(result: dict[str, Any]) -> dict[str, Any]:
+        result = with_atomicity_metadata(result)
         result = {
             **result,
             "brain_stamp_id": brain_stamp.get("brain_stamp_id"),
@@ -127,23 +129,21 @@ def run_patch_plan_with_artifacts(
             "Unsafe legacy shell validation is blocked: automation requires "
             "safe validation argv."
         )
-        result = with_replay_fields(
-            {
-                "success": False,
-                "applied_ops": [],
-                "diffs": [],
-                "rollback_performed": False,
-                "failed_op_index": None,
-                "failed_op": None,
-                "error": message,
-                "validation_ok": None,
-                "validation_command": validation_command,
-                "validation_output": "",
-                "validation_mode": "blocked_unsafe_legacy_shell",
-                "unsafe_validation_blocked": True,
-                "message": message,
-            }
-        )
+        result = with_replay_fields({
+            "success": False,
+            "applied_ops": [],
+            "diffs": [],
+            "rollback_performed": False,
+            "failed_op_index": None,
+            "failed_op": None,
+            "error": message,
+            "validation_ok": None,
+            "validation_command": validation_command,
+            "validation_output": "",
+            "validation_mode": "blocked_unsafe_legacy_shell",
+            "unsafe_validation_blocked": True,
+            "message": message,
+        })
         if bundle is not None:
             safe_write_json("apply_result.json", result)
             safe_write_artifact("validation_output.txt", "")
@@ -166,22 +166,20 @@ def run_patch_plan_with_artifacts(
         message = "Patch plan blocked by safety gate: " + "; ".join(
             patch_safety["reasons"]
         )
-        result = with_replay_fields(
-            {
-                "success": False,
-                "applied_ops": [],
-                "diffs": [],
-                "rollback_performed": False,
-                "failed_op_index": None,
-                "failed_op": None,
-                "error": message,
-                "validation_ok": None,
-                "validation_command": validation_command or "",
-                "validation_output": "",
-                "message": message,
-                "patch_safety": patch_safety,
-            }
-        )
+        result = with_replay_fields({
+            "success": False,
+            "applied_ops": [],
+            "diffs": [],
+            "rollback_performed": False,
+            "failed_op_index": None,
+            "failed_op": None,
+            "error": message,
+            "validation_ok": None,
+            "validation_command": validation_command or "",
+            "validation_output": "",
+            "message": message,
+            "patch_safety": patch_safety,
+        })
         if bundle is not None:
             safe_write_json("apply_result.json", result)
             safe_write_artifact("validation_output.txt", "")

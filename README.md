@@ -340,7 +340,8 @@ cargo test
 npm test
 ```
 
-If validation fails, the executor can roll back the file to its previous state.
+If validation fails, the executor can roll back the patch-touched file to its
+previous state.
 
 The web "Test Run Patch" flow now runs against a temporary copy of the repository. That means the real project stays safe while the user gets a more honest signal than a dry-run-only check.
 
@@ -350,6 +351,29 @@ Important files:
 - `core/validator.py`
 - `core/validation_command.py`
 - `core/preflight.py`
+
+### 8.1. Pre-Automation Validation Guardrails
+
+Two safety boundaries are now explicit before any stronger automation is added:
+
+- **A.18 Safe Validation Execution**: automation-safe callers use
+  `SafeValidationCommand`, argv execution with `shell=False`, a required
+  timeout, scrubbed environment, and rejection of shell metacharacters,
+  `python -c`, destructive commands, env-dumping tools, and shell interpreters.
+  Legacy shell validation remains manual/backward-compatible only.
+- **A.19 Patch-Plan Atomicity Boundary**: patch-plan atomicity is patch-op
+  scoped. Patch operations are rollback-protected, but validation side effects
+  are outside patch rollback scope unless validation runs as sandbox validation
+  or a future explicit side-effect rollback mechanism is used.
+
+Patch-plan and executor results now expose metadata such as
+`atomicity_scope="patch_ops_only"`,
+`validation_side_effects_in_rollback_scope=false`, and
+`validation_side_effect_policy="reported_not_rolled_back"`. When supported,
+validation-created, modified, or deleted files are reported instead of silently
+described as fully rolled back. Future automation/self-evolution paths must
+require safe validation execution and prefer sandbox validation before trusting
+validation results.
 
 ### 9. Memory System
 

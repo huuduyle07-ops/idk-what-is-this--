@@ -1,8 +1,8 @@
 # Validation Execution Safety
 
-Status: A.18 implemented boundary.
+Status: A.18 and A.19 implemented boundaries.
 
-## Safe Validation
+## A.18 Safe Validation Execution
 
 Automation-capable validation must use `core.validation_execution.SafeValidationCommand`.
 
@@ -50,3 +50,36 @@ flag, a raw `validation_command` string is rejected before patch operations run.
 
 This change adds no automation or self-evolution capability. It only creates the
 validation execution boundary those future paths must use.
+
+## A.19 Patch-Plan Atomicity Boundary
+
+Patch-plan atomicity is patch-operation scoped. Patch operations are
+rollback-protected on apply or validation failure, but validation side effects
+are outside patch rollback scope unless validation runs in a disposable sandbox
+or a future explicit side-effect rollback mechanism is used.
+
+In short: validation side effects are outside patch rollback scope unless
+sandbox validation or a future explicit rollback mechanism brings them inside it.
+
+Patch-plan and executor results expose metadata for this boundary:
+
+```json
+{
+  "atomicity_scope": "patch_ops_only",
+  "patch_ops_rollback_protected": true,
+  "validation_side_effects_in_rollback_scope": false,
+  "validation_side_effect_policy": "reported_not_rolled_back",
+  "sandbox_validation_recommended": true
+}
+```
+
+When supported, validation is surrounded by lightweight repo snapshots that
+report created, modified, and deleted files. The report marks whether each file
+is inside the patch-touched scope and whether it looks like generated/noisy
+output. A.19 does not auto-delete validation-created files, because validation
+may create meaningful user artifacts.
+
+Automation and self-evolution paths must use safe validation execution and must
+prefer sandbox validation before relying on validation results. If
+`validation_side_effects_in_rollback_scope` is `false`, future automation must
+either require sandbox validation or explicitly accept the side-effect boundary.

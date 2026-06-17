@@ -14,6 +14,11 @@ from patching.patch_engine import (
 )
 from core.patch_safety import evaluate_patch_safety
 from core.validation_execution import SafeValidationCommand, run_safe_validation_command
+from core.validation_side_effects import (
+    diff_validation_side_effects,
+    empty_validation_side_effect_report,
+    snapshot_repo_files,
+)
 from core.validator import run_validation_command, classify_validation_output
 
 # Markup / style files have no function-signature semantics, so risk heuristics
@@ -77,6 +82,14 @@ class ExecutionResult:
     patch_safety_blocked: bool = False
     patch_safety_reasons: List[str] = field(default_factory=list)
     blocked_reason: Optional[str] = None
+    atomicity_scope: str = "patch_ops_only"
+    patch_ops_rollback_protected: bool = True
+    validation_side_effects_in_rollback_scope: bool = False
+    validation_side_effect_policy: str = "reported_not_rolled_back"
+    sandbox_validation_recommended: bool = True
+    validation_side_effects: Dict[str, Any] = field(
+        default_factory=empty_validation_side_effect_report
+    )
 
     # Mutation oracle (Phase 2). Populated only on successful validation when
     # the oracle is enabled. None means "not run" or "no mutants applicable" —
@@ -278,15 +291,25 @@ class Executor:
         print(f"🧪 Executor cwd: {self.project_root}")
         safe_validation_block_reason = ""
         if safe_validation_command:
+            before_validation = snapshot_repo_files(self.project_root)
             safe_result = run_safe_validation_command(safe_validation_command)
+            after_validation = snapshot_repo_files(self.project_root)
             ok = safe_result.ok
             output = safe_result.output or safe_result.block_reason
             safe_validation_block_reason = safe_result.block_reason if safe_result.blocked else ""
         else:
+            before_validation = snapshot_repo_files(self.project_root)
             ok, output = run_validation_command(
                 validation_command,
                 cwd=str(self.project_root),
             )
+            after_validation = snapshot_repo_files(self.project_root)
+        validation_side_effects = diff_validation_side_effects(
+            self.project_root,
+            before_validation,
+            after_validation,
+            [target_file],
+        )
 
         if ok:
             oracle_strength: Optional[float] = None
@@ -336,6 +359,7 @@ class Executor:
                 oracle_tested=oracle_tested,
                 oracle_killed=oracle_killed,
                 oracle_note=oracle_note,
+                validation_side_effects=validation_side_effects,
             )
         print("🧪 Executor validation output:")
         print(output or "<empty>") 
@@ -409,6 +433,7 @@ class Executor:
             applied_patch=patch,
             failure_info=failure_info,
             matched_by=matched_by,
+            validation_side_effects=validation_side_effects,
         )
     
         
