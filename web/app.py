@@ -3485,13 +3485,6 @@ def help_route():
             _help_cache[cache_key] = '<p>README.md not found.</p>'
     return _help_cache[cache_key], 200, {'Content-Type': 'text/html; charset=utf-8'}
 
-
-if __name__ == "__main__":
-    from web.runner import run_web_app
-
-    run_web_app(app, debug=True)
-
-
 # === Phase 12.13f: explain-only graph explainability debug view ===
 @app.route("/graph/explainability/view", methods=["GET"])
 def graph_explainability_view_route():
@@ -3587,3 +3580,8 @@ def graph_explainability_view_route():
             response["html"] = ""
             response["html_error"] = f"{type(exc).__name__}: {exc}"
     return response
+
+if __name__ == "__main__":
+    from web.runner import run_web_app
+
+    run_web_app(app, debug=True)
