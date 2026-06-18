@@ -1034,9 +1034,48 @@ python scripts/validate_phase_registry.py \
   MODEL.1–3) so the report has real content. The **validation commands are stored
   as text and are never run by ROAD.1.**
 
-ROAD.1 is the **foundation for the ROAD.2 phase picker** — a future report-only
+ROAD.1 is the **foundation for the ROAD.2 phase picker** — a report-only
 selector of safe candidate work. ROAD.1 only validates and summarizes roadmap
 metadata; it selects nothing, runs nothing, and changes nothing in the real repo.
+
+## Phase Picker / Night Candidate Report (ROAD.2)
+
+ROAD.2 consumes the ROAD.1 registry and produces a **night candidate report**:
+it classifies every phase into a safe-candidate bucket so an operator can see, at
+a glance, what is safe to prepare next. It **recommends candidates only and has no
+execution power**.
+
+```bash
+python scripts/create_phase_picker_report.py \
+    --registry docs/roadmap/phase_registry.json --output-root .agent/roadmap
+```
+
+- It is **report-only**: it loads the registry, validates it **with the ROAD.1
+  validator** (never re-implementing the schema check), classifies each phase, and
+  writes a deterministic JSON + Markdown report
+  (`.agent/roadmap/phase_picker_report.json` and `.md`). It **does not execute
+  phases, modify code, run the stored validation commands or benchmarks, call
+  models, apply patches, write to the real repo, push, merge, open PRs, or contact
+  GitHub / Telegram / n8n**.
+- Each phase lands in exactly one bucket: `safe_to_prepare`, `sandbox_required`,
+  `human_approval_required`, `blocked`, `deferred_or_parked`, or
+  `complete_or_history`. Buckets are assigned by deterministic rules over the
+  ROAD.1 metadata (status, automation level, budget tier, risk level, the guardrail
+  booleans, and the ROAD.1 validation result) — never by running anything.
+- Each candidate carries `reasons` and a `recommended_next_step`
+  (`prepare_worker_assignment`, `prepare_sandbox_trial_contract`,
+  `request_human_approval`, `complete_prerequisites`, `keep_parked`,
+  `no_action_complete`, or `blocked_until_metadata_fixed`).
+- Within each bucket, candidates are ranked deterministically: lower risk first,
+  then lower automation level, then track order (ROAD, AUTO, MODEL, GOV, A, F, H),
+  then natural phase id. The `top_recommendation` is the best safe candidate.
+- **If the registry is invalid, ROAD.2 recommends nothing** — `safe_to_prepare` is
+  empty and there is no `top_recommendation`. The CLI exits nonzero on an invalid
+  registry unless `--allow-invalid-registry-report` is passed.
+
+ROAD.2 prepares the future AUTO.2 contracts (which themselves remain
+contract/dry-run only). It classifies phase metadata and recommends; it executes
+nothing, calls no models, touches no network, and changes nothing in the real repo.
 
 ## Environment Notes
 

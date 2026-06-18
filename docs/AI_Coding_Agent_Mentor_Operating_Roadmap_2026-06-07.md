@@ -1120,6 +1120,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **AUTO.1e** ✅ | Sandbox Self-Evolution Evidence Pack | Report-only builder that bundles the AUTO.1a/1b/1c/1d artifacts into one human-readable review package (summary, timeline, verdicts table, risk summary, human review packet); `--trial-dir` auto-discovery; deterministic final verdict (`ready_for_human_review` / `needs_more_validation` / `blocked` / `incomplete_pack`); any hard breach in any artifact blocks; bridge toward future Telegram/GitHub/n8n summaries but contacts none; no execution, patch apply, validation/benchmark run, model call, real-repo write, push/merge/PR, or auto-merge |
 | **AUTO.1f** ✅ | End-to-End Sandbox Self-Evolution Smoke Scenario | Deterministic single-trial smoke runner that drives the AUTO.1a→1e chain over one harmless explicit literal patch (creates `pkg/auto1f_smoke_demo.txt` in the sandbox copy only) inside one shared trial directory and `trial_id`; the only execution is declared safe validation (`compileall -q core`) inside a disposable managed sandbox; explicit cleanup (removes the sandbox by default, `--keep-sandbox` keeps it); clean smoke ends at `ready_for_human_review`; no patch generation, real-repo write, model call, push/merge/PR, auto-merge, worker launch, lesson promotion, proposal import, or external automation |
 | **ROAD.1** ✅ | Machine-Readable Phase Registry | Report-only validator + deterministic summary/report for roadmap phase metadata; seeds eight conservative phases (ROAD/AUTO/MODEL) and enforces required fields, the four enum vocabularies, unique phase ids, and safety rules (rejects `AUTO_4_AUTO_MERGE`, `merge_allowed`, non-complete human-approval-off / real-repo-write, `network_allowed`, `model_calls_allowed` outside the approval tier, empty allowed_files/validation, and missing forbidden_files); stores validation commands as text and never runs them; prepares the ROAD.2 phase picker; no execution, model, network, patch, push/merge/PR, or external-automation power added |
+| **ROAD.2** ✅ | Phase Picker / Night Candidate Report | Report-only classifier that consumes the ROAD.1 registry (reusing its validator, never re-implementing it) and sorts every phase into one of six buckets (`safe_to_prepare` / `sandbox_required` / `human_approval_required` / `blocked` / `deferred_or_parked` / `complete_or_history`) with `reasons` + a `recommended_next_step`; deterministic ranking (risk, automation, track, natural id) picks a `top_recommendation`; an invalid registry yields no candidates; never runs the stored validation commands; prepares the AUTO.2 contracts; no execution, model, network, patch, push/merge/PR, worker-launch, or auto-merge power added |
 
 These features are additive. They do not require implementing any district infrastructure.
 
@@ -1581,7 +1582,9 @@ CLI: `python scripts/validate_phase_registry.py --registry docs/roadmap/phase_re
 
 Shipment checkpoint: `python -m pytest tests/test_phase_registry.py -q`
 
-### ROAD.2 — Phase Picker / Night Candidate Report
+### ROAD.2 — Phase Picker / Night Candidate Report ✅
+
+Status: **Complete / shipped (2026-06-18) — report-only; no execution power added.**
 
 Goal: read the phase registry and produce a report of safe candidate work.
 
@@ -1597,6 +1600,26 @@ Boundary:
 * Does not run phases.
 * Does not call models.
 * Does not create branches or PRs.
+
+Implemented (2026-06-18):
+
+* `core/phase_picker.py` — pure stdlib classifier that **consumes** the ROAD.1 layer (`pick_phase_candidates`, `summarize_phase_candidates`, `render_phase_picker_markdown`, `write_phase_picker_report`). It reuses `core.phase_registry.validate_phase_registry` and never re-implements the schema validation.
+* Every phase is sorted into exactly one bucket — `safe_to_prepare`, `sandbox_required`, `human_approval_required`, `blocked`, `deferred_or_parked`, `complete_or_history` — by deterministic rules over the ROAD.1 metadata. Each candidate carries `reasons` and a `recommended_next_step`.
+* Within a bucket, candidates rank by lower risk, then lower automation level, then track order (ROAD, AUTO, MODEL, GOV, A, F, H), then natural phase id. The `top_recommendation` is the best safe candidate.
+* **An invalid registry yields no candidates** (`safe_to_prepare` empty, no `top_recommendation`). The validation commands inside the registry are treated as text and are never run.
+* `scripts/create_phase_picker_report.py` — CLI that writes `.agent/roadmap/phase_picker_report.json` + `.md`; exits nonzero on an invalid registry unless `--allow-invalid-registry-report`.
+* Against the seed registry all eight phases classify as `safe_to_prepare`, and ROAD.1 (the only phase with no pending prerequisite) is the top recommendation.
+* No execution, model call, network, patch generation/apply, sandbox run, push/merge/PR, remote host / chat app / external automation, lesson promotion, proposal import, worker launch, or auto-merge power was added. ROAD.2 prepares the AUTO.2 contracts but selects-and-prepares nothing itself.
+
+Files:
+
+* `core/phase_picker.py`
+* `scripts/create_phase_picker_report.py`
+* `tests/test_phase_picker.py`
+
+CLI: `python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --output-root .agent/roadmap`
+
+Shipment checkpoint: `python -m pytest tests/test_phase_picker.py -q`
 
 ---
 
