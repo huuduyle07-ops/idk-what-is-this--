@@ -1,0 +1,361 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-06-18T00:00:00+00:00",
+  "phases": [
+    {
+      "phase_id": "ROAD.1",
+      "title": "Machine-Readable Phase Registry",
+      "track": "ROAD",
+      "status": "active",
+      "summary": "Report-only registry that defines, validates, and summarizes roadmap phase metadata.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/phase_registry.py",
+        "scripts/validate_phase_registry.py",
+        "tests/test_phase_registry.py",
+        "docs/roadmap/phase_registry.json",
+        "README.md",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_phase_registry.py -q",
+        "python -m pytest -q",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [],
+      "expected_artifacts": [
+        ".agent/roadmap/phase_registry_report.json",
+        ".agent/roadmap/phase_registry_report.md"
+      ],
+      "notes": [
+        "Report-only. Validates and summarizes phase metadata; does not execute phases."
+      ]
+    },
+    {
+      "phase_id": "ROAD.2",
+      "title": "Phase Picker / Night Candidate Report",
+      "track": "ROAD",
+      "status": "proposed",
+      "summary": "Report-only selector that reads the phase registry and reports safe candidate work.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/phase_picker.py",
+        "scripts/create_phase_picker_report.py",
+        "tests/test_phase_picker.py",
+        "README.md",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_phase_picker.py -q",
+        "python -m pytest -q",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "ROAD.1"
+      ],
+      "expected_artifacts": [
+        ".agent/roadmap/phase_picker_report.json",
+        ".agent/roadmap/phase_picker_report.md"
+      ],
+      "notes": [
+        "Report-only. Recommends candidates; does not run phases, call models, or create branches/PRs."
+      ]
+    },
+    {
+      "phase_id": "AUTO.2a",
+      "title": "Telegram Evidence Summary Contract",
+      "track": "AUTO",
+      "status": "proposed",
+      "summary": "Contract-only definition of how evidence packs would be summarized for chat review; no integration.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/telegram_evidence_summary_contract.py",
+        "scripts/create_telegram_evidence_summary_contract.py",
+        "tests/test_telegram_evidence_summary_contract.py",
+        "README.md",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_telegram_evidence_summary_contract.py -q",
+        "python -m pytest -q"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "ROAD.1"
+      ],
+      "expected_artifacts": [
+        ".agent/roadmap/telegram_evidence_summary_contract.json"
+      ],
+      "notes": [
+        "Contract only. Defines summary wording and limits; no chat-app integration."
+      ]
+    },
+    {
+      "phase_id": "AUTO.2b",
+      "title": "GitHub Remote PR Safety Contract",
+      "track": "AUTO",
+      "status": "proposed",
+      "summary": "Contract-only definition of branch/PR safety rules before any remote automation; no integration.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "medium",
+      "allowed_files": [
+        "core/github_pr_safety_contract.py",
+        "scripts/create_github_pr_safety_contract.py",
+        "tests/test_github_pr_safety_contract.py",
+        "README.md",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_github_pr_safety_contract.py -q",
+        "python -m pytest -q"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "AUTO.2a"
+      ],
+      "expected_artifacts": [
+        ".agent/roadmap/github_pr_safety_contract.json"
+      ],
+      "notes": [
+        "Contract only. Defines branch/PR/no-auto-merge rules; no remote host integration."
+      ]
+    },
+    {
+      "phase_id": "AUTO.2c",
+      "title": "n8n Orchestration Dry Run",
+      "track": "AUTO",
+      "status": "proposed",
+      "summary": "Report-only dry run that reads a sample evidence pack and produces a limited notification payload; no live orchestration.",
+      "automation_level": "LOCAL_1_PREPARE",
+      "budget_tier": "local_only",
+      "risk_level": "medium",
+      "allowed_files": [
+        "core/n8n_orchestration_dry_run.py",
+        "scripts/create_n8n_orchestration_dry_run.py",
+        "tests/test_n8n_orchestration_dry_run.py",
+        "README.md",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_n8n_orchestration_dry_run.py -q",
+        "python -m pytest -q"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "AUTO.2b"
+      ],
+      "expected_artifacts": [
+        ".agent/roadmap/n8n_orchestration_dry_run.json"
+      ],
+      "notes": [
+        "Dry run only. Produces a sample payload; no repo mutation, worker launch, or external automation."
+      ]
+    },
+    {
+      "phase_id": "MODEL.1",
+      "title": "C.A.T.T.U.S Artifact Dataset Builder",
+      "track": "MODEL",
+      "status": "proposed",
+      "summary": "Report-only exporter that turns existing C.A.T.T.U.S artifacts into a clean training/evaluation dataset.",
+      "automation_level": "LOCAL_1_PREPARE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/cattus_artifact_dataset_builder.py",
+        "scripts/build_cattus_artifact_dataset.py",
+        "tests/test_cattus_artifact_dataset_builder.py",
+        "README.md",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_cattus_artifact_dataset_builder.py -q",
+        "python -m pytest -q"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "ROAD.1"
+      ],
+      "expected_artifacts": [
+        ".agent/roadmap/cattus_artifact_dataset_report.json"
+      ],
+      "notes": [
+        "Report-only dataset export. Builds a local dataset; does not train or call models."
+      ]
+    },
+    {
+      "phase_id": "MODEL.2",
+      "title": "Driver Classifier Baseline",
+      "track": "MODEL",
+      "status": "proposed",
+      "summary": "Report-only baseline that scores a small local classifier predicting Driver-like recommendations; recommend-only, deterministic Driver stays final.",
+      "automation_level": "LOCAL_1_PREPARE",
+      "budget_tier": "local_only",
+      "risk_level": "medium",
+      "allowed_files": [
+        "core/driver_classifier_baseline.py",
+        "scripts/create_driver_classifier_baseline.py",
+        "tests/test_driver_classifier_baseline.py",
+        "README.md",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_driver_classifier_baseline.py -q",
+        "python -m pytest -q"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "MODEL.1"
+      ],
+      "expected_artifacts": [
+        ".agent/roadmap/driver_classifier_baseline_report.json"
+      ],
+      "notes": [
+        "Report-only baseline. A small local classifier recommends only; deterministic Driver remains the final gate."
+      ]
+    },
+    {
+      "phase_id": "MODEL.3",
+      "title": "Lesson Graph Activation Dataset",
+      "track": "MODEL",
+      "status": "proposed",
+      "summary": "Report-only dataset builder for lesson / anti-lesson activation scoring; data only, no activation behavior.",
+      "automation_level": "LOCAL_1_PREPARE",
+      "budget_tier": "local_only",
+      "risk_level": "medium",
+      "allowed_files": [
+        "core/lesson_graph_activation_dataset.py",
+        "scripts/build_lesson_graph_activation_dataset.py",
+        "tests/test_lesson_graph_activation_dataset.py",
+        "README.md",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_lesson_graph_activation_dataset.py -q",
+        "python -m pytest -q"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "MODEL.1"
+      ],
+      "expected_artifacts": [
+        ".agent/roadmap/lesson_graph_activation_dataset_report.json"
+      ],
+      "notes": [
+        "Report-only dataset build. Produces activation training data; changes no retrieval behavior."
+      ]
+    }
+  ]
+}

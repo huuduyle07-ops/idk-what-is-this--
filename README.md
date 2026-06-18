@@ -1001,6 +1001,43 @@ python scripts/run_self_evolution_smoke.py --trial-id auto1f_smoke --keep-sandbo
 > The smoke itself writes nothing outside the sandbox; the interference is
 > external.
 
+## Machine-Readable Phase Registry (ROAD.1)
+
+ROAD.1 gives the roadmap a **machine-readable** companion: a structured registry
+of phase metadata that future phases can inspect and filter. It is the metadata
+layer only — it **does not choose work and has no execution power**.
+
+```bash
+python scripts/validate_phase_registry.py \
+    --registry docs/roadmap/phase_registry.json --output-root .agent/roadmap
+```
+
+- It is **report-only**: it loads the registry JSON, validates the schema and
+  every phase record, and writes a deterministic JSON + Markdown report
+  (`.agent/roadmap/phase_registry_report.json` and `.md`). It **does not execute
+  phases, run the stored validation commands or benchmarks, call models, apply
+  patches, write to the real repo, push, merge, open PRs, or contact GitHub /
+  Telegram / n8n**.
+- Each phase record carries an `automation_level` (`LOCAL_0_OBSERVE` →
+  `AUTO_4_AUTO_MERGE`), a `budget_tier`, a `risk_level`, an allow/forbid file
+  scope, a text-only `validation` list, and guardrail booleans
+  (`human_approval_required`, `merge_allowed`, `network_allowed`,
+  `model_calls_allowed`, `writes_real_repo`, `requires_sandbox`).
+- Validation is strict and conservative. It rejects `AUTO_4_AUTO_MERGE`,
+  `merge_allowed=true`, a dropped human-approval gate or real-repo-write authority
+  on any non-complete phase, network access, model calls outside the
+  `strong_model_requires_approval` budget tier, empty `allowed_files`/`validation`
+  on active/proposed phases, and any phase whose `forbidden_files` omits `.env`,
+  `.git`, or `.agent/private`. The CLI exits nonzero on an invalid registry unless
+  `--allow-invalid-report` is passed.
+- The seed registry ships eight conservative phases (ROAD.1, ROAD.2, AUTO.2a–2c,
+  MODEL.1–3) so the report has real content. The **validation commands are stored
+  as text and are never run by ROAD.1.**
+
+ROAD.1 is the **foundation for the ROAD.2 phase picker** — a future report-only
+selector of safe candidate work. ROAD.1 only validates and summarizes roadmap
+metadata; it selects nothing, runs nothing, and changes nothing in the real repo.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:

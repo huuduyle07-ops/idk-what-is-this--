@@ -1119,6 +1119,7 @@ The District Model framing does not change the near-term roadmap. The next pract
 | **AUTO.1d** ✅ | Sandbox Patch Graduation Review | Review-only gate that consumes an AUTO.1c evaluation artifact and decides whether the candidate is eligible for human review (separates "passed in sandbox" from "ready for human review"); deterministic safety/sandbox/human-gate/patch-safety/validation/side-effect checks; blocks self-approval and auto-merge; no patch apply, validation run, benchmark run, model call, real-repo write, push/merge/PR, or auto-merge |
 | **AUTO.1e** ✅ | Sandbox Self-Evolution Evidence Pack | Report-only builder that bundles the AUTO.1a/1b/1c/1d artifacts into one human-readable review package (summary, timeline, verdicts table, risk summary, human review packet); `--trial-dir` auto-discovery; deterministic final verdict (`ready_for_human_review` / `needs_more_validation` / `blocked` / `incomplete_pack`); any hard breach in any artifact blocks; bridge toward future Telegram/GitHub/n8n summaries but contacts none; no execution, patch apply, validation/benchmark run, model call, real-repo write, push/merge/PR, or auto-merge |
 | **AUTO.1f** ✅ | End-to-End Sandbox Self-Evolution Smoke Scenario | Deterministic single-trial smoke runner that drives the AUTO.1a→1e chain over one harmless explicit literal patch (creates `pkg/auto1f_smoke_demo.txt` in the sandbox copy only) inside one shared trial directory and `trial_id`; the only execution is declared safe validation (`compileall -q core`) inside a disposable managed sandbox; explicit cleanup (removes the sandbox by default, `--keep-sandbox` keeps it); clean smoke ends at `ready_for_human_review`; no patch generation, real-repo write, model call, push/merge/PR, auto-merge, worker launch, lesson promotion, proposal import, or external automation |
+| **ROAD.1** ✅ | Machine-Readable Phase Registry | Report-only validator + deterministic summary/report for roadmap phase metadata; seeds eight conservative phases (ROAD/AUTO/MODEL) and enforces required fields, the four enum vocabularies, unique phase ids, and safety rules (rejects `AUTO_4_AUTO_MERGE`, `merge_allowed`, non-complete human-approval-off / real-repo-write, `network_allowed`, `model_calls_allowed` outside the approval tier, empty allowed_files/validation, and missing forbidden_files); stores validation commands as text and never runs them; prepares the ROAD.2 phase picker; no execution, model, network, patch, push/merge/PR, or external-automation power added |
 
 These features are additive. They do not require implementing any district infrastructure.
 
@@ -1525,7 +1526,9 @@ Purpose: make the roadmap readable by both humans and C.A.T.T.U.S.
 
 The current roadmap is mostly prose. Future automation needs structured phase metadata so C.A.T.T.U.S can safely decide what can be prepared, sandboxed, deferred, or escalated.
 
-### ROAD.1 — Machine-Readable Phase Registry
+### ROAD.1 — Machine-Readable Phase Registry ✅
+
+Status: **Complete / shipped (2026-06-18) — report-only; no execution power added.**
 
 Goal: define a structured registry for roadmap phases.
 
@@ -1558,6 +1561,25 @@ Boundary:
 * No execution.
 * No model calls.
 * No automatic phase selection yet.
+
+Implemented (2026-06-18):
+
+* Seed registry `docs/roadmap/phase_registry.json` with eight phases (ROAD.1, ROAD.2, AUTO.2a–2c, MODEL.1–3). Every entry is conservative: human approval required; `merge_allowed` / `network_allowed` / `model_calls_allowed` / `writes_real_repo` all false; `AUTO_4_AUTO_MERGE` never appears.
+* `core/phase_registry.py` — pure stdlib validator + deterministic summary/report builder (`load_phase_registry`, `validate_phase_registry`, `summarize_phase_registry`, `render_phase_registry_markdown`, `write_phase_registry_report`). Enforces the required root/phase fields, the four enum vocabularies (status / automation_level / budget_tier / risk_level), unique phase ids, and the safety rules: rejects `AUTO_4_AUTO_MERGE`, `merge_allowed=true`, `human_approval_required=false` (non-complete), `writes_real_repo=true` (non-complete), `network_allowed=true`, `model_calls_allowed=true` outside the approval budget tier, empty allowed_files/validation for active/proposed phases, and forbidden_files missing `.env` / `.git` / `.agent/private`.
+* `scripts/validate_phase_registry.py` — CLI that writes `.agent/roadmap/phase_registry_report.json` + `.md`; exits nonzero on an invalid registry unless `--allow-invalid-report`.
+* Validation commands are stored as **text only** and are never run by ROAD.1.
+* No patch generation/apply, validation/benchmark run, sandbox run, push/merge/PR, remote host / chat app / external automation, lesson promotion, proposal import, or worker launch power was added. ROAD.1 prepares ROAD.2 (the phase picker) but selects nothing itself.
+
+Files:
+
+* `core/phase_registry.py`
+* `scripts/validate_phase_registry.py`
+* `tests/test_phase_registry.py`
+* `docs/roadmap/phase_registry.json`
+
+CLI: `python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --output-root .agent/roadmap`
+
+Shipment checkpoint: `python -m pytest tests/test_phase_registry.py -q`
 
 ### ROAD.2 — Phase Picker / Night Candidate Report
 
