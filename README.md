@@ -1077,6 +1077,47 @@ ROAD.2 prepares the future AUTO.2 contracts (which themselves remain
 contract/dry-run only). It classifies phase metadata and recommends; it executes
 nothing, calls no models, touches no network, and changes nothing in the real repo.
 
+## Telegram Evidence Summary Contract (AUTO.2a)
+
+AUTO.2a consumes an **AUTO.1e evidence pack** and produces a **chat-review summary
+contract**: a compact, human-readable summary plus an explicit list of what a human
+may and may not do on the strength of it. It **defines the summary only and has no
+integration or execution power**.
+
+```bash
+python scripts/create_telegram_evidence_contract.py \
+    --evidence-pack .agent/self_evolution_trials/<id>/self_evolution_evidence_pack.json \
+    --output-root .agent/automation_contracts
+```
+
+- It is **report-only**: it reads the evidence pack JSON, shapes a deterministic
+  JSON + Markdown contract (`.agent/automation_contracts/telegram_evidence_contract.json`
+  and `.md`), and **does not contact Telegram, send messages, call webhooks, make any
+  network call, call models, apply patches, run validation or benchmarks, push, merge,
+  open PRs, or contact GitHub / n8n**.
+- The contract carries a `telegram_message` preview, informational `approval_options`
+  (`review`, `defer`, `reject`, `request_more_validation`), a `forbidden_actions` list
+  (`approve_merge`, `push`, `merge`, `apply_patch`, `run_worker`, `launch_model`,
+  `rerun_automation`, `contact_network`), `required_human_checks`, a `risk_summary`,
+  and `evidence_links`.
+- **Sendability is conservative.** A summary is `is_sendable` only when the pack
+  verdict is `ready_for_human_review` or `needs_more_validation` **and** no hard
+  guardrail breach is reported. A `blocked` or `incomplete_pack` source, or any breach
+  (auto-merge eligibility, real-repo write, push/merge, model call, worker launch,
+  self-approval), sets `is_sendable=false` with `send_blockers` explaining why; the CLI
+  exits nonzero unless `--allow-blocked-summary` is passed (which still keeps the
+  summary not-sendable). For `needs_more_validation`, `request_more_validation` is
+  emphasised.
+- Every output guardrail is preserved and inert: `human_review_required=true`;
+  `self_approval_allowed`, `eligible_for_auto_merge`, `telegram_message_sent`,
+  `network_call_performed`, and the rest are all `false`.
+- **Chat approval is never merge authority** — the summary always states that human
+  review, local evidence, and branch protection remain required.
+
+AUTO.2a prepares the future AUTO.2b / AUTO.2c remote contracts (which themselves remain
+contract/dry-run only). It defines wording and limits; it sends nothing, calls no
+models, touches no network, and changes nothing in the real repo.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:

@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-06-18T00:00:00+00:00",
+  "updated_at": "2026-06-19T00:00:00+00:00",
   "phases": [
     {
       "phase_id": "ROAD.1",
       "title": "Machine-Readable Phase Registry",
       "track": "ROAD",
-      "status": "active",
+      "status": "complete",
       "summary": "Report-only registry that defines, validates, and summarizes roadmap phase metadata.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
@@ -51,7 +51,7 @@
       "phase_id": "ROAD.2",
       "title": "Phase Picker / Night Candidate Report",
       "track": "ROAD",
-      "status": "proposed",
+      "status": "complete",
       "summary": "Report-only selector that reads the phase registry and reports safe candidate work.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
@@ -97,15 +97,15 @@
       "phase_id": "AUTO.2a",
       "title": "Telegram Evidence Summary Contract",
       "track": "AUTO",
-      "status": "proposed",
+      "status": "complete",
       "summary": "Contract-only definition of how evidence packs would be summarized for chat review; no integration.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
       "allowed_files": [
-        "core/telegram_evidence_summary_contract.py",
-        "scripts/create_telegram_evidence_summary_contract.py",
-        "tests/test_telegram_evidence_summary_contract.py",
+        "core/telegram_evidence_contract.py",
+        "scripts/create_telegram_evidence_contract.py",
+        "tests/test_telegram_evidence_contract.py",
         "README.md",
         "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
       ],
@@ -118,7 +118,7 @@
       ],
       "validation": [
         "python -m compileall -q core scripts web tests benchmarks",
-        "python -m pytest tests/test_telegram_evidence_summary_contract.py -q",
+        "python -m pytest tests/test_telegram_evidence_contract.py -q",
         "python -m pytest -q"
       ],
       "human_approval_required": true,
@@ -131,7 +131,8 @@
         "ROAD.1"
       ],
       "expected_artifacts": [
-        ".agent/roadmap/telegram_evidence_summary_contract.json"
+        ".agent/automation_contracts/telegram_evidence_contract.json",
+        ".agent/automation_contracts/telegram_evidence_contract.md"
       ],
       "notes": [
         "Contract only. Defines summary wording and limits; no chat-app integration."

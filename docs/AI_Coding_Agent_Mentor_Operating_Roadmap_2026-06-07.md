@@ -1608,7 +1608,7 @@ Implemented (2026-06-18):
 * Within a bucket, candidates rank by lower risk, then lower automation level, then track order (ROAD, AUTO, MODEL, GOV, A, F, H), then natural phase id. The `top_recommendation` is the best safe candidate.
 * **An invalid registry yields no candidates** (`safe_to_prepare` empty, no `top_recommendation`). The validation commands inside the registry are treated as text and are never run.
 * `scripts/create_phase_picker_report.py` — CLI that writes `.agent/roadmap/phase_picker_report.json` + `.md`; exits nonzero on an invalid registry unless `--allow-invalid-registry-report`.
-* Against the seed registry all eight phases classify as `safe_to_prepare`, and ROAD.1 (the only phase with no pending prerequisite) is the top recommendation.
+* Against the seed registry the three shipped phases (ROAD.1, ROAD.2, AUTO.2a) classify as `complete_or_history` and the remaining five as `safe_to_prepare`; MODEL.1 — the only remaining low-risk phase — is the top recommendation, and AUTO.2b is unblocked (its AUTO.2a prerequisite is now complete). (Seed statuses were synced in **ROAD.2a** (2026-06-18) and **AUTO.2a** (2026-06-19).)
 * No execution, model call, network, patch generation/apply, sandbox run, push/merge/PR, remote host / chat app / external automation, lesson promotion, proposal import, worker launch, or auto-merge power was added. ROAD.2 prepares the AUTO.2 contracts but selects-and-prepares nothing itself.
 
 Files:
@@ -1644,7 +1644,9 @@ Rule:
 
 > Self-evolution may be tested in a sandbox. Self-approval is forbidden.
 
-### AUTO.2a — Telegram Evidence Summary Contract
+### AUTO.2a — Telegram Evidence Summary Contract ✅
+
+Status: **Complete / shipped (2026-06-19) — report-only; no chat / network / model / patch / merge power added.**
 
 Goal: define how C.A.T.T.U.S evidence packs are summarized for Telegram.
 
@@ -1669,6 +1671,26 @@ Boundary:
 
 * Contract only.
 * No Telegram API integration yet.
+
+Implemented (2026-06-19):
+
+* `core/telegram_evidence_contract.py` — pure stdlib builder that **consumes** an AUTO.1e evidence pack (a parsed dict) and returns a deterministic contract record plus Markdown (`build_telegram_evidence_contract`, `render_telegram_evidence_contract_markdown`, `write_telegram_evidence_contract`). It imports no other `core` module and reads no files.
+* The contract carries a `telegram_message` preview, informational `approval_options` (`review`, `defer`, `reject`, `request_more_validation`), a `forbidden_actions` list (`approve_merge`, `push`, `merge`, `apply_patch`, `run_worker`, `launch_model`, `rerun_automation`, `contact_network`), `required_human_checks`, a `risk_summary`, `evidence_links`, and a fixed `guardrails` block.
+* **Sendability is conservative.** `is_sendable` is true only for a `ready_for_human_review` or `needs_more_validation` pack with no hard guardrail breach. A `blocked` / `incomplete_pack` source — or any breach (auto-merge eligibility, real-repo write, push/merge, model call, worker launch, self-approval, or a missing human-review gate) — forces `is_sendable=false` with `send_blockers` explaining why. For `needs_more_validation`, `request_more_validation` is emphasised.
+* The summary **never implies chat approval is enough to merge**: it always states that human review, local evidence, and branch protection remain required. Every output guardrail is inert (`human_review_required=true`; `telegram_message_sent` / `network_call_performed` / merge / push / model / worker all false).
+* `scripts/create_telegram_evidence_contract.py` — CLI that reads `--evidence-pack`, writes `.agent/automation_contracts/telegram_evidence_contract.json` + `.md`, and exits nonzero on a blocked/incomplete source unless `--allow-blocked-summary` (which still keeps the summary not-sendable). It sends nothing.
+* Registry synced: AUTO.2a → `complete`. The ROAD.2 picker now classifies the three shipped phases (ROAD.1, ROAD.2, AUTO.2a) as `complete_or_history`; **MODEL.1** is the new top recommendation and **AUTO.2b is unblocked** (its AUTO.2a prerequisite is now complete).
+* No Telegram/chat send, webhook, network, model call, patch generation/apply, sandbox run, validation/benchmark run, push/merge/PR, GitHub/n8n contact, lesson promotion, proposal import, worker launch, or auto-merge power was added.
+
+Files:
+
+* `core/telegram_evidence_contract.py`
+* `scripts/create_telegram_evidence_contract.py`
+* `tests/test_telegram_evidence_contract.py`
+
+CLI: `python scripts/create_telegram_evidence_contract.py --evidence-pack <pack.json> --output-root .agent/automation_contracts`
+
+Shipment checkpoint: `python -m pytest tests/test_telegram_evidence_contract.py -q`
 
 ### AUTO.2b — GitHub Remote PR Safety Contract
 
@@ -1931,10 +1953,10 @@ Biology and physics metaphors are inspiration, not proof. Any Model Lab idea mus
 
 After AUTO.1f, preferred order:
 
-1. ROAD.1 — Machine-Readable Phase Registry
-2. ROAD.2 — Phase Picker / Night Candidate Report
-3. AUTO.2a — Telegram Evidence Summary Contract
-4. AUTO.2b — GitHub Remote PR Safety Contract
+1. ROAD.1 — Machine-Readable Phase Registry ✅ shipped (2026-06-18)
+2. ROAD.2 — Phase Picker / Night Candidate Report ✅ shipped (2026-06-18)
+3. AUTO.2a — Telegram Evidence Summary Contract ✅ shipped (2026-06-19)
+4. AUTO.2b — GitHub Remote PR Safety Contract ← next (unblocked; the ROAD.2 picker's top safe candidate is MODEL.1)
 5. AUTO.2c — n8n Orchestration Dry Run
 6. MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder
 7. MODEL.2 — Driver Classifier Baseline
@@ -2002,3 +2024,144 @@ Outputs:
 - uncertainty explanation
 - family-pressure warning, if relevant
 
+# Weird Idea: C.A.T.T.U.S as Tower-Defense Commander
+
+C.A.T.T.U.S should not become only a faster coding agent. It should become a tactical supervisor around coding agents.
+
+## Core metaphor
+
+* Model / worker = tower
+* Task / bug / migration = enemy
+* Big task = boss enemy
+* Subtasks = smaller enemies
+* Lesson cards = tower upgrades
+* Prompt/context cost = upgrade cost
+* Validation = enemy HP check
+* Human approval = final gate
+
+## Main idea
+
+Do not force every task through one heavy workflow.
+
+Separate modes:
+
+* **Instant Run**: fast, safe, small repair.
+* **Commander Run**: slow, strategic, for broad / uncertain / low-confidence / multi-file tasks.
+* **Project Evolution**: architecture and migration planning.
+* **Dream**: sandboxed exploration.
+* **Lesson Mode**: controlled memory upgrade system.
+
+## Commander Run responsibilities
+
+Commander Run should decide:
+
+1. Is this task too large for Instant Run?
+2. Should the task be decomposed?
+3. Which model/tower should handle each part?
+4. Which lesson cards are worth injecting?
+5. What is the prompt/context cost?
+6. What files are allowed or forbidden?
+7. What validation proves success?
+8. Did the worker’s change note match the actual diff?
+
+## Key mechanisms
+
+### 1. λ Decomposition
+
+Break a large or uncertain task into smaller owned subtasks.
+
+### 2. λ² Wave Scheduler
+
+Do not spawn every sub-agent at once. Group subtasks into waves.
+
+Example:
+
+* Wave 1: evidence / file discovery
+* Wave 2: patch draft
+* Wave 3: review / validation / merge check
+
+### 3. Boss Fracture
+
+If one “boss” subtask is still too large, break it into smaller owned parts.
+
+### 4. Lesson Upgrade Budget
+
+Lesson cards are like tower upgrades. They improve model behavior, but cost prompt tokens and context window space.
+
+Inject lessons only when:
+
+* relevance is high
+* risk reduction is worth the cost
+* the lesson is trusted / active
+* it does not crowd out source-code evidence
+
+### 5. Worker Change Ledger
+
+Every worker must write a temporary markdown note explaining:
+
+* what it intended to change
+* what it actually changed
+* why it changed those files
+* which files it touched
+* what validation it expects
+* what uncertainty remains
+
+### 6. Note-vs-Diff Check
+
+A second model or checker compares:
+
+* worker_change_note.md
+* actual changed files / git diff
+* allowed files
+* forbidden files
+* validation result
+
+If the worker touched undeclared or forbidden files, the output becomes suspicious or blocked.
+
+## Difference from Claude Code / Codex
+
+Claude Code and Codex are strong coding workers.
+
+C.A.T.T.U.S should become the commander around workers:
+
+* decides task shape
+* routes models
+* controls lesson injection
+* enforces safety gates
+* compares claims vs actual diffs
+* validates results
+* stores lessons only after evidence
+
+## Product law
+
+Instant Run optimizes for speed with safety.
+
+Commander Run optimizes for control, coordination, evidence, and cost-aware model usage.
+
+Do not make Instant Run carry Commander weight.
+
+Do not let Commander Run bypass Instant safety gates.
+
+## Extra Pro: Agent-as-Customer Readiness
+
+A future trend may be that agents are not only used by developers, but also become “customers” of tools, APIs, MCP servers, plugins, benchmark services, retrieval backends, and automation platforms.
+
+Commander Run gives C.A.T.T.U.S a safe place to evaluate tool adoption.
+
+It can ask:
+
+- Does this tool solve a real bottleneck?
+- Is it cheaper than using a stronger model?
+- Does it reduce prompt/context cost?
+- Does it improve validation, retrieval, safety, or speed?
+- What data would it access?
+- What permissions does it need?
+- Can it be tested in a sandbox first?
+- Is there a free/local alternative?
+- Does human approval need to happen before payment, install, or API-key use?
+
+Important rule:
+
+C.A.T.T.U.S may recommend, compare, or create a tool-adoption report.
+
+C.A.T.T.U.S must not auto-buy, auto-subscribe, auto-install, expose secrets, or connect paid services without explicit human approval.
