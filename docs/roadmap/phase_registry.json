@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-06-19T10:00:00+00:00",
+  "updated_at": "2026-06-19T11:00:00+00:00",
   "phases": [
     {
       "phase_id": "ROAD.1",
@@ -187,7 +187,7 @@
       "phase_id": "AUTO.2c",
       "title": "n8n Orchestration Dry Run",
       "track": "AUTO",
-      "status": "proposed",
+      "status": "complete",
       "summary": "Report-only dry run that reads a sample evidence pack and produces a limited notification payload; no live orchestration.",
       "automation_level": "LOCAL_1_PREPARE",
       "budget_tier": "local_only",
@@ -221,7 +221,8 @@
         "AUTO.2b"
       ],
       "expected_artifacts": [
-        ".agent/roadmap/n8n_orchestration_dry_run.json"
+        ".agent/automation_contracts/n8n_orchestration_dry_run.json",
+        ".agent/automation_contracts/n8n_orchestration_dry_run.md"
       ],
       "notes": [
         "Dry run only. Produces a sample payload; no repo mutation, worker launch, or external automation."

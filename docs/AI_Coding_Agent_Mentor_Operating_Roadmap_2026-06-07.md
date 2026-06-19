@@ -1608,7 +1608,7 @@ Implemented (2026-06-18):
 * Within a bucket, candidates rank by lower risk, then lower automation level, then track order (ROAD, AUTO, MODEL, GOV, A, F, H), then natural phase id. The `top_recommendation` is the best safe candidate.
 * **An invalid registry yields no candidates** (`safe_to_prepare` empty, no `top_recommendation`). The validation commands inside the registry are treated as text and are never run.
 * `scripts/create_phase_picker_report.py` — CLI that writes `.agent/roadmap/phase_picker_report.json` + `.md`; exits nonzero on an invalid registry unless `--allow-invalid-registry-report`.
-* Against the seed registry the four shipped phases (ROAD.1, ROAD.2, AUTO.2a, AUTO.2b) classify as `complete_or_history` and the remaining four as `safe_to_prepare`; MODEL.1 — the only remaining low-risk phase — is the top recommendation, and AUTO.2c is unblocked (its AUTO.2b prerequisite is now complete). (Seed statuses were synced in **ROAD.2a** (2026-06-18), **AUTO.2a** and **AUTO.2b** (2026-06-19).)
+* Against the seed registry the five shipped phases (ROAD.1, ROAD.2, AUTO.2a, AUTO.2b, AUTO.2c) classify as `complete_or_history` and the remaining three (MODEL.1–3) as `safe_to_prepare`; MODEL.1 — the only remaining low-risk phase — is the top recommendation, and with the whole AUTO.2 contract track shipped the MODEL track is next. (Seed statuses were synced in **ROAD.2a** (2026-06-18) and **AUTO.2a / AUTO.2b / AUTO.2c** (2026-06-19).)
 * No execution, model call, network, patch generation/apply, sandbox run, push/merge/PR, remote host / chat app / external automation, lesson promotion, proposal import, worker launch, or auto-merge power was added. ROAD.2 prepares the AUTO.2 contracts but selects-and-prepares nothing itself.
 
 Files:
@@ -1733,7 +1733,9 @@ CLI: `python scripts/create_github_pr_safety_contract.py --source-artifact <arti
 
 Shipment checkpoint: `python -m pytest tests/test_github_pr_safety_contract.py -q`
 
-### AUTO.2c — n8n Orchestration Dry Run
+### AUTO.2c — n8n Orchestration Dry Run ✅
+
+Status: **Complete / shipped (2026-06-19) — report-only; no n8n / network / Telegram / GitHub / git / model / patch / worker / merge power added.**
 
 Goal: simulate n8n orchestration using existing evidence packs.
 
@@ -1749,6 +1751,26 @@ Forbidden:
 * external coding agent launch
 * GitHub push/PR/merge
 * Telegram live action unless explicitly promoted later
+
+Implemented (2026-06-19):
+
+* `core/n8n_orchestration_dry_run.py` — pure stdlib builder that **consumes** one or more upstream artifacts (an AUTO.1e evidence pack, an AUTO.2a evidence summary, and/or an AUTO.2b PR safety contract; each detected via `detect_source_kind`) and returns a deterministic report record plus Markdown (`build_n8n_orchestration_dry_run`, `render_n8n_orchestration_dry_run_markdown`, `write_n8n_orchestration_dry_run`). It imports no other `core` module and reads no files.
+* The report lays out a deterministic 7-step simulated plan (`load_evidence_pack`, `build_telegram_summary`, `build_github_pr_safety_contract`, `prepare_human_review_notification`, `wait_for_human_review`, `prepare_future_draft_pr_request`, `stop_before_live_execution`). Each step records a descriptive `would_contact` plus **`actual_contact_performed=false`**, and the `simulated_notifications` / `simulated_remote_actions` are previews only (`actual_send_performed` / `actual_action_performed` are always false).
+* **The verdict is conservative.** All-ready sources → `overall_verdict="dry_run_ready_for_human_review"` and `is_orchestration_allowed_in_future=true`. `needs_more_validation` allows a review notification but blocks the draft-PR step. Any blocked/incomplete/missing source — or any hard guardrail breach in any source (push/merge/pr_created/branch_created, real-repo write, model call, worker launch, self-approval, auto-merge eligibility, github/n8n/chat contact, or a missing human-review gate) — forces `overall_verdict="blocked"`. `is_live_execution_allowed`, `is_merge_allowed`, and `is_auto_merge_allowed` are **always false**.
+* The report **never implies a dry run is enough to act**: it always states that human review and branch protection remain required before any live remote action. Every output guardrail is inert (`human_review_required=true`; `live_execution_allowed` / `n8n_contacted` / `telegram_message_sent` / `github_contacted` / `network_call_performed` / `pr_created` / `branch_created` all false).
+* `scripts/create_n8n_orchestration_dry_run.py` — CLI that reads `--evidence-pack` / `--telegram-contract` / `--github-pr-contract`, writes `.agent/automation_contracts/n8n_orchestration_dry_run.json` + `.md`, and exits nonzero on a blocked dry run unless `--allow-blocked-dry-run`. It contacts nothing and runs no git.
+* Registry synced: AUTO.2c → `complete`. The ROAD.2 picker now classifies the five shipped phases (ROAD.1, ROAD.2, AUTO.2a, AUTO.2b, AUTO.2c) as `complete_or_history`; with the whole AUTO.2 contract track shipped, **MODEL.1** is the top recommendation and the three MODEL phases are the remaining safe candidates.
+* No n8n/orchestrator contact, webhook, network, Telegram/chat send, GitHub/remote contact, git command, branch/PR/push/merge, model call, patch generation/apply, sandbox run, validation/benchmark run, lesson promotion, proposal import, worker launch, or auto-merge power was added.
+
+Files:
+
+* `core/n8n_orchestration_dry_run.py`
+* `scripts/create_n8n_orchestration_dry_run.py`
+* `tests/test_n8n_orchestration_dry_run.py`
+
+CLI: `python scripts/create_n8n_orchestration_dry_run.py --evidence-pack <pack.json> --telegram-contract <tg.json> --github-pr-contract <gh.json> --output-root .agent/automation_contracts`
+
+Shipment checkpoint: `python -m pytest tests/test_n8n_orchestration_dry_run.py -q`
 
 ---
 
@@ -1979,8 +2001,8 @@ After AUTO.1f, preferred order:
 2. ROAD.2 — Phase Picker / Night Candidate Report ✅ shipped (2026-06-18)
 3. AUTO.2a — Telegram Evidence Summary Contract ✅ shipped (2026-06-19)
 4. AUTO.2b — GitHub Remote PR Safety Contract ✅ shipped (2026-06-19)
-5. AUTO.2c — n8n Orchestration Dry Run ← next (unblocked; the ROAD.2 picker's top safe candidate is MODEL.1)
-6. MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder
+5. AUTO.2c — n8n Orchestration Dry Run ✅ shipped (2026-06-19)
+6. MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder ← next (the ROAD.2 picker's top safe candidate; whole AUTO.2 contract track shipped)
 7. MODEL.2 — Driver Classifier Baseline
 8. MODEL.3 — Lesson Graph Activation Dataset
 

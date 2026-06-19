@@ -1165,6 +1165,51 @@ AUTO.2b prepares the future AUTO.2c n8n dry run (which itself remains report-onl
 defines branch/PR/no-auto-merge rules; it contacts no remote host, runs no git, calls no
 models, touches no network, and changes nothing in the real repo.
 
+## n8n Orchestration Dry Run (AUTO.2c)
+
+AUTO.2c consumes one or more upstream artifacts — an **AUTO.1e evidence pack**, an
+**AUTO.2a evidence summary contract**, and/or an **AUTO.2b PR safety contract** — and
+produces a **dry-run simulation** of how a future n8n workflow would orchestrate the
+review chain. It **simulates only and has no integration or execution power**.
+
+```bash
+python scripts/create_n8n_orchestration_dry_run.py \
+    --evidence-pack pack.json --telegram-contract tg.json --github-pr-contract gh.json \
+    --output-root .agent/automation_contracts
+```
+
+- It is **report-only**: it reads the source artifact JSON files, detects each kind,
+  shapes a deterministic JSON + Markdown report
+  (`.agent/automation_contracts/n8n_orchestration_dry_run.json` and `.md`), and **does
+  not contact n8n, call webhooks, make any network call, send Telegram messages,
+  contact GitHub, run git, create branches, open or merge PRs, push commits, call
+  models, launch workers, apply patches, or run validation or benchmarks**.
+- The report lays out a deterministic **7-step simulated plan** (`load_evidence_pack`,
+  `build_telegram_summary`, `build_github_pr_safety_contract`,
+  `prepare_human_review_notification`, `wait_for_human_review`,
+  `prepare_future_draft_pr_request`, `stop_before_live_execution`). Every step records a
+  descriptive `would_contact` and **`actual_contact_performed=false`**, and the
+  `simulated_notifications` / `simulated_remote_actions` are previews only
+  (`actual_send_performed` / `actual_action_performed` are always `false`).
+- **Orchestration verdict is conservative.** All-ready sources →
+  `overall_verdict="dry_run_ready_for_human_review"` and
+  `is_orchestration_allowed_in_future=true`. `needs_more_validation` allows a review
+  notification but blocks the draft-PR step. Any blocked/incomplete/missing source, or
+  any hard guardrail breach in any source (push/merge/pr_created/branch_created, real-repo
+  write, model call, worker launch, self-approval, auto-merge eligibility, github/n8n/chat
+  contact, or human review not required), forces `overall_verdict="blocked"`. The CLI
+  exits nonzero for a blocked dry run unless `--allow-blocked-dry-run` is passed.
+- **Live execution, merge, and auto-merge are always `false`.** Every output guardrail is
+  inert: `human_review_required=true`; `live_execution_allowed`, `n8n_contacted`,
+  `telegram_message_sent`, `github_contacted`, `network_call_performed`, `pr_created`,
+  `branch_created`, and the rest are all `false`.
+- **A dry run is never merge authority** — the report always states that human review and
+  branch protection remain required before any live remote action.
+
+AUTO.2c completes the AUTO.2 contract track. It previews notifications and remote actions
+only; it contacts no n8n / Telegram / GitHub, runs no git, calls no models, touches no
+network, and changes nothing in the real repo.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
