@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-06-19T00:00:00+00:00",
+  "updated_at": "2026-06-19T10:00:00+00:00",
   "phases": [
     {
       "phase_id": "ROAD.1",
@@ -142,7 +142,7 @@
       "phase_id": "AUTO.2b",
       "title": "GitHub Remote PR Safety Contract",
       "track": "AUTO",
-      "status": "proposed",
+      "status": "complete",
       "summary": "Contract-only definition of branch/PR safety rules before any remote automation; no integration.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
@@ -176,7 +176,8 @@
         "AUTO.2a"
       ],
       "expected_artifacts": [
-        ".agent/roadmap/github_pr_safety_contract.json"
+        ".agent/automation_contracts/github_pr_safety_contract.json",
+        ".agent/automation_contracts/github_pr_safety_contract.md"
       ],
       "notes": [
         "Contract only. Defines branch/PR/no-auto-merge rules; no remote host integration."

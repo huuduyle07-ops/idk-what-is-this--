@@ -1608,7 +1608,7 @@ Implemented (2026-06-18):
 * Within a bucket, candidates rank by lower risk, then lower automation level, then track order (ROAD, AUTO, MODEL, GOV, A, F, H), then natural phase id. The `top_recommendation` is the best safe candidate.
 * **An invalid registry yields no candidates** (`safe_to_prepare` empty, no `top_recommendation`). The validation commands inside the registry are treated as text and are never run.
 * `scripts/create_phase_picker_report.py` — CLI that writes `.agent/roadmap/phase_picker_report.json` + `.md`; exits nonzero on an invalid registry unless `--allow-invalid-registry-report`.
-* Against the seed registry the three shipped phases (ROAD.1, ROAD.2, AUTO.2a) classify as `complete_or_history` and the remaining five as `safe_to_prepare`; MODEL.1 — the only remaining low-risk phase — is the top recommendation, and AUTO.2b is unblocked (its AUTO.2a prerequisite is now complete). (Seed statuses were synced in **ROAD.2a** (2026-06-18) and **AUTO.2a** (2026-06-19).)
+* Against the seed registry the four shipped phases (ROAD.1, ROAD.2, AUTO.2a, AUTO.2b) classify as `complete_or_history` and the remaining four as `safe_to_prepare`; MODEL.1 — the only remaining low-risk phase — is the top recommendation, and AUTO.2c is unblocked (its AUTO.2b prerequisite is now complete). (Seed statuses were synced in **ROAD.2a** (2026-06-18), **AUTO.2a** and **AUTO.2b** (2026-06-19).)
 * No execution, model call, network, patch generation/apply, sandbox run, push/merge/PR, remote host / chat app / external automation, lesson promotion, proposal import, worker launch, or auto-merge power was added. ROAD.2 prepares the AUTO.2 contracts but selects-and-prepares nothing itself.
 
 Files:
@@ -1692,7 +1692,9 @@ CLI: `python scripts/create_telegram_evidence_contract.py --evidence-pack <pack.
 
 Shipment checkpoint: `python -m pytest tests/test_telegram_evidence_contract.py -q`
 
-### AUTO.2b — GitHub Remote PR Safety Contract
+### AUTO.2b — GitHub Remote PR Safety Contract ✅
+
+Status: **Complete / shipped (2026-06-19) — report-only; no GitHub / git / network / model / patch / merge power added.**
 
 Goal: define branch/PR rules before remote automation.
 
@@ -1710,6 +1712,26 @@ Boundary:
 
 * Contract only.
 * No remote worker execution yet.
+
+Implemented (2026-06-19):
+
+* `core/github_pr_safety_contract.py` — pure stdlib builder that **consumes** one upstream artifact (an AUTO.1e evidence pack **or** an AUTO.2a evidence summary contract, detected via `detect_source_kind`) and returns a deterministic contract record plus Markdown (`build_github_pr_safety_contract`, `render_github_pr_safety_contract_markdown`, `write_github_pr_safety_contract`). It imports no other `core` module and reads no files.
+* The contract carries `pr_readiness`, `required_checks`, `required_branch_protection`, `required_human_checks`, a `forbidden_actions` list (`push_to_main`, `force_push`, `open_pr_without_human_review`, `merge_pr`, `enable_auto_merge`, `bypass_branch_protection`, `apply_patch_to_real_repo`, `launch_worker`, `call_model`, `contact_remote_service`), informational `allowed_future_actions` (`prepare_draft_pr_after_human_review`, `request_more_validation`, `reject_candidate`, `keep_local_only`), a `risk_summary`, `evidence_links`, and a fixed `guardrails` block.
+* **PR-readiness is conservative.** `is_pr_draft_allowed_in_future` is true only for a `ready_for_human_review` source with no hard guardrail breach and no carried blocker. `needs_more_validation` requires more validation first; a `blocked` / `incomplete_pack` / missing source — or any breach (real-repo write, patch applied, push/merge, model call, worker launch, self-approval, auto-merge eligibility, or a missing human-review gate) — blocks readiness. `is_merge_allowed` and `is_auto_merge_allowed` are **always false**.
+* The contract **never implies a future PR is enough to merge**: it always states that human review and branch protection remain required. Every output guardrail is inert (`human_review_required=true`; `pr_created` / `branch_created` / `github_contacted` / `network_call_performed` / push / merge / model / worker all false).
+* `scripts/create_github_pr_safety_contract.py` — CLI that reads `--source-artifact`, writes `.agent/automation_contracts/github_pr_safety_contract.json` + `.md`, and exits nonzero on a blocked/incomplete source unless `--allow-blocked-contract` (which still keeps a PR not allowed). It contacts no remote host and runs no git.
+* Registry synced: AUTO.2b → `complete`. The ROAD.2 picker now classifies the four shipped phases (ROAD.1, ROAD.2, AUTO.2a, AUTO.2b) as `complete_or_history`; **MODEL.1** remains the top recommendation and **AUTO.2c is unblocked** (its AUTO.2b prerequisite is now complete).
+* No GitHub/remote contact, git command, branch/PR/push/merge, webhook, network, model call, patch generation/apply, sandbox run, validation/benchmark run, Telegram/n8n contact, lesson promotion, proposal import, worker launch, or auto-merge power was added.
+
+Files:
+
+* `core/github_pr_safety_contract.py`
+* `scripts/create_github_pr_safety_contract.py`
+* `tests/test_github_pr_safety_contract.py`
+
+CLI: `python scripts/create_github_pr_safety_contract.py --source-artifact <artifact.json> --output-root .agent/automation_contracts`
+
+Shipment checkpoint: `python -m pytest tests/test_github_pr_safety_contract.py -q`
 
 ### AUTO.2c — n8n Orchestration Dry Run
 
@@ -1956,8 +1978,8 @@ After AUTO.1f, preferred order:
 1. ROAD.1 — Machine-Readable Phase Registry ✅ shipped (2026-06-18)
 2. ROAD.2 — Phase Picker / Night Candidate Report ✅ shipped (2026-06-18)
 3. AUTO.2a — Telegram Evidence Summary Contract ✅ shipped (2026-06-19)
-4. AUTO.2b — GitHub Remote PR Safety Contract ← next (unblocked; the ROAD.2 picker's top safe candidate is MODEL.1)
-5. AUTO.2c — n8n Orchestration Dry Run
+4. AUTO.2b — GitHub Remote PR Safety Contract ✅ shipped (2026-06-19)
+5. AUTO.2c — n8n Orchestration Dry Run ← next (unblocked; the ROAD.2 picker's top safe candidate is MODEL.1)
 6. MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder
 7. MODEL.2 — Driver Classifier Baseline
 8. MODEL.3 — Lesson Graph Activation Dataset

@@ -1118,6 +1118,53 @@ AUTO.2a prepares the future AUTO.2b / AUTO.2c remote contracts (which themselves
 contract/dry-run only). It defines wording and limits; it sends nothing, calls no
 models, touches no network, and changes nothing in the real repo.
 
+## GitHub Remote PR Safety Contract (AUTO.2b)
+
+AUTO.2b consumes one upstream evidence artifact — an **AUTO.1e evidence pack** or an
+**AUTO.2a evidence summary contract** — and produces a **remote-PR safety contract**:
+an explicit statement of what must be true before a *future* system may draft a remote
+pull request. It **defines the safety contract only and has no integration or execution
+power**.
+
+```bash
+python scripts/create_github_pr_safety_contract.py \
+    --source-artifact .agent/self_evolution_trials/<id>/self_evolution_evidence_pack.json \
+    --output-root .agent/automation_contracts
+```
+
+- It is **report-only**: it reads the source artifact JSON, detects its kind, shapes a
+  deterministic JSON + Markdown contract
+  (`.agent/automation_contracts/github_pr_safety_contract.json` and `.md`), and **does
+  not contact GitHub, create branches, push commits, open or merge PRs, run git, call
+  webhooks, make any network call, call models, apply patches, run validation or
+  benchmarks, or contact Telegram / n8n**.
+- **PR-readiness rules are conservative.** A future *draft* PR is allowed
+  (`is_pr_draft_allowed_in_future=true`) **only** when the source verdict is
+  `ready_for_human_review` with no hard guardrail breach and no carried blocker.
+  `needs_more_validation` requires more validation first; `blocked` / `incomplete_pack`
+  / a missing source / any breach (real-repo write, patch applied, push, merge, model
+  call, worker launch, self-approval, auto-merge eligibility, or human review not
+  required) all block readiness. **`is_merge_allowed` and `is_auto_merge_allowed` are
+  always `false`.** The CLI exits nonzero for a blocked/incomplete source unless
+  `--allow-blocked-contract` is passed (which still keeps a PR not allowed).
+- The contract carries `required_checks`, `required_branch_protection`,
+  `required_human_checks`, a `forbidden_actions` list (`push_to_main`, `force_push`,
+  `open_pr_without_human_review`, `merge_pr`, `enable_auto_merge`,
+  `bypass_branch_protection`, `apply_patch_to_real_repo`, `launch_worker`, `call_model`,
+  `contact_remote_service`), informational `allowed_future_actions`
+  (`prepare_draft_pr_after_human_review`, `request_more_validation`, `reject_candidate`,
+  `keep_local_only`), a `risk_summary`, and `evidence_links`.
+- Every output guardrail is preserved and inert: `human_review_required=true`;
+  `pr_created`, `branch_created`, `github_contacted`, `network_call_performed`,
+  `push_performed`, `merge_performed`, `eligible_for_auto_merge`, and the rest are all
+  `false`.
+- **A future PR is never merge authority** — the contract always states that human
+  review and branch protection remain required.
+
+AUTO.2b prepares the future AUTO.2c n8n dry run (which itself remains report-only). It
+defines branch/PR/no-auto-merge rules; it contacts no remote host, runs no git, calls no
+models, touches no network, and changes nothing in the real repo.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:

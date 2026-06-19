@@ -554,14 +554,14 @@ def test_seed_registry_produces_expected_buckets():
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     report = _report(data, report_id="r", created_at="t", registry_path=str(_SEED_PATH))
     assert report["registry_valid"] is True
-    # ROAD.1, ROAD.2 and AUTO.2a are shipped (complete); the remaining five are safe.
+    # ROAD.1, ROAD.2, AUTO.2a and AUTO.2b are shipped (complete); the remaining four are safe.
     assert report["bucket_counts"] == {
-        "safe_to_prepare": 5,
+        "safe_to_prepare": 4,
         "sandbox_required": 0,
         "human_approval_required": 0,
         "blocked": 0,
         "deferred_or_parked": 0,
-        "complete_or_history": 3,
+        "complete_or_history": 4,
     }
     # MODEL.1 is the highest-ranked safe phase (the only remaining low-risk one).
     assert report["top_recommendation"]["phase_id"] == "MODEL.1"
@@ -572,28 +572,30 @@ def test_seed_safe_candidates_sorted_deterministically():
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     report = _report(data, report_id="r", created_at="t")
     ids = [p["phase_id"] for p in report["safe_to_prepare"]]
-    # Completed ROAD.1/ROAD.2/AUTO.2a drop out; the rest rank by risk, automation, track, id.
-    assert ids == ["MODEL.1", "AUTO.2b", "AUTO.2c", "MODEL.2", "MODEL.3"]
+    # Completed ROAD.1/ROAD.2/AUTO.2a/AUTO.2b drop out; the rest rank by risk, automation, track, id.
+    assert ids == ["MODEL.1", "AUTO.2c", "MODEL.2", "MODEL.3"]
 
 
 def test_seed_shipped_phases_are_complete_and_not_recommended():
     # Shipped phases must read as complete and must never be recommended as work to
-    # prepare. AUTO.2a is now complete (AUTO.2a status sync), which unblocks AUTO.2b.
+    # prepare. AUTO.2b is now complete (AUTO.2b shipped), which unblocks AUTO.2c.
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     statuses = {p["phase_id"]: p["status"] for p in data["phases"]}
     assert statuses["ROAD.1"] == "complete"
     assert statuses["ROAD.2"] == "complete"
     assert statuses["AUTO.2a"] == "complete"
+    assert statuses["AUTO.2b"] == "complete"
     report = _report(data, report_id="r", created_at="t")
     history_ids = {p["phase_id"] for p in report["complete_or_history"]}
-    assert {"ROAD.1", "ROAD.2", "AUTO.2a"} <= history_ids
+    assert {"ROAD.1", "ROAD.2", "AUTO.2a", "AUTO.2b"} <= history_ids
     safe = {p["phase_id"]: p for p in report["safe_to_prepare"]}
     assert "ROAD.1" not in safe
     assert "ROAD.2" not in safe
     assert "AUTO.2a" not in safe
+    assert "AUTO.2b" not in safe
     assert report["top_recommendation"]["phase_id"] == "MODEL.1"
-    # AUTO.2b's prerequisite (AUTO.2a) is now complete, so it is unblocked and ready.
-    assert safe["AUTO.2b"]["recommended_next_step"] == "prepare_worker_assignment"
+    # AUTO.2c's prerequisite (AUTO.2b) is now complete, so it is unblocked and ready.
+    assert safe["AUTO.2c"]["recommended_next_step"] == "prepare_worker_assignment"
 
 
 # ── purity / constants ─────────────────────────────────────────────────────────
