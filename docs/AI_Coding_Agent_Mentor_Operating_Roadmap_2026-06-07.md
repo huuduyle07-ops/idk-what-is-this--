@@ -1608,7 +1608,7 @@ Implemented (2026-06-18):
 * Within a bucket, candidates rank by lower risk, then lower automation level, then track order (ROAD, AUTO, MODEL, GOV, A, F, H), then natural phase id. The `top_recommendation` is the best safe candidate.
 * **An invalid registry yields no candidates** (`safe_to_prepare` empty, no `top_recommendation`). The validation commands inside the registry are treated as text and are never run.
 * `scripts/create_phase_picker_report.py` — CLI that writes `.agent/roadmap/phase_picker_report.json` + `.md`; exits nonzero on an invalid registry unless `--allow-invalid-registry-report`.
-* Against the seed registry the five shipped phases (ROAD.1, ROAD.2, AUTO.2a, AUTO.2b, AUTO.2c) classify as `complete_or_history` and the remaining three (MODEL.1–3) as `safe_to_prepare`; MODEL.1 — the only remaining low-risk phase — is the top recommendation, and with the whole AUTO.2 contract track shipped the MODEL track is next. (Seed statuses were synced in **ROAD.2a** (2026-06-18) and **AUTO.2a / AUTO.2b / AUTO.2c** (2026-06-19).)
+* Against the seed registry the six shipped phases (ROAD.1, ROAD.2, AUTO.2a, AUTO.2b, AUTO.2c, MODEL.1) classify as `complete_or_history` and the remaining two (MODEL.2, MODEL.3) as `safe_to_prepare`; MODEL.2 — the leading safe candidate with its MODEL.1 prerequisite now met — is the top recommendation. (Seed statuses were synced in **ROAD.2a** (2026-06-18), **AUTO.2a / AUTO.2b / AUTO.2c** (2026-06-19), and **MODEL.1** (2026-06-20).)
 * No execution, model call, network, patch generation/apply, sandbox run, push/merge/PR, remote host / chat app / external automation, lesson promotion, proposal import, worker launch, or auto-merge power was added. ROAD.2 prepares the AUTO.2 contracts but selects-and-prepares nothing itself.
 
 Files:
@@ -1786,41 +1786,47 @@ Core rule:
 
 ---
 
-### MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder
+### MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder ✅
 
-Goal: export C.A.T.T.U.S artifacts into a clean training/evaluation dataset.
+Status: **Complete / shipped (2026-06-20) — report-only; no model training / model call / embedding / vector-DB / database / network / patch / validation / benchmark / worker / merge power added.**
 
-Sources:
+Goal: scan existing C.A.T.T.U.S artifacts and normalize them into a clean JSONL training/evaluation dataset.
 
-* Goal Briefs
-* Worker Assignments
-* Driver Decisions
-* Worker Result Reviews
-* Teaching Cards
-* A.17 Flaky Reviews
-* AUTO.1 evidence packs
-* patch safety outputs
-* lessons / anti-lessons
-* benchmark outcomes
+Sources scanned (when present under `.agent`):
 
-Example record:
-
-```json
-{
-  "input_text": "...",
-  "artifact_type": "worker_assignment",
-  "label_mode": "Debug",
-  "label_risk": "medium",
-  "label_vehicle": "cheap_api_allowed",
-  "label_next_step": "create_worker_assignment"
-}
-```
+* Goal Briefs, Worker Assignments, Driver Decisions
+* Visual Evidence Contracts, Worker Result Reviews
+* Flaky Case Reviews (A.17), Self-Evolution Evidence Packs (AUTO.1e)
+* Telegram / GitHub / n8n remote-safety contracts (AUTO.2a–2c)
+* Phase Registry Reports, Phase Picker Reports (ROAD.1–2)
+* Lesson Teaching Cards
 
 Boundary:
 
-* Dataset/export only.
-* No training yet.
-* No model authority.
+* Dataset/export only — builds data artifacts, does not train a model.
+* No model call, no embedding call, no vector-DB / database write.
+* No routing change and no prediction authority — rows are advisory only.
+
+Implemented (2026-06-20):
+
+* `core/artifact_dataset_builder.py` — pure stdlib (`hashlib`/`json`/`pathlib`/`typing`) scanner + normalizer. `scan_artifacts` walks the known artifact locations (kind is decided by directory, content is not sniffed), `normalize_artifact` projects each parsed dict onto a stable dataset row, `build_artifact_dataset_report` assembles counts + sample rows, `render_artifact_dataset_markdown` renders the report, and `write_artifact_dataset` writes the JSONL + JSON + Markdown. It imports no other `core` module and never mutates a source artifact.
+* Each row has a deterministic, machine-independent `row_id` (a `hashlib` digest over kind + repo-relative path + source id + verdict labels — no absolute paths), plus `artifact_kind` / `artifact_path` / `created_at` / `source_id` / `task_title` / `task_summary` / `mode` / `risk_level` / `automation_level` / `human_approval_required` / `allowed_actions` / `blocked_actions`, a `labels` block (`recommended_vehicle`, `final_verdict`, `recommended_next_step`), a six-flag `features` block, a `target` (`dataset_task`, `target_label`, `authority="advisory_only"`), and a `quality` block (`parse_status`, `missing_fields`, `warnings`).
+* **Tolerant by design.** Missing artifact directories produce warnings, not failures; malformed or non-object JSON is skipped with a warning; sparse artifacts produce a best-effort `partial` row. The output is deterministic for a fixed `--report-id` / `--created-at`.
+* `scripts/build_artifact_dataset.py` — CLI (`--repo-path`, `--output-root`, `--report-id`, `--created-at`, `--json`, `--include-kind` repeatable, `--limit`). Writes `.agent/model_lab/artifact_dataset/artifact_dataset.jsonl` + `artifact_dataset_report.json` + `artifact_dataset_report.md`. Every report guardrail is inert (`model_training_performed`, `model_call_performed`, `embedding_call_performed`, `database_write_performed`, `patch_applied`, `validation_run`, `benchmark_run`, `network_call_performed`, `worker_launch_performed`, `lesson_promotion_performed`, `merge_performed` all `false`).
+* Registry synced: MODEL.1 → `complete` (allowed_files / validation / expected_artifacts reconciled from the seed's guess to the real `core/artifact_dataset_builder.py`, `scripts/build_artifact_dataset.py`, and `.agent/model_lab/artifact_dataset/*` names). The ROAD.2 picker now classifies the six shipped phases (ROAD.1, ROAD.2, AUTO.2a–2c, MODEL.1) as `complete_or_history`; **MODEL.2** is the new top recommendation and **MODEL.2 / MODEL.3 are unblocked** (their MODEL.1 prerequisite is now complete).
+* No model training, model call, embedding call, vector-DB write, database write, subprocess, network, webhook, Telegram/GitHub/n8n contact, git command, patch generation/apply, sandbox run, validation/benchmark run, lesson promotion, proposal import, worker launch, or merge power was added.
+
+Files:
+
+* `core/artifact_dataset_builder.py`
+* `scripts/build_artifact_dataset.py`
+* `tests/test_artifact_dataset_builder.py`
+
+CLI: `python scripts/build_artifact_dataset.py --repo-path . --output-root .agent/model_lab/artifact_dataset --json`
+
+Shipment checkpoint: `python -m pytest tests/test_artifact_dataset_builder.py -q`
+
+MODEL.1 prepares **MODEL.2 — Driver Classifier Baseline**: it produces the normalized `routing_or_policy_learning` / `risk_classification` rows a future recommend-only baseline would score. The deterministic Driver stays the final gate.
 
 ---
 
@@ -2002,8 +2008,8 @@ After AUTO.1f, preferred order:
 3. AUTO.2a — Telegram Evidence Summary Contract ✅ shipped (2026-06-19)
 4. AUTO.2b — GitHub Remote PR Safety Contract ✅ shipped (2026-06-19)
 5. AUTO.2c — n8n Orchestration Dry Run ✅ shipped (2026-06-19)
-6. MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder ← next (the ROAD.2 picker's top safe candidate; whole AUTO.2 contract track shipped)
-7. MODEL.2 — Driver Classifier Baseline
+6. MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder ✅ shipped (2026-06-20)
+7. MODEL.2 — Driver Classifier Baseline ← next (the ROAD.2 picker's top safe candidate; MODEL.1 dataset shipped, prerequisite met)
 8. MODEL.3 — Lesson Graph Activation Dataset
 
 Do not start MODEL-G or GOV.2 before the roadmap becomes machine-readable.

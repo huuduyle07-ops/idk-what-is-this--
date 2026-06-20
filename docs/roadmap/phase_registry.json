@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-06-19T11:00:00+00:00",
+  "updated_at": "2026-06-20T00:00:00+00:00",
   "phases": [
     {
       "phase_id": "ROAD.1",
@@ -232,15 +232,17 @@
       "phase_id": "MODEL.1",
       "title": "C.A.T.T.U.S Artifact Dataset Builder",
       "track": "MODEL",
-      "status": "proposed",
-      "summary": "Report-only exporter that turns existing C.A.T.T.U.S artifacts into a clean training/evaluation dataset.",
+      "status": "complete",
+      "summary": "Report-only exporter that scans existing C.A.T.T.U.S artifacts and normalizes them into a stable JSONL training/evaluation dataset.",
       "automation_level": "LOCAL_1_PREPARE",
       "budget_tier": "local_only",
       "risk_level": "low",
       "allowed_files": [
-        "core/cattus_artifact_dataset_builder.py",
-        "scripts/build_cattus_artifact_dataset.py",
-        "tests/test_cattus_artifact_dataset_builder.py",
+        "core/artifact_dataset_builder.py",
+        "scripts/build_artifact_dataset.py",
+        "tests/test_artifact_dataset_builder.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
         "README.md",
         "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
       ],
@@ -253,7 +255,7 @@
       ],
       "validation": [
         "python -m compileall -q core scripts web tests benchmarks",
-        "python -m pytest tests/test_cattus_artifact_dataset_builder.py -q",
+        "python -m pytest tests/test_artifact_dataset_builder.py -q",
         "python -m pytest -q"
       ],
       "human_approval_required": true,
@@ -266,10 +268,12 @@
         "ROAD.1"
       ],
       "expected_artifacts": [
-        ".agent/roadmap/cattus_artifact_dataset_report.json"
+        ".agent/model_lab/artifact_dataset/artifact_dataset.jsonl",
+        ".agent/model_lab/artifact_dataset/artifact_dataset_report.json",
+        ".agent/model_lab/artifact_dataset/artifact_dataset_report.md"
       ],
       "notes": [
-        "Report-only dataset export. Builds a local dataset; does not train or call models."
+        "Report-only dataset export, shipped 2026-06-20. Scans existing artifacts into a local JSONL dataset; does not train or call models, call embeddings, write to a database, or grant execution authority."
       ]
     },
     {

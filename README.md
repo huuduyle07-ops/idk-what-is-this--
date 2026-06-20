@@ -1210,6 +1210,49 @@ AUTO.2c completes the AUTO.2 contract track. It previews notifications and remot
 only; it contacts no n8n / Telegram / GitHub, runs no git, calls no models, touches no
 network, and changes nothing in the real repo.
 
+## C.A.T.T.U.S Artifact Dataset Builder (MODEL.1)
+
+MODEL.1 scans existing **C.A.T.T.U.S artifacts** under a repo's `.agent` directory and
+normalizes each one into a **stable JSONL dataset row** for future model / classifier
+experiments. It is the first step of the MODEL track: it **builds training/evaluation data
+artifacts only — it does not train a model, call a model, change routing, or grant any
+prediction authority.**
+
+```bash
+python scripts/build_artifact_dataset.py --repo-path . \
+    --output-root .agent/model_lab/artifact_dataset --json
+```
+
+- It scans known artifact families when present — goal briefs, worker assignments, driver
+  decisions, visual evidence contracts, worker result reviews, flaky case reviews,
+  self-evolution evidence packs, the Telegram / GitHub / n8n remote-safety contracts, the
+  phase registry and picker reports, and lesson teaching cards. **Missing directories
+  produce warnings, not failures, and malformed JSON is skipped with a warning** — never a
+  crash.
+- Each row carries stable fields: a deterministic, machine-independent `row_id`; the
+  artifact kind and repo-relative path; best-effort `created_at` / `source_id` /
+  `task_title` / `task_summary` / `mode` / `risk_level` / `automation_level`; `labels`
+  (`recommended_vehicle`, `final_verdict`, `recommended_next_step`); `features`
+  (`has_validation`, `has_visual_issue`, `has_security_sensitive_claim`,
+  `has_remote_component`, `has_patch_candidate`, `has_human_gate`); a `target`
+  (`dataset_task`, `target_label`, `authority="advisory_only"`); and a `quality` block
+  (`parse_status`, `missing_fields`, `warnings`).
+- It writes three artifacts under `--output-root`:
+  `.agent/model_lab/artifact_dataset/artifact_dataset.jsonl`, `artifact_dataset_report.json`,
+  and `artifact_dataset_report.md`. Output is **deterministic** for a fixed
+  `--report-id` / `--created-at`. `--include-kind` (repeatable) and `--limit` narrow the
+  scan; `--json` prints the report summary.
+- It is **report-only**: it reads source artifacts and never mutates them. Every report
+  guardrail is inert — `model_training_performed`, `model_call_performed`,
+  `embedding_call_performed`, `database_write_performed`, `patch_applied`, `validation_run`,
+  `benchmark_run`, `network_call_performed`, `worker_launch_performed`,
+  `lesson_promotion_performed`, and `merge_performed` are all `false`.
+
+MODEL.1 prepares **MODEL.2 — Driver Classifier Baseline** by producing the normalized
+`routing_or_policy_learning` and `risk_classification` rows a future recommend-only baseline
+would score. The dataset rows are advisory artifacts only; the deterministic Driver remains
+the final gate.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
