@@ -1608,7 +1608,7 @@ Implemented (2026-06-18):
 * Within a bucket, candidates rank by lower risk, then lower automation level, then track order (ROAD, AUTO, MODEL, GOV, A, F, H), then natural phase id. The `top_recommendation` is the best safe candidate.
 * **An invalid registry yields no candidates** (`safe_to_prepare` empty, no `top_recommendation`). The validation commands inside the registry are treated as text and are never run.
 * `scripts/create_phase_picker_report.py` — CLI that writes `.agent/roadmap/phase_picker_report.json` + `.md`; exits nonzero on an invalid registry unless `--allow-invalid-registry-report`.
-* Against the seed registry the six shipped phases (ROAD.1, ROAD.2, AUTO.2a, AUTO.2b, AUTO.2c, MODEL.1) classify as `complete_or_history` and the remaining two (MODEL.2, MODEL.3) as `safe_to_prepare`; MODEL.2 — the leading safe candidate with its MODEL.1 prerequisite now met — is the top recommendation. (Seed statuses were synced in **ROAD.2a** (2026-06-18), **AUTO.2a / AUTO.2b / AUTO.2c** (2026-06-19), and **MODEL.1** (2026-06-20).)
+* Against the seed registry all eight seed phases (ROAD.1, ROAD.2, AUTO.2a, AUTO.2b, AUTO.2c, MODEL.1, MODEL.2, MODEL.3) classify as `complete_or_history`; `safe_to_prepare` is empty and there is no top recommendation. (Seed statuses were synced in **ROAD.2a** (2026-06-18), **AUTO.2a / AUTO.2b / AUTO.2c** (2026-06-19), and **MODEL.1 / MODEL.2 / MODEL.3** (2026-06-20).)
 * No execution, model call, network, patch generation/apply, sandbox run, push/merge/PR, remote host / chat app / external automation, lesson promotion, proposal import, worker launch, or auto-merge power was added. ROAD.2 prepares the AUTO.2 contracts but selects-and-prepares nothing itself.
 
 Files:
@@ -1830,72 +1830,71 @@ MODEL.1 prepares **MODEL.2 — Driver Classifier Baseline**: it produces the nor
 
 ---
 
-### MODEL.2 — Driver Classifier Baseline
+### MODEL.2 — Driver Classifier Baseline ✅
 
-Goal: train a small cheap model that predicts Driver-like recommendations.
+Status: **Complete / shipped (2026-06-20) — report-only; no live routing / Driver override / model API / LLM / embedding / vector-DB / database / network / patch / validation / benchmark / worker / merge power added.**
 
-Possible baseline:
-
-* TF-IDF text features
-* logistic regression
-* decision tree / random forest
-
-Predicted fields:
-
-* mode
-* risk
-* vehicle
-* missing artifacts
-* recommended next step
+Goal: consume the MODEL.1 dataset and learn a small offline, deterministic, pure-stdlib baseline that produces advisory Driver-like recommendations.
 
 Boundary:
 
-* Model recommends only.
-* Deterministic Driver remains final safety gate.
-* No automatic execution.
+* Baseline recommends only — predictions carry `authority="advisory_only"`.
+* Deterministic Driver remains the final safety gate; no live routing and no Driver override.
+* No model API / LLM / embedding call; no automatic execution.
+
+Implemented (2026-06-20):
+
+* `core/driver_classifier_baseline.py` — pure stdlib (`hashlib`/`json`/`pathlib`/`typing`) loader + deterministic feature extractor + baseline learner + evaluator. `load_dataset` reads the MODEL.1 JSONL (skipping malformed/non-object lines with a warning), `build_baseline_result` selects the target field (with deterministic fallback), splits train/test, learns the baseline, and evaluates; `build_report` / `render_driver_classifier_baseline_markdown` / `write_driver_classifier_baseline` shape and write the artifacts. It imports no other `core` module and never mutates the dataset.
+* **Baseline = single-rule (OneR) with a majority-class fallback.** For each feature it learns a per-value majority-label rule and its train accuracy; the best single feature is used when it strictly beats the global majority, otherwise the majority-class baseline is used. The split is a **stable per-`row_id` hash bucket** (no ordering dependence), with safe fallbacks (learn on all rows if the train split is empty; evaluate in-sample if the test split is empty) so tiny datasets still produce a deterministic report.
+* **Target selection.** Primary `target.target_label`, falling back through `labels.recommended_next_step` → `labels.final_verdict` → `artifact_kind` → `target.dataset_task` to the first field with ≥ 2 classes; a single class is reported as `insufficient_class_diversity` and an empty dataset as an insufficient-data blocker — both still write a deterministic report.
+* **Metrics** are `accuracy` / `correct` / `total` plus macro `precision` / `recall` / `f1` with safe zero-division handling, plus a confusion matrix. Each prediction row records `true_label`, `predicted_label`, a bounded `confidence`, `prediction_source`, `correct`, `features_used`, and **`authority="advisory_only"`**.
+* `scripts/run_driver_classifier_baseline.py` — CLI (`--dataset-path`, `--output-root`, `--report-id`, `--created-at`, `--target-field`, `--test-ratio`, `--json`, `--limit`). Writes `.agent/model_lab/driver_classifier_baseline/driver_classifier_baseline_report.json` + `.md` + `driver_classifier_predictions.jsonl`. Every report guardrail is inert (`live_routing_performed`, `driver_override_performed`, `model_api_call_performed`, `llm_call_performed`, `embedding_call_performed`, `training_requires_external_model`, `database_write_performed`, `network_call_performed`, `patch_applied`, `validation_run`, `benchmark_run`, `worker_launch_performed`, `merge_performed` all `false`).
+* Registry synced: MODEL.2 → `complete` (allowed_files / validation / expected_artifacts reconciled from the seed's `scripts/create_driver_classifier_baseline.py` / `.agent/roadmap/driver_classifier_baseline_report.json` guess to the real `scripts/run_driver_classifier_baseline.py` and `.agent/model_lab/driver_classifier_baseline/*` names). The ROAD.2 picker now classifies the seven shipped phases (ROAD.1, ROAD.2, AUTO.2a–2c, MODEL.1, MODEL.2) as `complete_or_history`; **MODEL.3** is the new (and only) top recommendation, with its MODEL.1 prerequisite satisfied.
+* No live routing, Driver override, model API call, LLM call, embedding call, vector-DB / database write, subprocess, network, patch generation/apply, sandbox run, validation/benchmark run, lesson promotion, proposal import, worker launch, or merge power was added.
+
+Files:
+
+* `core/driver_classifier_baseline.py`
+* `scripts/run_driver_classifier_baseline.py`
+* `tests/test_driver_classifier_baseline.py`
+
+CLI: `python scripts/run_driver_classifier_baseline.py --dataset-path .agent/model_lab/artifact_dataset/artifact_dataset.jsonl --output-root .agent/model_lab/driver_classifier_baseline --json`
+
+Shipment checkpoint: `python -m pytest tests/test_driver_classifier_baseline.py -q`
 
 ---
 
-### MODEL.3 — Lesson Graph Activation Dataset
+### MODEL.3 - Lesson Graph Activation Dataset
 
-Goal: build dataset for lesson/anti-lesson activation.
+Status: **Complete / shipped (2026-06-20) - report-only; no lesson retrieval / prompt injection / lesson promotion / lesson merge / lesson block / model / embedding / vector-DB / database / network / patch / validation / benchmark / worker / merge power added.**
 
-Metaphor:
-
-* lesson = neuron
-* anti-lesson = inhibition node
-* evidence/benchmark/replay = grounding signal
-* edge = synapse
-* current task = input current
-* activation score = which lessons should enter context
-
-Example output:
-
-```json
-{
-  "activated_lessons": [
-    {
-      "lesson_id": "lesson_allowed_files_scope",
-      "activation_score": 0.91,
-      "reason": "Task is broad and file scope is unclear"
-    }
-  ],
-  "activated_anti_lessons": [
-    {
-      "anti_lesson_id": "anti_wrong_file_assumption",
-      "inhibition_score": 0.84,
-      "reason": "Task may touch similar-looking files"
-    }
-  ]
-}
-```
+Goal: build a deterministic lesson / anti-lesson activation dataset for future activation scoring, using MODEL.1 query artifacts plus existing lesson candidates.
 
 Boundary:
 
-* Dataset/report-only.
-* No auto-promotion.
-* No auto-deletion.
-* No silent graph mutation.
+* Dataset/report-only. Rows carry `authority="advisory_only"`.
+* No change to lesson retrieval and no lesson injection into prompts.
+* No lesson promotion, merge, block, deletion, or live activation.
+* No model API, LLM, embedding, vector store, database, network, patch, validation, benchmark, sandbox, worker, or merge behavior.
+
+Implemented (2026-06-20):
+
+* `core/lesson_activation_dataset.py` - pure stdlib (`hashlib`/`json`/`pathlib`/`re`/`typing`) loader + scanner + normalizer + activation row builder + JSON/Markdown report writer. It reads MODEL.1 JSONL rows, skips malformed/non-object lines with warnings, scans `.agent/lessons/**` and `lessons/**` when present, and treats missing source families as warnings rather than failures. It imports no other `core` module and never mutates source artifacts.
+* **Activation rows** pair one query artifact with one lesson candidate. Each row includes stable query fields, normalized candidate fields (`lesson_id`, `kind`, `title`, `status`, `scope`, `confidence`, `tags`), deterministic features (`token_overlap`, `title_overlap`, `tag_overlap`, `risk_match`, `kind_match`, `has_evidence_refs`, `is_active`, `is_archived`, `is_anti_lesson`), an advisory target, and quality metadata.
+* **Labels are deterministic only.** Archived / superseded / blocked / duplicate / weak candidates become `suppress`; active candidates with overlap or explicit evidence references become `activate`; active candidates without overlap become `ignore`; insufficient partial records become `unknown`. `--min-overlap` controls the heuristic threshold and `--limit` deterministically caps rows.
+* `scripts/build_lesson_activation_dataset.py` - CLI (`--repo-path`, `--output-root`, `--artifact-dataset`, `--report-id`, `--created-at`, `--json`, `--limit`, `--min-overlap`). Writes `.agent/model_lab/lesson_activation_dataset/lesson_activation_dataset.jsonl` + `lesson_activation_dataset_report.json` + `lesson_activation_dataset_report.md`.
+* Registry synced: MODEL.3 -> `complete` (allowed_files / validation / expected_artifacts reconciled to `core/lesson_activation_dataset.py`, `scripts/build_lesson_activation_dataset.py`, `tests/test_lesson_activation_dataset.py`, and `.agent/model_lab/lesson_activation_dataset/*`). The ROAD.2 picker now classifies all eight seed phases (ROAD.1, ROAD.2, AUTO.2a-AUTO.2c, MODEL.1-MODEL.3) as `complete_or_history`; there are no proposed seed phases left and no top recommendation.
+* No lesson retrieval change, prompt injection change, lesson promotion, lesson merge/block, model call, embedding call, vector-DB / database write, subprocess, network, patch generation/apply, sandbox run, validation/benchmark run, proposal import, worker launch, or merge power was added.
+
+Files:
+
+* `core/lesson_activation_dataset.py`
+* `scripts/build_lesson_activation_dataset.py`
+* `tests/test_lesson_activation_dataset.py`
+
+CLI: `python scripts/build_lesson_activation_dataset.py --repo-path . --artifact-dataset .agent/model_lab/artifact_dataset/artifact_dataset.jsonl --output-root .agent/model_lab/lesson_activation_dataset --json`
+
+Shipment checkpoint: `python -m pytest tests/test_lesson_activation_dataset.py -q`
 
 ---
 
@@ -2009,8 +2008,8 @@ After AUTO.1f, preferred order:
 4. AUTO.2b — GitHub Remote PR Safety Contract ✅ shipped (2026-06-19)
 5. AUTO.2c — n8n Orchestration Dry Run ✅ shipped (2026-06-19)
 6. MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder ✅ shipped (2026-06-20)
-7. MODEL.2 — Driver Classifier Baseline ← next (the ROAD.2 picker's top safe candidate; MODEL.1 dataset shipped, prerequisite met)
-8. MODEL.3 — Lesson Graph Activation Dataset
+7. MODEL.2 — Driver Classifier Baseline ✅ shipped (2026-06-20)
+8. MODEL.3 - Lesson Graph Activation Dataset shipped (2026-06-20); ROAD.2 now has no proposed seed phases left
 
 Do not start MODEL-G or GOV.2 before the roadmap becomes machine-readable.
 

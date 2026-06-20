@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-06-20T00:00:00+00:00",
+  "updated_at": "2026-06-20T06:30:00+00:00",
   "phases": [
     {
       "phase_id": "ROAD.1",
@@ -280,15 +280,17 @@
       "phase_id": "MODEL.2",
       "title": "Driver Classifier Baseline",
       "track": "MODEL",
-      "status": "proposed",
-      "summary": "Report-only baseline that scores a small local classifier predicting Driver-like recommendations; recommend-only, deterministic Driver stays final.",
+      "status": "complete",
+      "summary": "Report-only baseline that learns a small offline pure-stdlib classifier over the MODEL.1 dataset and reports advisory predictions; recommend-only, deterministic Driver stays final.",
       "automation_level": "LOCAL_1_PREPARE",
       "budget_tier": "local_only",
       "risk_level": "medium",
       "allowed_files": [
         "core/driver_classifier_baseline.py",
-        "scripts/create_driver_classifier_baseline.py",
+        "scripts/run_driver_classifier_baseline.py",
         "tests/test_driver_classifier_baseline.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
         "README.md",
         "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
       ],
@@ -314,25 +316,29 @@
         "MODEL.1"
       ],
       "expected_artifacts": [
-        ".agent/roadmap/driver_classifier_baseline_report.json"
+        ".agent/model_lab/driver_classifier_baseline/driver_classifier_baseline_report.json",
+        ".agent/model_lab/driver_classifier_baseline/driver_classifier_baseline_report.md",
+        ".agent/model_lab/driver_classifier_baseline/driver_classifier_predictions.jsonl"
       ],
       "notes": [
-        "Report-only baseline. A small local classifier recommends only; deterministic Driver remains the final gate."
+        "Report-only baseline, shipped 2026-06-20. Learns a pure-stdlib OneR/majority baseline over the MODEL.1 dataset; predictions are advisory only, no live routing, no Driver override, no model/LLM/embedding calls. Deterministic Driver remains the final gate."
       ]
     },
     {
       "phase_id": "MODEL.3",
       "title": "Lesson Graph Activation Dataset",
       "track": "MODEL",
-      "status": "proposed",
-      "summary": "Report-only dataset builder for lesson / anti-lesson activation scoring; data only, no activation behavior.",
+      "status": "complete",
+      "summary": "Report-only dataset builder for lesson / anti-lesson activation scoring; deterministic overlap and evidence-link features only, advisory data only, no activation behavior.",
       "automation_level": "LOCAL_1_PREPARE",
       "budget_tier": "local_only",
       "risk_level": "medium",
       "allowed_files": [
-        "core/lesson_graph_activation_dataset.py",
-        "scripts/build_lesson_graph_activation_dataset.py",
-        "tests/test_lesson_graph_activation_dataset.py",
+        "core/lesson_activation_dataset.py",
+        "scripts/build_lesson_activation_dataset.py",
+        "tests/test_lesson_activation_dataset.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
         "README.md",
         "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-07.md"
       ],
@@ -345,8 +351,11 @@
       ],
       "validation": [
         "python -m compileall -q core scripts web tests benchmarks",
-        "python -m pytest tests/test_lesson_graph_activation_dataset.py -q",
-        "python -m pytest -q"
+        "python -m pytest tests/test_lesson_activation_dataset.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python -m pytest -q",
+        "python benchmarks/run_benchmarks.py --check"
       ],
       "human_approval_required": true,
       "merge_allowed": false,
@@ -358,10 +367,12 @@
         "MODEL.1"
       ],
       "expected_artifacts": [
-        ".agent/roadmap/lesson_graph_activation_dataset_report.json"
+        ".agent/model_lab/lesson_activation_dataset/lesson_activation_dataset.jsonl",
+        ".agent/model_lab/lesson_activation_dataset/lesson_activation_dataset_report.json",
+        ".agent/model_lab/lesson_activation_dataset/lesson_activation_dataset_report.md"
       ],
       "notes": [
-        "Report-only dataset build. Produces activation training data; changes no retrieval behavior."
+        "Report-only dataset build, shipped 2026-06-20. Produces advisory lesson / anti-lesson activation rows from MODEL.1 rows and lesson candidates; no retrieval changes, no prompt injection, no lesson promotion, no model/embedding calls, and no execution authority."
       ]
     }
   ]

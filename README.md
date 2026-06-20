@@ -1253,6 +1253,93 @@ MODEL.1 prepares **MODEL.2 — Driver Classifier Baseline** by producing the nor
 would score. The dataset rows are advisory artifacts only; the deterministic Driver remains
 the final gate.
 
+## Driver Classifier Baseline (MODEL.2)
+
+MODEL.2 consumes the **MODEL.1 JSONL dataset** and learns a small **offline, pure-stdlib
+baseline classifier** (a single-rule "OneR" over the dataset features, with a majority-class
+fallback). It produces an advisory evaluation report and a prediction preview. It **trains and
+evaluates an offline baseline only — it does not route live tasks, does not override the
+deterministic Driver, does not call model APIs / LLMs / embeddings, and adds no model
+authority.**
+
+```bash
+python scripts/run_driver_classifier_baseline.py \
+    --dataset-path .agent/model_lab/artifact_dataset/artifact_dataset.jsonl \
+    --output-root .agent/model_lab/driver_classifier_baseline --json
+```
+
+- It reads the dataset (skipping malformed/non-object lines with a warning), picks a target
+  field (`--target-field`, default `target.target_label`, with deterministic fallback to
+  `labels.recommended_next_step` → `labels.final_verdict` → `artifact_kind` →
+  `target.dataset_task` when the primary has fewer than two classes), and extracts a fixed,
+  deterministic feature schema (`artifact_kind`, `dataset_task`, `risk_level`,
+  `automation_level`, `final_verdict`, `recommended_vehicle`, and the four `has_*` feature
+  flags).
+- It splits rows into train/test by a **stable per-`row_id` hash bucket** (`--test-ratio`,
+  default 0.3), learns the baseline on the train rows, and evaluates on the test rows
+  (falling back to in-sample evaluation for tiny datasets). Metrics include `accuracy`,
+  `correct`, `total`, and macro `precision` / `recall` / `f1` (with safe zero-division
+  handling), plus a confusion matrix.
+- It writes three artifacts under `--output-root`:
+  `.agent/model_lab/driver_classifier_baseline/driver_classifier_baseline_report.json`,
+  `driver_classifier_baseline_report.md`, and `driver_classifier_predictions.jsonl`. Each
+  prediction row carries `true_label`, `predicted_label`, a bounded `confidence`,
+  `prediction_source`, `correct`, `features_used`, and **`authority="advisory_only"`**.
+  Output is **deterministic** for a fixed `--report-id` / `--created-at`; `--json` prints the
+  report summary.
+- If too few classes exist, it reports `insufficient_class_diversity` (and an empty dataset
+  reports an insufficient-data blocker) but **still writes a deterministic report**.
+- It is **report-only**: it reads the dataset and never mutates it. Every report guardrail is
+  inert — `live_routing_performed`, `driver_override_performed`, `model_api_call_performed`,
+  `llm_call_performed`, `embedding_call_performed`, `training_requires_external_model`,
+  `database_write_performed`, `network_call_performed`, `patch_applied`, `validation_run`,
+  `benchmark_run`, `worker_launch_performed`, and `merge_performed` are all `false`.
+
+MODEL.2 predictions are **advisory only**; the deterministic Driver stays the final gate. It
+prepares later MODEL-track work (e.g. **MODEL.3 — Lesson Graph Activation Dataset**) by
+establishing a reproducible, no-authority baseline to measure future classifiers against.
+
+## Lesson Graph Activation Dataset (MODEL.3)
+
+MODEL.3 consumes the **MODEL.1 JSONL dataset** plus lesson / anti-lesson candidates and
+builds deterministic **lesson activation rows** for future scoring experiments. It uses
+text, title, tag, risk, kind, and explicit evidence-link features only. It **does not change
+lesson retrieval, inject lessons into prompts, promote lessons, call models, call
+embeddings, write databases, or grant execution authority.**
+
+```bash
+python scripts/build_lesson_activation_dataset.py \
+    --repo-path . \
+    --artifact-dataset .agent/model_lab/artifact_dataset/artifact_dataset.jsonl \
+    --output-root .agent/model_lab/lesson_activation_dataset --json
+```
+
+- It reads MODEL.1 rows when present and scans lesson / anti-lesson candidate files under
+  `.agent/lessons/**` and `lessons/**`. Missing source families produce warnings, not
+  failures; malformed JSON / JSONL files are skipped with warnings.
+- Each output row pairs one query artifact with one lesson candidate and records
+  deterministic activation features: `token_overlap`, `title_overlap`, `tag_overlap`,
+  `risk_match`, `kind_match`, `has_evidence_refs`, `is_active`, `is_archived`, and
+  `is_anti_lesson`.
+- Labels are heuristic and advisory: archived / superseded / blocked / duplicate / weak
+  candidates become `suppress`; active candidates with overlap or explicit evidence links
+  become `activate`; active candidates without overlap become `ignore`; partial records
+  become `unknown`.
+- It writes three artifacts under `--output-root`:
+  `.agent/model_lab/lesson_activation_dataset/lesson_activation_dataset.jsonl`,
+  `lesson_activation_dataset_report.json`, and `lesson_activation_dataset_report.md`.
+  Output is deterministic for fixed `--report-id` / `--created-at`; `--limit` and
+  `--min-overlap` control row count and activation threshold.
+- It is **report-only**: every guardrail is inert, including
+  `lesson_retrieval_changed`, `prompt_injection_changed`, `lesson_promotion_performed`,
+  `lesson_merge_performed`, `lesson_block_performed`, `model_call_performed`,
+  `embedding_call_performed`, `database_write_performed`, `network_call_performed`,
+  `patch_applied`, `validation_run`, `benchmark_run`, `worker_launch_performed`, and
+  `merge_performed`.
+
+MODEL.3 prepares a future **lesson activation scorer**. It builds data only; lesson
+selection, prompt construction, and all execution gates remain unchanged.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
