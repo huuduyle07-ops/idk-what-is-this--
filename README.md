@@ -1422,6 +1422,51 @@ python scripts/create_benchmark_run_ledger.py \
 EVAL.1 turns benchmark runs into trackable evidence. It **reads reports and writes a
 ledger** — it adds no benchmark, model, patch, validation, worker, or merge power.
 
+## Benchmark Report Compare (EVAL.2)
+
+EVAL.2 is the second EVAL-branch phase. Where EVAL.1 rolls up *all* cases, EVAL.2
+**zooms in on one case** (or every suspected flake candidate) and **explains the
+evidence** across the existing benchmark reports: which reports mention the case,
+which runs passed or failed, which report is latest and *why*, and whether the
+evidence supports a **stochastic flake** or a **broken case**. It is **report-only**
+and **does not run benchmarks, call models, apply patches, edit benchmark cases, run
+validation, contact network services, write to a database, launch workers, or merge.**
+
+```bash
+python scripts/compare_benchmark_reports.py --repo-path . \
+    --case-id ts_migration_import_path_case --json
+python scripts/compare_benchmark_reports.py --repo-path . --all-flake-candidates
+```
+
+- It scans `.agent/benchmarks/benchmark_report_*.json` and builds a **case timeline**:
+  one observation per report that mentions the case (status, run-level pass/fail,
+  duration, models, fallbacks, tokens/cost, and a short failure summary). A **missing**
+  report set or an **unknown** case yields `no_evidence` with a warning, and malformed
+  reports are skipped with a warning.
+- It explains **report ordering** deterministically — `created_at` when present and
+  parseable, otherwise lexical report path — and records `ordering_source`,
+  `ordering_value`, and which report `is_latest` for that case.
+- It classifies conservatively and never overclaims: `single_pass_only`,
+  `single_failure_only`, `likely_flake` (mixed pass/fail across reports, or the ledger
+  shows recovery), `likely_broken` (repeated failures with no later pass), or
+  `no_evidence` / `insufficient_history`. Evidence labels such as `seen_in_full_suite`,
+  `passed_in_single_case_run`, `recovered_on_later_run`, `regressed_after_pass`, and
+  `latest_is_fail` make the reasoning explicit.
+- It **optionally cross-checks the EVAL.1 ledger** (`--ledger`). A missing ledger is a
+  warning only; when present, a case listed there is tagged `ledger_flake_candidate`.
+- It writes `.agent/eval/benchmark_report_compare/<case_id>_compare.json` and `.md`
+  (or `flake_candidates_compare.{json,md}` for `--all-flake-candidates`). Output is
+  **deterministic** for a fixed `--comparison-id` / `--created-at`; `--limit` keeps the
+  most recent N reports; `--json` prints the report. Every report guardrail
+  (`benchmark_run_performed`, `model_call_performed`, `patch_applied`,
+  `benchmark_case_modified`, `validation_run`, `network_call_performed`,
+  `database_write_performed`, `worker_launch_performed`, `merge_performed`) is `false`.
+
+For example, EVAL.2 explains `ts_migration_import_path_case` as `likely_flake`: seen
+across full-suite and single-case runs, failing in the latest single-case run but
+passing in others, recovered on later runs, and listed as a ledger flake candidate —
+evidence that points to stochastic live-model behavior rather than a broken case.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:

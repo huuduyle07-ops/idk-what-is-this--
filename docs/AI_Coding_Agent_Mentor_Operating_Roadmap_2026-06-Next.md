@@ -76,7 +76,7 @@ Purpose:
 Example phases:
 
 - EVAL.1 — Live Benchmark Run Ledger — ✅ shipped 2026-06-22 (complete).
-- EVAL.2 — Single-Case Replay Compare
+- EVAL.2 — Benchmark Report Compare / Single-Case Flake Evidence — ✅ shipped 2026-06-22 (complete).
 - EVAL.3 — Flake Classification Report
 - EVAL.4 — Run Variance Dashboard
 
@@ -203,6 +203,16 @@ with `tests/test_benchmark_run_ledger.py`. The ledger reads
 `.agent/benchmarks/benchmark_report_*.json` and writes
 `.agent/eval/benchmark_run_ledger/benchmark_run_ledger.{json,md}`. It runs no
 benchmarks, calls no models, and changes no scoring or cases.
+
+**EVAL.2 — Benchmark Report Compare / Single-Case Flake Evidence is also shipped
+2026-06-22 (complete).** Implemented report-only as `core/benchmark_report_compare.py`
++ `scripts/compare_benchmark_reports.py`, registered as a `complete` EVAL-track phase
+(prerequisite EVAL.1) in `docs/roadmap/phase_registry.json`, and validated with
+`tests/test_benchmark_report_compare.py`. It explains one case (or every flake
+candidate) across `.agent/benchmarks/benchmark_report_*.json` — report ordering, case
+timeline, evidence labels, conservative classification, and an optional EVAL.1 ledger
+cross-check — and writes `.agent/eval/benchmark_report_compare/<case_id>_compare.{json,md}`.
+It runs no benchmarks, calls no models, and changes no scoring or cases.
 
 Purpose:
 
