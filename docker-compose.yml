@@ -12,6 +12,7 @@ services:
         condition: service_healthy
     volumes:
       - .:/workspace
+      - ${CATTUS_CODE_ROOT:-C:/Users/Admin/Documents/Code}:/code
     environment:
       WEB_HOST: "0.0.0.0"
       DATABASE_URL: postgresql://myuser:mypassword@db:5432/codex_db
