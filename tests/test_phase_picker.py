@@ -554,7 +554,7 @@ def test_seed_registry_produces_expected_buckets():
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     report = _report(data, report_id="r", created_at="t", registry_path=str(_SEED_PATH))
     assert report["registry_valid"] is True
-    # ROAD.1, ROAD.2, AUTO.2a, AUTO.2b, AUTO.2c, MODEL.1, MODEL.2, and
+    # ROAD.1, ROAD.2, ROAD.3, AUTO.2a, AUTO.2b, AUTO.2c, MODEL.1, MODEL.2, and
     # MODEL.3 are shipped (complete); no proposed seed phase remains safe.
     assert report["bucket_counts"] == {
         "safe_to_prepare": 0,
@@ -562,9 +562,9 @@ def test_seed_registry_produces_expected_buckets():
         "human_approval_required": 0,
         "blocked": 0,
         "deferred_or_parked": 0,
-        "complete_or_history": 8,
+        "complete_or_history": 9,
     }
-    # MODEL.3 shipped; there is no remaining seed recommendation.
+    # ROAD.3 shipped; there is no remaining seed recommendation.
     assert report["top_recommendation"] is None
 
 
@@ -578,30 +578,18 @@ def test_seed_safe_candidates_sorted_deterministically():
 
 def test_seed_shipped_phases_are_complete_and_not_recommended():
     # Shipped phases must read as complete and must never be recommended as work to
-    # prepare. MODEL.1, MODEL.2, and MODEL.3 are now complete; the whole AUTO.2
-    # contract track shipped first.
+    # prepare. ROAD.3 shipped after the whole MODEL track; the AUTO.2 contract track
+    # shipped before that.
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     statuses = {p["phase_id"]: p["status"] for p in data["phases"]}
-    assert statuses["ROAD.1"] == "complete"
-    assert statuses["ROAD.2"] == "complete"
-    assert statuses["AUTO.2a"] == "complete"
-    assert statuses["AUTO.2b"] == "complete"
-    assert statuses["AUTO.2c"] == "complete"
-    assert statuses["MODEL.1"] == "complete"
-    assert statuses["MODEL.2"] == "complete"
-    assert statuses["MODEL.3"] == "complete"
+    shipped = ["ROAD.1", "ROAD.2", "ROAD.3", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3"]
+    for pid in shipped:
+        assert statuses[pid] == "complete", pid
     report = _report(data, report_id="r", created_at="t")
     history_ids = {p["phase_id"] for p in report["complete_or_history"]}
-    assert {"ROAD.1", "ROAD.2", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3"} <= history_ids
-    safe = {p["phase_id"]: p for p in report["safe_to_prepare"]}
-    assert "ROAD.1" not in safe
-    assert "ROAD.2" not in safe
-    assert "AUTO.2a" not in safe
-    assert "AUTO.2b" not in safe
-    assert "AUTO.2c" not in safe
-    assert "MODEL.1" not in safe
-    assert "MODEL.2" not in safe
-    assert "MODEL.3" not in safe
+    assert set(shipped) <= history_ids
+    safe = {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert not (set(shipped) & safe)
     assert report["top_recommendation"] is None
 
 

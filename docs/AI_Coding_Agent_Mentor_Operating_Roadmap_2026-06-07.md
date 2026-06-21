@@ -1898,6 +1898,39 @@ Shipment checkpoint: `python -m pytest tests/test_lesson_activation_dataset.py -
 
 ---
 
+### ROAD.3 — Post-MODEL Checkpoint Audit
+
+Status: **Complete / shipped (2026-06-21) — report-only; no work selection / phase execution / validation / benchmark / git / model / embedding / network / database / patch / worker / lesson-promotion / merge power added. The previous roadmap arc is now frozen.**
+
+Goal: audit the completed ROAD/AUTO/MODEL arc — verify the registry, the registry/picker reports, the generated MODEL datasets and AUTO.2 contracts, the docs, and the validation story all agree, without executing or selecting anything.
+
+Boundary:
+
+* Report/audit-only. Reads existing files and writes one JSON + Markdown report.
+* Does not choose new work, execute phases, or run validation / benchmarks / git.
+* Does not call models or embeddings, contact the network, apply patches, launch workers, write a database, or promote / merge / block / retrieve lessons.
+* Missing artifacts are warnings; malformed JSON is skipped with a warning; neither crashes.
+
+Implemented (2026-06-21):
+
+* `core/checkpoint_audit.py` — pure stdlib plus a single in-repo import of the ROAD.2 picker (`core.phase_picker.pick_phase_candidates`, which reuses the ROAD.1 validator) to derive the authoritative registry validity, phase counts, completed-phase set, safe-candidate count, and top recommendation. It recursively inspects every guardrail dictionary in each inspected artifact, cross-checks the generated reports against the registry, checks doc phase mentions, and never mutates an input.
+* **Checkpoint verdict** is `pass` / `warn` / `fail`: `pass` requires a valid registry, all expected phases complete, an empty picker `safe_to_prepare` with a null top recommendation, no guardrail breach, and no blocker; `warn` covers missing optional artifacts, incomplete docs, or stale generated reports; `fail` covers an invalid registry, a missing/incomplete expected phase, the picker still recommending work, or any artifact reporting hidden execution power. The recommended next step is `freeze_current_roadmap_and_plan_next_map` / `review_checkpoint_warnings` / `fix_checkpoint_blockers`.
+* `scripts/create_checkpoint_audit.py` — CLI (`--repo-path`, `--registry`, `--output-root`, `--report-id`, `--created-at`, `--json`, `--expected-phase` (repeatable), `--allow-warnings`). Writes `.agent/roadmap/checkpoint_audit_report.json` + `.md`; exits nonzero on `fail`, and on `warn` unless `--allow-warnings`.
+* Registry synced: ROAD.3 → `complete`. The ROAD.2 picker now classifies all nine phases (ROAD.1–ROAD.3, AUTO.2a–AUTO.2c, MODEL.1–MODEL.3) as `complete_or_history`; there are no proposed seed phases left and no top recommendation, so the audit confirms the arc is frozen.
+* No work selection, phase execution, validation/benchmark run, git command, model/embedding call, network call, database write, patch generation/apply, sandbox run, worker launch, lesson promotion/merge/block, or merge power was added.
+
+Files:
+
+* `core/checkpoint_audit.py`
+* `scripts/create_checkpoint_audit.py`
+* `tests/test_checkpoint_audit.py`
+
+CLI: `python scripts/create_checkpoint_audit.py --repo-path . --registry docs/roadmap/phase_registry.json --output-root .agent/roadmap --json --allow-warnings`
+
+Shipment checkpoint: `python -m pytest tests/test_checkpoint_audit.py -q`
+
+---
+
 ### MODEL.4 — Lesson Activation Scorer Baseline
 
 Goal: train a small model to predict which lessons/anti-lessons should activate for a task.
@@ -2010,6 +2043,7 @@ After AUTO.1f, preferred order:
 6. MODEL.1 — C.A.T.T.U.S Artifact Dataset Builder ✅ shipped (2026-06-20)
 7. MODEL.2 — Driver Classifier Baseline ✅ shipped (2026-06-20)
 8. MODEL.3 - Lesson Graph Activation Dataset shipped (2026-06-20); ROAD.2 now has no proposed seed phases left
+9. ROAD.3 — Post-MODEL Checkpoint Audit ✅ shipped (2026-06-21); the ROAD/AUTO/MODEL arc is now frozen
 
 Do not start MODEL-G or GOV.2 before the roadmap becomes machine-readable.
 

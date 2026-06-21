@@ -1340,6 +1340,46 @@ python scripts/build_lesson_activation_dataset.py \
 MODEL.3 prepares a future **lesson activation scorer**. It builds data only; lesson
 selection, prompt construction, and all execution gates remain unchanged.
 
+## Post-MODEL Checkpoint Audit (ROAD.3)
+
+ROAD.3 is the **checkpoint** that closes the ROAD/AUTO/MODEL arc. It reads the roadmap
+registry, the **ROAD.1 registry report** and **ROAD.2 picker report**, the generated
+**MODEL** datasets and **AUTO.2** automation contracts, and the docs, then writes a
+single audit that verifies everything agrees: the registry is valid, every expected
+phase (ROAD.1, ROAD.2, AUTO.2a–2c, MODEL.1–3) is complete, the picker recommends no
+further work, no inspected artifact hides execution power, and every phase is
+documented.
+
+```bash
+python scripts/create_checkpoint_audit.py \
+    --repo-path . \
+    --registry docs/roadmap/phase_registry.json \
+    --output-root .agent/roadmap --json --allow-warnings
+```
+
+- It reads existing reports when present and **tolerates missing or malformed
+  artifacts** — a missing report is a warning, malformed JSON is skipped with a
+  warning, and neither crashes the audit.
+- It **recursively inspects** each artifact's guardrail dictionaries; any execution
+  guardrail that is unexpectedly `true` (model / embedding / network / database /
+  patch / validation / benchmark / worker / merge / push / PR / branch / contact /
+  lesson / routing) becomes a **blocker**.
+- **Verdict:** `pass` (registry valid, all expected phases complete, picker
+  recommends nothing, no blockers), `warn` (optional artifacts missing, docs
+  incomplete, or generated reports stale — but nothing unsafe), or `fail` (registry
+  invalid, an expected phase missing/incomplete, the picker still recommends work, or
+  a guardrail breach). It writes `.agent/roadmap/checkpoint_audit_report.json` and
+  `.agent/roadmap/checkpoint_audit_report.md`, and the CLI exits nonzero on `fail`,
+  and on `warn` unless `--allow-warnings`.
+- It is **report-only**: it does not choose new work, execute phases, run validation
+  or benchmarks, call models or embeddings, contact the network, run git, apply
+  patches, launch workers, or promote / merge / block / retrieve lessons. Git history
+  is intentionally not inspected because ROAD.3 does not run git.
+
+ROAD.3 **freezes the completed roadmap arc**: with the eight prior phases shipped and
+the picker reporting no safe candidates, the audit confirms the arc is closed and the
+recommended next step is to plan the next machine-readable map.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
