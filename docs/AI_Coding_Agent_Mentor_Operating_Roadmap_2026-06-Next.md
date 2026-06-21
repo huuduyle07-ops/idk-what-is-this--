@@ -75,7 +75,7 @@ Purpose:
 
 Example phases:
 
-- EVAL.1 — Live Benchmark Run Ledger
+- EVAL.1 — Live Benchmark Run Ledger — ✅ shipped 2026-06-22 (complete).
 - EVAL.2 — Single-Case Replay Compare
 - EVAL.3 — Flake Classification Report
 - EVAL.4 — Run Variance Dashboard
@@ -195,6 +195,14 @@ REMOTE should go last because remote execution should stay locked. Telegram, Git
 ## 6. First Proposed Next Phase
 
 ### EVAL.1 — Live Benchmark Run Ledger
+
+**Status: shipped 2026-06-22 (complete).** Implemented report-only as
+`core/benchmark_run_ledger.py` + `scripts/create_benchmark_run_ledger.py`, registered
+as a `complete` EVAL-track phase in `docs/roadmap/phase_registry.json`, and validated
+with `tests/test_benchmark_run_ledger.py`. The ledger reads
+`.agent/benchmarks/benchmark_report_*.json` and writes
+`.agent/eval/benchmark_run_ledger/benchmark_run_ledger.{json,md}`. It runs no
+benchmarks, calls no models, and changes no scoring or cases.
 
 Purpose:
 

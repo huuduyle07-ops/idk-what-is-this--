@@ -554,17 +554,17 @@ def test_seed_registry_produces_expected_buckets():
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     report = _report(data, report_id="r", created_at="t", registry_path=str(_SEED_PATH))
     assert report["registry_valid"] is True
-    # ROAD.1, ROAD.2, ROAD.3, AUTO.2a, AUTO.2b, AUTO.2c, MODEL.1, MODEL.2, and
-    # MODEL.3 are shipped (complete); no proposed seed phase remains safe.
+    # ROAD.1, ROAD.2, ROAD.3, AUTO.2a, AUTO.2b, AUTO.2c, MODEL.1, MODEL.2,
+    # MODEL.3, and EVAL.1 are shipped (complete); no proposed seed phase remains safe.
     assert report["bucket_counts"] == {
         "safe_to_prepare": 0,
         "sandbox_required": 0,
         "human_approval_required": 0,
         "blocked": 0,
         "deferred_or_parked": 0,
-        "complete_or_history": 9,
+        "complete_or_history": 10,
     }
-    # ROAD.3 shipped; there is no remaining seed recommendation.
+    # ROAD.3 and EVAL.1 shipped; there is no remaining seed recommendation.
     assert report["top_recommendation"] is None
 
 
@@ -582,7 +582,7 @@ def test_seed_shipped_phases_are_complete_and_not_recommended():
     # shipped before that.
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     statuses = {p["phase_id"]: p["status"] for p in data["phases"]}
-    shipped = ["ROAD.1", "ROAD.2", "ROAD.3", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3"]
+    shipped = ["ROAD.1", "ROAD.2", "ROAD.3", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3", "EVAL.1"]
     for pid in shipped:
         assert statuses[pid] == "complete", pid
     report = _report(data, report_id="r", created_at="t")

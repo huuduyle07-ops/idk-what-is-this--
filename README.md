@@ -1380,6 +1380,48 @@ ROAD.3 **freezes the completed roadmap arc**: with the eight prior phases shippe
 the picker reporting no safe candidates, the audit confirms the arc is closed and the
 recommended next step is to plan the next machine-readable map.
 
+## Live Benchmark Run Ledger (EVAL.1)
+
+EVAL.1 opens the **EVAL branch** of the next operating roadmap. It is a **report-only
+ledger** that reads existing benchmark report artifacts and summarizes **live benchmark
+run history** so operators can understand benchmark health over time — run-to-run
+tracking and flake classification — instead of treating each run as an isolated event.
+It **does not run benchmarks, call models, apply patches, edit benchmark cases, run
+validation, contact network services, write to a database, launch workers, or merge.**
+
+```bash
+python scripts/create_benchmark_run_ledger.py \
+    --repo-path . \
+    --input-glob ".agent/benchmarks/benchmark_report_*.json" \
+    --output-root .agent/eval/benchmark_run_ledger --json
+```
+
+- It scans `.agent/benchmarks/benchmark_report_*.json`, parsing each report and
+  ordering runs deterministically by timestamp. A **missing** report set yields an
+  empty ledger with a warning, and **malformed** reports are skipped with a warning —
+  neither crashes the ledger. Older reports are tolerated: missing aggregates are
+  derived from the per-case results.
+- Each **run record** captures the run id, timestamp, pass/fail counts, success rate,
+  failed cases, models used, fallback count, token/cost totals, and duration. The
+  **case history** rolls those up per case (seen runs, pass/fail counts, latest status
+  and duration, observed languages/categories/difficulties).
+- **Flake candidates** are marked conservatively: a case is `suspected_flaky` only on
+  real evidence — `mixed_pass_fail_history` (both pass and fail seen),
+  `recovered_on_later_run` (a failure a later run passed), `passed_in_single_case_rerun`
+  (a suite failure that passed an isolated rerun), or a `within_run_retry_flake`. With
+  too little evidence it does not overclaim (`single_failure_observed`,
+  `insufficient_history`).
+- It writes `.agent/eval/benchmark_run_ledger/benchmark_run_ledger.json` and
+  `benchmark_run_ledger.md`. Output is **deterministic** for a fixed `--ledger-id` /
+  `--created-at`; `--limit` keeps the most recent N runs; `--json` prints the report.
+  Every report guardrail is inert — `benchmark_run_performed`, `model_call_performed`,
+  `patch_applied`, `benchmark_case_modified`, `validation_run`, `network_call_performed`,
+  `database_write_performed`, `worker_launch_performed`, and `merge_performed` are all
+  `false`.
+
+EVAL.1 turns benchmark runs into trackable evidence. It **reads reports and writes a
+ledger** — it adds no benchmark, model, patch, validation, worker, or merge power.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
