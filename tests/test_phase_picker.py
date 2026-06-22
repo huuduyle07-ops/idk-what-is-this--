@@ -555,7 +555,7 @@ def test_seed_registry_produces_expected_buckets():
     report = _report(data, report_id="r", created_at="t", registry_path=str(_SEED_PATH))
     assert report["registry_valid"] is True
     # ROAD.1, ROAD.2, ROAD.3, AUTO.2a, AUTO.2b, AUTO.2c, MODEL.1, MODEL.2,
-    # MODEL.3, EVAL.1, EVAL.2, EVAL.3, and CMD.1 are shipped (complete);
+    # MODEL.3, EVAL.1, EVAL.2, EVAL.3, CMD.1, and CMD.2 are shipped (complete);
     # no proposed seed phase remains safe.
     assert report["bucket_counts"] == {
         "safe_to_prepare": 0,
@@ -563,9 +563,9 @@ def test_seed_registry_produces_expected_buckets():
         "human_approval_required": 0,
         "blocked": 0,
         "deferred_or_parked": 0,
-        "complete_or_history": 13,
+        "complete_or_history": 14,
     }
-    # ROAD.3, EVAL.1, EVAL.2, EVAL.3, and CMD.1 shipped; there is no remaining seed recommendation.
+    # ROAD.3, EVAL.1, EVAL.2, EVAL.3, CMD.1, and CMD.2 shipped; there is no remaining seed recommendation.
     assert report["top_recommendation"] is None
 
 
@@ -573,7 +573,7 @@ def test_seed_safe_candidates_sorted_deterministically():
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     report = _report(data, report_id="r", created_at="t")
     ids = [p["phase_id"] for p in report["safe_to_prepare"]]
-    # Completed ROAD.1/ROAD.2/AUTO.2a/AUTO.2b/AUTO.2c/MODEL.1/MODEL.2/MODEL.3/EVAL.1/EVAL.2/EVAL.3/CMD.1 all drop out.
+    # Completed ROAD.1/ROAD.2/AUTO.2a/AUTO.2b/AUTO.2c/MODEL.1/MODEL.2/MODEL.3/EVAL.1/EVAL.2/EVAL.3/CMD.1/CMD.2 all drop out.
     assert ids == []
 
 
@@ -583,7 +583,7 @@ def test_seed_shipped_phases_are_complete_and_not_recommended():
     # shipped before that.
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     statuses = {p["phase_id"]: p["status"] for p in data["phases"]}
-    shipped = ["ROAD.1", "ROAD.2", "ROAD.3", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3", "EVAL.1", "EVAL.2", "EVAL.3", "CMD.1"]
+    shipped = ["ROAD.1", "ROAD.2", "ROAD.3", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3", "EVAL.1", "EVAL.2", "EVAL.3", "CMD.1", "CMD.2"]
     for pid in shipped:
         assert statuses[pid] == "complete", pid
     report = _report(data, report_id="r", created_at="t")

@@ -1536,6 +1536,36 @@ python scripts/create_commander_run_contract.py \
   `network_call_performed`, `database_write_performed`, `worker_launch_performed`,
   and `merge_performed` are all `false`.
 
+## Task Decomposition Preview (CMD.2)
+
+CMD.2 continues the **CMD branch** as a **report-only decomposition preview**. It
+reads either a CMD.1 Commander Run Contract or plain task text, then produces a
+deterministic phase-plan preview with evidence, validation, benchmark, budget,
+rollback, and human-checkpoint plans. A CMD.1 contract takes priority when both a
+contract and task text are supplied.
+
+```bash
+python scripts/create_commander_task_decomposition.py \
+    --repo-path . \
+    --contract .agent/commander/contracts/<contract_id>_commander-run-contract.json \
+    --json
+```
+
+- It writes `.agent/commander/decomposition_previews/<preview_id>.json` and
+  `.agent/commander/decomposition_previews/<preview_id>.md`. Output is
+  deterministic for a fixed `--preview-id` / `--created-at`.
+- It previews phase IDs, expected inputs/outputs, evidence requirements,
+  validation requirements, risk, stop conditions, allowed actions, forbidden
+  actions, budget posture, rollback posture, and explicit human checkpoints.
+- It is **not Commander Mode execution**: it does not execute the decomposition,
+  run agents, call models, apply patches, run validation, run benchmarks, contact
+  network services, launch workers, write to a database, push, merge, or open
+  PRs. Guardrails such as `decomposition_executed`, `agent_launched`,
+  `model_call_performed`, `patch_applied`, `validation_run`,
+  `benchmark_run_performed`, `network_call_performed`,
+  `database_write_performed`, `worker_launch_performed`, and `merge_performed`
+  are all `false`.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
