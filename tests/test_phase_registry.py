@@ -522,9 +522,9 @@ def test_seed_registry_has_expected_phases():
     ids = {p["phase_id"] for p in data["phases"]}
     assert {
         "ROAD.1", "ROAD.2", "ROAD.3", "AUTO.2a", "AUTO.2b", "AUTO.2c",
-        "MODEL.1", "MODEL.2", "MODEL.3", "EVAL.1", "EVAL.2", "EVAL.3", "CMD.1", "CMD.2", "CMD.3",
+        "MODEL.1", "MODEL.2", "MODEL.3", "EVAL.1", "EVAL.2", "EVAL.3", "CMD.1", "CMD.2", "CMD.3", "CMD.4",
     } <= ids
-    assert len(data["phases"]) == 15
+    assert len(data["phases"]) == 16
 
 
 def test_seed_registry_is_conservative():
@@ -542,7 +542,7 @@ def test_seed_registry_is_conservative():
 def test_seed_registry_summary_counts():
     data = load_phase_registry(str(_SEED_PATH))
     report = summarize_phase_registry(data, report_id="r", created_at="t")
-    assert report["counts_by_track"] == {"AUTO": 3, "CMD": 3, "EVAL": 3, "MODEL": 3, "ROAD": 3}
+    assert report["counts_by_track"] == {"AUTO": 3, "CMD": 4, "EVAL": 3, "MODEL": 3, "ROAD": 3}
 
 
 # ── enum / constant exposure ───────────────────────────────────────────────────

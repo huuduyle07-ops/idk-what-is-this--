@@ -1596,6 +1596,38 @@ python scripts/create_commander_budget_governor.py \
   `database_write_performed`, `worker_launch_performed`, and `merge_performed`
   are all `false`.
 
+## Commander Readiness Report (CMD.4)
+
+CMD.4 closes the initial **CMD branch** planning chain as a **report-only
+readiness check**. It reads optional CMD.1, CMD.2, and CMD.3 artifacts, then
+summarizes source coverage, required gates, budget posture, stop conditions,
+human approval requirements, and the conservative items required before any
+future implementation.
+
+```bash
+python scripts/create_commander_readiness_report.py \
+    --repo-path . \
+    --contract .agent/commander/contracts/<contract_id>.json \
+    --decomposition .agent/commander/decomposition_previews/<preview_id>.json \
+    --budget .agent/commander/budget_previews/<preview_id>.json \
+    --json
+```
+
+- It writes `.agent/commander/readiness_reports/<report_id>.json` and
+  `.agent/commander/readiness_reports/<report_id>.md`. Output is deterministic
+  for a fixed `--report-id` / `--created-at`.
+- It classifies readiness as `ready_for_human_approval`,
+  `needs_human_reapproval`, `blocked`, or `insufficient_evidence`. It never
+  classifies a commander plan as ready for execution.
+- It is **not Commander Mode execution**: it does not execute the commander
+  plan, run agents, call models, apply patches, run validation, run benchmarks,
+  contact network services, launch workers, write to a database, push, merge, or
+  open PRs. Guardrails such as `readiness_execution_performed`,
+  `commander_execution_performed`, `agent_launched`, `model_call_performed`,
+  `patch_applied`, `validation_run`, `benchmark_run_performed`,
+  `network_call_performed`, `database_write_performed`,
+  `worker_launch_performed`, and `merge_performed` are all `false`.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
