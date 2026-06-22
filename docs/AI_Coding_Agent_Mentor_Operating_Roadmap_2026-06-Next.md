@@ -77,7 +77,7 @@ Example phases:
 
 - EVAL.1 — Live Benchmark Run Ledger — ✅ shipped 2026-06-22 (complete).
 - EVAL.2 — Benchmark Report Compare / Single-Case Flake Evidence — ✅ shipped 2026-06-22 (complete).
-- EVAL.3 — Flake Classification Report
+- EVAL.3 — Flake Classification Report — ✅ shipped 2026-06-22 (complete).
 - EVAL.4 — Run Variance Dashboard
 
 Branch boundary:
@@ -213,6 +213,17 @@ candidate) across `.agent/benchmarks/benchmark_report_*.json` — report orderin
 timeline, evidence labels, conservative classification, and an optional EVAL.1 ledger
 cross-check — and writes `.agent/eval/benchmark_report_compare/<case_id>_compare.{json,md}`.
 It runs no benchmarks, calls no models, and changes no scoring or cases.
+
+**EVAL.3 — Flake Classification Report is also shipped 2026-06-22 (complete).**
+Implemented report-only as `core/flake_classification_report.py` +
+`scripts/create_flake_classification_report.py`, registered as a `complete`
+EVAL-track phase (prerequisite EVAL.2) in `docs/roadmap/phase_registry.json`, and
+validated with `tests/test_flake_classification_report.py`. It reads the EVAL.1
+ledger, EVAL.2 compare reports, and benchmark reports only as fallback evidence;
+then writes `.agent/eval/flake_classification_report/flake_classification_report.{json,md}`.
+It produces stable / likely_flake / likely_broken / needs_rerun /
+insufficient_history buckets, conservative human actions, and no benchmark/model/
+patch/validation/network/worker/merge power.
 
 Purpose:
 

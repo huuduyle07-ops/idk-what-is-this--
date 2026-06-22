@@ -1467,6 +1467,37 @@ across full-suite and single-case runs, failing in the latest single-case run bu
 passing in others, recovered on later runs, and listed as a ledger flake candidate —
 evidence that points to stochastic live-model behavior rather than a broken case.
 
+## Flake Classification Report (EVAL.3)
+
+EVAL.3 turns the EVAL.1 ledger and EVAL.2 case comparisons into a single
+operator-facing **benchmark stability triage**. It answers which cases look stable,
+which look flaky, which look likely broken, which need a rerun, and which need more
+history. It is **report-only** and **does not run benchmarks, call models, apply
+patches, edit benchmark cases, run validation, contact network services, write to a
+database, launch workers, or merge.**
+
+```bash
+python scripts/create_flake_classification_report.py --repo-path . --json
+```
+
+- It reads `.agent/eval/benchmark_run_ledger/benchmark_run_ledger.json` when present,
+  reads `.agent/eval/benchmark_report_compare/*.json` when present, and falls back to
+  `.agent/benchmarks/benchmark_report_*.json` only when the EVAL artifacts are absent
+  or unusable. Missing or malformed artifacts produce warnings, not crashes.
+- It classifies each case into deterministic buckets: `stable`, `likely_flake`,
+  `likely_broken`, `insufficient_history`, `needs_rerun`, or `no_evidence`. EVAL.2
+  `likely_flake` evidence overrides weak ledger ambiguity; mixed pass/fail and
+  recovered failures remain flakes even when the latest observation is a failure.
+- It writes `.agent/eval/flake_classification_report/flake_classification_report.json`
+  and `.agent/eval/flake_classification_report/flake_classification_report.md`.
+  Output is deterministic for a fixed `--report-id` / `--created-at`; `--limit`
+  keeps the highest-priority case rows.
+- Recommended actions are conservative human-review labels such as `monitor`,
+  `rerun_single_case`, `inspect_failure_notes`, and `do_not_patch_yet`. Single
+  failures recommend rerun evidence, likely broken cases recommend inspection, and
+  likely flakes recommend monitoring or rerun evidence; the report never recommends
+  automatic code changes.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:
