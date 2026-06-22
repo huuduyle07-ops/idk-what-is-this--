@@ -1498,6 +1498,44 @@ python scripts/create_flake_classification_report.py --repo-path . --json
   likely flakes recommend monitoring or rerun evidence; the report never recommends
   automatic code changes.
 
+## Commander Run Contract (CMD.1)
+
+CMD.1 opens the **CMD branch** after the EVAL mini-arc. It is a **report-only
+planning contract** that classifies a plain-text task as `instant_run`,
+`commander_run`, `needs_clarification`, or `reject_or_defer`. It previews risk,
+size, evidence, budget, required gates, stop conditions, allowed next steps, and
+forbidden next steps before any large-task workflow starts.
+
+```bash
+python scripts/create_commander_run_contract.py \
+    --repo-path . \
+    --task "Implement a multi-phase roadmap-controlled Commander Mode preview for large tasks" \
+    --estimated-files-touched 5 \
+    --estimated-lines-changed 120 \
+    --requires-validation \
+    --requires-benchmark \
+    --json
+```
+
+- It writes `.agent/commander/contracts/<contract_id>.json` and
+  `.agent/commander/contracts/<contract_id>.md`. Output is deterministic for a
+  fixed `--contract-id` / `--created-at`.
+- It recommends `instant_run` for small, low-risk, local, specific tasks, and
+  `commander_run` for multi-file, large, multi-phase, validation/benchmark-heavy,
+  architecture, roadmap, automation, model-authority, remote-workflow, or
+  stop-condition-sensitive tasks.
+- It recommends `needs_clarification` for vague, missing-target, unclear-output,
+  ambiguous-risk, or conflicting tasks, and `reject_or_defer` for auto-merge,
+  hidden secret access, approval bypass, remote execution without a contract, or
+  forbidden-file requests.
+- It is **not Commander Mode execution**: it does not run agents, call models,
+  apply patches, run validation, run benchmarks, contact network services, launch
+  workers, write to a database, push, merge, or open PRs. Guardrails such as
+  `commander_execution_performed`, `agent_launched`, `model_call_performed`,
+  `patch_applied`, `validation_run`, `benchmark_run_performed`,
+  `network_call_performed`, `database_write_performed`, `worker_launch_performed`,
+  and `merge_performed` are all `false`.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:

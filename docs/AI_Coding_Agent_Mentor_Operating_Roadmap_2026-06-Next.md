@@ -120,7 +120,7 @@ Purpose:
 
 Example phases:
 
-- CMD.1 — Commander Run Contract
+- CMD.1 — Commander Run Contract — shipped 2026-06-22 (complete).
 - CMD.2 — Task Decomposition Preview
 - CMD.3 — Budget Governor Preview
 - CMD.4 — Stop Condition Report
@@ -172,21 +172,30 @@ Branch boundary:
 - REMOTE may define criteria, ceremonies, kill switches, replay checks, and dry-run evidence.
 - REMOTE must not send live messages, open remote PRs, trigger n8n, or perform real network side effects.
 
+### Track S — Skill / Prompt Optimization Evidence Loop
+
+S.1 Skill Registry
+S.2 Skill Eval Report
+S.3 Rejected Edit Buffer
+S.4 Bounded Edit Draft
+S.5 Promotion Gate
+S.6 Optional optimizer experiment
+
 ## 5. Recommended Priority
 
 Recommended branch order:
 
-1. EVAL
-2. UX
-3. CMD
+1. EVAL — shipped through EVAL.3
+2. CMD — selected after EVAL; CMD.1 shipped
+3. UX
 4. MODEL
 5. REMOTE
 
-EVAL should go first because a live benchmark flake appeared. Even though the isolated rerun passed 3/3 and no urgent patch is required, C.A.T.T.U.S should improve trust in benchmark interpretation before relying on larger operational claims.
+EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-UX should go second because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
+CMD is selected next because large-task orchestration needs doctrine before implementation. CMD.1 is now shipped as a report-only Commander Run Contract that decides planning mode only and previews gates, budgets, evidence, and stop conditions without adding execution power.
 
-CMD should go third because Commander Mode needs doctrine before implementation. Big-task orchestration should start as contracts, previews, budgets, and stop conditions, not as live autonomous execution.
+UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
 MODEL should go fourth because the current dataset is small. More coverage, labels, and comparisons are useful, but model output must remain advisory until there is much stronger evidence and explicit authorization.
 
@@ -225,6 +234,18 @@ It produces stable / likely_flake / likely_broken / needs_rerun /
 insufficient_history buckets, conservative human actions, and no benchmark/model/
 patch/validation/network/worker/merge power.
 
+**CMD.1 — Commander Run Contract is also shipped 2026-06-22 (complete).**
+Implemented report-only as `core/commander_run_contract.py` +
+`scripts/create_commander_run_contract.py`, registered as a `complete`
+CMD-track phase (prerequisite EVAL.3) in `docs/roadmap/phase_registry.json`, and
+validated with `tests/test_commander_run_contract.py`. It accepts a plain-text
+task and optional scope/risk context, then writes
+`.agent/commander/contracts/<contract_id>.{json,md}` classifying the task as
+`instant_run`, `commander_run`, `needs_clarification`, or `reject_or_defer`. It
+previews required gates and stop conditions, but adds no Commander execution,
+agent launch, model call, patch apply, validation run, benchmark run, network
+call, database write, worker launch, push, merge, or PR power.
+
 Purpose:
 
 Track full benchmark runs as artifacts so operators can understand benchmark health over time instead of treating each run as an isolated event.
@@ -261,7 +282,7 @@ Expected first shape:
 
 ## 7. Parking Lot
 
-- Commander Mode / Tower Defense Commander.
+- Commander Mode execution beyond the CMD.1 report-only contract.
 - Model Lab specialist models.
 - Remote execution unlock.
 - Cross-district architecture.
