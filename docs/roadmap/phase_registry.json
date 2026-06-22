@@ -678,6 +678,57 @@
       "notes": [
         "Report-only Task Decomposition Preview, shipped 2026-06-22. Reads a CMD.1 Commander Run Contract or plain task text and writes deterministic JSON/Markdown previews of phases, evidence, validation, benchmark, budget, rollback, and human checkpoints. Does not execute the decomposition, run agents, call models, apply patches, run validation, run benchmarks, contact network services, launch workers, write to a database, push, merge, or open PRs."
       ]
+    },
+    {
+      "phase_id": "CMD.3",
+      "title": "Budget Governor Preview",
+      "track": "CMD",
+      "status": "complete",
+      "summary": "Report-only budget governor preview that reads a CMD.1 contract and/or CMD.2 decomposition preview and writes deterministic budget, threshold, escalation, stop, and human approval estimates.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "medium",
+      "allowed_files": [
+        "core/commander_budget_governor.py",
+        "scripts/create_commander_budget_governor.py",
+        "tests/test_commander_budget_governor.py",
+        "tests/test_phase_picker.py",
+        "tests/test_phase_registry.py",
+        "docs/roadmap/phase_registry.json",
+        "README.md",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_commander_budget_governor.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_commander_budget_governor.py --repo-path . --decomposition .agent/commander/decomposition_previews/2026-06-22T07-58-53-2185_task-decomposition-preview.json --json",
+        "python -m pytest -q",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "CMD.2"
+      ],
+      "expected_artifacts": [
+        ".agent/commander/budget_previews/<preview_id>.json",
+        ".agent/commander/budget_previews/<preview_id>.md"
+      ],
+      "notes": [
+        "Report-only Budget Governor Preview, shipped 2026-06-22. Reads an optional CMD.1 Commander Run Contract and optional CMD.2 Task Decomposition Preview, then writes deterministic JSON/Markdown previews of scope estimates, budget limits, status, escalation rules, stop conditions, and human checkpoints. Does not enforce budgets, execute tasks, run agents, call models, apply patches, run validation, run benchmarks, contact network services, launch workers, write to a database, push, merge, or open PRs."
+      ]
     }
   ]
 }

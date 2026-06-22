@@ -1566,6 +1566,36 @@ python scripts/create_commander_task_decomposition.py \
   `database_write_performed`, `worker_launch_performed`, and `merge_performed`
   are all `false`.
 
+## Budget Governor Preview (CMD.3)
+
+CMD.3 continues the **CMD branch** as a **report-only budget governor preview**.
+It reads an optional CMD.1 Commander Run Contract and optional CMD.2 Task
+Decomposition Preview, then estimates file, line, time, phase, evidence, budget,
+escalation, stop, and human-approval posture before any future execution.
+
+```bash
+python scripts/create_commander_budget_governor.py \
+    --repo-path . \
+    --decomposition .agent/commander/decomposition_previews/<preview_id>.json \
+    --json
+```
+
+- It writes `.agent/commander/budget_previews/<preview_id>.json` and
+  `.agent/commander/budget_previews/<preview_id>.md`. Output is deterministic for
+  a fixed `--preview-id` / `--created-at`.
+- It classifies budget posture as `within_budget`, `near_limit`,
+  `needs_human_reapproval`, or `insufficient_information`; raw limit checks can
+  also classify a file, line, or time estimate as `over_budget`.
+- It is **not budget enforcement or Commander Mode execution**: it does not
+  execute tasks, run agents, call models, apply patches, run validation, run
+  benchmarks, contact network services, launch workers, write to a database,
+  push, merge, or open PRs. Guardrails such as
+  `budget_enforcement_performed`, `commander_execution_performed`,
+  `agent_launched`, `model_call_performed`, `patch_applied`, `validation_run`,
+  `benchmark_run_performed`, `network_call_performed`,
+  `database_write_performed`, `worker_launch_performed`, and `merge_performed`
+  are all `false`.
+
 ## Environment Notes
 
 The setup guide mentions two Python environments:

@@ -122,7 +122,7 @@ Example phases:
 
 - CMD.1 — Commander Run Contract — shipped 2026-06-22 (complete).
 - CMD.2 — Task Decomposition Preview — shipped 2026-06-22 (complete).
-- CMD.3 — Budget Governor Preview
+- CMD.3 — Budget Governor Preview — shipped 2026-06-22 (complete).
 - CMD.4 — Stop Condition Report
 
 Branch boundary:
@@ -186,14 +186,14 @@ S.6 Optional optimizer experiment
 Recommended branch order:
 
 1. EVAL — shipped through EVAL.3
-2. CMD — selected after EVAL; CMD.1 and CMD.2 shipped
+2. CMD — selected after EVAL; CMD.1, CMD.2, and CMD.3 shipped
 3. UX
 4. MODEL
 5. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is selected next because large-task orchestration needs doctrine before implementation. CMD.1 is now shipped as a report-only Commander Run Contract that decides planning mode only and previews gates, budgets, evidence, and stop conditions without adding execution power. CMD.2 is also shipped as a report-only Task Decomposition Preview that turns a CMD.1 contract or task text into phase, evidence, validation, benchmark, budget, rollback, and human-checkpoint previews without executing the plan.
+CMD is selected next because large-task orchestration needs doctrine before implementation. CMD.1 is now shipped as a report-only Commander Run Contract that decides planning mode only and previews gates, budgets, evidence, and stop conditions without adding execution power. CMD.2 is also shipped as a report-only Task Decomposition Preview that turns a CMD.1 contract or task text into phase, evidence, validation, benchmark, budget, rollback, and human-checkpoint previews without executing the plan. CMD.3 is shipped as a report-only Budget Governor Preview that estimates budget limits, status, escalation rules, stop conditions, and human checkpoints from CMD.1/CMD.2 inputs without enforcing or executing anything.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -257,6 +257,18 @@ phase plan plus evidence, validation, benchmark, budget, rollback, and human
 checkpoint previews. It adds no decomposition execution, agent launch, model call,
 patch apply, validation run, benchmark run, network call, database write, worker
 launch, push, merge, or PR power.
+
+**CMD.3 — Budget Governor Preview is also shipped 2026-06-22 (complete).**
+Implemented report-only as `core/commander_budget_governor.py` +
+`scripts/create_commander_budget_governor.py`, registered as a `complete`
+CMD-track phase (prerequisite CMD.2) in `docs/roadmap/phase_registry.json`, and
+validated with `tests/test_commander_budget_governor.py`. It reads an optional
+CMD.1 contract and optional CMD.2 decomposition preview, then writes
+`.agent/commander/budget_previews/<preview_id>.{json,md}` with deterministic file,
+line, time, phase, budget-limit, escalation-rule, stop-condition, and human
+checkpoint previews. It adds no budget enforcement, Commander execution, agent
+launch, model call, patch apply, validation run, benchmark run, network call,
+database write, worker launch, push, merge, or PR power.
 
 Purpose:
 
