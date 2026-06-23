@@ -365,3 +365,29 @@ This roadmap does not authorize auto-merge.
 This roadmap does not authorize model authority.
 
 It only defines the next candidate map.
+
+## HARDEN Track
+
+HARDEN phases add defensive hardening to the CATTUS web app. They do not redesign the app, add new automation power, call models, contact network services, run validation, apply patches, push, merge, or open PRs.
+
+### HARDEN.1 — Web Mutation Auth / CSRF Gate
+
+**Status:** Complete  
+**Prerequisite:** ROAD.4  
+**Risk:** Medium (modifies web/app.py before_request behavior)
+
+Adds a centralized `@app.before_request` security gate to the Flask web app. For safe HTTP methods (GET, HEAD, OPTIONS), all requests are allowed. For mutating methods (POST, PUT, PATCH, DELETE):
+
+- If `WEB_AUTH_TOKEN` is set: all mutating requests require a matching token in `X-CATTUS-Web-Token` or `Authorization: Bearer <token>`.
+- If `WEB_AUTH_TOKEN` is not set: mutating requests are allowed only from loopback addresses (127.0.0.1, ::1, localhost); all others receive 403.
+- Cross-origin mutating requests are always rejected (Origin/Referer CSRF check).
+
+**New env vars:**
+- `WEB_AUTH_TOKEN` — token for web mutation auth; unset means loopback-only
+- `WEB_SECRET_KEY` — Flask secret key; generates a dev-only placeholder if unset
+
+**New files:**
+- `web/auth_gate.py` — pure gate helpers, GateDecision dataclass
+- `tests/test_web_mutation_auth_gate.py` — 21-test suite (15 cases)
+
+**No new automation power.** Does not run models, apply patches, validate, benchmark, contact network services, push, merge, or open PRs.

@@ -2198,6 +2198,31 @@ This is an active AI engineering project, not a tiny demo. The code already incl
 - **F.8c Goal Brief assistive intake simplification complete.** UX-only. The Goal Brief tab now reads as an assistive flow rather than a strict interview: a three-step stage indicator (Describe → Refine → Handoff), one primary task box ("What do you want help with?") with rough notes collapsed into an optional detail, a non-blocking checklist (soft labels like "Not provided yet" / "Needed before worker assignment" instead of a red "Missing" wall), friendly "good enough" guidance before handoff, and assistive button wording ("Start assisted brief", "Help me structure this", "Suggest workflow mode"). Mode routing, review pack, and raw details moved into a collapsed **Advanced helpers** section. Worker Assignment stays gated exactly as in F.8b (Create disabled until the final prompt is ready; Copy assignment hidden until Markdown exists; no empty boxes). The Goal Brief Builder remains a collector — no model call beyond the existing interview route, worker launch, patch/apply, validation run, Dream, Project Evolution, webhook/network, lesson promotion, or proposal import was added.
 - **F.8b Goal Brief action-bar cleanup complete.** UX-only follow-up to F.8a. The Goal Brief tab now reads top-to-bottom as one action per stage: conversation actions (Start brief / Send reply) → chat + checklist → the Worker Assignment handoff (**Copy final prompt** + **Create Worker Assignment**) moved *below* the checklist and gated on a ready brief (disabled with helper text until the final prompt is built) → one compact Worker Assignment card whose preview/Markdown/Copy-assignment controls stay hidden until an assignment exists (no empty boxes, no duplicate action bars). The Review Pack is now a collapsed secondary `<details>` so its Copy button no longer competes with the primary Create Worker Assignment. No backend permission, Worker Assignment JSON schema, or execution power changed.
 
+## Web App Security
+
+### `WEB_AUTH_TOKEN` (optional)
+
+When set, all mutating HTTP requests to the web app (POST, PUT, PATCH, DELETE) require this token in one of:
+
+- Header: `X-CATTUS-Web-Token: <token>`
+- Header: `Authorization: Bearer <token>`
+
+If `WEB_AUTH_TOKEN` is **not set**, mutating requests are allowed only from loopback addresses (127.0.0.1, ::1, localhost). Any non-loopback client receives `403 Forbidden`.
+
+> **Warning:** If you expose the web app beyond localhost (e.g., `host=0.0.0.0`), you **must** set `WEB_AUTH_TOKEN` to prevent unauthenticated remote access to mutation routes such as `/apply_patch`, `/dream/apply`, `/mcp/inspector/launch`, and `/harness/controls/apply-env`.
+
+### `WEB_SECRET_KEY` (optional)
+
+Flask secret key. If not set, a dev-only insecure placeholder is used. This is safe for local development but **must** be set to a strong random value for any network-exposed deployment.
+
+### Cross-Origin Mutation
+
+Cross-origin mutating requests are always rejected (403) regardless of token. Clients must originate from the same host as the web app.
+
+### Local Development
+
+With default settings (no `WEB_AUTH_TOKEN`), the web app accepts mutating requests only from localhost. This is the expected behavior for local development.
+
 ## Short Summary
 
 C.A.T.T.U.S is a repo-aware AI coding agent. It reads a project, finds the important code, reasons about bugs or features, proposes safe patches, validates the result, reports what happened through a web workspace, coordinates bounded external-worker handoffs, exposes safe MCP evidence tools, and learns from each run.
