@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import os
+import hmac
 from dataclasses import dataclass
 from urllib.parse import urlparse
 
 
 _LOOPBACK_HOSTS = {"127.0.0.1", "::1", "localhost"}
-_SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
 _MUTATING_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 
 
@@ -22,6 +21,8 @@ def is_loopback_host(value: str) -> bool:
     if not value:
         return False
     host = value.split(":")[0].strip().lower()
+    if not host:
+        host = value.strip().lower()
     return host in _LOOPBACK_HOSTS
 
 
@@ -45,6 +46,8 @@ def origin_matches_request(origin: str, host: str) -> bool:
     except Exception:
         return False
     request_host = host.split(":")[0].strip().lower()
+    if not request_host:
+        request_host = host.strip().lower()
     origin_host = origin_host.strip().lower()
     if not origin_host:
         return True
@@ -99,7 +102,7 @@ def should_allow_mutation(
                 status_code=401,
                 reason="mutation requires WEB_AUTH_TOKEN; no token provided",
             )
-        if provided != token:
+        if not hmac.compare_digest(provided, token):
             return GateDecision(
                 allowed=False,
                 status_code=403,
