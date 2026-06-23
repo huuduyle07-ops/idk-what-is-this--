@@ -1380,6 +1380,34 @@ ROAD.3 **freezes the completed roadmap arc**: with the eight prior phases shippe
 the picker reporting no safe candidates, the audit confirms the arc is closed and the
 recommended next step is to plan the next machine-readable map.
 
+## Post-EVAL/CMD Checkpoint Audit (ROAD.4)
+
+ROAD.4 is the **checkpoint** that closes the EVAL and CMD arcs. It reads the phase
+registry, the **EVAL.1–EVAL.3** artifact roots, the **CMD.1–CMD.4** artifact roots,
+and the project documentation, then writes a single audit that verifies all seven
+required phases (EVAL.1, EVAL.2, EVAL.3, CMD.1, CMD.2, CMD.3, CMD.4) are registered,
+complete, report-only, artifact-backed, and documented.
+
+Audit statuses: `pass`, `pass_with_warnings`, `blocked`. A blocked result means one or
+more required phases are missing, non-complete, or have a guardrail field set to `True`.
+Warnings are emitted for missing artifact root directories, undocumented phases, or
+outstanding phase-picker safe candidates.
+
+```bash
+python scripts/create_post_eval_cmd_checkpoint_audit.py \
+    --repo-path . \
+    --registry docs/roadmap/phase_registry.json \
+    --json --allow-warnings
+```
+
+- It is **report-only**: it does not choose new work, execute phases, call models, apply
+  patches, run validation or benchmarks, contact network services, launch workers, push,
+  merge, or open PRs. ROAD.4 is a report-only checkpoint audit.
+
+ROAD.4 **freezes the completed EVAL and CMD arcs**: with all seven EVAL/CMD phases
+shipped, the audit confirms the arcs are closed and the recommended next step is to
+freeze the checkpoint before starting the next roadmap branch.
+
 ## Live Benchmark Run Ledger (EVAL.1)
 
 EVAL.1 opens the **EVAL branch** of the next operating roadmap. It is a **report-only

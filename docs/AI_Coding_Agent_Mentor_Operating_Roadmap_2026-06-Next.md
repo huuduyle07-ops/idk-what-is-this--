@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary
 
-The previous C.A.T.T.U.S operating roadmap arc is complete after ROAD.3. The completed work established a machine-readable phase registry, a phase picker with night candidate reporting, and a post-MODEL checkpoint audit. The autonomy experiment is now frozen: the system has tested local autonomy boundaries, recorded the results, and should not chase broader autonomy as the next default move.
+The previous C.A.T.T.U.S operating roadmap arc is complete after ROAD.4. The completed work established a machine-readable phase registry, a phase picker with night candidate reporting, a post-MODEL checkpoint audit, a full EVAL benchmark evidence arc (EVAL.1–3), a full CMD orchestration doctrine arc (CMD.1–4), and a post-EVAL/CMD checkpoint audit (ROAD.4). The autonomy experiment is now frozen: the system has tested local autonomy boundaries, recorded the results, and should not chase broader autonomy as the next default move.
 
 The next roadmap should turn the tested boundary into controlled operating doctrine. That means selecting the next work deliberately, branch by branch, with evidence and human authorization before action. C.A.T.T.U.S may recommend, summarize, compare, classify, and prepare reports, but the human operator remains the final authority for direction, approval, execution, merge decisions, and any future unlock.
 
@@ -17,7 +17,8 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.1 created the machine-readable phase registry.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
-- The phase registry is valid.
+- ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
+- The phase registry is valid (17 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD).
 - The phase picker currently has no safe candidates.
 - The top recommendation is `null`.
 
@@ -193,7 +194,7 @@ Recommended branch order:
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is selected next because large-task orchestration needs doctrine before implementation. CMD.1 is now shipped as a report-only Commander Run Contract that decides planning mode only and previews gates, budgets, evidence, and stop conditions without adding execution power. CMD.2 is also shipped as a report-only Task Decomposition Preview that turns a CMD.1 contract or task text into phase, evidence, validation, benchmark, budget, rollback, and human-checkpoint previews without executing the plan. CMD.3 is shipped as a report-only Budget Governor Preview that estimates budget limits, status, escalation rules, stop conditions, and human checkpoints from CMD.1/CMD.2 inputs without enforcing or executing anything. CMD.4 is shipped as a report-only Commander Readiness / Stop Condition Report that combines CMD.1/CMD.2/CMD.3 artifacts into readiness, gate, budget, stop-condition, and human-approval evidence without declaring anything ready for execution.
+CMD is selected next because large-task orchestration needs doctrine before implementation. CMD.1 is now shipped as a report-only Commander Run Contract that decides planning mode only and previews gates, budgets, evidence, and stop conditions without adding execution power. CMD.2 is also shipped as a report-only Task Decomposition Preview that turns a CMD.1 contract or task text into phase, evidence, validation, benchmark, budget, rollback, and human-checkpoint previews without executing the plan. CMD.3 is shipped as a report-only Budget Governor Preview that estimates budget limits, status, escalation rules, stop conditions, and human checkpoints from CMD.1/CMD.2 inputs without enforcing or executing anything. CMD.4 is shipped as a report-only Commander Readiness / Stop Condition Report that combines CMD.1/CMD.2/CMD.3 artifacts into readiness, gate, budget, stop-condition, and human-approval evidence without declaring anything ready for execution. ROAD.4 is shipped as a report-only Post-EVAL/CMD Checkpoint Audit that verifies all seven EVAL/CMD phases are registered, complete, report-only, artifact-backed, and documented — closing the EVAL and CMD arcs.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -282,6 +283,19 @@ human-approval requirements, and required-before-implementation items. It adds n
 readiness execution, Commander execution, agent launch, model call, patch apply,
 validation run, benchmark run, network call, database write, worker launch, push,
 merge, or PR power.
+
+**ROAD.4 — Post-EVAL/CMD Checkpoint Audit is shipped 2026-06-23 (complete).**
+Implemented report-only as `core/post_eval_cmd_checkpoint_audit.py` +
+`scripts/create_post_eval_cmd_checkpoint_audit.py`, registered as a `complete`
+ROAD-track phase (prerequisite CMD.4) in `docs/roadmap/phase_registry.json`, and
+validated with `tests/test_post_eval_cmd_checkpoint_audit.py`. It reads the
+phase registry, EVAL.1–3 artifact roots, CMD.1–4 artifact roots, and project
+documentation, then writes
+`.agent/roadmap/post_eval_cmd_checkpoint/post_eval_cmd_checkpoint_audit.{json,md}`
+verifying that all seven required phases are registered, complete, report-only,
+artifact-backed, and documented. Audit statuses: `pass`, `pass_with_warnings`,
+`blocked`. It adds no model call, patch apply, validation run, benchmark run,
+network call, database write, worker launch, push, merge, or PR power.
 
 Purpose:
 
