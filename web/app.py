@@ -86,6 +86,27 @@ app.register_blueprint(project_evolution_approval_routes_bp)
 app.register_blueprint(replay_routes_bp)
 app.register_blueprint(history_routes_bp)
 
+import os as _os_gate
+
+# Secret key — read from env; dev-only placeholder when unset.
+app.secret_key = _os_gate.environ.get("WEB_SECRET_KEY") or "dev-insecure-local-only-do-not-use-in-prod"
+
+from web.auth_gate import should_allow_mutation as _should_allow_mutation
+
+@app.before_request
+def _web_mutation_gate():
+    from flask import abort as _abort
+    configured_token = _os_gate.environ.get("WEB_AUTH_TOKEN", "")
+    decision = _should_allow_mutation(
+        method=request.method,
+        remote_addr=(request.remote_addr or ""),
+        headers=request.headers,
+        host=(request.host or ""),
+        configured_token=configured_token,
+    )
+    if not decision.allowed:
+        _abort(decision.status_code, decision.reason)
+
 WEB_DIR = Path(__file__).parent
 from web.session_store import load_sessions, save_sessions, find_session
 from scripts.run_patch_proposal_queue import PROPOSAL_ROOT as _DREAM_PROPOSAL_ROOT
@@ -3599,4 +3620,4 @@ def graph_explainability_view_route():
 if __name__ == "__main__":
     from web.runner import run_web_app
 
-    run_web_app(app, debug=True)
+    run_web_app(app, debug=False)
