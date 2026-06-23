@@ -183,7 +183,7 @@ def test_direct_run_block_starts_after_explainability_route_registration():
 
     assert route_index < main_index
     assert "@app.route(" not in source[main_index:]
-    assert "run_web_app(app, debug=True)" in source[main_index:]
+    assert "run_web_app(app, debug=False)" in source[main_index:]
 
 
 # ------------------------------- guardrails --------------------------------
