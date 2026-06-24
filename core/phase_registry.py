@@ -68,7 +68,7 @@ MODEL_BUDGET_TIER = "strong_model_requires_approval"
 RISK_LEVELS: tuple[str, ...] = ("low", "medium", "high", "blocked")
 
 #: Accepted phase-id prefixes (the token before the first dot).
-PHASE_ID_PREFIXES: tuple[str, ...] = ("ROAD", "AUTO", "MODEL", "EVAL", "CMD", "A", "GOV", "F", "H", "HARDEN")
+PHASE_ID_PREFIXES: tuple[str, ...] = ("ROAD", "AUTO", "MODEL", "EVAL", "CMD", "A", "GOV", "F", "H", "HARDEN", "UX")
 
 #: Registry-root fields that must be present.
 REQUIRED_ROOT_FIELDS: tuple[str, ...] = ("schema_version", "updated_at", "phases")

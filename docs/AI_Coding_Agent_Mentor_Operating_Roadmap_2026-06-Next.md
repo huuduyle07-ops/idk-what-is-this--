@@ -18,7 +18,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (17 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD).
+- The phase registry is valid (19 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 1 HARDEN + 1 UX).
 - The phase picker currently has no safe candidates.
 - The top recommendation is `null`.
 
@@ -98,10 +98,12 @@ Purpose:
 
 Example phases:
 
-- UX.1 — Operator Workflow Map Refresh
-- UX.2 — Evidence Panel Simplification
-- UX.3 — Dangerous Action Disclosure Pass
-- UX.4 — Daily Debug Session Layout
+- UX.1 — Operator Cockpit & Idea Intake Plan — ✅ shipped 2026-06-24 (complete).
+- UX.2 — Run Timeline / Progress Surface
+- UX.3 — Continue-from-Frame Contract
+- UX.4 — Mixed Mode Intent Router Preview
+- UX.5 — Goal Brief 4W1H Simplifier
+- UX.6 — Evidence Card Layout
 
 Branch boundary:
 
@@ -283,6 +285,29 @@ human-approval requirements, and required-before-implementation items. It adds n
 readiness execution, Commander execution, agent launch, model call, patch apply,
 validation run, benchmark run, network call, database write, worker launch, push,
 merge, or PR power.
+
+**HARDEN.1 — Web Mutation Auth / CSRF Gate is shipped 2026-06-23 (complete).**
+Implemented as `web/auth_gate.py` wired into `web/app.py` via `before_request`, registered
+as a `complete` HARDEN-track phase (prerequisite ROAD.4) in `docs/roadmap/phase_registry.json`,
+and validated with `tests/test_web_mutation_auth_gate.py`. It adds a centralized Flask gate
+that blocks unauthenticated or cross-origin mutating HTTP requests (POST/PUT/PATCH/DELETE).
+Token reads `WEB_AUTH_TOKEN` env var at request time; loopback-only fallback when unset.
+Cross-origin mutations are always rejected. Adds no model call, patch apply, validation run,
+benchmark run, network call, database write, worker launch, push, merge, or PR power.
+
+**UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
+Implemented report-only as `core/operator_cockpit_plan.py` +
+`scripts/create_operator_cockpit_plan.py`, registered as a `complete`
+UX-track phase (prerequisite HARDEN.1) in `docs/roadmap/phase_registry.json`, and
+validated with `tests/test_operator_cockpit_plan.py`. It builds a deterministic UX
+planning report inventorying 8 pain points, a 5-step operator workflow (Start/Run/Review/
+Continue/Learn), 10 cockpit sections (Task Bar, Mode Decision, Run Timeline, etc.),
+primary/advanced/debug action maps, an idea intake board (use_now/prototype_later/park/block),
+metaphor placement for 4W1H/Navier-Stokes/Excavator, and a UX roadmap proposal (UX.1–UX.6).
+Artifacts: `.agent/ux/operator_cockpit_plan/operator_cockpit_plan.{json,md}`. It adds no
+UI implementation, backend behavior change, task execution, agent launch, model call,
+patch apply, validation run, benchmark run, network call, database write, worker launch,
+push, merge, or PR power.
 
 **ROAD.4 — Post-EVAL/CMD Checkpoint Audit is shipped 2026-06-23 (complete).**
 Implemented report-only as `core/post_eval_cmd_checkpoint_audit.py` +
