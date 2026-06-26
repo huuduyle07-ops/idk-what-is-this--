@@ -102,7 +102,7 @@ Example phases:
 - UX.2 — Run Timeline / Progress Surface — ✅ shipped 2026-06-25 (complete).
 - UX.3 — Continue-from-Frame Contract — ✅ shipped 2026-06-26 (complete).
 - UX.4 — Mixed Mode Intent Router Preview — ✅ shipped 2026-06-26 (complete).
-- UX.5 — Goal Brief 4W1H Simplifier
+- UX.5 — Goal Brief 4W1H Simplifier — ✅ shipped 2026-06-26 (complete).
 - UX.6 — Evidence Card Layout
 
 Branch boundary:
@@ -297,7 +297,21 @@ ambiguous and rejected/deferred input surfaces, and demo mode. A read-only "Mixe
 placeholder panel was added to `web/templates/index.html` (Views tab group).
 Artifacts: `.agent/ux/mixed_mode_intent_router/mixed_mode_intent_router_preview.{json,md}`. No router
 dispatch, agent launch, model call, patch apply, validation run, benchmark run, network call, database
-write, worker launch, push, merge, or PR power was added. Next likely: UX.5 — Goal Brief 4W1H Simplifier.
+write, worker launch, push, merge, or PR power was added.
+
+**UX.5 — Goal Brief 4W1H Simplifier is shipped 2026-06-26 (complete).**
+Implemented as `core/goal_brief_4w1h.py` + `scripts/create_goal_brief_4w1h_preview.py`,
+registered as a `complete` UX-track phase (prerequisite UX.4) in
+`docs/roadmap/phase_registry.json`, and validated with `tests/test_goal_brief_4w1h.py` (57 tests).
+UX.5 scores operator Goal Briefs across five 4W1H dimensions (What/Why/Where/When-stop/How-validate),
+classifies each field as strong/present/weak/missing (score 0–100), generates clarifying questions for
+incomplete fields, and recommends a mode hint (instant_run_preview, commander_contract_preview, clarify,
+chat). Includes simplified goal brief, field completeness aggregates, allowed/forbidden next steps, demo
+mode covering all four hint types, and boundary text. A read-only "4W1H Goal Brief" placeholder panel
+was added to `web/templates/index.html` (Views tab group).
+Artifacts: `.agent/ux/goal_brief_4w1h/goal_brief_4w1h_preview.{json,md}`. No goal execution,
+dispatch, agent launch, model call, patch apply, validation run, benchmark run, network call, database
+write, worker launch, push, merge, or PR power was added. Next likely: UX.6 — Evidence Card Layout.
 
 **UX.3 — Continue-from-Frame Contract is shipped 2026-06-26 (complete).**
 Implemented as `core/continue_from_frame_contract.py` + `scripts/create_continue_from_frame_contract.py`,

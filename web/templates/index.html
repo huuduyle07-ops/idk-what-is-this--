@@ -253,6 +253,7 @@
               <button type="button" id="ws-tab-run-timeline"  role="tab" aria-controls="ws-run-timeline"  class="ws-tab" data-ws="run-timeline"  onclick="showWorkspaceTab('run-timeline')">Run Timeline</button>
               <button type="button" id="ws-tab-continue-from-frame" role="tab" aria-controls="ws-continue-from-frame" class="ws-tab" data-ws="continue-from-frame" onclick="showWorkspaceTab('continue-from-frame')">Continue From Frame</button>
               <button type="button" id="ws-tab-mixed-mode-router" role="tab" aria-controls="ws-mixed-mode-router" class="ws-tab" data-ws="mixed-mode-router" onclick="showWorkspaceTab('mixed-mode-router')">Mixed Mode Router</button>
+              <button type="button" id="ws-tab-goal-brief-4w1h" role="tab" aria-controls="ws-goal-brief-4w1h" class="ws-tab" data-ws="goal-brief-4w1h" onclick="showWorkspaceTab('goal-brief-4w1h')">4W1H Goal Brief</button>
             </div>
             <!-- /ws-nav-secondary -->
           </div>
@@ -1367,6 +1368,31 @@
           </section>
         </div>
         <!-- /ws-mixed-mode-router -->
+
+        <!-- 4W1H Goal Brief (UX.5 — preview-only simplifier; goal-brief-execution not implemented) -->
+        <div id="ws-goal-brief-4w1h" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-goal-brief-4w1h">
+          <section class="run-timeline-panel">
+            <header class="run-timeline-panel__header">
+              <strong>4W1H Goal Brief</strong>
+            </header>
+            <p>Preview-only Goal Brief simplifier defined in UX.5; goal execution is not implemented here.</p>
+            <p>The 4W1H simplifier scores operator task briefs across five dimensions — What, Why, Where, When-stop, How-validate — and recommends a mode hint (instant run, commander plan, clarify, or chat). Human confirmation is required before any run.</p>
+            <details>
+              <summary>UX.5 Boundaries</summary>
+              <ul>
+                <li>UX.5 simplifies task intake only.</li>
+                <li>UX.5 does not dispatch execution.</li>
+                <li>UX.5 does not start runs.</li>
+                <li>UX.5 does not call models.</li>
+                <li>UX.5 does not apply patches.</li>
+                <li>UX.5 does not run validation or benchmarks.</li>
+                <li>UX.5 does not contact network services or launch workers.</li>
+                <li>UX.5 does not mutate the repo, push, merge, or open PRs.</li>
+              </ul>
+            </details>
+          </section>
+        </div>
+        <!-- /ws-goal-brief-4w1h -->
 
         <!-- Settings / Health -->
         <div id="ws-settings" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-settings">
