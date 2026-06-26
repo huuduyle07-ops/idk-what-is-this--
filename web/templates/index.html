@@ -251,6 +251,7 @@
               <button type="button" id="ws-tab-goal-brief"    role="tab" aria-controls="ws-goal-brief"    class="ws-tab" data-ws="goal-brief"    onclick="showWorkspaceTab('goal-brief')">Goal Brief</button>
               <button type="button" id="ws-tab-graph"         role="tab" aria-controls="ws-graph"         class="ws-tab" data-ws="graph"         onclick="showWorkspaceTab('graph')">Graph</button>
               <button type="button" id="ws-tab-run-timeline"  role="tab" aria-controls="ws-run-timeline"  class="ws-tab" data-ws="run-timeline"  onclick="showWorkspaceTab('run-timeline')">Run Timeline</button>
+              <button type="button" id="ws-tab-continue-from-frame" role="tab" aria-controls="ws-continue-from-frame" class="ws-tab" data-ws="continue-from-frame" onclick="showWorkspaceTab('continue-from-frame')">Continue From Frame</button>
             </div>
             <!-- /ws-nav-secondary -->
           </div>
@@ -1319,6 +1320,29 @@
           </section>
         </div>
         <!-- /ws-run-timeline -->
+
+        <!-- Continue From Frame (UX.3 — contract defined; execution not implemented) -->
+        <div id="ws-continue-from-frame" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-continue-from-frame">
+          <section class="run-timeline-panel">
+            <header class="run-timeline-panel__header">
+              <strong>Continue From Frame</strong>
+            </header>
+            <p>Contract defined in UX.3; execution not implemented yet.</p>
+            <p>A frame is a reusable snapshot of operator-facing run context. Continuation requires explicit human approval before any action.</p>
+            <details>
+              <summary>UX.3 Boundaries</summary>
+              <ul>
+                <li>UX.3 defines the continuation contract only.</li>
+                <li>UX.3 does not implement actual continuation execution.</li>
+                <li>UX.3 does not start a run from history.</li>
+                <li>UX.3 does not call models, apply patches, run validation, or run benchmarks.</li>
+                <li>UX.3 does not contact network services or launch workers.</li>
+                <li>UX.3 does not mutate the repo, push, merge, or open PRs.</li>
+              </ul>
+            </details>
+          </section>
+        </div>
+        <!-- /ws-continue-from-frame -->
 
         <!-- Settings / Health -->
         <div id="ws-settings" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-settings">

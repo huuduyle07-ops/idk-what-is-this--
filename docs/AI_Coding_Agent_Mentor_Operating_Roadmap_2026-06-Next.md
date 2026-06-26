@@ -100,7 +100,7 @@ Example phases:
 
 - UX.1 — Operator Cockpit & Idea Intake Plan — ✅ shipped 2026-06-24 (complete).
 - UX.2 — Run Timeline / Progress Surface — ✅ shipped 2026-06-25 (complete).
-- UX.3 — Continue-from-Frame Contract
+- UX.3 — Continue-from-Frame Contract — ✅ shipped 2026-06-26 (complete).
 - UX.4 — Mixed Mode Intent Router Preview
 - UX.5 — Goal Brief 4W1H Simplifier
 - UX.6 — Evidence Card Layout
@@ -285,6 +285,19 @@ human-approval requirements, and required-before-implementation items. It adds n
 readiness execution, Commander execution, agent launch, model call, patch apply,
 validation run, benchmark run, network call, database write, worker launch, push,
 merge, or PR power.
+
+**UX.3 — Continue-from-Frame Contract is shipped 2026-06-26 (complete).**
+Implemented as `core/continue_from_frame_contract.py` + `scripts/create_continue_from_frame_contract.py`,
+registered as a `complete` UX-track phase (prerequisite UX.2) in
+`docs/roadmap/phase_registry.json`, and validated with `tests/test_continue_from_frame_contract.py` (25 tests).
+UX.3 defines the contract for continuing from a prior run frame: frame schema (24 required fields),
+allowed/forbidden continuation modes, reusable/excluded context policies, human confirmation policy,
+staleness policy (fresh/possibly_stale/stale/unknown), and UI contract. A read-only "Continue From
+Frame" placeholder panel was added to `web/templates/index.html` (Views tab group).
+Artifacts: `.agent/ux/continue_from_frame_contract/continue_from_frame_contract.{json,md}`. No
+continuation execution, agent launch, model call, patch apply, validation run, benchmark run, network
+call, database write, worker launch, push, merge, or PR power was added. Next likely: UX.4 — Mixed
+Mode Intent Router Preview.
 
 **UX.2 — Run Timeline / Progress Surface is shipped 2026-06-25 (complete).**
 Implemented as `core/run_timeline_surface.py` + `scripts/create_run_timeline_surface.py`,
