@@ -252,6 +252,7 @@
               <button type="button" id="ws-tab-graph"         role="tab" aria-controls="ws-graph"         class="ws-tab" data-ws="graph"         onclick="showWorkspaceTab('graph')">Graph</button>
               <button type="button" id="ws-tab-run-timeline"  role="tab" aria-controls="ws-run-timeline"  class="ws-tab" data-ws="run-timeline"  onclick="showWorkspaceTab('run-timeline')">Run Timeline</button>
               <button type="button" id="ws-tab-continue-from-frame" role="tab" aria-controls="ws-continue-from-frame" class="ws-tab" data-ws="continue-from-frame" onclick="showWorkspaceTab('continue-from-frame')">Continue From Frame</button>
+              <button type="button" id="ws-tab-mixed-mode-router" role="tab" aria-controls="ws-mixed-mode-router" class="ws-tab" data-ws="mixed-mode-router" onclick="showWorkspaceTab('mixed-mode-router')">Mixed Mode Router</button>
             </div>
             <!-- /ws-nav-secondary -->
           </div>
@@ -1343,6 +1344,29 @@
           </section>
         </div>
         <!-- /ws-continue-from-frame -->
+
+        <!-- Mixed Mode Router (UX.4 — preview-only router; auto-dispatch not implemented) -->
+        <div id="ws-mixed-mode-router" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-mixed-mode-router">
+          <section class="run-timeline-panel">
+            <header class="run-timeline-panel__header">
+              <strong>Mixed Mode Router</strong>
+            </header>
+            <p>Preview-only router contract defined in UX.4; auto-dispatch is not implemented.</p>
+            <p>The router predicts user intent (chat / instant run / continue from frame / commander plan / clarify / reject) using deterministic signal matching. Human confirmation is required before any action.</p>
+            <details>
+              <summary>UX.4 Boundaries</summary>
+              <ul>
+                <li>UX.4 predicts user intent only.</li>
+                <li>UX.4 does not dispatch execution.</li>
+                <li>UX.4 does not start runs, call models, or apply patches.</li>
+                <li>UX.4 does not run validation or benchmarks.</li>
+                <li>UX.4 does not contact network services or launch workers.</li>
+                <li>UX.4 does not mutate the repo, push, merge, or open PRs.</li>
+              </ul>
+            </details>
+          </section>
+        </div>
+        <!-- /ws-mixed-mode-router -->
 
         <!-- Settings / Health -->
         <div id="ws-settings" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-settings">

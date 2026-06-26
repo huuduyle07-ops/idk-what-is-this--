@@ -101,7 +101,7 @@ Example phases:
 - UX.1 — Operator Cockpit & Idea Intake Plan — ✅ shipped 2026-06-24 (complete).
 - UX.2 — Run Timeline / Progress Surface — ✅ shipped 2026-06-25 (complete).
 - UX.3 — Continue-from-Frame Contract — ✅ shipped 2026-06-26 (complete).
-- UX.4 — Mixed Mode Intent Router Preview
+- UX.4 — Mixed Mode Intent Router Preview — ✅ shipped 2026-06-26 (complete).
 - UX.5 — Goal Brief 4W1H Simplifier
 - UX.6 — Evidence Card Layout
 
@@ -285,6 +285,19 @@ human-approval requirements, and required-before-implementation items. It adds n
 readiness execution, Commander execution, agent launch, model call, patch apply,
 validation run, benchmark run, network call, database write, worker launch, push,
 merge, or PR power.
+
+**UX.4 — Mixed Mode Intent Router Preview is shipped 2026-06-26 (complete).**
+Implemented as `core/mixed_mode_intent_router.py` + `scripts/create_mixed_mode_intent_router_preview.py`,
+registered as a `complete` UX-track phase (prerequisite UX.3) in
+`docs/roadmap/phase_registry.json`, and validated with `tests/test_mixed_mode_intent_router.py` (38 tests +
+1 skipped). UX.4 classifies user text into one of six intent modes (chat / instant_run /
+continue_from_frame / commander_plan / clarify / reject_or_defer) using deterministic signal matching.
+Includes routing policy, UI contract, per-mode allowed/forbidden next steps, mode count summary,
+ambiguous and rejected/deferred input surfaces, and demo mode. A read-only "Mixed Mode Router"
+placeholder panel was added to `web/templates/index.html` (Views tab group).
+Artifacts: `.agent/ux/mixed_mode_intent_router/mixed_mode_intent_router_preview.{json,md}`. No router
+dispatch, agent launch, model call, patch apply, validation run, benchmark run, network call, database
+write, worker launch, push, merge, or PR power was added. Next likely: UX.5 — Goal Brief 4W1H Simplifier.
 
 **UX.3 — Continue-from-Frame Contract is shipped 2026-06-26 (complete).**
 Implemented as `core/continue_from_frame_contract.py` + `scripts/create_continue_from_frame_contract.py`,
