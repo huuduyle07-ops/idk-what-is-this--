@@ -103,7 +103,7 @@ Example phases:
 - UX.3 — Continue-from-Frame Contract — ✅ shipped 2026-06-26 (complete).
 - UX.4 — Mixed Mode Intent Router Preview — ✅ shipped 2026-06-26 (complete).
 - UX.5 — Goal Brief 4W1H Simplifier — ✅ shipped 2026-06-26 (complete).
-- UX.6 — Evidence Card Layout
+- UX.6 — Evidence Card Layout — ✅ shipped 2026-06-26 (complete).
 
 Branch boundary:
 
@@ -311,7 +311,20 @@ mode covering all four hint types, and boundary text. A read-only "4W1H Goal Bri
 was added to `web/templates/index.html` (Views tab group).
 Artifacts: `.agent/ux/goal_brief_4w1h/goal_brief_4w1h_preview.{json,md}`. No goal execution,
 dispatch, agent launch, model call, patch apply, validation run, benchmark run, network call, database
-write, worker launch, push, merge, or PR power was added. Next likely: UX.6 — Evidence Card Layout.
+write, worker launch, push, merge, or PR power was added.
+
+**UX.6 — Evidence Card Layout is shipped 2026-06-26 (complete).**
+Implemented as `core/evidence_card_layout.py` + `scripts/create_evidence_card_layout_preview.py`,
+registered as a `complete` UX-track phase (prerequisite UX.5) in
+`docs/roadmap/phase_registry.json`, and validated with `tests/test_evidence_card_layout.py` (42 tests + 1 skipped).
+Defines 8 canonical card types (answer_summary, patch_summary, changed_files, validation_summary,
+benchmark_summary, risk_summary, human_review, next_action), six card statuses (pass/warn/fail/missing/info/blocked),
+three priorities (high/medium/low), five display groups (result/change/checks/risk/decision), and a four-outcome
+deterministic operator decision summary (ready_for_human_review, needs_more_evidence, blocked_by_failed_check,
+insufficient_information). A read-only "Evidence Cards" placeholder panel was added to `web/templates/index.html`.
+Artifacts: `.agent/ux/evidence_card_layout/evidence_card_layout_preview.{json,md}`. No evidence creation,
+execution, agent launch, AI service call, patch apply, validation run, benchmark run, network call, database
+write, worker launch, push, merge, or PR power was added.
 
 **UX.3 — Continue-from-Frame Contract is shipped 2026-06-26 (complete).**
 Implemented as `core/continue_from_frame_contract.py` + `scripts/create_continue_from_frame_contract.py`,

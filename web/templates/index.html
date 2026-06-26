@@ -254,6 +254,7 @@
               <button type="button" id="ws-tab-continue-from-frame" role="tab" aria-controls="ws-continue-from-frame" class="ws-tab" data-ws="continue-from-frame" onclick="showWorkspaceTab('continue-from-frame')">Continue From Frame</button>
               <button type="button" id="ws-tab-mixed-mode-router" role="tab" aria-controls="ws-mixed-mode-router" class="ws-tab" data-ws="mixed-mode-router" onclick="showWorkspaceTab('mixed-mode-router')">Mixed Mode Router</button>
               <button type="button" id="ws-tab-goal-brief-4w1h" role="tab" aria-controls="ws-goal-brief-4w1h" class="ws-tab" data-ws="goal-brief-4w1h" onclick="showWorkspaceTab('goal-brief-4w1h')">4W1H Goal Brief</button>
+              <button type="button" id="ws-tab-evidence-cards" role="tab" aria-controls="ws-evidence-cards" class="ws-tab" data-ws="evidence-cards" onclick="showWorkspaceTab('evidence-cards')">Evidence Cards</button>
             </div>
             <!-- /ws-nav-secondary -->
           </div>
@@ -1393,6 +1394,45 @@
           </section>
         </div>
         <!-- /ws-goal-brief-4w1h -->
+
+        <!-- Evidence Cards (UX.6 — preview-only card layout; evidence creation and execution not implemented) -->
+        <div id="ws-evidence-cards" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-evidence-cards">
+          <section class="run-timeline-panel">
+            <header class="run-timeline-panel__header">
+              <strong>Evidence Cards</strong>
+            </header>
+            <p>Preview-only Evidence Card Layout defined in UX.6; evidence creation and execution are not implemented here.</p>
+            <p>Evidence cards summarise what changed, what evidence exists, what checks say, what risks remain, and what the human should do next. Human confirmation is required before any run.</p>
+            <details>
+              <summary>Card types</summary>
+              <ul>
+                <li><strong>Answer</strong> — What did CATTUS produce?</li>
+                <li><strong>Patch</strong> — What files changed?</li>
+                <li><strong>Changed Files</strong> — Scope of modifications</li>
+                <li><strong>Validation</strong> — Test and check results</li>
+                <li><strong>Benchmark</strong> — Performance evidence</li>
+                <li><strong>Risk</strong> — Risks and mitigations</li>
+                <li><strong>Human Review</strong> — Operator sign-off status</li>
+                <li><strong>Next Action</strong> — What the operator should do</li>
+              </ul>
+            </details>
+            <details>
+              <summary>UX.6 Boundaries</summary>
+              <ul>
+                <li>UX.6 is a preview-only evidence layout phase.</li>
+                <li>UX.6 does not create new evidence.</li>
+                <li>UX.6 does not dispatch execution.</li>
+                <li>UX.6 does not start runs.</li>
+                <li>UX.6 does not call AI services.</li>
+                <li>UX.6 does not apply patches.</li>
+                <li>UX.6 does not run validation or benchmarks.</li>
+                <li>UX.6 does not contact network services or launch workers.</li>
+                <li>UX.6 does not mutate the repo, push, merge, or open PRs.</li>
+              </ul>
+            </details>
+          </section>
+        </div>
+        <!-- /ws-evidence-cards -->
 
         <!-- Settings / Health -->
         <div id="ws-settings" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-settings">
