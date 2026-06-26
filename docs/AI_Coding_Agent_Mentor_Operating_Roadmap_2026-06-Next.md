@@ -18,7 +18,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (19 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 1 HARDEN + 1 UX).
+- The phase registry is valid (20 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 1 HARDEN + 2 UX).
 - The phase picker currently has no safe candidates.
 - The top recommendation is `null`.
 
@@ -99,7 +99,7 @@ Purpose:
 Example phases:
 
 - UX.1 — Operator Cockpit & Idea Intake Plan — ✅ shipped 2026-06-24 (complete).
-- UX.2 — Run Timeline / Progress Surface
+- UX.2 — Run Timeline / Progress Surface — ✅ shipped 2026-06-25 (complete).
 - UX.3 — Continue-from-Frame Contract
 - UX.4 — Mixed Mode Intent Router Preview
 - UX.5 — Goal Brief 4W1H Simplifier
@@ -285,6 +285,19 @@ human-approval requirements, and required-before-implementation items. It adds n
 readiness execution, Commander execution, agent launch, model call, patch apply,
 validation run, benchmark run, network call, database write, worker launch, push,
 merge, or PR power.
+
+**UX.2 — Run Timeline / Progress Surface is shipped 2026-06-25 (complete).**
+Implemented as `core/run_timeline_surface.py` + `scripts/create_run_timeline_surface.py`,
+registered as a `complete` UX-track phase (prerequisite UX.1) in
+`docs/roadmap/phase_registry.json`, and validated with `tests/test_run_timeline_surface.py`.
+UX.2 is a passive visibility layer: it surfaces run progress from existing or explicitly
+supplied event state via a deterministic timeline data model (10 stages, 7 statuses, a
+progress-percent heuristic, blocking-event surface, and next-operator-action field).
+Artifacts: `.agent/ux/run_timeline_surface/run_timeline_surface.{json,md}`. A read-only
+Run Timeline panel was added to `web/templates/index.html` (Views tab group). No new
+mutation routes were introduced. No task execution, agent launch, model call, patch apply,
+validation run, benchmark run, network call, database write, worker launch, push, merge,
+or PR power was added.
 
 **HARDEN.1 — Web Mutation Auth / CSRF Gate is shipped 2026-06-23 (complete).**
 Implemented as `web/auth_gate.py` wired into `web/app.py` via `before_request`, registered

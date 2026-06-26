@@ -248,8 +248,9 @@
                  launcher opens the UI.2c drawer. Nothing removed or renamed. -->
             <div class="ws-nav ws-nav--secondary" data-ui-group="ws-nav-secondary" role="presentation">
               <span class="ws-nav__label" aria-hidden="true">Views</span>
-              <button type="button" id="ws-tab-goal-brief" role="tab" aria-controls="ws-goal-brief" class="ws-tab" data-ws="goal-brief" onclick="showWorkspaceTab('goal-brief')">Goal Brief</button>
-              <button type="button" id="ws-tab-graph"      role="tab" aria-controls="ws-graph"      class="ws-tab" data-ws="graph"      onclick="showWorkspaceTab('graph')">Graph</button>
+              <button type="button" id="ws-tab-goal-brief"    role="tab" aria-controls="ws-goal-brief"    class="ws-tab" data-ws="goal-brief"    onclick="showWorkspaceTab('goal-brief')">Goal Brief</button>
+              <button type="button" id="ws-tab-graph"         role="tab" aria-controls="ws-graph"         class="ws-tab" data-ws="graph"         onclick="showWorkspaceTab('graph')">Graph</button>
+              <button type="button" id="ws-tab-run-timeline"  role="tab" aria-controls="ws-run-timeline"  class="ws-tab" data-ws="run-timeline"  onclick="showWorkspaceTab('run-timeline')">Run Timeline</button>
             </div>
             <!-- /ws-nav-secondary -->
           </div>
@@ -1241,6 +1242,83 @@
             </div>
           </div>
         </div>
+
+        <!-- Run Timeline (UX.2 — passive visibility panel, no execution) -->
+        <div id="ws-run-timeline" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-run-timeline">
+          <section class="run-timeline-panel">
+            <header class="run-timeline-panel__header">
+              <strong>Run Timeline</strong>
+              <span class="run-timeline-panel__note">Operator visibility — not runtime certainty</span>
+            </header>
+
+            {% if result and result.timeline %}
+            {% set tl = result.timeline %}
+            <div class="run-timeline-summary">
+              <span class="run-timeline-status run-timeline-status--{{ tl.timeline_status | replace('_','-') }}">
+                {{ tl.timeline_status }}
+              </span>
+              <span class="run-timeline-stage">Stage: <strong>{{ tl.current_stage or 'none' }}</strong></span>
+              <span class="run-timeline-progress">{{ tl.progress_percent }}%</span>
+            </div>
+
+            <div class="run-timeline-bar" aria-label="Operator visibility progress {{ tl.progress_percent }}%">
+              <div class="run-timeline-bar__fill" style="width: {{ tl.progress_percent }}%"></div>
+            </div>
+
+            {% if tl.next_operator_action %}
+            <div class="run-timeline-next-action">
+              <strong>Next:</strong> {{ tl.next_operator_action }}
+            </div>
+            {% endif %}
+
+            {% if tl.blocking_events %}
+            <div class="run-timeline-blocking">
+              <strong>Blocking:</strong>
+              {% for ev in tl.blocking_events %}
+              <span class="run-timeline-block-badge">{{ ev.stage }} ({{ ev.status }})</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <ol class="run-timeline-events">
+              {% for ev in tl.events %}
+              <li class="run-timeline-event run-timeline-event--{{ ev.status }}{% if ev.is_current %} run-timeline-event--current{% endif %}">
+                <span class="run-timeline-event__stage">{{ ev.stage }}</span>
+                <span class="run-timeline-event__title">{{ ev.title }}</span>
+                <span class="run-timeline-event__status">{{ ev.status }}</span>
+                {% if ev.summary %}<span class="run-timeline-event__summary">{{ ev.summary }}</span>{% endif %}
+              </li>
+              {% endfor %}
+            </ol>
+
+            {% else %}
+            <div class="run-timeline-empty">
+              <p>No run timeline available yet.</p>
+              <p class="run-timeline-empty__hint">
+                Submit a task to start a run. The timeline will surface progress stages here
+                — without starting anything automatically.
+              </p>
+            </div>
+            {% endif %}
+
+            <details class="run-timeline-boundaries">
+              <summary>Boundaries (UX.2 does not&hellip;)</summary>
+              <ul>
+                <li>UX.2 does not execute tasks.</li>
+                <li>UX.2 does not run agents.</li>
+                <li>UX.2 does not call models.</li>
+                <li>UX.2 does not apply patches.</li>
+                <li>UX.2 does not run validation.</li>
+                <li>UX.2 does not run benchmarks.</li>
+                <li>UX.2 does not contact network services.</li>
+                <li>UX.2 does not launch workers.</li>
+                <li>UX.2 does not push, merge, or open PRs.</li>
+                <li>UX.2 is a passive visibility layer.</li>
+              </ul>
+            </details>
+          </section>
+        </div>
+        <!-- /ws-run-timeline -->
 
         <!-- Settings / Health -->
         <div id="ws-settings" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-settings">

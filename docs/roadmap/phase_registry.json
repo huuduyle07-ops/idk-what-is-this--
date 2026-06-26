@@ -932,6 +932,59 @@
       "notes": [
         "Report-only UX planning phase. Plans the cockpit; does not implement the UI, change backend behavior, execute tasks, run agents, call models, apply patches, run validation, run benchmarks, contact network services, launch workers, push, merge, or open PRs."
       ]
+    },
+    {
+      "phase_id": "UX.2",
+      "title": "Run Timeline / Progress Surface",
+      "track": "UX",
+      "status": "complete",
+      "summary": "Passive visibility layer that surfaces run progress from existing or supplied event state. Adds a deterministic timeline data model (10 stages, 7 statuses), a progress-percent heuristic, a blocking-event surface, a next-operator-action field, JSON+Markdown artifacts, a CLI with --demo mode, and a read-only Run Timeline panel in the web UI.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/run_timeline_surface.py",
+        "scripts/create_run_timeline_surface.py",
+        "tests/test_run_timeline_surface.py",
+        "web/templates/index.html",
+        "web/static/style.css",
+        "docs/roadmap/phase_registry.json",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "README.md",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_run_timeline_surface.py -q",
+        "python scripts/create_run_timeline_surface.py --repo-path . --demo --json",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python -m pytest -q",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "UX.1"
+      ],
+      "expected_artifacts": [
+        ".agent/ux/run_timeline_surface/run_timeline_surface.json",
+        ".agent/ux/run_timeline_surface/run_timeline_surface.md"
+      ],
+      "notes": [
+        "Passive visibility layer. Does not execute tasks, run agents, call models, apply patches, run validation, run benchmarks, contact network services, launch workers, push, merge, or open PRs. Web panel is read-only display only; no new mutation routes added."
+      ]
     }
   ]
 }
