@@ -18,7 +18,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (26 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 1 HARDEN + 8 UX).
+- The phase registry is valid (27 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 1 HARDEN + 9 UX).
 - The phase picker currently has no safe candidates.
 - The top recommendation is `null`.
 
@@ -106,7 +106,8 @@ Example phases:
 - UX.6 — Evidence Card Layout — ✅ shipped 2026-06-26 (complete).
 - UX.7 — Cockpit Navigation & Action Hierarchy Cleanup — ✅ shipped 2026-06-27 (complete).
 - UX.8 — Cockpit Usability Checkpoint — ✅ shipped 2026-06-27 (complete).
-- UX.9 — Unified Workbench Input Plan (next likely phase)
+- UX.9 — Unified Workbench Input Plan — ✅ shipped 2026-06-27 (complete).
+- UX.10 — Unified Workbench Input Visual Integration (next likely phase)
 
 Branch boundary:
 
@@ -357,6 +358,21 @@ next phase. Default recommendation: UX.9 — Unified Workbench Input Plan, becau
 Chat vs Instant Run remains the major structural split. No backend routes, mutation
 routes, execution powers, model calls, network calls, patches, validation, benchmarks,
 workers, database writes, push, merge, or PRs added.
+
+**UX.9 — Unified Workbench Input Plan is shipped 2026-06-27 (complete).**
+Implemented as `core/unified_workbench_input_plan.py` +
+`scripts/create_unified_workbench_input_plan.py`, registered as a `complete`
+UX-track phase (prerequisite UX.8) in `docs/roadmap/phase_registry.json`, and
+validated with `tests/test_unified_workbench_input_plan.py`. UX.9 is a plan-only
+contract for one Workbench input that conceptually merges Chat, Instant Run, and
+Goal Brief / 4W1H. It defines the unified input field schema, the help-only `?`
+activation helper, UX.4-style mode preview, explicit confirmation actions, button
+reduction plan, future UI layout plan, and staged migration plan. Artifacts:
+`.agent/ux/unified_workbench_input_plan/unified_workbench_input_plan.{json,md}`.
+Next likely: UX.10 — Unified Workbench Input Visual Integration. No auto-dispatch,
+execution-path merge, backend route, mutation route, run start, model call, patch
+apply, validation run, benchmark run, network call, database write, worker launch,
+push, merge, or PR power was added.
 
 **UX.3 — Continue-from-Frame Contract is shipped 2026-06-26 (complete).**
 Implemented as `core/continue_from_frame_contract.py` + `scripts/create_continue_from_frame_contract.py`,

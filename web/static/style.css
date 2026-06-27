@@ -5277,6 +5277,41 @@ body.inspector-open .inspector-toggle {
     color: var(--color-accent);
 }
 
+/* UX.9: read-only Unified Workbench plan marker; no route or action wiring. */
+.unified-workbench-placeholder {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface-muted, rgba(148, 163, 184, 0.08));
+}
+.unified-workbench-placeholder__header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: baseline;
+    color: var(--color-text);
+}
+.unified-workbench-placeholder__header span {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
+.unified-workbench-placeholder__labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+.unified-workbench-placeholder__labels span {
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1;
+    padding: 5px 8px;
+}
+
 /* ============================================================ */
 /* UX.7: Cockpit navigation — workflow group + advanced drawer. */
 /* Visual/layout only: no route, handler, id, or backend        */

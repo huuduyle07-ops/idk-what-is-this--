@@ -277,6 +277,21 @@
             <button type="button" class="goal-brief-hint__link"
                     onclick="showWorkspaceTab('goal-brief')">Refine goal in Goal Brief / 4W1H &rarr;</button>
           </p>
+          <!-- UX.9 unified-workbench-placeholder: read-only plan marker, no route or dispatch. -->
+          <section class="unified-workbench-placeholder" aria-label="Unified Workbench plan-only placeholder">
+            <div class="unified-workbench-placeholder__header">
+              <strong>Unified Workbench</strong>
+              <span>Plan-only unified input contract defined in UX.9; execution merge and auto-dispatch are not implemented.</span>
+            </div>
+            <div class="unified-workbench-placeholder__labels" aria-label="UX.9 planned surface labels">
+              <span>Main input</span>
+              <span>4W1H fields</span>
+              <span>? helper</span>
+              <span>Mode preview</span>
+              <span>Confirmation action</span>
+            </div>
+          </section>
+          <!-- /UX.9 unified-workbench-placeholder -->
           <!-- Phase UI.2b: Answer + Patch stay primary; the six secondary
                result tabs (Context/State/Validation/Cost/Diff/Candidates)
                fold into a collapsed "Run details" disclosure. Every showTab()
