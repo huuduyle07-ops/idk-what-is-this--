@@ -5259,9 +5259,193 @@ body.inspector-open .inspector-toggle {
     color: var(--color-text);
 }
 
+/* UX.10: Workbench-first visual integration and secondary workflow hinting. */
+.unified-workbench {
+    display: grid;
+    gap: 16px;
+    padding: 18px;
+    border: 1px solid rgba(59, 130, 246, 0.24);
+    border-radius: 12px;
+    background: rgba(30, 41, 59, 0.92);
+}
+.unified-workbench__intro {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 18px;
+    align-items: end;
+}
+.unified-workbench__eyebrow {
+    color: #93c5fd;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.unified-workbench__title {
+    margin: 4px 0 0;
+    font-size: 28px;
+    line-height: 1.05;
+}
+.unified-workbench__summary {
+    max-width: 480px;
+    margin: 0;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+.workbench-section__header {
+    display: grid;
+    gap: 4px;
+}
+.workbench-section__header span {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.4;
+}
+.workbench-main-intent,
+.workbench-brief,
+.workbench-mode-preview,
+.workbench-confirmation-actions {
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.56);
+}
+.workbench-main-intent__input {
+    min-height: 136px;
+}
+.workbench-brief-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+.workbench-brief-field {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 10px;
+    background: rgba(9, 9, 11, 0.35);
+}
+.workbench-brief-field p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.45;
+}
+.workbench-brief-field__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: start;
+}
+.workbench-helper {
+    margin: 0;
+}
+.workbench-helper > summary {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid rgba(148, 163, 184, 0.26);
+    border-radius: 999px;
+    background: transparent;
+    color: #bfdbfe;
+    cursor: pointer;
+    list-style: none;
+}
+.workbench-helper > summary::-webkit-details-marker {
+    display: none;
+}
+.workbench-helper__body {
+    margin-top: 8px;
+    padding: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.72);
+}
+.workbench-helper__body p {
+    margin: 0 0 6px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+.workbench-helper__body p:last-child {
+    margin-bottom: 0;
+}
+.workbench-brief__actions,
+.workbench-confirmation-actions__submit {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+.workbench-brief__actions span,
+.workbench-confirmation-actions__submit span,
+.workbench-safety-note {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.45;
+}
+.workbench-secondary-action,
+.workbench-confirmation {
+    border: 1px solid rgba(96, 165, 250, 0.28);
+    border-radius: 999px;
+    background: rgba(30, 41, 59, 0.84);
+    color: #eff6ff;
+    font-weight: 600;
+}
+.workbench-confirmation--secondary,
+.workbench-secondary-action {
+    background: rgba(15, 23, 42, 0.88);
+    color: var(--color-text);
+}
+.workbench-mode-preview__chips,
+.workbench-confirmation-actions__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.workbench-mode-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 999px;
+    color: var(--color-text-muted);
+    background: rgba(15, 23, 42, 0.58);
+    font-size: 13px;
+    font-weight: 600;
+}
+.workbench-mode-chip--active {
+    border-color: rgba(96, 165, 250, 0.48);
+    background: rgba(37, 99, 235, 0.22);
+    color: #eff6ff;
+}
+.workbench-safety-note {
+    margin: 0;
+    padding-top: 4px;
+    border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
+@media (max-width: 900px) {
+    .unified-workbench__title {
+        font-size: 24px;
+    }
+    .workbench-brief-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Phase UI.2d: quiet Goal Brief discoverability link in the Run area. */
 .goal-brief-hint {
     margin: 0 0 8px;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.45;
 }
 .goal-brief-hint__link {
     background: transparent;
@@ -5275,41 +5459,6 @@ body.inspector-open .inspector-toggle {
 }
 .goal-brief-hint__link:hover {
     color: var(--color-accent);
-}
-
-/* UX.9: read-only Unified Workbench plan marker; no route or action wiring. */
-.unified-workbench-placeholder {
-    margin: 0 0 12px;
-    padding: 10px 12px;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    background: var(--color-surface-muted, rgba(148, 163, 184, 0.08));
-}
-.unified-workbench-placeholder__header {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 12px;
-    align-items: baseline;
-    color: var(--color-text);
-}
-.unified-workbench-placeholder__header span {
-    color: var(--color-text-muted);
-    font-size: 12px;
-    line-height: 1.4;
-}
-.unified-workbench-placeholder__labels {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 8px;
-}
-.unified-workbench-placeholder__labels span {
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    color: var(--color-text-muted);
-    font-size: 12px;
-    line-height: 1;
-    padding: 5px 8px;
 }
 
 /* ============================================================ */

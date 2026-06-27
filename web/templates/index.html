@@ -79,24 +79,165 @@
 
         <form method="POST" class="agent-form" id="agentForm">
             <input type="hidden" id="webModeInput" name="web_mode" value="{{ page_web_mode }}">
-            <div class="form-row">
-                <input
-                    id="repoPathInput"
-                    type="text"
-                    name="repo_path"
-                    placeholder="Repo path or drag folder here"
-                    value="{{ current.repo_path if current else '' }}"
-                    required
-                    class="flex-2"
-                >
-                <input name="project_tag"
-                       value="{{ current.project_tag if current else '' }}"
-                       placeholder="Tag (auto)"
-                          class="flex-1" />
-            </div>
             <input type="file" id="folderInput" webkitdirectory multiple hidden>
 
-            <textarea name="query" placeholder="Enter your query..." required>{{ current.query if current else '' }}</textarea>
+            <!-- UX.9 unified-workbench-placeholder: Plan-only unified input contract defined in UX.9; execution merge and auto-dispatch are not implemented. Main input / 4W1H fields / ? helper / Mode preview / Confirmation action. -->
+            <!-- /UX.9 unified-workbench-placeholder -->
+            <!-- UX.10 unified-workbench: visual integration only, no new route or dispatch. -->
+            <section class="unified-workbench" aria-label="Unified Workbench">
+                <div class="unified-workbench__intro">
+                    <div>
+                        <div class="unified-workbench__eyebrow">Unified Workbench</div>
+                        <h2 class="unified-workbench__title">Use one input for Chat and Instant Run</h2>
+                    </div>
+                    <p class="unified-workbench__summary">
+                        Current mode:
+                        <strong id="workbenchCurrentMode">{{ 'Chat' if page_web_mode == 'chat' else 'Instant Run' }}</strong>.
+                        Visual integration only; existing behavior is preserved.
+                    </p>
+                </div>
+
+                <div class="form-row">
+                    <input
+                        id="repoPathInput"
+                        type="text"
+                        name="repo_path"
+                        placeholder="Repo path or drag folder here"
+                        value="{{ current.repo_path if current else '' }}"
+                        required
+                        class="flex-2"
+                    >
+                    <input name="project_tag"
+                           value="{{ current.project_tag if current else '' }}"
+                           placeholder="Tag (auto)"
+                           class="flex-1" />
+                </div>
+
+                <section class="workbench-main-intent" aria-label="Main Intent">
+                    <div class="workbench-section__header">
+                        <strong>Main Intent</strong>
+                        <span>What do you want C.A.T.T.U.S to do?</span>
+                    </div>
+                    <textarea name="query" class="workbench-main-intent__input" placeholder="Enter your query..." required>{{ current.query if current else '' }}</textarea>
+                </section>
+
+                <section class="workbench-brief" aria-label="4W1H Brief">
+                    <div class="workbench-section__header">
+                        <strong>4W1H Brief</strong>
+                        <span>Goal Brief and 4W1H stay available here without replacing the existing builder.</span>
+                    </div>
+                    <div class="workbench-brief-grid">
+                        <article class="workbench-brief-field">
+                            <div class="workbench-brief-field__top">
+                                <strong>What are we changing?</strong>
+                                <details class="workbench-helper">
+                                    <summary>?</summary>
+                                    <div class="workbench-helper__body">
+                                        <p>Describe the specific change or question.</p>
+                                        <p>Example: Move Run Timeline closer to the Run action.</p>
+                                        <p>Help only.</p>
+                                    </div>
+                                </details>
+                            </div>
+                            <p>Keep the main intent short, then use the full Goal Brief Builder when you need structured detail.</p>
+                        </article>
+                        <article class="workbench-brief-field">
+                            <div class="workbench-brief-field__top">
+                                <strong>Why are we changing it?</strong>
+                                <details class="workbench-helper">
+                                    <summary>?</summary>
+                                    <div class="workbench-helper__body">
+                                        <p>Explain why this matters.</p>
+                                        <p>Example: The current layout makes progress hard to see.</p>
+                                        <p>Help only.</p>
+                                    </div>
+                                </details>
+                            </div>
+                            <p>Capture urgency, operator pain, or the review reason before you confirm an action.</p>
+                        </article>
+                        <article class="workbench-brief-field">
+                            <div class="workbench-brief-field__top">
+                                <strong>Where should C.A.T.T.U.S focus?</strong>
+                                <details class="workbench-helper">
+                                    <summary>?</summary>
+                                    <div class="workbench-helper__body">
+                                        <p>Name a file, UI area, route, workflow, or artifact.</p>
+                                        <p>Example: web/templates/index.html, Workbench header.</p>
+                                        <p>Help only.</p>
+                                    </div>
+                                </details>
+                            </div>
+                            <p>Point to the likely files or UI surface so the follow-up review stays bounded.</p>
+                        </article>
+                        <article class="workbench-brief-field">
+                            <div class="workbench-brief-field__top">
+                                <strong>When should it stop?</strong>
+                                <details class="workbench-helper">
+                                    <summary>?</summary>
+                                    <div class="workbench-helper__body">
+                                        <p>Define the stopping boundary.</p>
+                                        <p>Example: Stop after visual integration; do not change execution paths.</p>
+                                        <p>Help only.</p>
+                                    </div>
+                                </details>
+                            </div>
+                            <p>State the boundary before opening deeper planning surfaces.</p>
+                        </article>
+                        <article class="workbench-brief-field">
+                            <div class="workbench-brief-field__top">
+                                <strong>How do we validate?</strong>
+                                <details class="workbench-helper">
+                                    <summary>?</summary>
+                                    <div class="workbench-helper__body">
+                                        <p>Say how success should be checked.</p>
+                                        <p>Example: targeted UI tests, registry validation, full pytest, manual screenshot review.</p>
+                                        <p>Help only.</p>
+                                    </div>
+                                </details>
+                            </div>
+                            <p>Use the existing Goal Brief / 4W1H Builder when you want the deeper structured handoff.</p>
+                        </article>
+                    </div>
+                    <div class="workbench-brief__actions">
+                        <button type="button" class="workbench-secondary-action" onclick="showWorkspaceTab('goal-brief')">Open Goal Brief / 4W1H Builder</button>
+                        <span>The full builder still owns the existing Goal Brief workflow.</span>
+                    </div>
+                </section>
+
+                <section class="workbench-mode-preview" aria-label="Mode Preview">
+                    <div class="workbench-section__header">
+                        <strong>Mode Preview</strong>
+                        <span>Preview only. The selected action still requires confirmation and does not auto-dispatch.</span>
+                    </div>
+                    <div class="workbench-mode-preview__chips">
+                        <span class="workbench-mode-chip" data-workbench-mode="chat">Chat</span>
+                        <span class="workbench-mode-chip" data-workbench-mode="instant">Instant Run</span>
+                        <span class="workbench-mode-chip" data-workbench-mode="continue">Continue</span>
+                        <span class="workbench-mode-chip" data-workbench-mode="commander">Commander</span>
+                        <span class="workbench-mode-chip" data-workbench-mode="clarify">Clarify</span>
+                    </div>
+                </section>
+
+                <section class="workbench-confirmation-actions" aria-label="Confirmation Actions">
+                    <div class="workbench-section__header">
+                        <strong>Confirmation Actions</strong>
+                        <span>Ask and Preview Run set the current mode. Continue and Commander open the existing supporting surfaces.</span>
+                    </div>
+                    <div class="workbench-confirmation-actions__row">
+                        <button type="button" class="workbench-confirmation" onclick="setProductMode('chat')">Ask</button>
+                        <button type="button" class="workbench-confirmation" onclick="setProductMode('instant')">Preview Run</button>
+                        <button type="button" class="workbench-confirmation workbench-confirmation--secondary" onclick="showWorkspaceTab('continue-from-frame')">Continue From Frame</button>
+                        <button type="button" class="workbench-confirmation workbench-confirmation--secondary" onclick="showWorkspaceTab('goal-brief')">Commander Plan</button>
+                    </div>
+                    <div class="workbench-confirmation-actions__submit">
+                        <button type="submit" id="primarySubmit">Run</button>
+                        <span id="workbenchSubmitHint">Confirm the current mode with the existing agent form. No new route or background action was added.</span>
+                    </div>
+                </section>
+
+                <p class="workbench-safety-note">Mode preview does not auto-dispatch. Apply Patch remains separate and human-triggered below.</p>
+            </section>
+            <!-- /UX.10 unified-workbench -->
 
             <details class="instant-run-controls" data-mode-panel="instant-controls">
             <summary class="instant-run-summary">Options</summary>
@@ -177,8 +318,6 @@
             </select>
 
             </details>
-
-            <button type="submit" id="primarySubmit">Run</button>
         </form>
 
         <div class="status-chip">
@@ -271,27 +410,11 @@
 
         <!-- Chat / Patch (default workspace tab) -->
         <div id="ws-chat" class="ws-content" role="tabpanel" aria-labelledby="ws-tab-chat">
-          <!-- Phase UI.2d: Goal Brief is now a secondary "Views" tab, so keep it
-               discoverable from the Run area with a quiet inline link. -->
           <p class="goal-brief-hint">
             <button type="button" class="goal-brief-hint__link"
-                    onclick="showWorkspaceTab('goal-brief')">Refine goal in Goal Brief / 4W1H &rarr;</button>
+                    onclick="showWorkspaceTab('goal-brief')">Refine goal in Goal Brief / 4W1H</button>
+            when you need the full builder. The Unified Workbench above stays the primary intake, while Goal Brief / 4W1H and Continue From Frame remain supporting workflow surfaces.
           </p>
-          <!-- UX.9 unified-workbench-placeholder: read-only plan marker, no route or dispatch. -->
-          <section class="unified-workbench-placeholder" aria-label="Unified Workbench plan-only placeholder">
-            <div class="unified-workbench-placeholder__header">
-              <strong>Unified Workbench</strong>
-              <span>Plan-only unified input contract defined in UX.9; execution merge and auto-dispatch are not implemented.</span>
-            </div>
-            <div class="unified-workbench-placeholder__labels" aria-label="UX.9 planned surface labels">
-              <span>Main input</span>
-              <span>4W1H fields</span>
-              <span>? helper</span>
-              <span>Mode preview</span>
-              <span>Confirmation action</span>
-            </div>
-          </section>
-          <!-- /UX.9 unified-workbench-placeholder -->
           <!-- Phase UI.2b: Answer + Patch stay primary; the six secondary
                result tabs (Context/State/Validation/Cost/Diff/Candidates)
                fold into a collapsed "Run details" disclosure. Every showTab()
@@ -1797,6 +1920,8 @@ function setProductMode(mode, options = {}) {
     const modeTitle = document.getElementById("modeTitle");
     const modeSubtitle = document.getElementById("modeSubtitle");
     const primarySubmit = document.getElementById("primarySubmit");
+    const workbenchCurrentMode = document.getElementById("workbenchCurrentMode");
+    const workbenchSubmitHint = document.getElementById("workbenchSubmitHint");
     const queryInput = document.querySelector("textarea[name='query']");
     const newSessionLink = document.getElementById("newSessionLink");
 
@@ -1821,12 +1946,22 @@ function setProductMode(mode, options = {}) {
     if (modeTitle) modeTitle.textContent = nextMode === "chat" ? "Chat" : "Instant Run";
     if (modeSubtitle) modeSubtitle.textContent = nextMode === "chat" ? "Understanding" : "Execution";
     if (primarySubmit) primarySubmit.textContent = nextMode === "chat" ? "Ask" : "Run";
+    if (workbenchCurrentMode) workbenchCurrentMode.textContent = nextMode === "chat" ? "Chat" : "Instant Run";
+    if (workbenchSubmitHint) {
+        workbenchSubmitHint.textContent = nextMode === "chat"
+            ? "Confirm the current mode with the existing agent form. Ask still requires a deliberate submit."
+            : "Confirm the current mode with the existing agent form. Preview Run still requires a deliberate submit.";
+    }
     if (newSessionLink) newSessionLink.href = `/new?web_mode=${encodeURIComponent(nextMode)}`;
     if (queryInput) {
         queryInput.placeholder = nextMode === "chat"
             ? "Ask what this code does..."
             : "Enter your query...";
     }
+    document.querySelectorAll("[data-workbench-mode]").forEach(chip => {
+        const chipMode = chip.dataset.workbenchMode;
+        chip.classList.toggle("workbench-mode-chip--active", chipMode === nextMode);
+    });
 
     if (nextMode === "chat") {
         const modeSelect = document.getElementById("modeSelect");

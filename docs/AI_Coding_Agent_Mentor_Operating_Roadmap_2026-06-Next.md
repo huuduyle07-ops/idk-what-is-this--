@@ -18,7 +18,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (27 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 1 HARDEN + 9 UX).
+- The phase registry is valid (28 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 1 HARDEN + 10 UX).
 - The phase picker currently has no safe candidates.
 - The top recommendation is `null`.
 
@@ -107,7 +107,8 @@ Example phases:
 - UX.7 — Cockpit Navigation & Action Hierarchy Cleanup — ✅ shipped 2026-06-27 (complete).
 - UX.8 — Cockpit Usability Checkpoint — ✅ shipped 2026-06-27 (complete).
 - UX.9 — Unified Workbench Input Plan — ✅ shipped 2026-06-27 (complete).
-- UX.10 — Unified Workbench Input Visual Integration (next likely phase)
+- UX.10 — Unified Workbench Input Visual Integration — ✅ shipped 2026-06-27 (complete).
+- UX.11 — Unified Workbench Behavior Preservation Check (next likely phase)
 
 Branch boundary:
 
@@ -373,6 +374,18 @@ Next likely: UX.10 — Unified Workbench Input Visual Integration. No auto-dispa
 execution-path merge, backend route, mutation route, run start, model call, patch
 apply, validation run, benchmark run, network call, database write, worker launch,
 push, merge, or PR power was added.
+
+**UX.10 — Unified Workbench Input Visual Integration is shipped 2026-06-27 (complete).**
+Implemented in `web/templates/index.html` and `web/static/style.css`, registered as a
+`complete` UX-track phase (prerequisite UX.9) in `docs/roadmap/phase_registry.json`,
+and validated with `tests/test_unified_workbench_visual_integration.py`. UX.10 makes
+the existing agent form read visually as one Unified Workbench: one main intent input,
+compact 4W1H helper rows with help-only `?` affordances, preview-only mode chips,
+confirmation actions that reuse existing mode switching or workflow navigation, and an
+explicit safety note that mode preview does not auto-dispatch. Existing behavior is
+preserved: no backend route was added, no execution path was merged, no new fetch/post
+path was introduced, and Apply / Review Patch remains separate and human-triggered.
+Next likely: UX.11 — Unified Workbench Behavior Preservation Check.
 
 **UX.3 — Continue-from-Frame Contract is shipped 2026-06-26 (complete).**
 Implemented as `core/continue_from_frame_contract.py` + `scripts/create_continue_from_frame_contract.py`,

@@ -561,7 +561,7 @@ def test_seed_registry_produces_expected_buckets():
         "human_approval_required": 0,
         "blocked": 0,
         "deferred_or_parked": 0,
-        "complete_or_history": 27,
+        "complete_or_history": 28,
     }
     # All seed phases complete; there is no remaining seed recommendation.
     assert report["top_recommendation"] is None
