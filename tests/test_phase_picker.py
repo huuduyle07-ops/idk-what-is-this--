@@ -554,14 +554,14 @@ def test_seed_registry_produces_expected_buckets():
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     report = _report(data, report_id="r", created_at="t", registry_path=str(_SEED_PATH))
     assert report["registry_valid"] is True
-    # All 20 seed phases are shipped (complete); no proposed seed phase remains safe.
+    # All seed phases are shipped (complete); no proposed seed phase remains safe.
     assert report["bucket_counts"] == {
         "safe_to_prepare": 0,
         "sandbox_required": 0,
         "human_approval_required": 0,
         "blocked": 0,
         "deferred_or_parked": 0,
-        "complete_or_history": 24,
+        "complete_or_history": 25,
     }
     # All seed phases complete; there is no remaining seed recommendation.
     assert report["top_recommendation"] is None

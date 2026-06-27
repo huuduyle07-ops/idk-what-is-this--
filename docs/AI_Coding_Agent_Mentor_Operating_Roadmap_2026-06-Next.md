@@ -18,7 +18,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (20 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 1 HARDEN + 2 UX).
+- The phase registry is valid (25 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 1 HARDEN + 7 UX).
 - The phase picker currently has no safe candidates.
 - The top recommendation is `null`.
 
@@ -104,6 +104,8 @@ Example phases:
 - UX.4 — Mixed Mode Intent Router Preview — ✅ shipped 2026-06-26 (complete).
 - UX.5 — Goal Brief 4W1H Simplifier — ✅ shipped 2026-06-26 (complete).
 - UX.6 — Evidence Card Layout — ✅ shipped 2026-06-26 (complete).
+- UX.7 — Cockpit Navigation & Action Hierarchy Cleanup — ✅ shipped 2026-06-27 (complete).
+- UX.8 — Cockpit Checkpoint / Usability Review (next likely phase)
 
 Branch boundary:
 
@@ -325,6 +327,19 @@ insufficient_information). A read-only "Evidence Cards" placeholder panel was ad
 Artifacts: `.agent/ux/evidence_card_layout/evidence_card_layout_preview.{json,md}`. No evidence creation,
 execution, agent launch, AI service call, patch apply, validation run, benchmark run, network call, database
 write, worker launch, push, merge, or PR power was added.
+
+**UX.7 — Cockpit Navigation & Action Hierarchy Cleanup is shipped 2026-06-27 (complete).**
+Implemented as `core/cockpit_action_hierarchy.py` + `scripts/create_cockpit_action_hierarchy_report.py`,
+registered as a `complete` UX-track phase (prerequisite UX.6) in
+`docs/roadmap/phase_registry.json`, and validated with `tests/test_cockpit_action_hierarchy.py` (36 tests).
+Restructures `web/templates/index.html` navigation into three tiers: Primary (Workbench/Memory/Settings),
+Workflow (Run Timeline/Mode Decision/Goal Brief+4W1H/Evidence Cards/Continue From Frame), and a collapsible
+Advanced/Debug drawer (Benchmarks/Dream/Graph). Merges the separate "Goal Brief" and "4W1H Goal Brief" nav
+tabs into one "Goal Brief / 4W1H" entry. Relabels "Mixed Mode Router" to "Mode Decision". Adds cockpit-section
+CSS in `web/static/style.css` for the workflow group and advanced drawer. Extends `showWorkspaceTab()` valid
+array to include all UX panel IDs (run-timeline, continue-from-frame, mixed-mode-router, goal-brief-4w1h,
+evidence-cards). No new backend routes, mutation routes, execution powers, model calls, network calls,
+patches, validation, benchmarks, workers, push, merge, or PRs added.
 
 **UX.3 — Continue-from-Frame Contract is shipped 2026-06-26 (complete).**
 Implemented as `core/continue_from_frame_contract.py` + `scripts/create_continue_from_frame_contract.py`,

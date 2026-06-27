@@ -235,31 +235,37 @@
                  / onclick / label is unchanged; the groups use display:contents so
                  the flat tab strip is preserved - the only change is grouping and
                  moving Goal Brief + Graph into the quieter "Views" group below. -->
-            <div class="ws-nav ws-nav--primary" data-ui-group="ws-nav-primary" role="presentation">
-              <button type="button" id="ws-tab-chat"       role="tab" aria-controls="ws-chat"       class="ws-tab" data-ws="chat"       onclick="showWorkspaceTab('chat')">Chat / Patch</button>
-              <button type="button" id="ws-tab-benchmarks" role="tab" aria-controls="ws-benchmarks" class="ws-tab" data-ws="benchmarks" onclick="showWorkspaceTab('benchmarks')">Benchmarks</button>
-              <button type="button" id="ws-tab-dream"      role="tab" aria-controls="ws-dream"      class="ws-tab" data-ws="dream"      onclick="showWorkspaceTab('dream')">Dream</button>
-              <button type="button" id="ws-tab-memory"     role="tab" aria-controls="ws-memory"     class="ws-tab" data-ws="memory"     onclick="showWorkspaceTab('memory')">Memory</button>
-              <button type="button" id="ws-tab-settings"   role="tab" aria-controls="ws-settings"   class="ws-tab" data-ws="settings"   onclick="showWorkspaceTab('settings')">Settings / Health</button>
+            <!-- UX.7 primary: 3 daily-use destinations. -->
+            <div class="ws-nav ws-nav--primary" data-ui-group="ws-nav-primary" data-cockpit-area="primary" role="presentation">
+              <button type="button" id="ws-tab-chat"     role="tab" aria-controls="ws-chat"     class="ws-tab" data-ws="chat"     onclick="showWorkspaceTab('chat')">Workbench</button>
+              <button type="button" id="ws-tab-memory"   role="tab" aria-controls="ws-memory"   class="ws-tab" data-ws="memory"   onclick="showWorkspaceTab('memory')">Memory</button>
+              <button type="button" id="ws-tab-settings" role="tab" aria-controls="ws-settings" class="ws-tab" data-ws="settings" onclick="showWorkspaceTab('settings')">Settings / Health</button>
             </div>
             <!-- /ws-nav-primary -->
-            <!-- Phase UI.2d: secondary "Views" destinations (visually quieter).
-                 Goal Brief and Graph keep their tabs + ws-* panels; the Inspector
-                 launcher opens the UI.2c drawer. Nothing removed or renamed. -->
-            <div class="ws-nav ws-nav--secondary" data-ui-group="ws-nav-secondary" role="presentation">
-              <span class="ws-nav__label" aria-hidden="true">Views</span>
-              <button type="button" id="ws-tab-goal-brief"    role="tab" aria-controls="ws-goal-brief"    class="ws-tab" data-ws="goal-brief"    onclick="showWorkspaceTab('goal-brief')">Goal Brief</button>
-              <button type="button" id="ws-tab-graph"         role="tab" aria-controls="ws-graph"         class="ws-tab" data-ws="graph"         onclick="showWorkspaceTab('graph')">Graph</button>
-              <button type="button" id="ws-tab-run-timeline"  role="tab" aria-controls="ws-run-timeline"  class="ws-tab" data-ws="run-timeline"  onclick="showWorkspaceTab('run-timeline')">Run Timeline</button>
+            <!-- UX.7 Workflow: UX surfaces in operator flow order.
+                 Goal Brief / 4W1H merges UX.1+UX.5; Mode Decision replaces "Mixed Mode Router".
+                 ws-tab-goal-brief-4w1h removed from nav (panel ws-goal-brief-4w1h preserved). -->
+            <div class="ws-nav ws-nav--workflow" data-ui-group="ws-nav-workflow" data-cockpit-area="workbench" role="presentation">
+              <span class="ws-nav__label" aria-hidden="true">Workflow</span>
+              <button type="button" id="ws-tab-run-timeline"        role="tab" aria-controls="ws-run-timeline"        class="ws-tab" data-ws="run-timeline"        onclick="showWorkspaceTab('run-timeline')">Run Timeline</button>
+              <button type="button" id="ws-tab-mixed-mode-router"   role="tab" aria-controls="ws-mixed-mode-router"   class="ws-tab" data-ws="mixed-mode-router"   onclick="showWorkspaceTab('mixed-mode-router')">Mode Decision</button>
+              <button type="button" id="ws-tab-goal-brief"          role="tab" aria-controls="ws-goal-brief"          class="ws-tab" data-ws="goal-brief"          onclick="showWorkspaceTab('goal-brief')">Goal Brief / 4W1H</button>
+              <button type="button" id="ws-tab-evidence-cards"      role="tab" aria-controls="ws-evidence-cards"      class="ws-tab" data-ws="evidence-cards"      onclick="showWorkspaceTab('evidence-cards')">Evidence Cards</button>
               <button type="button" id="ws-tab-continue-from-frame" role="tab" aria-controls="ws-continue-from-frame" class="ws-tab" data-ws="continue-from-frame" onclick="showWorkspaceTab('continue-from-frame')">Continue From Frame</button>
-              <button type="button" id="ws-tab-mixed-mode-router" role="tab" aria-controls="ws-mixed-mode-router" class="ws-tab" data-ws="mixed-mode-router" onclick="showWorkspaceTab('mixed-mode-router')">Mixed Mode Router</button>
-              <button type="button" id="ws-tab-goal-brief-4w1h" role="tab" aria-controls="ws-goal-brief-4w1h" class="ws-tab" data-ws="goal-brief-4w1h" onclick="showWorkspaceTab('goal-brief-4w1h')">4W1H Goal Brief</button>
-              <button type="button" id="ws-tab-evidence-cards" role="tab" aria-controls="ws-evidence-cards" class="ws-tab" data-ws="evidence-cards" onclick="showWorkspaceTab('evidence-cards')">Evidence Cards</button>
             </div>
-            <!-- /ws-nav-secondary -->
+            <!-- /ws-nav-workflow -->
           </div>
-          <!-- Phase UI.2e: Inspector launcher sits beside the tab strip (a row
-               sibling, not a tablist tab) so it reads as an action, not a view. -->
+          <!-- UX.7 Advanced / Debug drawer: collapsed by default. -->
+          <details class="ws-nav-advanced-drawer" data-ui-group="advanced-debug">
+            <summary class="ws-nav-advanced-drawer__summary">Advanced / Debug &#x25BE;</summary>
+            <div class="ws-nav ws-nav--advanced" role="tablist" aria-label="Advanced and debug tools" data-cockpit-area="advanced">
+              <button type="button" id="ws-tab-benchmarks" role="tab" aria-controls="ws-benchmarks" class="ws-tab" data-ws="benchmarks" onclick="showWorkspaceTab('benchmarks')">Benchmarks</button>
+              <button type="button" id="ws-tab-dream"      role="tab" aria-controls="ws-dream"      class="ws-tab" data-ws="dream"      onclick="showWorkspaceTab('dream')">Dream</button>
+              <button type="button" id="ws-tab-graph"      role="tab" aria-controls="ws-graph"      class="ws-tab" data-ws="graph"      onclick="showWorkspaceTab('graph')">Graph</button>
+            </div>
+          </details>
+          <!-- /advanced-debug -->
+          <!-- Inspector launcher: row sibling, reads as an action not a view. -->
           <button type="button" class="ws-nav__inspector" onclick="toggleInspector(true)" title="Inspector — debug &amp; evidence tools (Ctrl-J)">&#x1F50E; Inspector</button>
         </div>
 
@@ -269,7 +275,7 @@
                discoverable from the Run area with a quiet inline link. -->
           <p class="goal-brief-hint">
             <button type="button" class="goal-brief-hint__link"
-                    onclick="showWorkspaceTab('goal-brief')">Refine goal in Goal Brief &rarr;</button>
+                    onclick="showWorkspaceTab('goal-brief')">Refine goal in Goal Brief / 4W1H &rarr;</button>
           </p>
           <!-- Phase UI.2b: Answer + Patch stay primary; the six secondary
                result tabs (Context/State/Validation/Cost/Diff/Candidates)
@@ -5671,7 +5677,8 @@ function showTab(id) {
 // Memory, Graph, Settings/Health). Mirrors the showTab() pattern but operates
 // on .ws-content / .ws-tab. Persistence key: activeWorkspaceTab.
 function showWorkspaceTab(id) {
-    const valid = ["chat", "goal-brief", "benchmarks", "dream", "memory", "graph", "settings"];
+    const valid = ["chat", "goal-brief", "benchmarks", "dream", "memory", "graph", "settings",
+               "run-timeline", "continue-from-frame", "mixed-mode-router", "goal-brief-4w1h", "evidence-cards"];
     if (!valid.includes(id)) id = "chat";
     localStorage.setItem("activeWorkspaceTab", id);
 
