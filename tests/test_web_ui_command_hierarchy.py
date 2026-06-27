@@ -520,23 +520,33 @@ def test_no_backend_change_in_inspector_drawer():
 
 
 # ===========================================================================
-# UI.2d - Primary / Secondary top-nav + dangerous-action cleanup
+# UI.2d / UX.7 - Cockpit top-nav + dangerous-action cleanup
 #
-#   * The seven workspace tabs are split into two visual groups (no id / key /
-#     label changes): a prominent primary group (Chat/Patch, Benchmarks, Dream,
-#     Memory, Settings/Health) and a quieter "Views" secondary group (Goal
-#     Brief, Graph) plus an Inspector launcher.
+#   * UX.7 reorganizes workspace tabs into primary, workflow, and Advanced /
+#     Debug groups. Primary holds daily-use destinations, workflow holds the
+#     cockpit path, and Benchmarks/Dream/Graph sit behind Advanced / Debug.
 #   * A small "Refine goal in Goal Brief ->" link inside Chat/Patch keeps Goal
 #     Brief discoverable without a primary tab.
 #   * Dangerous controls stay out of the primary nav and the Inspector drawer.
 # ===========================================================================
 WS_TAB_IDS = (
-    "ws-tab-chat", "ws-tab-goal-brief", "ws-tab-benchmarks", "ws-tab-dream",
-    "ws-tab-memory", "ws-tab-graph", "ws-tab-settings",
+    "ws-tab-chat", "ws-tab-memory", "ws-tab-settings",
+    "ws-tab-run-timeline", "ws-tab-mixed-mode-router", "ws-tab-goal-brief",
+    "ws-tab-evidence-cards", "ws-tab-continue-from-frame",
+    "ws-tab-benchmarks", "ws-tab-dream", "ws-tab-graph",
 )
-WS_TAB_KEYS = ("chat", "goal-brief", "benchmarks", "dream", "memory", "graph", "settings")
-PRIMARY_KEYS = ("chat", "benchmarks", "dream", "memory", "settings")
-SECONDARY_KEYS = ("goal-brief", "graph")
+WS_TAB_KEYS = (
+    "chat", "memory", "settings",
+    "run-timeline", "mixed-mode-router", "goal-brief",
+    "evidence-cards", "continue-from-frame",
+    "benchmarks", "dream", "graph",
+)
+PRIMARY_KEYS = ("chat", "memory", "settings")
+WORKFLOW_KEYS = (
+    "run-timeline", "mixed-mode-router", "goal-brief",
+    "evidence-cards", "continue-from-frame",
+)
+ADVANCED_KEYS = ("benchmarks", "dream", "graph")
 
 
 # ---------------------------------------------------------------------------
@@ -544,22 +554,22 @@ SECONDARY_KEYS = ("goal-brief", "graph")
 # ---------------------------------------------------------------------------
 def test_ws_nav_groups_exist():
     t = _template()
-    for group in ("ws-nav-primary", "ws-nav-secondary"):
+    for group in ("ws-nav-primary", "ws-nav-workflow", "advanced-debug"):
         assert f'data-ui-group="{group}"' in t, f"missing nav group {group}"
         assert f"<!-- /{group} -->" in t, f"missing sentinel for {group}"
 
 
 # ---------------------------------------------------------------------------
-# 30 - All seven workspace tab ids survive
+# 30 - All workspace tab ids survive
 # ---------------------------------------------------------------------------
-def test_all_seven_ws_tab_ids_preserved():
+def test_all_ws_tab_ids_preserved():
     t = _template()
     for tid in WS_TAB_IDS:
         assert f'id="{tid}"' in t, f"workspace tab id {tid!r} missing"
 
 
 # ---------------------------------------------------------------------------
-# 31 - All seven showWorkspaceTab keys survive
+# 31 - All showWorkspaceTab keys survive
 # ---------------------------------------------------------------------------
 def test_all_showworkspacetab_keys_preserved():
     t = _template()
@@ -568,26 +578,41 @@ def test_all_showworkspacetab_keys_preserved():
 
 
 # ---------------------------------------------------------------------------
-# 32 - Primary group holds the five primary destinations (not goal-brief/graph)
+# 32 - Primary group holds daily-use destinations only
 # ---------------------------------------------------------------------------
 def test_primary_nav_membership():
     t = _template()
     primary = _group_segment(t, "ws-nav-primary")
     for key in PRIMARY_KEYS:
         assert f"showWorkspaceTab('{key}')" in primary, f"{key} must be a primary destination"
-    for key in SECONDARY_KEYS:
+    for key in WORKFLOW_KEYS + ADVANCED_KEYS:
         assert f"showWorkspaceTab('{key}')" not in primary, f"{key} must NOT be primary"
 
 
 # ---------------------------------------------------------------------------
-# 33 - Secondary "Views" group holds Goal Brief + Graph (+ a label)
+# 33 - Workflow group holds the cockpit workflow panels
 # ---------------------------------------------------------------------------
-def test_secondary_nav_membership():
+def test_workflow_nav_membership():
     t = _template()
-    secondary = _group_segment(t, "ws-nav-secondary")
-    for key in SECONDARY_KEYS:
-        assert f"showWorkspaceTab('{key}')" in secondary, f"{key} must be in the Views group"
-    assert "Views" in secondary, "secondary group needs a small label (e.g. 'Views')"
+    workflow = _group_segment(t, "ws-nav-workflow")
+    for key in WORKFLOW_KEYS:
+        assert f"showWorkspaceTab('{key}')" in workflow, f"{key} must be in the Workflow group"
+    assert "Workflow" in workflow, "workflow group needs a small label"
+    for key in ADVANCED_KEYS:
+        assert f"showWorkspaceTab('{key}')" not in workflow, f"{key} must not be in Workflow"
+
+
+# ---------------------------------------------------------------------------
+# 33b - Advanced / Debug holds debug and inspection-adjacent tabs
+# ---------------------------------------------------------------------------
+def test_advanced_debug_nav_membership():
+    t = _template()
+    advanced = _group_segment(t, "advanced-debug")
+    for key in ADVANCED_KEYS:
+        assert f"showWorkspaceTab('{key}')" in advanced, f"{key} must be in Advanced / Debug"
+    for key in PRIMARY_KEYS + WORKFLOW_KEYS:
+        assert f"showWorkspaceTab('{key}')" not in advanced, f"{key} must not be in Advanced / Debug"
+    assert "Advanced / Debug" in advanced
 
 
 # ---------------------------------------------------------------------------
