@@ -395,6 +395,8 @@ def test_recommended_next_branch_is_harden_away_from_ux():
     report = _build()
     assert report["recommended_next_branch"] == NEXT_BRANCH_HARDEN == "HARDEN"
     assert "HARDEN" in report["recommended_next_phase"]
+    assert "HARDEN.3" in report["recommended_next_phase"]
+    assert "HARDEN.2" not in report["recommended_next_phase"]
     assert report["next_branch_candidates"]
     assert "UX" not in report["recommended_next_branch"]
 

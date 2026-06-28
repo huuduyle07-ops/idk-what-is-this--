@@ -151,15 +151,16 @@ NEXT_STEP_BY_STATUS: dict[str, str] = {
 }
 
 #: After UX freezes, the documented top priority is continued security hardening
-#: of the remaining audit debt (HARDEN.1 only closed the web auth / CSRF gap).
+#: of the remaining audit debt. HARDEN.1 closed the web auth / CSRF gap and
+#: HARDEN.2 inventories the web mutation surface; the next recommendation moves
+#: to the remaining safe-validation / MCP-approval debt.
 NEXT_BRANCH_HARDEN = "HARDEN"
 NEXT_PHASE_HARDEN_CONTINUE = (
-    "HARDEN.2 - Remaining Security Debt (safe validation hardening / "
-    "MCP approval enforcement)"
+    "HARDEN.3 - Safe Validation / MCP Approval Enforcement Audit"
 )
 NEXT_BRANCH_CANDIDATES: tuple[str, ...] = (
-    "HARDEN - continue security hardening of the remaining audit debt "
-    "(safe validation hardening, MCP approval enforcement).",
+    "HARDEN - continue security hardening after HARDEN.2 with safe validation "
+    "hardening and MCP approval enforcement.",
     "Human selects the next branch among the documented candidate branches with "
     "explicit approval.",
 )
