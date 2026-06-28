@@ -280,8 +280,8 @@ def test_phase_registry_seed_counts_include_ux11():
     data = json.loads(_REGISTRY_PATH.read_text(encoding="utf-8"))
     ids = {p["phase_id"] for p in data["phases"]}
     assert "UX.11" in ids
-    assert len(data["phases"]) == 29
-    assert sum(1 for p in data["phases"] if p["track"] == "UX") == 11
+    assert len(data["phases"]) == 30
+    assert sum(1 for p in data["phases"] if p["track"] == "UX") == 12
 
 
 def test_new_ux11_core_script_files_are_safe():

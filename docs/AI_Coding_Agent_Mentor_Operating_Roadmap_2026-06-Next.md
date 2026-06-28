@@ -109,12 +109,18 @@ Example phases:
 - UX.9 — Unified Workbench Input Plan — ✅ shipped 2026-06-27 (complete).
 - UX.10 — Unified Workbench Input Visual Integration — ✅ shipped 2026-06-27 (complete).
 - UX.11 — Unified Workbench Behavior Preservation Check — ✅ shipped 2026-06-28 (complete).
-- UX.CLOSE — UX Branch Freeze Checkpoint (next likely phase)
+- UX.CLOSE — UX Branch Freeze Checkpoint — ✅ shipped 2026-06-28 (complete). UX branch is frozen.
 
 Branch boundary:
 
 - UX may improve operator comprehension and workflow layout.
 - UX must not weaken approvals, hide required evidence, make dangerous actions easier to trigger, or add new autonomous behavior.
+
+Next recommendation: the UX branch is complete and frozen at UX.CLOSE. The phase
+picker has no safe candidate, so the next move is a human-approved branch choice.
+The documented top priority is continued security hardening of the remaining audit
+debt (HARDEN.1 only closed the web auth / CSRF gap): **HARDEN.2 — Remaining Security
+Debt (safe validation hardening / MCP approval enforcement)**.
 
 ### Branch CMD — Commander Mode
 
@@ -387,6 +393,26 @@ explicit safety note that mode preview does not auto-dispatch. Existing behavior
 preserved: no backend route was added, no execution path was merged, no new fetch/post
 path was introduced, and Apply / Review Patch remains separate and human-triggered.
 Follow-up: UX.11 — Unified Workbench Behavior Preservation Check.
+
+**UX.CLOSE — UX Branch Freeze Checkpoint is shipped 2026-06-28 (complete).**
+Implemented as `core/ux_branch_freeze_checkpoint.py` +
+`scripts/create_ux_branch_freeze_checkpoint.py`, registered as a `complete` UX-track
+phase (prerequisite UX.11) in `docs/roadmap/phase_registry.json`, and validated with
+`tests/test_ux_branch_freeze_checkpoint.py`. UX.CLOSE is a report-only checkpoint that
+proves the UX branch (UX.1 through UX.11) is complete, behavior-preserving, and safe to
+freeze. It verifies: UX.1–UX.11 are registered complete and report-only; the Unified
+Workbench visual integration exists; the UX.11 behavior preservation check exists and
+passes; the UX branch added no new execution path; UX.10/UX.11 added no new mutation
+route; dangerous actions remain separate and human-triggered; Goal Brief / 4W1H / Mode
+Preview remain assistive or preview-only; Apply / Review Patch remains outside the
+unified input and requires human action; and remaining UX work is future polish only.
+It reuses the phase picker for registry state and ingests the UX.11 report (built from
+source text) so the freeze criteria are proven by the same source-level checks. Artifacts:
+`.agent/ux/ux_branch_freeze_checkpoint/ux_branch_freeze_checkpoint.{json,md}`. No model
+call, patch apply, validation run, benchmark run, network call, database write, worker
+launch, backend or mutation route, UI behavior change, push, merge, or PR power was added.
+The UX branch is now frozen; the recommended next move is a human-approved branch choice,
+with continued security hardening (HARDEN.2) as the documented top candidate.
 
 **UX.11 — Unified Workbench Behavior Preservation Check is shipped 2026-06-28 (complete).**
 Implemented as `core/unified_workbench_behavior_preservation.py` +
