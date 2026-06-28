@@ -116,11 +116,12 @@ Branch boundary:
 - UX may improve operator comprehension and workflow layout.
 - UX must not weaken approvals, hide required evidence, make dangerous actions easier to trigger, or add new autonomous behavior.
 
-Next recommendation: the UX branch is complete and frozen at UX.CLOSE. The phase
-picker has no safe candidate, so the next move is a human-approved branch choice.
-The documented top priority is continued security hardening of the remaining audit
-debt (HARDEN.1 only closed the web auth / CSRF gap): **HARDEN.2 — Remaining Security
-Debt (safe validation hardening / MCP approval enforcement)**.
+Next recommendation: the UX branch is complete and frozen at UX.CLOSE, and
+HARDEN.2 has now audited the web mutation surface after HARDEN.1's auth / CSRF
+gate. The phase picker has no safe candidate, so the next move remains a
+human-approved branch choice. The documented top priority is continued security
+hardening of the remaining audit debt: **HARDEN.3 — Safe Validation / MCP
+Approval Enforcement Audit**.
 
 ### Branch CMD — Commander Mode
 
@@ -411,8 +412,9 @@ source text) so the freeze criteria are proven by the same source-level checks. 
 `.agent/ux/ux_branch_freeze_checkpoint/ux_branch_freeze_checkpoint.{json,md}`. No model
 call, patch apply, validation run, benchmark run, network call, database write, worker
 launch, backend or mutation route, UI behavior change, push, merge, or PR power was added.
-The UX branch is now frozen; the recommended next move is a human-approved branch choice,
-with continued security hardening (HARDEN.2) as the documented top candidate.
+The UX branch is now frozen; after HARDEN.2's web mutation surface audit, the
+recommended next move is a human-approved branch choice with continued security
+hardening (HARDEN.3) as the documented top candidate.
 
 **UX.11 — Unified Workbench Behavior Preservation Check is shipped 2026-06-28 (complete).**
 Implemented as `core/unified_workbench_behavior_preservation.py` +
@@ -460,6 +462,21 @@ that blocks unauthenticated or cross-origin mutating HTTP requests (POST/PUT/PAT
 Token reads `WEB_AUTH_TOKEN` env var at request time; loopback-only fallback when unset.
 Cross-origin mutations are always rejected. Adds no model call, patch apply, validation run,
 benchmark run, network call, database write, worker launch, push, merge, or PR power.
+
+**HARDEN.2 — Web Mutation Surface Audit is shipped 2026-06-28 (complete).**
+Implemented report-only as `core/web_mutation_surface_audit.py` +
+`scripts/create_web_mutation_surface_audit.py`, registered as a `complete`
+HARDEN-track phase (prerequisites UX.CLOSE and HARDEN.1) in
+`docs/roadmap/phase_registry.json`, and validated with
+`tests/test_web_mutation_surface_audit.py` plus the HARDEN.1 gate tests. It
+inspects the Flask `app.url_map`, classifies safe/read-only versus mutating
+methods, flags high-risk route keywords, reports dangerous-sounding GET-only
+routes for manual review, checks route modules that define routes but are not in
+the app map, and confirms mutating routes are covered by the HARDEN.1 gate.
+Artifacts: `.agent/harden/web_mutation_surface_audit/web_mutation_surface_audit.{json,md}`.
+Adds no model call, patch apply, validation run, benchmark run, network call,
+database write, worker launch, Dream execution, Replay janitor apply, route
+behavior change, auth policy change, UI behavior change, push, merge, or PR power.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
@@ -582,3 +599,25 @@ Adds a centralized `@app.before_request` security gate to the Flask web app. For
 - `tests/test_web_mutation_auth_gate.py` — 21-test suite (15 cases)
 
 **No new automation power.** Does not run models, apply patches, validate, benchmark, contact network services, push, merge, or open PRs.
+
+### HARDEN.2 — Web Mutation Surface Audit
+
+**Status:** Complete  
+**Prerequisites:** UX.CLOSE, HARDEN.1  
+**Risk:** Medium (security audit of route mutation surface; report-only)
+
+Creates a report-only inventory of all Flask routes from the registered app
+route map. Routes are classified by safe methods (GET, HEAD, OPTIONS), mutating
+methods (POST, PUT, PATCH, DELETE), mixed method surfaces, high-risk route
+keywords, and category hints including artifact-writing, validation-running,
+benchmark-running, worker-launching, replay/janitor-related, and
+external-integration-related.
+
+**Artifacts:**
+- `.agent/harden/web_mutation_surface_audit/web_mutation_surface_audit.json`
+- `.agent/harden/web_mutation_surface_audit/web_mutation_surface_audit.md`
+
+**No new automation power.** Does not call handlers, run models, apply patches,
+validate, benchmark, launch workers, execute Dream actions, apply Replay janitor
+actions, contact network services, write to a database, change routes, change
+auth policy, change UI behavior, push, merge, or open PRs.
