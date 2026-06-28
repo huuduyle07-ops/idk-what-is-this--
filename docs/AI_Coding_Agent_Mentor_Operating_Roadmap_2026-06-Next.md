@@ -108,7 +108,8 @@ Example phases:
 - UX.8 — Cockpit Usability Checkpoint — ✅ shipped 2026-06-27 (complete).
 - UX.9 — Unified Workbench Input Plan — ✅ shipped 2026-06-27 (complete).
 - UX.10 — Unified Workbench Input Visual Integration — ✅ shipped 2026-06-27 (complete).
-- UX.11 — Unified Workbench Behavior Preservation Check (next likely phase)
+- UX.11 — Unified Workbench Behavior Preservation Check — ✅ shipped 2026-06-28 (complete).
+- UX.CLOSE — UX Branch Freeze Checkpoint (next likely phase)
 
 Branch boundary:
 
@@ -385,7 +386,19 @@ confirmation actions that reuse existing mode switching or workflow navigation, 
 explicit safety note that mode preview does not auto-dispatch. Existing behavior is
 preserved: no backend route was added, no execution path was merged, no new fetch/post
 path was introduced, and Apply / Review Patch remains separate and human-triggered.
-Next likely: UX.11 — Unified Workbench Behavior Preservation Check.
+Follow-up: UX.11 — Unified Workbench Behavior Preservation Check.
+
+**UX.11 — Unified Workbench Behavior Preservation Check is shipped 2026-06-28 (complete).**
+Implemented as `core/unified_workbench_behavior_preservation.py` +
+`scripts/create_unified_workbench_behavior_preservation_report.py`, registered as a
+`complete` UX-track phase (prerequisite UX.10) in `docs/roadmap/phase_registry.json`,
+and validated with `tests/test_unified_workbench_behavior_preservation.py`. UX.11
+proves UX.10 preserved behavior: the existing `agentForm`, real `query` textarea,
+primary submit path, help-only 4W1H helpers, preview-only Mode Preview, Goal Brief
+builder access, separate human-triggered Apply / Review Patch, no Workbench POST or
+mutation route, and no auto-run/fetch path. Optional artifacts:
+`.agent/ux/unified_workbench_behavior_preservation/unified_workbench_behavior_preservation_report.{json,md}`.
+Next likely: UX.CLOSE — UX Branch Freeze Checkpoint.
 
 **UX.3 — Continue-from-Frame Contract is shipped 2026-06-26 (complete).**
 Implemented as `core/continue_from_frame_contract.py` + `scripts/create_continue_from_frame_contract.py`,
