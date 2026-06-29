@@ -18,7 +18,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (28 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 1 HARDEN + 10 UX).
+- The phase registry is valid (33 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 4 HARDEN + 12 UX).
 - The phase picker currently has no safe candidates.
 - The top recommendation is `null`.
 
@@ -41,7 +41,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 ### Validation State
 
 - Registry validation is passing.
-- The current phase picker result is intentionally empty because no safe candidate is available under the old map.
+- The current phase picker result is intentionally empty because no safe candidate is available under the current map.
 - The old roadmap arc is complete and should not be stretched to imply new authorization.
 
 ### Benchmark State
@@ -117,11 +117,11 @@ Branch boundary:
 - UX must not weaken approvals, hide required evidence, make dangerous actions easier to trigger, or add new autonomous behavior.
 
 Next recommendation: the UX branch is complete and frozen at UX.CLOSE, and
-HARDEN.2 has now audited the web mutation surface after HARDEN.1's auth / CSRF
-gate. The phase picker has no safe candidate, so the next move remains a
-human-approved branch choice. The documented top priority is continued security
-hardening of the remaining audit debt: **HARDEN.3 — Safe Validation / MCP
-Approval Enforcement Audit**.
+HARDEN.CLOSE has now consolidated HARDEN.1-HARDEN.3 evidence. The checkpoint
+freezes the HARDEN branch with manual-review warnings, not confirmed bypasses.
+The phase picker has no safe candidate, so the next move remains a
+human-approved branch choice. The documented top priority is **MIRROR.1 - Mirror
+Tunnel Trace Contract**, a report-only contract phase for the next branch.
 
 ### Branch CMD — Commander Mode
 
@@ -203,9 +203,11 @@ Recommended branch order:
 
 1. EVAL — shipped through EVAL.3
 2. CMD — selected after EVAL; CMD.1, CMD.2, CMD.3, and CMD.4 shipped
-3. UX
-4. MODEL
-5. REMOTE
+3. UX - shipped through UX.CLOSE
+4. HARDEN - shipped through HARDEN.CLOSE
+5. MIRROR - next recommended report-only branch
+6. MODEL
+7. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
@@ -412,9 +414,9 @@ source text) so the freeze criteria are proven by the same source-level checks. 
 `.agent/ux/ux_branch_freeze_checkpoint/ux_branch_freeze_checkpoint.{json,md}`. No model
 call, patch apply, validation run, benchmark run, network call, database write, worker
 launch, backend or mutation route, UI behavior change, push, merge, or PR power was added.
-The UX branch is now frozen; after HARDEN.2's web mutation surface audit, the
-recommended next move is a human-approved branch choice with continued security
-hardening (HARDEN.3) as the documented top candidate.
+The UX branch is now frozen; after HARDEN.CLOSE consolidated HARDEN.1-HARDEN.3
+evidence, the recommended next move is a human-approved branch choice with
+MIRROR.1 - Mirror Tunnel Trace Contract as the documented top candidate.
 
 **UX.11 — Unified Workbench Behavior Preservation Check is shipped 2026-06-28 (complete).**
 Implemented as `core/unified_workbench_behavior_preservation.py` +
@@ -477,6 +479,41 @@ Artifacts: `.agent/harden/web_mutation_surface_audit/web_mutation_surface_audit.
 Adds no model call, patch apply, validation run, benchmark run, network call,
 database write, worker launch, Dream execution, Replay janitor apply, route
 behavior change, auth policy change, UI behavior change, push, merge, or PR power.
+
+**HARDEN.3 — Safe Validation / MCP Approval Enforcement Audit is shipped 2026-06-29 (complete).**
+Implemented report-only as `core/safe_validation_mcp_approval_audit.py` +
+`scripts/create_safe_validation_mcp_approval_audit.py`, registered as a
+`complete` HARDEN-track phase (prerequisite HARDEN.2) in
+`docs/roadmap/phase_registry.json`, and validated with
+`tests/test_safe_validation_mcp_approval_audit.py` plus the HARDEN.1 and
+HARDEN.2 safety tests. It statically inspects local Python source for validation
+execution, MCP/tool-style artifact actions, janitor/apply/delete cleanup paths,
+approval-sensitive fields, and route metadata. It reports gate evidence such as
+safe-validation helpers, command safety checks, temp-clone/sandbox boundaries,
+MCP allowlists, audit logging, confirmation tokens, HARDEN.1 auth coverage, and
+human-approval policy fields. Artifacts:
+`.agent/harden/safe_validation_mcp_approval_audit/safe_validation_mcp_approval_audit.{json,md}`.
+Adds no model call, patch apply, validation run, benchmark run, MCP invocation,
+worker launch, Dream execution, Replay janitor apply, network call, database
+write, route behavior change, auth policy change, UI behavior change, push,
+merge, or PR power. Then shipped: HARDEN.CLOSE - Hardening Branch Checkpoint.
+
+**HARDEN.CLOSE - Hardening Branch Checkpoint is shipped 2026-06-29 (complete).**
+Implemented report-only as `core/hardening_branch_checkpoint.py` +
+`scripts/create_hardening_branch_checkpoint.py`, registered as a `complete`
+HARDEN-track phase (prerequisite HARDEN.3) in
+`docs/roadmap/phase_registry.json`, and validated with
+`tests/test_hardening_branch_checkpoint.py` plus the HARDEN.1, HARDEN.2, and
+HARDEN.3 safety tests. It reads the phase registry, HARDEN.1 source markers,
+and existing HARDEN.2/HARDEN.3 artifacts, then decides whether the HARDEN branch
+is frozen, frozen with manual-review warnings, needs HARDEN.4, or is blocked.
+Artifacts:
+`.agent/harden/hardening_branch_checkpoint/hardening_branch_checkpoint.{json,md}`.
+Adds no model call, patch apply, validation run, benchmark run, MCP invocation,
+worker launch, Dream execution, Replay janitor apply, Docker/subprocess use,
+network call, database write, route behavior change, auth policy change, UI
+behavior change, push, merge, or PR power. Next likely: MIRROR.1 - Mirror Tunnel
+Trace Contract.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
@@ -621,3 +658,53 @@ external-integration-related.
 validate, benchmark, launch workers, execute Dream actions, apply Replay janitor
 actions, contact network services, write to a database, change routes, change
 auth policy, change UI behavior, push, merge, or open PRs.
+
+### HARDEN.3 — Safe Validation / MCP Approval Enforcement Audit
+
+**Status:** Complete  
+**Prerequisite:** HARDEN.2  
+**Risk:** Medium (security audit of execution and approval surfaces; report-only)
+
+Creates a report-only static source audit for validation execution, MCP/tool
+artifact actions, janitor/apply/delete cleanup paths, approval-sensitive fields,
+and route metadata. The report inventories audited files, routes, functions,
+validation surfaces, MCP surfaces, janitor or cleanup surfaces, and approval
+gate surfaces. It distinguishes blockers from manual-review warnings and records
+gate evidence such as safe validation helpers, command safety checks,
+temp-clone/sandbox boundaries, MCP tool allowlists, audit logging, confirmation
+tokens, HARDEN.1 auth coverage, and human-approval policy fields.
+
+**Artifacts:**
+- `.agent/harden/safe_validation_mcp_approval_audit/safe_validation_mcp_approval_audit.json`
+- `.agent/harden/safe_validation_mcp_approval_audit/safe_validation_mcp_approval_audit.md`
+
+**No new automation power.** Does not import audited application modules, call
+handlers, invoke MCP tools, run models, apply patches, validate, benchmark,
+launch workers, execute Dream actions, apply Replay janitor actions, contact
+network services, write to a database, change routes, change auth policy, change
+UI behavior, push, merge, or open PRs.
+
+### HARDEN.CLOSE - Hardening Branch Checkpoint
+
+**Status:** Complete  
+**Prerequisite:** HARDEN.3  
+**Risk:** Medium (branch closure checkpoint; report-only)
+
+Creates a report-only checkpoint that reviews HARDEN.1, HARDEN.2, and HARDEN.3
+evidence together. It verifies that HARDEN.1 is registered complete and the
+auth gate is detectable, HARDEN.2 has zero uncovered mutating routes and zero
+blockers, HARDEN.3 has zero blockers, and HARDEN.2/HARDEN.3 warnings are
+manual-review items rather than confirmed bypasses. It decides one of four
+statuses: frozen, frozen_with_manual_review_warnings, needs_harden_4, or
+blocked.
+
+**Artifacts:**
+- `.agent/harden/hardening_branch_checkpoint/hardening_branch_checkpoint.json`
+- `.agent/harden/hardening_branch_checkpoint/hardening_branch_checkpoint.md`
+
+**No new automation power.** Does not call models, apply patches, validate,
+benchmark, invoke MCP tools, launch workers, execute Dream actions, apply Replay
+janitor actions, use Docker or subprocess, contact network services, write to a
+database, change route behavior, change auth policy, change UI behavior, push,
+merge, or open PRs. When frozen or frozen with manual-review warnings, the next
+recommended phase is MIRROR.1 - Mirror Tunnel Trace Contract.
