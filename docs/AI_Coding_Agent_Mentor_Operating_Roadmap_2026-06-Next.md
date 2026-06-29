@@ -117,11 +117,10 @@ Branch boundary:
 - UX must not weaken approvals, hide required evidence, make dangerous actions easier to trigger, or add new autonomous behavior.
 
 Next recommendation: the UX branch is complete and frozen at UX.CLOSE, and
-HARDEN.CLOSE has now consolidated HARDEN.1-HARDEN.3 evidence. The checkpoint
-freezes the HARDEN branch with manual-review warnings, not confirmed bypasses.
-The phase picker has no safe candidate, so the next move remains a
-human-approved branch choice. The documented top priority is **MIRROR.1 - Mirror
-Tunnel Trace Contract**, a report-only contract phase for the next branch.
+HARDEN.CLOSE has now consolidated HARDEN.1-HARDEN.3 evidence, and MIRROR.1 has
+shipped the report-only Mirror Tunnel Trace Contract. The phase picker now
+recommends **MIRROR.2 - Mirror Tunnel Derailment Score Preview** as the next
+human-approved report-only branch step.
 
 ### Branch CMD — Commander Mode
 
@@ -414,9 +413,9 @@ source text) so the freeze criteria are proven by the same source-level checks. 
 `.agent/ux/ux_branch_freeze_checkpoint/ux_branch_freeze_checkpoint.{json,md}`. No model
 call, patch apply, validation run, benchmark run, network call, database write, worker
 launch, backend or mutation route, UI behavior change, push, merge, or PR power was added.
-The UX branch is now frozen; after HARDEN.CLOSE consolidated HARDEN.1-HARDEN.3
-evidence, the recommended next move is a human-approved branch choice with
-MIRROR.1 - Mirror Tunnel Trace Contract as the documented top candidate.
+The UX and HARDEN branches are now frozen, and MIRROR.1 has shipped the trace
+contract needed before derailment scoring. The recommended next move is
+MIRROR.2 - Mirror Tunnel Derailment Score Preview.
 
 **UX.11 — Unified Workbench Behavior Preservation Check is shipped 2026-06-28 (complete).**
 Implemented as `core/unified_workbench_behavior_preservation.py` +
@@ -512,8 +511,24 @@ Artifacts:
 Adds no model call, patch apply, validation run, benchmark run, MCP invocation,
 worker launch, Dream execution, Replay janitor apply, Docker/subprocess use,
 network call, database write, route behavior change, auth policy change, UI
-behavior change, push, merge, or PR power. Next likely: MIRROR.1 - Mirror Tunnel
-Trace Contract.
+behavior change, push, merge, or PR power. MIRROR.1 has since shipped; next
+likely: MIRROR.2 - Mirror Tunnel Derailment Score Preview.
+
+**MIRROR.1 - Mirror Tunnel Trace Contract is shipped 2026-06-29 (complete).**
+Implemented as `core/mirror_tunnel_trace_contract.py` +
+`scripts/create_mirror_tunnel_trace_contract.py`, registered as a `complete`
+MIRROR-track phase (prerequisite HARDEN.CLOSE) in
+`docs/roadmap/phase_registry.json`, and validated with
+`tests/test_mirror_tunnel_trace_contract.py`. It reads explicit existing
+artifact paths and writes
+`.agent/mirror_tunnel/trace_contract/mirror_tunnel_trace_contract.{json,md}`.
+The contract records canonical frame order, frame schema, available and missing
+evidence, reusable and excluded context, trust level, artifact references,
+boundaries, and `recommended_next_phase = MIRROR.2`. It does not call models,
+apply patches, run validation, run benchmarks, invoke MCP tools, launch workers,
+execute Dream actions, apply Replay janitor actions, use Docker or subprocess,
+contact network services, write to a database, change route behavior, change
+auth policy, change UI behavior, score derailment, push, merge, or open PRs.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
@@ -706,5 +721,5 @@ blocked.
 benchmark, invoke MCP tools, launch workers, execute Dream actions, apply Replay
 janitor actions, use Docker or subprocess, contact network services, write to a
 database, change route behavior, change auth policy, change UI behavior, push,
-merge, or open PRs. When frozen or frozen with manual-review warnings, the next
-recommended phase is MIRROR.1 - Mirror Tunnel Trace Contract.
+merge, or open PRs. MIRROR.1 has since shipped; the next recommended phase is
+MIRROR.2 - Mirror Tunnel Derailment Score Preview.
