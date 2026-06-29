@@ -118,9 +118,9 @@ Branch boundary:
 
 Next recommendation: the UX branch is complete and frozen at UX.CLOSE,
 HARDEN.CLOSE has consolidated HARDEN.1-HARDEN.3 evidence, and
-MIRROR.1/MIRROR.2/MIRROR.3 have shipped the report-only trace, scoring, and
-claim-vs-diff foundation. The phase picker now recommends
-**MIRROR.4 - Mirror Tunnel Replay Readiness Pack** as the next
+MIRROR.1 through MIRROR.4 have shipped the report-only trace, scoring,
+claim-vs-diff, and ingestion-planning foundation. The phase picker now
+recommends **MIRROR.5 - Mirror Tunnel Frame Emitter Contract** as the next
 human-approved report-only branch step.
 
 ### Branch CMD — Commander Mode
@@ -414,9 +414,10 @@ source text) so the freeze criteria are proven by the same source-level checks. 
 `.agent/ux/ux_branch_freeze_checkpoint/ux_branch_freeze_checkpoint.{json,md}`. No model
 call, patch apply, validation run, benchmark run, network call, database write, worker
 launch, backend or mutation route, UI behavior change, push, merge, or PR power was added.
-The UX and HARDEN branches are now frozen, and MIRROR.1/MIRROR.2/MIRROR.3 have
-shipped the trace contract, derailment scoring report, and claim-vs-diff check.
-The recommended next move is MIRROR.4 - Mirror Tunnel Replay Readiness Pack.
+The UX and HARDEN branches are now frozen, and MIRROR.1 through MIRROR.4 have
+shipped the trace contract, derailment scoring report, claim-vs-diff check, and
+real-run ingestion plan. The recommended next move is MIRROR.5 - Mirror Tunnel
+Frame Emitter Contract.
 
 **UX.11 — Unified Workbench Behavior Preservation Check is shipped 2026-06-28 (complete).**
 Implemented as `core/unified_workbench_behavior_preservation.py` +
@@ -512,8 +513,8 @@ Artifacts:
 Adds no model call, patch apply, validation run, benchmark run, MCP invocation,
 worker launch, Dream execution, Replay janitor apply, Docker/subprocess use,
 network call, database write, route behavior change, auth policy change, UI
-behavior change, push, merge, or PR power. MIRROR.1, MIRROR.2, and MIRROR.3
-have since shipped; next likely: MIRROR.4 - Mirror Tunnel Replay Readiness Pack.
+behavior change, push, merge, or PR power. MIRROR.1 through MIRROR.4 have since
+shipped; next likely: MIRROR.5 - Mirror Tunnel Frame Emitter Contract.
 
 **MIRROR.1 - Mirror Tunnel Trace Contract is shipped 2026-06-29 (complete).**
 Implemented as `core/mirror_tunnel_trace_contract.py` +
@@ -566,7 +567,29 @@ action. It does not call models, use embeddings or semantic APIs, apply patches,
 run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream
 actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, block
-execution, push, merge, or open PRs. Recommended next phase: MIRROR.4.
+execution, push, merge, or open PRs. At shipment, its recommended next phase was
+MIRROR.4; MIRROR.4 has since shipped, so the current recommended next phase is
+MIRROR.5.
+
+**MIRROR.4 - Real Run Trace Ingestion Plan is shipped 2026-06-29 (complete).**
+Implemented as `core/mirror_tunnel_ingestion_plan.py` +
+`scripts/create_mirror_tunnel_ingestion_plan.py`, registered as a `complete`
+MIRROR-track phase (prerequisite MIRROR.3) in
+`docs/roadmap/phase_registry.json`, and validated with
+`tests/test_mirror_tunnel_ingestion_plan.py`. It writes
+`.agent/mirror_tunnel/ingestion_plan/mirror_tunnel_ingestion_plan.{json,md}`.
+The plan inventories artifact sources such as raw query text, Goal Brief JSON,
+mode-decision previews, control prompts, worker assignments/replies, patch
+proposals, validation evidence, benchmark reports, replay artifacts, final
+answers, and lesson cards; maps them to MIRROR.1 frame types with P0/P1/P2
+priorities; names required fields; identifies gaps around final answers,
+worker replies, control-prompt redaction, and real-run frame emission; and
+recommends future integration points. It does not call models, apply patches,
+run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream
+actions, apply Replay janitor actions, use Docker or subprocess, contact network
+services, write to a database, change route behavior, change auth policy, enable
+automatic Mirror tracing, block execution, push, merge, or open PRs.
+Recommended next phase: MIRROR.5.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
@@ -759,5 +782,5 @@ blocked.
 benchmark, invoke MCP tools, launch workers, execute Dream actions, apply Replay
 janitor actions, use Docker or subprocess, contact network services, write to a
 database, change route behavior, change auth policy, change UI behavior, push,
-merge, or open PRs. MIRROR.1, MIRROR.2, and MIRROR.3 have since shipped; the
-next recommended phase is MIRROR.4 - Mirror Tunnel Replay Readiness Pack.
+merge, or open PRs. MIRROR.1 through MIRROR.4 have since shipped; the next
+recommended phase is MIRROR.5 - Mirror Tunnel Frame Emitter Contract.

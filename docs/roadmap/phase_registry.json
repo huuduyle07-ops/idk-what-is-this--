@@ -1050,7 +1050,7 @@
       ],
       "notes": [
         "Report-only HARDEN.CLOSE checkpoint, shipped 2026-06-29. Reads the phase registry, HARDEN.1 source markers, and existing HARDEN.2/HARDEN.3 audit artifacts to decide frozen, frozen_with_manual_review_warnings, needs_harden_4, or blocked.",
-        "Does not call models, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream or Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, change UI behavior, push, merge, or open PRs. MIRROR.1, MIRROR.2, and MIRROR.3 have since shipped; the next registry recommendation moves to MIRROR.4."
+        "Does not call models, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream or Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, change UI behavior, push, merge, or open PRs. MIRROR.1 through MIRROR.4 have since shipped; the next registry recommendation moves to MIRROR.5."
       ]
     },
     {
@@ -1212,27 +1212,27 @@
       ],
       "notes": [
         "Report-only MIRROR.3 phase, shipped 2026-06-29. Reads MIRROR.1 trace contracts, optional MIRROR.2 score reports, and optional explicit evidence files, then compares changed-file, no-change, validation, benchmark, test, safety, scope, completion, and uncertainty claims against detected evidence.",
-        "Does not call models, use embeddings, call semantic APIs, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, block execution, push, merge, or open PRs. Recommended next phase: MIRROR.4."
+        "Does not call models, use embeddings, call semantic APIs, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, block execution, push, merge, or open PRs. MIRROR.4 has since shipped; current recommended next phase: MIRROR.5."
       ]
     },
     {
       "phase_id": "MIRROR.4",
-      "title": "Mirror Tunnel Replay Readiness Pack",
+      "title": "Real Run Trace Ingestion Plan",
       "track": "MIRROR",
-      "status": "proposed",
-      "summary": "Report-only next phase that will package MIRROR.1 trace, MIRROR.2 derailment score, and MIRROR.3 claim-vs-diff findings into a replay-readiness review bundle without executing replay, validation, benchmarks, workers, or patches.",
+      "status": "complete",
+      "summary": "Report-only ingestion plan that inventories existing C.A.T.T.U.S artifacts, maps them to MIRROR.1 frame types, identifies source gaps, and defines future integration points needed for real runs to emit useful Mirror Tunnel frames.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
       "allowed_files": [
-        "core/mirror_tunnel_replay_readiness_pack.py",
-        "scripts/create_mirror_tunnel_replay_readiness_pack.py",
-        "tests/test_mirror_tunnel_replay_readiness_pack.py",
+        "core/mirror_tunnel_ingestion_plan.py",
+        "scripts/create_mirror_tunnel_ingestion_plan.py",
+        "tests/test_mirror_tunnel_ingestion_plan.py",
         "tests/test_phase_registry.py",
         "tests/test_phase_picker.py",
         "docs/roadmap/phase_registry.json",
         "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
-        ".agent/mirror_tunnel/replay_readiness/"
+        ".agent/mirror_tunnel/ingestion_plan/"
       ],
       "forbidden_files": [
         ".env",
@@ -1243,7 +1243,7 @@
       ],
       "validation": [
         "python -m compileall -q core scripts web tests benchmarks",
-        "python -m pytest tests/test_mirror_tunnel_replay_readiness_pack.py -q",
+        "python -m pytest tests/test_mirror_tunnel_ingestion_plan.py -q",
         "python -m pytest tests/test_mirror_tunnel_trace_contract.py tests/test_mirror_tunnel_derailment_score.py tests/test_mirror_tunnel_claim_diff_check.py -q",
         "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
         "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
@@ -1261,12 +1261,66 @@
         "MIRROR.3"
       ],
       "expected_artifacts": [
-        ".agent/mirror_tunnel/replay_readiness/mirror_tunnel_replay_readiness_pack.json",
-        ".agent/mirror_tunnel/replay_readiness/mirror_tunnel_replay_readiness_pack.md"
+        ".agent/mirror_tunnel/ingestion_plan/mirror_tunnel_ingestion_plan.json",
+        ".agent/mirror_tunnel/ingestion_plan/mirror_tunnel_ingestion_plan.md"
       ],
       "notes": [
-        "Proposed report-only MIRROR.4 phase. It may assemble MIRROR.1, MIRROR.2, and MIRROR.3 artifacts into a replay-readiness pack with recommended human review steps, preserving artifact paths, missing evidence, claim support, and guardrails.",
-        "Human approval is required before acting on this phase. No replay execution, validation run, benchmark run, model call, embedding call, semantic API call, patch apply, MCP invocation, worker launch, network call, database write, route behavior change, auth policy change, push, merge, or PR power is granted by this registry entry."
+        "Report-only MIRROR.4 phase, shipped 2026-06-29. Defines artifact source inventory, frame mapping plan, ingestion priorities, required fields per source, missing source gaps, future integration points, and safety/privacy boundaries for future real-run Mirror Tunnel frame emission.",
+        "Does not call models, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, enable automatic Mirror tracing, block execution, push, merge, or open PRs. Recommended next phase: MIRROR.5."
+      ]
+    },
+    {
+      "phase_id": "MIRROR.5",
+      "title": "Mirror Tunnel Frame Emitter Contract",
+      "track": "MIRROR",
+      "status": "proposed",
+      "summary": "Report-only next phase that will turn the MIRROR.4 ingestion plan into a concrete future frame-emitter contract for real run integration, without enabling automatic tracing or changing execution behavior.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/mirror_tunnel_frame_emitter_contract.py",
+        "scripts/create_mirror_tunnel_frame_emitter_contract.py",
+        "tests/test_mirror_tunnel_frame_emitter_contract.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/mirror_tunnel/frame_emitter_contract/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_mirror_tunnel_frame_emitter_contract.py -q",
+        "python -m pytest tests/test_mirror_tunnel_trace_contract.py tests/test_mirror_tunnel_derailment_score.py tests/test_mirror_tunnel_claim_diff_check.py tests/test_mirror_tunnel_ingestion_plan.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python -m pytest -q",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "MIRROR.4"
+      ],
+      "expected_artifacts": [
+        ".agent/mirror_tunnel/frame_emitter_contract/mirror_tunnel_frame_emitter_contract.json",
+        ".agent/mirror_tunnel/frame_emitter_contract/mirror_tunnel_frame_emitter_contract.md"
+      ],
+      "notes": [
+        "Proposed report-only MIRROR.5 phase. It may define the future frame-emitter schema, hook points, redaction requirements, idempotency rules, and acceptance checks that would be needed before real run paths can emit Mirror Tunnel frames.",
+        "Human approval is required before acting on this phase. No automatic tracing, route behavior change, auth policy change, model call, patch apply, validation run, benchmark run, MCP invocation, worker launch, network call, database write, push, merge, or PR power is granted by this registry entry."
       ]
     },
     {
