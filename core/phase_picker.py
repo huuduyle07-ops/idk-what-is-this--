@@ -82,7 +82,20 @@ _REMOTE_PR_AUTOMATION = "REMOTE_3_DRAFT_PR"
 _SANDBOX_AUTOMATION = "SANDBOX_2_DRAFT_PATCH"
 
 #: Track display order for deterministic ranking.
-TRACK_ORDER: tuple[str, ...] = ("ROAD", "AUTO", "MODEL", "GOV", "A", "F", "H")
+TRACK_ORDER: tuple[str, ...] = (
+    "ROAD",
+    "AUTO",
+    "MODEL",
+    "EVAL",
+    "CMD",
+    "HARDEN",
+    "MIRROR",
+    "UX",
+    "GOV",
+    "A",
+    "F",
+    "H",
+)
 
 #: Rank lookups derived from the ROAD.1 ordered enums (lowest = best).
 _RISK_RANK: dict[str, int] = {value: index for index, value in enumerate(RISK_LEVELS)}
