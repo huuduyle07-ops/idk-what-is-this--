@@ -118,10 +118,10 @@ Branch boundary:
 
 Next recommendation: the UX branch is complete and frozen at UX.CLOSE,
 HARDEN.CLOSE has consolidated HARDEN.1-HARDEN.3 evidence, and
-MIRROR.1 through MIRROR.5 have shipped the report-only trace, scoring,
-claim-vs-diff, ingestion-planning, and manual trace assembly foundation. The
-phase picker now recommends **MIRROR.6 - Mirror Tunnel Frame Emitter Contract**
-as the next human-approved report-only branch step.
+MIRROR.1 through MIRROR.6 have shipped the report-only trace, scoring,
+claim-vs-diff, ingestion-planning, manual trace assembly, and manual review
+pipeline foundation. The phase picker now recommends **MIRROR.CLOSE - Mirror
+Tunnel Branch Checkpoint** as the next human-approved report-only branch step.
 
 ### Branch CMD — Commander Mode
 
@@ -414,10 +414,10 @@ source text) so the freeze criteria are proven by the same source-level checks. 
 `.agent/ux/ux_branch_freeze_checkpoint/ux_branch_freeze_checkpoint.{json,md}`. No model
 call, patch apply, validation run, benchmark run, network call, database write, worker
 launch, backend or mutation route, UI behavior change, push, merge, or PR power was added.
-The UX and HARDEN branches are now frozen, and MIRROR.1 through MIRROR.5 have
+The UX and HARDEN branches are now frozen, and MIRROR.1 through MIRROR.6 have
 shipped the trace contract, derailment scoring report, claim-vs-diff check, and
-real-run ingestion/manual assembly foundation. The recommended next move is
-MIRROR.6 - Mirror Tunnel Frame Emitter Contract.
+real-run ingestion/manual assembly/manual review foundation. The recommended
+next move is MIRROR.CLOSE - Mirror Tunnel Branch Checkpoint.
 
 **UX.11 — Unified Workbench Behavior Preservation Check is shipped 2026-06-28 (complete).**
 Implemented as `core/unified_workbench_behavior_preservation.py` +
@@ -513,8 +513,8 @@ Artifacts:
 Adds no model call, patch apply, validation run, benchmark run, MCP invocation,
 worker launch, Dream execution, Replay janitor apply, Docker/subprocess use,
 network call, database write, route behavior change, auth policy change, UI
-behavior change, push, merge, or PR power. MIRROR.1 through MIRROR.5 have since
-shipped; next likely: MIRROR.6 - Mirror Tunnel Frame Emitter Contract.
+behavior change, push, merge, or PR power. MIRROR.1 through MIRROR.6 have since
+shipped; next likely: MIRROR.CLOSE - Mirror Tunnel Branch Checkpoint.
 
 **MIRROR.1 - Mirror Tunnel Trace Contract is shipped 2026-06-29 (complete).**
 Implemented as `core/mirror_tunnel_trace_contract.py` +
@@ -568,8 +568,8 @@ run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream
 actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, block
 execution, push, merge, or open PRs. At shipment, its recommended next phase was
-MIRROR.4; MIRROR.4 and MIRROR.5 have since shipped, so the current recommended
-next phase is MIRROR.6.
+MIRROR.4; MIRROR.4 through MIRROR.6 have since shipped, so the current
+recommended next phase is MIRROR.CLOSE.
 
 **MIRROR.4 - Real Run Trace Ingestion Plan is shipped 2026-06-29 (complete).**
 Implemented as `core/mirror_tunnel_ingestion_plan.py` +
@@ -590,7 +590,8 @@ actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, enable
 automatic Mirror tracing, block execution, push, merge, or open PRs.
 At shipment, its recommended next phase was MIRROR.5; MIRROR.5 has since
-shipped, so the current recommended next phase is MIRROR.6.
+shipped, and MIRROR.6 has also shipped, so the current recommended next phase is
+MIRROR.CLOSE.
 
 **MIRROR.5 - Manual Trace Assembler is shipped 2026-06-29 (complete).**
 Implemented as `core/mirror_tunnel_manual_trace_assembler.py` +
@@ -611,8 +612,28 @@ paths. It does not call models, apply patches, run validation, run benchmarks,
 invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor
 actions, use Docker or subprocess, contact network services, write to a
 database, change route behavior, change auth policy, enable automatic live
-tracing, block execution, push, merge, or open PRs. Recommended next phase:
-MIRROR.6.
+tracing, block execution, push, merge, or open PRs. MIRROR.6 has since shipped,
+so the current recommended next phase is MIRROR.CLOSE.
+
+**MIRROR.6 - Manual Trace Score Pipeline is shipped 2026-06-30 (complete).**
+Implemented as `core/mirror_tunnel_manual_review_pipeline.py` +
+`scripts/create_mirror_tunnel_manual_review.py`, registered as a `complete`
+MIRROR-track phase (prerequisite MIRROR.5) in
+`docs/roadmap/phase_registry.json`, and validated with
+`tests/test_mirror_tunnel_manual_review_pipeline.py`. It reads a manually
+assembled MIRROR.5/MIRROR.1 trace, optionally reads existing MIRROR.2 and
+MIRROR.3 JSON reports, otherwise calls the MIRROR.2 and MIRROR.3 pure Python
+builders directly, and writes
+`.agent/mirror_tunnel/manual_review/<review_id>/mirror_tunnel_manual_review.{json,md}`.
+The combined review pack summarizes trace status and frame coverage,
+derailment verdict/score, claim support verdict, strongest drift dimensions,
+mismatches, unsupported claims, missing evidence, human-review notes, and a
+recommended next action. It does not call models, apply patches, run validation,
+run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply
+Replay janitor actions, use Docker or subprocess, contact network services,
+write to a database, change route behavior, change auth policy, enable live
+runtime tracing, shell out to CLI scripts, block execution, push, merge, or open
+PRs. Recommended next phase: MIRROR.CLOSE.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
@@ -805,5 +826,5 @@ blocked.
 benchmark, invoke MCP tools, launch workers, execute Dream actions, apply Replay
 janitor actions, use Docker or subprocess, contact network services, write to a
 database, change route behavior, change auth policy, change UI behavior, push,
-merge, or open PRs. MIRROR.1 through MIRROR.5 have since shipped; the next
-recommended phase is MIRROR.6 - Mirror Tunnel Frame Emitter Contract.
+merge, or open PRs. MIRROR.1 through MIRROR.6 have since shipped; the next
+recommended phase is MIRROR.CLOSE - Mirror Tunnel Branch Checkpoint.
