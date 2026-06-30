@@ -524,9 +524,9 @@ def test_seed_registry_has_expected_phases():
         "ROAD.1", "ROAD.2", "ROAD.3", "ROAD.4", "AUTO.2a", "AUTO.2b", "AUTO.2c",
         "MODEL.1", "MODEL.2", "MODEL.3", "EVAL.1", "EVAL.2", "EVAL.3", "CMD.1", "CMD.2", "CMD.3", "CMD.4",
         "HARDEN.1", "HARDEN.2", "HARDEN.3", "HARDEN.CLOSE", "UX.1", "UX.2", "UX.3", "UX.4", "UX.5", "UX.6", "UX.7", "UX.8", "UX.9", "UX.10", "UX.11",
-        "UX.CLOSE", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE",
+        "UX.CLOSE", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE", "MIRROR.7",
     } <= ids
-    assert len(data["phases"]) == 40
+    assert len(data["phases"]) == 41
 
 
 def test_seed_registry_is_conservative():
@@ -549,7 +549,7 @@ def test_seed_registry_summary_counts():
         "CMD": 4,
         "EVAL": 3,
         "HARDEN": 4,
-        "MIRROR": 7,
+        "MIRROR": 8,
         "MODEL": 3,
         "ROAD": 4,
         "UX": 12,
