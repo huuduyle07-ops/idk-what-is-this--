@@ -500,8 +500,18 @@ def _excluded_live_scan_path(rel: Path) -> bool:
     return False
 
 
+def _allowed_shadow_live_trace_hook(rel: Path, text: str) -> bool:
+    norm = _norm_path(rel)
+    return (
+        norm == "web/runner.py"
+        and "core.mirror_tunnel_shadow_live_trace" in text
+        and "maybe_write_shadow_live_trace" in text
+    )
+
+
 def _scan_live_instrumentation(repo: Path) -> dict[str, Any]:
     matches: list[dict[str, str]] = []
+    allowed_shadow_matches: list[dict[str, str]] = []
     for root_name in ("core", "scripts", "web", "benchmarks"):
         root = repo / root_name
         if not root.exists():
@@ -520,10 +530,19 @@ def _scan_live_instrumentation(repo: Path) -> dict[str, Any]:
             except OSError:
                 continue
             if "mirror_tunnel" in text or "shadow_live_trace" in text:
+                if _allowed_shadow_live_trace_hook(rel, text):
+                    allowed_shadow_matches.append(
+                        {
+                            "path": _norm_path(rel),
+                            "token": "approved_mirror7_shadow_live_trace_hook",
+                        }
+                    )
+                    continue
                 matches.append({"path": _norm_path(rel), "token": "mirror_tunnel/shadow_live_trace"})
     return {
         "live_runtime_instrumentation_added": bool(matches),
         "matches": matches,
+        "allowed_shadow_only_default_off_matches": allowed_shadow_matches,
     }
 
 

@@ -315,6 +315,7 @@ def test_gather_real_inputs_and_cli_current_status(tmp_path):
     assert report["phase_status"]["all_required_mirror_phases_complete"] is True
     assert report["manual_pipeline_summary"]["usable_even_if_real_trace_quality_is_weak"] is True
     assert report["live_instrumentation_summary"]["live_runtime_instrumentation_added"] is False
+    assert report["live_instrumentation_summary"]["allowed_shadow_only_default_off_matches"]
 
     result = script.run_create_mirror_tunnel_branch_checkpoint(
         repo_path=str(PROJECT_ROOT),
@@ -350,19 +351,23 @@ def test_cli_exit_codes_for_warning_and_blocked(tmp_path):
     assert script.main(base + ["--manual-review", str(missing), "--allow-warnings"]) != 0
 
 
-def test_real_registry_registers_close_complete_and_mirror7_proposed():
+def test_real_registry_registers_mirror7_complete_and_mirror8_proposed():
     data = json.loads(REAL_REGISTRY.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
     assert THIS_PHASE_ID in by_id
     assert by_id[THIS_PHASE_ID]["status"] == "complete"
     assert by_id[THIS_PHASE_ID]["prerequisites"] == ["MIRROR.6"]
     assert "MIRROR.7" in by_id
-    assert by_id["MIRROR.7"]["status"] == "proposed"
+    assert by_id["MIRROR.7"]["status"] == "complete"
     assert by_id["MIRROR.7"]["prerequisites"] == [THIS_PHASE_ID]
     assert by_id["MIRROR.7"]["title"] == "Shadow Live Trace Writer"
     assert by_id["MIRROR.7"]["model_calls_allowed"] is False
     assert by_id["MIRROR.7"]["network_allowed"] is False
     assert by_id["MIRROR.7"]["writes_real_repo"] is False
+    assert by_id["MIRROR.8"]["status"] == "complete"
+    assert by_id["MIRROR.8"]["prerequisites"] == ["MIRROR.7"]
+    assert by_id["MIRROR.9"]["status"] == "proposed"
+    assert by_id["MIRROR.9"]["prerequisites"] == ["MIRROR.8"]
 
 
 def test_guardrail_flags_show_report_only_boundaries():

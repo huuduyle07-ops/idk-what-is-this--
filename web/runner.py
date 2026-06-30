@@ -4,6 +4,7 @@ import json
 import os, uuid
 import re
 from pathlib import Path
+from typing import Any
 
 from core.agent_state import AgentState
 from core.code_dna import dna_to_prompt_block, get_or_compute_dna
@@ -52,6 +53,7 @@ from patching.patch_gates import (
     promote_ts_missing_import_candidate_to_patch_plan,
 )
 from core.source_snippet_fallback import hydrate_control_source_from_scout
+from core.mirror_tunnel_shadow_live_trace import maybe_write_shadow_live_trace
 from web.mcp_inspector_processes import stop_mcp_inspectors
 
 
@@ -207,6 +209,30 @@ def _write_debug_no_json_answer(_state: AgentState, reviewed_answer: str) -> Non
         encoding="utf-8",
     )
     print("⚠️ No structured patch JSON. Raw answer saved to .agent/debug_no_json_answer.txt")
+
+
+def _maybe_write_web_shadow_live_trace(
+    *,
+    result: dict,
+    query: str,
+    repo_path: str,
+    session_id: Any,
+    control_result: dict | None,
+    patch_or_diff: Any,
+    validation_evidence: Any,
+    final_answer: Any,
+) -> dict:
+    maybe_write_shadow_live_trace(
+        repo_path=repo_path or ".",
+        run_id=str(session_id or ""),
+        user_intent=query,
+        control_prompt=control_result,
+        patch_or_diff=patch_or_diff,
+        validation_evidence=validation_evidence,
+        final_answer=final_answer,
+        boundary="web.runner.run_agent_web.final_result",
+    )
+    return result
 
 
 def run_agent_web(
@@ -521,7 +547,7 @@ def run_agent_web(
             save_message(session_id, "assistant", state.final_answer)
         except Exception as e:
             print(f"⚠️ DB message save skipped: {e}")
-        return {
+        result = {
             "answer": state.final_answer,
             "context": state.context_data,
             "graph": json.dumps(state.code_analysis, indent=2),
@@ -535,6 +561,16 @@ def run_agent_web(
             "runtime_environment_description": runtime_description,
             **_harness_payload(post_gate_decision),
         }
+        return _maybe_write_web_shadow_live_trace(
+            result=result,
+            query=query,
+            repo_path=state.repo_path or repo_path or ".",
+            session_id=session_id,
+            control_result=state.control_result,
+            patch_or_diff=state.json_block or {},
+            validation_evidence=state.validation_output or "",
+            final_answer=state.final_answer,
+        )
 
     except Exception as e:
         return {

@@ -560,9 +560,9 @@ def test_seed_registry_produces_expected_buckets():
         "human_approval_required": 0,
         "blocked": 0,
         "deferred_or_parked": 0,
-        "complete_or_history": 40,
+        "complete_or_history": 42,
     }
-    assert report["top_recommendation"]["phase_id"] == "MIRROR.7"
+    assert report["top_recommendation"]["phase_id"] == "MIRROR.9"
     assert report["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"
 
 
@@ -570,8 +570,8 @@ def test_seed_safe_candidates_sorted_deterministically():
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     report = _report(data, report_id="r", created_at="t")
     ids = [p["phase_id"] for p in report["safe_to_prepare"]]
-    # Completed phases drop out; MIRROR.7 remains the next safe report-only candidate.
-    assert ids == ["MIRROR.7"]
+    # Completed phases drop out; MIRROR.9 remains the next safe report-only candidate.
+    assert ids == ["MIRROR.9"]
 
 
 def test_seed_shipped_phases_are_complete_and_not_recommended():
@@ -580,7 +580,7 @@ def test_seed_shipped_phases_are_complete_and_not_recommended():
     # shipped before that.
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     statuses = {p["phase_id"]: p["status"] for p in data["phases"]}
-    shipped = ["ROAD.1", "ROAD.2", "ROAD.3", "ROAD.4", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3", "EVAL.1", "EVAL.2", "EVAL.3", "CMD.1", "CMD.2", "CMD.3", "CMD.4", "HARDEN.1", "HARDEN.2", "HARDEN.3", "HARDEN.CLOSE", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE"]
+    shipped = ["ROAD.1", "ROAD.2", "ROAD.3", "ROAD.4", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3", "EVAL.1", "EVAL.2", "EVAL.3", "CMD.1", "CMD.2", "CMD.3", "CMD.4", "HARDEN.1", "HARDEN.2", "HARDEN.3", "HARDEN.CLOSE", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE", "MIRROR.7", "MIRROR.8"]
     for pid in shipped:
         assert statuses[pid] == "complete", pid
     report = _report(data, report_id="r", created_at="t")
@@ -588,7 +588,7 @@ def test_seed_shipped_phases_are_complete_and_not_recommended():
     assert set(shipped) <= history_ids
     safe = {p["phase_id"] for p in report["safe_to_prepare"]}
     assert not (set(shipped) & safe)
-    assert report["top_recommendation"]["phase_id"] == "MIRROR.7"
+    assert report["top_recommendation"]["phase_id"] == "MIRROR.9"
 
 
 # ── purity / constants ─────────────────────────────────────────────────────────
