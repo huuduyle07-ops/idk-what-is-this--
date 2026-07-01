@@ -1,8 +1,9 @@
 """Tests for MIRROR.10 - Operator Panel Read-only UI Stub.
 
-The MIRROR.10 panel is a static/read-only operator surface for already
-available MIRROR.7/MIRROR.8/MIRROR.9 evidence. It must not add execution,
-scoring, approval, blocking, or route behavior.
+The MIRROR.10 panel is a read-only operator surface for already available
+MIRROR.7/MIRROR.8/MIRROR.9 evidence. Later Mirror phases may add GET-only
+artifact loading, but the panel must not add execution, scoring, approval, or
+blocking behavior.
 """
 from __future__ import annotations
 
@@ -43,6 +44,11 @@ def _mirror_js(template: str | None = None) -> str:
     return _between(template or _template(), "// MIRROR.10 read-only operator panel", "// /MIRROR.10 read-only operator panel")
 
 
+def _mirror_route_source() -> str:
+    src = WEB_APP.read_text(encoding="utf-8")
+    return _between(src, "# MIRROR.11 read-only preview loader", "# /MIRROR.11 read-only preview loader")
+
+
 def _button_labels(html: str) -> list[str]:
     return [re.sub(r"\s+", " ", label).strip() for label in re.findall(r"<button\b[^>]*>(.*?)</button>", html, re.S)]
 
@@ -75,7 +81,7 @@ def test_mirror_panel_actions_are_read_only_and_never_approval_or_execution_butt
     panel = _mirror_panel()
     labels = _button_labels(panel)
 
-    assert labels == ["Refresh Mirror summary", "Copy Mirror summary", "Copy artifact paths"]
+    assert labels == ["Load Mirror preview", "Refresh Mirror summary", "Copy Mirror summary", "Copy artifact paths"]
     for label in labels:
         assert all(word not in label.lower() for word in ("apply", "reject", "approve", "run"))
 
@@ -125,12 +131,16 @@ def test_mirror_javascript_renders_only_existing_data_without_mutating_fetches()
     js = _mirror_js()
 
     assert "function renderMirrorTunnelSummary" in js
+    assert "function loadMirrorTunnelPreview" in js
     assert "window.mirrorTunnelSummary" in js
     assert "MIRROR_TUNNEL_EMPTY_SUMMARY" in js
+    assert "fetch(`/mirror-tunnel/preview/" in js
     for forbidden in (
-        "fetch(",
         "method: \"POST\"",
         "method: 'POST'",
+        "/generate_patch",
+        "/apply_patch",
+        "/benchmarks/run",
         "applyPatch(",
         "generatePatch(",
         "runAllBenchmarks(",
@@ -138,17 +148,22 @@ def test_mirror_javascript_renders_only_existing_data_without_mutating_fetches()
         "runValidation",
         "launchWorker",
         "callModel",
+        "maybe_write_shadow_live_trace",
     ):
         assert forbidden not in js
 
 
-def test_no_mirror_backend_route_is_added_for_ui_stub():
+def test_mirror_backend_route_is_get_only_and_read_only_after_loader_phase():
     route_sources = [WEB_APP.read_text(encoding="utf-8")]
     route_sources.extend(path.read_text(encoding="utf-8") for path in WEB_ROUTES.glob("*.py"))
-    web_route_text = "\n".join(route_sources).lower()
+    web_route_text = "\n".join(route_sources)
+    route = _mirror_route_source()
 
-    assert "mirror-tunnel" not in web_route_text
-    assert "mirror_tunnel" not in web_route_text
+    assert '@app.route("/mirror-tunnel/preview/<path:preview_id>", methods=["GET"])' in route
+    assert "methods=[\"POST\"]" not in route
+    assert ".write_text" not in route
+    assert ".mkdir" not in route
+    assert "mirror-tunnel" in web_route_text
 
 
 def test_mirror_panel_has_local_styles():
@@ -157,6 +172,7 @@ def test_mirror_panel_has_local_styles():
     for selector in (
         ".mirror-tunnel-panel",
         ".mirror-tunnel-badge",
+        ".mirror-tunnel-loader",
         ".mirror-tunnel-fields",
         ".mirror-tunnel-details",
         ".mirror-tunnel-raw",
@@ -171,12 +187,14 @@ def test_registry_marks_mirror10_complete_and_picker_recommends_mirror11():
     assert by_id["MIRROR.9"]["status"] == "complete"
     assert by_id["MIRROR.10"]["status"] == "complete"
     assert by_id["MIRROR.10"]["prerequisites"] == ["MIRROR.9"]
-    assert by_id["MIRROR.11"]["status"] == "proposed"
+    assert by_id["MIRROR.11"]["status"] == "complete"
     assert by_id["MIRROR.11"]["prerequisites"] == ["MIRROR.10"]
+    assert by_id["MIRROR.12"]["status"] == "proposed"
+    assert by_id["MIRROR.12"]["prerequisites"] == ["MIRROR.11"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="mirror10-ui",
         created_at="2026-07-02T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "MIRROR.11"
+    assert report["top_recommendation"]["phase_id"] == "MIRROR.12"
