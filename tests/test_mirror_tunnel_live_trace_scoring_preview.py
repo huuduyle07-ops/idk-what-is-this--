@@ -307,12 +307,18 @@ def test_registry_picker_recommends_next_phase():
     assert by_id["MIRROR.8"]["status"] == "complete"
     assert by_id["MIRROR.8"]["title"] == "Live Trace Scoring Preview"
     assert by_id["MIRROR.8"]["prerequisites"] == ["MIRROR.7"]
-    assert by_id["MIRROR.9"]["status"] == "proposed"
+    assert by_id["MIRROR.9"]["status"] == "complete"
     assert by_id["MIRROR.9"]["prerequisites"] == ["MIRROR.8"]
+    assert by_id["MIRROR.10"]["status"] == "complete"
+    assert by_id["MIRROR.10"]["prerequisites"] == ["MIRROR.9"]
+    assert by_id["MIRROR.11"]["status"] == "complete"
+    assert by_id["MIRROR.11"]["prerequisites"] == ["MIRROR.10"]
+    assert by_id["MIRROR.12"]["status"] == "proposed"
+    assert by_id["MIRROR.12"]["prerequisites"] == ["MIRROR.11"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="r",
         created_at="2026-06-30T00:00:00+00:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "MIRROR.9"
+    assert report["top_recommendation"]["phase_id"] == "MIRROR.12"
