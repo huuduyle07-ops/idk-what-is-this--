@@ -4668,6 +4668,160 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     word-wrap: break-word;
 }
 
+/* MIRROR.10: read-only Mirror Tunnel operator panel. */
+.mirror-tunnel-panel {
+    margin-top: 16px;
+    padding: 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+}
+
+.mirror-tunnel-panel__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.mirror-tunnel-panel__note {
+    margin: 4px 0 0;
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+.mirror-tunnel-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: normal;
+    text-align: right;
+}
+
+.mirror-tunnel-badge--empty {
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+}
+
+.mirror-tunnel-badge--loaded {
+    background: #052e16;
+    color: #bbf7d0;
+    border-color: #166534;
+}
+
+.mirror-tunnel-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin: 0;
+}
+
+.mirror-tunnel-fields > div {
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-bg);
+}
+
+.mirror-tunnel-fields dt {
+    margin-bottom: 5px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0;
+}
+
+.mirror-tunnel-fields dd {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 13px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.mirror-tunnel-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.mirror-tunnel-copy-status {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.mirror-tunnel-details {
+    margin-top: 12px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 8px;
+}
+
+.mirror-tunnel-details > summary {
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.mirror-tunnel-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.mirror-tunnel-detail-grid section {
+    min-width: 0;
+}
+
+.mirror-tunnel-detail-grid h4 {
+    margin: 0 0 6px;
+    color: var(--color-text);
+    font-size: 13px;
+}
+
+.mirror-tunnel-list {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.mirror-tunnel-list code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.mirror-tunnel-detail-empty {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.mirror-tunnel-raw {
+    margin: 0;
+    max-height: 220px;
+    overflow: auto;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
 /* ---- Phase 12.15a: Harness Controls panel ---- */
 .harness-controls__note {
     font-size: 12px;

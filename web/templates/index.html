@@ -1547,6 +1547,69 @@
             </header>
             <p>Preview-only Evidence Card Layout defined in UX.6; evidence creation and execution are not implemented here.</p>
             <p>Evidence cards summarise what changed, what evidence exists, what checks say, what risks remain, and what the human should do next. Human confirmation is required before any run.</p>
+            <section id="mirrorTunnelPanel" class="mirror-tunnel-panel" aria-label="Mirror Tunnel" data-mirror-readonly="true">
+              <header class="mirror-tunnel-panel__header">
+                <div>
+                  <strong>Mirror Tunnel</strong>
+                  <p class="mirror-tunnel-panel__note">Mirror Tunnel is advisory evidence, not an approval gate.</p>
+                </div>
+                <span id="mirrorTunnelStatusBadge" class="mirror-tunnel-badge mirror-tunnel-badge--empty">No live trace preview loaded</span>
+              </header>
+              <dl class="mirror-tunnel-fields">
+                <div>
+                  <dt>Trace status</dt>
+                  <dd id="mirrorTraceStatus">No trace loaded</dd>
+                </div>
+                <div>
+                  <dt>Derailment verdict</dt>
+                  <dd id="mirrorDerailmentVerdict">No preview loaded</dd>
+                </div>
+                <div>
+                  <dt>Claim support verdict</dt>
+                  <dd id="mirrorClaimSupportVerdict">No preview loaded</dd>
+                </div>
+                <div>
+                  <dt>Missing evidence count</dt>
+                  <dd id="mirrorMissingEvidenceCount">Not available</dd>
+                </div>
+                <div>
+                  <dt>Recommended next action</dt>
+                  <dd id="mirrorRecommendedNextAction">Load an existing Mirror Tunnel trace or scoring preview artifact.</dd>
+                </div>
+              </dl>
+              <div class="mirror-tunnel-actions" aria-label="Mirror Tunnel read-only actions">
+                <button type="button" onclick="renderMirrorTunnelSummary()">Refresh Mirror summary</button>
+                <button type="button" onclick="copyMirrorTunnelSummary()">Copy Mirror summary</button>
+                <button type="button" onclick="copyMirrorTunnelArtifactPaths()">Copy artifact paths</button>
+                <span id="mirrorCopyStatus" class="mirror-tunnel-copy-status" aria-live="polite"></span>
+              </div>
+              <details class="mirror-tunnel-details">
+                <summary>Mirror details</summary>
+                <div class="mirror-tunnel-detail-grid">
+                  <section>
+                    <h4>Frame coverage</h4>
+                    <div id="mirrorFrameCoverage" class="mirror-tunnel-detail-empty">No frame coverage loaded.</div>
+                  </section>
+                  <section>
+                    <h4>Top warnings</h4>
+                    <ul id="mirrorTopWarnings" class="mirror-tunnel-list">
+                      <li>No warnings loaded.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Artifact paths</h4>
+                    <ul id="mirrorArtifactPaths" class="mirror-tunnel-list">
+                      <li>No artifact paths loaded.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Raw JSON</h4>
+                    <pre id="mirrorRawJson" class="mirror-tunnel-raw">No raw Mirror JSON loaded.</pre>
+                  </section>
+                </div>
+              </details>
+            </section>
+            <!-- /mirror-tunnel-panel -->
             <details>
               <summary>Card types</summary>
               <ul>
@@ -7841,6 +7904,179 @@ function _renderEvidenceFiles(files) {
     container.innerHTML = `<ul class="evidence-file-list">${rows}</ul>`;
 }
 
+// MIRROR.10 read-only operator panel
+const MIRROR_TUNNEL_EMPTY_SUMMARY = Object.freeze({
+    status_badge: "No live trace preview loaded",
+    trace_status: "No trace loaded",
+    derailment_verdict: "No preview loaded",
+    claim_support_verdict: "No preview loaded",
+    missing_evidence_count: "Not available",
+    recommended_next_action: "Load an existing Mirror Tunnel trace or scoring preview artifact.",
+    frame_coverage: "No frame coverage loaded.",
+    top_warnings: [],
+    artifact_paths: [],
+    raw_json_placeholder: "No raw Mirror JSON loaded."
+});
+
+let mirrorTunnelCurrentSummary = MIRROR_TUNNEL_EMPTY_SUMMARY;
+
+function _mirrorObject(value) {
+    return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+}
+
+function _mirrorVisible(summary) {
+    const obj = _mirrorObject(summary);
+    return _mirrorObject(obj.visible_fields || obj.summary || obj);
+}
+
+function _mirrorPick(summary, keys, fallback) {
+    const visible = _mirrorVisible(summary);
+    const root = _mirrorObject(summary);
+    for (const key of keys) {
+        if (visible[key] !== undefined && visible[key] !== null && visible[key] !== "") return visible[key];
+        if (root[key] !== undefined && root[key] !== null && root[key] !== "") return root[key];
+    }
+    return fallback;
+}
+
+function _mirrorArray(value) {
+    if (Array.isArray(value)) return value.filter(item => item !== undefined && item !== null && String(item).trim() !== "").map(String);
+    if (value === undefined || value === null || value === "") return [];
+    return [String(value)];
+}
+
+function _mirrorArtifactPathLines(paths) {
+    if (Array.isArray(paths)) return _mirrorArray(paths);
+    if (paths && typeof paths === "object") {
+        return Object.entries(paths)
+            .filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== "")
+            .map(([key, value]) => `${key}: ${value}`);
+    }
+    return _mirrorArray(paths);
+}
+
+function _mirrorFrameCoverageLines(coverage) {
+    if (!coverage || coverage === MIRROR_TUNNEL_EMPTY_SUMMARY.frame_coverage) return [];
+    if (typeof coverage === "string") return [coverage];
+    if (Array.isArray(coverage)) return coverage.map(String);
+    if (typeof coverage === "object") {
+        return Object.entries(coverage)
+            .filter(([, value]) => value !== undefined && value !== null && value !== "")
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`);
+    }
+    return [String(coverage)];
+}
+
+function _mirrorSetText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(value);
+}
+
+function _mirrorRenderList(id, items, emptyText) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const rows = _mirrorArray(items);
+    if (!rows.length) {
+        el.innerHTML = `<li>${_escapeHtml(emptyText)}</li>`;
+        return;
+    }
+    el.innerHTML = rows.map(item => `<li><code>${_escapeHtml(item)}</code></li>`).join("");
+}
+
+function _mirrorSummaryData(input) {
+    const candidate = input || window.mirrorTunnelSummary || MIRROR_TUNNEL_EMPTY_SUMMARY;
+    return _mirrorObject(candidate) === candidate ? candidate : MIRROR_TUNNEL_EMPTY_SUMMARY;
+}
+
+function renderMirrorTunnelSummary(summary) {
+    const data = _mirrorSummaryData(summary);
+    const visible = _mirrorVisible(data);
+    mirrorTunnelCurrentSummary = data;
+
+    const frameCoverage = visible.frame_coverage || data.frame_coverage || MIRROR_TUNNEL_EMPTY_SUMMARY.frame_coverage;
+    const missingEvidence = _mirrorPick(
+        data,
+        ["missing_evidence_count"],
+        frameCoverage && typeof frameCoverage === "object" && frameCoverage.missing_evidence_count !== undefined
+            ? frameCoverage.missing_evidence_count
+            : (Array.isArray(data.missing_evidence) ? data.missing_evidence.length : MIRROR_TUNNEL_EMPTY_SUMMARY.missing_evidence_count)
+    );
+
+    const statusBadge = document.getElementById("mirrorTunnelStatusBadge");
+    if (statusBadge) {
+        statusBadge.textContent = _mirrorPick(data, ["status_badge", "status"], MIRROR_TUNNEL_EMPTY_SUMMARY.status_badge);
+        statusBadge.className = "mirror-tunnel-badge";
+        statusBadge.classList.add(data === MIRROR_TUNNEL_EMPTY_SUMMARY ? "mirror-tunnel-badge--empty" : "mirror-tunnel-badge--loaded");
+    }
+
+    _mirrorSetText("mirrorTraceStatus", _mirrorPick(data, ["trace_status"], data.trace?.status || MIRROR_TUNNEL_EMPTY_SUMMARY.trace_status));
+    _mirrorSetText("mirrorDerailmentVerdict", _mirrorPick(data, ["derailment_verdict"], data.derailment_score_preview?.verdict || MIRROR_TUNNEL_EMPTY_SUMMARY.derailment_verdict));
+    _mirrorSetText("mirrorClaimSupportVerdict", _mirrorPick(data, ["claim_support_verdict"], data.claim_vs_diff_preview?.overall_claim_support || MIRROR_TUNNEL_EMPTY_SUMMARY.claim_support_verdict));
+    _mirrorSetText("mirrorMissingEvidenceCount", missingEvidence);
+    _mirrorSetText("mirrorRecommendedNextAction", _mirrorPick(data, ["recommended_next_action"], MIRROR_TUNNEL_EMPTY_SUMMARY.recommended_next_action));
+
+    const coverageLines = _mirrorFrameCoverageLines(frameCoverage);
+    const coverage = document.getElementById("mirrorFrameCoverage");
+    if (coverage) {
+        coverage.classList.toggle("mirror-tunnel-detail-empty", coverageLines.length === 0);
+        coverage.innerHTML = coverageLines.length
+            ? `<ul class="mirror-tunnel-list">${coverageLines.map(item => `<li>${_escapeHtml(item)}</li>`).join("")}</ul>`
+            : MIRROR_TUNNEL_EMPTY_SUMMARY.frame_coverage;
+    }
+
+    _mirrorRenderList("mirrorTopWarnings", visible.top_warnings || data.top_warnings || data.warnings || [], "No warnings loaded.");
+    _mirrorRenderList("mirrorArtifactPaths", visible.artifact_paths || data.artifact_paths || [], "No artifact paths loaded.");
+
+    const raw = document.getElementById("mirrorRawJson");
+    if (raw) {
+        raw.textContent = data === MIRROR_TUNNEL_EMPTY_SUMMARY
+            ? MIRROR_TUNNEL_EMPTY_SUMMARY.raw_json_placeholder
+            : JSON.stringify(data.raw_json || data, null, 2);
+    }
+}
+
+function _mirrorSummaryText() {
+    const data = mirrorTunnelCurrentSummary || MIRROR_TUNNEL_EMPTY_SUMMARY;
+    const visible = _mirrorVisible(data);
+    const artifactLines = _mirrorArtifactPathLines(visible.artifact_paths || data.artifact_paths || []);
+    const warningLines = _mirrorArray(visible.top_warnings || data.top_warnings || data.warnings || []);
+    return [
+        "Mirror Tunnel",
+        `trace status: ${document.getElementById("mirrorTraceStatus")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.trace_status}`,
+        `derailment verdict: ${document.getElementById("mirrorDerailmentVerdict")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.derailment_verdict}`,
+        `claim support verdict: ${document.getElementById("mirrorClaimSupportVerdict")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.claim_support_verdict}`,
+        `missing evidence count: ${document.getElementById("mirrorMissingEvidenceCount")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.missing_evidence_count}`,
+        `recommended next action: ${document.getElementById("mirrorRecommendedNextAction")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.recommended_next_action}`,
+        warningLines.length ? `warnings: ${warningLines.join("; ")}` : "warnings: none loaded",
+        artifactLines.length ? `artifact paths: ${artifactLines.join("; ")}` : "artifact paths: none loaded"
+    ].join("\n");
+}
+
+function _mirrorCopyText(text, doneMessage) {
+    const status = document.getElementById("mirrorCopyStatus");
+    if (!navigator.clipboard || typeof navigator.clipboard.writeText !== "function") {
+        if (status) status.textContent = "Clipboard unavailable.";
+        return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+        if (status) status.textContent = doneMessage;
+    }).catch(err => {
+        if (status) status.textContent = `Copy failed: ${err}`;
+    });
+}
+
+function copyMirrorTunnelSummary() {
+    _mirrorCopyText(_mirrorSummaryText(), "Mirror summary copied.");
+}
+
+function copyMirrorTunnelArtifactPaths() {
+    const data = mirrorTunnelCurrentSummary || MIRROR_TUNNEL_EMPTY_SUMMARY;
+    const visible = _mirrorVisible(data);
+    const artifactLines = _mirrorArtifactPathLines(visible.artifact_paths || data.artifact_paths || []);
+    _mirrorCopyText(artifactLines.join("\n") || "No artifact paths loaded.", "Artifact paths copied.");
+}
+// /MIRROR.10 read-only operator panel
+
 function refreshPresentationEvidence() {
     const repo = _evidenceRepo();
     const status = document.getElementById("evidencePackStatus");
@@ -8806,6 +9042,7 @@ showTab(initialTab);
 // Restore the last-active workspace tab (default: chat).
 const savedWs = localStorage.getItem("activeWorkspaceTab") || "chat";
 showWorkspaceTab(savedWs);
+renderMirrorTunnelSummary();
 
 const hasCurrentSession = "{{ 'true' if current else 'false' }}" === "true";
 const serverProductMode = normalizeProductMode(document.getElementById("webModeInput")?.value || "instant");
