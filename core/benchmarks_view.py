@@ -24,6 +24,9 @@ _FILE_CHANGE_LEDGER_FIELDS = (
     "unexpected_mutations",
 )
 _FILE_CHANGE_SCOPES = ("CLEAN", "GENERATED", "UNEXPECTED", "UNKNOWN")
+_TEMP_CREATE_ATTEMPTS = 100
+_WINDOWS_REPLACE_ATTEMPTS = 4
+_WINDOWS_REPLACE_RETRY_DELAY_SECONDS = 0.02
 _FAILURE_KIND_DISPLAY_BY_KIND = {
     "environment": "ENVIRONMENT",
     "toolchain": "TOOLCHAIN",
@@ -59,9 +62,55 @@ def read_benchmark_meta(repo_path: str | Path) -> dict:
 def write_benchmark_meta(repo_path: str | Path, meta: dict) -> None:
     path = _meta_path(repo_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
-    tmp.replace(path)
+    tmp_path = _write_meta_temp_file(path, meta)
+    try:
+        _replace_meta_file(tmp_path, path)
+    except Exception:
+        try:
+            tmp_path.unlink()
+        except FileNotFoundError:
+            pass
+        raise
+
+
+def _write_meta_temp_file(path: Path, meta: dict) -> Path:
+    for attempt in range(_TEMP_CREATE_ATTEMPTS):
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
+        tmp_path = path.with_name(f"{path.name}.{stamp}.{attempt}.tmp")
+        try:
+            with tmp_path.open("x", encoding="utf-8") as tmp:
+                json.dump(meta, tmp, indent=2, ensure_ascii=False)
+            return tmp_path
+        except FileExistsError:
+            continue
+        except Exception:
+            try:
+                tmp_path.unlink()
+            except FileNotFoundError:
+                pass
+            raise
+    raise FileExistsError(f"could not create unique temp file for {path}")
+
+
+def _replace_meta_file(tmp_path: Path, path: Path) -> None:
+    attempts = _WINDOWS_REPLACE_ATTEMPTS if path.drive else 1
+    for attempt in range(attempts):
+        try:
+            tmp_path.replace(path)
+            return
+        except PermissionError:
+            if attempt == attempts - 1:
+                raise
+            _wait_before_replace_retry()
+
+
+def _wait_before_replace_retry() -> None:
+    deadline = (
+        datetime.now(timezone.utc).timestamp()
+        + _WINDOWS_REPLACE_RETRY_DELAY_SECONDS
+    )
+    while datetime.now(timezone.utc).timestamp() < deadline:
+        pass
 
 
 def update_benchmark_entry(repo_path: str | Path, filename: str, **fields) -> dict:

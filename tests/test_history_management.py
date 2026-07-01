@@ -99,6 +99,36 @@ def test_benchmark_meta_roundtrip(tmp_path):
     assert meta[filename]["pinned"] is False
 
 
+def test_write_benchmark_meta_creates_parent_and_writes_valid_json(tmp_path):
+    from core.benchmarks_view import write_benchmark_meta
+
+    repo = tmp_path / "repo"
+    filename = "benchmark_report_1000000000.json"
+    meta = {filename: {"archived": True, "pinned": False}}
+
+    write_benchmark_meta(repo, meta)
+
+    path = repo / ".agent" / "benchmarks" / "history_meta.json"
+    assert json.loads(path.read_text(encoding="utf-8")) == meta
+
+
+def test_write_benchmark_meta_cleans_up_temp_file_when_replace_fails(tmp_path, monkeypatch):
+    from core.benchmarks_view import write_benchmark_meta
+
+    repo, filename = _make_bench_dir(tmp_path)
+
+    def _raise_permission_error(self, target):
+        raise PermissionError("locked")
+
+    monkeypatch.setattr(Path, "replace", _raise_permission_error)
+
+    with pytest.raises(PermissionError):
+        write_benchmark_meta(repo, {filename: {"deleted": True}})
+
+    bench_dir = repo / ".agent" / "benchmarks"
+    assert not list(bench_dir.glob("history_meta*.tmp*"))
+
+
 def test_update_benchmark_entry_merges(tmp_path):
     from core.benchmarks_view import update_benchmark_entry, read_benchmark_meta
     repo, filename = _make_bench_dir(tmp_path)
