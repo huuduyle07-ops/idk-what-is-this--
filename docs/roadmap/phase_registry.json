@@ -1212,7 +1212,7 @@
       ],
       "notes": [
         "Report-only MIRROR.3 phase, shipped 2026-06-29. Reads MIRROR.1 trace contracts, optional MIRROR.2 score reports, and optional explicit evidence files, then compares changed-file, no-change, validation, benchmark, test, safety, scope, completion, and uncertainty claims against detected evidence.",
-        "Does not call models, use embeddings, call semantic APIs, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, block execution, push, merge, or open PRs. MIRROR.4 through MIRROR.10 have since shipped; current recommended next phase: MIRROR.11."
+        "Does not call models, use embeddings, call semantic APIs, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, block execution, push, merge, or open PRs. MIRROR.4 through MIRROR.11 have since shipped; current recommended next phase: MIRROR.12."
       ]
     },
     {
@@ -1266,7 +1266,7 @@
       ],
       "notes": [
         "Report-only MIRROR.4 phase, shipped 2026-06-29. Defines artifact source inventory, frame mapping plan, ingestion priorities, required fields per source, missing source gaps, future integration points, and safety/privacy boundaries for future real-run Mirror Tunnel frame emission.",
-        "Does not call models, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, enable automatic Mirror tracing, block execution, push, merge, or open PRs. MIRROR.5, MIRROR.6, MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, and MIRROR.10 have since shipped; current recommended next phase: MIRROR.11."
+        "Does not call models, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, enable automatic Mirror tracing, block execution, push, merge, or open PRs. MIRROR.5, MIRROR.6, MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, MIRROR.10, and MIRROR.11 have since shipped; current recommended next phase: MIRROR.12."
       ]
     },
     {
@@ -1320,7 +1320,7 @@
       ],
       "notes": [
         "Report-only MIRROR.5 phase, shipped 2026-06-29. Maps explicit operator-provided artifact paths to MIRROR.1 frame types, preserves artifact references, records omitted optional inputs as missing evidence, caps excerpts, stores per-frame manual trust levels, and writes MIRROR.1-compatible trace JSON/Markdown under a trace-id directory.",
-        "Does not call models, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, enable automatic live tracing, block execution, push, merge, or open PRs. MIRROR.6, MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, and MIRROR.10 have since shipped; current recommended next phase: MIRROR.11."
+        "Does not call models, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, enable automatic live tracing, block execution, push, merge, or open PRs. MIRROR.6, MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, MIRROR.10, and MIRROR.11 have since shipped; current recommended next phase: MIRROR.12."
       ]
     },
     {
@@ -1374,7 +1374,7 @@
       ],
       "notes": [
         "Report-only MIRROR.6 phase, shipped 2026-06-30. Reads a manually assembled MIRROR.5/MIRROR.1 trace, derives MIRROR.2 and MIRROR.3 reports through pure Python builders when existing reports are not supplied, and writes a combined review pack with trace coverage, derailment verdict/score, claim support, strongest drift dimensions, mismatches, unsupported claims, missing evidence, human-review notes, and recommended next action.",
-        "Does not call models, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, enable live runtime tracing, shell out to CLI scripts, block execution, push, merge, or open PRs. MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, and MIRROR.10 have since shipped; current recommended next phase: MIRROR.11."
+        "Does not call models, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker or subprocess, contact network services, write to a database, change route behavior, change auth policy, enable live runtime tracing, shell out to CLI scripts, block execution, push, merge, or open PRs. MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, MIRROR.10, and MIRROR.11 have since shipped; current recommended next phase: MIRROR.12."
       ]
     },
     {
@@ -1429,7 +1429,7 @@
       "notes": [
         "Report-only MIRROR.CLOSE phase, shipped 2026-06-30. Reads the phase registry, MIRROR.1-MIRROR.6 source modules, existing Mirror Tunnel artifacts, and manual trace/review artifacts, then writes a branch checkpoint that freezes the manual evidence loop.",
         "Verifies MIRROR.1-MIRROR.6 are complete, required artifacts exist, Mirror source remains report-only, no live runtime instrumentation has been added, no Mirror phase calls models, runs validation or benchmarks, applies patches, blocks execution, invokes MCP, launches workers, uses Docker/subprocess, contacts the network, writes to a database, changes route/auth behavior, or enables live runtime tracing.",
-        "Current checkpoint status is expected to be frozen_with_manual_review_warnings because the manual pipeline exists, while baseline generated MIRROR.1-MIRROR.3 artifacts still include weak trace quality such as insufficient_trace / insufficient_evidence. MIRROR.7, MIRROR.8, MIRROR.9, and MIRROR.10 have since shipped; current recommended next phase: MIRROR.11 - Read-only Artifact Summary Loader."
+        "Current checkpoint status is expected to be frozen_with_manual_review_warnings because the manual pipeline exists, while baseline generated MIRROR.1-MIRROR.3 artifacts still include weak trace quality such as insufficient_trace / insufficient_evidence. MIRROR.7, MIRROR.8, MIRROR.9, MIRROR.10, and MIRROR.11 have since shipped; current recommended next phase: MIRROR.12 - Mirror Tunnel Live Trace Demo Run / Readiness Check."
       ]
     },
     {
@@ -1541,7 +1541,7 @@
       ],
       "notes": [
         "MIRROR.8 shipped 2026-06-30 as a post-run scoring preview for MIRROR.7 live trace artifacts. It reads an existing trace JSON, calls MIRROR.2 and MIRROR.3 pure core builders directly, reuses MIRROR.6-style aggregation through the pure core builder, and writes a separate preview pack.",
-        "Does not call CLI scripts, run during the original web run, call the MIRROR.7 live writer, mutate live trace artifacts, call models, change prompts, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change route behavior, change auth policy, block runs, score during runtime, push, merge, or open PRs. MIRROR.9 and MIRROR.10 have since shipped; current recommended next phase: MIRROR.11."
+        "Does not call CLI scripts, run during the original web run, call the MIRROR.7 live writer, mutate live trace artifacts, call models, change prompts, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change route behavior, change auth policy, block runs, score during runtime, push, merge, or open PRs. MIRROR.9, MIRROR.10, and MIRROR.11 have since shipped; current recommended next phase: MIRROR.12."
       ]
     },
     {
@@ -1644,23 +1644,24 @@
       "expected_artifacts": [],
       "notes": [
         "MIRROR.10 shipped 2026-07-02 as a read-only UI stub in the Evidence Cards area. It adds the Mirror Tunnel advisory panel, empty-state badge, visible summary fields, collapsed details, local render helper, and copy-only actions.",
-        "Does not add backend routes, call models, change prompts, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change route behavior, change auth policy, score during runtime, mutate live traces, hide Apply controls, block execution, push, merge, or open PRs. Recommended next phase: MIRROR.11."
+        "Does not add backend routes, call models, change prompts, apply patches, run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change route behavior, change auth policy, score during runtime, mutate live traces, hide Apply controls, block execution, push, merge, or open PRs. MIRROR.11 has since shipped; recommended next phase: MIRROR.12."
       ]
     },
     {
       "phase_id": "MIRROR.11",
-      "title": "Read-only Artifact Summary Loader",
+      "title": "Operator Panel Artifact Loader Preview",
       "track": "MIRROR",
-      "status": "proposed",
-      "summary": "Future read-only loader that can hydrate the MIRROR.10 panel from already-written MIRROR.7/MIRROR.8/MIRROR.9 artifacts without POST routes, runtime scoring, trace mutation, approval gates, or execution behavior.",
+      "status": "complete",
+      "summary": "Read-only UI/data loader that hydrates the MIRROR.10 operator panel from an already-written MIRROR.8 live trace scoring preview artifact through a narrow GET-only route, without generating previews, scoring traces, mutating artifacts, or affecting Submit/Apply behavior.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
       "allowed_files": [
         "web/templates/index.html",
         "web/static/style.css",
-        "web/routes/mirror_tunnel_routes.py",
-        "tests/test_mirror_tunnel_operator_panel_artifact_loader.py",
+        "web/app.py",
+        "tests/test_mirror_tunnel_operator_panel_loader.py",
+        "tests/test_mirror_tunnel_operator_panel_ui.py",
         "tests/test_phase_registry.py",
         "tests/test_phase_picker.py",
         "docs/roadmap/phase_registry.json",
@@ -1675,10 +1676,13 @@
       ],
       "validation": [
         "python -m compileall -q core scripts web tests benchmarks",
-        "python -m pytest tests/test_mirror_tunnel_operator_panel_artifact_loader.py -q",
+        "python -m pytest tests/test_mirror_tunnel_operator_panel_loader.py -q",
+        "python -m pytest tests/test_mirror_tunnel_operator_panel_ui.py -q",
+        "python -m pytest tests/test_mirror_tunnel_live_trace_scoring_preview.py -q",
         "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
         "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
         "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python -m pytest -q",
         "python benchmarks/run_benchmarks.py --check"
       ],
       "human_approval_required": true,
@@ -1692,8 +1696,61 @@
       ],
       "expected_artifacts": [],
       "notes": [
-        "Proposed MIRROR.11 phase. Hydrates the MIRROR.10 panel from existing local Mirror Tunnel artifacts only, preferably via already-available data and, if unavoidable, GET-only read-only routes.",
-        "Must not POST, score traces, mutate trace artifacts, run validation or benchmarks, call models, invoke MCP tools, launch workers, apply patches, block Apply controls, change route/auth policy, write to the database, use Docker/subprocess, contact the network, push, merge, or open PRs."
+        "MIRROR.11 shipped 2026-07-02 as a read-only operator-panel artifact loader preview. It adds a sanitized GET-only /mirror-tunnel/preview/<preview_id> route that reads only .agent/mirror_tunnel/live_trace_scoring_preview/<preview_id>/mirror_tunnel_live_trace_scoring_preview.json, plus panel controls that load, render, and copy advisory evidence.",
+        "Does not POST, generate MIRROR.8 previews, call MIRROR.2 or MIRROR.3 builders, call the MIRROR.7 live writer, score traces, mutate trace or preview artifacts, run validation or benchmarks, call models, invoke MCP tools, launch workers, apply patches, block Apply controls, change auth policy, write to the database, use Docker/subprocess, contact the network, push, merge, or open PRs. Recommended next phase: MIRROR.12."
+      ]
+    },
+    {
+      "phase_id": "MIRROR.12",
+      "title": "Mirror Tunnel Live Trace Demo Run / Readiness Check",
+      "track": "MIRROR",
+      "status": "proposed",
+      "summary": "Report-only readiness checkpoint for deciding whether to manually exercise one real shadow live trace end-to-end after the read-only UI loader, while keeping execution explicit, human-controlled, and outside automatic routing.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "medium",
+      "allowed_files": [
+        "core/mirror_tunnel_live_trace_demo_readiness.py",
+        "scripts/create_mirror_tunnel_live_trace_demo_readiness.py",
+        "tests/test_mirror_tunnel_live_trace_demo_readiness.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/mirror_tunnel/live_trace_demo_readiness/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_mirror_tunnel_live_trace_demo_readiness.py -q",
+        "python -m pytest tests/test_mirror_tunnel_operator_panel_loader.py tests/test_mirror_tunnel_operator_panel_ui.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "MIRROR.11"
+      ],
+      "expected_artifacts": [
+        ".agent/mirror_tunnel/live_trace_demo_readiness/mirror_tunnel_live_trace_demo_readiness.json",
+        ".agent/mirror_tunnel/live_trace_demo_readiness/mirror_tunnel_live_trace_demo_readiness.md"
+      ],
+      "notes": [
+        "Proposed MIRROR.12 phase. Should produce a report-only readiness checklist for a human-approved manual shadow trace demo run; it must not automatically start a run, call models, generate previews, score at runtime, mutate live traces, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, contact the network, change auth or route behavior, block execution, push, merge, or open PRs.",
+        "If a manual end-to-end shadow trace is not desired yet, MIRROR.CLOSE3 - Live UI Readiness Checkpoint remains the safer alternative."
       ]
     },
     {

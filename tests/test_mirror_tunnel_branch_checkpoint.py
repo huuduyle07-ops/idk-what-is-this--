@@ -22,6 +22,7 @@ from core.mirror_tunnel_branch_checkpoint import (
     gather_mirror_tunnel_branch_checkpoint_inputs,
     render_mirror_tunnel_branch_checkpoint_markdown,
     write_mirror_tunnel_branch_checkpoint,
+    _scan_live_instrumentation,
 )
 import scripts.create_mirror_tunnel_branch_checkpoint as script
 
@@ -263,6 +264,40 @@ def test_live_runtime_instrumentation_blocks_checkpoint():
     assert any("live runtime instrumentation" in blocker.lower() for blocker in report["blockers"])
 
 
+def test_read_only_operator_loader_is_not_live_runtime_instrumentation(tmp_path):
+    web_dir = tmp_path / "web"
+    web_dir.mkdir()
+    (web_dir / "app.py").write_text(
+        "\n".join(
+            [
+                "# MIRROR.11 read-only preview loader",
+                "_MIRROR_PREVIEW_SUBDIR = Path('.agent') / 'mirror_tunnel' / 'live_trace_scoring_preview'",
+                "@app.route('/mirror-tunnel/preview/<path:preview_id>', methods=['GET'])",
+                "def mirror_tunnel_preview_route(preview_id):",
+                "    return {'ok': True}",
+                "# /MIRROR.11 read-only preview loader",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    summary = _scan_live_instrumentation(tmp_path)
+
+    assert summary["live_runtime_instrumentation_added"] is False
+    assert summary["matches"] == []
+
+
+def test_unmarked_web_mirror_tokens_still_count_as_live_runtime_instrumentation(tmp_path):
+    web_dir = tmp_path / "web"
+    web_dir.mkdir()
+    (web_dir / "app.py").write_text("mirror_tunnel_live_writer_enabled = True\n", encoding="utf-8")
+
+    summary = _scan_live_instrumentation(tmp_path)
+
+    assert summary["live_runtime_instrumentation_added"] is True
+    assert summary["matches"] == [{"path": "web/app.py", "token": "mirror_tunnel/shadow_live_trace"}]
+
+
 def test_markdown_contains_required_sections():
     md = render_mirror_tunnel_branch_checkpoint_markdown(_build())
     assert "# Mirror Tunnel Branch Checkpoint" in md
@@ -366,8 +401,14 @@ def test_real_registry_registers_mirror7_complete_and_mirror8_proposed():
     assert by_id["MIRROR.7"]["writes_real_repo"] is False
     assert by_id["MIRROR.8"]["status"] == "complete"
     assert by_id["MIRROR.8"]["prerequisites"] == ["MIRROR.7"]
-    assert by_id["MIRROR.9"]["status"] == "proposed"
+    assert by_id["MIRROR.9"]["status"] == "complete"
     assert by_id["MIRROR.9"]["prerequisites"] == ["MIRROR.8"]
+    assert by_id["MIRROR.10"]["status"] == "complete"
+    assert by_id["MIRROR.10"]["prerequisites"] == ["MIRROR.9"]
+    assert by_id["MIRROR.11"]["status"] == "complete"
+    assert by_id["MIRROR.11"]["prerequisites"] == ["MIRROR.10"]
+    assert by_id["MIRROR.12"]["status"] == "proposed"
+    assert by_id["MIRROR.12"]["prerequisites"] == ["MIRROR.11"]
 
 
 def test_guardrail_flags_show_report_only_boundaries():

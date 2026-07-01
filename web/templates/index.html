@@ -1555,14 +1555,32 @@
                 </div>
                 <span id="mirrorTunnelStatusBadge" class="mirror-tunnel-badge mirror-tunnel-badge--empty">No live trace preview loaded</span>
               </header>
+              <div class="mirror-tunnel-loader">
+                <label for="mirrorPreviewId">Preview ID</label>
+                <input id="mirrorPreviewId" type="text" autocomplete="off" placeholder="preview-id">
+                <button type="button" onclick="loadMirrorTunnelPreview()">Load Mirror preview</button>
+                <span id="mirrorLoadStatus" class="mirror-tunnel-copy-status" aria-live="polite"></span>
+              </div>
               <dl class="mirror-tunnel-fields">
                 <div>
                   <dt>Trace status</dt>
                   <dd id="mirrorTraceStatus">No trace loaded</dd>
                 </div>
                 <div>
+                  <dt>Trace ID</dt>
+                  <dd id="mirrorTraceId">Not available</dd>
+                </div>
+                <div>
+                  <dt>Run ID</dt>
+                  <dd id="mirrorRunId">Not available</dd>
+                </div>
+                <div>
                   <dt>Derailment verdict</dt>
                   <dd id="mirrorDerailmentVerdict">No preview loaded</dd>
+                </div>
+                <div>
+                  <dt>Derailment score</dt>
+                  <dd id="mirrorDerailmentScore">Not available</dd>
                 </div>
                 <div>
                   <dt>Claim support verdict</dt>
@@ -7906,9 +7924,13 @@ function _renderEvidenceFiles(files) {
 
 // MIRROR.10 read-only operator panel
 const MIRROR_TUNNEL_EMPTY_SUMMARY = Object.freeze({
+    status: "no_live_trace_preview_loaded",
     status_badge: "No live trace preview loaded",
     trace_status: "No trace loaded",
+    trace_id: "Not available",
+    run_id: "Not available",
     derailment_verdict: "No preview loaded",
+    derailment_score: "Not available",
     claim_support_verdict: "No preview loaded",
     missing_evidence_count: "Not available",
     recommended_next_action: "Load an existing Mirror Tunnel trace or scoring preview artifact.",
@@ -7916,6 +7938,14 @@ const MIRROR_TUNNEL_EMPTY_SUMMARY = Object.freeze({
     top_warnings: [],
     artifact_paths: [],
     raw_json_placeholder: "No raw Mirror JSON loaded."
+});
+
+const MIRROR_TUNNEL_NO_PREVIEW_SELECTED = Object.freeze({
+    ...MIRROR_TUNNEL_EMPTY_SUMMARY,
+    status: "no_preview_selected",
+    status_badge: "No preview selected",
+    trace_status: "No preview selected",
+    recommended_next_action: "Enter an existing Mirror Tunnel preview id."
 });
 
 let mirrorTunnelCurrentSummary = MIRROR_TUNNEL_EMPTY_SUMMARY;
@@ -7984,8 +8014,22 @@ function _mirrorRenderList(id, items, emptyText) {
 }
 
 function _mirrorSummaryData(input) {
-    const candidate = input || window.mirrorTunnelSummary || MIRROR_TUNNEL_EMPTY_SUMMARY;
+    const candidate = input || window.mirrorTunnelSummary || mirrorTunnelCurrentSummary || MIRROR_TUNNEL_EMPTY_SUMMARY;
     return _mirrorObject(candidate) === candidate ? candidate : MIRROR_TUNNEL_EMPTY_SUMMARY;
+}
+
+function _mirrorBadgeClass(data) {
+    const status = _mirrorPick(data, ["status"], "");
+    if (data === MIRROR_TUNNEL_EMPTY_SUMMARY || status === "no_live_trace_preview_loaded" || status === "no_preview_selected") {
+        return "mirror-tunnel-badge--empty";
+    }
+    if (status === "preview_with_warnings" || status === "insufficient_trace") {
+        return "mirror-tunnel-badge--warning";
+    }
+    if (status === "preview_not_found" || status === "malformed_preview" || status === "blocked_unsafe_preview_id") {
+        return "mirror-tunnel-badge--error";
+    }
+    return "mirror-tunnel-badge--loaded";
 }
 
 function renderMirrorTunnelSummary(summary) {
@@ -8006,11 +8050,14 @@ function renderMirrorTunnelSummary(summary) {
     if (statusBadge) {
         statusBadge.textContent = _mirrorPick(data, ["status_badge", "status"], MIRROR_TUNNEL_EMPTY_SUMMARY.status_badge);
         statusBadge.className = "mirror-tunnel-badge";
-        statusBadge.classList.add(data === MIRROR_TUNNEL_EMPTY_SUMMARY ? "mirror-tunnel-badge--empty" : "mirror-tunnel-badge--loaded");
+        statusBadge.classList.add(_mirrorBadgeClass(data));
     }
 
     _mirrorSetText("mirrorTraceStatus", _mirrorPick(data, ["trace_status"], data.trace?.status || MIRROR_TUNNEL_EMPTY_SUMMARY.trace_status));
+    _mirrorSetText("mirrorTraceId", _mirrorPick(data, ["trace_id"], MIRROR_TUNNEL_EMPTY_SUMMARY.trace_id));
+    _mirrorSetText("mirrorRunId", _mirrorPick(data, ["run_id"], MIRROR_TUNNEL_EMPTY_SUMMARY.run_id));
     _mirrorSetText("mirrorDerailmentVerdict", _mirrorPick(data, ["derailment_verdict"], data.derailment_score_preview?.verdict || MIRROR_TUNNEL_EMPTY_SUMMARY.derailment_verdict));
+    _mirrorSetText("mirrorDerailmentScore", _mirrorPick(data, ["derailment_score", "overall_derailment_score"], data.derailment_score_preview?.overall_derailment_score ?? MIRROR_TUNNEL_EMPTY_SUMMARY.derailment_score));
     _mirrorSetText("mirrorClaimSupportVerdict", _mirrorPick(data, ["claim_support_verdict"], data.claim_vs_diff_preview?.overall_claim_support || MIRROR_TUNNEL_EMPTY_SUMMARY.claim_support_verdict));
     _mirrorSetText("mirrorMissingEvidenceCount", missingEvidence);
     _mirrorSetText("mirrorRecommendedNextAction", _mirrorPick(data, ["recommended_next_action"], MIRROR_TUNNEL_EMPTY_SUMMARY.recommended_next_action));
@@ -8035,6 +8082,67 @@ function renderMirrorTunnelSummary(summary) {
     }
 }
 
+function _mirrorSetLoadStatus(message) {
+    const status = document.getElementById("mirrorLoadStatus");
+    if (status) status.textContent = message || "";
+}
+
+function _mirrorClientErrorSummary(status, message) {
+    return {
+        status,
+        status_badge: status === "malformed_preview" ? "Malformed preview" : "Preview load failed",
+        trace_status: status,
+        trace_id: "Not available",
+        run_id: "Not available",
+        derailment_verdict: "Not available",
+        derailment_score: "Not available",
+        claim_support_verdict: "Not available",
+        missing_evidence_count: "Not available",
+        recommended_next_action: "select_existing_mirror_preview",
+        frame_coverage: {},
+        top_warnings: [message],
+        artifact_paths: [],
+        raw_json: { status, error: message },
+    };
+}
+
+function loadMirrorTunnelPreview() {
+    const input = document.getElementById("mirrorPreviewId");
+    const previewId = (input?.value || "").trim();
+    if (!previewId) {
+        _mirrorSetLoadStatus("No preview selected.");
+        renderMirrorTunnelSummary(MIRROR_TUNNEL_NO_PREVIEW_SELECTED);
+        return;
+    }
+
+    _mirrorSetLoadStatus("Loading Mirror preview...");
+    fetch(`/mirror-tunnel/preview/${encodeURIComponent(previewId)}`)
+        .then(response => response.json()
+            .then(data => ({ response, data }))
+            .catch(() => ({
+                response,
+                data: {
+                    ok: false,
+                    status: "malformed_preview",
+                    summary: _mirrorClientErrorSummary("malformed_preview", "Malformed Mirror Tunnel preview response."),
+                },
+            })))
+        .then(({ response, data }) => {
+            const summary = data.summary || _mirrorClientErrorSummary(data.status || "preview_not_found", data.error || "Mirror preview load failed.");
+            renderMirrorTunnelSummary(summary);
+            if (data.ok && response.ok) {
+                _mirrorSetLoadStatus(`Loaded ${data.preview_id || previewId}.`);
+            } else {
+                _mirrorSetLoadStatus(data.error || "Mirror preview load failed.");
+            }
+        })
+        .catch(err => {
+            const message = `Mirror preview load failed: ${err}`;
+            renderMirrorTunnelSummary(_mirrorClientErrorSummary("preview_not_found", message));
+            _mirrorSetLoadStatus(message);
+        });
+}
+
 function _mirrorSummaryText() {
     const data = mirrorTunnelCurrentSummary || MIRROR_TUNNEL_EMPTY_SUMMARY;
     const visible = _mirrorVisible(data);
@@ -8043,7 +8151,10 @@ function _mirrorSummaryText() {
     return [
         "Mirror Tunnel",
         `trace status: ${document.getElementById("mirrorTraceStatus")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.trace_status}`,
+        `trace id: ${document.getElementById("mirrorTraceId")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.trace_id}`,
+        `run id: ${document.getElementById("mirrorRunId")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.run_id}`,
         `derailment verdict: ${document.getElementById("mirrorDerailmentVerdict")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.derailment_verdict}`,
+        `derailment score: ${document.getElementById("mirrorDerailmentScore")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.derailment_score}`,
         `claim support verdict: ${document.getElementById("mirrorClaimSupportVerdict")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.claim_support_verdict}`,
         `missing evidence count: ${document.getElementById("mirrorMissingEvidenceCount")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.missing_evidence_count}`,
         `recommended next action: ${document.getElementById("mirrorRecommendedNextAction")?.textContent || MIRROR_TUNNEL_EMPTY_SUMMARY.recommended_next_action}`,

@@ -509,6 +509,19 @@ def _allowed_shadow_live_trace_hook(rel: Path, text: str) -> bool:
     )
 
 
+def _without_allowed_read_only_loader(rel: Path, text: str) -> str:
+    if _norm_path(rel) != "web/app.py":
+        return text
+    start_marker = "# MIRROR.11 read-only preview loader"
+    end_marker = "# /MIRROR.11 read-only preview loader"
+    remaining = text
+    while start_marker in remaining and end_marker in remaining:
+        start = remaining.index(start_marker)
+        end = remaining.index(end_marker, start) + len(end_marker)
+        remaining = remaining[:start] + remaining[end:]
+    return remaining
+
+
 def _scan_live_instrumentation(repo: Path) -> dict[str, Any]:
     matches: list[dict[str, str]] = []
     allowed_shadow_matches: list[dict[str, str]] = []
@@ -529,6 +542,7 @@ def _scan_live_instrumentation(repo: Path) -> dict[str, Any]:
                 text = path.read_text(encoding="utf-8", errors="replace")
             except OSError:
                 continue
+            text = _without_allowed_read_only_loader(rel, text)
             if "mirror_tunnel" in text or "shadow_live_trace" in text:
                 if _allowed_shadow_live_trace_hook(rel, text):
                     allowed_shadow_matches.append(

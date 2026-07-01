@@ -118,14 +118,16 @@ Branch boundary:
 
 Next recommendation: the UX branch is complete and frozen at UX.CLOSE,
 HARDEN.CLOSE has consolidated HARDEN.1-HARDEN.3 evidence, and
-MIRROR.1 through MIRROR.10 have shipped the report-only trace, scoring,
+MIRROR.1 through MIRROR.11 have shipped the report-only trace, scoring,
 claim-vs-diff, ingestion-planning, manual trace assembly, manual review
 pipeline, branch checkpoint, default-off shadow live trace writer, and post-run
 live trace scoring preview foundation, advisory operator panel plan, and
-read-only operator panel UI stub.
+read-only operator panel UI stub and artifact loader preview.
 The phase picker now recommends
-**MIRROR.11 - Read-only Artifact Summary Loader** as the next human-approved report-only
-branch step.
+**MIRROR.12 - Mirror Tunnel Live Trace Demo Run / Readiness Check** as the next
+human-approved report-only branch step. `MIRROR.CLOSE3 - Live UI Readiness
+Checkpoint` remains the safer alternative if a manual shadow trace demo is not
+desired yet.
 
 ### Branch CMD — Commander Mode
 
@@ -419,12 +421,13 @@ source text) so the freeze criteria are proven by the same source-level checks. 
 call, patch apply, validation run, benchmark run, network call, database write, worker
 launch, backend or mutation route, UI behavior change, push, merge, or PR power was added.
 The UX, HARDEN, and manual MIRROR branches are now frozen. MIRROR.1 through
-MIRROR.9 have shipped the trace contract, derailment scoring report,
+MIRROR.11 have shipped the trace contract, derailment scoring report,
 claim-vs-diff check, real-run ingestion/manual assembly/manual review
 foundation, branch checkpoint, default-off shadow live trace writer, post-run
-scoring preview, advisory operator panel plan, and read-only operator panel UI
-stub. The recommended next move is MIRROR.11 - Read-only Artifact Summary
-Loader.
+scoring preview, advisory operator panel plan, read-only operator panel UI
+stub, and artifact loader preview. The recommended next move is MIRROR.12 -
+Mirror Tunnel Live Trace Demo Run / Readiness Check, with MIRROR.CLOSE3 as the
+safer checkpoint alternative.
 
 **UX.11 — Unified Workbench Behavior Preservation Check is shipped 2026-06-28 (complete).**
 Implemented as `core/unified_workbench_behavior_preservation.py` +
@@ -520,8 +523,9 @@ Artifacts:
 Adds no model call, patch apply, validation run, benchmark run, MCP invocation,
 worker launch, Dream execution, Replay janitor apply, Docker/subprocess use,
 network call, database write, route behavior change, auth policy change, UI
-behavior change, push, merge, or PR power. MIRROR.1 through MIRROR.9 have
-since shipped; next likely: MIRROR.11 - Read-only Artifact Summary Loader.
+behavior change, push, merge, or PR power. MIRROR.1 through MIRROR.11 have
+since shipped; next likely: MIRROR.12 - Mirror Tunnel Live Trace Demo Run /
+Readiness Check.
 
 **MIRROR.1 - Mirror Tunnel Trace Contract is shipped 2026-06-29 (complete).**
 Implemented as `core/mirror_tunnel_trace_contract.py` +
@@ -575,8 +579,8 @@ run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream
 actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, block
 execution, push, merge, or open PRs. At shipment, its recommended next phase was
-MIRROR.4; MIRROR.4 through MIRROR.10 have since shipped, so the current
-recommended next phase is MIRROR.11.
+MIRROR.4; MIRROR.4 through MIRROR.11 have since shipped, so the current
+recommended next phase is MIRROR.12.
 
 **MIRROR.4 - Real Run Trace Ingestion Plan is shipped 2026-06-29 (complete).**
 Implemented as `core/mirror_tunnel_ingestion_plan.py` +
@@ -597,8 +601,8 @@ actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, enable
 automatic Mirror tracing, block execution, push, merge, or open PRs.
 At shipment, its recommended next phase was MIRROR.5; MIRROR.5, MIRROR.6, and
-MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, and MIRROR.10 have since shipped,
-so the current recommended next phase is MIRROR.11.
+MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, MIRROR.10, and MIRROR.11 have
+since shipped, so the current recommended next phase is MIRROR.12.
 
 **MIRROR.5 - Manual Trace Assembler is shipped 2026-06-29 (complete).**
 Implemented as `core/mirror_tunnel_manual_trace_assembler.py` +
@@ -622,8 +626,9 @@ database, change route behavior, change auth policy, enable automatic live
 tracing, block execution, push, merge, or open PRs. MIRROR.6 and MIRROR.CLOSE
 have since shipped, MIRROR.7 has added default-off shadow trace writing, and
 MIRROR.8 has added post-run scoring previews, MIRROR.9 has added the operator
-panel plan, and MIRROR.10 has added the read-only UI stub, so the current
-recommended next phase is MIRROR.11.
+panel plan, MIRROR.10 has added the read-only UI stub, and MIRROR.11 has added
+the artifact loader preview, so the current recommended next phase is
+MIRROR.12.
 
 **MIRROR.6 - Manual Trace Score Pipeline is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_manual_review_pipeline.py` +
@@ -643,8 +648,8 @@ run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply
 Replay janitor actions, use Docker or subprocess, contact network services,
 write to a database, change route behavior, change auth policy, enable live
 runtime tracing, shell out to CLI scripts, block execution, push, merge, or open
-PRs. MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, and MIRROR.10 have since
-shipped; current recommended next phase: MIRROR.11.
+PRs. MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, MIRROR.10, and MIRROR.11 have
+since shipped; current recommended next phase: MIRROR.12.
 
 **MIRROR.CLOSE - Mirror Tunnel Branch Checkpoint is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_branch_checkpoint.py` +
@@ -663,7 +668,7 @@ benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply
 Replay janitor actions, use Docker or subprocess, contact network services,
 write to a database, change route behavior, change auth policy, enable live
 runtime tracing, block execution, push, merge, or open PRs. MIRROR.8, MIRROR.9,
-and MIRROR.10 have since shipped; recommended next phase: MIRROR.11.
+MIRROR.10, and MIRROR.11 have since shipped; recommended next phase: MIRROR.12.
 
 **MIRROR.7 - Shadow Live Trace Writer is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_shadow_live_trace.py`, wired only into the
@@ -680,8 +685,8 @@ benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply
 Replay janitor actions, use Docker or subprocess, contact network services,
 write to a database, change route behavior, change auth policy, block execution,
 score during the run, run claim-vs-diff checks during the run, push, merge, or
-open PRs. MIRROR.8, MIRROR.9, and MIRROR.10 have since shipped; recommended
-next phase: MIRROR.11.
+open PRs. MIRROR.8, MIRROR.9, MIRROR.10, and MIRROR.11 have since shipped;
+recommended next phase: MIRROR.12.
 
 **MIRROR.8 - Live Trace Scoring Preview is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_live_trace_scoring_preview.py` +
@@ -698,8 +703,8 @@ live writer, mutate live trace artifacts, call models, apply patches, run
 validation, run benchmarks, invoke MCP tools, launch workers, execute Dream
 actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, block
-runs, score during runtime, push, merge, or open PRs. MIRROR.9 has since
-shipped; current recommended next phase: MIRROR.11.
+runs, score during runtime, push, merge, or open PRs. MIRROR.9 through
+MIRROR.11 have since shipped; current recommended next phase: MIRROR.12.
 
 **MIRROR.9 - Live Trace Operator Report Panel Plan is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_operator_panel_plan.py` +
@@ -720,7 +725,7 @@ actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, block
 runs, score during runtime, mutate traces or previews, hide Apply controls,
 auto-trust results, auto-reject patches, push, merge, or open PRs. MIRROR.10
-has since shipped; recommended next phase: MIRROR.11.
+and MIRROR.11 have since shipped; recommended next phase: MIRROR.12.
 
 **MIRROR.10 - Operator Panel Read-only UI Stub is shipped 2026-07-02 (complete).**
 Implemented in `web/templates/index.html` and `web/static/style.css`,
@@ -736,16 +741,34 @@ patches, run validation, run benchmarks, invoke MCP tools, launch workers,
 execute Dream actions, apply Replay janitor actions, use Docker or subprocess,
 contact network services, write to a database, change route behavior, change
 auth policy, score during runtime, mutate live traces, hide Apply controls,
-block execution, push, merge, or open PRs. Recommended next phase: MIRROR.11.
+block execution, push, merge, or open PRs. MIRROR.11 has since shipped;
+recommended next phase: MIRROR.12.
 
-**MIRROR.11 - Read-only Artifact Summary Loader is proposed.**
-MIRROR.11 is the next human-approved MIRROR candidate. It should hydrate the
-MIRROR.10 panel from already-written MIRROR.7/MIRROR.8/MIRROR.9 artifacts only,
-preferably via already-available data and, if unavoidable, GET-only read-only
-routes. It must not POST, score traces, mutate trace artifacts, run validation
-or benchmarks, call models, invoke MCP tools, launch workers, apply patches,
-block Apply controls, change route/auth policy, write to the database, use
+**MIRROR.11 - Operator Panel Artifact Loader Preview is shipped 2026-07-02 (complete).**
+Implemented in `web/templates/index.html`, `web/static/style.css`, and
+`web/app.py`, registered as a `complete` MIRROR-track phase (prerequisite
+MIRROR.10) in `docs/roadmap/phase_registry.json`, and validated with
+`tests/test_mirror_tunnel_operator_panel_loader.py`. It adds a sanitized
+GET-only `/mirror-tunnel/preview/<preview_id>` route that reads only an existing
+MIRROR.8 preview JSON from
+`.agent/mirror_tunnel/live_trace_scoring_preview/<preview_id>/mirror_tunnel_live_trace_scoring_preview.json`,
+then renders status, trace/run ids, derailment verdict and score, claim support,
+missing evidence count, warnings, artifact paths, and raw JSON into the existing
+read-only Mirror Tunnel panel.
+
+MIRROR.11 does not POST, generate MIRROR.8 previews, call MIRROR.2/MIRROR.3
+builders, call the MIRROR.7 live writer, score traces, mutate live trace or
+preview artifacts, alter Submit / Apply / Patch / Validation behavior, run
+validation or benchmarks, call models, invoke MCP tools, launch workers, apply
+patches, block Apply controls, change auth policy, write to the database, use
 Docker/subprocess, contact the network, push, merge, or open PRs.
+
+**MIRROR.12 - Mirror Tunnel Live Trace Demo Run / Readiness Check is proposed.**
+MIRROR.12 is the next registered MIRROR candidate. It should produce a
+report-only readiness checklist for a human-approved manual shadow trace demo
+run, without automatically starting runs or expanding authority. If a manual
+end-to-end shadow trace is not desired yet, `MIRROR.CLOSE3 - Live UI Readiness
+Checkpoint` remains the safer alternative.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
@@ -938,5 +961,6 @@ blocked.
 benchmark, invoke MCP tools, launch workers, execute Dream actions, apply Replay
 janitor actions, use Docker or subprocess, contact network services, write to a
 database, change route behavior, change auth policy, change UI behavior, push,
-merge, or open PRs. MIRROR.1 through MIRROR.10 have since shipped; the next
-recommended phase is MIRROR.11 - Read-only Artifact Summary Loader.
+merge, or open PRs. MIRROR.1 through MIRROR.11 have since shipped; the next
+recommended phase is MIRROR.12 - Mirror Tunnel Live Trace Demo Run / Readiness
+Check.

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json, shutil, subprocess, sys
+import json, re, shutil, subprocess, sys
 import markdown as _markdown_lib
 from datetime import datetime
 from pathlib import Path
@@ -1483,6 +1483,166 @@ def dream_seed_from_benchmark_route():
 # can be invoked from the Benchmarks tab without running benchmarks or
 # calling models.
 # ---------------------------------------------------------------------------
+
+# MIRROR.11 read-only preview loader
+_MIRROR_PREVIEW_SUBDIR = Path(".agent") / "mirror_tunnel" / "live_trace_scoring_preview"
+_MIRROR_PREVIEW_JSON = "mirror_tunnel_live_trace_scoring_preview.json"
+_MIRROR_PREVIEW_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
+
+
+def _is_safe_mirror_preview_id(value: str) -> bool:
+    preview_id = str(value or "").strip()
+    if not preview_id or preview_id in {".", ".."}:
+        return False
+    if ".." in preview_id or "/" in preview_id or "\\" in preview_id or "?" in preview_id:
+        return False
+    return bool(_MIRROR_PREVIEW_ID_RE.fullmatch(preview_id))
+
+
+def _mirror_preview_root() -> Path:
+    return (PROJECT_ROOT / _MIRROR_PREVIEW_SUBDIR).resolve()
+
+
+def _mirror_preview_artifact_path(preview_id: str) -> Path:
+    if not _is_safe_mirror_preview_id(preview_id):
+        raise ValueError("blocked unsafe preview id")
+    root = _mirror_preview_root()
+    path = (root / preview_id / _MIRROR_PREVIEW_JSON).resolve()
+    path.relative_to(root)
+    return path
+
+
+def _mirror_rel_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
+    except (OSError, ValueError):
+        return path.as_posix()
+
+
+def _mirror_dict(value):
+    return value if isinstance(value, dict) else {}
+
+
+def _mirror_list(value) -> list:
+    return value if isinstance(value, list) else []
+
+
+def _mirror_status_badge(status: str) -> str:
+    labels = {
+        "preview_ready": "Preview ready",
+        "preview_with_warnings": "Preview with warnings",
+        "insufficient_trace": "Insufficient trace",
+        "preview_not_found": "Preview not found",
+        "malformed_preview": "Malformed preview",
+        "blocked_unsafe_preview_id": "Blocked unsafe preview id",
+        "no_preview_selected": "No preview selected",
+    }
+    return labels.get(status, status or "No live trace preview loaded")
+
+
+def _mirror_artifact_paths(preview: dict, path: Path) -> dict:
+    paths = dict(_mirror_dict(preview.get("artifact_paths")))
+    paths.setdefault("preview_json", _mirror_rel_path(path))
+    return {str(key): str(value) for key, value in paths.items() if str(value).strip()}
+
+
+def _mirror_preview_summary(preview: dict, path: Path) -> dict:
+    status = str(preview.get("status") or "preview_ready")
+    live_input = _mirror_dict(preview.get("live_trace_input"))
+    derailment = _mirror_dict(preview.get("derailment_score_preview"))
+    claim = _mirror_dict(preview.get("claim_vs_diff_preview"))
+    frame_coverage = _mirror_dict(preview.get("frame_coverage"))
+    missing = _mirror_list(preview.get("missing_evidence"))
+    missing_count = len(missing)
+    if not missing and frame_coverage.get("missing_evidence_count") is not None:
+        missing_count = frame_coverage.get("missing_evidence_count")
+    warnings = [str(item) for item in _mirror_list(preview.get("warnings")) if str(item).strip()]
+    return {
+        "status": status,
+        "status_badge": _mirror_status_badge(status),
+        "trace_status": str(live_input.get("trace_status") or status),
+        "trace_id": str(preview.get("trace_id") or "Not available"),
+        "run_id": str(preview.get("run_id") or "Not available"),
+        "derailment_verdict": str(derailment.get("verdict") or "Not available"),
+        "derailment_score": derailment.get("overall_derailment_score", "Not available"),
+        "claim_support_verdict": str(claim.get("overall_claim_support") or "Not available"),
+        "missing_evidence_count": missing_count,
+        "recommended_next_action": str(preview.get("recommended_next_action") or "review_loaded_preview"),
+        "frame_coverage": frame_coverage,
+        "top_warnings": warnings,
+        "warnings": warnings,
+        "artifact_paths": _mirror_artifact_paths(preview, path),
+        "raw_json": preview,
+    }
+
+
+def _mirror_preview_error(status: str, message: str, code: int, preview_id: str = ""):
+    summary = {
+        "status": status,
+        "status_badge": _mirror_status_badge(status),
+        "trace_status": status,
+        "trace_id": "Not available",
+        "run_id": "Not available",
+        "derailment_verdict": "Not available",
+        "derailment_score": "Not available",
+        "claim_support_verdict": "Not available",
+        "missing_evidence_count": "Not available",
+        "recommended_next_action": "select_existing_mirror_preview",
+        "frame_coverage": {},
+        "top_warnings": [message],
+        "warnings": [message],
+        "artifact_paths": {},
+        "raw_json": {"status": status, "error": message},
+    }
+    return {"ok": False, "status": status, "preview_id": str(preview_id or ""), "error": message, "summary": summary}, code
+
+
+@app.route("/mirror-tunnel/preview/<path:preview_id>", methods=["GET"])
+def mirror_tunnel_preview_route(preview_id: str):
+    """Read one existing MIRROR.8 preview JSON by sanitized id."""
+    try:
+        path = _mirror_preview_artifact_path(preview_id)
+    except (OSError, ValueError):
+        return _mirror_preview_error(
+            "blocked_unsafe_preview_id",
+            "Blocked unsafe Mirror Tunnel preview id.",
+            400,
+            preview_id,
+        )
+    if not path.is_file():
+        return _mirror_preview_error(
+            "preview_not_found",
+            "Mirror Tunnel preview artifact was not found.",
+            404,
+            preview_id,
+        )
+    try:
+        preview = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return _mirror_preview_error(
+            "malformed_preview",
+            "Malformed Mirror Tunnel preview JSON.",
+            400,
+            preview_id,
+        )
+    if not isinstance(preview, dict) or preview.get("report_kind") != "mirror_tunnel_live_trace_scoring_preview":
+        return _mirror_preview_error(
+            "malformed_preview",
+            "Malformed Mirror Tunnel preview JSON.",
+            400,
+            preview_id,
+        )
+    status = str(preview.get("status") or "preview_ready")
+    return {
+        "ok": True,
+        "status": status,
+        "preview_id": str(preview.get("preview_id") or preview_id),
+        "artifact_path": _mirror_rel_path(path),
+        "summary": _mirror_preview_summary(preview, path),
+    }
+
+
+# /MIRROR.11 read-only preview loader
 
 _EVIDENCE_SUBDIR = Path(".agent") / "presentation_evidence"
 
