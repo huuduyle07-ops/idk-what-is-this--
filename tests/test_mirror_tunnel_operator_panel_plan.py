@@ -300,7 +300,7 @@ def test_source_has_no_runtime_or_authority_expanding_primitives():
     assert sorted(calls & forbidden_calls) == []
 
 
-def test_registry_picker_recommends_cmd_n3_after_operator_panel_plan():
+def test_registry_picker_recommends_cmd_n4_after_operator_panel_plan():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -323,4 +323,4 @@ def test_registry_picker_recommends_cmd_n3_after_operator_panel_plan():
         report_id="r",
         created_at="2026-06-30T00:00:00+00:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "CMD.N3"
+    assert report["top_recommendation"]["phase_id"] == "CMD.N4"

@@ -394,7 +394,7 @@ def test_source_is_report_only_and_does_not_import_scoring_or_live_writer():
     assert sorted(calls & forbidden_calls) == []
 
 
-def test_registry_picker_recommends_cmd_n3_after_close3_and_cmd_n2():
+def test_registry_picker_recommends_cmd_n4_after_close3_and_cmd_n3():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -411,4 +411,4 @@ def test_registry_picker_recommends_cmd_n3_after_close3_and_cmd_n2():
         report_id="mirror12-readiness",
         created_at="2026-07-02T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "CMD.N3"
+    assert report["top_recommendation"]["phase_id"] == "CMD.N4"
