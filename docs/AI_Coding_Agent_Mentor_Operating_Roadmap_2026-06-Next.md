@@ -118,15 +118,17 @@ Branch boundary:
 
 Next recommendation: the UX branch is complete and frozen at UX.CLOSE,
 HARDEN.CLOSE has consolidated HARDEN.1-HARDEN.3 evidence, and
-MIRROR.1 through MIRROR.12 have shipped the report-only trace, scoring,
+MIRROR.1 through MIRROR.CLOSE3 have shipped the report-only trace, scoring,
 claim-vs-diff, ingestion-planning, manual trace assembly, manual review
 pipeline, branch checkpoint, default-off shadow live trace writer, and post-run
 live trace scoring preview foundation, advisory operator panel plan, and
 read-only operator panel UI stub, artifact loader preview, and live demo
-readiness checker.
+readiness checker, plus the live/UI readiness checkpoint.
 The phase picker now recommends
-**MIRROR.CLOSE3 - Mirror Tunnel Live UI Readiness Checkpoint** as the next
-human-approved report-only branch step after the manual demo readiness check.
+**CMD.N2 - Boss Fracture Sub-Boss Contract Plan** as the next
+human-approved report-only branch step after CMD.N1 defined Commander
+stagnation detection. MIRROR.13 remains a proposed Mirror candidate, but CMD.N2
+now ranks first by the registry picker.
 
 ### Branch CMD — Commander Mode
 
@@ -145,6 +147,8 @@ Example phases:
 - CMD.2 — Task Decomposition Preview — shipped 2026-06-22 (complete).
 - CMD.3 — Budget Governor Preview — shipped 2026-06-22 (complete).
 - CMD.4 — Commander Readiness / Stop Condition Report — shipped 2026-06-22 (complete).
+- CMD.N1 - Boss Half-Life Fracture Plan - shipped 2026-07-02 (complete).
+- CMD.N2 - Boss Fracture Sub-Boss Contract Plan - proposed.
 
 Branch boundary:
 
@@ -207,16 +211,16 @@ S.6 Optional optimizer experiment
 Recommended branch order:
 
 1. EVAL — shipped through EVAL.3
-2. CMD — selected after EVAL; CMD.1, CMD.2, CMD.3, and CMD.4 shipped
+2. CMD — selected after EVAL; CMD.1, CMD.2, CMD.3, CMD.4, and CMD.N1 shipped; CMD.N2 is next recommended
 3. UX - shipped through UX.CLOSE
 4. HARDEN - shipped through HARDEN.CLOSE
-5. MIRROR - next recommended report-only branch
+5. MIRROR - proposed through MIRROR.13, but currently ranked after CMD.N2
 6. MODEL
 7. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is selected next because large-task orchestration needs doctrine before implementation. CMD.1 is now shipped as a report-only Commander Run Contract that decides planning mode only and previews gates, budgets, evidence, and stop conditions without adding execution power. CMD.2 is also shipped as a report-only Task Decomposition Preview that turns a CMD.1 contract or task text into phase, evidence, validation, benchmark, budget, rollback, and human-checkpoint previews without executing the plan. CMD.3 is shipped as a report-only Budget Governor Preview that estimates budget limits, status, escalation rules, stop conditions, and human checkpoints from CMD.1/CMD.2 inputs without enforcing or executing anything. CMD.4 is shipped as a report-only Commander Readiness / Stop Condition Report that combines CMD.1/CMD.2/CMD.3 artifacts into readiness, gate, budget, stop-condition, and human-approval evidence without declaring anything ready for execution. ROAD.4 is shipped as a report-only Post-EVAL/CMD Checkpoint Audit that verifies all seven EVAL/CMD phases are registered, complete, report-only, artifact-backed, and documented — closing the EVAL and CMD arcs.
+CMD is selected next because large-task orchestration needs doctrine before implementation. CMD.1 is now shipped as a report-only Commander Run Contract that decides planning mode only and previews gates, budgets, evidence, and stop conditions without adding execution power. CMD.2 is also shipped as a report-only Task Decomposition Preview that turns a CMD.1 contract or task text into phase, evidence, validation, benchmark, budget, rollback, and human-checkpoint previews without executing the plan. CMD.3 is shipped as a report-only Budget Governor Preview that estimates budget limits, status, escalation rules, stop conditions, and human checkpoints from CMD.1/CMD.2 inputs without enforcing or executing anything. CMD.4 is shipped as a report-only Commander Readiness / Stop Condition Report that combines CMD.1/CMD.2/CMD.3 artifacts into readiness, gate, budget, stop-condition, and human-approval evidence without declaring anything ready for execution. CMD.N1 is shipped as a report-only Boss Half-Life Fracture Plan that defines deterministic stagnation detection without decomposing tasks or assigning workers. ROAD.4 is shipped as a report-only Post-EVAL/CMD Checkpoint Audit that verifies all seven original EVAL/CMD phases are registered, complete, report-only, artifact-backed, and documented. The current picker recommendation is CMD.N2, which should define the human-reviewed sub-boss contract after fracture is recommended.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -419,13 +423,14 @@ source text) so the freeze criteria are proven by the same source-level checks. 
 `.agent/ux/ux_branch_freeze_checkpoint/ux_branch_freeze_checkpoint.{json,md}`. No model
 call, patch apply, validation run, benchmark run, network call, database write, worker
 launch, backend or mutation route, UI behavior change, push, merge, or PR power was added.
-The UX, HARDEN, and manual MIRROR branches are now frozen. MIRROR.1 through
-MIRROR.12 have shipped the trace contract, derailment scoring report,
+The UX, HARDEN, and MIRROR branches are now frozen through MIRROR.CLOSE3.
+MIRROR.1 through MIRROR.CLOSE3 have shipped the trace contract, derailment scoring report,
 claim-vs-diff check, real-run ingestion/manual assembly/manual review
 foundation, branch checkpoint, default-off shadow live trace writer, post-run
 scoring preview, advisory operator panel plan, read-only operator panel UI
-stub, artifact loader preview, and live demo readiness checker. The recommended
-next move is MIRROR.CLOSE3 - Mirror Tunnel Live UI Readiness Checkpoint.
+stub, artifact loader preview, live demo readiness checker, and live/UI
+readiness checkpoint. CMD.N1 has since defined Commander stagnation detection,
+and the recommended next move is CMD.N2 - Boss Fracture Sub-Boss Contract Plan.
 
 **UX.11 — Unified Workbench Behavior Preservation Check is shipped 2026-06-28 (complete).**
 Implemented as `core/unified_workbench_behavior_preservation.py` +
@@ -521,9 +526,8 @@ Artifacts:
 Adds no model call, patch apply, validation run, benchmark run, MCP invocation,
 worker launch, Dream execution, Replay janitor apply, Docker/subprocess use,
 network call, database write, route behavior change, auth policy change, UI
-behavior change, push, merge, or PR power. MIRROR.1 through MIRROR.12 have
-since shipped; next likely: MIRROR.CLOSE3 - Mirror Tunnel Live UI Readiness
-Checkpoint.
+behavior change, push, merge, or PR power. MIRROR.1 through MIRROR.CLOSE3 and
+CMD.N1 have since shipped; next likely: CMD.N2 - Boss Fracture Sub-Boss Contract Plan.
 
 **MIRROR.1 - Mirror Tunnel Trace Contract is shipped 2026-06-29 (complete).**
 Implemented as `core/mirror_tunnel_trace_contract.py` +
@@ -577,8 +581,8 @@ run validation, run benchmarks, invoke MCP tools, launch workers, execute Dream
 actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, block
 execution, push, merge, or open PRs. At shipment, its recommended next phase was
-MIRROR.4; MIRROR.4 through MIRROR.12 have since shipped, so the current
-recommended next phase is MIRROR.CLOSE3.
+MIRROR.4; MIRROR.4 through MIRROR.CLOSE3 and CMD.N1 have since shipped, so the
+current recommended next phase is CMD.N2.
 
 **MIRROR.4 - Real Run Trace Ingestion Plan is shipped 2026-06-29 (complete).**
 Implemented as `core/mirror_tunnel_ingestion_plan.py` +
@@ -599,9 +603,9 @@ actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, enable
 automatic Mirror tracing, block execution, push, merge, or open PRs.
 At shipment, its recommended next phase was MIRROR.5; MIRROR.5, MIRROR.6, and
-MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, MIRROR.10, MIRROR.11, and
-MIRROR.12 have since shipped, so the current recommended next phase is
-MIRROR.CLOSE3.
+MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, MIRROR.10, MIRROR.11, MIRROR.12,
+and MIRROR.CLOSE3 and CMD.N1 have since shipped, so the current recommended
+next phase is CMD.N2.
 
 **MIRROR.5 - Manual Trace Assembler is shipped 2026-06-29 (complete).**
 Implemented as `core/mirror_tunnel_manual_trace_assembler.py` +
@@ -626,8 +630,9 @@ tracing, block execution, push, merge, or open PRs. MIRROR.6 and MIRROR.CLOSE
 have since shipped, MIRROR.7 has added default-off shadow trace writing, and
 MIRROR.8 has added post-run scoring previews, MIRROR.9 has added the operator
 panel plan, MIRROR.10 has added the read-only UI stub, MIRROR.11 has added the
-artifact loader preview, and MIRROR.12 has added the live demo readiness
-checker, so the current recommended next phase is MIRROR.CLOSE3.
+artifact loader preview, MIRROR.12 has added the live demo readiness checker,
+and MIRROR.CLOSE3 has frozen the live/UI slice. CMD.N1 has since shipped, so the
+current recommended next phase is CMD.N2.
 
 **MIRROR.6 - Manual Trace Score Pipeline is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_manual_review_pipeline.py` +
@@ -647,8 +652,9 @@ run benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply
 Replay janitor actions, use Docker or subprocess, contact network services,
 write to a database, change route behavior, change auth policy, enable live
 runtime tracing, shell out to CLI scripts, block execution, push, merge, or open
-PRs. MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, MIRROR.10, MIRROR.11, and
-MIRROR.12 have since shipped; current recommended next phase: MIRROR.CLOSE3.
+PRs. MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, MIRROR.10, MIRROR.11,
+MIRROR.12, MIRROR.CLOSE3, and CMD.N1 have since shipped; current recommended
+next phase: CMD.N2.
 
 **MIRROR.CLOSE - Mirror Tunnel Branch Checkpoint is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_branch_checkpoint.py` +
@@ -667,8 +673,8 @@ benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply
 Replay janitor actions, use Docker or subprocess, contact network services,
 write to a database, change route behavior, change auth policy, enable live
 runtime tracing, block execution, push, merge, or open PRs. MIRROR.8, MIRROR.9,
-MIRROR.10, MIRROR.11, and MIRROR.12 have since shipped; recommended next phase:
-MIRROR.CLOSE3.
+MIRROR.10, MIRROR.11, MIRROR.12, MIRROR.CLOSE3, and CMD.N1 have since shipped;
+recommended next phase: CMD.N2.
 
 **MIRROR.7 - Shadow Live Trace Writer is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_shadow_live_trace.py`, wired only into the
@@ -685,8 +691,8 @@ benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply
 Replay janitor actions, use Docker or subprocess, contact network services,
 write to a database, change route behavior, change auth policy, block execution,
 score during the run, run claim-vs-diff checks during the run, push, merge, or
-open PRs. MIRROR.8, MIRROR.9, MIRROR.10, MIRROR.11, and MIRROR.12 have since
-shipped; recommended next phase: MIRROR.CLOSE3.
+open PRs. MIRROR.8, MIRROR.9, MIRROR.10, MIRROR.11, MIRROR.12, MIRROR.CLOSE3,
+and CMD.N1 have since shipped; recommended next phase: CMD.N2.
 
 **MIRROR.8 - Live Trace Scoring Preview is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_live_trace_scoring_preview.py` +
@@ -704,7 +710,7 @@ validation, run benchmarks, invoke MCP tools, launch workers, execute Dream
 actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, block
 runs, score during runtime, push, merge, or open PRs. MIRROR.9 through
-MIRROR.12 have since shipped; current recommended next phase: MIRROR.CLOSE3.
+MIRROR.CLOSE3 and CMD.N1 have since shipped; current recommended next phase: CMD.N2.
 
 **MIRROR.9 - Live Trace Operator Report Panel Plan is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_operator_panel_plan.py` +
@@ -725,8 +731,8 @@ actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, block
 runs, score during runtime, mutate traces or previews, hide Apply controls,
 auto-trust results, auto-reject patches, push, merge, or open PRs. MIRROR.10,
-MIRROR.11, and MIRROR.12 have since shipped; recommended next phase:
-MIRROR.CLOSE3.
+MIRROR.11, MIRROR.12, MIRROR.CLOSE3, and CMD.N1 have since shipped; recommended
+next phase: CMD.N2.
 
 **MIRROR.10 - Operator Panel Read-only UI Stub is shipped 2026-07-02 (complete).**
 Implemented in `web/templates/index.html` and `web/static/style.css`,
@@ -742,8 +748,8 @@ patches, run validation, run benchmarks, invoke MCP tools, launch workers,
 execute Dream actions, apply Replay janitor actions, use Docker or subprocess,
 contact network services, write to a database, change route behavior, change
 auth policy, score during runtime, mutate live traces, hide Apply controls,
-block execution, push, merge, or open PRs. MIRROR.11 and MIRROR.12 have since
-shipped; recommended next phase: MIRROR.CLOSE3.
+block execution, push, merge, or open PRs. MIRROR.11, MIRROR.12, MIRROR.CLOSE3,
+and CMD.N1 have since shipped; recommended next phase: CMD.N2.
 
 **MIRROR.11 - Operator Panel Artifact Loader Preview is shipped 2026-07-02 (complete).**
 Implemented in `web/templates/index.html`, `web/static/style.css`, and
@@ -774,11 +780,50 @@ existing MIRROR.7 live trace, an existing MIRROR.8 preview, and MIRROR.11
 preview-id loader compatibility, then writes a report-only readiness verdict
 for one manually controlled demo run.
 
-**MIRROR.CLOSE3 - Mirror Tunnel Live UI Readiness Checkpoint is proposed.**
-MIRROR.CLOSE3 is the next registered MIRROR candidate. It should freeze the
-MIRROR.7 through MIRROR.12 live trace and read-only UI readiness chain while
-preserving advisory/non-blocking policy and without executing demos, generating
-previews, scoring traces, mutating artifacts, or changing UI behavior.
+**MIRROR.CLOSE3 - Mirror Tunnel Live UI Readiness Checkpoint is shipped 2026-07-02 (complete).**
+Implemented as `core/mirror_tunnel_live_ui_readiness_checkpoint.py` +
+`scripts/create_mirror_tunnel_live_ui_readiness_checkpoint.py`, registered as a
+`complete` MIRROR-track phase (prerequisite MIRROR.12) in
+`docs/roadmap/phase_registry.json`, and validated with
+`tests/test_mirror_tunnel_live_ui_readiness_checkpoint.py`. MIRROR.CLOSE3
+freezes the MIRROR.7 through MIRROR.12 live trace and read-only UI readiness
+chain while preserving advisory/non-blocking policy. It writes
+`.agent/mirror_tunnel/live_ui_readiness_checkpoint/mirror_tunnel_live_ui_readiness_checkpoint.{json,md}`.
+It does not execute demos, generate previews, score traces, mutate artifacts,
+change UI behavior, or add approval gates.
+
+**CMD.N1 - Boss Half-Life Fracture Plan is shipped 2026-07-02 (complete).**
+Implemented as `core/boss_half_life_fracture_plan.py` +
+`scripts/create_boss_half_life_fracture_plan.py`, registered as a `complete`
+CMD-track phase (prerequisite MIRROR.CLOSE3) in
+`docs/roadmap/phase_registry.json`, and validated with
+`tests/test_boss_half_life_fracture_plan.py`. CMD.N1 defines the deterministic
+Boss Half-Life Fracture model:
+`B_t = B_0 * (1/2) ** (t / H)`, `H = T / k`, default `T=6`, `k=2`, `H=3`,
+and `tolerance=0.20`. It computes `fracture_pressure =
+actual_remaining / expected_remaining` and classifies the boss as
+`ahead_of_decay`, `on_track`, `review_recommended`,
+`fracture_recommended`, `hard_fracture_required`, or `invalid_parameters`.
+Artifacts: `.agent/commander/boss_half_life_fracture_plan/boss_half_life_fracture_plan.{json,md}`.
+No task decomposition, worker assignment, model call, Commander launch, routing
+change, patch apply, validation run, benchmark run, MCP invocation, Dream
+execution, Replay janitor apply, Docker/subprocess use, network call, database
+write, auth policy change, push, merge, or PR power was added.
+
+**CMD.N2 - Boss Fracture Sub-Boss Contract Plan is proposed.**
+CMD.N2 is the current phase picker recommendation. It should define the
+human-reviewed sub-boss contract to use after CMD.N1 recommends fracture:
+sub-boss identifiers, parent linkage, title, goal, scope, expected complexity,
+evidence required, allowed/forbidden files, assigned role, attempt budget,
+completion signal, rollback boundary, and dependencies. CMD.N2 must remain
+report-only and must not automatically decompose tasks or assign workers.
+
+**MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
+MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
+improve live trace frame capture quality after the MIRROR.CLOSE3 freeze, while
+keeping Mirror evidence report-only, advisory, non-blocking, and free of runtime
+scoring or UI approval-gate behavior. The current top picker recommendation is
+CMD.N2.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
@@ -971,6 +1016,5 @@ blocked.
 benchmark, invoke MCP tools, launch workers, execute Dream actions, apply Replay
 janitor actions, use Docker or subprocess, contact network services, write to a
 database, change route behavior, change auth policy, change UI behavior, push,
-merge, or open PRs. MIRROR.1 through MIRROR.12 have since shipped; the next
-recommended phase is MIRROR.CLOSE3 - Mirror Tunnel Live UI Readiness
-Checkpoint.
+merge, or open PRs. MIRROR.1 through MIRROR.CLOSE3 and CMD.N1 have since
+shipped; the next recommended phase is CMD.N2 - Boss Fracture Sub-Boss Contract Plan.
