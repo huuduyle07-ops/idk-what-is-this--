@@ -256,16 +256,18 @@ def test_source_has_no_forbidden_imports_or_execution_calls():
                 }, f"{path} calls forbidden function {name}"
 
 
-def test_registry_and_picker_recommend_cmd_n2():
+def test_registry_and_picker_recommend_cmd_n3_after_cmd_n2():
     data = json.loads((_ROOT / "docs" / "roadmap" / "phase_registry.json").read_text(encoding="utf-8"))
     phases = {phase["phase_id"]: phase for phase in data["phases"]}
     assert phases["MIRROR.CLOSE3"]["status"] == "complete"
     assert phases["CMD.N1"]["status"] == "complete"
     assert phases["CMD.N1"]["prerequisites"] == ["MIRROR.CLOSE3"]
-    assert phases["CMD.N2"]["status"] == "proposed"
+    assert phases["CMD.N2"]["status"] == "complete"
     assert phases["CMD.N2"]["prerequisites"] == ["CMD.N1"]
+    assert phases["CMD.N3"]["status"] == "proposed"
+    assert phases["CMD.N3"]["prerequisites"] == ["CMD.N2"]
 
     pick = pick_phase_candidates(data)
     assert pick["registry_valid"] is True
-    assert pick["top_recommendation"]["phase_id"] == "CMD.N2"
+    assert pick["top_recommendation"]["phase_id"] == "CMD.N3"
     assert pick["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"

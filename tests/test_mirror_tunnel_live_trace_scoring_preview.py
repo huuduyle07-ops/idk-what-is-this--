@@ -300,7 +300,7 @@ def test_source_uses_core_builders_not_cli_or_live_writer():
     assert "scripts.create_mirror_tunnel_claim_diff_check" not in core_src
 
 
-def test_registry_picker_recommends_cmd_n2_after_live_trace_chain():
+def test_registry_picker_recommends_cmd_n3_after_live_trace_chain():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -325,4 +325,4 @@ def test_registry_picker_recommends_cmd_n2_after_live_trace_chain():
         report_id="r",
         created_at="2026-06-30T00:00:00+00:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "CMD.N2"
+    assert report["top_recommendation"]["phase_id"] == "CMD.N3"

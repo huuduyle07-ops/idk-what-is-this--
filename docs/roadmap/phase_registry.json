@@ -831,27 +831,28 @@
       ],
       "notes": [
         "CMD.N1 shipped 2026-07-02 as a report-only Boss Half-Life Fracture Plan. It defines B_t = B_0 * (1/2) ** (t / H), H = T / k, default T=6, k=2, H=3, tolerance=0.20, fracture_pressure = actual_remaining / expected_remaining, and deterministic Commander decision statuses.",
-        "Does not actually decompose tasks, assign workers, call models, launch Commander mode, affect routing, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change auth policy, automatically decompose tasks, automatically assign workers, push, merge, or open PRs. Recommended next phase: CMD.N2."
+        "Does not actually decompose tasks, assign workers, call models, launch Commander mode, affect routing, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change auth policy, automatically decompose tasks, automatically assign workers, push, merge, or open PRs. CMD.N2 has since shipped; current recommended next phase: CMD.N3."
       ]
     },
     {
       "phase_id": "CMD.N2",
-      "title": "Boss Fracture Sub-Boss Contract Plan",
+      "title": "Manual Boss Fracture Report",
       "track": "CMD",
-      "status": "proposed",
-      "summary": "Report-only follow-up phase that should define the human-reviewed sub-boss contract fields and evidence boundaries to use after CMD.N1 recommends fracture, without automatic decomposition or worker assignment.",
+      "status": "complete",
+      "summary": "Report-only Commander artifact that applies the CMD.N1 Boss Half-Life Fracture model to one manually described boss task and optional manual sub-boss candidates, producing a deterministic fracture report without automatic decomposition or worker assignment.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
       "allowed_files": [
-        "core/boss_fracture_sub_boss_contract_plan.py",
-        "scripts/create_boss_fracture_sub_boss_contract_plan.py",
-        "tests/test_boss_fracture_sub_boss_contract_plan.py",
+        "core/manual_boss_fracture_report.py",
+        "scripts/create_manual_boss_fracture_report.py",
+        "tests/test_manual_boss_fracture_report.py",
+        "tests/test_boss_half_life_fracture_plan.py",
         "tests/test_phase_picker.py",
         "tests/test_phase_registry.py",
         "docs/roadmap/phase_registry.json",
         "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
-        ".agent/commander/boss_fracture_sub_boss_contract_plan/"
+        ".agent/commander/manual_boss_fracture_report/"
       ],
       "forbidden_files": [
         ".env",
@@ -862,7 +863,8 @@
       ],
       "validation": [
         "python -m compileall -q core scripts web tests benchmarks",
-        "python -m pytest tests/test_boss_fracture_sub_boss_contract_plan.py -q",
+        "python -m pytest tests/test_manual_boss_fracture_report.py -q",
+        "python -m pytest tests/test_boss_half_life_fracture_plan.py -q",
         "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
         "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
         "python -m pytest tests/test_phase_picker.py tests/test_phase_registry.py -q",
@@ -879,11 +881,64 @@
         "CMD.N1"
       ],
       "expected_artifacts": [
-        ".agent/commander/boss_fracture_sub_boss_contract_plan/boss_fracture_sub_boss_contract_plan.json",
-        ".agent/commander/boss_fracture_sub_boss_contract_plan/boss_fracture_sub_boss_contract_plan.md"
+        ".agent/commander/manual_boss_fracture_report/<boss_id>/manual_boss_fracture_report.json",
+        ".agent/commander/manual_boss_fracture_report/<boss_id>/manual_boss_fracture_report.md"
       ],
       "notes": [
-        "Proposed CMD.N2 phase. It should define how a human-reviewed fracture plan records sub-boss fields, dependencies, evidence, allowed files, forbidden files, rollback boundaries, and completion signals after CMD.N1 recommends fracture.",
+        "CMD.N2 shipped 2026-07-02 as a report-only Manual Boss Fracture Report. It applies CMD.N1 half-life math to manual boss input, validates manually supplied sub-boss candidates, compares sub-boss expected complexity against actual_remaining, and writes JSON plus Markdown report artifacts.",
+        "Does not call models, automatically decompose tasks, assign workers, launch Commander mode, affect routing, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change auth policy, change route behavior, push, merge, or open PRs. Recommended next phase: CMD.N3."
+      ]
+    },
+    {
+      "phase_id": "CMD.N3",
+      "title": "Commander Fracture Tree Schema / Registry",
+      "track": "CMD",
+      "status": "proposed",
+      "summary": "Report-only follow-up phase that should define a stable Commander fracture tree schema and registry for human-reviewed sub-boss trees after CMD.N2, without routing, automatic decomposition, worker assignment, or execution behavior.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/commander_fracture_tree_schema_registry.py",
+        "scripts/create_commander_fracture_tree_schema_registry.py",
+        "tests/test_commander_fracture_tree_schema_registry.py",
+        "tests/test_phase_picker.py",
+        "tests/test_phase_registry.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/commander/fracture_tree_schema_registry/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_commander_fracture_tree_schema_registry.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python -m pytest tests/test_phase_picker.py tests/test_phase_registry.py -q",
+        "python -m pytest -q",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "CMD.N2"
+      ],
+      "expected_artifacts": [
+        ".agent/commander/fracture_tree_schema_registry/commander_fracture_tree_schema_registry.json",
+        ".agent/commander/fracture_tree_schema_registry/commander_fracture_tree_schema_registry.md"
+      ],
+      "notes": [
+        "Proposed CMD.N3 phase. It should define a stable schema and registry for human-reviewed Commander fracture trees produced after CMD.N2 manual reports.",
         "Must remain report-only and advisory. It must not automatically decompose tasks, assign workers, call models, launch Commander mode, affect routing, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, execute Dream actions, use Docker/subprocess, contact network services, write to a database, change auth policy, push, merge, or open PRs."
       ]
     },
@@ -1914,7 +1969,7 @@
       ],
       "notes": [
         "MIRROR.CLOSE3 shipped 2026-07-02 as a report-only checkpoint for the MIRROR.7-MIRROR.12 live/UI chain. It verifies phase completion, MIRROR.7 default-off behavior, MIRROR.8 post-run separate preview artifacts, MIRROR.9 planning-only scope, MIRROR.10 read-only UI behavior, MIRROR.11 GET-only loader behavior, and MIRROR.12 artifact-inspection-only readiness evidence.",
-        "Does not execute demos, call the MIRROR.7 live writer, generate MIRROR.8 previews, call scoring builders, score at runtime, mutate live traces or previews, call models, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change route behavior, change auth policy, change UI behavior, block execution, push, merge, or open PRs. CMD.N1 has since shipped; recommended next phase: CMD.N2."
+        "Does not execute demos, call the MIRROR.7 live writer, generate MIRROR.8 previews, call scoring builders, score at runtime, mutate live traces or previews, call models, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change route behavior, change auth policy, change UI behavior, block execution, push, merge, or open PRs. CMD.N1 and CMD.N2 have since shipped; recommended next phase: CMD.N3."
       ]
     },
     {
