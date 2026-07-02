@@ -300,7 +300,7 @@ def test_source_uses_core_builders_not_cli_or_live_writer():
     assert "scripts.create_mirror_tunnel_claim_diff_check" not in core_src
 
 
-def test_registry_picker_recommends_next_phase():
+def test_registry_picker_recommends_cmd_n2_after_live_trace_chain():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -313,12 +313,16 @@ def test_registry_picker_recommends_next_phase():
     assert by_id["MIRROR.10"]["prerequisites"] == ["MIRROR.9"]
     assert by_id["MIRROR.11"]["status"] == "complete"
     assert by_id["MIRROR.11"]["prerequisites"] == ["MIRROR.10"]
-    assert by_id["MIRROR.12"]["status"] == "proposed"
+    assert by_id["MIRROR.12"]["status"] == "complete"
     assert by_id["MIRROR.12"]["prerequisites"] == ["MIRROR.11"]
+    assert by_id["MIRROR.CLOSE3"]["status"] == "complete"
+    assert by_id["MIRROR.CLOSE3"]["prerequisites"] == ["MIRROR.12"]
+    assert by_id["MIRROR.13"]["status"] == "proposed"
+    assert by_id["MIRROR.13"]["prerequisites"] == ["MIRROR.CLOSE3"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="r",
         created_at="2026-06-30T00:00:00+00:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "MIRROR.12"
+    assert report["top_recommendation"]["phase_id"] == "CMD.N2"

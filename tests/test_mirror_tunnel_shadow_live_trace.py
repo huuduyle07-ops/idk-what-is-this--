@@ -282,12 +282,16 @@ def test_registry_and_phase_picker_recommend_mirror8():
     assert by_id["MIRROR.10"]["prerequisites"] == ["MIRROR.9"]
     assert by_id["MIRROR.11"]["status"] == "complete"
     assert by_id["MIRROR.11"]["prerequisites"] == ["MIRROR.10"]
-    assert by_id["MIRROR.12"]["status"] == "proposed"
+    assert by_id["MIRROR.12"]["status"] == "complete"
     assert by_id["MIRROR.12"]["prerequisites"] == ["MIRROR.11"]
+    assert by_id["MIRROR.CLOSE3"]["status"] == "complete"
+    assert by_id["MIRROR.CLOSE3"]["prerequisites"] == ["MIRROR.12"]
+    assert by_id["MIRROR.13"]["status"] == "proposed"
+    assert by_id["MIRROR.13"]["prerequisites"] == ["MIRROR.CLOSE3"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="r",
         created_at="2026-06-30T00:00:00+00:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "MIRROR.12"
+    assert report["top_recommendation"]["phase_id"] == "CMD.N2"

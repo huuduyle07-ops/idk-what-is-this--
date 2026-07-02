@@ -407,8 +407,12 @@ def test_real_registry_registers_mirror7_complete_and_mirror8_proposed():
     assert by_id["MIRROR.10"]["prerequisites"] == ["MIRROR.9"]
     assert by_id["MIRROR.11"]["status"] == "complete"
     assert by_id["MIRROR.11"]["prerequisites"] == ["MIRROR.10"]
-    assert by_id["MIRROR.12"]["status"] == "proposed"
+    assert by_id["MIRROR.12"]["status"] == "complete"
     assert by_id["MIRROR.12"]["prerequisites"] == ["MIRROR.11"]
+    assert by_id["MIRROR.CLOSE3"]["status"] == "complete"
+    assert by_id["MIRROR.CLOSE3"]["prerequisites"] == ["MIRROR.12"]
+    assert by_id["MIRROR.13"]["status"] == "proposed"
+    assert by_id["MIRROR.13"]["prerequisites"] == ["MIRROR.CLOSE3"]
 
 
 def test_guardrail_flags_show_report_only_boundaries():

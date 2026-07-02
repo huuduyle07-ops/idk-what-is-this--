@@ -348,19 +348,23 @@ def test_loader_route_source_is_read_only_and_does_not_import_scoring_or_writer_
         assert forbidden not in route
 
 
-def test_registry_marks_mirror11_complete_and_picker_recommends_mirror12():
+def test_registry_marks_mirror11_complete_and_picker_recommends_cmd_n2():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
     assert by_id["MIRROR.10"]["status"] == "complete"
     assert by_id["MIRROR.11"]["status"] == "complete"
     assert by_id["MIRROR.11"]["prerequisites"] == ["MIRROR.10"]
-    assert by_id["MIRROR.12"]["status"] == "proposed"
+    assert by_id["MIRROR.12"]["status"] == "complete"
     assert by_id["MIRROR.12"]["prerequisites"] == ["MIRROR.11"]
+    assert by_id["MIRROR.CLOSE3"]["status"] == "complete"
+    assert by_id["MIRROR.CLOSE3"]["prerequisites"] == ["MIRROR.12"]
+    assert by_id["MIRROR.13"]["status"] == "proposed"
+    assert by_id["MIRROR.13"]["prerequisites"] == ["MIRROR.CLOSE3"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="mirror11-loader",
         created_at="2026-07-02T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "MIRROR.12"
+    assert report["top_recommendation"]["phase_id"] == "CMD.N2"
