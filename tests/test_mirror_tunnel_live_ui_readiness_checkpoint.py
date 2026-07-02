@@ -477,12 +477,14 @@ def test_registry_marks_close3_complete_and_picker_recommends_cmd_n4():
     assert by_id["CMD.N3"]["prerequisites"] == ["CMD.N2"]
     assert by_id["CMD.N4"]["status"] == "complete"
     assert by_id["CMD.N4"]["prerequisites"] == ["CMD.N3"]
-    assert by_id["CMD.N5"]["status"] == "proposed"
+    assert by_id["CMD.N5"]["status"] == "complete"
     assert by_id["CMD.N5"]["prerequisites"] == ["CMD.N4"]
+    assert by_id["CMD.N6"]["status"] == "proposed"
+    assert by_id["CMD.N6"]["prerequisites"] == ["CMD.N5"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="mirror-close3",
         created_at="2026-07-02T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "CMD.N5"
+    assert report["top_recommendation"]["phase_id"] == "CMD.N6"
