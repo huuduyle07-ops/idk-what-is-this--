@@ -270,10 +270,12 @@ def test_registry_and_picker_recommend_cmd_n4_after_cmd_n3():
     assert phases["CMD.N4"]["prerequisites"] == ["CMD.N3"]
     assert phases["CMD.N5"]["status"] == "complete"
     assert phases["CMD.N5"]["prerequisites"] == ["CMD.N4"]
-    assert phases["CMD.N6"]["status"] == "proposed"
+    assert phases["CMD.N6"]["status"] == "complete"
     assert phases["CMD.N6"]["prerequisites"] == ["CMD.N5"]
+    assert phases["CMD.CLOSE"]["status"] == "proposed"
+    assert phases["CMD.CLOSE"]["prerequisites"] == ["CMD.N6"]
 
     pick = pick_phase_candidates(data)
     assert pick["registry_valid"] is True
-    assert pick["top_recommendation"]["phase_id"] == "CMD.N6"
+    assert pick["top_recommendation"]["phase_id"] == "CMD.CLOSE"
     assert pick["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"

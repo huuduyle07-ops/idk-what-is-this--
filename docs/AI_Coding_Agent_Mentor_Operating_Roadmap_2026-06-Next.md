@@ -659,7 +659,7 @@ write to a database, change route behavior, change auth policy, enable live
 runtime tracing, shell out to CLI scripts, block execution, push, merge, or open
 PRs. MIRROR.CLOSE, MIRROR.7, MIRROR.8, MIRROR.9, MIRROR.10, MIRROR.11,
 MIRROR.12, MIRROR.CLOSE3, CMD.N1, and CMD.N2 have since shipped; current recommended
-next phase: CMD.N5.
+next phase: CMD.CLOSE.
 
 **MIRROR.CLOSE - Mirror Tunnel Branch Checkpoint is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_branch_checkpoint.py` +
@@ -678,8 +678,8 @@ benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply
 Replay janitor actions, use Docker or subprocess, contact network services,
 write to a database, change route behavior, change auth policy, enable live
 runtime tracing, block execution, push, merge, or open PRs. MIRROR.8, MIRROR.9,
-MIRROR.10, MIRROR.11, MIRROR.12, MIRROR.CLOSE3, CMD.N1, and CMD.N2 have since shipped;
-recommended next phase: CMD.N6.
+MIRROR.10, MIRROR.11, MIRROR.12, MIRROR.CLOSE3, CMD.N1, CMD.N2, CMD.N3, CMD.N4, CMD.N5, and CMD.N6 have since shipped;
+recommended next phase: CMD.CLOSE.
 
 **MIRROR.7 - Shadow Live Trace Writer is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_shadow_live_trace.py`, wired only into the
@@ -697,7 +697,7 @@ Replay janitor actions, use Docker or subprocess, contact network services,
 write to a database, change route behavior, change auth policy, block execution,
 score during the run, run claim-vs-diff checks during the run, push, merge, or
 open PRs. MIRROR.8, MIRROR.9, MIRROR.10, MIRROR.11, MIRROR.12, MIRROR.CLOSE3,
-CMD.N1, CMD.N2, CMD.N3, CMD.N4, and CMD.N5 have since shipped; recommended next phase: CMD.N6.
+CMD.N1, CMD.N2, CMD.N3, CMD.N4, CMD.N5, and CMD.N6 have since shipped; recommended next phase: CMD.CLOSE.
 
 **MIRROR.8 - Live Trace Scoring Preview is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_live_trace_scoring_preview.py` +
@@ -715,7 +715,7 @@ validation, run benchmarks, invoke MCP tools, launch workers, execute Dream
 actions, apply Replay janitor actions, use Docker or subprocess, contact network
 services, write to a database, change route behavior, change auth policy, block
 runs, score during runtime, push, merge, or open PRs. MIRROR.9 through
-MIRROR.CLOSE3, CMD.N1, CMD.N2, CMD.N3, CMD.N4, and CMD.N5 have since shipped; current recommended next phase: CMD.N6.
+MIRROR.CLOSE3, CMD.N1, CMD.N2, CMD.N3, CMD.N4, CMD.N5, and CMD.N6 have since shipped; current recommended next phase: CMD.CLOSE.
 
 **MIRROR.9 - Live Trace Operator Report Panel Plan is shipped 2026-06-30 (complete).**
 Implemented as `core/mirror_tunnel_operator_panel_plan.py` +
@@ -737,7 +737,7 @@ services, write to a database, change route behavior, change auth policy, block
 runs, score during runtime, mutate traces or previews, hide Apply controls,
 auto-trust results, auto-reject patches, push, merge, or open PRs. MIRROR.10,
 MIRROR.11, MIRROR.12, MIRROR.CLOSE3, CMD.N1, and CMD.N2 have since shipped; recommended
-next phase: CMD.N5.
+next phase: CMD.CLOSE.
 
 **MIRROR.10 - Operator Panel Read-only UI Stub is shipped 2026-07-02 (complete).**
 Implemented in `web/templates/index.html` and `web/static/style.css`,
@@ -754,7 +754,7 @@ execute Dream actions, apply Replay janitor actions, use Docker or subprocess,
 contact network services, write to a database, change route behavior, change
 auth policy, score during runtime, mutate live traces, hide Apply controls,
 block execution, push, merge, or open PRs. MIRROR.11, MIRROR.12, MIRROR.CLOSE3,
-and CMD.N1, CMD.N2, CMD.N3, CMD.N4, and CMD.N5 have since shipped; recommended next phase: CMD.N6.
+and CMD.N1, CMD.N2, CMD.N3, CMD.N4, CMD.N5, and CMD.N6 have since shipped; recommended next phase: CMD.CLOSE.
 
 **MIRROR.11 - Operator Panel Artifact Loader Preview is shipped 2026-07-02 (complete).**
 Implemented in `web/templates/index.html`, `web/static/style.css`, and
