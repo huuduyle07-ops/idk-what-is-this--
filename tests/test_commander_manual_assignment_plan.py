@@ -439,7 +439,7 @@ def test_source_has_no_forbidden_imports_or_execution_calls():
                 }, f"{path} calls forbidden function {name}"
 
 
-def test_registry_and_picker_recommend_cmd_n6():
+def test_registry_and_picker_recommend_model_n3_after_model_n2():
     data = json.loads((_ROOT / "docs" / "roadmap" / "phase_registry.json").read_text(encoding="utf-8"))
     phases = {phase["phase_id"]: phase for phase in data["phases"]}
     assert phases["CMD.N4"]["status"] == "complete"
@@ -449,10 +449,26 @@ def test_registry_and_picker_recommend_cmd_n6():
     assert phases["CMD.N6"]["prerequisites"] == ["CMD.N5"]
     assert phases["CMD.CLOSE"]["status"] == "complete"
     assert phases["CMD.CLOSE"]["prerequisites"] == ["CMD.N6"]
-    assert phases["MODEL.N1"]["status"] == "proposed"
+    assert phases["MODEL.N1"]["status"] == "complete"
     assert phases["MODEL.N1"]["prerequisites"] == ["CMD.CLOSE"]
+    assert phases["MODEL.N2"]["status"] == "complete"
+    assert phases["MODEL.N2"]["prerequisites"] == ["MODEL.N1"]
+    assert phases["MODEL.N3"]["status"] == "complete"
+    assert phases["MODEL.N3"]["prerequisites"] == ["MODEL.N2"]
+    assert phases["MODEL.N4"]["status"] == "complete"
+    assert phases["MODEL.N4"]["prerequisites"] == ["MODEL.N3"]
+    assert phases["MODEL.N5"]["status"] == "complete"
+    assert phases["MODEL.N5"]["prerequisites"] == ["MODEL.N4"]
+    assert phases["MODEL.N6"]["status"] == "complete"
+    assert phases["MODEL.N6"]["prerequisites"] == ["MODEL.N5"]
+    assert phases["MODEL.N7"]["status"] == "complete"
+    assert phases["MODEL.N7"]["prerequisites"] == ["MODEL.N6"]
+    assert phases["MODEL.CLOSE"]["status"] == "complete"
+    assert phases["MODEL.CLOSE"]["prerequisites"] == ["MODEL.N7"]
+    assert phases["EVAL.N1"]["status"] == "proposed"
+    assert phases["EVAL.N1"]["prerequisites"] == ["MODEL.CLOSE"]
 
     pick = pick_phase_candidates(data)
     assert pick["registry_valid"] is True
-    assert pick["top_recommendation"]["phase_id"] == "MODEL.N1"
+    assert pick["top_recommendation"]["phase_id"] == "EVAL.N1"
     assert pick["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"
