@@ -1112,8 +1112,8 @@
       "phase_id": "CMD.CLOSE",
       "title": "Commander Planning Branch Checkpoint",
       "track": "CMD",
-      "status": "proposed",
-      "summary": "Report-only checkpoint phase to freeze the Commander planning branch after CMD.N1-CMD.N6 before any execution-related Commander work begins.",
+      "status": "complete",
+      "summary": "Report-only checkpoint phase that freezes the Commander planning branch after CMD.N1-CMD.N6 before any execution-related Commander work begins.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
@@ -1154,12 +1154,65 @@
         "CMD.N6"
       ],
       "expected_artifacts": [
-        ".agent/commander/planning_branch_checkpoint/<checkpoint_id>/commander_planning_branch_checkpoint.json",
-        ".agent/commander/planning_branch_checkpoint/<checkpoint_id>/commander_planning_branch_checkpoint.md"
+        ".agent/commander/planning_branch_checkpoint/commander_planning_branch_checkpoint.json",
+        ".agent/commander/planning_branch_checkpoint/commander_planning_branch_checkpoint.md"
       ],
       "notes": [
-        "Proposed CMD.CLOSE phase. It should create a report-only planning branch checkpoint that confirms CMD.N1-CMD.N6 artifacts are enough to freeze the Commander planning branch before any execution-related design.",
-        "Must remain report-only and checkpoint-only. It must not execute sub-bosses, assign real workers, bind executable worker IDs, bind real model IDs as authority, call models, launch Commander mode, affect routing, mutate source artifacts, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change auth policy, change route behavior, push, merge, or open PRs."
+        "CMD.CLOSE shipped 2026-07-03 as a report-only planning branch checkpoint. It confirms CMD.N1-CMD.N6 give Commander enough planning, fracture, preflight, advisory assignment, and review-pack structure to freeze the branch before execution-related design.",
+        "Remains report-only and checkpoint-only. It does not execute sub-bosses, assign real workers, bind executable worker IDs, bind real model IDs as authority, call models, launch Commander mode, affect routing, mutate source artifacts, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change auth policy, change route behavior, push, merge, or open PRs. Recommended next phase: MODEL.N1 - Model Role Registry / Tower Card Contract."
+      ]
+    },
+    {
+      "phase_id": "MODEL.N1",
+      "title": "Model Role Registry / Tower Card Contract",
+      "track": "MODEL",
+      "status": "proposed",
+      "summary": "Report-only contract for advisory model/role tower cards after Mirror self-observation and Commander planning structure, before any model routing, real model binding, executable worker assignment, or authority transfer exists.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/model_role_registry.py",
+        "scripts/create_model_role_registry.py",
+        "tests/test_model_role_registry.py",
+        "tests/test_phase_picker.py",
+        "tests/test_phase_registry.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/model_lab/model_role_registry/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_model_role_registry.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python -m pytest tests/test_phase_picker.py tests/test_phase_registry.py -q",
+        "python -m pytest -q",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "CMD.CLOSE"
+      ],
+      "expected_artifacts": [
+        ".agent/model_lab/model_role_registry/model_role_registry.json",
+        ".agent/model_lab/model_role_registry/model_role_registry.md"
+      ],
+      "notes": [
+        "Proposed MODEL.N1 phase. It should define advisory model/role tower cards as metadata only before any actual routing, model call, model authority, or worker assignment exists.",
+        "Must remain report-only and contract-only. It must not call models, bind a real model ID as authority, route tasks, launch workers, execute Commander plans, apply patches, run validation or benchmarks, invoke MCP tools, use Docker/subprocess, contact network services, write to a database, change route/auth/routing behavior, push, merge, or open PRs. Commander execution safety design remains an explicit alternative only if the operator chooses it."
       ]
     },
     {
@@ -2189,7 +2242,7 @@
       ],
       "notes": [
         "MIRROR.CLOSE3 shipped 2026-07-02 as a report-only checkpoint for the MIRROR.7-MIRROR.12 live/UI chain. It verifies phase completion, MIRROR.7 default-off behavior, MIRROR.8 post-run separate preview artifacts, MIRROR.9 planning-only scope, MIRROR.10 read-only UI behavior, MIRROR.11 GET-only loader behavior, and MIRROR.12 artifact-inspection-only readiness evidence.",
-        "Does not execute demos, call the MIRROR.7 live writer, generate MIRROR.8 previews, call scoring builders, score at runtime, mutate live traces or previews, call models, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change route behavior, change auth policy, change UI behavior, block execution, push, merge, or open PRs. CMD.N1, CMD.N2, CMD.N3, CMD.N4, CMD.N5, and CMD.N6 have since shipped; recommended next phase: CMD.CLOSE."
+        "Does not execute demos, call the MIRROR.7 live writer, generate MIRROR.8 previews, call scoring builders, score at runtime, mutate live traces or previews, call models, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change route behavior, change auth policy, change UI behavior, block execution, push, merge, or open PRs. CMD.N1, CMD.N2, CMD.N3, CMD.N4, CMD.N5, CMD.N6, and CMD.CLOSE have since shipped; recommended next phase: MODEL.N1."
       ]
     },
     {
