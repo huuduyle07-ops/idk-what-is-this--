@@ -325,4 +325,4 @@ def test_registry_picker_recommends_cmd_n4_after_live_trace_chain():
         report_id="r",
         created_at="2026-06-30T00:00:00+00:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "CMD.CLOSE"
+    assert report["top_recommendation"]["phase_id"] == "MODEL.N1"
