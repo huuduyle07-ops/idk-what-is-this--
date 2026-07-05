@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (33 phases, 4 ROAD + 3 AUTO + 3 MODEL + 3 EVAL + 4 CMD + 4 HARDEN + 12 UX).
-- The phase picker currently has no safe candidates.
-- The top recommendation is `null`.
+- The phase registry is valid (65 phases: 4 ROAD + 3 AUTO + 11 MODEL + 5 EVAL + 11 CMD + 4 HARDEN + 15 MIRROR + 12 UX).
+- The phase picker currently has two safe candidates: `EVAL.N2` and `MIRROR.13`.
+- The top recommendation is `EVAL.N2` - Evidence Quality Report Contract.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -41,7 +41,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 ### Validation State
 
 - Registry validation is passing.
-- The current phase picker result is intentionally empty because no safe candidate is available under the current map.
+- The current phase picker result recommends `EVAL.N2` after EVAL.N1 shipped as the report-only evidence quality plan.
 - The old roadmap arc is complete and should not be stretched to imply new authorization.
 
 ### Benchmark State
@@ -125,11 +125,12 @@ live trace scoring preview foundation, advisory operator panel plan, and
 read-only operator panel UI stub, artifact loader preview, and live demo
 readiness checker, plus the live/UI readiness checkpoint.
 The phase picker now recommends
-**CMD.N6 - Commander Assignment Review Pack** as the next
-human-approved report-only branch step after CMD.N5 defined manual advisory
-assignment planning for preflighted Commander sub-bosses. MIRROR.13 remains a
-proposed Mirror candidate, but CMD.N6
-now ranks first by the registry picker.
+**EVAL.N2 - Evidence Quality Report Contract** as the next
+human-approved report-only branch step after EVAL.N1 defined the evidence
+quality planning layer. EVAL.N2 should apply the EVAL.N1 plan to existing
+artifacts and produce a deterministic evidence quality report, still without
+running validation or benchmarks. MIRROR.13 remains a proposed Mirror
+candidate, but EVAL.N2 now ranks first by the registry picker.
 
 ### Branch CMD — Commander Mode
 
@@ -215,17 +216,17 @@ S.6 Optional optimizer experiment
 
 Recommended branch order:
 
-1. EVAL — shipped through EVAL.3
-2. CMD — selected after EVAL; CMD.1, CMD.2, CMD.3, CMD.4, CMD.N1, CMD.N2, CMD.N3, CMD.N4, and CMD.N5 shipped; CMD.N6 is next recommended
-3. UX - shipped through UX.CLOSE
-4. HARDEN - shipped through HARDEN.CLOSE
-5. MIRROR - proposed through MIRROR.13, but currently ranked after CMD.N6
-6. MODEL
+1. EVAL - shipped through EVAL.N1; EVAL.N2 is next recommended
+2. CMD - shipped through CMD.CLOSE
+3. MODEL - shipped through MODEL.CLOSE
+4. UX - shipped through UX.CLOSE
+5. HARDEN - shipped through HARDEN.CLOSE
+6. MIRROR - proposed through MIRROR.13, but currently ranked after EVAL.N2
 7. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is selected next because large-task orchestration needs doctrine before implementation. CMD.1 is now shipped as a report-only Commander Run Contract that decides planning mode only and previews gates, budgets, evidence, and stop conditions without adding execution power. CMD.2 is also shipped as a report-only Task Decomposition Preview that turns a CMD.1 contract or task text into phase, evidence, validation, benchmark, budget, rollback, and human-checkpoint previews without executing the plan. CMD.3 is shipped as a report-only Budget Governor Preview that estimates budget limits, status, escalation rules, stop conditions, and human checkpoints from CMD.1/CMD.2 inputs without enforcing or executing anything. CMD.4 is shipped as a report-only Commander Readiness / Stop Condition Report that combines CMD.1/CMD.2/CMD.3 artifacts into readiness, gate, budget, stop-condition, and human-approval evidence without declaring anything ready for execution. CMD.N1 is shipped as a report-only Boss Half-Life Fracture Plan that defines deterministic stagnation detection without decomposing tasks or assigning workers. CMD.N2 is shipped as a report-only Manual Boss Fracture Report that applies CMD.N1 math to manual boss input and optional manual sub-boss candidates without automatic decomposition or worker assignment. CMD.N3 is shipped as a report-only Commander Fracture Tree Registry that validates durable manual boss/sub-boss trees without routing, execution, or worker assignment. CMD.N4 is shipped as a report-only Commander Preflight Contract that evaluates readiness for registered sub-bosses without execution, validation, routing, or worker assignment. CMD.N5 is shipped as a report-only Commander Manual Assignment Plan that maps preflighted sub-bosses to advisory role labels without worker launch, model binding, routing, or source artifact mutation. ROAD.4 is shipped as a report-only Post-EVAL/CMD Checkpoint Audit that verifies all seven original EVAL/CMD phases are registered, complete, report-only, artifact-backed, and documented. The current picker recommendation is CMD.N6, which should combine the fracture tree, preflight contract, and assignment plan into a human-readable review pack.
+CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.N1 is the newest shipped phase; it defines the evidence-quality layer for claim support, patch relevance, validation/benchmark relevance, freshness, missing evidence, contradiction risk, confidence alignment, scope alignment, and human review boundaries. The current picker recommendation is EVAL.N2, which should apply that plan to existing artifacts and produce a deterministic evidence quality report without running validation or benchmarks.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -872,17 +873,31 @@ binding, model call, routing change, source preflight/tree mutation, patch apply
 validation run, benchmark run, network call, database write, route behavior
 change, auth policy change, push, merge, or PR power was added.
 
-**CMD.N6 - Commander Assignment Review Pack is proposed.**
-CMD.N6 is the current phase picker recommendation. It should combine the
-CMD.N3 fracture tree, CMD.N4 preflight contract, and CMD.N5 assignment plan into
-a human-readable review pack before any execution design.
+**EVAL.N1 - Evidence Quality Planning is shipped 2026-07-05 (complete).**
+Implemented as `core/evidence_quality_plan.py` +
+`scripts/create_evidence_quality_plan.py`, registered as a `complete`
+EVAL-track phase (prerequisite MODEL.CLOSE), and validated with
+`tests/test_evidence_quality_plan.py`. EVAL.N1 writes
+`.agent/eval/evidence_quality_plan/evidence_quality_plan.{json,md}` and defines
+evidence quality dimensions, future verdicts, future score fields, freshness
+rules, claim-vs-evidence rules, validation/benchmark relevance rules, missing
+evidence rules, confidence alignment rules, human review boundaries, and
+guardrails. It remains planning-only: no validation run, benchmark run, model
+call, patch apply, scoring-gate change, MCP invocation, worker launch, network
+call, database write, route/auth change, or automatic approval/rejection power
+was added.
+
+**EVAL.N2 - Evidence Quality Report Contract is proposed.**
+EVAL.N2 is the current phase picker recommendation. It should apply the EVAL.N1
+plan to existing artifacts and produce a deterministic evidence quality report,
+still without running tests or benchmarks.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
 improve live trace frame capture quality after the MIRROR.CLOSE3 freeze, while
 keeping Mirror evidence report-only, advisory, non-blocking, and free of runtime
 scoring or UI approval-gate behavior. The current top picker recommendation is
-CMD.N6.
+EVAL.N2.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
