@@ -465,10 +465,14 @@ def test_registry_and_picker_recommend_model_n3_after_model_n2():
     assert phases["MODEL.N7"]["prerequisites"] == ["MODEL.N6"]
     assert phases["MODEL.CLOSE"]["status"] == "complete"
     assert phases["MODEL.CLOSE"]["prerequisites"] == ["MODEL.N7"]
-    assert phases["EVAL.N1"]["status"] == "proposed"
+    assert phases["EVAL.N1"]["status"] == "complete"
     assert phases["EVAL.N1"]["prerequisites"] == ["MODEL.CLOSE"]
+    assert phases["EVAL.N2"]["status"] == "complete"
+    assert phases["EVAL.N2"]["prerequisites"] == ["EVAL.N1"]
+    assert phases["EVAL.N3"]["status"] == "complete"
+    assert phases["EVAL.N3"]["prerequisites"] == ["EVAL.N2"]
 
     pick = pick_phase_candidates(data)
     assert pick["registry_valid"] is True
-    assert pick["top_recommendation"]["phase_id"] == "EVAL.N1"
+    assert pick["top_recommendation"]["phase_id"] == "EVAL.N4"
     assert pick["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"

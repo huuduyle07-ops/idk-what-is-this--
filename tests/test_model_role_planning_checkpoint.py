@@ -36,16 +36,16 @@ def _phase_registry() -> dict:
         data["phases"].append(
             {
                 "phase_id": "EVAL.N1",
-                "title": "Evidence Quality / Coverage Planning",
+                "title": "Evidence Quality Planning",
                 "track": "EVAL",
-                "status": "proposed",
-                "summary": "Report-only plan for improving evidence quality and coverage before deeper execution work.",
+                "status": "complete",
+                "summary": "Report-only evidence quality planning artifact.",
                 "automation_level": "LOCAL_0_OBSERVE",
                 "budget_tier": "local_only",
                 "risk_level": "low",
-                "allowed_files": ["core/evidence_quality_coverage_plan.py", "tests/test_evidence_quality_coverage_plan.py"],
+                "allowed_files": ["core/evidence_quality_plan.py", "tests/test_evidence_quality_plan.py"],
                 "forbidden_files": [".env", ".git", ".agent/private", "secrets", "credentials"],
-                "validation": ["python -m pytest tests/test_evidence_quality_coverage_plan.py -q"],
+                "validation": ["python -m pytest tests/test_evidence_quality_plan.py -q"],
                 "human_approval_required": True,
                 "merge_allowed": False,
                 "network_allowed": False,
@@ -53,8 +53,86 @@ def _phase_registry() -> dict:
                 "writes_real_repo": False,
                 "requires_sandbox": False,
                 "prerequisites": ["MODEL.CLOSE"],
-                "expected_artifacts": [".agent/eval/evidence_quality_coverage_plan/evidence_quality_coverage_plan.json"],
-                "notes": ["Proposed evidence quality planning phase."],
+                "expected_artifacts": [".agent/eval/evidence_quality_plan/evidence_quality_plan.json"],
+                "notes": ["Report-only evidence quality planning phase."],
+            }
+        )
+    phases = {phase["phase_id"]: phase for phase in data["phases"]}
+    if "EVAL.N2" not in phases:
+        data["phases"].append(
+            {
+                "phase_id": "EVAL.N2",
+                "title": "Evidence Quality Report Contract",
+                "track": "EVAL",
+                "status": "complete",
+                "summary": "Report-only contract for applying the EVAL.N1 evidence quality plan to existing artifacts.",
+                "automation_level": "LOCAL_0_OBSERVE",
+                "budget_tier": "local_only",
+                "risk_level": "low",
+                "allowed_files": ["core/evidence_quality_report_contract.py", "tests/test_evidence_quality_report_contract.py"],
+                "forbidden_files": [".env", ".git", ".agent/private", "secrets", "credentials"],
+                "validation": ["python -m pytest tests/test_evidence_quality_report_contract.py -q"],
+                "human_approval_required": True,
+                "merge_allowed": False,
+                "network_allowed": False,
+                "model_calls_allowed": False,
+                "writes_real_repo": False,
+                "requires_sandbox": False,
+                "prerequisites": ["EVAL.N1"],
+                "expected_artifacts": [".agent/eval/evidence_quality_report_contract/evidence_quality_report_contract.json"],
+                "notes": ["Report-only evidence quality report contract phase."],
+            }
+        )
+    phases = {phase["phase_id"]: phase for phase in data["phases"]}
+    if "EVAL.N3" not in phases:
+        data["phases"].append(
+            {
+                "phase_id": "EVAL.N3",
+                "title": "Evidence Quality Report Builder",
+                "track": "EVAL",
+                "status": "complete",
+                "summary": "Report-only builder for an actual evidence quality report from existing run/evidence artifacts.",
+                "automation_level": "LOCAL_0_OBSERVE",
+                "budget_tier": "local_only",
+                "risk_level": "low",
+                "allowed_files": ["core/evidence_quality_report_builder.py", "tests/test_evidence_quality_report_builder.py"],
+                "forbidden_files": [".env", ".git", ".agent/private", "secrets", "credentials"],
+                "validation": ["python -m pytest tests/test_evidence_quality_report_builder.py -q"],
+                "human_approval_required": True,
+                "merge_allowed": False,
+                "network_allowed": False,
+                "model_calls_allowed": False,
+                "writes_real_repo": False,
+                "requires_sandbox": False,
+                "prerequisites": ["EVAL.N2"],
+                "expected_artifacts": [".agent/eval/evidence_quality_report/evidence_quality_report.json"],
+                "notes": ["Proposed evidence quality report builder phase."],
+            }
+        )
+    phases = {phase["phase_id"]: phase for phase in data["phases"]}
+    if "EVAL.N4" not in phases:
+        data["phases"].append(
+            {
+                "phase_id": "EVAL.N4",
+                "title": "Evidence Quality Artifact Loader Plan",
+                "track": "EVAL",
+                "status": "proposed",
+                "summary": "Report-only artifact loader plan for existing evidence quality reports.",
+                "automation_level": "LOCAL_0_OBSERVE",
+                "budget_tier": "local_only",
+                "risk_level": "low",
+                "allowed_files": ["core/evidence_quality_artifact_loader_plan.py", "tests/test_evidence_quality_artifact_loader_plan.py"],
+                "forbidden_files": [".env", ".git", ".agent/private", "secrets", "credentials"],
+                "validation": ["python -m pytest tests/test_evidence_quality_artifact_loader_plan.py -q"],
+                "human_approval_required": True,
+                "merge_allowed": False,
+                "network_allowed": False,
+                "model_calls_allowed": False,
+                "writes_real_repo": False,
+                "requires_sandbox": False,
+                "prerequisites": ["EVAL.N3"],
+                "expected_artifacts": [".agent/eval/evidence_quality_artifact_loader_plan/evidence_quality_artifact_loader_plan.json"],
+                "notes": ["Proposed evidence quality artifact loader planning phase."],
             }
         )
     return data
@@ -489,10 +567,14 @@ def test_registry_and_picker_recommend_eval_n1():
     assert phases["MODEL.N7"]["status"] == "complete"
     assert phases["MODEL.CLOSE"]["status"] == "complete"
     assert phases["MODEL.CLOSE"]["prerequisites"] == ["MODEL.N7"]
-    assert phases["EVAL.N1"]["status"] == "proposed"
+    assert phases["EVAL.N1"]["status"] == "complete"
     assert phases["EVAL.N1"]["prerequisites"] == ["MODEL.CLOSE"]
+    assert phases["EVAL.N2"]["status"] == "complete"
+    assert phases["EVAL.N2"]["prerequisites"] == ["EVAL.N1"]
+    assert phases["EVAL.N3"]["status"] == "complete"
+    assert phases["EVAL.N3"]["prerequisites"] == ["EVAL.N2"]
 
     pick = pick_phase_candidates(data)
     assert pick["registry_valid"] is True
-    assert pick["top_recommendation"]["phase_id"] == "EVAL.N1"
+    assert pick["top_recommendation"]["phase_id"] == "EVAL.N4"
     assert pick["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"

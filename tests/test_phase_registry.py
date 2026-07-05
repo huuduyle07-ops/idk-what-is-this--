@@ -522,11 +522,11 @@ def test_seed_registry_has_expected_phases():
     ids = {p["phase_id"] for p in data["phases"]}
     assert {
         "ROAD.1", "ROAD.2", "ROAD.3", "ROAD.4", "AUTO.2a", "AUTO.2b", "AUTO.2c",
-        "MODEL.1", "MODEL.2", "MODEL.3", "MODEL.N1", "MODEL.N2", "MODEL.N3", "MODEL.N4", "MODEL.N5", "MODEL.N6", "MODEL.N7", "MODEL.CLOSE", "EVAL.1", "EVAL.2", "EVAL.3", "EVAL.N1", "CMD.1", "CMD.2", "CMD.3", "CMD.4", "CMD.N1", "CMD.N2", "CMD.N3", "CMD.N4", "CMD.N5", "CMD.N6", "CMD.CLOSE",
+        "MODEL.1", "MODEL.2", "MODEL.3", "MODEL.N1", "MODEL.N2", "MODEL.N3", "MODEL.N4", "MODEL.N5", "MODEL.N6", "MODEL.N7", "MODEL.CLOSE", "EVAL.1", "EVAL.2", "EVAL.3", "EVAL.N1", "EVAL.N2", "EVAL.N3", "EVAL.N4", "CMD.1", "CMD.2", "CMD.3", "CMD.4", "CMD.N1", "CMD.N2", "CMD.N3", "CMD.N4", "CMD.N5", "CMD.N6", "CMD.CLOSE",
         "HARDEN.1", "HARDEN.2", "HARDEN.3", "HARDEN.CLOSE", "UX.1", "UX.2", "UX.3", "UX.4", "UX.5", "UX.6", "UX.7", "UX.8", "UX.9", "UX.10", "UX.11",
         "UX.CLOSE", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE", "MIRROR.7", "MIRROR.8", "MIRROR.9", "MIRROR.10", "MIRROR.11", "MIRROR.12", "MIRROR.CLOSE3", "MIRROR.13",
     } <= ids
-    assert len(data["phases"]) == 64
+    assert len(data["phases"]) == 67
 
 
 def test_seed_registry_is_conservative():
@@ -547,7 +547,7 @@ def test_seed_registry_summary_counts():
     assert report["counts_by_track"] == {
         "AUTO": 3,
         "CMD": 11,
-        "EVAL": 4,
+        "EVAL": 7,
         "HARDEN": 4,
         "MIRROR": 15,
         "MODEL": 11,
