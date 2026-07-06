@@ -1547,6 +1547,127 @@
             </header>
             <p>Preview-only Evidence Card Layout defined in UX.6; evidence creation and execution are not implemented here.</p>
             <p>Evidence cards summarise what changed, what evidence exists, what checks say, what risks remain, and what the human should do next. Human confirmation is required before any run.</p>
+            <section id="evidenceQualityPanel" class="evidence-quality-panel" aria-label="Evidence Quality" data-evidence-quality-readonly="true">
+              <header class="evidence-quality-panel__header">
+                <div>
+                  <strong>Evidence Quality</strong>
+                  <p class="evidence-quality-panel__note">Evidence Quality is advisory evidence, not an approval gate.</p>
+                </div>
+                <span id="evidenceQualityStatusBadge" class="evidence-quality-badge evidence-quality-badge--empty">No evidence quality report loaded</span>
+              </header>
+              <div id="evidenceQualityEmptyState" class="evidence-quality-empty" aria-live="polite">No evidence quality report loaded.</div>
+              <dl class="evidence-quality-fields">
+                <div>
+                  <dt>Evidence quality status</dt>
+                  <dd id="evidenceQualityStatus">No report loaded</dd>
+                </div>
+                <div>
+                  <dt>Overall evidence quality</dt>
+                  <dd id="evidenceQualityOverall">Not available</dd>
+                </div>
+                <div>
+                  <dt>Claim count</dt>
+                  <dd id="evidenceQualityClaimCount">Not available</dd>
+                </div>
+                <div>
+                  <dt>Missing evidence count</dt>
+                  <dd id="evidenceQualityMissingEvidenceCount">Not available</dd>
+                </div>
+                <div>
+                  <dt>Contradiction risk count</dt>
+                  <dd id="evidenceQualityContradictionRiskCount">Not available</dd>
+                </div>
+                <div>
+                  <dt>Confidence alignment warnings</dt>
+                  <dd id="evidenceQualityConfidenceAlignmentWarnings">Not available</dd>
+                </div>
+                <div>
+                  <dt>Validation evidence status</dt>
+                  <dd id="evidenceQualityValidationEvidenceStatus">Not available</dd>
+                </div>
+                <div>
+                  <dt>Benchmark evidence status</dt>
+                  <dd id="evidenceQualityBenchmarkEvidenceStatus">Not available</dd>
+                </div>
+                <div>
+                  <dt>Freshness status</dt>
+                  <dd id="evidenceQualityFreshnessStatus">Not available</dd>
+                </div>
+                <div>
+                  <dt>Recommended human checks</dt>
+                  <dd id="evidenceQualityRecommendedHumanChecks">No recommended human checks loaded.</dd>
+                </div>
+              </dl>
+              <div class="evidence-quality-actions" aria-label="Evidence Quality read-only actions">
+                <button type="button" onclick="renderEvidenceQualityPanel()">Refresh Evidence Quality summary</button>
+                <button type="button" onclick="copyEvidenceQualitySummary()">Copy Evidence Quality summary</button>
+                <span id="evidenceQualityCopyStatus" class="evidence-quality-copy-status" aria-live="polite"></span>
+              </div>
+              <details class="evidence-quality-details">
+                <summary>Evidence Quality details</summary>
+                <div class="evidence-quality-detail-grid">
+                  <section>
+                    <h4>Artifact inventory</h4>
+                    <ul id="evidenceQualityArtifactInventory" class="evidence-quality-list">
+                      <li>No artifact inventory loaded.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Claim inventory</h4>
+                    <ul id="evidenceQualityClaimInventory" class="evidence-quality-list">
+                      <li>No claim inventory loaded.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Evidence inventory</h4>
+                    <ul id="evidenceQualityEvidenceInventory" class="evidence-quality-list">
+                      <li>No evidence inventory loaded.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Dimension reviews</h4>
+                    <ul id="evidenceQualityDimensionReviews" class="evidence-quality-list">
+                      <li>No dimension reviews loaded.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Missing evidence list</h4>
+                    <ul id="evidenceQualityMissingEvidenceList" class="evidence-quality-list">
+                      <li>No missing evidence loaded.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Contradiction risks</h4>
+                    <ul id="evidenceQualityContradictionRisks" class="evidence-quality-list">
+                      <li>No contradiction risks loaded.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Freshness findings</h4>
+                    <ul id="evidenceQualityFreshnessFindings" class="evidence-quality-list">
+                      <li>No freshness findings loaded.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Confidence alignment findings</h4>
+                    <ul id="evidenceQualityConfidenceAlignmentFindings" class="evidence-quality-list">
+                      <li>No confidence alignment findings loaded.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Scope alignment findings</h4>
+                    <ul id="evidenceQualityScopeAlignmentFindings" class="evidence-quality-list">
+                      <li>No scope alignment findings loaded.</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Raw JSON</h4>
+                    <pre id="evidenceQualityRawJson" class="evidence-quality-raw">No raw Evidence Quality JSON loaded.</pre>
+                  </section>
+                </div>
+              </details>
+            </section>
+            <!-- /evidence-quality-panel -->
             <section id="mirrorTunnelPanel" class="mirror-tunnel-panel" aria-label="Mirror Tunnel" data-mirror-readonly="true">
               <header class="mirror-tunnel-panel__header">
                 <div>
@@ -7921,6 +8042,211 @@ function _renderEvidenceFiles(files) {
     `).join("");
     container.innerHTML = `<ul class="evidence-file-list">${rows}</ul>`;
 }
+
+// EVAL.N5 read-only Evidence Quality panel
+const EVIDENCE_QUALITY_EMPTY_REPORT = Object.freeze({
+    status: "no_evidence_quality_report_loaded",
+    status_badge: "No evidence quality report loaded",
+    empty_state: "No evidence quality report loaded.",
+    evidence_quality_status: "No report loaded",
+    overall_evidence_quality: "Not available",
+    claim_count: "Not available",
+    missing_evidence_count: "Not available",
+    contradiction_risk_count: "Not available",
+    confidence_alignment_warnings: "Not available",
+    validation_evidence_status: "Not available",
+    benchmark_evidence_status: "Not available",
+    freshness_status: "Not available",
+    recommended_human_checks: [],
+    raw_json_placeholder: "No raw Evidence Quality JSON loaded."
+});
+
+let evidenceQualityCurrentReport = EVIDENCE_QUALITY_EMPTY_REPORT;
+
+function _evidenceQualityObject(value) {
+    return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+}
+
+function _evidenceQualityVisible(report) {
+    const root = _evidenceQualityObject(report);
+    return _evidenceQualityObject(root.visible_fields || root.summary || root);
+}
+
+function _evidenceQualityArray(value) {
+    if (Array.isArray(value)) {
+        return value.filter(item => item !== undefined && item !== null && String(item).trim() !== "");
+    }
+    if (value === undefined || value === null || value === "") return [];
+    return [value];
+}
+
+function _evidenceQualityLabel(value) {
+    if (value === undefined || value === null || value === "") return "Not available";
+    if (Array.isArray(value)) return value.length ? value.map(_evidenceQualityLabel).join("; ") : "None loaded";
+    if (typeof value === "object") {
+        const pieces = [];
+        for (const [key, item] of Object.entries(value)) {
+            if (item !== undefined && item !== null && String(item).trim() !== "") pieces.push(`${key}: ${item}`);
+        }
+        return pieces.length ? pieces.join("; ") : "Not available";
+    }
+    return String(value);
+}
+
+function _evidenceQualityPick(report, keys, fallback) {
+    const visible = _evidenceQualityVisible(report);
+    const root = _evidenceQualityObject(report);
+    for (const key of keys) {
+        if (visible[key] !== undefined && visible[key] !== null && visible[key] !== "") return visible[key];
+        if (root[key] !== undefined && root[key] !== null && root[key] !== "") return root[key];
+    }
+    return fallback;
+}
+
+function _evidenceQualityCount(report, keys, listKeys, fallback) {
+    const direct = _evidenceQualityPick(report, keys, undefined);
+    if (direct !== undefined) return direct;
+    for (const key of listKeys) {
+        const rows = _evidenceQualityArray(_evidenceQualityObject(report)[key]);
+        if (rows.length) return rows.length;
+    }
+    return fallback;
+}
+
+function _evidenceQualityEvidenceStatus(report, artifactKey, fallback) {
+    const direct = _evidenceQualityPick(report, [`${artifactKey}_evidence_status`], undefined);
+    if (direct !== undefined) return direct;
+    const inventory = _evidenceQualityArray(_evidenceQualityObject(report).evidence_inventory);
+    const match = inventory.find(item => _evidenceQualityObject(item).artifact_key === artifactKey);
+    return _evidenceQualityObject(match).evidence_status || fallback;
+}
+
+function _evidenceQualityFreshnessStatus(report) {
+    const direct = _evidenceQualityPick(report, ["freshness_status"], undefined);
+    if (direct !== undefined) return direct;
+    const findings = _evidenceQualityArray(_evidenceQualityObject(report).freshness_findings);
+    if (!findings.length) return EVIDENCE_QUALITY_EMPTY_REPORT.freshness_status;
+    return findings.map(item => _evidenceQualityObject(item).freshness_status || _evidenceQualityLabel(item)).join("; ");
+}
+
+function _evidenceQualitySetText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = _evidenceQualityLabel(value);
+}
+
+function _evidenceQualityRenderList(id, items, emptyText) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const rows = _evidenceQualityArray(items);
+    if (!rows.length) {
+        el.innerHTML = `<li>${_escapeHtml(emptyText)}</li>`;
+        return;
+    }
+    el.innerHTML = rows.map(item => `<li>${_escapeHtml(_evidenceQualityLabel(item))}</li>`).join("");
+}
+
+function _evidenceQualityReportData(input) {
+    const candidate = input !== undefined
+        ? input
+        : (window.evidenceQualityReport || evidenceQualityCurrentReport || EVIDENCE_QUALITY_EMPTY_REPORT);
+    const obj = _evidenceQualityObject(candidate);
+    return Object.keys(obj).length ? obj : EVIDENCE_QUALITY_EMPTY_REPORT;
+}
+
+function _evidenceQualityBadgeClass(data) {
+    const status = String(_evidenceQualityPick(data, ["status", "evidence_quality_status"], "")).toLowerCase();
+    const overall = String(_evidenceQualityPick(data, ["overall_evidence_quality"], "")).toLowerCase();
+    if (data === EVIDENCE_QUALITY_EMPTY_REPORT || status.includes("no_evidence") || status.includes("no report")) {
+        return "evidence-quality-badge--empty";
+    }
+    if (status.includes("blocked") || overall.includes("blocked") || overall.includes("contradicted")) {
+        return "evidence-quality-badge--error";
+    }
+    if (status.includes("warning") || overall.includes("weak") || overall.includes("missing") || overall.includes("partial")) {
+        return "evidence-quality-badge--warning";
+    }
+    return "evidence-quality-badge--loaded";
+}
+
+function renderEvidenceQualityPanel(reportObject) {
+    const data = _evidenceQualityReportData(reportObject);
+    evidenceQualityCurrentReport = data;
+
+    const badge = document.getElementById("evidenceQualityStatusBadge");
+    if (badge) {
+        badge.textContent = _evidenceQualityPick(data, ["status_badge", "evidence_quality_status", "status"], EVIDENCE_QUALITY_EMPTY_REPORT.status_badge);
+        badge.className = "evidence-quality-badge";
+        badge.classList.add(_evidenceQualityBadgeClass(data));
+    }
+
+    const empty = document.getElementById("evidenceQualityEmptyState");
+    if (empty) {
+        empty.textContent = data === EVIDENCE_QUALITY_EMPTY_REPORT
+            ? EVIDENCE_QUALITY_EMPTY_REPORT.empty_state
+            : "Evidence quality summary loaded from existing in-page object.";
+    }
+
+    _evidenceQualitySetText("evidenceQualityStatus", _evidenceQualityPick(data, ["evidence_quality_status", "status"], EVIDENCE_QUALITY_EMPTY_REPORT.evidence_quality_status));
+    _evidenceQualitySetText("evidenceQualityOverall", _evidenceQualityPick(data, ["overall_evidence_quality"], EVIDENCE_QUALITY_EMPTY_REPORT.overall_evidence_quality));
+    _evidenceQualitySetText("evidenceQualityClaimCount", _evidenceQualityCount(data, ["claim_count"], ["claim_inventory"], EVIDENCE_QUALITY_EMPTY_REPORT.claim_count));
+    _evidenceQualitySetText("evidenceQualityMissingEvidenceCount", _evidenceQualityCount(data, ["missing_evidence_count"], ["missing_evidence"], EVIDENCE_QUALITY_EMPTY_REPORT.missing_evidence_count));
+    _evidenceQualitySetText("evidenceQualityContradictionRiskCount", _evidenceQualityCount(data, ["contradiction_risk_count"], ["contradiction_risks"], EVIDENCE_QUALITY_EMPTY_REPORT.contradiction_risk_count));
+    _evidenceQualitySetText("evidenceQualityConfidenceAlignmentWarnings", _evidenceQualityCount(data, ["confidence_alignment_warnings"], ["confidence_alignment_findings"], EVIDENCE_QUALITY_EMPTY_REPORT.confidence_alignment_warnings));
+    _evidenceQualitySetText("evidenceQualityValidationEvidenceStatus", _evidenceQualityEvidenceStatus(data, "validation", EVIDENCE_QUALITY_EMPTY_REPORT.validation_evidence_status));
+    _evidenceQualitySetText("evidenceQualityBenchmarkEvidenceStatus", _evidenceQualityEvidenceStatus(data, "benchmark", EVIDENCE_QUALITY_EMPTY_REPORT.benchmark_evidence_status));
+    _evidenceQualitySetText("evidenceQualityFreshnessStatus", _evidenceQualityFreshnessStatus(data));
+    _evidenceQualitySetText("evidenceQualityRecommendedHumanChecks", _evidenceQualityPick(data, ["recommended_human_checks"], EVIDENCE_QUALITY_EMPTY_REPORT.recommended_human_checks));
+
+    _evidenceQualityRenderList("evidenceQualityArtifactInventory", data.artifact_inventory || data.source_artifacts, "No artifact inventory loaded.");
+    _evidenceQualityRenderList("evidenceQualityClaimInventory", data.claim_inventory || data.claims, "No claim inventory loaded.");
+    _evidenceQualityRenderList("evidenceQualityEvidenceInventory", data.evidence_inventory, "No evidence inventory loaded.");
+    _evidenceQualityRenderList("evidenceQualityDimensionReviews", data.dimension_reviews, "No dimension reviews loaded.");
+    _evidenceQualityRenderList("evidenceQualityMissingEvidenceList", data.missing_evidence, "No missing evidence loaded.");
+    _evidenceQualityRenderList("evidenceQualityContradictionRisks", data.contradiction_risks, "No contradiction risks loaded.");
+    _evidenceQualityRenderList("evidenceQualityFreshnessFindings", data.freshness_findings, "No freshness findings loaded.");
+    _evidenceQualityRenderList("evidenceQualityConfidenceAlignmentFindings", data.confidence_alignment_findings, "No confidence alignment findings loaded.");
+    _evidenceQualityRenderList("evidenceQualityScopeAlignmentFindings", data.scope_alignment_findings, "No scope alignment findings loaded.");
+
+    const raw = document.getElementById("evidenceQualityRawJson");
+    if (raw) {
+        raw.textContent = data === EVIDENCE_QUALITY_EMPTY_REPORT
+            ? EVIDENCE_QUALITY_EMPTY_REPORT.raw_json_placeholder
+            : JSON.stringify(data.raw_json || data, null, 2);
+    }
+}
+
+function _evidenceQualitySummaryText() {
+    return [
+        "Evidence Quality",
+        "Evidence Quality is advisory evidence, not an approval gate.",
+        `evidence quality status: ${document.getElementById("evidenceQualityStatus")?.textContent || EVIDENCE_QUALITY_EMPTY_REPORT.evidence_quality_status}`,
+        `overall evidence quality: ${document.getElementById("evidenceQualityOverall")?.textContent || EVIDENCE_QUALITY_EMPTY_REPORT.overall_evidence_quality}`,
+        `claim count: ${document.getElementById("evidenceQualityClaimCount")?.textContent || EVIDENCE_QUALITY_EMPTY_REPORT.claim_count}`,
+        `missing evidence count: ${document.getElementById("evidenceQualityMissingEvidenceCount")?.textContent || EVIDENCE_QUALITY_EMPTY_REPORT.missing_evidence_count}`,
+        `contradiction risk count: ${document.getElementById("evidenceQualityContradictionRiskCount")?.textContent || EVIDENCE_QUALITY_EMPTY_REPORT.contradiction_risk_count}`,
+        `confidence alignment warnings: ${document.getElementById("evidenceQualityConfidenceAlignmentWarnings")?.textContent || EVIDENCE_QUALITY_EMPTY_REPORT.confidence_alignment_warnings}`,
+        `validation evidence status: ${document.getElementById("evidenceQualityValidationEvidenceStatus")?.textContent || EVIDENCE_QUALITY_EMPTY_REPORT.validation_evidence_status}`,
+        `benchmark evidence status: ${document.getElementById("evidenceQualityBenchmarkEvidenceStatus")?.textContent || EVIDENCE_QUALITY_EMPTY_REPORT.benchmark_evidence_status}`,
+        `freshness status: ${document.getElementById("evidenceQualityFreshnessStatus")?.textContent || EVIDENCE_QUALITY_EMPTY_REPORT.freshness_status}`,
+        `recommended human checks: ${document.getElementById("evidenceQualityRecommendedHumanChecks")?.textContent || "No recommended human checks loaded."}`
+    ].join("\n");
+}
+
+function copyEvidenceQualitySummary() {
+    const status = document.getElementById("evidenceQualityCopyStatus");
+    if (!navigator.clipboard || typeof navigator.clipboard.writeText !== "function") {
+        if (status) status.textContent = "Clipboard unavailable.";
+        return;
+    }
+    navigator.clipboard.writeText(_evidenceQualitySummaryText()).then(() => {
+        if (status) status.textContent = "Evidence Quality summary copied.";
+    }).catch(err => {
+        if (status) status.textContent = `Copy failed: ${err}`;
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => renderEvidenceQualityPanel());
+// /EVAL.N5 read-only Evidence Quality panel
 
 // MIRROR.10 read-only operator panel
 const MIRROR_TUNNEL_EMPTY_SUMMARY = Object.freeze({
