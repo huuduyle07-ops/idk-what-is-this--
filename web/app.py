@@ -1484,6 +1484,205 @@ def dream_seed_from_benchmark_route():
 # calling models.
 # ---------------------------------------------------------------------------
 
+# EVAL.N6 GET-only Evidence Quality artifact loader
+_EVIDENCE_QUALITY_REPORT_SUBDIR = Path(".agent") / "eval" / "evidence_quality_report"
+_EVIDENCE_QUALITY_REPORT_JSON = "evidence_quality_report.json"
+_EVIDENCE_QUALITY_REPORT_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
+
+
+def _is_safe_evidence_quality_report_id(value: str) -> bool:
+    report_id = str(value or "").strip()
+    if not report_id or report_id in {".", ".."}:
+        return False
+    if ".." in report_id or "/" in report_id or "\\" in report_id or "?" in report_id or ":" in report_id:
+        return False
+    return bool(_EVIDENCE_QUALITY_REPORT_ID_RE.fullmatch(report_id))
+
+
+def _evidence_quality_report_root() -> Path:
+    return (PROJECT_ROOT / _EVIDENCE_QUALITY_REPORT_SUBDIR).resolve()
+
+
+def _evidence_quality_report_artifact_path(report_id: str) -> Path:
+    if not _is_safe_evidence_quality_report_id(report_id):
+        raise ValueError("blocked unsafe evidence quality report id")
+    root = _evidence_quality_report_root()
+    if str(report_id).strip() == "default":
+        path = (root / _EVIDENCE_QUALITY_REPORT_JSON).resolve()
+    else:
+        path = (root / str(report_id).strip() / _EVIDENCE_QUALITY_REPORT_JSON).resolve()
+    path.relative_to(root)
+    return path
+
+
+def _evidence_quality_rel_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
+    except (OSError, ValueError):
+        return path.as_posix()
+
+
+def _evidence_quality_dict(value):
+    return value if isinstance(value, dict) else {}
+
+
+def _evidence_quality_list(value) -> list:
+    return value if isinstance(value, list) else []
+
+
+def _evidence_quality_status_badge(status: str) -> str:
+    labels = {
+        "evidence_quality_ready": "Evidence quality ready",
+        "evidence_quality_ready_with_warnings": "Evidence quality ready with warnings",
+        "evidence_quality_incomplete": "Evidence quality incomplete",
+        "evidence_quality_blocked": "Evidence quality blocked",
+        "report_not_found": "Report not found",
+        "malformed_report": "Malformed report",
+        "blocked_unsafe_report_id": "Blocked unsafe report id",
+        "no_report_selected": "No report selected",
+    }
+    return labels.get(status, status or "No evidence quality report loaded")
+
+
+def _evidence_quality_count(report: dict, direct_key: str, list_key: str):
+    value = report.get(direct_key)
+    if value is not None:
+        return value
+    return len(_evidence_quality_list(report.get(list_key)))
+
+
+def _evidence_quality_evidence_status(report: dict, artifact_key: str) -> str:
+    direct = report.get(f"{artifact_key}_evidence_status")
+    if direct:
+        return str(direct)
+    for item in _evidence_quality_list(report.get("evidence_inventory")):
+        row = _evidence_quality_dict(item)
+        if row.get("artifact_key") == artifact_key:
+            return str(row.get("evidence_status") or "Not available")
+    return "Not available"
+
+
+def _evidence_quality_freshness_status(report: dict) -> str:
+    if report.get("freshness_status"):
+        return str(report.get("freshness_status"))
+    findings = _evidence_quality_list(report.get("freshness_findings"))
+    statuses = [
+        str(_evidence_quality_dict(item).get("freshness_status") or "").strip()
+        for item in findings
+    ]
+    statuses = [item for item in statuses if item]
+    return "; ".join(statuses) if statuses else "Not available"
+
+
+def _evidence_quality_report_summary(report: dict, path: Path) -> dict:
+    status = str(report.get("evidence_quality_status") or report.get("status") or "evidence_quality_incomplete")
+    return {
+        "status": status,
+        "status_badge": _evidence_quality_status_badge(status),
+        "evidence_quality_status": status,
+        "overall_evidence_quality": str(report.get("overall_evidence_quality") or "Not available"),
+        "claim_count": _evidence_quality_count(report, "claim_count", "claim_inventory"),
+        "missing_evidence_count": _evidence_quality_count(report, "missing_evidence_count", "missing_evidence"),
+        "contradiction_risk_count": _evidence_quality_count(report, "contradiction_risk_count", "contradiction_risks"),
+        "confidence_alignment_warnings": _evidence_quality_count(
+            report,
+            "confidence_alignment_warnings",
+            "confidence_alignment_findings",
+        ),
+        "validation_evidence_status": _evidence_quality_evidence_status(report, "validation"),
+        "benchmark_evidence_status": _evidence_quality_evidence_status(report, "benchmark"),
+        "freshness_status": _evidence_quality_freshness_status(report),
+        "recommended_human_checks": _evidence_quality_list(report.get("recommended_human_checks")),
+        "artifact_inventory": _evidence_quality_list(report.get("artifact_inventory") or report.get("source_artifacts")),
+        "claim_inventory": _evidence_quality_list(report.get("claim_inventory")),
+        "evidence_inventory": _evidence_quality_list(report.get("evidence_inventory")),
+        "dimension_reviews": _evidence_quality_list(report.get("dimension_reviews")),
+        "missing_evidence": _evidence_quality_list(report.get("missing_evidence")),
+        "contradiction_risks": _evidence_quality_list(report.get("contradiction_risks")),
+        "freshness_findings": _evidence_quality_list(report.get("freshness_findings")),
+        "confidence_alignment_findings": _evidence_quality_list(report.get("confidence_alignment_findings")),
+        "scope_alignment_findings": _evidence_quality_list(report.get("scope_alignment_findings")),
+        "artifact_path": _evidence_quality_rel_path(path),
+        "raw_json": report,
+    }
+
+
+def _evidence_quality_report_error(status: str, message: str, code: int, report_id: str = ""):
+    summary = {
+        "status": status,
+        "status_badge": _evidence_quality_status_badge(status),
+        "evidence_quality_status": status,
+        "overall_evidence_quality": "Not available",
+        "claim_count": "Not available",
+        "missing_evidence_count": "Not available",
+        "contradiction_risk_count": "Not available",
+        "confidence_alignment_warnings": "Not available",
+        "validation_evidence_status": "Not available",
+        "benchmark_evidence_status": "Not available",
+        "freshness_status": "Not available",
+        "recommended_human_checks": [message],
+        "artifact_inventory": [],
+        "claim_inventory": [],
+        "evidence_inventory": [],
+        "dimension_reviews": [],
+        "missing_evidence": [],
+        "contradiction_risks": [],
+        "freshness_findings": [],
+        "confidence_alignment_findings": [],
+        "scope_alignment_findings": [],
+        "raw_json": {"status": status, "error": message},
+    }
+    return {"ok": False, "status": status, "report_id": str(report_id or ""), "error": message, "summary": summary}, code
+
+
+@app.route("/eval/evidence-quality/report/<path:report_id>", methods=["GET"])
+def evidence_quality_report_route(report_id: str):
+    """Read one existing EVAL.N3 Evidence Quality report by sanitized id."""
+    try:
+        path = _evidence_quality_report_artifact_path(report_id)
+    except (OSError, ValueError):
+        return _evidence_quality_report_error(
+            "blocked_unsafe_report_id",
+            "Blocked unsafe Evidence Quality report id.",
+            400,
+            report_id,
+        )
+    if not path.is_file():
+        return _evidence_quality_report_error(
+            "report_not_found",
+            "Select an existing Evidence Quality report.",
+            404,
+            report_id,
+        )
+    try:
+        report = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return _evidence_quality_report_error(
+            "malformed_report",
+            "Malformed Evidence Quality report JSON.",
+            400,
+            report_id,
+        )
+    if not isinstance(report, dict) or report.get("report_kind") != "evidence_quality_report":
+        return _evidence_quality_report_error(
+            "malformed_report",
+            "Malformed Evidence Quality report JSON.",
+            400,
+            report_id,
+        )
+    status = str(report.get("evidence_quality_status") or report.get("status") or "evidence_quality_incomplete")
+    return {
+        "ok": True,
+        "status": status,
+        "report_id": str(report_id or ""),
+        "artifact_path": _evidence_quality_rel_path(path),
+        "summary": _evidence_quality_report_summary(report, path),
+        "report": report,
+    }
+
+
+# /EVAL.N6 GET-only Evidence Quality artifact loader
+
 # MIRROR.11 read-only preview loader
 _MIRROR_PREVIEW_SUBDIR = Path(".agent") / "mirror_tunnel" / "live_trace_scoring_preview"
 _MIRROR_PREVIEW_JSON = "mirror_tunnel_live_trace_scoring_preview.json"

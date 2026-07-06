@@ -1556,6 +1556,12 @@
                 <span id="evidenceQualityStatusBadge" class="evidence-quality-badge evidence-quality-badge--empty">No evidence quality report loaded</span>
               </header>
               <div id="evidenceQualityEmptyState" class="evidence-quality-empty" aria-live="polite">No evidence quality report loaded.</div>
+              <div class="evidence-quality-loader" aria-label="Evidence Quality report loader">
+                <label for="evidenceQualityReportId">Report ID</label>
+                <input id="evidenceQualityReportId" type="text" value="default" autocomplete="off" spellcheck="false">
+                <button type="button" onclick="loadEvidenceQualityReport()">Load Evidence Quality report</button>
+                <span id="evidenceQualityLoadStatus" class="evidence-quality-load-status" aria-live="polite"></span>
+              </div>
               <dl class="evidence-quality-fields">
                 <div>
                   <dt>Evidence quality status</dt>
@@ -8043,7 +8049,7 @@ function _renderEvidenceFiles(files) {
     container.innerHTML = `<ul class="evidence-file-list">${rows}</ul>`;
 }
 
-// EVAL.N5 read-only Evidence Quality panel
+// EVAL.N5/EVAL.N6 read-only Evidence Quality panel
 const EVIDENCE_QUALITY_EMPTY_REPORT = Object.freeze({
     status: "no_evidence_quality_report_loaded",
     status_badge: "No evidence quality report loaded",
@@ -8060,6 +8066,21 @@ const EVIDENCE_QUALITY_EMPTY_REPORT = Object.freeze({
     recommended_human_checks: [],
     raw_json_placeholder: "No raw Evidence Quality JSON loaded."
 });
+
+const EVIDENCE_QUALITY_NO_REPORT_SELECTED = Object.freeze({
+    ...EVIDENCE_QUALITY_EMPTY_REPORT,
+    status: "no_report_selected",
+    status_badge: "No report selected",
+    empty_state: "No report selected.",
+    evidence_quality_status: "no_report_selected",
+    recommended_human_checks: ["Enter an existing Evidence Quality report id."]
+});
+
+const EVIDENCE_QUALITY_ROUTE_ERROR_STATUSES = Object.freeze([
+    "report_not_found",
+    "malformed_report",
+    "blocked_unsafe_report_id"
+]);
 
 let evidenceQualityCurrentReport = EVIDENCE_QUALITY_EMPTY_REPORT;
 
@@ -8156,10 +8177,10 @@ function _evidenceQualityReportData(input) {
 function _evidenceQualityBadgeClass(data) {
     const status = String(_evidenceQualityPick(data, ["status", "evidence_quality_status"], "")).toLowerCase();
     const overall = String(_evidenceQualityPick(data, ["overall_evidence_quality"], "")).toLowerCase();
-    if (data === EVIDENCE_QUALITY_EMPTY_REPORT || status.includes("no_evidence") || status.includes("no report")) {
+    if (data === EVIDENCE_QUALITY_EMPTY_REPORT || status.includes("no_evidence") || status.includes("no report") || status.includes("no_report_selected")) {
         return "evidence-quality-badge--empty";
     }
-    if (status.includes("blocked") || overall.includes("blocked") || overall.includes("contradicted")) {
+    if (status.includes("blocked") || status.includes("not_found") || status.includes("malformed") || overall.includes("blocked") || overall.includes("contradicted")) {
         return "evidence-quality-badge--error";
     }
     if (status.includes("warning") || overall.includes("weak") || overall.includes("missing") || overall.includes("partial")) {
@@ -8181,9 +8202,13 @@ function renderEvidenceQualityPanel(reportObject) {
 
     const empty = document.getElementById("evidenceQualityEmptyState");
     if (empty) {
-        empty.textContent = data === EVIDENCE_QUALITY_EMPTY_REPORT
-            ? EVIDENCE_QUALITY_EMPTY_REPORT.empty_state
-            : "Evidence quality summary loaded from existing in-page object.";
+        empty.textContent = _evidenceQualityPick(
+            data,
+            ["empty_state"],
+            data === EVIDENCE_QUALITY_EMPTY_REPORT
+                ? EVIDENCE_QUALITY_EMPTY_REPORT.empty_state
+                : "Evidence quality report loaded from an existing artifact or in-page object."
+        );
     }
 
     _evidenceQualitySetText("evidenceQualityStatus", _evidenceQualityPick(data, ["evidence_quality_status", "status"], EVIDENCE_QUALITY_EMPTY_REPORT.evidence_quality_status));
@@ -8212,6 +8237,62 @@ function renderEvidenceQualityPanel(reportObject) {
         raw.textContent = data === EVIDENCE_QUALITY_EMPTY_REPORT
             ? EVIDENCE_QUALITY_EMPTY_REPORT.raw_json_placeholder
             : JSON.stringify(data.raw_json || data, null, 2);
+    }
+}
+
+function _evidenceQualitySetLoadStatus(message) {
+    const status = document.getElementById("evidenceQualityLoadStatus");
+    if (status) status.textContent = message || "";
+}
+
+function _evidenceQualityRouteError(status, message) {
+    return {
+        status,
+        status_badge: status,
+        empty_state: message,
+        evidence_quality_status: status,
+        overall_evidence_quality: "Not available",
+        claim_count: "Not available",
+        missing_evidence_count: "Not available",
+        contradiction_risk_count: "Not available",
+        confidence_alignment_warnings: "Not available",
+        validation_evidence_status: "Not available",
+        benchmark_evidence_status: "Not available",
+        freshness_status: "Not available",
+        recommended_human_checks: [message],
+        raw_json: { status, error: message }
+    };
+}
+
+async function loadEvidenceQualityReport() {
+    const input = document.getElementById("evidenceQualityReportId");
+    const reportId = (input?.value || "").trim();
+    if (!reportId) {
+        renderEvidenceQualityPanel(EVIDENCE_QUALITY_NO_REPORT_SELECTED);
+        _evidenceQualitySetLoadStatus("No report selected.");
+        return;
+    }
+
+    const encodedReportId = encodeURIComponent(reportId);
+    try {
+        const response = await fetch(`/eval/evidence-quality/report/${encodedReportId}`);
+        const body = await response.json().catch(() => ({
+            ok: false,
+            status: "malformed_report",
+            error: "Malformed Evidence Quality report response.",
+            summary: _evidenceQualityRouteError("malformed_report", "Malformed Evidence Quality report response.")
+        }));
+        if (!response.ok || body.ok === false) {
+            renderEvidenceQualityPanel(body.report || body.summary || _evidenceQualityRouteError(body.status || "report_not_found", body.error || "Evidence Quality report was not loaded."));
+            _evidenceQualitySetLoadStatus(body.error || body.status || "Evidence Quality report was not loaded.");
+            return;
+        }
+        window.evidenceQualityReport = body.report || body.summary || EVIDENCE_QUALITY_EMPTY_REPORT;
+        renderEvidenceQualityPanel(body.report || body.summary || EVIDENCE_QUALITY_EMPTY_REPORT);
+        _evidenceQualitySetLoadStatus("Evidence Quality report loaded.");
+    } catch (err) {
+        renderEvidenceQualityPanel(_evidenceQualityRouteError("malformed_report", `Evidence Quality report load failed: ${err}`));
+        _evidenceQualitySetLoadStatus(`Evidence Quality report load failed: ${err}`);
     }
 }
 
@@ -8246,7 +8327,7 @@ function copyEvidenceQualitySummary() {
 }
 
 document.addEventListener("DOMContentLoaded", () => renderEvidenceQualityPanel());
-// /EVAL.N5 read-only Evidence Quality panel
+// /EVAL.N5/EVAL.N6 read-only Evidence Quality panel
 
 // MIRROR.10 read-only operator panel
 const MIRROR_TUNNEL_EMPTY_SUMMARY = Object.freeze({

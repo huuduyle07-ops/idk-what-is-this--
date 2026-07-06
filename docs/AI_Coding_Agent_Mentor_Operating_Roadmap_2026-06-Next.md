@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (67 phases: 4 ROAD + 3 AUTO + 11 MODEL + 7 EVAL + 11 CMD + 4 HARDEN + 15 MIRROR + 12 UX).
-- The phase picker currently has two safe candidates: `EVAL.N4` and `MIRROR.13`.
-- The top recommendation is `EVAL.N4` - Evidence Quality Artifact Loader Plan.
+- The phase registry is valid (70 phases: 4 ROAD + 3 AUTO + 11 MODEL + 10 EVAL + 11 CMD + 4 HARDEN + 15 MIRROR + 12 UX).
+- The phase picker currently has two safe candidates: `EVAL.N7` and `MIRROR.13`.
+- The top recommendation is `EVAL.N7` - Evidence Quality Loader Readiness Check.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -41,7 +41,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 ### Validation State
 
 - Registry validation is passing.
-- The current phase picker result recommends `EVAL.N4` after EVAL.N3 shipped as the report-only evidence quality report builder.
+- The current phase picker result recommends `EVAL.N7` after EVAL.N6 shipped the GET-only read-only Evidence Quality artifact loader.
 - The old roadmap arc is complete and should not be stretched to imply new authorization.
 
 ### Benchmark State
@@ -125,13 +125,14 @@ live trace scoring preview foundation, advisory operator panel plan, and
 read-only operator panel UI stub, artifact loader preview, and live demo
 readiness checker, plus the live/UI readiness checkpoint.
 The phase picker now recommends
-**EVAL.N4 - Evidence Quality Artifact Loader Plan** as the next
-human-approved report-only branch step after EVAL.N3 built the first actual
-evidence quality report from explicitly supplied artifacts. EVAL.N4 should plan
-how to surface existing evidence quality report artifacts safely, still without
-running validation, benchmarks, models, patch application, scoring gates,
-approval logic, or runtime blockers. MIRROR.13 remains a proposed Mirror
-candidate, but EVAL.N4 now ranks first by the registry picker.
+**EVAL.N7 - Evidence Quality Loader Readiness Check** as the next
+human-approved report-only branch step after EVAL.N6 added a GET-only
+read-only loader for existing EVAL.N3 Evidence Quality reports. EVAL.N7 should
+verify the UI and loader remain safe, advisory, compatible with existing
+reports, and free of validation runs, benchmarks, model calls, patch
+application, scoring gates, approval logic, or runtime blockers. MIRROR.13
+remains a proposed Mirror candidate, but EVAL.N7 now ranks first by the
+registry picker.
 
 ### Branch CMD — Commander Mode
 
@@ -217,17 +218,17 @@ S.6 Optional optimizer experiment
 
 Recommended branch order:
 
-1. EVAL - shipped through EVAL.N3; EVAL.N4 is next recommended
+1. EVAL - shipped through EVAL.N6; EVAL.N7 is next recommended
 2. CMD - shipped through CMD.CLOSE
 3. MODEL - shipped through MODEL.CLOSE
 4. UX - shipped through UX.CLOSE
 5. HARDEN - shipped through HARDEN.CLOSE
-6. MIRROR - proposed through MIRROR.13, but currently ranked after EVAL.N4
+6. MIRROR - proposed through MIRROR.13, but currently ranked after EVAL.N7
 7. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.N3 is the newest shipped phase; it turns the EVAL.N2 evidence-quality contract into an actual deterministic evidence quality report builder for explicitly supplied artifacts, overall evidence quality, recommended human checks, claim support, patch relevance, validation/benchmark relevance, freshness, missing evidence, contradiction risk, confidence alignment, scope alignment, and human review boundaries. The current picker recommendation is EVAL.N4, which should plan how to load and surface existing evidence quality report artifacts without executing validation or benchmarks.
+CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.N6 is the newest shipped phase; it loads existing EVAL.N3 evidence quality report artifacts through a narrow GET-only read-only web route and renders them in the advisory Evidence Quality panel without executing validation or benchmarks. The current picker recommendation is EVAL.N7, which should verify the UI and loader readiness before closing the EVAL branch.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -915,17 +916,46 @@ validation run, benchmark run, model call, patch apply, scoring-gate change, MCP
 invocation, worker launch, network call, database write, route/auth change, or
 automatic approval/rejection power was added.
 
-**EVAL.N4 - Evidence Quality Artifact Loader Plan is proposed.**
-EVAL.N4 is the current phase picker recommendation. It should plan how to load
-and surface existing EVAL.N3 evidence quality report artifacts safely for
-operator review, without making them an approval gate or runtime blocker.
+**EVAL.N4 - Evidence Quality Artifact Loader Plan is shipped 2026-07-05 (complete).**
+Implemented as `core/evidence_quality_artifact_loader_plan.py` +
+`scripts/create_evidence_quality_artifact_loader_plan.py`, registered as a
+`complete` EVAL-track phase (prerequisite EVAL.N3), and validated with
+`tests/test_evidence_quality_artifact_loader_plan.py`. EVAL.N4 planned the safe
+artifact-loader/display layer for existing EVAL.N3 reports without adding a UI
+panel, backend route, runtime artifact loading, validation, benchmarks, model
+calls, patch application, scoring gates, or approval/rejection power.
+
+**EVAL.N5 - Evidence Quality Read-only UI Stub is shipped 2026-07-06 (complete).**
+Implemented in `web/templates/index.html` and `web/static/style.css`, registered
+as a `complete` EVAL-track phase (prerequisite EVAL.N4), and validated with
+`tests/test_evidence_quality_panel_ui.py`. EVAL.N5 added the inert advisory
+Evidence Quality panel with empty state placeholders, visible summary fields,
+collapsed debug placeholders, and read-only refresh/copy controls. It did not
+add a backend loader, generate reports, run validation or benchmarks, call
+models, apply patches, mutate evidence reports, or block Submit/Apply.
+
+**EVAL.N6 - Evidence Quality GET-only Artifact Loader is shipped 2026-07-06 (complete).**
+Implemented as a narrow GET-only route in `web/app.py` plus read-only loader
+controls in the Evidence Quality panel, registered as a `complete` EVAL-track
+phase (prerequisite EVAL.N5), and validated with
+`tests/test_evidence_quality_panel_loader.py`. EVAL.N6 loads existing EVAL.N3
+reports only from `.agent/eval/evidence_quality_report/`, supports the default
+report and safe report-id subdirectories, blocks unsafe ids, and keeps the panel
+advisory. It does not add mutation routes, generate reports, run validation or
+benchmarks, call models, apply patches, approve/reject work, mutate evidence
+reports, or block Submit/Apply.
+
+**EVAL.N7 - Evidence Quality Loader Readiness Check is proposed.**
+EVAL.N7 is the current phase picker recommendation. It should verify the
+EVAL.N6 GET loader and EVAL.N5/N6 UI remain safe, read-only, non-blocking, and
+compatible with existing EVAL.N3 reports before closing the EVAL branch.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
 improve live trace frame capture quality after the MIRROR.CLOSE3 freeze, while
 keeping Mirror evidence report-only, advisory, non-blocking, and free of runtime
 scoring or UI approval-gate behavior. The current top picker recommendation is
-EVAL.N4.
+EVAL.N7.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
