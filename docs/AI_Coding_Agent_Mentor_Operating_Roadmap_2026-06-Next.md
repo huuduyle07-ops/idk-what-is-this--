@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (71 phases: 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 11 CMD + 4 HARDEN + 15 MIRROR + 12 UX).
-- The phase picker currently has two safe candidates: `EVAL.CLOSE` and `MIRROR.13`.
-- The top recommendation is `EVAL.CLOSE` - Evidence Quality Branch Checkpoint.
+- The phase registry is valid (72 phases: 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 1 HUMAN + 11 CMD + 4 HARDEN + 15 MIRROR + 12 UX).
+- The phase picker currently has two safe candidates: `HUMAN.N1` and `MIRROR.13`.
+- The top recommendation is `HUMAN.N1` - Human Review Boundary Map.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -41,7 +41,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 ### Validation State
 
 - Registry validation is passing.
-- The current phase picker result recommends `EVAL.CLOSE` after EVAL.N7 shipped the report-only Evidence Quality loader readiness check.
+- The current phase picker result recommends `HUMAN.N1` after EVAL.CLOSE froze the report-only Evidence Quality branch.
 - The old roadmap arc is complete and should not be stretched to imply new authorization.
 
 ### Benchmark State
@@ -124,16 +124,12 @@ pipeline, branch checkpoint, default-off shadow live trace writer, and post-run
 live trace scoring preview foundation, advisory operator panel plan, and
 read-only operator panel UI stub, artifact loader preview, and live demo
 readiness checker, plus the live/UI readiness checkpoint.
-The phase picker now recommends
-**EVAL.CLOSE - Evidence Quality Branch Checkpoint** as the next
-human-approved report-only branch step after EVAL.N7 verified the EVAL.N5/N6
-Evidence Quality panel and loader readiness. EVAL.CLOSE should freeze the
-Evidence Quality branch while confirming the report contract, builder, UI
-panel, GET-only loader, and readiness check remain advisory, compatible, and
-free of validation runs, benchmarks, model calls, patch application, scoring
-gates, approval logic, evidence report mutation, or runtime blockers. MIRROR.13
-remains a proposed Mirror candidate, but EVAL.CLOSE now ranks first by the
-registry picker.
+EVAL.CLOSE has now frozen the Evidence Quality branch after EVAL.N7 verified
+the EVAL.N5/N6 panel and loader readiness. The phase picker now recommends
+**HUMAN.N1 - Human Review Boundary Map** as the next human-approved report-only
+branch step: define what the system may advise or display versus what only the
+human may approve. MIRROR.13 remains a proposed Mirror candidate, but HUMAN.N1
+now ranks first by the registry picker.
 
 ### Branch CMD — Commander Mode
 
@@ -219,17 +215,17 @@ S.6 Optional optimizer experiment
 
 Recommended branch order:
 
-1. EVAL - shipped through EVAL.N7; EVAL.CLOSE is next recommended
+1. HUMAN - HUMAN.N1 is next recommended after EVAL.CLOSE
 2. CMD - shipped through CMD.CLOSE
 3. MODEL - shipped through MODEL.CLOSE
 4. UX - shipped through UX.CLOSE
 5. HARDEN - shipped through HARDEN.CLOSE
-6. MIRROR - proposed through MIRROR.13, but currently ranked after EVAL.CLOSE
+6. MIRROR - proposed through MIRROR.13, but currently ranked after HUMAN.N1
 7. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.N7 is the newest shipped phase; it writes a report-only readiness checkpoint for the EVAL.N5/N6 Evidence Quality panel and loader chain without generating reports, executing validation or benchmarks, calling models, applying patches, approving/rejecting work, mutating reports, or blocking Submit/Apply. The current picker recommendation is EVAL.CLOSE, which should freeze the Evidence Quality branch.
+CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE is the newest shipped phase; it writes a report-only branch checkpoint for EVAL.N1-EVAL.N7 without generating reports, executing validation or benchmarks, calling models, applying patches, approving/rejecting work, mutating reports, or blocking Submit/Apply. The current picker recommendation is HUMAN.N1, which should map human-only review and approval boundaries across the advisory surfaces.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -958,19 +954,27 @@ report-only: no evidence quality report generation, validation run, benchmark
 run, model call, patch apply, approval/rejection, evidence report mutation, or
 Apply/Submit blocking power was added.
 
-**EVAL.CLOSE - Evidence Quality Branch Checkpoint is proposed.**
-EVAL.CLOSE is the current phase picker recommendation. It should freeze the
-Evidence Quality branch after EVAL.N7 verified the read-only UI/loader chain and
-confirm EVAL.N1 through EVAL.N7 remain advisory, report-only, non-blocking, and
+**EVAL.CLOSE - Evidence Quality Branch Checkpoint is shipped 2026-07-06 (complete).**
+Implemented as `core/evidence_quality_branch_checkpoint.py` +
+`scripts/create_evidence_quality_branch_checkpoint.py`, registered as a
+`complete` EVAL-track phase (prerequisite EVAL.N7), and validated with
+`tests/test_evidence_quality_branch_checkpoint.py`. EVAL.CLOSE writes
+`.agent/eval/evidence_quality_branch_checkpoint/evidence_quality_branch_checkpoint.{json,md}`
+and freezes EVAL.N1 through EVAL.N7 as advisory, report-only, non-blocking, and
 free of runtime scoring, validation, benchmark, model, patch, approval, or
 mutation authority.
+
+**HUMAN.N1 - Human Review Boundary Map is proposed.**
+HUMAN.N1 is the current phase picker recommendation. It should map what the
+system may advise or display versus what only the human may approve, reject,
+apply, merge, accept as risk, or treat as sufficient evidence.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
 improve live trace frame capture quality after the MIRROR.CLOSE3 freeze, while
 keeping Mirror evidence report-only, advisory, non-blocking, and free of runtime
 scoring or UI approval-gate behavior. The current top picker recommendation is
-EVAL.CLOSE.
+HUMAN.N1.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
