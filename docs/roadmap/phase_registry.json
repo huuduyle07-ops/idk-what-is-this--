@@ -1935,12 +1935,14 @@
       "phase_id": "EVAL.N7",
       "title": "Evidence Quality Loader Readiness Check",
       "track": "EVAL",
-      "status": "proposed",
+      "status": "complete",
       "summary": "Readiness check for the Evidence Quality GET-only loader and UI panel, verifying they remain safe, read-only, non-blocking, and compatible with existing EVAL.N3 reports before closing the EVAL branch.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
       "allowed_files": [
+        "core/evidence_quality_loader_readiness.py",
+        "scripts/create_evidence_quality_loader_readiness.py",
         "web/app.py",
         "web/templates/index.html",
         "web/static/style.css",
@@ -1979,10 +1981,71 @@
       "prerequisites": [
         "EVAL.N6"
       ],
-      "expected_artifacts": [],
+      "expected_artifacts": [
+        ".agent/eval/evidence_quality_loader_readiness/evidence_quality_loader_readiness.json",
+        ".agent/eval/evidence_quality_loader_readiness/evidence_quality_loader_readiness.md"
+      ],
       "notes": [
-        "Proposed EVAL.N7 phase. It should verify the EVAL.N6 GET loader and EVAL.N5/N6 UI are safe, read-only, non-blocking, and compatible with existing EVAL.N3 reports before closing the EVAL branch.",
-        "Must not add mutation routes, generate reports, run validation, run benchmarks, call models, apply patches, change scoring gates, approve/reject work, block Apply/Submit, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change auth policy, mutate evidence reports, push, merge, or open PRs."
+        "EVAL.N7 shipped 2026-07-06 as a report-only readiness checkpoint for the EVAL.N5 Evidence Quality panel and EVAL.N6 GET-only loader. It inspects source and optional existing EVAL.N3 report artifacts, then writes readiness JSON/Markdown artifacts.",
+        "Remains readiness-check-only and report-only. It does not generate evidence quality reports, run validation, run benchmarks, call models, apply patches, approve/reject work, mutate evidence reports, block Apply/Submit, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change auth policy, change scoring gates, push, merge, or open PRs. Recommended next phase: EVAL.CLOSE - Evidence Quality Branch Checkpoint."
+      ]
+    },
+    {
+      "phase_id": "EVAL.CLOSE",
+      "title": "Evidence Quality Branch Checkpoint",
+      "track": "EVAL",
+      "status": "proposed",
+      "summary": "Report-only branch checkpoint to freeze the Evidence Quality branch after EVAL.N1 through EVAL.N7, confirming the report contract, builder, UI panel, GET-only loader, and readiness check remain advisory and non-blocking.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/evidence_quality_branch_checkpoint.py",
+        "scripts/create_evidence_quality_branch_checkpoint.py",
+        "tests/test_evidence_quality_branch_checkpoint.py",
+        "tests/test_evidence_quality_loader_readiness.py",
+        "tests/test_evidence_quality_panel_loader.py",
+        "tests/test_evidence_quality_panel_ui.py",
+        "tests/test_phase_picker.py",
+        "tests/test_phase_registry.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts web tests benchmarks",
+        "python -m pytest tests/test_evidence_quality_branch_checkpoint.py -q",
+        "python -m pytest tests/test_evidence_quality_loader_readiness.py -q",
+        "python -m pytest tests/test_evidence_quality_panel_loader.py tests/test_evidence_quality_panel_ui.py -q",
+        "python -m pytest tests/test_evidence_quality_report_builder.py tests/test_evidence_quality_report_contract.py tests/test_evidence_quality_plan.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python -m pytest -q",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "EVAL.N7"
+      ],
+      "expected_artifacts": [
+        ".agent/eval/evidence_quality_branch_checkpoint/evidence_quality_branch_checkpoint.json",
+        ".agent/eval/evidence_quality_branch_checkpoint/evidence_quality_branch_checkpoint.md"
+      ],
+      "notes": [
+        "Proposed EVAL.CLOSE phase. It should freeze the Evidence Quality branch after EVAL.N7 verified the read-only UI/loader chain readiness.",
+        "Must remain report-only and checkpoint-only. It must not generate new evidence quality reports, run validation, run benchmarks, call models, apply patches, approve/reject work, mutate evidence reports, block Apply/Submit, invoke MCP tools, launch workers, execute Dream actions, apply Replay janitor actions, use Docker/subprocess, contact network services, write to a database, change auth policy, change scoring gates, push, merge, or open PRs."
       ]
     },
     {
