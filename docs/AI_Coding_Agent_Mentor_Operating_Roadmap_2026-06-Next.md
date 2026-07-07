@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (76 phases: 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 4 HARDEN + 15 MIRROR + 12 UX).
-- The phase picker currently has two safe candidates: `HUMAN.CLOSE` and `MIRROR.13`.
-- The top recommendation is `HUMAN.CLOSE` - Human Authority Branch Checkpoint.
+- The phase registry is valid (77 phases: 1 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 4 HARDEN + 15 MIRROR + 12 UX).
+- The phase picker currently has two safe candidates: `ADOPT.MODEL.1` and `MIRROR.13`.
+- The top recommendation is `ADOPT.MODEL.1` - Human-Approved Model Role Catalog Adoption.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -41,7 +41,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 ### Validation State
 
 - Registry validation is passing.
-- The current phase picker result recommends `HUMAN.CLOSE` after HUMAN.N4 added the report-only approval token sample catalog.
+- The current phase picker result recommends `ADOPT.MODEL.1` after HUMAN.CLOSE froze the report-only human authority branch.
 - The old roadmap arc is complete and should not be stretched to imply new authorization.
 
 ### Benchmark State
@@ -127,12 +127,13 @@ readiness checker, plus the live/UI readiness checkpoint.
 EVAL.CLOSE froze the Evidence Quality branch after EVAL.N7 verified the
 EVAL.N5/N6 panel and loader readiness. HUMAN.N1 mapped what the system may
 advise or display versus what only the human may approve, HUMAN.N2 defined
-the explicit confirmation signal shape before dangerous actions, and HUMAN.N3
-added report-only dry-run validation for sample approval tokens. The phase
-picker now recommends **HUMAN.CLOSE - Human Authority Branch Checkpoint** as
-the next human-approved report-only branch step: freeze the human authority
-branch before runtime enforcement design. MIRROR.13 remains a proposed Mirror
-candidate, but HUMAN.CLOSE now ranks first by the registry picker.
+the explicit confirmation signal shape before dangerous actions, HUMAN.N3
+added report-only dry-run validation for sample approval tokens, HUMAN.N4
+added documentation-only sample tokens, and HUMAN.CLOSE froze the human
+authority branch before runtime enforcement design. The phase picker now
+recommends **ADOPT.MODEL.1 - Human-Approved Model Role Catalog Adoption** as
+the next human-approved report-only branch step. MIRROR.13 remains a proposed
+Mirror candidate, but ADOPT.MODEL.1 now ranks first by the registry picker.
 
 ### Branch CMD — Commander Mode
 
@@ -218,17 +219,18 @@ S.6 Optional optimizer experiment
 
 Recommended branch order:
 
-1. HUMAN - HUMAN.CLOSE is next recommended after HUMAN.N4
-2. CMD - shipped through CMD.CLOSE
-3. MODEL - shipped through MODEL.CLOSE
-4. UX - shipped through UX.CLOSE
-5. HARDEN - shipped through HARDEN.CLOSE
-6. MIRROR - proposed through MIRROR.13, but currently ranked after HUMAN.CLOSE
-7. REMOTE
+1. ADOPT - ADOPT.MODEL.1 is next recommended after HUMAN.CLOSE
+2. HUMAN - shipped through HUMAN.CLOSE
+3. CMD - shipped through CMD.CLOSE
+4. MODEL - shipped through MODEL.CLOSE
+5. UX - shipped through UX.CLOSE
+6. HARDEN - shipped through HARDEN.CLOSE
+7. MIRROR - proposed through MIRROR.13, but currently ranked after ADOPT.MODEL.1
+8. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, HUMAN.N2 defined explicit human confirmation signals before dangerous actions, HUMAN.N3 added dry-run sample token validation against that contract without enforcing runtime behavior, and HUMAN.N4 added documentation-only valid, warning, invalid, and blocked sample tokens. The current picker recommendation is HUMAN.CLOSE, which should freeze the human authority branch before runtime enforcement design.
+CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, HUMAN.N2 defined explicit human confirmation signals before dangerous actions, HUMAN.N3 added dry-run sample token validation against that contract without enforcing runtime behavior, HUMAN.N4 added documentation-only valid, warning, invalid, and blocked sample tokens, and HUMAN.CLOSE froze the human authority branch. The current picker recommendation is ADOPT.MODEL.1, which should adopt the proposed model-role catalog only through explicit human approval and report-first artifacts.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -1020,18 +1022,28 @@ documentation-only valid, warning, invalid, and blocked sample tokens plus a
 JSON/Markdown catalog. The samples are not live approvals and authorize no
 action.
 
-**HUMAN.CLOSE - Human Authority Branch Checkpoint is proposed.**
-HUMAN.CLOSE is the current phase picker recommendation. It should freeze the
-human authority branch now that HUMAN.N1-N4 provide the authority map, approval
-token contract, dry-run validator, and sample token catalog, before any runtime
-enforcement design.
+**HUMAN.CLOSE - Human Authority Branch Checkpoint is shipped 2026-07-08 (complete).**
+Implemented report-only as `core/human_authority_branch_checkpoint.py` +
+`scripts/create_human_authority_branch_checkpoint.py` +
+`tests/test_human_authority_branch_checkpoint.py`. HUMAN.CLOSE writes
+`.agent/human/authority_branch_checkpoint/human_authority_branch_checkpoint.{json,md}`
+and freezes HUMAN.N1-N4 before runtime enforcement, route integration, token
+issuance/consumption, approval gates, patch apply, validation/benchmark
+execution, worker launch, model routing, or auth policy changes. Current status:
+`human_authority_branch_frozen_with_warnings`.
+
+**ADOPT.MODEL.1 - Human-Approved Model Role Catalog Adoption is proposed.**
+ADOPT.MODEL.1 is the current phase picker recommendation. It should adopt the
+proposed 10-role model catalog only after explicit human approval and only as a
+report-first adoption step. HARDEN.N1 remains the alternative if enforcement
+readiness should come before catalog adoption.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
 improve live trace frame capture quality after the MIRROR.CLOSE3 freeze, while
 keeping Mirror evidence report-only, advisory, non-blocking, and free of runtime
 scoring or UI approval-gate behavior. The current top picker recommendation is
-HUMAN.CLOSE.
+ADOPT.MODEL.1.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
