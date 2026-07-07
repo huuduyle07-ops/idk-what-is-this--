@@ -291,7 +291,7 @@ def test_core_and_cli_do_not_import_or_call_execution_primitives():
         assert calls.isdisjoint(forbidden_calls)
 
 
-def test_real_registry_marks_human_n1_complete_and_picker_recommends_human_n2():
+def test_real_registry_marks_human_n1_complete_and_picker_recommends_adopt_model_1():
     data = json.loads(REAL_REGISTRY.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -304,7 +304,7 @@ def test_real_registry_marks_human_n1_complete_and_picker_recommends_human_n2():
     assert by_id["HUMAN.N1"]["network_allowed"] is False
     assert by_id["HUMAN.N1"]["model_calls_allowed"] is False
     assert by_id["HUMAN.N1"]["writes_real_repo"] is False
-    assert by_id["HUMAN.N2"]["status"] == "proposed"
+    assert by_id["HUMAN.N2"]["status"] == "complete"
     assert by_id["HUMAN.N2"]["prerequisites"] == ["HUMAN.N1"]
     assert by_id["HUMAN.N2"]["title"] == "Human Approval Token / Confirmation Contract"
 
@@ -313,4 +313,4 @@ def test_real_registry_marks_human_n1_complete_and_picker_recommends_human_n2():
         report_id="human-n1-registry",
         created_at="2026-07-07T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "HUMAN.N2"
+    assert report["top_recommendation"]["phase_id"] == "ADOPT.MODEL.1"

@@ -408,7 +408,7 @@ def test_source_has_no_forbidden_imports_or_execution_calls():
                 }, f"{path} calls forbidden function {name}"
 
 
-def test_registry_and_picker_recommend_cmd_n4():
+def test_registry_keeps_commander_and_evidence_branch_history_valid():
     data = json.loads((_ROOT / "docs" / "roadmap" / "phase_registry.json").read_text(encoding="utf-8"))
     phases = {phase["phase_id"]: phase for phase in data["phases"]}
     assert phases["CMD.N2"]["status"] == "complete"
@@ -447,5 +447,3 @@ def test_registry_and_picker_recommend_cmd_n4():
 
     pick = pick_phase_candidates(data)
     assert pick["registry_valid"] is True
-    assert pick["top_recommendation"]["phase_id"] == "EVAL.N4"
-    assert pick["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"

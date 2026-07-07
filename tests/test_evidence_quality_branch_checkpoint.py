@@ -593,7 +593,7 @@ def test_checkpoint_core_and_cli_do_not_import_or_call_execution_primitives():
         )
 
 
-def test_real_registry_marks_eval_close_complete_and_picker_recommends_human_n1():
+def test_real_registry_keeps_eval_close_and_human_history_valid():
     data = json.loads(REAL_REGISTRY.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -606,7 +606,7 @@ def test_real_registry_marks_eval_close_complete_and_picker_recommends_human_n1(
     assert by_id["EVAL.CLOSE"]["network_allowed"] is False
     assert by_id["EVAL.CLOSE"]["model_calls_allowed"] is False
     assert by_id["EVAL.CLOSE"]["writes_real_repo"] is False
-    assert by_id["HUMAN.N1"]["status"] == "proposed"
+    assert by_id["HUMAN.N1"]["status"] == "complete"
     assert by_id["HUMAN.N1"]["prerequisites"] == ["EVAL.CLOSE"]
     assert by_id["HUMAN.N1"]["title"] == "Human Review Boundary Map"
 
@@ -615,4 +615,4 @@ def test_real_registry_marks_eval_close_complete_and_picker_recommends_human_n1(
         report_id="eval-close-checkpoint",
         created_at="2026-07-06T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "HUMAN.N1"
+    assert report["registry_valid"] is True

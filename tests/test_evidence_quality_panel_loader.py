@@ -350,16 +350,20 @@ def test_loader_route_source_is_read_only_and_does_not_generate_or_execute():
         assert forbidden not in route
 
 
-def test_registry_marks_eval_n6_complete_and_picker_recommends_eval_n7():
+def test_registry_keeps_eval_panel_loader_branch_history_valid():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
     assert by_id["EVAL.N5"]["status"] == "complete"
     assert by_id["EVAL.N6"]["status"] == "complete"
     assert by_id["EVAL.N6"]["prerequisites"] == ["EVAL.N5"]
-    assert by_id["EVAL.N7"]["status"] == "proposed"
+    assert by_id["EVAL.N7"]["status"] == "complete"
     assert by_id["EVAL.N7"]["title"] == "Evidence Quality Loader Readiness Check"
     assert by_id["EVAL.N7"]["prerequisites"] == ["EVAL.N6"]
+    assert by_id["EVAL.CLOSE"]["status"] == "complete"
+    assert by_id["EVAL.CLOSE"]["prerequisites"] == ["EVAL.N7"]
+    assert by_id["HUMAN.N1"]["status"] == "complete"
+    assert by_id["HUMAN.N1"]["prerequisites"] == ["EVAL.CLOSE"]
     assert by_id["EVAL.N6"]["network_allowed"] is False
     assert by_id["EVAL.N6"]["model_calls_allowed"] is False
     assert by_id["EVAL.N6"]["writes_real_repo"] is False
@@ -370,4 +374,4 @@ def test_registry_marks_eval_n6_complete_and_picker_recommends_eval_n7():
         report_id="eval-n6-loader",
         created_at="2026-07-06T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "EVAL.N7"
+    assert report["registry_valid"] is True

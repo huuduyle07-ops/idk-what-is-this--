@@ -304,7 +304,7 @@ def test_core_and_cli_do_not_import_or_call_execution_primitives():
         assert calls.isdisjoint(forbidden_calls)
 
 
-def test_real_registry_marks_human_n2_complete_and_picker_recommends_human_n3():
+def test_real_registry_marks_human_n2_complete_and_picker_recommends_adopt_model_1():
     data = json.loads(REAL_REGISTRY.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -317,13 +317,19 @@ def test_real_registry_marks_human_n2_complete_and_picker_recommends_human_n3():
     assert by_id["HUMAN.N2"]["network_allowed"] is False
     assert by_id["HUMAN.N2"]["model_calls_allowed"] is False
     assert by_id["HUMAN.N2"]["writes_real_repo"] is False
-    assert by_id["HUMAN.N3"]["status"] == "proposed"
+    assert by_id["HUMAN.N3"]["status"] == "complete"
     assert by_id["HUMAN.N3"]["prerequisites"] == ["HUMAN.N2"]
     assert by_id["HUMAN.N3"]["title"] == "Human Approval Token Dry-Run Validator"
+    assert by_id["HUMAN.N4"]["status"] == "complete"
+    assert by_id["HUMAN.N4"]["prerequisites"] == ["HUMAN.N3"]
+    assert by_id["HUMAN.CLOSE"]["status"] == "complete"
+    assert by_id["HUMAN.CLOSE"]["prerequisites"] == ["HUMAN.N4"]
+    assert by_id["ADOPT.MODEL.1"]["status"] == "proposed"
+    assert by_id["ADOPT.MODEL.1"]["prerequisites"] == ["HUMAN.CLOSE"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="human-n2-registry",
         created_at="2026-07-07T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "HUMAN.N3"
+    assert report["top_recommendation"]["phase_id"] == "ADOPT.MODEL.1"

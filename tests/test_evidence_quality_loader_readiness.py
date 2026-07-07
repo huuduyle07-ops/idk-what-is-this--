@@ -382,7 +382,7 @@ def test_readiness_checker_and_cli_do_not_import_or_call_execution_primitives():
         )
 
 
-def test_registry_marks_eval_n7_complete_and_picker_recommends_eval_close():
+def test_registry_keeps_eval_readiness_and_human_history_valid():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -395,13 +395,15 @@ def test_registry_marks_eval_n7_complete_and_picker_recommends_eval_close():
     assert by_id["EVAL.N7"]["network_allowed"] is False
     assert by_id["EVAL.N7"]["model_calls_allowed"] is False
     assert by_id["EVAL.N7"]["writes_real_repo"] is False
-    assert by_id["EVAL.CLOSE"]["status"] == "proposed"
+    assert by_id["EVAL.CLOSE"]["status"] == "complete"
     assert by_id["EVAL.CLOSE"]["prerequisites"] == ["EVAL.N7"]
     assert by_id["EVAL.CLOSE"]["title"] == "Evidence Quality Branch Checkpoint"
+    assert by_id["HUMAN.N1"]["status"] == "complete"
+    assert by_id["HUMAN.N1"]["prerequisites"] == ["EVAL.CLOSE"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="eval-n7-readiness",
         created_at="2026-07-06T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "EVAL.CLOSE"
+    assert report["registry_valid"] is True

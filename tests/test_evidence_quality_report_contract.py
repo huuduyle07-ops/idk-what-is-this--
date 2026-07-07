@@ -379,7 +379,7 @@ def test_source_has_no_forbidden_imports_or_execution_calls():
                 }, f"{path} calls forbidden function {name}"
 
 
-def test_registry_and_picker_recommend_eval_n3_after_eval_n2():
+def test_registry_keeps_eval_report_contract_branch_history_valid():
     root = Path(__file__).parent.parent
     data = json.loads((root / "docs" / "roadmap" / "phase_registry.json").read_text(encoding="utf-8"))
     phases = {phase["phase_id"]: phase for phase in data["phases"]}
@@ -391,8 +391,18 @@ def test_registry_and_picker_recommend_eval_n3_after_eval_n2():
     assert phases["EVAL.N3"]["status"] == "complete"
     assert phases["EVAL.N3"]["prerequisites"] == ["EVAL.N2"]
     assert phases["EVAL.N3"]["title"] == "Evidence Quality Report Builder"
+    assert phases["EVAL.N4"]["status"] == "complete"
+    assert phases["EVAL.N4"]["prerequisites"] == ["EVAL.N3"]
+    assert phases["EVAL.N5"]["status"] == "complete"
+    assert phases["EVAL.N5"]["prerequisites"] == ["EVAL.N4"]
+    assert phases["EVAL.N6"]["status"] == "complete"
+    assert phases["EVAL.N6"]["prerequisites"] == ["EVAL.N5"]
+    assert phases["EVAL.N7"]["status"] == "complete"
+    assert phases["EVAL.N7"]["prerequisites"] == ["EVAL.N6"]
+    assert phases["EVAL.CLOSE"]["status"] == "complete"
+    assert phases["EVAL.CLOSE"]["prerequisites"] == ["EVAL.N7"]
+    assert phases["HUMAN.N1"]["status"] == "complete"
+    assert phases["HUMAN.N1"]["prerequisites"] == ["EVAL.CLOSE"]
 
     pick = pick_phase_candidates(data)
     assert pick["registry_valid"] is True
-    assert pick["top_recommendation"]["phase_id"] == "EVAL.N4"
-    assert pick["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"
