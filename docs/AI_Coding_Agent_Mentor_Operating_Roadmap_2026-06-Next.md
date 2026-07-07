@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (77 phases: 1 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 4 HARDEN + 15 MIRROR + 12 UX).
-- The phase picker currently has two safe candidates: `ADOPT.MODEL.1` and `MIRROR.13`.
-- The top recommendation is `ADOPT.MODEL.1` - Human-Approved Model Role Catalog Adoption.
+- The phase registry is valid (78 phases: 2 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 4 HARDEN + 15 MIRROR + 12 UX).
+- The phase picker currently has two safe candidates: `ADOPT.MODEL.2` and `MIRROR.13`.
+- The top recommendation is `ADOPT.MODEL.2` - Post-Adoption Role Coverage Recheck.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -41,7 +41,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 ### Validation State
 
 - Registry validation is passing.
-- The current phase picker result recommends `ADOPT.MODEL.1` after HUMAN.CLOSE froze the report-only human authority branch.
+- The current phase picker result recommends `ADOPT.MODEL.2` after ADOPT.MODEL.1 adopted the advisory catalog artifact.
 - The old roadmap arc is complete and should not be stretched to imply new authorization.
 
 ### Benchmark State
@@ -131,9 +131,10 @@ the explicit confirmation signal shape before dangerous actions, HUMAN.N3
 added report-only dry-run validation for sample approval tokens, HUMAN.N4
 added documentation-only sample tokens, and HUMAN.CLOSE froze the human
 authority branch before runtime enforcement design. The phase picker now
-recommends **ADOPT.MODEL.1 - Human-Approved Model Role Catalog Adoption** as
-the next human-approved report-only branch step. MIRROR.13 remains a proposed
-Mirror candidate, but ADOPT.MODEL.1 now ranks first by the registry picker.
+recommends **ADOPT.MODEL.2 - Post-Adoption Role Coverage Recheck** as the next
+report-only branch step after ADOPT.MODEL.1 adopted the advisory catalog
+artifact. MIRROR.13 remains a proposed Mirror candidate, but ADOPT.MODEL.2 now
+ranks first by the registry picker.
 
 ### Branch CMD — Commander Mode
 
@@ -219,18 +220,18 @@ S.6 Optional optimizer experiment
 
 Recommended branch order:
 
-1. ADOPT - ADOPT.MODEL.1 is next recommended after HUMAN.CLOSE
+1. ADOPT - ADOPT.MODEL.2 is next recommended after ADOPT.MODEL.1
 2. HUMAN - shipped through HUMAN.CLOSE
 3. CMD - shipped through CMD.CLOSE
 4. MODEL - shipped through MODEL.CLOSE
 5. UX - shipped through UX.CLOSE
 6. HARDEN - shipped through HARDEN.CLOSE
-7. MIRROR - proposed through MIRROR.13, but currently ranked after ADOPT.MODEL.1
+7. MIRROR - proposed through MIRROR.13, but currently ranked after ADOPT.MODEL.2
 8. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, HUMAN.N2 defined explicit human confirmation signals before dangerous actions, HUMAN.N3 added dry-run sample token validation against that contract without enforcing runtime behavior, HUMAN.N4 added documentation-only valid, warning, invalid, and blocked sample tokens, and HUMAN.CLOSE froze the human authority branch. The current picker recommendation is ADOPT.MODEL.1, which should adopt the proposed model-role catalog only through explicit human approval and report-first artifacts.
+CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, HUMAN.N2 defined explicit human confirmation signals before dangerous actions, HUMAN.N3 added dry-run sample token validation against that contract without enforcing runtime behavior, HUMAN.N4 added documentation-only valid, warning, invalid, and blocked sample tokens, HUMAN.CLOSE froze the human authority branch, and ADOPT.MODEL.1 adopted the advisory model-role catalog artifact. The current picker recommendation is ADOPT.MODEL.2, which should recheck role coverage against the active 10-role advisory catalog through report-first artifacts.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -1032,18 +1033,24 @@ issuance/consumption, approval gates, patch apply, validation/benchmark
 execution, worker launch, model routing, or auth policy changes. Current status:
 `human_authority_branch_frozen_with_warnings`.
 
-**ADOPT.MODEL.1 - Human-Approved Model Role Catalog Adoption is proposed.**
-ADOPT.MODEL.1 is the current phase picker recommendation. It should adopt the
-proposed 10-role model catalog only after explicit human approval and only as a
-report-first adoption step. HARDEN.N1 remains the alternative if enforcement
-readiness should come before catalog adoption.
+**ADOPT.MODEL.1 - Human-Approved Model Role Catalog Adoption is shipped 2026-07-08 (complete).**
+ADOPT.MODEL.1 adopted the reviewed MODEL.N4 proposed 10-role advisory catalog as
+the active artifact, backed up the previous 7-role registry, and wrote JSON plus
+Markdown adoption receipts. It did not grant routing, model-call, worker-launch,
+executable-binding, validation, benchmark, patch, network, database, route/auth,
+approval-token, or automatic authority.
+
+**ADOPT.MODEL.2 - Post-Adoption Role Coverage Recheck is proposed.**
+ADOPT.MODEL.2 is the current phase picker recommendation. It should recheck
+coverage against the active 10-role advisory catalog as report-only follow-up
+work after the artifact-level adoption.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
 improve live trace frame capture quality after the MIRROR.CLOSE3 freeze, while
 keeping Mirror evidence report-only, advisory, non-blocking, and free of runtime
 scoring or UI approval-gate behavior. The current top picker recommendation is
-ADOPT.MODEL.1.
+ADOPT.MODEL.2.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
