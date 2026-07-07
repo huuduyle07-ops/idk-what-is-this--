@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (74 phases: 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 3 HUMAN + 11 CMD + 4 HARDEN + 15 MIRROR + 12 UX).
-- The phase picker currently has two safe candidates: `HUMAN.N3` and `MIRROR.13`.
-- The top recommendation is `HUMAN.N3` - Human Approval Token Dry-Run Validator.
+- The phase registry is valid (76 phases: 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 4 HARDEN + 15 MIRROR + 12 UX).
+- The phase picker currently has two safe candidates: `HUMAN.CLOSE` and `MIRROR.13`.
+- The top recommendation is `HUMAN.CLOSE` - Human Authority Branch Checkpoint.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -41,7 +41,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 ### Validation State
 
 - Registry validation is passing.
-- The current phase picker result recommends `HUMAN.N3` after HUMAN.N2 defined the report-only confirmation contract.
+- The current phase picker result recommends `HUMAN.CLOSE` after HUMAN.N4 added the report-only approval token sample catalog.
 - The old roadmap arc is complete and should not be stretched to imply new authorization.
 
 ### Benchmark State
@@ -126,12 +126,13 @@ read-only operator panel UI stub, artifact loader preview, and live demo
 readiness checker, plus the live/UI readiness checkpoint.
 EVAL.CLOSE froze the Evidence Quality branch after EVAL.N7 verified the
 EVAL.N5/N6 panel and loader readiness. HUMAN.N1 mapped what the system may
-advise or display versus what only the human may approve, and HUMAN.N2 defined
-the explicit confirmation signal shape before dangerous actions. The phase
-picker now recommends **HUMAN.N3 - Human Approval Token Dry-Run Validator** as
-the next human-approved report-only branch step: validate sample approval tokens
-against the HUMAN.N2 contract without runtime enforcement. MIRROR.13 remains a
-proposed Mirror candidate, but HUMAN.N3 now ranks first by the registry picker.
+advise or display versus what only the human may approve, HUMAN.N2 defined
+the explicit confirmation signal shape before dangerous actions, and HUMAN.N3
+added report-only dry-run validation for sample approval tokens. The phase
+picker now recommends **HUMAN.CLOSE - Human Authority Branch Checkpoint** as
+the next human-approved report-only branch step: freeze the human authority
+branch before runtime enforcement design. MIRROR.13 remains a proposed Mirror
+candidate, but HUMAN.CLOSE now ranks first by the registry picker.
 
 ### Branch CMD — Commander Mode
 
@@ -217,17 +218,17 @@ S.6 Optional optimizer experiment
 
 Recommended branch order:
 
-1. HUMAN - HUMAN.N3 is next recommended after HUMAN.N2
+1. HUMAN - HUMAN.CLOSE is next recommended after HUMAN.N4
 2. CMD - shipped through CMD.CLOSE
 3. MODEL - shipped through MODEL.CLOSE
 4. UX - shipped through UX.CLOSE
 5. HARDEN - shipped through HARDEN.CLOSE
-6. MIRROR - proposed through MIRROR.13, but currently ranked after HUMAN.N3
+6. MIRROR - proposed through MIRROR.13, but currently ranked after HUMAN.CLOSE
 7. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, and HUMAN.N2 defined explicit human confirmation signals before dangerous actions. The current picker recommendation is HUMAN.N3, which should dry-run sample token validation against that contract without enforcing runtime behavior.
+CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, HUMAN.N2 defined explicit human confirmation signals before dangerous actions, HUMAN.N3 added dry-run sample token validation against that contract without enforcing runtime behavior, and HUMAN.N4 added documentation-only valid, warning, invalid, and blocked sample tokens. The current picker recommendation is HUMAN.CLOSE, which should freeze the human authority branch before runtime enforcement design.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -997,17 +998,40 @@ execute Dream or Replay actions, use Docker/subprocess, contact network
 services, write to a database, change route/auth behavior, add scoring gates,
 approve/reject work, or block Apply/Submit.
 
-**HUMAN.N3 - Human Approval Token Dry-Run Validator is proposed.**
-HUMAN.N3 is the current phase picker recommendation. It should validate sample
-approval tokens against the HUMAN.N2 contract without enforcing runtime
-behavior.
+**HUMAN.N3 - Human Approval Token Dry-Run Validator is shipped 2026-07-07 (complete).**
+Implemented report-only as `core/human_approval_token_dry_run_validator.py` +
+`scripts/create_human_approval_token_dry_run.py`, registered as a `complete`
+HUMAN-track phase (prerequisite HUMAN.N2) in `docs/roadmap/phase_registry.json`,
+and validated with `tests/test_human_approval_token_dry_run_validator.py`.
+HUMAN.N3 writes per-token dry-run artifacts under
+`.agent/human/approval_token_dry_run/<token_id-or-sample>/human_approval_token_dry_run.{json,md}`
+and reports whether a sample token would be valid, invalid, expired, revoked,
+too generic, too broad, unsafe, or blocked in a future enforcement phase. It
+does not authorize actions, reject live actions, enforce routes, issue or
+consume tokens, apply patches, run validation or benchmarks, call models, route
+models, invoke MCP tools, launch workers, write to a database, change auth or
+route behavior, or block Apply/Submit.
+
+**HUMAN.N4 - Human Approval Token Sample Catalog is shipped 2026-07-07 (complete).**
+Implemented report-only as `core/human_approval_token_sample_catalog.py` +
+`scripts/create_human_approval_token_sample_catalog.py` +
+`tests/test_human_approval_token_sample_catalog.py`. HUMAN.N4 writes
+documentation-only valid, warning, invalid, and blocked sample tokens plus a
+JSON/Markdown catalog. The samples are not live approvals and authorize no
+action.
+
+**HUMAN.CLOSE - Human Authority Branch Checkpoint is proposed.**
+HUMAN.CLOSE is the current phase picker recommendation. It should freeze the
+human authority branch now that HUMAN.N1-N4 provide the authority map, approval
+token contract, dry-run validator, and sample token catalog, before any runtime
+enforcement design.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
 improve live trace frame capture quality after the MIRROR.CLOSE3 freeze, while
 keeping Mirror evidence report-only, advisory, non-blocking, and free of runtime
 scoring or UI approval-gate behavior. The current top picker recommendation is
-HUMAN.N3.
+HUMAN.CLOSE.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
