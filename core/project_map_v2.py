@@ -94,6 +94,8 @@ IGNORED_DIR_PREFIXES = (
 LANGUAGE_BY_EXTENSION = {
     ".py": "python",
     ".rs": "rust",
+    ".mojo": "mojo",
+    ".lua": "lua",
     ".c": "c",
     ".h": "c",
     ".cpp": "cpp",

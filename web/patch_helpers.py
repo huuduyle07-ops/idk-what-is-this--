@@ -28,6 +28,10 @@ def detect_repo_language(repo_root: str | Path) -> str:
         return "go"
     if (root / "package.json").exists():
         return "javascript"
+    if any(root.rglob("*.mojo")):
+        return "mojo"
+    if any(root.rglob("*.lua")):
+        return "lua"
     if any(root.glob("*.py")) or any(root.rglob("*.py")):
         return "python"
     if (

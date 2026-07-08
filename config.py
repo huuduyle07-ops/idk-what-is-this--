@@ -43,6 +43,10 @@ SUPPORTED_EXTENSIONS = {
     ".py",
     # rust
     ".rs",
+    # mojo
+    ".mojo",
+    # lua
+    ".lua",
     # c-family
     ".c", ".h", ".cpp", ".cxx", ".cc", ".hpp", ".hxx",
     # csharp
@@ -68,6 +72,10 @@ LANGUAGE_MAP = {
     ".py": "python",
     # rust
     ".rs": "rust",
+    # mojo
+    ".mojo": "mojo",
+    # lua
+    ".lua": "lua",
     # csharp
     ".cs": "csharp",
     # c-family
