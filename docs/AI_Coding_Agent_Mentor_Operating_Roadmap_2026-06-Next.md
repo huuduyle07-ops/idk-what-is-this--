@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (80 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 5 HARDEN + 15 MIRROR + 12 UX).
-- The phase picker currently has two safe candidates: `HARDEN.N1` and `MIRROR.13`.
-- The top recommendation is `HARDEN.N1` - Approval Enforcement Readiness Audit.
+- The phase registry is valid (83 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 15 MIRROR + 12 UX).
+- The phase picker currently has two safe candidates: `HARDEN.N4` and `MIRROR.13`.
+- The top recommendation is `HARDEN.N4` - Approval Enforcement Operator Report.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -133,9 +133,12 @@ added documentation-only sample tokens, and HUMAN.CLOSE froze the human
 authority branch before runtime enforcement design. ADOPT.MODEL.CLOSE froze
 the model catalog adoption branch after ADOPT.MODEL.1 adopted the advisory
 catalog artifact and ADOPT.MODEL.2 verified the active 10-role coverage. The
-phase picker now recommends **HARDEN.N1 - Approval Enforcement Readiness
-Audit** as the next report-only step before any approval enforcement design.
-MIRROR.13 remains a proposed Mirror candidate, but HARDEN.N1 now ranks first by
+HARDEN.N1, HARDEN.N2, and HARDEN.N3 have since shipped the approval enforcement
+readiness audit, attachment plan, and dry-run gate simulator, all report-only
+and without runtime enforcement. The phase picker now recommends
+**HARDEN.N4 - Approval Enforcement Operator Report** as the next report-only
+step before any approval enforcement implementation. MIRROR.13 remains a
+proposed Mirror candidate, but HARDEN.N4 now ranks first by
 the registry picker.
 
 ### Branch CMD — Commander Mode
@@ -1057,11 +1060,19 @@ advisory catalog, the three added roles, resolved gaps, preserved prior roles,
 HUMAN authority boundary reference, and all non-execution guardrails, remaining
 report-only and checkpoint-only.
 
-**HARDEN.N1 - Approval Enforcement Readiness Audit is proposed.**
-HARDEN.N1 is the current phase picker recommendation. It should audit where
-approval enforcement could safely attach later after HUMAN.CLOSE and
-ADOPT.MODEL.CLOSE, without adding enforcement, issuing or consuming tokens,
-changing routes/auth, launching workers, calling models, or routing models.
+**HARDEN.N1 - Approval Enforcement Readiness Audit, HARDEN.N2 - Approval Enforcement Attachment Plan, and HARDEN.N3 - Approval Enforcement Dry-Run Gate Simulator are shipped 2026-07-08 (complete).**
+The HARDEN.N1-N3 chain audited dangerous action surfaces, planned future
+approval-token attachment points, and simulated sample approval-gate outcomes
+without adding runtime enforcement, issuing or consuming tokens, changing
+routes/auth, launching workers, calling models, or routing models.
+
+**HARDEN.N4 - Approval Enforcement Operator Report is proposed.**
+HARDEN.N4 is the current phase picker recommendation. It should create a
+read-only operator-facing report format for simulated approval-gate outcomes,
+still without runtime enforcement, live token validation, token issuance or
+consumption, route/auth behavior changes, model calls, model routing, worker
+launches, patch application, validation runs, benchmark runs, network access,
+database writes, push, merge, or PR power.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
@@ -1263,12 +1274,12 @@ janitor actions, use Docker or subprocess, contact network services, write to a
 database, change route behavior, change auth policy, change UI behavior, push,
 merge, or open PRs. MIRROR.1 through MIRROR.CLOSE3 and CMD.N1 have since
 shipped; CMD.N1 through CMD.CLOSE, HUMAN.CLOSE, and ADOPT.MODEL.CLOSE have also
-shipped. The current recommended phase is HARDEN.N1 - Approval Enforcement
-Readiness Audit.
+shipped. HARDEN.N1 through HARDEN.N3 have also shipped. The current recommended
+phase is HARDEN.N4 - Approval Enforcement Operator Report.
 
 ### HARDEN.N1 - Approval Enforcement Readiness Audit
 
-**Status:** Proposed  
+**Status:** Complete
 **Prerequisite:** ADOPT.MODEL.CLOSE  
 **Risk:** Low (readiness audit only; no enforcement)
 
@@ -1283,3 +1294,51 @@ change route/auth behavior.
 **Expected artifacts:**
 - `.agent/harden/approval_enforcement_readiness_audit/approval_enforcement_readiness_audit.json`
 - `.agent/harden/approval_enforcement_readiness_audit/approval_enforcement_readiness_audit.md`
+
+### HARDEN.N2 - Approval Enforcement Attachment Plan
+
+**Status:** Complete
+**Prerequisite:** HARDEN.N1
+**Risk:** Low (attachment plan only; no enforcement)
+
+Mapped each dangerous action category from HARDEN.N1 to future attachment
+layers, required token/context fields, confirmation surfaces, audit-log needs,
+bypass risks, and blocked boundaries. It did not add approval enforcement,
+validate live tokens, issue or consume tokens, block routes, change auth, call
+models, route models, launch workers, apply patches, run validation or
+benchmarks, invoke tools, contact network services, write databases, push,
+merge, or open PRs.
+
+**Expected artifacts:**
+- `.agent/harden/approval_enforcement_attachment_plan/approval_enforcement_attachment_plan.json`
+- `.agent/harden/approval_enforcement_attachment_plan/approval_enforcement_attachment_plan.md`
+
+### HARDEN.N3 - Approval Enforcement Dry-Run Gate Simulator
+
+**Status:** Complete
+**Prerequisite:** HARDEN.N2
+**Risk:** Low (simulation only; no enforcement)
+
+Simulates what a future approval gate would decide for sample action requests
+and sample approval tokens using the HARDEN.N2 attachment plan. Even a
+`would_allow_with_valid_token` result remains simulation-only and does not
+authorize, dispatch, block, issue, consume, validate, route, or enforce any real
+action.
+
+**Expected artifacts:**
+- `.agent/harden/approval_enforcement_dry_run_gate_simulator/approval_enforcement_dry_run_gate_simulator.json`
+- `.agent/harden/approval_enforcement_dry_run_gate_simulator/approval_enforcement_dry_run_gate_simulator.md`
+
+### HARDEN.N4 - Approval Enforcement Operator Report
+
+**Status:** Proposed
+**Prerequisite:** HARDEN.N3
+**Risk:** Low (operator report only; no enforcement)
+
+Creates a read-only operator-facing report format for simulated approval-gate
+outcomes. It should make simulated allow/warn/deny/block outcomes easier to
+review, while preserving the same non-authoritative boundary as HARDEN.N3.
+
+**Expected artifacts:**
+- `.agent/harden/approval_enforcement_operator_report/approval_enforcement_operator_report.json`
+- `.agent/harden/approval_enforcement_operator_report/approval_enforcement_operator_report.md`
