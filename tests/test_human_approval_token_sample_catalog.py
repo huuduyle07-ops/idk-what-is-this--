@@ -267,12 +267,26 @@ def test_real_registry_marks_human_n4_complete_and_picker_recommends_adopt_model
     assert by_id["HUMAN.CLOSE"]["status"] == "complete"
     assert by_id["HUMAN.CLOSE"]["prerequisites"] == ["HUMAN.N4"]
     assert by_id["HUMAN.CLOSE"]["title"] == "Human Authority Branch Checkpoint"
-    assert by_id["ADOPT.MODEL.1"]["status"] == "proposed"
+    assert by_id["ADOPT.MODEL.1"]["status"] == "complete"
     assert by_id["ADOPT.MODEL.1"]["prerequisites"] == ["HUMAN.CLOSE"]
+    assert by_id["ADOPT.MODEL.2"]["status"] == "complete"
+    assert by_id["ADOPT.MODEL.2"]["prerequisites"] == ["ADOPT.MODEL.1"]
+    assert by_id["ADOPT.MODEL.CLOSE"]["status"] == "complete"
+    assert by_id["ADOPT.MODEL.CLOSE"]["prerequisites"] == ["ADOPT.MODEL.2"]
+    assert by_id["HARDEN.N1"]["status"] == "complete"
+    assert by_id["HARDEN.N1"]["prerequisites"] == ["ADOPT.MODEL.CLOSE"]
+    assert by_id["HARDEN.N2"]["status"] == "complete"
+    assert by_id["HARDEN.N2"]["prerequisites"] == ["HARDEN.N1"]
+    assert by_id["HARDEN.N3"]["status"] == "complete"
+    assert by_id["HARDEN.N3"]["prerequisites"] == ["HARDEN.N2"]
+    assert by_id["HARDEN.N4"]["status"] == "complete"
+    assert by_id["HARDEN.N4"]["prerequisites"] == ["HARDEN.N3"]
+    assert by_id["HARDEN.CLOSE"]["status"] == "proposed"
+    assert by_id["HARDEN.CLOSE"]["prerequisites"] == ["HARDEN.N4"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="human-n4-registry",
         created_at="2026-07-07T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "ADOPT.MODEL.1"
+    assert report["top_recommendation"]["phase_id"] == "HARDEN.CLOSE"

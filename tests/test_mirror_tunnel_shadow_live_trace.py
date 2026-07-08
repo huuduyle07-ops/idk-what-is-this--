@@ -268,7 +268,7 @@ def test_web_boundary_preserves_result_shape_when_disabled(tmp_path, monkeypatch
     assert not (tmp_path / ".agent" / "mirror_tunnel" / "live_traces").exists()
 
 
-def test_registry_and_phase_picker_recommend_mirror8():
+def test_registry_keeps_mirror_shadow_trace_branch_history_valid():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -294,4 +294,4 @@ def test_registry_and_phase_picker_recommend_mirror8():
         report_id="r",
         created_at="2026-06-30T00:00:00+00:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "MODEL.N1"
+    assert report["registry_valid"] is True

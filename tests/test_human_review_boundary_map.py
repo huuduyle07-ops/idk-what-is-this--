@@ -313,4 +313,4 @@ def test_real_registry_marks_human_n1_complete_and_picker_recommends_adopt_model
         report_id="human-n1-registry",
         created_at="2026-07-07T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "ADOPT.MODEL.1"
+    assert report["top_recommendation"]["phase_id"] == "HARDEN.CLOSE"

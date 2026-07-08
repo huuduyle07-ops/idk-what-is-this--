@@ -291,19 +291,27 @@ def test_real_registry_marks_harden_n1_complete_and_picker_recommends_harden_n2(
         ".agent/harden/approval_enforcement_readiness_audit/approval_enforcement_readiness_audit.json",
         ".agent/harden/approval_enforcement_readiness_audit/approval_enforcement_readiness_audit.md",
     ]
-    assert by_id["HARDEN.N2"]["status"] == "proposed"
-    assert by_id["HARDEN.N2"]["title"] == "Approval Enforcement Design Plan"
+    assert by_id["HARDEN.N2"]["status"] == "complete"
+    assert by_id["HARDEN.N2"]["title"] == "Approval Enforcement Attachment Plan"
     assert by_id["HARDEN.N2"]["prerequisites"] == ["HARDEN.N1"]
     assert by_id["HARDEN.N2"]["network_allowed"] is False
     assert by_id["HARDEN.N2"]["model_calls_allowed"] is False
     assert by_id["HARDEN.N2"]["writes_real_repo"] is False
+    assert by_id["HARDEN.N3"]["status"] == "complete"
+    assert by_id["HARDEN.N3"]["prerequisites"] == ["HARDEN.N2"]
+    assert by_id["HARDEN.N4"]["status"] == "complete"
+    assert by_id["HARDEN.N4"]["prerequisites"] == ["HARDEN.N3"]
+    assert by_id["HARDEN.CLOSE"]["status"] == "complete"
+    assert by_id["HARDEN.CLOSE"]["prerequisites"] == ["HARDEN.N4"]
+    assert by_id["OPS.TEST.1"]["status"] == "proposed"
+    assert by_id["OPS.TEST.1"]["prerequisites"] == ["HARDEN.CLOSE"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="harden-n1-registry",
         created_at="2026-07-08T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "HARDEN.N2"
+    assert report["top_recommendation"]["phase_id"] == "OPS.TEST.1"
 
 
 def test_core_and_cli_do_not_import_or_call_runtime_enforcement_primitives():

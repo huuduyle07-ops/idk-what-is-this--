@@ -347,12 +347,22 @@ def test_phase_registry_marks_adopt_model_2_complete_and_picker_recommends_close
     assert phases["ADOPT.MODEL.2"]["prerequisites"] == ["ADOPT.MODEL.1"]
     assert "core/model_role_post_adoption_coverage.py" in phases["ADOPT.MODEL.2"]["allowed_files"]
     assert ".agent/model_role_registry/post_adoption_coverage/model_role_post_adoption_coverage.json" in phases["ADOPT.MODEL.2"]["expected_artifacts"]
-    assert phases["ADOPT.MODEL.CLOSE"]["status"] == "proposed"
+    assert phases["ADOPT.MODEL.CLOSE"]["status"] == "complete"
     assert phases["ADOPT.MODEL.CLOSE"]["prerequisites"] == ["ADOPT.MODEL.2"]
+    assert phases["HARDEN.N1"]["status"] == "complete"
+    assert phases["HARDEN.N1"]["prerequisites"] == ["ADOPT.MODEL.CLOSE"]
+    assert phases["HARDEN.N2"]["status"] == "complete"
+    assert phases["HARDEN.N2"]["prerequisites"] == ["HARDEN.N1"]
+    assert phases["HARDEN.N3"]["status"] == "complete"
+    assert phases["HARDEN.N3"]["prerequisites"] == ["HARDEN.N2"]
+    assert phases["HARDEN.N4"]["status"] == "complete"
+    assert phases["HARDEN.N4"]["prerequisites"] == ["HARDEN.N3"]
+    assert phases["HARDEN.CLOSE"]["status"] == "proposed"
+    assert phases["HARDEN.CLOSE"]["prerequisites"] == ["HARDEN.N4"]
 
     pick = pick_phase_candidates(data)
     assert pick["registry_valid"] is True
-    assert pick["top_recommendation"]["phase_id"] == "ADOPT.MODEL.CLOSE"
+    assert pick["top_recommendation"]["phase_id"] == "HARDEN.CLOSE"
     assert pick["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"
 
 

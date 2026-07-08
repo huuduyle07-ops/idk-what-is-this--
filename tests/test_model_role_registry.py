@@ -330,5 +330,5 @@ def test_registry_and_picker_recommend_model_n3_after_model_n2():
 
     pick = pick_phase_candidates(data)
     assert pick["registry_valid"] is True
-    assert pick["top_recommendation"]["phase_id"] == "EVAL.N4"
+    assert pick["top_recommendation"]["phase_id"] == "HARDEN.CLOSE"
     assert pick["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"

@@ -397,7 +397,7 @@ def test_source_has_no_forbidden_imports_or_execution_calls():
                 }, f"{path} calls forbidden function {name}"
 
 
-def test_registry_and_picker_recommend_model_n4():
+def test_registry_keeps_model_gap_branch_history_valid():
     root = Path(__file__).parent.parent
     data = json.loads((root / "docs" / "roadmap" / "phase_registry.json").read_text(encoding="utf-8"))
     phases = {phase["phase_id"]: phase for phase in data["phases"]}
@@ -423,5 +423,3 @@ def test_registry_and_picker_recommend_model_n4():
 
     pick = pick_phase_candidates(data)
     assert pick["registry_valid"] is True
-    assert pick["top_recommendation"]["phase_id"] == "EVAL.N4"
-    assert pick["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"

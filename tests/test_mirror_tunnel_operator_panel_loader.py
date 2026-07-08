@@ -348,7 +348,7 @@ def test_loader_route_source_is_read_only_and_does_not_import_scoring_or_writer_
         assert forbidden not in route
 
 
-def test_registry_marks_mirror11_complete_and_picker_recommends_cmd_n4():
+def test_registry_keeps_mirror_operator_loader_branch_history_valid():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -367,4 +367,4 @@ def test_registry_marks_mirror11_complete_and_picker_recommends_cmd_n4():
         report_id="mirror11-loader",
         created_at="2026-07-02T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "MODEL.N1"
+    assert report["registry_valid"] is True

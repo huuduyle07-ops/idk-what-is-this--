@@ -364,7 +364,7 @@ def test_markdown_contains_required_report_sections():
         assert section in low, section
 
 
-def test_real_registry_marks_harden_n2_complete_adds_n3_and_picker_recommends_harden_n3():
+def test_real_registry_marks_harden_n2_complete_adds_n3_and_picker_recommends_harden_n4():
     data = json.loads(REAL_REGISTRY.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -375,19 +375,27 @@ def test_real_registry_marks_harden_n2_complete_adds_n3_and_picker_recommends_ha
         ".agent/harden/approval_enforcement_attachment_plan/approval_enforcement_attachment_plan.json",
         ".agent/harden/approval_enforcement_attachment_plan/approval_enforcement_attachment_plan.md",
     ]
-    assert by_id["HARDEN.N3"]["status"] == "proposed"
+    assert by_id["HARDEN.N3"]["status"] == "complete"
     assert by_id["HARDEN.N3"]["title"] == "Approval Enforcement Dry-Run Gate Simulator"
     assert by_id["HARDEN.N3"]["prerequisites"] == ["HARDEN.N2"]
     assert by_id["HARDEN.N3"]["network_allowed"] is False
     assert by_id["HARDEN.N3"]["model_calls_allowed"] is False
     assert by_id["HARDEN.N3"]["writes_real_repo"] is False
+    assert by_id["HARDEN.N4"]["status"] == "complete"
+    assert by_id["HARDEN.N4"]["title"] == "Approval Enforcement Operator Report"
+    assert by_id["HARDEN.N4"]["prerequisites"] == ["HARDEN.N3"]
+    assert by_id["HARDEN.CLOSE"]["status"] == "complete"
+    assert by_id["HARDEN.CLOSE"]["title"] == "Approval Enforcement Planning Branch Checkpoint"
+    assert by_id["HARDEN.CLOSE"]["prerequisites"] == ["HARDEN.N4"]
+    assert by_id["OPS.TEST.1"]["status"] == "proposed"
+    assert by_id["OPS.TEST.1"]["prerequisites"] == ["HARDEN.CLOSE"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="harden-n2-registry",
         created_at="2026-07-08T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "HARDEN.N3"
+    assert report["top_recommendation"]["phase_id"] == "OPS.TEST.1"
 
 
 def test_core_and_cli_do_not_import_or_call_runtime_enforcement_primitives():

@@ -222,7 +222,7 @@ def run_validation_command(command: str, cwd: str, timeout: int = 30) -> tuple[b
 run_legacy_validation_command = run_validation_command
 
 SOURCE_EXTENSIONS = {
-    ".py", ".rs", ".js", ".jsx", ".ts", ".tsx", ".go", ".java",
+    ".py", ".rs", ".mojo", ".js", ".jsx", ".ts", ".tsx", ".go", ".java",
     ".c", ".h", ".cpp", ".hpp", ".cs", ".php", ".rb", ".swift",
     ".kt", ".kts", ".lua", ".dart",
 }

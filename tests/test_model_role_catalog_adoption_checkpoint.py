@@ -412,7 +412,7 @@ def test_script_writes_summary_json(tmp_path):
     assert Path(result["summary"]["md_path"]).is_file()
 
 
-def test_real_registry_marks_close_complete_adds_harden_n1_and_picker_recommends_harden_n1():
+def test_real_registry_marks_close_complete_adds_harden_n2_and_picker_recommends_harden_n2():
     data = json.loads(REAL_REGISTRY.read_text(encoding="utf-8"))
     phases = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -422,16 +422,25 @@ def test_real_registry_marks_close_complete_adds_harden_n1_and_picker_recommends
     assert ".agent/model_role_registry/adoption_checkpoint/model_role_catalog_adoption_checkpoint.json" in phases[
         "ADOPT.MODEL.CLOSE"
     ]["expected_artifacts"]
-    assert phases["HARDEN.N1"]["status"] == "proposed"
+    assert phases["HARDEN.N1"]["status"] == "complete"
     assert phases["HARDEN.N1"]["title"] == "Approval Enforcement Readiness Audit"
     assert phases["HARDEN.N1"]["prerequisites"] == ["ADOPT.MODEL.CLOSE"]
     assert phases["HARDEN.N1"]["network_allowed"] is False
     assert phases["HARDEN.N1"]["model_calls_allowed"] is False
     assert phases["HARDEN.N1"]["writes_real_repo"] is False
+    assert phases["HARDEN.N2"]["status"] == "complete"
+    assert phases["HARDEN.N2"]["title"] == "Approval Enforcement Attachment Plan"
+    assert phases["HARDEN.N2"]["prerequisites"] == ["HARDEN.N1"]
+    assert phases["HARDEN.N3"]["status"] == "complete"
+    assert phases["HARDEN.N3"]["prerequisites"] == ["HARDEN.N2"]
+    assert phases["HARDEN.N4"]["status"] == "complete"
+    assert phases["HARDEN.N4"]["prerequisites"] == ["HARDEN.N3"]
+    assert phases["HARDEN.CLOSE"]["status"] == "proposed"
+    assert phases["HARDEN.CLOSE"]["prerequisites"] == ["HARDEN.N4"]
 
     pick = pick_phase_candidates(data)
     assert pick["registry_valid"] is True
-    assert pick["top_recommendation"]["phase_id"] == "HARDEN.N1"
+    assert pick["top_recommendation"]["phase_id"] == "HARDEN.CLOSE"
     assert pick["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"
 
 
