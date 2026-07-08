@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (83 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 15 MIRROR + 12 UX).
-- The phase picker currently has two safe candidates: `HARDEN.N4` and `MIRROR.13`.
-- The top recommendation is `HARDEN.N4` - Approval Enforcement Operator Report.
+- The phase registry is valid (84 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 1 OPS + 15 MIRROR + 12 UX).
+- The phase picker currently has two safe candidates: `OPS.TEST.1` and `MIRROR.13`.
+- The top recommendation is `OPS.TEST.1` - Full Suite Runtime / Slow Test Audit.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -41,7 +41,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 ### Validation State
 
 - Registry validation is passing.
-- The current phase picker result recommends `HARDEN.N1` after ADOPT.MODEL.CLOSE froze the adopted advisory catalog branch.
+- The current phase picker result recommends `OPS.TEST.1` after HARDEN.CLOSE froze the approval-enforcement planning branch.
 - The old roadmap arc is complete and should not be stretched to imply new authorization.
 
 ### Benchmark State
@@ -117,7 +117,8 @@ Branch boundary:
 - UX must not weaken approvals, hide required evidence, make dangerous actions easier to trigger, or add new autonomous behavior.
 
 Next recommendation: the UX branch is complete and frozen at UX.CLOSE,
-HARDEN.CLOSE has consolidated HARDEN.1-HARDEN.3 evidence, and
+the earlier hardening checkpoint artifacts have consolidated HARDEN.1-HARDEN.3
+evidence, and
 MIRROR.1 through MIRROR.CLOSE3 have shipped the report-only trace, scoring,
 claim-vs-diff, ingestion-planning, manual trace assembly, manual review
 pipeline, branch checkpoint, default-off shadow live trace writer, and post-run
@@ -133,13 +134,14 @@ added documentation-only sample tokens, and HUMAN.CLOSE froze the human
 authority branch before runtime enforcement design. ADOPT.MODEL.CLOSE froze
 the model catalog adoption branch after ADOPT.MODEL.1 adopted the advisory
 catalog artifact and ADOPT.MODEL.2 verified the active 10-role coverage. The
-HARDEN.N1, HARDEN.N2, and HARDEN.N3 have since shipped the approval enforcement
-readiness audit, attachment plan, and dry-run gate simulator, all report-only
-and without runtime enforcement. The phase picker now recommends
-**HARDEN.N4 - Approval Enforcement Operator Report** as the next report-only
-step before any approval enforcement implementation. MIRROR.13 remains a
-proposed Mirror candidate, but HARDEN.N4 now ranks first by
-the registry picker.
+HARDEN.N1, HARDEN.N2, HARDEN.N3, and HARDEN.N4 have since shipped the approval
+enforcement readiness audit, attachment plan, dry-run gate simulator, and
+operator report, all report-only and without runtime enforcement. HARDEN.CLOSE
+has now frozen HARDEN.N1-N4 as a non-enforcing planning branch. The phase picker
+now recommends **OPS.TEST.1 - Full Suite Runtime / Slow Test Audit** so the
+project can address full-suite pytest timeouts before adding more runtime
+features. MIRROR.13 remains a proposed Mirror candidate, but OPS.TEST.1 now
+ranks first by the registry picker.
 
 ### Branch CMD — Commander Mode
 
@@ -526,13 +528,13 @@ human-approval policy fields. Artifacts:
 Adds no model call, patch apply, validation run, benchmark run, MCP invocation,
 worker launch, Dream execution, Replay janitor apply, network call, database
 write, route behavior change, auth policy change, UI behavior change, push,
-merge, or PR power. Then shipped: HARDEN.CLOSE - Hardening Branch Checkpoint.
+merge, or PR power. The older hardening checkpoint artifacts remain available as
+`hardening_branch_checkpoint`; the live `HARDEN.CLOSE` registry slot now names
+the approval-enforcement planning checkpoint after HARDEN.N4.
 
-**HARDEN.CLOSE - Hardening Branch Checkpoint is shipped 2026-06-29 (complete).**
+**Legacy hardening branch checkpoint artifacts shipped 2026-06-29.**
 Implemented report-only as `core/hardening_branch_checkpoint.py` +
-`scripts/create_hardening_branch_checkpoint.py`, registered as a `complete`
-HARDEN-track phase (prerequisite HARDEN.3) in
-`docs/roadmap/phase_registry.json`, and validated with
+`scripts/create_hardening_branch_checkpoint.py`, and validated with
 `tests/test_hardening_branch_checkpoint.py` plus the HARDEN.1, HARDEN.2, and
 HARDEN.3 safety tests. It reads the phase registry, HARDEN.1 source markers,
 and existing HARDEN.2/HARDEN.3 artifacts, then decides whether the HARDEN branch
@@ -1066,20 +1068,31 @@ approval-token attachment points, and simulated sample approval-gate outcomes
 without adding runtime enforcement, issuing or consuming tokens, changing
 routes/auth, launching workers, calling models, or routing models.
 
-**HARDEN.N4 - Approval Enforcement Operator Report is proposed.**
-HARDEN.N4 is the current phase picker recommendation. It should create a
-read-only operator-facing report format for simulated approval-gate outcomes,
-still without runtime enforcement, live token validation, token issuance or
-consumption, route/auth behavior changes, model calls, model routing, worker
-launches, patch application, validation runs, benchmark runs, network access,
-database writes, push, merge, or PR power.
+**HARDEN.N4 - Approval Enforcement Operator Report is shipped 2026-07-08 (complete).**
+HARDEN.N4 created a read-only operator-facing report format for simulated
+approval-gate outcomes, still without runtime enforcement, live token
+validation, token issuance or consumption, route/auth behavior changes, model
+calls, model routing, worker launches, patch application, validation runs,
+benchmark runs, network access, database writes, push, merge, or PR power.
+
+**HARDEN.CLOSE - Approval Enforcement Planning Branch Checkpoint is shipped 2026-07-08 (complete).**
+HARDEN.CLOSE froze HARDEN.N1-N4 as a complete non-enforcing
+approval-enforcement planning branch. Its expected current status is
+`approval_enforcement_planning_branch_frozen_with_warnings` because runtime
+enforcement remains intentionally unimplemented.
+
+**OPS.TEST.1 - Full Suite Runtime / Slow Test Audit is proposed.**
+OPS.TEST.1 is the current phase picker recommendation. It should audit why full
+pytest repeatedly times out around 304 seconds and propose a suite-splitting or
+runtime plan before more runtime feature work. Alternative next phase:
+UX.RUN.1 - Run Progress / Operator Visibility.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
 improve live trace frame capture quality after the MIRROR.CLOSE3 freeze, while
 keeping Mirror evidence report-only, advisory, non-blocking, and free of runtime
 scoring or UI approval-gate behavior. The current top picker recommendation is
-HARDEN.N1.
+OPS.TEST.1.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
@@ -1250,32 +1263,46 @@ launch workers, execute Dream actions, apply Replay janitor actions, contact
 network services, write to a database, change routes, change auth policy, change
 UI behavior, push, merge, or open PRs.
 
-### HARDEN.CLOSE - Hardening Branch Checkpoint
+### HARDEN.CLOSE - Approval Enforcement Planning Branch Checkpoint
 
-**Status:** Complete  
-**Prerequisite:** HARDEN.3  
-**Risk:** Medium (branch closure checkpoint; report-only)
+**Status:** Complete
+**Prerequisite:** HARDEN.N4
+**Risk:** Low (planning branch checkpoint; report-only)
 
-Creates a report-only checkpoint that reviews HARDEN.1, HARDEN.2, and HARDEN.3
-evidence together. It verifies that HARDEN.1 is registered complete and the
-auth gate is detectable, HARDEN.2 has zero uncovered mutating routes and zero
-blockers, HARDEN.3 has zero blockers, and HARDEN.2/HARDEN.3 warnings are
-manual-review items rather than confirmed bypasses. It decides one of four
-statuses: frozen, frozen_with_manual_review_warnings, needs_harden_4, or
-blocked.
+Freezes HARDEN.N1-N4 as a complete non-enforcing approval-enforcement planning
+branch. It reads the readiness audit, attachment plan, dry-run gate simulator,
+and operator report artifacts, then decides whether the planning branch is
+frozen, frozen_with_warnings, incomplete, or blocked.
 
-**Artifacts:**
-- `.agent/harden/hardening_branch_checkpoint/hardening_branch_checkpoint.json`
-- `.agent/harden/hardening_branch_checkpoint/hardening_branch_checkpoint.md`
+**Expected artifacts:**
+- `.agent/harden/approval_enforcement_planning_branch_checkpoint/approval_enforcement_planning_branch_checkpoint.json`
+- `.agent/harden/approval_enforcement_planning_branch_checkpoint/approval_enforcement_planning_branch_checkpoint.md`
 
-**No new automation power.** Does not call models, apply patches, validate,
-benchmark, invoke MCP tools, launch workers, execute Dream actions, apply Replay
-janitor actions, use Docker or subprocess, contact network services, write to a
-database, change route behavior, change auth policy, change UI behavior, push,
-merge, or open PRs. MIRROR.1 through MIRROR.CLOSE3 and CMD.N1 have since
-shipped; CMD.N1 through CMD.CLOSE, HUMAN.CLOSE, and ADOPT.MODEL.CLOSE have also
-shipped. HARDEN.N1 through HARDEN.N3 have also shipped. The current recommended
-phase is HARDEN.N4 - Approval Enforcement Operator Report.
+**No new automation power.** Must not enforce approval gates, validate live
+tokens, issue or consume tokens, approve or reject real actions, apply patches,
+validate, benchmark, invoke MCP tools, launch workers, call or route models,
+contact network services, write to a database, change route behavior, change
+auth policy, push, merge, or open PRs. MIRROR.13 remains a proposed Mirror
+candidate, but OPS.TEST.1 is now the current picker recommendation.
+
+### OPS.TEST.1 - Full Suite Runtime / Slow Test Audit
+
+**Status:** Proposed
+**Prerequisite:** HARDEN.CLOSE
+**Risk:** Low (test-suite audit only; report-only)
+
+Should audit why full pytest repeatedly times out around 304 seconds and propose
+a suite-splitting/runtime plan before adding more runtime features.
+
+**Expected artifacts:**
+- `.agent/ops/full_suite_runtime_slow_test_audit/full_suite_runtime_slow_test_audit.json`
+- `.agent/ops/full_suite_runtime_slow_test_audit/full_suite_runtime_slow_test_audit.md`
+
+**No new automation power.** Must not change tests, run slow/full validation as
+part of report generation, alter runtime routes, change auth, call or route
+models, launch workers, apply patches, invoke MCP tools, contact network
+services, write to a database, push, merge, or open PRs. Alternative next phase:
+UX.RUN.1 - Run Progress / Operator Visibility.
 
 ### HARDEN.N1 - Approval Enforcement Readiness Audit
 
@@ -1331,14 +1358,19 @@ action.
 
 ### HARDEN.N4 - Approval Enforcement Operator Report
 
-**Status:** Proposed
+**Status:** Complete
 **Prerequisite:** HARDEN.N3
 **Risk:** Low (operator report only; no enforcement)
 
 Creates a read-only operator-facing report format for simulated approval-gate
-outcomes. It should make simulated allow/warn/deny/block outcomes easier to
-review, while preserving the same non-authoritative boundary as HARDEN.N3.
+outcomes. It makes simulated allow/warn/deny/block outcomes easier to review,
+while preserving the same non-authoritative boundary as HARDEN.N3.
 
 **Expected artifacts:**
 - `.agent/harden/approval_enforcement_operator_report/approval_enforcement_operator_report.json`
 - `.agent/harden/approval_enforcement_operator_report/approval_enforcement_operator_report.md`
+
+Expected current status is
+`approval_enforcement_operator_report_ready_with_warnings` because future
+enforcement remains intentionally unimplemented. The recommended next phase is
+HARDEN.CLOSE - Approval Enforcement Planning Branch Checkpoint.
