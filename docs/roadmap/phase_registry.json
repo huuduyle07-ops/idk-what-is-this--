@@ -2517,8 +2517,8 @@
       "phase_id": "HARDEN.N1",
       "title": "Approval Enforcement Readiness Audit",
       "track": "HARDEN",
-      "status": "proposed",
-      "summary": "Report-only audit of where approval enforcement could safely attach later after HUMAN.CLOSE and ADOPT.MODEL.CLOSE, without adding enforcement.",
+      "status": "complete",
+      "summary": "Report-only audit mapping dangerous runtime action categories to future HUMAN.N2 approval-token requirements and candidate enforcement attachment points after HUMAN.CLOSE and ADOPT.MODEL.CLOSE, without adding enforcement.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
@@ -2540,10 +2540,14 @@
         "credentials"
       ],
       "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
         "python -m pytest tests/test_approval_enforcement_readiness_audit.py -q",
+        "python -m pytest tests/test_human_authority_branch_checkpoint.py tests/test_human_approval_token_contract.py -q",
+        "python -m pytest tests/test_model_role_catalog_adoption_checkpoint.py -q",
         "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
         "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
-        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json"
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
       ],
       "human_approval_required": true,
       "merge_allowed": false,
@@ -2559,8 +2563,59 @@
         ".agent/harden/approval_enforcement_readiness_audit/approval_enforcement_readiness_audit.md"
       ],
       "notes": [
-        "Proposed follow-up after HUMAN.CLOSE and ADOPT.MODEL.CLOSE are complete. The audit should inventory candidate approval-enforcement attachment points before any enforcement design or runtime change.",
-        "Must remain report-only and audit-only. It must not enforce approvals, issue or consume approval tokens, call models, route models, launch workers, apply patches, run validation or benchmarks as part of audit generation, invoke MCP tools, contact network services, write databases, change route/auth behavior, push, merge, or open PRs."
+        "HARDEN.N1 shipped 2026-07-08 as a report-only audit. It maps patch apply, file mutation, worker launch, model call/routing, validation, benchmark, MCP/tool, network, subprocess/Docker, database, auth/route, registry, model catalog, Dream, Replay, remote execution, automatic approval/rejection, and hidden mutation surfaces to future HUMAN.N2 approval-token requirements or forbidden boundaries.",
+        "Expected current status is approval_enforcement_readiness_ready_with_warnings because future approval enforcement is intentionally not implemented. It does not enforce approvals, issue or consume approval tokens, validate live tokens, block routes, change auth policy, call models, route models, launch workers, apply patches, run validation or benchmarks as part of audit generation, invoke MCP tools, contact network services, write databases, change route behavior, push, merge, or open PRs. Recommended next phase: HARDEN.N2 - Approval Enforcement Design Plan."
+      ]
+    },
+    {
+      "phase_id": "HARDEN.N2",
+      "title": "Approval Enforcement Design Plan",
+      "track": "HARDEN",
+      "status": "proposed",
+      "summary": "Report-only design plan for how future approval enforcement could be implemented from HARDEN.N1 findings, without adding runtime token gates, route blockers, auth changes, or automatic approval/rejection behavior.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/approval_enforcement_design_plan.py",
+        "scripts/create_approval_enforcement_design_plan.py",
+        "tests/test_approval_enforcement_design_plan.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/harden/approval_enforcement_design_plan/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_approval_enforcement_design_plan.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "HARDEN.N1"
+      ],
+      "expected_artifacts": [
+        ".agent/harden/approval_enforcement_design_plan/approval_enforcement_design_plan.json",
+        ".agent/harden/approval_enforcement_design_plan/approval_enforcement_design_plan.md"
+      ],
+      "notes": [
+        "Proposed follow-up after HARDEN.N1. It should design approval enforcement boundaries and rollout sequencing from the readiness audit before any implementation phase.",
+        "Must remain report-only and design-only. It must not add approval enforcement, validate live approval tokens, issue or consume approval tokens, add route blockers, change auth policy, change route behavior, call models, route models, launch workers, apply patches, run validation or benchmarks as part of plan generation, invoke MCP tools, contact network services, write databases, push, merge, or open PRs."
       ]
     },
     {
