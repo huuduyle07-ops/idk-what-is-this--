@@ -4078,8 +4078,8 @@
       "phase_id": "UX.RUN.2",
       "title": "Run Progress Snapshot Loader",
       "track": "UX",
-      "status": "proposed",
-      "summary": "GET-only/read-only loader for existing run progress snapshot artifacts, feeding future operator visibility without creating live progress, polling active runs, or changing execution behavior.",
+      "status": "complete",
+      "summary": "GET-only/read-only loader for existing run progress snapshot artifacts, including a core loader, report artifact writer, and safe Flask GET route without creating live progress, polling active runs, or changing execution behavior.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
@@ -4087,6 +4087,7 @@
         "core/run_progress_snapshot_loader.py",
         "scripts/create_run_progress_snapshot_loader_report.py",
         "tests/test_run_progress_snapshot_loader.py",
+        "tests/test_run_progress_visibility.py",
         "tests/test_phase_registry.py",
         "tests/test_phase_picker.py",
         "docs/roadmap/phase_registry.json",
@@ -4106,6 +4107,7 @@
       "validation": [
         "python -m compileall -q core scripts tests benchmarks web",
         "python -m pytest tests/test_run_progress_snapshot_loader.py -q",
+        "python -m pytest tests/test_run_progress_visibility.py -q",
         "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
         "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
         "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
@@ -4125,8 +4127,64 @@
         ".agent/ux/run_progress_snapshot_loader/run_progress_snapshot_loader_report.md"
       ],
       "notes": [
-        "Proposed follow-up after UX.RUN.1. It should load existing progress snapshot artifacts with a GET-only/read-only boundary and surface them to the operator if safe.",
-        "Must remain read-only and non-blocking. It must not create live progress, poll active runs automatically, start runs, add execution authority, call models, route models, apply patches, run validation or benchmarks, contact network services, launch workers, write databases, change auth policy, enforce approval, issue or consume tokens, hide errors, push, merge, or open PRs."
+        "UX.RUN.2 shipped 2026-07-10 as a GET-only/read-only loader for existing progress snapshot artifacts. It adds core/run_progress_snapshot_loader.py, scripts/create_run_progress_snapshot_loader_report.py, tests/test_run_progress_snapshot_loader.py, and a safe Flask GET route at /ux/run-progress/snapshot/<snapshot_id>.",
+        "Expected current status is run_progress_snapshot_loaded_with_warnings for the default UX.RUN.1 report because live progress streaming remains intentionally unimplemented.",
+        "Remains read-only and non-blocking. It does not create live progress, poll active runs automatically, start runs, add execution authority, call models, route models, apply patches, run validation or benchmarks, contact network services, launch workers, write databases, change auth policy, enforce approval, issue or consume tokens, hide errors, push, merge, or open PRs. Recommended next phase: UX.RUN.3 - Run Progress UI Panel Stub."
+      ]
+    },
+    {
+      "phase_id": "UX.RUN.3",
+      "title": "Run Progress UI Panel Stub",
+      "track": "UX",
+      "status": "proposed",
+      "summary": "Read-only UI panel stub that displays loaded run progress snapshots without live streaming, polling, runtime hooks, action controls, or execution behavior changes.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "web/templates/index.html",
+        "web/static/style.css",
+        "web/app.py",
+        "tests/test_run_progress_ui_panel_stub.py",
+        "tests/test_run_progress_snapshot_loader.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/ux/run_progress_ui_panel_stub/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_run_progress_ui_panel_stub.py -q",
+        "python -m pytest tests/test_run_progress_snapshot_loader.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "UX.RUN.2"
+      ],
+      "expected_artifacts": [
+        ".agent/ux/run_progress_ui_panel_stub/run_progress_ui_panel_stub_report.json",
+        ".agent/ux/run_progress_ui_panel_stub/run_progress_ui_panel_stub_report.md"
+      ],
+      "notes": [
+        "Proposed follow-up after UX.RUN.2. It should add a compact read-only UI panel that displays loaded progress snapshots through the existing GET-only loader.",
+        "Must remain read-only and non-blocking. It must not create live progress, poll active runs automatically, add POST routes, add action buttons, start runs, add execution authority, call models, route models, apply patches, run validation or benchmarks, contact network services, launch workers, write databases, change auth policy, enforce approval, issue or consume tokens, hide errors, push, merge, or open PRs."
       ]
     },
     {

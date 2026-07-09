@@ -1683,6 +1683,44 @@ def evidence_quality_report_route(report_id: str):
 
 # /EVAL.N6 GET-only Evidence Quality artifact loader
 
+# UX.RUN.2 GET-only Run Progress Snapshot Loader
+from core.run_progress_snapshot_loader import (  # noqa: E402
+    BLOCKED as _RUN_PROGRESS_SNAPSHOT_BLOCKED,
+    LOADED as _RUN_PROGRESS_SNAPSHOT_LOADED,
+    LOADED_WITH_WARNINGS as _RUN_PROGRESS_SNAPSHOT_LOADED_WITH_WARNINGS,
+    MALFORMED as _RUN_PROGRESS_SNAPSHOT_MALFORMED,
+    NOT_FOUND as _RUN_PROGRESS_SNAPSHOT_NOT_FOUND,
+    load_run_progress_snapshot as _load_run_progress_snapshot,
+)
+
+
+def _run_progress_snapshot_status_code(status: str) -> int:
+    if status == _RUN_PROGRESS_SNAPSHOT_NOT_FOUND:
+        return 404
+    if status in {_RUN_PROGRESS_SNAPSHOT_BLOCKED, _RUN_PROGRESS_SNAPSHOT_MALFORMED}:
+        return 400
+    return 200
+
+
+@app.route("/ux/run-progress/snapshot/<path:snapshot_id>", methods=["GET"])
+def run_progress_snapshot_route(snapshot_id: str):
+    """Read one existing UX.RUN.2 progress snapshot/report by sanitized id."""
+    result = _load_run_progress_snapshot(snapshot_id=snapshot_id, repo_root=PROJECT_ROOT)
+    status = str(result.get("loader_status") or "")
+    ok = status in {
+        _RUN_PROGRESS_SNAPSHOT_LOADED,
+        _RUN_PROGRESS_SNAPSHOT_LOADED_WITH_WARNINGS,
+    }
+    return {
+        "ok": ok,
+        "status": status,
+        "snapshot_id": str(result.get("snapshot_id") or snapshot_id or ""),
+        "result": result,
+    }, _run_progress_snapshot_status_code(status)
+
+
+# /UX.RUN.2 GET-only Run Progress Snapshot Loader
+
 # MIRROR.11 read-only preview loader
 _MIRROR_PREVIEW_SUBDIR = Path(".agent") / "mirror_tunnel" / "live_trace_scoring_preview"
 _MIRROR_PREVIEW_JSON = "mirror_tunnel_live_trace_scoring_preview.json"
