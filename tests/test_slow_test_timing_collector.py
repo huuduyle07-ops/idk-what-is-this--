@@ -247,9 +247,16 @@ def test_real_registry_marks_ops_test_2_complete_and_recommends_ops_test_3():
         ".agent/ops/slow_test_timing_collector/slow_test_timing_report.json",
         ".agent/ops/slow_test_timing_collector/slow_test_timing_report.md",
     ]
-    assert by_id["OPS.TEST.3"]["status"] == "proposed"
+    assert by_id["OPS.TEST.3"]["status"] == "complete"
     assert by_id["OPS.TEST.3"]["title"] == "Suite Split Manifest Plan"
     assert by_id["OPS.TEST.3"]["prerequisites"] == ["OPS.TEST.2"]
+    assert by_id["OPS.TEST.3"]["expected_artifacts"] == [
+        ".agent/ops/test_suite_split_manifest_plan/test_suite_split_manifest_plan.json",
+        ".agent/ops/test_suite_split_manifest_plan/test_suite_split_manifest_plan.md",
+    ]
+    assert by_id["OPS.TEST.CLOSE"]["status"] == "complete"
+    assert by_id["OPS.TEST.CLOSE"]["title"] == "Test Runtime Operations Branch Checkpoint"
+    assert by_id["OPS.TEST.CLOSE"]["prerequisites"] == ["OPS.TEST.3"]
     assert by_id["OPS.TEST.3"]["network_allowed"] is False
     assert by_id["OPS.TEST.3"]["model_calls_allowed"] is False
     assert by_id["OPS.TEST.3"]["writes_real_repo"] is False
@@ -259,7 +266,7 @@ def test_real_registry_marks_ops_test_2_complete_and_recommends_ops_test_3():
         report_id="ops-test-2-registry",
         created_at="2026-07-09T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "OPS.TEST.3"
+    assert report["top_recommendation"]["phase_id"] == "UX.RUN.1"
 
 
 def test_core_and_cli_do_not_import_or_call_pytest_subprocess_or_mutation_primitives():
