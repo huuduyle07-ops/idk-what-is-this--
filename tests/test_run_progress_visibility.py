@@ -218,7 +218,7 @@ def test_cli_writes_report_and_prints_summary_json(tmp_path, capsys):
     assert Path(printed["md_path"]).is_file()
 
 
-def test_registry_marks_ux_run_1_complete_and_adds_ux_run_2_proposed():
+def test_registry_tracks_completed_ux_run_3_and_proposed_checkpoint():
     registry_path = Path(__file__).parent.parent / "docs" / "roadmap" / "phase_registry.json"
     data = load_phase_registry(registry_path)
     result = validate_phase_registry(data)
@@ -230,19 +230,24 @@ def test_registry_marks_ux_run_1_complete_and_adds_ux_run_2_proposed():
         ".agent/ux/run_progress_visibility/run_progress_visibility_report.json",
         ".agent/ux/run_progress_visibility/run_progress_visibility_report.md",
     ]
-    assert by_id["UX.RUN.2"]["status"] == "proposed"
+    assert by_id["UX.RUN.2"]["status"] == "complete"
     assert by_id["UX.RUN.2"]["title"] == "Run Progress Snapshot Loader"
     assert by_id["UX.RUN.2"]["prerequisites"] == ["UX.RUN.1"]
+    assert by_id["UX.RUN.3"]["status"] == "complete"
+    assert by_id["UX.RUN.3"]["title"] == "Run Progress UI Panel Stub"
+    assert by_id["UX.RUN.3"]["prerequisites"] == ["UX.RUN.2"]
+    assert by_id["UX.RUN.CLOSE"]["status"] == "proposed"
+    assert by_id["UX.RUN.CLOSE"]["prerequisites"] == ["UX.RUN.3"]
 
 
-def test_phase_picker_recommends_ux_run_2():
+def test_phase_picker_recommends_ux_run_close():
     registry_path = Path(__file__).parent.parent / "docs" / "roadmap" / "phase_registry.json"
     data = load_phase_registry(registry_path)
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="r", created_at="t")
 
-    assert report["top_recommendation"]["phase_id"] == "UX.RUN.2"
+    assert report["top_recommendation"]["phase_id"] == "UX.RUN.CLOSE"
     safe_ids = [phase["phase_id"] for phase in report["safe_to_prepare"]]
-    assert safe_ids[:2] == ["UX.RUN.2", "MIRROR.13"]
+    assert safe_ids[:2] == ["UX.RUN.CLOSE", "MIRROR.13"]
 
 
 def test_guardrails_have_all_runtime_power_flags_false():

@@ -550,16 +550,20 @@ def test_real_registry_marks_harden_close_complete_adds_ops_test_1_and_picker_re
     assert by_id["HARDEN.CLOSE"]["network_allowed"] is False
     assert by_id["HARDEN.CLOSE"]["model_calls_allowed"] is False
     assert by_id["HARDEN.CLOSE"]["writes_real_repo"] is False
-    assert by_id["OPS.TEST.1"]["status"] == "proposed"
-    assert by_id["OPS.TEST.1"]["title"] == "Full Suite Runtime / Slow Test Audit"
+    assert by_id["OPS.TEST.1"]["status"] == "complete"
+    assert by_id["OPS.TEST.1"]["title"] == "Test Suite Runtime Profile Audit"
     assert by_id["OPS.TEST.1"]["prerequisites"] == ["HARDEN.CLOSE"]
+    assert by_id["OPS.TEST.2"]["status"] == "complete"
+    assert by_id["OPS.TEST.2"]["prerequisites"] == ["OPS.TEST.1"]
+    assert by_id["OPS.TEST.3"]["status"] == "complete"
+    assert by_id["OPS.TEST.3"]["prerequisites"] == ["OPS.TEST.2"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="harden-close-checkpoint",
         created_at="2026-07-08T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "OPS.TEST.1"
+    assert report["top_recommendation"]["phase_id"] == "UX.RUN.1"
     assert report["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"
 
 

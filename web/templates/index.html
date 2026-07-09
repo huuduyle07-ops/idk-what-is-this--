@@ -1547,6 +1547,58 @@
             </header>
             <p>Preview-only Evidence Card Layout defined in UX.6; evidence creation and execution are not implemented here.</p>
             <p>Evidence cards summarise what changed, what evidence exists, what checks say, what risks remain, and what the human should do next. Human confirmation is required before any run.</p>
+            <!-- UX.RUN.3 run-progress-panel: read-only GET snapshot display; no polling or runtime controls. -->
+            <section id="runProgressPanel" class="run-progress-panel" aria-label="Run Progress Snapshot" data-run-progress-readonly="true">
+              <header class="run-progress-panel__header">
+                <div>
+                  <strong>Run Progress Snapshot</strong>
+                  <p class="run-progress-panel__note">Read-only visibility for an existing progress snapshot.</p>
+                </div>
+                <span id="runProgressStatusBadge" class="run-progress-badge run-progress-badge--empty">No snapshot loaded</span>
+              </header>
+              <p id="runProgressEmptyState" class="run-progress-empty" aria-live="polite">No live progress stream yet. Load a read-only snapshot to inspect planned progress stages.</p>
+              <p class="run-progress-panel__boundary">GET-only snapshot display. It does not auto-refresh, change runtime behavior, or expose execution, validation, benchmark, worker, model, approval, or token controls.</p>
+              <div class="run-progress-loader" aria-label="Run Progress Snapshot loader">
+                <label for="runProgressSnapshotId">Snapshot ID</label>
+                <input id="runProgressSnapshotId" type="text" value="default" autocomplete="off" spellcheck="false">
+                <button type="button" onclick="loadRunProgressSnapshot()">Load snapshot</button>
+                <span id="runProgressLoadStatus" class="run-progress-load-status" aria-live="polite"></span>
+              </div>
+              <dl class="run-progress-fields">
+                <div><dt>snapshot_id</dt><dd id="runProgressSnapshotIdValue">Not available</dd></div>
+                <div><dt>snapshot_status</dt><dd id="runProgressSnapshotStatus">Not available</dd></div>
+                <div><dt>current_stage_id</dt><dd id="runProgressCurrentStageId">Not run / unavailable</dd></div>
+                <div><dt>completed_stage_ids</dt><dd id="runProgressCompletedStageIds">Not available</dd></div>
+                <div><dt>pending_stage_ids</dt><dd id="runProgressPendingStageIds">Not available</dd></div>
+                <div><dt>warning_stage_ids</dt><dd id="runProgressWarningStageIds">Not available</dd></div>
+                <div><dt>error_stage_ids</dt><dd id="runProgressErrorStageIds">Not available</dd></div>
+                <div><dt>progress_notice</dt><dd id="runProgressNotice">Not available</dd></div>
+                <div><dt>simulated_only</dt><dd id="runProgressSimulatedOnly">Not available</dd></div>
+                <div><dt>live_stream_enabled</dt><dd id="runProgressLiveStreamEnabled">Not available</dd></div>
+                <div><dt>polling_enabled</dt><dd id="runProgressPollingEnabled">Not available</dd></div>
+                <div><dt>runtime_behavior_changed</dt><dd id="runProgressRuntimeBehaviorChanged">Not available</dd></div>
+                <div><dt>warnings</dt><dd id="runProgressWarnings">Not available</dd></div>
+                <div><dt>blocked_reasons</dt><dd id="runProgressBlockedReasons">Not available</dd></div>
+              </dl>
+              <section class="run-progress-stages" aria-labelledby="runProgressStagesHeading">
+                <div class="run-progress-stages__header">
+                  <h4 id="runProgressStagesHeading">Planned stages</h4>
+                  <span class="run-progress-stages__note">Not run / unavailable is not a passed result.</span>
+                </div>
+                <div class="run-progress-stage-legend" aria-label="Stage status legend">
+                  <span class="run-progress-stage run-progress-stage--completed">Completed</span>
+                  <span class="run-progress-stage run-progress-stage--current">Current</span>
+                  <span class="run-progress-stage run-progress-stage--pending">Pending</span>
+                  <span class="run-progress-stage run-progress-stage--warning">Warning</span>
+                  <span class="run-progress-stage run-progress-stage--error">Error</span>
+                  <span class="run-progress-stage run-progress-stage--not-run">Not run / unavailable</span>
+                </div>
+                <div id="runProgressStages" class="run-progress-stage-list" aria-live="polite">
+                  <span class="run-progress-stage run-progress-stage--not-run">No stages loaded</span>
+                </div>
+              </section>
+            </section>
+            <!-- /UX.RUN.3 run-progress-panel -->
             <section id="evidenceQualityPanel" class="evidence-quality-panel" aria-label="Evidence Quality" data-evidence-quality-readonly="true">
               <header class="evidence-quality-panel__header">
                 <div>
@@ -10270,6 +10322,215 @@ function kbResetAll() {
   CATTUS_KB.resetAll();
   renderKbList();
 }
+
+// UX.RUN.3 run-progress-panel: GET-only rendering of an existing UX.RUN.2 snapshot.
+const RUN_PROGRESS_EMPTY_SNAPSHOT = Object.freeze({
+    snapshot_id: "Not available",
+    snapshot_status: "No snapshot loaded",
+    current_stage_id: "Not run / unavailable",
+    completed_stage_ids: [],
+    pending_stage_ids: [],
+    warning_stage_ids: [],
+    error_stage_ids: [],
+    progress_notice: "No live progress stream yet. Load a read-only snapshot to inspect planned progress stages.",
+    simulated_only: "Not available",
+    live_stream_enabled: "Not available",
+    polling_enabled: "Not available",
+    runtime_behavior_changed: "Not available",
+    warnings: [],
+    blocked_reasons: [],
+    stages: []
+});
+
+function _runProgressObject(value) {
+    return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+}
+
+function _runProgressArray(value) {
+    return Array.isArray(value) ? value : [];
+}
+
+function _runProgressValue(value, fallback = "Not available") {
+    if (value === undefined || value === null || value === "") return fallback;
+    if (typeof value === "boolean") return value ? "true" : "false";
+    if (typeof value === "object") {
+        const reason = value.reason || value.code || "";
+        const message = value.message || value.detail || "";
+        return [reason, message].filter(Boolean).join(": ") || fallback;
+    }
+    return String(value);
+}
+
+function _runProgressList(value, emptyText = "None") {
+    const rows = _runProgressArray(value).map(item => _runProgressValue(item, "")).filter(Boolean);
+    return rows.length ? rows.join(", ") : emptyText;
+}
+
+function _runProgressSetText(id, value, fallback) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = _runProgressValue(value, fallback);
+}
+
+function _runProgressBadgeClass(snapshotStatus) {
+    const status = String(snapshotStatus || "").toLowerCase();
+    if (!status || status.includes("no_snapshot")) return "run-progress-badge--empty";
+    if (status.includes("blocked") || status.includes("malformed") || status.includes("not_found") || status.includes("error")) {
+        return "run-progress-badge--error";
+    }
+    if (status.includes("warning")) return "run-progress-badge--warning";
+    return "run-progress-badge--loaded";
+}
+
+function _runProgressStageState(stageId, snapshot) {
+    const id = String(stageId || "");
+    if (_runProgressArray(snapshot.error_stage_ids).map(String).includes(id)) return "error";
+    if (_runProgressArray(snapshot.warning_stage_ids).map(String).includes(id)) return "warning";
+    if (String(snapshot.current_stage_id || "") === id) return "current";
+    if (_runProgressArray(snapshot.completed_stage_ids).map(String).includes(id)) return "completed";
+    if (_runProgressArray(snapshot.pending_stage_ids).map(String).includes(id)) return "pending";
+    return "not-run";
+}
+
+function _runProgressRenderStages(snapshot) {
+    const container = document.getElementById("runProgressStages");
+    if (!container) return;
+
+    const stageMap = new Map();
+    for (const stage of _runProgressArray(snapshot.stages)) {
+        const row = _runProgressObject(stage);
+        const stageId = String(row.stage_id || "").trim();
+        if (stageId) stageMap.set(stageId, row);
+    }
+    const stageIds = [
+        ...stageMap.keys(),
+        ..._runProgressArray(snapshot.completed_stage_ids),
+        ..._runProgressArray(snapshot.pending_stage_ids),
+        ..._runProgressArray(snapshot.warning_stage_ids),
+        ..._runProgressArray(snapshot.error_stage_ids),
+        snapshot.current_stage_id
+    ].map(value => String(value || "").trim()).filter(Boolean);
+    const uniqueStageIds = [...new Set(stageIds)];
+    container.replaceChildren();
+
+    if (!uniqueStageIds.length) {
+        const chip = document.createElement("span");
+        chip.className = "run-progress-stage run-progress-stage--not-run";
+        chip.textContent = "No stages loaded";
+        container.appendChild(chip);
+        return;
+    }
+
+    for (const stageId of uniqueStageIds) {
+        const stage = _runProgressObject(stageMap.get(stageId));
+        const label = _runProgressValue(stage.label || stage.stage_id || stageId, "Not run / unavailable");
+        const state = _runProgressStageState(stageId, snapshot);
+        const chip = document.createElement("span");
+        chip.className = "run-progress-stage run-progress-stage--" + state;
+        chip.textContent = label + " - " + state.replace("-", " ");
+        container.appendChild(chip);
+    }
+}
+
+function renderRunProgressSnapshot(snapshotObject) {
+    const supplied = _runProgressObject(snapshotObject);
+    const snapshot = Object.keys(supplied).length ? supplied : RUN_PROGRESS_EMPTY_SNAPSHOT;
+    const status = _runProgressValue(snapshot.snapshot_status, RUN_PROGRESS_EMPTY_SNAPSHOT.snapshot_status);
+    const badge = document.getElementById("runProgressStatusBadge");
+    if (badge) {
+        badge.textContent = status;
+        badge.className = "run-progress-badge";
+        badge.classList.add(_runProgressBadgeClass(status));
+    }
+
+    const emptyState = document.getElementById("runProgressEmptyState");
+    if (emptyState) {
+        emptyState.textContent = _runProgressValue(snapshot.progress_notice, RUN_PROGRESS_EMPTY_SNAPSHOT.progress_notice);
+    }
+
+    _runProgressSetText("runProgressSnapshotIdValue", snapshot.snapshot_id);
+    _runProgressSetText("runProgressSnapshotStatus", snapshot.snapshot_status);
+    _runProgressSetText("runProgressCurrentStageId", snapshot.current_stage_id, "Not run / unavailable");
+    _runProgressSetText("runProgressCompletedStageIds", _runProgressList(snapshot.completed_stage_ids));
+    _runProgressSetText("runProgressPendingStageIds", _runProgressList(snapshot.pending_stage_ids));
+    _runProgressSetText("runProgressWarningStageIds", _runProgressList(snapshot.warning_stage_ids));
+    _runProgressSetText("runProgressErrorStageIds", _runProgressList(snapshot.error_stage_ids));
+    _runProgressSetText("runProgressNotice", snapshot.progress_notice);
+    _runProgressSetText("runProgressSimulatedOnly", snapshot.simulated_only);
+    _runProgressSetText("runProgressLiveStreamEnabled", snapshot.live_stream_enabled);
+    _runProgressSetText("runProgressPollingEnabled", snapshot.polling_enabled);
+    _runProgressSetText("runProgressRuntimeBehaviorChanged", snapshot.runtime_behavior_changed);
+    _runProgressSetText("runProgressWarnings", _runProgressList(snapshot.warnings));
+    _runProgressSetText("runProgressBlockedReasons", _runProgressList(snapshot.blocked_reasons));
+    _runProgressRenderStages(snapshot);
+}
+
+function _runProgressRouteError(status, message, result) {
+    const loaderResult = _runProgressObject(result);
+    return {
+        ...RUN_PROGRESS_EMPTY_SNAPSHOT,
+        snapshot_id: loaderResult.snapshot_id || "Not available",
+        snapshot_status: status || "snapshot_error",
+        progress_notice: message || "The read-only snapshot could not be loaded.",
+        warnings: _runProgressArray(loaderResult.warnings),
+        blocked_reasons: _runProgressArray(loaderResult.blocked_reasons)
+    };
+}
+
+function _runProgressSetLoadStatus(message) {
+    const status = document.getElementById("runProgressLoadStatus");
+    if (status) status.textContent = message || "";
+}
+
+async function loadRunProgressSnapshot(snapshotId) {
+    const input = document.getElementById("runProgressSnapshotId");
+    const requestedId = typeof snapshotId === "string"
+        ? snapshotId.trim()
+        : String(input && input.value || "").trim();
+    if (!requestedId) {
+        renderRunProgressSnapshot(_runProgressRouteError(
+            "snapshot_not_found",
+            "Enter a snapshot ID to inspect an existing read-only snapshot."
+        ));
+        _runProgressSetLoadStatus("No snapshot ID selected.");
+        return;
+    }
+    if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(requestedId)) {
+        renderRunProgressSnapshot(_runProgressRouteError(
+            "snapshot_blocked",
+            "That snapshot ID is not safe to load."
+        ));
+        _runProgressSetLoadStatus("Unsafe snapshot ID was not requested.");
+        return;
+    }
+
+    const safeId = encodeURIComponent(requestedId);
+    _runProgressSetLoadStatus("Loading read-only snapshot...");
+    try {
+        const response = await fetch("/ux/run-progress/snapshot/" + safeId, { method: "GET" });
+        const body = await response.json().catch(() => ({
+            ok: false,
+            status: "snapshot_malformed",
+            error: "Malformed run progress snapshot response."
+        }));
+        const payload = _runProgressObject(body);
+        const result = _runProgressObject(payload.result);
+        const snapshot = _runProgressObject(result.snapshot);
+        if (!response.ok || payload.ok !== true || !Object.keys(snapshot).length) {
+            const status = payload.status || result.loader_status || "snapshot_not_found";
+            const message = payload.error || "Run progress snapshot " + status + ".";
+            renderRunProgressSnapshot(_runProgressRouteError(status, message, result));
+            _runProgressSetLoadStatus(message);
+            return;
+        }
+        renderRunProgressSnapshot(snapshot);
+        _runProgressSetLoadStatus("Read-only snapshot loaded.");
+    } catch (error) {
+        const message = "Run progress snapshot load failed: " + _runProgressValue(error, "unknown error");
+        renderRunProgressSnapshot(_runProgressRouteError("snapshot_malformed", message));
+        _runProgressSetLoadStatus(message);
+    }
+}
+// /UX.RUN.3 run-progress-panel
 
 document.addEventListener('DOMContentLoaded', renderKbList);
 

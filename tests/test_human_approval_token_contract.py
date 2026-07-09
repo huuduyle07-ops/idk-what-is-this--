@@ -340,12 +340,16 @@ def test_real_registry_marks_human_n2_complete_and_picker_recommends_adopt_model
     assert by_id["HARDEN.N4"]["prerequisites"] == ["HARDEN.N3"]
     assert by_id["HARDEN.CLOSE"]["status"] == "complete"
     assert by_id["HARDEN.CLOSE"]["prerequisites"] == ["HARDEN.N4"]
-    assert by_id["OPS.TEST.1"]["status"] == "proposed"
+    assert by_id["OPS.TEST.1"]["status"] == "complete"
     assert by_id["OPS.TEST.1"]["prerequisites"] == ["HARDEN.CLOSE"]
+    assert by_id["OPS.TEST.2"]["status"] == "complete"
+    assert by_id["OPS.TEST.2"]["prerequisites"] == ["OPS.TEST.1"]
+    assert by_id["OPS.TEST.3"]["status"] == "complete"
+    assert by_id["OPS.TEST.3"]["prerequisites"] == ["OPS.TEST.2"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="human-n2-registry",
         created_at="2026-07-07T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "OPS.TEST.1"
+    assert report["top_recommendation"]["phase_id"] == "UX.RUN.1"

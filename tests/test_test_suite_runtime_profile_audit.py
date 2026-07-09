@@ -246,7 +246,7 @@ def test_markdown_contains_required_operator_sections():
         assert section in low, section
 
 
-def test_real_registry_marks_ops_test_1_complete_and_recommends_ops_test_2():
+def test_real_registry_marks_ops_test_1_complete_and_preserves_ops_test_chain():
     data = json.loads(REAL_REGISTRY.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
@@ -256,9 +256,23 @@ def test_real_registry_marks_ops_test_1_complete_and_recommends_ops_test_2():
         ".agent/ops/test_suite_runtime_profile_audit/test_suite_runtime_profile_audit.json",
         ".agent/ops/test_suite_runtime_profile_audit/test_suite_runtime_profile_audit.md",
     ]
-    assert by_id["OPS.TEST.2"]["status"] == "proposed"
+    assert by_id["OPS.TEST.2"]["status"] == "complete"
     assert by_id["OPS.TEST.2"]["title"] == "Slow Test Timing Collector"
     assert by_id["OPS.TEST.2"]["prerequisites"] == ["OPS.TEST.1"]
+    assert by_id["OPS.TEST.2"]["expected_artifacts"] == [
+        ".agent/ops/slow_test_timing_collector/slow_test_timing_report.json",
+        ".agent/ops/slow_test_timing_collector/slow_test_timing_report.md",
+    ]
+    assert by_id["OPS.TEST.3"]["status"] == "complete"
+    assert by_id["OPS.TEST.3"]["title"] == "Suite Split Manifest Plan"
+    assert by_id["OPS.TEST.3"]["prerequisites"] == ["OPS.TEST.2"]
+    assert by_id["OPS.TEST.3"]["expected_artifacts"] == [
+        ".agent/ops/test_suite_split_manifest_plan/test_suite_split_manifest_plan.json",
+        ".agent/ops/test_suite_split_manifest_plan/test_suite_split_manifest_plan.md",
+    ]
+    assert by_id["OPS.TEST.CLOSE"]["status"] == "complete"
+    assert by_id["OPS.TEST.CLOSE"]["title"] == "Test Runtime Operations Branch Checkpoint"
+    assert by_id["OPS.TEST.CLOSE"]["prerequisites"] == ["OPS.TEST.3"]
     assert by_id["OPS.TEST.2"]["network_allowed"] is False
     assert by_id["OPS.TEST.2"]["model_calls_allowed"] is False
     assert by_id["OPS.TEST.2"]["writes_real_repo"] is False
@@ -268,7 +282,7 @@ def test_real_registry_marks_ops_test_1_complete_and_recommends_ops_test_2():
         report_id="ops-test-1-registry",
         created_at="2026-07-09T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "OPS.TEST.2"
+    assert report["top_recommendation"]["phase_id"] == "UX.RUN.1"
 
 
 def test_core_and_cli_do_not_import_or_call_runtime_or_mutation_primitives():

@@ -329,15 +329,19 @@ def test_real_registry_marks_harden_n4_and_harden_close_complete_then_picker_rec
     assert by_id["HARDEN.CLOSE"]["network_allowed"] is False
     assert by_id["HARDEN.CLOSE"]["model_calls_allowed"] is False
     assert by_id["HARDEN.CLOSE"]["writes_real_repo"] is False
-    assert by_id["OPS.TEST.1"]["status"] == "proposed"
+    assert by_id["OPS.TEST.1"]["status"] == "complete"
     assert by_id["OPS.TEST.1"]["prerequisites"] == ["HARDEN.CLOSE"]
+    assert by_id["OPS.TEST.2"]["status"] == "complete"
+    assert by_id["OPS.TEST.2"]["prerequisites"] == ["OPS.TEST.1"]
+    assert by_id["OPS.TEST.3"]["status"] == "complete"
+    assert by_id["OPS.TEST.3"]["prerequisites"] == ["OPS.TEST.2"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
         report_id="harden-n4-registry",
         created_at="2026-07-08T00:00:00+09:00",
     )
-    assert report["top_recommendation"]["phase_id"] == "OPS.TEST.1"
+    assert report["top_recommendation"]["phase_id"] == "UX.RUN.1"
 
 
 def test_core_and_cli_do_not_import_or_call_runtime_enforcement_primitives():

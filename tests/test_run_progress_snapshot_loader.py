@@ -387,7 +387,7 @@ def test_default_output_root_matches_required_artifact_location():
     assert MD_NAME == "run_progress_snapshot_loader_report.md"
 
 
-def test_registry_marks_ux_run_2_complete_and_adds_ux_run_3():
+def test_registry_tracks_completed_ux_run_3_and_checkpoint_after_loader():
     data = load_phase_registry(REGISTRY_PATH)
     result = validate_phase_registry(data)
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
@@ -398,15 +398,17 @@ def test_registry_marks_ux_run_2_complete_and_adds_ux_run_3():
         ".agent/ux/run_progress_snapshot_loader/run_progress_snapshot_loader_report.json",
         ".agent/ux/run_progress_snapshot_loader/run_progress_snapshot_loader_report.md",
     ]
-    assert by_id["UX.RUN.3"]["status"] == "proposed"
+    assert by_id["UX.RUN.3"]["status"] == "complete"
     assert by_id["UX.RUN.3"]["title"] == "Run Progress UI Panel Stub"
     assert by_id["UX.RUN.3"]["prerequisites"] == ["UX.RUN.2"]
+    assert by_id["UX.RUN.CLOSE"]["status"] == "proposed"
+    assert by_id["UX.RUN.CLOSE"]["prerequisites"] == ["UX.RUN.3"]
 
 
-def test_phase_picker_recommends_ux_run_3_after_loader():
+def test_phase_picker_recommends_ux_run_close_after_loader():
     data = load_phase_registry(REGISTRY_PATH)
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="r", created_at="t")
 
-    assert report["top_recommendation"]["phase_id"] == "UX.RUN.3"
+    assert report["top_recommendation"]["phase_id"] == "UX.RUN.CLOSE"
     safe_ids = [phase["phase_id"] for phase in report["safe_to_prepare"]]
-    assert safe_ids[:2] == ["UX.RUN.3", "MIRROR.13"]
+    assert safe_ids[:2] == ["UX.RUN.CLOSE", "MIRROR.13"]

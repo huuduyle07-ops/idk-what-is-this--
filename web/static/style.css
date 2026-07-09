@@ -4862,6 +4862,177 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     white-space: pre-wrap;
 }
 
+/* UX.RUN.3: compact, read-only run progress snapshot display. */
+.run-progress-panel {
+    margin-top: 16px;
+    padding: 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+}
+
+.run-progress-panel__header,
+.run-progress-stages__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.run-progress-panel__header {
+    margin-bottom: 10px;
+}
+
+.run-progress-panel__note,
+.run-progress-panel__boundary,
+.run-progress-stages__note {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.run-progress-panel__note {
+    margin: 4px 0 0;
+}
+
+.run-progress-panel__boundary {
+    margin: 0 0 12px;
+}
+
+.run-progress-empty {
+    margin: 0 0 10px;
+    padding: 9px 10px;
+    border: 1px dashed var(--color-border);
+    border-radius: 6px;
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+.run-progress-loader {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 12px;
+}
+
+.run-progress-loader label,
+.run-progress-load-status {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.run-progress-loader input {
+    min-width: 150px;
+    max-width: 240px;
+    padding: 7px 9px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: 13px;
+}
+
+.run-progress-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 3px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.2;
+    text-align: right;
+}
+
+.run-progress-badge--empty { background: var(--color-bg); }
+.run-progress-badge--loaded { background: #052e16; border-color: #166534; color: #bbf7d0; }
+.run-progress-badge--warning { background: #431407; border-color: #9a3412; color: #fed7aa; }
+.run-progress-badge--error { background: #450a0a; border-color: #991b1b; color: #fecaca; }
+
+.run-progress-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 8px;
+    margin: 0;
+}
+
+.run-progress-fields > div {
+    min-width: 0;
+    padding: 9px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-bg);
+}
+
+.run-progress-fields dt {
+    margin-bottom: 4px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    overflow-wrap: anywhere;
+}
+
+.run-progress-fields dd {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 12px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.run-progress-stages {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border);
+}
+
+.run-progress-stages h4 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 13px;
+}
+
+.run-progress-stage-legend,
+.run-progress-stage-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.run-progress-stage-legend { margin-top: 8px; }
+.run-progress-stage-list { margin-top: 8px; }
+
+.run-progress-stage {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 24px;
+    padding: 3px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.run-progress-stage--completed { background: #052e16; border-color: #166534; color: #bbf7d0; }
+.run-progress-stage--current { background: #172554; border-color: #1d4ed8; color: #bfdbfe; }
+.run-progress-stage--pending { background: #1f2937; border-color: #4b5563; color: #d1d5db; }
+.run-progress-stage--warning { background: #431407; border-color: #9a3412; color: #fed7aa; }
+.run-progress-stage--error { background: #450a0a; border-color: #991b1b; color: #fecaca; }
+.run-progress-stage--not-run,
+.run-progress-stage--unavailable { background: var(--color-bg); color: var(--color-text-muted); }
+
+@media (max-width: 640px) {
+    .run-progress-panel__header,
+    .run-progress-stages__header {
+        flex-direction: column;
+    }
+}
+
 /* MIRROR.10: read-only Mirror Tunnel operator panel. */
 .mirror-tunnel-panel {
     margin-top: 16px;
