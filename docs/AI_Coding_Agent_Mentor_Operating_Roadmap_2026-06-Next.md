@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (88 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 4 OPS + 15 MIRROR + 13 UX).
-- The phase picker currently has two safe candidates: `UX.RUN.1` and `MIRROR.13`.
-- The top recommendation is `UX.RUN.1` - Run Progress / Operator Visibility.
+- The phase registry is valid (89 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 4 OPS + 15 MIRROR + 14 UX).
+- The phase picker currently has two safe candidates: `UX.RUN.2` and `MIRROR.13`.
+- The top recommendation is `UX.RUN.2` - Run Progress Snapshot Loader.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -41,7 +41,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 ### Validation State
 
 - Registry validation is passing.
-- The current phase picker result recommends `UX.RUN.1` after OPS.TEST.CLOSE froze the test-runtime planning branch.
+- The current phase picker result recommends `UX.RUN.2` after UX.RUN.1 defined the read-only run progress visibility contract.
 - The old roadmap arc is complete and should not be stretched to imply new authorization.
 
 ### Benchmark State
@@ -140,9 +140,10 @@ operator report, all report-only and without runtime enforcement. HARDEN.CLOSE
 has now frozen HARDEN.N1-N4 as a non-enforcing planning branch. OPS.TEST.1,
 OPS.TEST.2, OPS.TEST.3, and OPS.TEST.CLOSE have also shipped, freezing the
 test-runtime planning branch before executable manifests or runner commands.
-The phase picker now recommends **UX.RUN.1 - Run Progress / Operator
-Visibility** so the product can make long-running runs less silent for the
-operator. MIRROR.13 remains a proposed Mirror candidate, ranked after UX.RUN.1.
+The phase picker now recommends **UX.RUN.2 - Run Progress Snapshot Loader** so
+existing progress snapshot artifacts can be loaded read-only after UX.RUN.1 made
+the progress-stage contract visible. MIRROR.13 remains a proposed Mirror
+candidate, ranked after UX.RUN.2.
 
 ### Branch CMD — Commander Mode
 
@@ -234,12 +235,12 @@ Recommended branch order:
 4. MODEL - shipped through MODEL.CLOSE
 5. UX - shipped through UX.CLOSE
 6. ADOPT - shipped through ADOPT.MODEL.CLOSE
-7. MIRROR - proposed through MIRROR.13, but currently ranked after UX.RUN.1
+7. MIRROR - proposed through MIRROR.13, but currently ranked after UX.RUN.2
 8. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, HUMAN.N2 defined explicit human confirmation signals before dangerous actions, HUMAN.N3 added dry-run sample token validation against that contract without enforcing runtime behavior, HUMAN.N4 added documentation-only valid, warning, invalid, and blocked sample tokens, HUMAN.CLOSE froze the human authority branch, ADOPT.MODEL.1 adopted the advisory model-role catalog artifact, ADOPT.MODEL.2 verified post-adoption coverage against the active 10-role catalog, ADOPT.MODEL.CLOSE froze the adoption branch through a report-only checkpoint, HARDEN.CLOSE froze the approval-enforcement planning branch, and OPS.TEST.CLOSE froze the test-runtime planning branch. The current picker recommendation is UX.RUN.1, which should improve operator visibility for long-running runs before more test-runner operations.
+CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, HUMAN.N2 defined explicit human confirmation signals before dangerous actions, HUMAN.N3 added dry-run sample token validation against that contract without enforcing runtime behavior, HUMAN.N4 added documentation-only valid, warning, invalid, and blocked sample tokens, HUMAN.CLOSE froze the human authority branch, ADOPT.MODEL.1 adopted the advisory model-role catalog artifact, ADOPT.MODEL.2 verified post-adoption coverage against the active 10-role catalog, ADOPT.MODEL.CLOSE froze the adoption branch through a report-only checkpoint, HARDEN.CLOSE froze the approval-enforcement planning branch, OPS.TEST.CLOSE froze the test-runtime planning branch, and UX.RUN.1 defined the read-only run progress visibility contract. The current picker recommendation is UX.RUN.2, which should load existing progress snapshots read-only before more test-runner operations.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -1088,18 +1089,26 @@ branch. Its expected current status is
 `test_runtime_operations_branch_frozen_with_warnings` because executable suite
 manifest files and runner commands remain intentionally unimplemented.
 
-**UX.RUN.1 - Run Progress / Operator Visibility is proposed.**
-UX.RUN.1 is the current phase picker recommendation. It should make C.A.T.T.U.S
-less silent during long-running local runs before the project continues into
-executable test-suite operations. Alternative next phase: OPS.TEST.4 -
-Executable Suite Manifest Design.
+**UX.RUN.1 - Run Progress / Operator Visibility is shipped 2026-07-09 (complete).**
+UX.RUN.1 defines the read-only progress-stage contract/report, writes
+`.agent/ux/run_progress_visibility/run_progress_visibility_report.json` and
+`.agent/ux/run_progress_visibility/run_progress_visibility_report.md`, and keeps
+live streaming/polling as future work. Its expected current status is
+`run_progress_visibility_ready_with_warnings`.
+
+**UX.RUN.2 - Run Progress Snapshot Loader is proposed.**
+UX.RUN.2 is the current phase picker recommendation. It should add a
+GET-only/read-only loader for existing progress snapshot artifacts, without
+creating live progress, polling active runs, changing execution behavior, calling
+models, launching workers, applying patches, or running validation/benchmarks.
+Alternative next phase: OPS.TEST.4 - Executable Suite Manifest Design.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
 improve live trace frame capture quality after the MIRROR.CLOSE3 freeze, while
 keeping Mirror evidence report-only, advisory, non-blocking, and free of runtime
 scoring or UI approval-gate behavior. The current top picker recommendation is
-UX.RUN.1.
+UX.RUN.2.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
@@ -1290,7 +1299,7 @@ tokens, issue or consume tokens, approve or reject real actions, apply patches,
 validate, benchmark, invoke MCP tools, launch workers, call or route models,
 contact network services, write to a database, change route behavior, change
 auth policy, push, merge, or open PRs. MIRROR.13 remains a proposed Mirror
-candidate, but UX.RUN.1 is now the current picker recommendation.
+candidate, but UX.RUN.2 is now the current picker recommendation.
 
 ### OPS.TEST.CLOSE - Test Runtime Operations Branch Checkpoint
 
@@ -1309,7 +1318,7 @@ any executable suite manifests, runner commands, or CI changes are added.
 timeout as pass; hide failures; add executable runner behavior; alter runtime
 routes; change auth; call or route models; launch workers; apply patches; invoke
 MCP tools; contact network services; write to a database; push, merge, or open
-PRs. Recommended next phase: UX.RUN.1 - Run Progress / Operator Visibility.
+PRs. Recommended next phase: UX.RUN.2 - Run Progress Snapshot Loader.
 
 ### HARDEN.N1 - Approval Enforcement Readiness Audit
 
