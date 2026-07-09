@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-07-08T00:00:00+09:00",
+  "updated_at": "2026-07-09T00:00:00+09:00",
   "phases": [
     {
       "phase_id": "ROAD.1",
@@ -3054,14 +3054,14 @@
       "phase_id": "OPS.TEST.2",
       "title": "Slow Test Timing Collector",
       "track": "OPS",
-      "status": "proposed",
+      "status": "complete",
       "summary": "Report-only collector/parser for pytest timing data that identifies slowest test files and recommends suite splitting without deleting or weakening tests.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
       "allowed_files": [
         "core/slow_test_timing_collector.py",
-        "scripts/create_slow_test_timing_collector.py",
+        "scripts/create_slow_test_timing_report.py",
         "tests/test_slow_test_timing_collector.py",
         "tests/test_phase_registry.py",
         "tests/test_phase_picker.py",
@@ -3094,12 +3094,121 @@
         "OPS.TEST.1"
       ],
       "expected_artifacts": [
-        ".agent/ops/slow_test_timing_collector/slow_test_timing_collector.json",
-        ".agent/ops/slow_test_timing_collector/slow_test_timing_collector.md"
+        ".agent/ops/slow_test_timing_collector/slow_test_timing_report.json",
+        ".agent/ops/slow_test_timing_collector/slow_test_timing_report.md"
       ],
       "notes": [
-        "Proposed follow-up after OPS.TEST.1. It should collect or parse test timing data to identify the slowest test files and recommend suite splitting.",
-        "Must remain report-only and test-policy-only. It must not delete tests, weaken safety coverage, hide failures, treat timeout as pass, change production behavior, alter runtime routes, change auth, call models, route models, launch workers, apply patches, invoke MCP tools, contact network services, write databases, push, merge, or open PRs."
+        "OPS.TEST.2 shipped 2026-07-09 as a report-only slow test timing collector. It parses pytest duration/progress text, accepts manual timing maps, provides sample fallback data, aggregates slowest tests/files, buckets runtime, and recommends safe suite splitting.",
+        "Expected current status is slow_test_timing_report_ready_with_warnings when produced from sample/manual timing data and slow_test_timing_report_ready when real timing data is parsed.",
+        "It does not require running full pytest, execute pytest from the CLI, delete tests, weaken safety coverage, hide failures, treat timeout as pass, change production behavior, alter runtime routes, change auth, call models, route models, launch workers, apply patches, mutate benchmark cases, contact network services, write databases, push, merge, or open PRs. Recommended next phase: OPS.TEST.3 - Suite Split Manifest Plan. Alternative: UX.RUN.1 - Run Progress / Operator Visibility."
+      ]
+    },
+    {
+      "phase_id": "OPS.TEST.3",
+      "title": "Suite Split Manifest Plan",
+      "track": "OPS",
+      "status": "complete",
+      "summary": "Report-only plan for named suite manifests such as smoke, phase, branch, registry_picker, benchmark, full, nightly, and release_freeze without changing test behavior.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/test_suite_split_manifest_plan.py",
+        "scripts/create_test_suite_split_manifest_plan.py",
+        "tests/test_test_suite_split_manifest_plan.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/ops/test_suite_split_manifest_plan/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_test_suite_split_manifest_plan.py -q",
+        "python -m pytest tests/test_test_suite_runtime_profile_audit.py tests/test_slow_test_timing_collector.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "OPS.TEST.2"
+      ],
+      "expected_artifacts": [
+        ".agent/ops/test_suite_split_manifest_plan/test_suite_split_manifest_plan.json",
+        ".agent/ops/test_suite_split_manifest_plan/test_suite_split_manifest_plan.md"
+      ],
+      "notes": [
+        "OPS.TEST.3 shipped 2026-07-09 as a report-only suite split manifest plan. It defines smoke, phase, branch, registry_picker, benchmark, full, nightly, and release_freeze profiles, command templates, required gates by context, timeout policy, failure reporting policy, and no-weakening guardrails.",
+        "Expected current status is test_suite_split_manifest_plan_ready_with_warnings because executable suite manifest files are intentionally deferred to a future phase.",
+        "It does not move tests, delete tests, skip tests, weaken safety coverage, hide failures, treat timeout as pass, change production behavior, alter runtime routes, change auth, call models, route models, launch workers, apply patches, mutate benchmark cases, contact network services, write databases, push, merge, or open PRs. Recommended next phase: OPS.TEST.CLOSE - Test Runtime Operations Branch Checkpoint. Alternative: UX.RUN.1 - Run Progress / Operator Visibility."
+      ]
+    },
+    {
+      "phase_id": "OPS.TEST.CLOSE",
+      "title": "Test Runtime Operations Branch Checkpoint",
+      "track": "OPS",
+      "status": "complete",
+      "summary": "Report-only checkpoint that freezes OPS.TEST.1-OPS.TEST.3 as a complete, safe, non-mutating test-runtime planning branch before executable manifests, runner commands, or CI changes.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/test_runtime_operations_branch_checkpoint.py",
+        "scripts/create_test_runtime_operations_branch_checkpoint.py",
+        "tests/test_test_runtime_operations_branch_checkpoint.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/ops/test_runtime_operations_branch_checkpoint/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_test_runtime_operations_branch_checkpoint.py -q",
+        "python -m pytest tests/test_test_suite_runtime_profile_audit.py tests/test_slow_test_timing_collector.py tests/test_test_suite_split_manifest_plan.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "OPS.TEST.3"
+      ],
+      "expected_artifacts": [
+        ".agent/ops/test_runtime_operations_branch_checkpoint/test_runtime_operations_branch_checkpoint.json",
+        ".agent/ops/test_runtime_operations_branch_checkpoint/test_runtime_operations_branch_checkpoint.md"
+      ],
+      "notes": [
+        "OPS.TEST.CLOSE shipped 2026-07-09 as a report-only checkpoint. It verifies OPS.TEST.1, OPS.TEST.2, and OPS.TEST.3 are complete, their artifacts exist, runtime profiles and suite manifest plans are present, timeout policy is explicit, full pytest pass requires successful pytest exit, timeout is not treated as pass, and no weakening or hidden-failure policy is present.",
+        "Expected current status is test_runtime_operations_branch_frozen_with_warnings because executable suite manifest files and runner commands are intentionally deferred to a future phase.",
+        "It does not move, delete, skip, or weaken tests; change test behavior; hide failures; treat timeout as pass; change production behavior; call models; launch workers; apply patches; mutate benchmark cases; contact network services; write databases; add executable test runner changes; push, merge, or open PRs. Recommended next phase: UX.RUN.1 - Run Progress / Operator Visibility. Alternative: OPS.TEST.4 - Executable Suite Manifest Design."
       ]
     },
     {
@@ -3911,6 +4020,58 @@
       "notes": [
         "Proposed MIRROR.13 phase. It should plan capture-quality improvements for live trace frames after MIRROR.CLOSE3 freezes the current live/UI chain.",
         "Must remain report-only and advisory. It must not call models, apply patches, run validation or benchmarks, invoke MCP tools, launch workers, execute Dream actions, use Docker/subprocess, contact network services, write to a database, change route/auth behavior, score at runtime, mutate live traces or previews, add UI approval gates, block execution, push, merge, or open PRs."
+      ]
+    },
+    {
+      "phase_id": "UX.RUN.1",
+      "title": "Run Progress / Operator Visibility",
+      "track": "UX",
+      "status": "proposed",
+      "summary": "Report-only UX plan for making C.A.T.T.U.S less silent during long-running local runs by defining operator-visible progress states, status copy, evidence surfaces, and non-mutating UI integration boundaries.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/run_progress_operator_visibility.py",
+        "scripts/create_run_progress_operator_visibility.py",
+        "tests/test_run_progress_operator_visibility.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/ux/run_progress_operator_visibility/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_run_progress_operator_visibility.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "OPS.TEST.CLOSE"
+      ],
+      "expected_artifacts": [
+        ".agent/ux/run_progress_operator_visibility/run_progress_operator_visibility.json",
+        ".agent/ux/run_progress_operator_visibility/run_progress_operator_visibility.md"
+      ],
+      "notes": [
+        "Recommended next phase after OPS.TEST.CLOSE. It should make long-running local runs more visible to the operator before continuing test-runner operations.",
+        "Must remain conservative and operator-visible. It must not start runs automatically, add execution authority, call models, apply patches, run validation or benchmarks as part of report generation, contact network services, launch workers, write databases, change auth policy, hide failures, skip tests, push, merge, or open PRs."
       ]
     },
     {
