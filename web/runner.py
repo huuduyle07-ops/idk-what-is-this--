@@ -54,10 +54,12 @@ from patching.patch_gates import (
 )
 from core.source_snippet_fallback import hydrate_control_source_from_scout
 from core.mirror_tunnel_shadow_live_trace import maybe_write_shadow_live_trace
+from core.run_progress_snapshot_shadow_writer import safe_write_run_progress_snapshot
 from web.mcp_inspector_processes import stop_mcp_inspectors
 
 
 _WINDOWS_PATH_HINT_RE = re.compile(r"[A-Za-z]:[\\/][^\s\"'<>|]+")
+_RUN_PROGRESS_SNAPSHOT_ROOT = Path(__file__).resolve().parent.parent
 
 
 def run_web_app(flask_app, **run_kwargs) -> None:
@@ -232,6 +234,32 @@ def _maybe_write_web_shadow_live_trace(
         final_answer=final_answer,
         boundary="web.runner.run_agent_web.final_result",
     )
+    return result
+
+
+def _maybe_write_run_progress_snapshot_shadow(
+    *,
+    result: dict,
+    session_id: Any,
+    mode: str,
+    outcome: str,
+) -> dict:
+    """Observe one terminal result without changing the result returned to the UI."""
+    try:
+        safe_write_run_progress_snapshot(
+            session_id,
+            repo_root=_RUN_PROGRESS_SNAPSHOT_ROOT,
+            outcome=outcome,
+            metadata={
+                "mode": mode,
+                "source_component": "web.runner",
+                "result_type": "terminal_error" if outcome == "error" else "terminal_response",
+            },
+        )
+    except Exception:
+        # The writer is an optional shadow observer.  Preserve the original run
+        # result even if a future implementation unexpectedly fails here.
+        pass
     return result
 
 
@@ -561,6 +589,12 @@ def run_agent_web(
             "runtime_environment_description": runtime_description,
             **_harness_payload(post_gate_decision),
         }
+        _maybe_write_run_progress_snapshot_shadow(
+            result=result,
+            session_id=session_id,
+            mode=mode,
+            outcome="success",
+        )
         return _maybe_write_web_shadow_live_trace(
             result=result,
             query=query,
@@ -573,7 +607,7 @@ def run_agent_web(
         )
 
     except Exception as e:
-        return {
+        result = {
             "answer": f"Error: {str(e)}",
             "context": "",
             "graph": "",
@@ -587,3 +621,9 @@ def run_agent_web(
             "runtime_environment_description": runtime_description,
             **_harness_payload(base_harness_decision),
         }
+        return _maybe_write_run_progress_snapshot_shadow(
+            result=result,
+            session_id=locals().get("session_id", ""),
+            mode=mode,
+            outcome="error",
+        )
