@@ -54,7 +54,11 @@ from patching.patch_gates import (
 )
 from core.source_snippet_fallback import hydrate_control_source_from_scout
 from core.mirror_tunnel_shadow_live_trace import maybe_write_shadow_live_trace
-from core.run_progress_snapshot_shadow_writer import safe_write_run_progress_snapshot
+from core.run_progress_snapshot_shadow_writer import (
+    is_run_progress_shadow_writer_enabled,
+    safe_update_run_progress_snapshot_shadow,
+    safe_write_run_progress_snapshot,
+)
 from web.mcp_inspector_processes import stop_mcp_inspectors
 
 
@@ -263,6 +267,32 @@ def _maybe_write_run_progress_snapshot_shadow(
     return result
 
 
+def _new_run_progress_shadow_run_id() -> str:
+    """Create one internal safe ID only when the default-off writer is enabled."""
+    return f"run_{uuid.uuid4().hex}" if is_run_progress_shadow_writer_enabled() else ""
+
+
+def _maybe_update_run_progress_snapshot_shadow(
+    *,
+    run_id: str,
+    mode: str,
+    stage_id: str,
+) -> None:
+    """Observe a real boundary without allowing progress to control execution."""
+    if not run_id:
+        return
+    try:
+        safe_update_run_progress_snapshot_shadow(
+            run_id,
+            stage_id=stage_id,
+            repo_root=_RUN_PROGRESS_SNAPSHOT_ROOT,
+            source_component="web.runner",
+            mode=mode,
+        )
+    except Exception:
+        pass
+
+
 def run_agent_web(
     query: str,
     repo_path: str,
@@ -444,6 +474,7 @@ def run_agent_web(
         harness_mode_decision=base_harness_decision.to_dict(),
     )
 
+    shadow_run_id = ""
     try:
         try:
             session_id = create_session(
@@ -456,6 +487,12 @@ def run_agent_web(
             print(f"⚠️ DB session disabled: {e}")
             session_id = f"no-db-{uuid.uuid4().hex[:8]}"
         state.session_id = session_id
+        shadow_run_id = _new_run_progress_shadow_run_id()
+        _maybe_update_run_progress_snapshot_shadow(
+            run_id=shadow_run_id,
+            mode=mode,
+            stage_id="request_received",
+        )
         # Recover exact source_snippet when Tree-sitter/CONTROL cannot localize,
         # but Scout has identified a likely file/symbol.
         if state.control_result and state.control_result.get("scout") and state.repo_path:
@@ -532,6 +569,11 @@ def run_agent_web(
                 except Exception as e:
                     print(f"⚠️ DB memory save skipped: {e}")
         draft = run_draft_pipeline(state)
+        _maybe_update_run_progress_snapshot_shadow(
+            run_id=shadow_run_id,
+            mode=mode,
+            stage_id="model_response_received",
+        )
         reviewed = run_review_pipeline(state, draft)
         finalize_answer(state, reviewed)
         run_postprocess_gate_battery(
@@ -591,7 +633,7 @@ def run_agent_web(
         }
         _maybe_write_run_progress_snapshot_shadow(
             result=result,
-            session_id=session_id,
+            session_id=shadow_run_id,
             mode=mode,
             outcome="success",
         )
@@ -623,7 +665,7 @@ def run_agent_web(
         }
         return _maybe_write_run_progress_snapshot_shadow(
             result=result,
-            session_id=locals().get("session_id", ""),
+            session_id=shadow_run_id,
             mode=mode,
             outcome="error",
         )
