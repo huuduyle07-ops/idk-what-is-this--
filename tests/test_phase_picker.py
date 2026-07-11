@@ -560,9 +560,9 @@ def test_seed_registry_produces_expected_buckets():
         "human_approval_required": 0,
         "blocked": 0,
         "deferred_or_parked": 0,
-        "complete_or_history": 88,
+        "complete_or_history": 97,
     }
-    assert report["top_recommendation"]["phase_id"] == "UX.RUN.3"
+    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
     assert report["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"
 
 
@@ -570,8 +570,8 @@ def test_seed_safe_candidates_sorted_deterministically():
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     report = _report(data, report_id="r", created_at="t")
     ids = [p["phase_id"] for p in report["safe_to_prepare"]]
-    # Completed phases drop out; UX.RUN.3 is ranked ahead of MIRROR.13 by track order.
-    assert ids == ["UX.RUN.3", "MIRROR.13"]
+    # Completed phases drop out; UX.LIVE.8 is ranked ahead of MIRROR.13 by track order.
+    assert ids == ["UX.LIVE.8", "MIRROR.13"]
 
 
 def test_seed_shipped_phases_are_complete_and_not_recommended():
@@ -580,7 +580,7 @@ def test_seed_shipped_phases_are_complete_and_not_recommended():
     # shipped before that.
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     statuses = {p["phase_id"]: p["status"] for p in data["phases"]}
-    shipped = ["ROAD.1", "ROAD.2", "ROAD.3", "ROAD.4", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3", "MODEL.N1", "MODEL.N2", "MODEL.N3", "MODEL.N4", "MODEL.N5", "MODEL.N6", "MODEL.N7", "MODEL.CLOSE", "EVAL.1", "EVAL.2", "EVAL.3", "EVAL.N1", "EVAL.N2", "EVAL.N3", "EVAL.N4", "EVAL.N5", "EVAL.N6", "EVAL.N7", "EVAL.CLOSE", "HUMAN.N1", "HUMAN.N2", "HUMAN.N3", "HUMAN.N4", "HUMAN.CLOSE", "ADOPT.MODEL.1", "ADOPT.MODEL.2", "ADOPT.MODEL.CLOSE", "CMD.1", "CMD.2", "CMD.3", "CMD.4", "CMD.N1", "CMD.N2", "CMD.N3", "CMD.N4", "CMD.N5", "CMD.N6", "CMD.CLOSE", "HARDEN.N1", "HARDEN.N2", "HARDEN.N3", "HARDEN.N4", "HARDEN.1", "HARDEN.2", "HARDEN.3", "HARDEN.CLOSE", "OPS.TEST.1", "OPS.TEST.2", "OPS.TEST.3", "OPS.TEST.CLOSE", "UX.RUN.1", "UX.RUN.2", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE", "MIRROR.7", "MIRROR.8", "MIRROR.9", "MIRROR.10", "MIRROR.11", "MIRROR.12", "MIRROR.CLOSE3"]
+    shipped = ["ROAD.1", "ROAD.2", "ROAD.3", "ROAD.4", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3", "MODEL.N1", "MODEL.N2", "MODEL.N3", "MODEL.N4", "MODEL.N5", "MODEL.N6", "MODEL.N7", "MODEL.CLOSE", "EVAL.1", "EVAL.2", "EVAL.3", "EVAL.N1", "EVAL.N2", "EVAL.N3", "EVAL.N4", "EVAL.N5", "EVAL.N6", "EVAL.N7", "EVAL.CLOSE", "HUMAN.N1", "HUMAN.N2", "HUMAN.N3", "HUMAN.N4", "HUMAN.CLOSE", "ADOPT.MODEL.1", "ADOPT.MODEL.2", "ADOPT.MODEL.CLOSE", "CMD.1", "CMD.2", "CMD.3", "CMD.4", "CMD.N1", "CMD.N2", "CMD.N3", "CMD.N4", "CMD.N5", "CMD.N6", "CMD.CLOSE", "HARDEN.N1", "HARDEN.N2", "HARDEN.N3", "HARDEN.N4", "HARDEN.1", "HARDEN.2", "HARDEN.3", "HARDEN.CLOSE", "OPS.TEST.1", "OPS.TEST.2", "OPS.TEST.3", "OPS.TEST.CLOSE", "UX.RUN.1", "UX.RUN.2", "UX.RUN.3", "UX.RUN.CLOSE", "UX.LIVE.1", "UX.LIVE.2", "UX.LIVE.3", "UX.LIVE.4", "UX.LIVE.5", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE", "MIRROR.7", "MIRROR.8", "MIRROR.9", "MIRROR.10", "MIRROR.11", "MIRROR.12", "MIRROR.CLOSE3"]
     for pid in shipped:
         assert statuses[pid] == "complete", pid
     report = _report(data, report_id="r", created_at="t")
@@ -588,7 +588,7 @@ def test_seed_shipped_phases_are_complete_and_not_recommended():
     assert set(shipped) <= history_ids
     safe = {p["phase_id"] for p in report["safe_to_prepare"]}
     assert not (set(shipped) & safe)
-    assert report["top_recommendation"]["phase_id"] == "UX.RUN.3"
+    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
 
 
 # ── purity / constants ─────────────────────────────────────────────────────────

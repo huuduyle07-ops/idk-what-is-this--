@@ -274,16 +274,26 @@ def test_renderer_is_pure_and_defaults_match_spec():
     assert DEFAULT_OUTPUT_ROOT == Path(".agent") / "ux" / "run_progress_visibility_branch_checkpoint"
 
 
-def test_real_registry_closes_run_progress_branch_and_recommends_live_plan():
+def test_real_registry_closes_run_progress_branch_and_recommends_live_5():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
     assert by_id["UX.RUN.CLOSE"]["status"] == "complete"
     assert by_id["UX.RUN.CLOSE"]["prerequisites"] == ["UX.RUN.3"]
-    assert by_id["UX.LIVE.1"]["status"] == "proposed"
+    assert by_id["UX.LIVE.1"]["status"] == "complete"
     assert by_id["UX.LIVE.1"]["prerequisites"] == ["UX.RUN.CLOSE"]
+    assert by_id["UX.LIVE.2"]["status"] == "complete"
+    assert by_id["UX.LIVE.2"]["prerequisites"] == ["UX.LIVE.1"]
+    assert by_id["UX.LIVE.3"]["status"] == "complete"
+    assert by_id["UX.LIVE.3"]["prerequisites"] == ["UX.LIVE.2"]
+    assert by_id["UX.LIVE.4"]["status"] == "complete"
+    assert by_id["UX.LIVE.4"]["prerequisites"] == ["UX.LIVE.3"]
+    assert by_id["UX.LIVE.5"]["status"] == "complete"
+    assert by_id["UX.LIVE.5"]["prerequisites"] == ["UX.LIVE.4"]
+    assert by_id["UX.LIVE.6"]["status"] == "complete"
+    assert by_id["UX.LIVE.6"]["prerequisites"] == ["UX.LIVE.5"]
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="ux-run-close", created_at="t")
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.1"
-    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["UX.LIVE.1", "MIRROR.13"]
+    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
+    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["UX.LIVE.8", "MIRROR.13"]
 
 
 def test_checkpoint_source_does_not_execute_runtime_work():

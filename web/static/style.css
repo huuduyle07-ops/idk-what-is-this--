@@ -4934,6 +4934,19 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     font-size: 13px;
 }
 
+/* UX.LIVE.6: an observation-only control, intentionally visually secondary. */
+.run-progress-refresh-button {
+    padding: 6px 9px;
+    border-color: var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.run-progress-refresh-button:not(:disabled):hover {
+    color: var(--color-text);
+}
+
 .run-progress-badge {
     display: inline-flex;
     align-items: center;

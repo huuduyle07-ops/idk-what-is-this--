@@ -401,14 +401,30 @@ def test_registry_tracks_completed_ux_run_3_and_checkpoint_after_loader():
     assert by_id["UX.RUN.3"]["status"] == "complete"
     assert by_id["UX.RUN.3"]["title"] == "Run Progress UI Panel Stub"
     assert by_id["UX.RUN.3"]["prerequisites"] == ["UX.RUN.2"]
-    assert by_id["UX.RUN.CLOSE"]["status"] == "proposed"
+    assert by_id["UX.RUN.CLOSE"]["status"] == "complete"
     assert by_id["UX.RUN.CLOSE"]["prerequisites"] == ["UX.RUN.3"]
+    assert by_id["UX.LIVE.1"]["status"] == "complete"
+    assert by_id["UX.LIVE.1"]["prerequisites"] == ["UX.RUN.CLOSE"]
+    assert by_id["UX.LIVE.2"]["status"] == "complete"
+    assert by_id["UX.LIVE.2"]["prerequisites"] == ["UX.LIVE.1"]
+    assert by_id["UX.LIVE.3"]["status"] == "complete"
+    assert by_id["UX.LIVE.3"]["prerequisites"] == ["UX.LIVE.2"]
+    assert by_id["UX.LIVE.4"]["status"] == "complete"
+    assert by_id["UX.LIVE.4"]["prerequisites"] == ["UX.LIVE.3"]
+    assert by_id["UX.LIVE.5"]["status"] == "complete"
+    assert by_id["UX.LIVE.5"]["prerequisites"] == ["UX.LIVE.4"]
+    assert by_id["UX.LIVE.6"]["status"] == "complete"
+    assert by_id["UX.LIVE.6"]["prerequisites"] == ["UX.LIVE.5"]
+    assert by_id["UX.LIVE.7"]["status"] == "complete"
+    assert by_id["UX.LIVE.7"]["prerequisites"] == ["UX.LIVE.6"]
+    assert by_id["UX.LIVE.8"]["status"] == "proposed"
+    assert by_id["UX.LIVE.8"]["prerequisites"] == ["UX.LIVE.7"]
 
 
-def test_phase_picker_recommends_ux_run_close_after_loader():
+def test_phase_picker_recommends_ux_live_plan_after_loader_checkpoint():
     data = load_phase_registry(REGISTRY_PATH)
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="r", created_at="t")
 
-    assert report["top_recommendation"]["phase_id"] == "UX.RUN.CLOSE"
+    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
     safe_ids = [phase["phase_id"] for phase in report["safe_to_prepare"]]
-    assert safe_ids[:2] == ["UX.RUN.CLOSE", "MIRROR.13"]
+    assert safe_ids[:2] == ["UX.LIVE.8", "MIRROR.13"]

@@ -218,7 +218,7 @@ def test_cli_writes_report_and_prints_summary_json(tmp_path, capsys):
     assert Path(printed["md_path"]).is_file()
 
 
-def test_registry_tracks_completed_ux_run_3_and_proposed_checkpoint():
+def test_registry_tracks_completed_ux_run_3_and_completed_checkpoint():
     registry_path = Path(__file__).parent.parent / "docs" / "roadmap" / "phase_registry.json"
     data = load_phase_registry(registry_path)
     result = validate_phase_registry(data)
@@ -236,18 +236,30 @@ def test_registry_tracks_completed_ux_run_3_and_proposed_checkpoint():
     assert by_id["UX.RUN.3"]["status"] == "complete"
     assert by_id["UX.RUN.3"]["title"] == "Run Progress UI Panel Stub"
     assert by_id["UX.RUN.3"]["prerequisites"] == ["UX.RUN.2"]
-    assert by_id["UX.RUN.CLOSE"]["status"] == "proposed"
+    assert by_id["UX.RUN.CLOSE"]["status"] == "complete"
     assert by_id["UX.RUN.CLOSE"]["prerequisites"] == ["UX.RUN.3"]
+    assert by_id["UX.LIVE.1"]["status"] == "complete"
+    assert by_id["UX.LIVE.1"]["prerequisites"] == ["UX.RUN.CLOSE"]
+    assert by_id["UX.LIVE.2"]["status"] == "complete"
+    assert by_id["UX.LIVE.2"]["prerequisites"] == ["UX.LIVE.1"]
+    assert by_id["UX.LIVE.3"]["status"] == "complete"
+    assert by_id["UX.LIVE.3"]["prerequisites"] == ["UX.LIVE.2"]
+    assert by_id["UX.LIVE.4"]["status"] == "complete"
+    assert by_id["UX.LIVE.4"]["prerequisites"] == ["UX.LIVE.3"]
+    assert by_id["UX.LIVE.5"]["status"] == "complete"
+    assert by_id["UX.LIVE.5"]["prerequisites"] == ["UX.LIVE.4"]
+    assert by_id["UX.LIVE.6"]["status"] == "complete"
+    assert by_id["UX.LIVE.6"]["prerequisites"] == ["UX.LIVE.5"]
 
 
-def test_phase_picker_recommends_ux_run_close():
+def test_phase_picker_recommends_ux_live_plan_after_checkpoint():
     registry_path = Path(__file__).parent.parent / "docs" / "roadmap" / "phase_registry.json"
     data = load_phase_registry(registry_path)
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="r", created_at="t")
 
-    assert report["top_recommendation"]["phase_id"] == "UX.RUN.CLOSE"
+    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
     safe_ids = [phase["phase_id"] for phase in report["safe_to_prepare"]]
-    assert safe_ids[:2] == ["UX.RUN.CLOSE", "MIRROR.13"]
+    assert safe_ids[:2] == ["UX.LIVE.8", "MIRROR.13"]
 
 
 def test_guardrails_have_all_runtime_power_flags_false():

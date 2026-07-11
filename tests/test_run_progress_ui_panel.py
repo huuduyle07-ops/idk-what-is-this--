@@ -86,21 +86,26 @@ def test_panel_exposes_every_requested_snapshot_field_without_action_controls():
         "snapshot_id",
         "snapshot_status",
         "current_stage_id",
+        "observed_stage_ids",
         "completed_stage_ids",
         "pending_stage_ids",
         "warning_stage_ids",
         "error_stage_ids",
+        "updated_at",
+        "sequence_number",
+        "terminal",
         "progress_notice",
         "simulated_only",
         "live_stream_enabled",
         "polling_enabled",
         "runtime_behavior_changed",
         "warnings",
+        "errors",
         "blocked_reasons",
     ):
         assert f">{field}<" in panel
 
-    assert _button_labels(panel) == ["Load snapshot"]
+    assert _button_labels(panel) == ["Refresh progress", "Load associated snapshot", "Load snapshot"]
     for forbidden in (
         "Apply",
         "Run",
@@ -139,7 +144,7 @@ def test_stage_chips_distinguish_every_visibility_state_and_not_run_is_not_passe
 def test_panel_javascript_uses_only_operator_initiated_get_and_renders_error_states():
     js = _panel_js()
 
-    assert "async function loadRunProgressSnapshot(snapshotId)" in js
+    assert "async function loadRunProgressSnapshot(snapshotId, options = {})" in js
     assert "function renderRunProgressSnapshot" in js
     assert 'fetch("/ux/run-progress/snapshot/" + safeId, { method: "GET" })' in js
     assert "encodeURIComponent(requestedId)" in js
@@ -203,16 +208,32 @@ def test_panel_has_compact_local_styles_for_panel_and_stage_states():
         assert selector in css
 
 
-def test_registry_marks_ux_run_3_complete_and_adds_ux_run_close_proposed():
+def test_registry_marks_ux_run_3_and_close_complete_then_adds_live_plan():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
     assert by_id["UX.RUN.3"]["status"] == "complete"
     assert by_id["UX.RUN.3"]["prerequisites"] == ["UX.RUN.2"]
     assert by_id["UX.RUN.3"]["expected_artifacts"] == []
-    assert by_id["UX.RUN.CLOSE"]["status"] == "proposed"
+    assert by_id["UX.RUN.CLOSE"]["status"] == "complete"
     assert by_id["UX.RUN.CLOSE"]["title"] == "Run Progress Visibility Branch Checkpoint"
     assert by_id["UX.RUN.CLOSE"]["prerequisites"] == ["UX.RUN.3"]
+    assert by_id["UX.LIVE.1"]["status"] == "complete"
+    assert by_id["UX.LIVE.1"]["prerequisites"] == ["UX.RUN.CLOSE"]
+    assert by_id["UX.LIVE.2"]["status"] == "complete"
+    assert by_id["UX.LIVE.2"]["prerequisites"] == ["UX.LIVE.1"]
+    assert by_id["UX.LIVE.3"]["status"] == "complete"
+    assert by_id["UX.LIVE.3"]["prerequisites"] == ["UX.LIVE.2"]
+    assert by_id["UX.LIVE.4"]["status"] == "complete"
+    assert by_id["UX.LIVE.4"]["prerequisites"] == ["UX.LIVE.3"]
+    assert by_id["UX.LIVE.5"]["status"] == "complete"
+    assert by_id["UX.LIVE.5"]["prerequisites"] == ["UX.LIVE.4"]
+    assert by_id["UX.LIVE.6"]["status"] == "complete"
+    assert by_id["UX.LIVE.6"]["prerequisites"] == ["UX.LIVE.5"]
+    assert by_id["UX.LIVE.7"]["status"] == "complete"
+    assert by_id["UX.LIVE.7"]["prerequisites"] == ["UX.LIVE.6"]
+    assert by_id["UX.LIVE.8"]["status"] == "proposed"
+    assert by_id["UX.LIVE.8"]["prerequisites"] == ["UX.LIVE.7"]
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
@@ -220,7 +241,7 @@ def test_registry_marks_ux_run_3_complete_and_adds_ux_run_close_proposed():
         created_at="2026-07-10T00:00:00+09:00",
     )
     assert report["registry_valid"] is True, report["errors"]
-    assert report["top_recommendation"]["phase_id"] == "UX.RUN.CLOSE"
+    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
     safe_ids = [phase["phase_id"] for phase in report["safe_to_prepare"]]
-    assert safe_ids[:2] == ["UX.RUN.CLOSE", "MIRROR.13"]
+    assert safe_ids[:2] == ["UX.LIVE.8", "MIRROR.13"]
 

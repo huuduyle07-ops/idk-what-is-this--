@@ -197,8 +197,8 @@ def test_existing_terminal_snapshot_at_different_boundary_is_preserved(tmp_path)
 
     result = safe_write_run_progress_snapshot("safe-run", repo_root=tmp_path, enabled=True, outcome="error")
 
-    assert result["writer_status"] == FAILED_ISOLATED
-    assert result["warning"] == "terminal_boundary_changed_snapshot_preserved"
+    assert result["writer_status"] == BLOCKED
+    assert result["blocked_reason"] == "terminal_snapshot_update_rejected"
     assert path.read_text(encoding="utf-8") == before
 
 
@@ -276,13 +276,19 @@ def test_writer_source_has_no_network_database_or_execution_expansion():
         assert forbidden not in source
 
 
-def test_registry_marks_live_3_complete_adds_live_4_and_recommends_it():
+def test_registry_marks_live_3_and_live_4_complete_then_recommends_live_5():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
 
     assert by_id["UX.LIVE.3"]["status"] == "complete"
     assert by_id["UX.LIVE.3"]["prerequisites"] == ["UX.LIVE.2"]
-    assert by_id["UX.LIVE.4"]["status"] == "proposed"
+    assert by_id["UX.LIVE.4"]["status"] == "complete"
     assert by_id["UX.LIVE.4"]["prerequisites"] == ["UX.LIVE.3"]
+    assert by_id["UX.LIVE.5"]["status"] == "complete"
+    assert by_id["UX.LIVE.5"]["prerequisites"] == ["UX.LIVE.4"]
+    assert by_id["UX.LIVE.6"]["status"] == "complete"
+    assert by_id["UX.LIVE.6"]["prerequisites"] == ["UX.LIVE.5"]
+    assert by_id["UX.LIVE.7"]["status"] == "complete"
+    assert by_id["UX.LIVE.7"]["prerequisites"] == ["UX.LIVE.6"]
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="ux-live-3", created_at="t")
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.4"
+    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"

@@ -278,14 +278,20 @@ def test_renderer_is_pure_and_default_output_root_matches_spec():
     assert DEFAULT_OUTPUT_ROOT == Path(".agent") / "ux" / "run_progress_snapshot_writer_plan"
 
 
-def test_real_registry_completes_live_2_adds_live_3_and_recommends_it():
+def test_real_registry_completes_live_2_and_live_3_then_recommends_live_4():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
     assert by_id["UX.LIVE.2"]["status"] == "complete"
-    assert by_id["UX.LIVE.3"]["status"] == "proposed"
+    assert by_id["UX.LIVE.3"]["status"] == "complete"
     assert by_id["UX.LIVE.3"]["prerequisites"] == ["UX.LIVE.2"]
+    assert by_id["UX.LIVE.4"]["status"] == "complete"
+    assert by_id["UX.LIVE.4"]["prerequisites"] == ["UX.LIVE.3"]
+    assert by_id["UX.LIVE.5"]["status"] == "complete"
+    assert by_id["UX.LIVE.5"]["prerequisites"] == ["UX.LIVE.4"]
+    assert by_id["UX.LIVE.6"]["status"] == "complete"
+    assert by_id["UX.LIVE.6"]["prerequisites"] == ["UX.LIVE.5"]
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="ux-live-2", created_at="t")
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.3"
+    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
 
 
 def test_plan_source_has_no_runtime_execution_or_network_path():
