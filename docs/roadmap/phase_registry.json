@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-07-10T00:00:00+09:00",
+  "updated_at": "2026-07-11T00:00:00+09:00",
   "phases": [
     {
       "phase_id": "ROAD.1",
@@ -4477,8 +4477,8 @@
       "phase_id": "UX.LIVE.5",
       "title": "Current Run Snapshot Association",
       "track": "UX",
-      "status": "proposed",
-      "summary": "Read-only association of a current browser/run context with its existing shadow snapshot ID, so an operator need not manually discover or type the ID. It must remain default-off, non-authoritative, manually refreshed, and free of polling, execution decisions, database jobs, and action controls.",
+      "status": "complete",
+      "summary": "Read-only association of a completed browser run with the existing shadow writer's safe snapshot ID, so an operator need not manually discover or type it. The association is page-local, advisory-only, manually loaded through the existing GET route, and free of polling, execution decisions, database jobs, and action controls.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
@@ -4487,8 +4487,9 @@
         "web/runner.py",
         "web/app.py",
         "web/templates/index.html",
-        "tests/test_run_progress_current_snapshot_association.py",
+        "tests/test_current_run_snapshot_association.py",
         "tests/test_run_progress_multistage_shadow_instrumentation.py",
+        "tests/test_run_progress_snapshot_shadow_writer.py",
         "tests/test_run_progress_snapshot_writer_plan.py",
         "tests/test_run_progress_instrumentation_plan.py",
         "tests/test_run_progress_snapshot_loader.py",
@@ -4509,7 +4510,8 @@
       ],
       "validation": [
         "python -m compileall -q core scripts tests benchmarks web",
-        "python -m pytest tests/test_run_progress_current_snapshot_association.py tests/test_run_progress_multistage_shadow_instrumentation.py -q",
+        "python -m pytest tests/test_current_run_snapshot_association.py -q",
+        "python -m pytest tests/test_run_progress_multistage_shadow_instrumentation.py tests/test_run_progress_snapshot_shadow_writer.py -q",
         "python -m pytest tests/test_run_progress_snapshot_loader.py tests/test_run_progress_ui_panel.py -q",
         "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
         "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
@@ -4527,8 +4529,171 @@
       ],
       "expected_artifacts": [],
       "notes": [
-        "Read-only current-run to snapshot-ID association only. It may make an existing snapshot easier to select manually, but must not poll, auto-refresh, or alter execution behavior.",
-        "Do not add action controls, authority, POST routes, a database job system, model routing, workers, patch application, validation/benchmark execution, approval enforcement, retention cleanup, or network delivery beyond existing same-app read-only behaviour."
+        "UX.LIVE.5 shipped 2026-07-11 as a safe advisory association from the existing full-run result to the stable UX.LIVE.4 snapshot ID. The browser receives only a validated slug and keeps it in page-local state; it never receives filesystem paths, repository paths, temporary names, prompts, responses, or raw errors.",
+        "The panel has no polling, auto-refresh, streaming, POST route, writer-enable control, runtime authority, action control, database job system, model routing, worker launch, patch application, validation/benchmark execution, approval enforcement, or cleanup. Snapshot availability only means it may be loaded manually and never implies success, validation, or approval. Recommended next phase: UX.LIVE.6 - Manual Run Progress Refresh."
+      ]
+    },
+    {
+      "phase_id": "UX.LIVE.6",
+      "title": "Manual Run Progress Refresh",
+      "track": "UX",
+      "status": "complete",
+      "summary": "One explicit GET-only refresh of the currently associated safe run-progress snapshot per operator click, with loading and visible error states but no polling, retries, runtime authority, or execution controls.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "web/templates/index.html",
+        "web/static/style.css",
+        "tests/test_manual_run_progress_refresh.py",
+        "tests/test_current_run_snapshot_association.py",
+        "tests/test_run_progress_snapshot_loader.py",
+        "tests/test_run_progress_ui_panel.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_manual_run_progress_refresh.py -q",
+        "python -m pytest tests/test_current_run_snapshot_association.py tests/test_run_progress_ui_panel.py -q",
+        "python -m pytest tests/test_run_progress_snapshot_loader.py -q",
+        "python -m pytest tests/test_run_progress_multistage_shadow_instrumentation.py tests/test_run_progress_snapshot_shadow_writer.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "UX.LIVE.5"
+      ],
+      "expected_artifacts": [],
+      "notes": [
+        "UX.LIVE.6 shipped 2026-07-11 as a compact, page-local, read-only Refresh progress control. An explicit operator click captures only the current validated advisory snapshot ID, performs one GET through the existing loader, and stops. The button is disabled while the request is active and re-enabled after success or a visible failure.",
+        "The refresh is race-protected: if a newer run becomes associated before an earlier response returns, the stale response is ignored rather than rendered for the new run. It renders only the loader-approved snapshot fields and keeps progress advisory; current, completed, terminal, or sequence values do not imply success, validation, approval, patch safety, or execution authority.",
+        "The implementation adds no polling, auto-refresh, automatic retries, streaming, POST, writer enablement, filesystem access, database persistence, runtime authority, actions, model or worker work, patch application, validation/benchmark execution, approval enforcement, or cleanup. Expected current status: manual_run_progress_refresh_ready_with_warnings, because repeated manual clicks are necessary and freshness/staleness classification remains future work. Recommended next phase: UX.LIVE.7 - Bounded Progress Polling Experiment Plan."
+      ]
+    },
+    {
+      "phase_id": "UX.LIVE.7",
+      "title": "Snapshot Freshness and Staleness Plan",
+      "track": "UX",
+      "status": "complete",
+      "summary": "Report-only deterministic contract for classifying existing run-progress snapshots as fresh, recent, terminal, stale, possibly abandoned, unknown, or invalid using only approved metadata. It defines advisory thresholds, timestamp and clock-skew handling, terminal precedence, warning codes, and a narrow UX.LIVE.8 implementation boundary without changing runtime or UI behavior.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/run_progress_freshness_plan.py",
+        "scripts/create_run_progress_freshness_plan.py",
+        "tests/test_run_progress_freshness_plan.py",
+        "docs/roadmap/phase_registry.json",
+        "tests/test_manual_run_progress_refresh.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/ux/run_progress_freshness_plan/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_run_progress_freshness_plan.py -q",
+        "python -m pytest tests/test_manual_run_progress_refresh.py tests/test_current_run_snapshot_association.py -q",
+        "python -m pytest tests/test_run_progress_snapshot_loader.py tests/test_run_progress_ui_panel.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "UX.LIVE.6"
+      ],
+      "expected_artifacts": [
+        ".agent/ux/run_progress_freshness_plan/run_progress_freshness_plan.json",
+        ".agent/ux/run_progress_freshness_plan/run_progress_freshness_plan.md"
+      ],
+      "notes": [
+        "UX.LIVE.7 shipped 2026-07-11 as a report-only snapshot freshness and staleness contract. It writes JSON and Markdown plan artifacts describing approved metadata inputs, timezone-aware UTC time handling, safe default thresholds, deterministic precedence, terminal details, clock-skew handling, malformed timestamp behavior, sequence supporting evidence, warning codes, and the future classifier result schema.",
+        "Freshness remains advisory and unimplemented in this phase. The plan does not read or alter snapshot files, change the writer, runtime instrumentation, loader route, browser behavior, manual refresh, polling, streaming, retries, cleanup, execution, configuration, routes, database state, network state, workers, models, validation, benchmarks, approval, tokens, or authority. Expected current status: run_progress_freshness_plan_ready_with_warnings because the contract is complete but thresholds remain planning defaults and UX.LIVE.8 is not implemented. Recommended next phase: UX.LIVE.8 - Freshness Classification Implementation."
+      ]
+    },
+    {
+      "phase_id": "UX.LIVE.8",
+      "title": "Freshness Classification Implementation",
+      "track": "UX",
+      "status": "proposed",
+      "summary": "Narrow future implementation of the pure deterministic advisory freshness classifier defined by UX.LIVE.7, with derived loader response data and existing-panel display only. It must not alter canonical snapshots, execution, polling, or background behavior.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/run_progress_freshness.py",
+        "tests/test_run_progress_freshness.py",
+        "core/run_progress_snapshot_loader.py",
+        "web/templates/index.html",
+        "tests/test_run_progress_snapshot_loader.py",
+        "tests/test_run_progress_ui_panel.py",
+        "tests/test_run_progress_freshness_plan.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_run_progress_freshness.py tests/test_run_progress_freshness_plan.py -q",
+        "python -m pytest tests/test_run_progress_snapshot_loader.py tests/test_run_progress_ui_panel.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "UX.LIVE.7"
+      ],
+      "expected_artifacts": [],
+      "notes": [
+        "UX.LIVE.8 may implement only the pure deterministic advisory classifier from UX.LIVE.7. It may derive freshness when an existing snapshot is loaded or manually refreshed, include that derived result in the existing GET loader response, and display it in the existing Run Progress panel.",
+        "It must not write freshness data into canonical snapshot artifacts; add polling, streaming, background requests, retries, cleanup, cancellation, restart, execution controls, runtime authority, actions, model routing, worker work, patch application, validation/benchmark execution, approval enforcement, token use, database work, or network probes. Recommended next phase after implementation: UX.LIVE.9 - Bounded Polling Experiment Plan."
       ]
     },
     {

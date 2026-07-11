@@ -56,6 +56,7 @@ from core.source_snippet_fallback import hydrate_control_source_from_scout
 from core.mirror_tunnel_shadow_live_trace import maybe_write_shadow_live_trace
 from core.run_progress_snapshot_shadow_writer import (
     is_run_progress_shadow_writer_enabled,
+    normalize_run_id,
     safe_update_run_progress_snapshot_shadow,
     safe_write_run_progress_snapshot,
 )
@@ -270,6 +271,91 @@ def _maybe_write_run_progress_snapshot_shadow(
 def _new_run_progress_shadow_run_id() -> str:
     """Create one internal safe ID only when the default-off writer is enabled."""
     return f"run_{uuid.uuid4().hex}" if is_run_progress_shadow_writer_enabled() else ""
+
+
+def build_current_run_progress_snapshot_association(
+    run_id: Any,
+    *,
+    writer_enabled: bool | None = None,
+) -> dict[str, Any]:
+    """Build safe, advisory-only metadata for the browser's current run.
+
+    The browser receives a validated slug, never a snapshot path.  This helper
+    does not look up, create, or update a snapshot and cannot affect execution.
+    """
+    enabled = is_run_progress_shadow_writer_enabled() if writer_enabled is None else bool(writer_enabled)
+    raw_run_id = str(run_id or "").strip()
+    snapshot_id = ""
+    warnings: list[str] = []
+
+    if enabled and raw_run_id:
+        try:
+            snapshot_id = normalize_run_id(raw_run_id)
+        except ValueError:
+            warnings.append("unsafe_snapshot_id_rejected")
+
+    available = bool(enabled and snapshot_id)
+    if available:
+        status = "current_run_snapshot_associated_with_warnings"
+        notice = (
+            "Snapshot associated for this run. It may be loaded manually; "
+            "availability does not imply success, validation, or approval."
+        )
+        warnings.append("association_available_after_run_response")
+    elif enabled and raw_run_id:
+        status = "current_run_snapshot_invalid"
+        notice = "Progress snapshot association is unavailable because its ID was not safe to expose."
+    else:
+        status = "current_run_snapshot_unavailable"
+        notice = (
+            "Progress snapshot unavailable because shadow progress writing was disabled."
+            if not enabled
+            else "Progress snapshot unavailable for this run."
+        )
+
+    return {
+        "association_status": status,
+        "snapshot_id": snapshot_id or None,
+        "snapshot_available": available,
+        "writer_enabled": enabled,
+        "association_mode": "advisory",
+        "source_run_result": True,
+        "safe_for_loader": available,
+        "warnings": warnings,
+        "blocked_reasons": [],
+        "runtime_result_changed": False,
+        "runtime_authority": False,
+        "action_triggered": False,
+        "actions_available": [],
+        "notice": notice,
+        "recommended_next_phase": {
+            "phase_id": "UX.LIVE.6",
+            "title": "Manual Run Progress Refresh",
+        },
+    }
+
+
+def _attach_current_run_progress_snapshot_association(
+    result: dict,
+    run_id: Any,
+    *,
+    writer_enabled: bool | None = None,
+) -> dict:
+    """Attach optional discoverability metadata without altering existing payloads."""
+    association = build_current_run_progress_snapshot_association(
+        run_id,
+        writer_enabled=writer_enabled,
+    )
+    result.update(
+        {
+            "run_progress_snapshot_id": association["snapshot_id"],
+            "run_progress_available": association["snapshot_available"],
+            "run_progress_writer_enabled": association["writer_enabled"],
+            "run_progress_association_mode": association["association_mode"],
+            "run_progress_notice": association["notice"],
+        }
+    )
+    return result
 
 
 def _maybe_update_run_progress_snapshot_shadow(
@@ -631,6 +717,11 @@ def run_agent_web(
             "runtime_environment_description": runtime_description,
             **_harness_payload(post_gate_decision),
         }
+        _attach_current_run_progress_snapshot_association(
+            result,
+            shadow_run_id,
+            writer_enabled=is_run_progress_shadow_writer_enabled(),
+        )
         _maybe_write_run_progress_snapshot_shadow(
             result=result,
             session_id=shadow_run_id,
@@ -663,6 +754,11 @@ def run_agent_web(
             "runtime_environment_description": runtime_description,
             **_harness_payload(base_harness_decision),
         }
+        _attach_current_run_progress_snapshot_association(
+            result,
+            shadow_run_id,
+            writer_enabled=is_run_progress_shadow_writer_enabled(),
+        )
         return _maybe_write_run_progress_snapshot_shadow(
             result=result,
             session_id=shadow_run_id,

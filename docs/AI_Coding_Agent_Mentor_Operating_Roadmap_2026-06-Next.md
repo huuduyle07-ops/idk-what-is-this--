@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (92 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 4 OPS + 15 MIRROR + 17 UX).
-- The phase picker currently has two safe candidates: `UX.LIVE.1` and `MIRROR.13`.
-- The top recommendation is `UX.LIVE.1` - Run Progress Instrumentation Plan.
+- The phase registry is valid (99 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 4 OPS + 15 MIRROR + 24 UX).
+- The phase picker currently has two safe candidates: `UX.LIVE.8` and `MIRROR.13`.
+- The top recommendation is `UX.LIVE.8` - Freshness Classification Implementation.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -143,9 +143,10 @@ test-runtime planning branch before executable manifests or runner commands.
 UX.RUN.3 ships a compact read-only panel for loaded progress snapshot artifacts
 after UX.RUN.2 made the progress-stage contract loadable. UX.RUN.CLOSE now freezes
 UX.RUN.1 through UX.RUN.3 as a safe read-only branch. The phase picker recommends
-**UX.LIVE.1 - Run Progress Instrumentation Plan** for plan-only consideration of
-future instrumentation; it does not authorize live hooks or polling.
-MIRROR.13 remains a proposed Mirror candidate, ranked after UX.LIVE.1.
+**UX.LIVE.8 - Freshness Classification Implementation** after UX.LIVE.7's
+report-only freshness/staleness contract; it does not authorize polling or
+runtime execution changes. MIRROR.13 remains a proposed Mirror candidate,
+ranked after UX.LIVE.8.
 
 ### Branch CMD — Commander Mode
 
@@ -1127,10 +1128,26 @@ instrumentation remain intentionally unimplemented. It does not add any runtime
 behavior, polling, POST routes, action controls, model or worker controls, patch
 application, validation/benchmark execution, approval enforcement, or tokens.
 
-**UX.LIVE.1 - Run Progress Instrumentation Plan is proposed.**
-UX.LIVE.1 is the current phase picker recommendation. It may describe possible
+**UX.LIVE.1 - Run Progress Instrumentation Plan is shipped 2026-07-10 (complete).**
+UX.LIVE.1 described possible
 future instrumentation sources, update cadence options, and human review
 boundaries, but it must not implement live hooks, polling, or runtime behavior.
+
+**UX.LIVE.7 - Snapshot Freshness and Staleness Plan is shipped 2026-07-11 (complete).**
+UX.LIVE.7 writes a report-only contract for advisory classification of approved
+snapshot metadata as fresh, recent, terminal, stale, possibly abandoned,
+unknown, or invalid. It defines timezone-aware UTC handling, safe threshold
+defaults, terminal precedence, clock-skew and malformed timestamp policies,
+sequence supporting evidence, warning codes, and the future classifier result
+schema. It does not change the writer, loader route, browser behavior, manual
+refresh, polling, streaming, retries, cleanup, runtime execution, or snapshot
+artifacts. Its expected status is `run_progress_freshness_plan_ready_with_warnings`.
+
+**UX.LIVE.8 - Freshness Classification Implementation is proposed.**
+UX.LIVE.8 is the current recommendation. It may add only the pure advisory
+classifier and narrow existing-loader/panel display integration; it must not
+write canonical snapshots or add polling, background requests, runtime
+authority, retries, cancellation, restart, or execution controls.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
@@ -1347,7 +1364,7 @@ any executable suite manifests, runner commands, or CI changes are added.
 timeout as pass; hide failures; add executable runner behavior; alter runtime
 routes; change auth; call or route models; launch workers; apply patches; invoke
 MCP tools; contact network services; write to a database; push, merge, or open
-PRs. Current recommended next phase: UX.LIVE.1 - Run Progress Instrumentation Plan.
+PRs. Current recommended next phase: UX.LIVE.8 - Freshness Classification Implementation.
 
 ### HARDEN.N1 - Approval Enforcement Readiness Audit
 

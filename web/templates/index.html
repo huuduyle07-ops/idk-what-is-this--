@@ -1557,10 +1557,19 @@
                 <span id="runProgressStatusBadge" class="run-progress-badge run-progress-badge--empty">No snapshot loaded</span>
               </header>
               <p id="runProgressEmptyState" class="run-progress-empty" aria-live="polite">No live progress stream yet. Load a read-only snapshot to inspect planned progress stages.</p>
+              <p id="runProgressAssociationState" class="run-progress-empty" aria-live="polite">No run is currently associated with this panel.</p>
               <p class="run-progress-panel__boundary">GET-only snapshot display. It does not auto-refresh, change runtime behavior, or expose execution, validation, benchmark, worker, model, approval, or token controls.</p>
+              <dl class="run-progress-fields" aria-label="Current run snapshot association">
+                <div><dt>associated_snapshot_id</dt><dd id="runProgressAssociatedSnapshotId">Not available</dd></div>
+                <div><dt>snapshot_available</dt><dd id="runProgressSnapshotAvailable">false</dd></div>
+                <div><dt>writer_enabled</dt><dd id="runProgressWriterEnabled">false</dd></div>
+                <div><dt>association_mode</dt><dd id="runProgressAssociationMode">advisory</dd></div>
+              </dl>
               <div class="run-progress-loader" aria-label="Run Progress Snapshot loader">
+                <button id="runProgressRefreshButton" class="run-progress-refresh-button" type="button" onclick="refreshAssociatedRunProgressSnapshot()" disabled>Refresh progress</button>
                 <label for="runProgressSnapshotId">Snapshot ID</label>
-                <input id="runProgressSnapshotId" type="text" value="default" autocomplete="off" spellcheck="false">
+                <input id="runProgressSnapshotId" type="text" value="" placeholder="Existing snapshot ID" autocomplete="off" spellcheck="false">
+                <button id="runProgressLoadAssociatedButton" type="button" onclick="loadAssociatedRunProgressSnapshot()" disabled>Load associated snapshot</button>
                 <button type="button" onclick="loadRunProgressSnapshot()">Load snapshot</button>
                 <span id="runProgressLoadStatus" class="run-progress-load-status" aria-live="polite"></span>
               </div>
@@ -1568,16 +1577,21 @@
                 <div><dt>snapshot_id</dt><dd id="runProgressSnapshotIdValue">Not available</dd></div>
                 <div><dt>snapshot_status</dt><dd id="runProgressSnapshotStatus">Not available</dd></div>
                 <div><dt>current_stage_id</dt><dd id="runProgressCurrentStageId">Not run / unavailable</dd></div>
+                <div><dt>observed_stage_ids</dt><dd id="runProgressObservedStageIds">Not available</dd></div>
                 <div><dt>completed_stage_ids</dt><dd id="runProgressCompletedStageIds">Not available</dd></div>
                 <div><dt>pending_stage_ids</dt><dd id="runProgressPendingStageIds">Not available</dd></div>
                 <div><dt>warning_stage_ids</dt><dd id="runProgressWarningStageIds">Not available</dd></div>
                 <div><dt>error_stage_ids</dt><dd id="runProgressErrorStageIds">Not available</dd></div>
+                <div><dt>updated_at</dt><dd id="runProgressUpdatedAt">Not available</dd></div>
+                <div><dt>sequence_number</dt><dd id="runProgressSequenceNumber">Not available</dd></div>
+                <div><dt>terminal</dt><dd id="runProgressTerminal">Not available</dd></div>
                 <div><dt>progress_notice</dt><dd id="runProgressNotice">Not available</dd></div>
                 <div><dt>simulated_only</dt><dd id="runProgressSimulatedOnly">Not available</dd></div>
                 <div><dt>live_stream_enabled</dt><dd id="runProgressLiveStreamEnabled">Not available</dd></div>
                 <div><dt>polling_enabled</dt><dd id="runProgressPollingEnabled">Not available</dd></div>
                 <div><dt>runtime_behavior_changed</dt><dd id="runProgressRuntimeBehaviorChanged">Not available</dd></div>
                 <div><dt>warnings</dt><dd id="runProgressWarnings">Not available</dd></div>
+                <div><dt>errors</dt><dd id="runProgressErrors">Not available</dd></div>
                 <div><dt>blocked_reasons</dt><dd id="runProgressBlockedReasons">Not available</dd></div>
               </dl>
               <section class="run-progress-stages" aria-labelledby="runProgressStagesHeading">
@@ -10328,19 +10342,43 @@ const RUN_PROGRESS_EMPTY_SNAPSHOT = Object.freeze({
     snapshot_id: "Not available",
     snapshot_status: "No snapshot loaded",
     current_stage_id: "Not run / unavailable",
+    observed_stage_ids: [],
     completed_stage_ids: [],
     pending_stage_ids: [],
     warning_stage_ids: [],
     error_stage_ids: [],
+    updated_at: "Not available",
+    sequence_number: "Not available",
+    terminal: "Not available",
     progress_notice: "No live progress stream yet. Load a read-only snapshot to inspect planned progress stages.",
     simulated_only: "Not available",
     live_stream_enabled: "Not available",
     polling_enabled: "Not available",
     runtime_behavior_changed: "Not available",
     warnings: [],
+    errors: [],
     blocked_reasons: [],
     stages: []
 });
+
+// UX.LIVE.5: this is page-local advisory state derived from the completed run
+// response. It is neither persisted nor sent back to control a runtime.
+const RUN_PROGRESS_ASSOCIATION_FROM_RUN_RESULT = Object.freeze({
+    snapshotId: {{ (result.get("run_progress_snapshot_id") if result else none) | tojson }},
+    available: {{ (result.get("run_progress_available", false) if result else false) | tojson }},
+    writerEnabled: {{ (result.get("run_progress_writer_enabled", false) if result else false) | tojson }},
+    associationMode: {{ (result.get("run_progress_association_mode", "advisory") if result else "advisory") | tojson }},
+    notice: {{ (result.get("run_progress_notice", "") if result else "") | tojson }}
+});
+const RUN_PROGRESS_ASSOCIATION_SAFE_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
+let currentRunProgressSnapshotId = null;
+let currentRunProgressAvailable = false;
+let currentRunProgressWriterEnabled = false;
+let currentRunProgressAssociationMode = "advisory";
+let currentRunProgressNotice = "No progress snapshot is associated with the current run.";
+let runProgressRefreshInFlight = false;
+let lastRunProgressRefreshAt = "";
+let lastRunProgressRefreshStatus = "association_unavailable";
 
 function _runProgressObject(value) {
     return value && typeof value === "object" && !Array.isArray(value) ? value : {};
@@ -10369,6 +10407,95 @@ function _runProgressList(value, emptyText = "None") {
 function _runProgressSetText(id, value, fallback) {
     const element = document.getElementById(id);
     if (element) element.textContent = _runProgressValue(value, fallback);
+}
+
+function _renderCurrentRunProgressAssociation() {
+    _runProgressSetText("runProgressAssociatedSnapshotId", currentRunProgressSnapshotId);
+    _runProgressSetText("runProgressSnapshotAvailable", currentRunProgressAvailable, "false");
+    _runProgressSetText("runProgressWriterEnabled", currentRunProgressWriterEnabled, "false");
+    _runProgressSetText("runProgressAssociationMode", currentRunProgressAssociationMode, "advisory");
+    const state = document.getElementById("runProgressAssociationState");
+    if (state) state.textContent = currentRunProgressNotice;
+    const button = document.getElementById("runProgressLoadAssociatedButton");
+    if (button) button.disabled = !currentRunProgressAvailable || runProgressRefreshInFlight;
+    const refreshButton = document.getElementById("runProgressRefreshButton");
+    if (refreshButton) {
+        refreshButton.disabled = !currentRunProgressAvailable || runProgressRefreshInFlight;
+        refreshButton.textContent = runProgressRefreshInFlight ? "Refreshing…" : "Refresh progress";
+    }
+}
+
+function setRunProgressRefreshState(status, message) {
+    runProgressRefreshInFlight = status === "refreshing";
+    lastRunProgressRefreshStatus = status || "idle";
+    if (status === "refreshed") lastRunProgressRefreshAt = new Date().toISOString();
+    _renderCurrentRunProgressAssociation();
+    if (message) _runProgressSetLoadStatus(message);
+}
+
+function setCurrentRunProgressAssociation(association) {
+    const supplied = _runProgressObject(association);
+    const rawSnapshotId = typeof supplied.snapshotId === "string" ? supplied.snapshotId.trim() : "";
+    const writerEnabled = supplied.writerEnabled === true;
+    const requestedAvailable = supplied.available === true;
+    const requestedMode = supplied.associationMode === "advisory" ? "advisory" : "advisory";
+
+    currentRunProgressWriterEnabled = writerEnabled;
+    currentRunProgressAssociationMode = requestedMode;
+    currentRunProgressSnapshotId = null;
+    currentRunProgressAvailable = false;
+
+    if (!writerEnabled) {
+        currentRunProgressNotice = "No progress snapshot is associated with the current run. Shadow progress writing was disabled.";
+    } else if (rawSnapshotId && !RUN_PROGRESS_ASSOCIATION_SAFE_ID_RE.test(rawSnapshotId)) {
+        currentRunProgressNotice = "No progress snapshot is associated with the current run because its ID was not safe to load.";
+    } else if (rawSnapshotId && requestedAvailable) {
+        currentRunProgressSnapshotId = rawSnapshotId;
+        currentRunProgressAvailable = true;
+        currentRunProgressNotice = "Snapshot associated for this run. Load it manually; availability does not imply success, validation, or approval.";
+        const input = document.getElementById("runProgressSnapshotId");
+        if (input) input.value = rawSnapshotId;
+    } else {
+        currentRunProgressNotice = "No progress snapshot is associated with the current run.";
+    }
+    if (!runProgressRefreshInFlight) setRunProgressRefreshState("association_unavailable");
+    _renderCurrentRunProgressAssociation();
+}
+
+function loadAssociatedRunProgressSnapshot() {
+    if (runProgressRefreshInFlight) return;
+    if (!currentRunProgressAvailable || !currentRunProgressSnapshotId) {
+        _runProgressSetLoadStatus("Snapshot is associated but not currently available.");
+        return;
+    }
+    loadRunProgressSnapshot(currentRunProgressSnapshotId);
+}
+
+async function refreshAssociatedRunProgressSnapshot() {
+    if (runProgressRefreshInFlight) return;
+    const snapshotId = currentRunProgressSnapshotId;
+    if (!currentRunProgressAvailable || !snapshotId || !RUN_PROGRESS_ASSOCIATION_SAFE_ID_RE.test(snapshotId)) {
+        setRunProgressRefreshState(
+            "association_unavailable",
+            "No progress snapshot is associated with the current run."
+        );
+        return;
+    }
+
+    setRunProgressRefreshState("refreshing", "Refreshing associated read-only snapshot...");
+    const outcome = await loadRunProgressSnapshot(snapshotId, {
+        expectedAssociatedSnapshotId: snapshotId,
+        requestFailureStatus: "refresh_failed"
+    });
+    if (outcome.stale) {
+        setRunProgressRefreshState("idle");
+        return;
+    }
+    if (outcome.ok) {
+        setRunProgressRefreshState("refreshed", "Progress snapshot refreshed.");
+    } else {
+        setRunProgressRefreshState(outcome.status || "refresh_failed", outcome.message || "The progress snapshot refresh failed.");
+    }
 }
 
 function _runProgressBadgeClass(snapshotStatus) {
@@ -10450,16 +10577,21 @@ function renderRunProgressSnapshot(snapshotObject) {
     _runProgressSetText("runProgressSnapshotIdValue", snapshot.snapshot_id);
     _runProgressSetText("runProgressSnapshotStatus", snapshot.snapshot_status);
     _runProgressSetText("runProgressCurrentStageId", snapshot.current_stage_id, "Not run / unavailable");
+    _runProgressSetText("runProgressObservedStageIds", _runProgressList(snapshot.observed_stage_ids));
     _runProgressSetText("runProgressCompletedStageIds", _runProgressList(snapshot.completed_stage_ids));
     _runProgressSetText("runProgressPendingStageIds", _runProgressList(snapshot.pending_stage_ids));
     _runProgressSetText("runProgressWarningStageIds", _runProgressList(snapshot.warning_stage_ids));
     _runProgressSetText("runProgressErrorStageIds", _runProgressList(snapshot.error_stage_ids));
+    _runProgressSetText("runProgressUpdatedAt", snapshot.updated_at);
+    _runProgressSetText("runProgressSequenceNumber", snapshot.sequence_number);
+    _runProgressSetText("runProgressTerminal", snapshot.terminal);
     _runProgressSetText("runProgressNotice", snapshot.progress_notice);
     _runProgressSetText("runProgressSimulatedOnly", snapshot.simulated_only);
     _runProgressSetText("runProgressLiveStreamEnabled", snapshot.live_stream_enabled);
     _runProgressSetText("runProgressPollingEnabled", snapshot.polling_enabled);
     _runProgressSetText("runProgressRuntimeBehaviorChanged", snapshot.runtime_behavior_changed);
     _runProgressSetText("runProgressWarnings", _runProgressList(snapshot.warnings));
+    _runProgressSetText("runProgressErrors", _runProgressList(snapshot.errors));
     _runProgressSetText("runProgressBlockedReasons", _runProgressList(snapshot.blocked_reasons));
     _runProgressRenderStages(snapshot);
 }
@@ -10481,7 +10613,25 @@ function _runProgressSetLoadStatus(message) {
     if (status) status.textContent = message || "";
 }
 
-async function loadRunProgressSnapshot(snapshotId) {
+function _runProgressRefreshMessage(status, result) {
+    if (status === "snapshot_not_found") return "The associated snapshot is not currently available.";
+    if (status === "snapshot_malformed") return "The progress snapshot could not be read safely.";
+    if (status === "snapshot_blocked") {
+        const reasons = _runProgressList(_runProgressObject(result).blocked_reasons, "");
+        return reasons ? "The associated snapshot is blocked: " + reasons : "The associated snapshot is blocked.";
+    }
+    return "The progress snapshot refresh failed.";
+}
+
+function _runProgressAssociationIsCurrent(snapshotId, options) {
+    return !options.expectedAssociatedSnapshotId || (
+        snapshotId === options.expectedAssociatedSnapshotId
+        && snapshotId === currentRunProgressSnapshotId
+        && currentRunProgressAvailable
+    );
+}
+
+async function loadRunProgressSnapshot(snapshotId, options = {}) {
     const input = document.getElementById("runProgressSnapshotId");
     const requestedId = typeof snapshotId === "string"
         ? snapshotId.trim()
@@ -10492,7 +10642,7 @@ async function loadRunProgressSnapshot(snapshotId) {
             "Enter a snapshot ID to inspect an existing read-only snapshot."
         ));
         _runProgressSetLoadStatus("No snapshot ID selected.");
-        return;
+        return { ok: false, status: "snapshot_not_found", message: "No snapshot ID selected." };
     }
     if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(requestedId)) {
         renderRunProgressSnapshot(_runProgressRouteError(
@@ -10500,7 +10650,7 @@ async function loadRunProgressSnapshot(snapshotId) {
             "That snapshot ID is not safe to load."
         ));
         _runProgressSetLoadStatus("Unsafe snapshot ID was not requested.");
-        return;
+        return { ok: false, status: "snapshot_blocked", message: "Unsafe snapshot ID was not requested." };
     }
 
     const safeId = encodeURIComponent(requestedId);
@@ -10515,24 +10665,36 @@ async function loadRunProgressSnapshot(snapshotId) {
         const payload = _runProgressObject(body);
         const result = _runProgressObject(payload.result);
         const snapshot = _runProgressObject(result.snapshot);
+        if (!_runProgressAssociationIsCurrent(requestedId, options)) return { ok: false, stale: true };
         if (!response.ok || payload.ok !== true || !Object.keys(snapshot).length) {
             const status = payload.status || result.loader_status || "snapshot_not_found";
-            const message = payload.error || "Run progress snapshot " + status + ".";
+            const message = options.expectedAssociatedSnapshotId
+                ? _runProgressRefreshMessage(status, result)
+                : (payload.error || "Run progress snapshot " + status + ".");
             renderRunProgressSnapshot(_runProgressRouteError(status, message, result));
             _runProgressSetLoadStatus(message);
-            return;
+            return { ok: false, status, message };
         }
         renderRunProgressSnapshot(snapshot);
         _runProgressSetLoadStatus("Read-only snapshot loaded.");
+        return { ok: true, status: "refreshed" };
     } catch (error) {
-        const message = "Run progress snapshot load failed: " + _runProgressValue(error, "unknown error");
-        renderRunProgressSnapshot(_runProgressRouteError("snapshot_malformed", message));
+        if (!_runProgressAssociationIsCurrent(requestedId, options)) return { ok: false, stale: true };
+        const status = options.requestFailureStatus || "snapshot_malformed";
+        const message = options.expectedAssociatedSnapshotId
+            ? "The progress snapshot refresh failed."
+            : ("Run progress snapshot load failed: " + _runProgressValue(error, "unknown error"));
+        renderRunProgressSnapshot(_runProgressRouteError(status, message));
         _runProgressSetLoadStatus(message);
+        return { ok: false, status, message };
     }
 }
 // /UX.RUN.3 run-progress-panel
 
-document.addEventListener('DOMContentLoaded', renderKbList);
+document.addEventListener('DOMContentLoaded', () => {
+    renderKbList();
+    setCurrentRunProgressAssociation(RUN_PROGRESS_ASSOCIATION_FROM_RUN_RESULT);
+});
 
 </script>
 
