@@ -13,6 +13,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from core.run_progress_freshness import DEFAULT_THRESHOLDS, classify_run_progress_freshness
+
 
 REPORT_KIND = "run_progress_snapshot_loader"
 JSON_NAME = "run_progress_snapshot_loader_report.json"
@@ -114,6 +116,7 @@ def _result(
     snapshot_id: str,
     source_path: str = "",
     snapshot: dict[str, Any] | None = None,
+    freshness: dict[str, Any] | None = None,
     warnings: list[str] | None = None,
     blocked_reasons: list[dict[str, str]] | None = None,
 ) -> dict[str, Any]:
@@ -122,10 +125,48 @@ def _result(
         "snapshot_id": str(snapshot_id or ""),
         "source_path": str(source_path or ""),
         "snapshot": snapshot,
+        "freshness": copy.deepcopy(freshness) if isinstance(freshness, dict) else None,
         "warnings": list(warnings or []),
         "blocked_reasons": list(blocked_reasons or []),
         "recommended_next_phase": dict(RECOMMENDED_NEXT_PHASE),
     }
+
+
+def _freshness_failure_result() -> dict[str, Any]:
+    """Keep a classifier failure advisory and isolated from snapshot loading."""
+    return {
+        "freshness_status": "unknown",
+        "observed_at": None,
+        "created_at": None,
+        "updated_at": None,
+        "age_seconds": None,
+        "lifetime_seconds": None,
+        "terminal": False,
+        "terminal_outcome": None,
+        "terminal_stage_id": None,
+        "clock_skew_detected": False,
+        "timestamp_parse_valid": False,
+        "thresholds_used": {
+            "fresh_seconds": DEFAULT_THRESHOLDS.fresh_seconds,
+            "recent_seconds": DEFAULT_THRESHOLDS.recent_seconds,
+            "abandoned_seconds": DEFAULT_THRESHOLDS.abandoned_seconds,
+            "clock_skew_tolerance_seconds": DEFAULT_THRESHOLDS.clock_skew_tolerance_seconds,
+        },
+        "warning_codes": ["freshness_classification_failed"],
+        "advisory_notice": "Snapshot freshness could not be classified safely.",
+        "runtime_authority": False,
+        "action_triggered": False,
+        "actions_available": [],
+    }
+
+
+def _classify_loaded_snapshot(snapshot: dict[str, Any]) -> dict[str, Any]:
+    """Return derived advisory data without allowing it to affect loader status."""
+    try:
+        freshness = classify_run_progress_freshness(snapshot)
+    except Exception:
+        return _freshness_failure_result()
+    return copy.deepcopy(freshness) if isinstance(freshness, dict) else _freshness_failure_result()
 
 
 def _rel_path(path: Path, repo_root: Path) -> str:
@@ -419,6 +460,7 @@ def load_run_progress_snapshot(
             snapshot_id=safe_id,
             source_path=source_path,
             snapshot=snapshot,
+            freshness=_classify_loaded_snapshot(snapshot),
             warnings=warnings,
             blocked_reasons=[],
         )

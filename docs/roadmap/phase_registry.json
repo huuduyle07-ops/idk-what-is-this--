@@ -4647,8 +4647,8 @@
       "phase_id": "UX.LIVE.8",
       "title": "Freshness Classification Implementation",
       "track": "UX",
-      "status": "proposed",
-      "summary": "Narrow future implementation of the pure deterministic advisory freshness classifier defined by UX.LIVE.7, with derived loader response data and existing-panel display only. It must not alter canonical snapshots, execution, polling, or background behavior.",
+      "status": "complete",
+      "summary": "Pure deterministic advisory freshness classification for safely loaded run-progress snapshots, returned beside the existing loader response and displayed in the existing panel only after a manual load or refresh. It does not alter canonical snapshots, execution, polling, or background behavior.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
@@ -4660,6 +4660,12 @@
         "tests/test_run_progress_snapshot_loader.py",
         "tests/test_run_progress_ui_panel.py",
         "tests/test_run_progress_freshness_plan.py",
+        "tests/test_manual_run_progress_refresh.py",
+        "tests/test_current_run_snapshot_association.py",
+        "tests/test_run_progress_multistage_shadow_instrumentation.py",
+        "tests/test_run_progress_snapshot_shadow_writer.py",
+        "tests/test_run_progress_visibility.py",
+        "tests/test_run_progress_visibility_branch_checkpoint.py",
         "tests/test_phase_registry.py",
         "tests/test_phase_picker.py",
         "docs/roadmap/phase_registry.json",
@@ -4676,6 +4682,8 @@
         "python -m compileall -q core scripts tests benchmarks web",
         "python -m pytest tests/test_run_progress_freshness.py tests/test_run_progress_freshness_plan.py -q",
         "python -m pytest tests/test_run_progress_snapshot_loader.py tests/test_run_progress_ui_panel.py -q",
+        "python -m pytest tests/test_manual_run_progress_refresh.py tests/test_current_run_snapshot_association.py -q",
+        "python -m pytest tests/test_run_progress_multistage_shadow_instrumentation.py tests/test_run_progress_snapshot_shadow_writer.py -q",
         "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
         "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
         "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
@@ -4692,8 +4700,63 @@
       ],
       "expected_artifacts": [],
       "notes": [
-        "UX.LIVE.8 may implement only the pure deterministic advisory classifier from UX.LIVE.7. It may derive freshness when an existing snapshot is loaded or manually refreshed, include that derived result in the existing GET loader response, and display it in the existing Run Progress panel.",
-        "It must not write freshness data into canonical snapshot artifacts; add polling, streaming, background requests, retries, cleanup, cancellation, restart, execution controls, runtime authority, actions, model routing, worker work, patch application, validation/benchmark execution, approval enforcement, token use, database work, or network probes. Recommended next phase after implementation: UX.LIVE.9 - Bounded Polling Experiment Plan."
+        "UX.LIVE.8 shipped 2026-07-11 with a pure deterministic classifier for approved run-progress metadata. It classifies fresh, recent, terminal, stale, possibly_abandoned, and unknown states, keeps terminal precedence over age, validates thresholds with safe defaults, rejects unsafe timestamps, and emits only advisory data with runtime_authority=false, action_triggered=false, and no available actions.",
+        "The existing GET-only loader returns freshness beside the canonical snapshot after an operator manually loads or refreshes it. The panel displays text labels, age at load time, terminal outcome, notice, and warning codes. It adds no polling, timers, streaming, retries, cleanup, cancellation, restart, execution controls, canonical snapshot mutation, database/network/process inspection, model or worker work, patch application, validation/benchmark execution, approval enforcement, or automatic authority. Expected current status: run_progress_freshness_ready_with_warnings because freshness is recalculated only on manual load or refresh. Recommended next phase: UX.LIVE.9 - Bounded Progress Polling Experiment Plan."
+      ]
+    },
+    {
+      "phase_id": "UX.LIVE.9",
+      "title": "Bounded Progress Polling Experiment Plan",
+      "track": "UX",
+      "status": "proposed",
+      "summary": "Report-only design for a future default-off, operator-enabled bounded polling experiment around the existing read-only progress snapshot loader. It must specify limits and stop conditions without implementing polling or granting execution authority.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/run_progress_polling_experiment_plan.py",
+        "scripts/create_run_progress_polling_experiment_plan.py",
+        "tests/test_run_progress_polling_experiment_plan.py",
+        "tests/test_run_progress_freshness.py",
+        "tests/test_manual_run_progress_refresh.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/ux/run_progress_polling_experiment_plan/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_run_progress_polling_experiment_plan.py -q",
+        "python -m pytest tests/test_run_progress_freshness.py tests/test_manual_run_progress_refresh.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "UX.LIVE.8"
+      ],
+      "expected_artifacts": [
+        ".agent/ux/run_progress_polling_experiment_plan/run_progress_polling_experiment_plan.json",
+        ".agent/ux/run_progress_polling_experiment_plan/run_progress_polling_experiment_plan.md"
+      ],
+      "notes": [
+        "UX.LIVE.9 is a report-only plan, not a polling implementation. It should define default-off operator enablement, a minimum interval, maximum duration, request deduplication, tab-hidden behavior, bounded error handling, and stop conditions for terminal snapshots or changed associations.",
+        "It must not alter run execution, use freshness as authority, introduce automatic retries or uncontrolled background activity, inspect processes, or add cancellation, restart, cleanup, model, worker, patch, validation, benchmark, approval, database, or network authority."
       ]
     },
     {

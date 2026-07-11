@@ -1558,7 +1558,7 @@
               </header>
               <p id="runProgressEmptyState" class="run-progress-empty" aria-live="polite">No live progress stream yet. Load a read-only snapshot to inspect planned progress stages.</p>
               <p id="runProgressAssociationState" class="run-progress-empty" aria-live="polite">No run is currently associated with this panel.</p>
-              <p class="run-progress-panel__boundary">GET-only snapshot display. It does not auto-refresh, change runtime behavior, or expose execution, validation, benchmark, worker, model, approval, or token controls.</p>
+              <p class="run-progress-panel__boundary">GET-only snapshot display. Freshness is calculated only when a snapshot is manually loaded or refreshed, so the displayed age does not update automatically. It does not auto-refresh, change runtime behavior, or expose execution, validation, benchmark, worker, model, approval, or token controls.</p>
               <dl class="run-progress-fields" aria-label="Current run snapshot association">
                 <div><dt>associated_snapshot_id</dt><dd id="runProgressAssociatedSnapshotId">Not available</dd></div>
                 <div><dt>snapshot_available</dt><dd id="runProgressSnapshotAvailable">false</dd></div>
@@ -1585,6 +1585,11 @@
                 <div><dt>updated_at</dt><dd id="runProgressUpdatedAt">Not available</dd></div>
                 <div><dt>sequence_number</dt><dd id="runProgressSequenceNumber">Not available</dd></div>
                 <div><dt>terminal</dt><dd id="runProgressTerminal">Not available</dd></div>
+                <div><dt>Freshness</dt><dd id="runProgressFreshnessStatus" aria-live="polite">Unknown</dd></div>
+                <div><dt>snapshot_age</dt><dd id="runProgressFreshnessAge">Not available</dd></div>
+                <div><dt>terminal_outcome</dt><dd id="runProgressTerminalOutcome">Not applicable</dd></div>
+                <div><dt>freshness_notice</dt><dd id="runProgressFreshnessNotice" aria-live="polite">Snapshot freshness could not be classified safely.</dd></div>
+                <div><dt>freshness_warning_codes</dt><dd id="runProgressFreshnessWarnings">None</dd></div>
                 <div><dt>progress_notice</dt><dd id="runProgressNotice">Not available</dd></div>
                 <div><dt>simulated_only</dt><dd id="runProgressSimulatedOnly">Not available</dd></div>
                 <div><dt>live_stream_enabled</dt><dd id="runProgressLiveStreamEnabled">Not available</dd></div>
@@ -10350,6 +10355,13 @@ const RUN_PROGRESS_EMPTY_SNAPSHOT = Object.freeze({
     updated_at: "Not available",
     sequence_number: "Not available",
     terminal: "Not available",
+    freshness: {
+        freshness_status: "unknown",
+        age_seconds: null,
+        terminal_outcome: null,
+        advisory_notice: "Snapshot freshness could not be classified safely.",
+        warning_codes: []
+    },
     progress_notice: "No live progress stream yet. Load a read-only snapshot to inspect planned progress stages.",
     simulated_only: "Not available",
     live_stream_enabled: "Not available",
@@ -10402,6 +10414,24 @@ function _runProgressValue(value, fallback = "Not available") {
 function _runProgressList(value, emptyText = "None") {
     const rows = _runProgressArray(value).map(item => _runProgressValue(item, "")).filter(Boolean);
     return rows.length ? rows.join(", ") : emptyText;
+}
+
+function _runProgressFreshnessLabel(value) {
+    const labels = {
+        fresh: "Fresh",
+        recent: "Recent",
+        terminal: "Terminal",
+        stale: "Stale",
+        possibly_abandoned: "Possibly abandoned",
+        unknown: "Unknown"
+    };
+    return labels[String(value || "unknown").toLowerCase()] || "Unknown";
+}
+
+function _runProgressFreshnessAge(value) {
+    const age = Number(value);
+    if (!Number.isFinite(age) || age < 0) return "Not available";
+    return age.toFixed(age % 1 ? 1 : 0) + " seconds (when loaded)";
 }
 
 function _runProgressSetText(id, value, fallback) {
@@ -10561,6 +10591,7 @@ function _runProgressRenderStages(snapshot) {
 function renderRunProgressSnapshot(snapshotObject) {
     const supplied = _runProgressObject(snapshotObject);
     const snapshot = Object.keys(supplied).length ? supplied : RUN_PROGRESS_EMPTY_SNAPSHOT;
+    const freshness = _runProgressObject(snapshot.freshness);
     const status = _runProgressValue(snapshot.snapshot_status, RUN_PROGRESS_EMPTY_SNAPSHOT.snapshot_status);
     const badge = document.getElementById("runProgressStatusBadge");
     if (badge) {
@@ -10585,6 +10616,11 @@ function renderRunProgressSnapshot(snapshotObject) {
     _runProgressSetText("runProgressUpdatedAt", snapshot.updated_at);
     _runProgressSetText("runProgressSequenceNumber", snapshot.sequence_number);
     _runProgressSetText("runProgressTerminal", snapshot.terminal);
+    _runProgressSetText("runProgressFreshnessStatus", _runProgressFreshnessLabel(freshness.freshness_status), "Unknown");
+    _runProgressSetText("runProgressFreshnessAge", _runProgressFreshnessAge(freshness.age_seconds));
+    _runProgressSetText("runProgressTerminalOutcome", freshness.terminal_outcome, "Not applicable");
+    _runProgressSetText("runProgressFreshnessNotice", freshness.advisory_notice, "Snapshot freshness could not be classified safely.");
+    _runProgressSetText("runProgressFreshnessWarnings", _runProgressList(freshness.warning_codes));
     _runProgressSetText("runProgressNotice", snapshot.progress_notice);
     _runProgressSetText("runProgressSimulatedOnly", snapshot.simulated_only);
     _runProgressSetText("runProgressLiveStreamEnabled", snapshot.live_stream_enabled);
@@ -10665,6 +10701,7 @@ async function loadRunProgressSnapshot(snapshotId, options = {}) {
         const payload = _runProgressObject(body);
         const result = _runProgressObject(payload.result);
         const snapshot = _runProgressObject(result.snapshot);
+        const freshness = _runProgressObject(result.freshness);
         if (!_runProgressAssociationIsCurrent(requestedId, options)) return { ok: false, stale: true };
         if (!response.ok || payload.ok !== true || !Object.keys(snapshot).length) {
             const status = payload.status || result.loader_status || "snapshot_not_found";
@@ -10675,7 +10712,7 @@ async function loadRunProgressSnapshot(snapshotId, options = {}) {
             _runProgressSetLoadStatus(message);
             return { ok: false, status, message };
         }
-        renderRunProgressSnapshot(snapshot);
+        renderRunProgressSnapshot({ ...snapshot, freshness });
         _runProgressSetLoadStatus("Read-only snapshot loaded.");
         return { ok: true, status: "refreshed" };
     } catch (error) {
