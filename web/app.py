@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json, re, shutil, subprocess, sys
+from math import isfinite
 import markdown as _markdown_lib
 from datetime import datetime
 from pathlib import Path
@@ -90,6 +91,65 @@ import os as _os_gate
 
 # Secret key — read from env; dev-only placeholder when unset.
 app.secret_key = _os_gate.environ.get("WEB_SECRET_KEY") or "dev-insecure-local-only-do-not-use-in-prod"
+
+
+_RUN_PROGRESS_POLLING_DEFAULTS = {
+    "enabled": False,
+    "interval_seconds": 3,
+    "maximum_duration_seconds": 300,
+    "maximum_requests": 100,
+    "maximum_consecutive_errors": 3,
+}
+
+
+def _run_progress_polling_number(
+    name: str,
+    default: int,
+    *,
+    minimum: int,
+    maximum: int,
+    allow_zero: bool = False,
+) -> int:
+    """Read one bounded browser-polling setting without changing runtime work."""
+    raw = _os_gate.environ.get(name, "")
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return default
+    if not isfinite(value) or value != int(value):
+        return default
+    parsed = int(value)
+    if parsed > maximum or parsed < (0 if allow_zero else minimum):
+        return default
+    return parsed
+
+
+def _run_progress_polling_config() -> dict[str, int | bool]:
+    """Expose only bounded, default-off reader settings to the index template."""
+    enabled = _os_gate.environ.get("RUN_PROGRESS_POLLING_ENABLED", "").strip().lower() in {
+        "1", "true", "yes", "on"
+    }
+    return {
+        "enabled": enabled,
+        "interval_seconds": _run_progress_polling_number(
+            "RUN_PROGRESS_POLL_INTERVAL_SECONDS", 3, minimum=2, maximum=60
+        ),
+        "maximum_duration_seconds": _run_progress_polling_number(
+            "RUN_PROGRESS_POLL_MAX_DURATION_SECONDS", 300, minimum=1, maximum=3600
+        ),
+        "maximum_requests": _run_progress_polling_number(
+            "RUN_PROGRESS_POLL_MAX_REQUESTS", 100, minimum=1, maximum=1000
+        ),
+        "maximum_consecutive_errors": _run_progress_polling_number(
+            "RUN_PROGRESS_POLL_MAX_CONSECUTIVE_ERRORS", 3, minimum=0, maximum=100, allow_zero=True
+        ),
+    }
+
+
+@app.context_processor
+def _run_progress_polling_template_context() -> dict[str, dict[str, int | bool]]:
+    """Keep the optional polling experiment explicitly configured per page render."""
+    return {"run_progress_polling_config": _run_progress_polling_config()}
 
 from web.auth_gate import should_allow_mutation as _should_allow_mutation
 

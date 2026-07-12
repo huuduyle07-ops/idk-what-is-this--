@@ -1547,7 +1547,7 @@
             </header>
             <p>Preview-only Evidence Card Layout defined in UX.6; evidence creation and execution are not implemented here.</p>
             <p>Evidence cards summarise what changed, what evidence exists, what checks say, what risks remain, and what the human should do next. Human confirmation is required before any run.</p>
-            <!-- UX.RUN.3 run-progress-panel: read-only GET snapshot display; no polling or runtime controls. -->
+            <!-- UX.RUN.3 run-progress-panel: UX.LIVE.10 GET-only advisory display. -->
             <section id="runProgressPanel" class="run-progress-panel" aria-label="Run Progress Snapshot" data-run-progress-readonly="true">
               <header class="run-progress-panel__header">
                 <div>
@@ -1558,7 +1558,7 @@
               </header>
               <p id="runProgressEmptyState" class="run-progress-empty" aria-live="polite">No live progress stream yet. Load a read-only snapshot to inspect planned progress stages.</p>
               <p id="runProgressAssociationState" class="run-progress-empty" aria-live="polite">No run is currently associated with this panel.</p>
-              <p class="run-progress-panel__boundary">GET-only snapshot display. Freshness is calculated only when a snapshot is manually loaded or refreshed, so the displayed age does not update automatically. It does not auto-refresh, change runtime behavior, or expose execution, validation, benchmark, worker, model, approval, or token controls.</p>
+              <p class="run-progress-panel__boundary">GET-only snapshot display. Optional progress updates are disabled by default, require an explicit operator click, remain temporary and page-local, and never change runtime behavior or expose execution, validation, benchmark, worker, model, approval, or token controls.</p>
               <dl class="run-progress-fields" aria-label="Current run snapshot association">
                 <div><dt>associated_snapshot_id</dt><dd id="runProgressAssociatedSnapshotId">Not available</dd></div>
                 <div><dt>snapshot_available</dt><dd id="runProgressSnapshotAvailable">false</dd></div>
@@ -1572,6 +1572,12 @@
                 <button id="runProgressLoadAssociatedButton" type="button" onclick="loadAssociatedRunProgressSnapshot()" disabled>Load associated snapshot</button>
                 <button type="button" onclick="loadRunProgressSnapshot()">Load snapshot</button>
                 <span id="runProgressLoadStatus" class="run-progress-load-status" aria-live="polite"></span>
+              </div>
+              <div class="run-progress-polling-controls" aria-label="Temporary read-only progress updates">
+                <p class="run-progress-polling-controls__note">Temporary read-only progress updates use the existing snapshot loader only. They never affect the underlying run.</p>
+                <button id="runProgressPollingStartButton" class="run-progress-polling-button" type="button" onclick="startRunProgressPolling()" disabled>Start progress updates</button>
+                <button id="runProgressPollingStopButton" class="run-progress-polling-button" type="button" onclick="stopRunProgressPolling('operator')" disabled>Stop progress updates</button>
+                <span id="runProgressPollingStatus" class="run-progress-polling-status" aria-live="polite">Automatic progress updates are disabled.</span>
               </div>
               <dl class="run-progress-fields">
                 <div><dt>snapshot_id</dt><dd id="runProgressSnapshotIdValue">Not available</dd></div>
@@ -10383,6 +10389,63 @@ const RUN_PROGRESS_ASSOCIATION_FROM_RUN_RESULT = Object.freeze({
     notice: {{ (result.get("run_progress_notice", "") if result else "") | tojson }}
 });
 const RUN_PROGRESS_ASSOCIATION_SAFE_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
+const RUN_PROGRESS_POLLING_DEFAULTS = Object.freeze({
+    enabled: false,
+    intervalSeconds: 3,
+    maximumDurationSeconds: 300,
+    maximumRequests: 100,
+    maximumConsecutiveErrors: 3
+});
+const RUN_PROGRESS_POLLING_CONFIGURATION_FROM_SERVER = {{ run_progress_polling_config | tojson }};
+const RUN_PROGRESS_POLLING_INVARIANTS = Object.freeze({
+    runtime_authority: false,
+    action_triggered: false,
+    actions_available: [],
+    runtime_behavior_changed: false
+});
+
+function _runProgressPollingNumber(value, fallback, minimum, maximum, allowZero = false) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed !== Math.floor(parsed)) return fallback;
+    if (parsed > maximum || parsed < (allowZero ? 0 : minimum)) return fallback;
+    return parsed;
+}
+
+function _runProgressPollingConfiguration(value) {
+    const supplied = _runProgressObject(value);
+    return Object.freeze({
+        enabled: supplied.enabled === true,
+        intervalSeconds: _runProgressPollingNumber(
+            supplied.interval_seconds,
+            RUN_PROGRESS_POLLING_DEFAULTS.intervalSeconds,
+            2,
+            60
+        ),
+        maximumDurationSeconds: _runProgressPollingNumber(
+            supplied.maximum_duration_seconds,
+            RUN_PROGRESS_POLLING_DEFAULTS.maximumDurationSeconds,
+            1,
+            3600
+        ),
+        maximumRequests: _runProgressPollingNumber(
+            supplied.maximum_requests,
+            RUN_PROGRESS_POLLING_DEFAULTS.maximumRequests,
+            1,
+            1000
+        ),
+        maximumConsecutiveErrors: _runProgressPollingNumber(
+            supplied.maximum_consecutive_errors,
+            RUN_PROGRESS_POLLING_DEFAULTS.maximumConsecutiveErrors,
+            0,
+            100,
+            true
+        )
+    });
+}
+
+const RUN_PROGRESS_POLLING_CONFIGURATION = _runProgressPollingConfiguration(
+    RUN_PROGRESS_POLLING_CONFIGURATION_FROM_SERVER
+);
 let currentRunProgressSnapshotId = null;
 let currentRunProgressAvailable = false;
 let currentRunProgressWriterEnabled = false;
@@ -10391,6 +10454,16 @@ let currentRunProgressNotice = "No progress snapshot is associated with the curr
 let runProgressRefreshInFlight = false;
 let lastRunProgressRefreshAt = "";
 let lastRunProgressRefreshStatus = "association_unavailable";
+let runProgressPollingActive = false;
+let runProgressPollingPaused = false;
+let runProgressPollingInFlight = false;
+let runProgressPollingTimeoutId = null;
+let runProgressPollingStartedAt = 0;
+let runProgressPollingRequestCount = 0;
+let runProgressPollingConsecutiveErrors = 0;
+let runProgressPollingSnapshotId = null;
+let runProgressPollingSessionToken = 0;
+let runProgressPollingStopReason = "";
 
 function _runProgressObject(value) {
     return value && typeof value === "object" && !Array.isArray(value) ? value : {};
@@ -10453,6 +10526,7 @@ function _renderCurrentRunProgressAssociation() {
         refreshButton.disabled = !currentRunProgressAvailable || runProgressRefreshInFlight;
         refreshButton.textContent = runProgressRefreshInFlight ? "Refreshing…" : "Refresh progress";
     }
+    _renderRunProgressPollingControls();
 }
 
 function setRunProgressRefreshState(status, message) {
@@ -10469,6 +10543,13 @@ function setCurrentRunProgressAssociation(association) {
     const writerEnabled = supplied.writerEnabled === true;
     const requestedAvailable = supplied.available === true;
     const requestedMode = supplied.associationMode === "advisory" ? "advisory" : "advisory";
+    const nextSnapshotId = writerEnabled && requestedAvailable && RUN_PROGRESS_ASSOCIATION_SAFE_ID_RE.test(rawSnapshotId)
+        ? rawSnapshotId
+        : null;
+
+    if ((runProgressPollingActive || runProgressPollingPaused) && nextSnapshotId !== runProgressPollingSnapshotId) {
+        stopRunProgressPolling(nextSnapshotId ? "association_changed" : "association_unavailable");
+    }
 
     currentRunProgressWriterEnabled = writerEnabled;
     currentRunProgressAssociationMode = requestedMode;
@@ -10493,6 +10574,7 @@ function setCurrentRunProgressAssociation(association) {
 }
 
 function loadAssociatedRunProgressSnapshot() {
+    if (runProgressPollingActive || runProgressPollingPaused) stopRunProgressPolling("operator");
     if (runProgressRefreshInFlight) return;
     if (!currentRunProgressAvailable || !currentRunProgressSnapshotId) {
         _runProgressSetLoadStatus("Snapshot is associated but not currently available.");
@@ -10502,6 +10584,7 @@ function loadAssociatedRunProgressSnapshot() {
 }
 
 async function refreshAssociatedRunProgressSnapshot() {
+    if (runProgressPollingActive || runProgressPollingPaused) stopRunProgressPolling("operator");
     if (runProgressRefreshInFlight) return;
     const snapshotId = currentRunProgressSnapshotId;
     if (!currentRunProgressAvailable || !snapshotId || !RUN_PROGRESS_ASSOCIATION_SAFE_ID_RE.test(snapshotId)) {
@@ -10515,7 +10598,8 @@ async function refreshAssociatedRunProgressSnapshot() {
     setRunProgressRefreshState("refreshing", "Refreshing associated read-only snapshot...");
     const outcome = await loadRunProgressSnapshot(snapshotId, {
         expectedAssociatedSnapshotId: snapshotId,
-        requestFailureStatus: "refresh_failed"
+        requestFailureStatus: "refresh_failed",
+        manualRefresh: true
     });
     if (outcome.stale) {
         setRunProgressRefreshState("idle");
@@ -10668,6 +10752,13 @@ function _runProgressAssociationIsCurrent(snapshotId, options) {
 }
 
 async function loadRunProgressSnapshot(snapshotId, options = {}) {
+    const pollingRequest = Number.isInteger(options.pollingSessionToken);
+    if (!pollingRequest && !options.manualRefresh && (runProgressPollingActive || runProgressPollingPaused)) {
+        stopRunProgressPolling("operator");
+    }
+    if (!pollingRequest && !options.manualRefresh && runProgressRefreshInFlight) {
+        return { ok: false, status: "refresh_in_flight", message: "A snapshot request is already in progress." };
+    }
     const input = document.getElementById("runProgressSnapshotId");
     const requestedId = typeof snapshotId === "string"
         ? snapshotId.trim()
@@ -10714,7 +10805,7 @@ async function loadRunProgressSnapshot(snapshotId, options = {}) {
         }
         renderRunProgressSnapshot({ ...snapshot, freshness });
         _runProgressSetLoadStatus("Read-only snapshot loaded.");
-        return { ok: true, status: "refreshed" };
+        return { ok: true, status: "refreshed", snapshot, freshness };
     } catch (error) {
         if (!_runProgressAssociationIsCurrent(requestedId, options)) return { ok: false, stale: true };
         const status = options.requestFailureStatus || "snapshot_malformed";
@@ -10726,6 +10817,245 @@ async function loadRunProgressSnapshot(snapshotId, options = {}) {
         return { ok: false, status, message };
     }
 }
+
+const RUN_PROGRESS_POLLING_STOP_REASONS = new Set([
+    "operator", "terminal", "association_changed", "association_unavailable",
+    "duration_limit", "request_limit", "error_limit", "possibly_abandoned",
+    "blocked_snapshot", "unsafe_snapshot_id", "page_unload", "stale_session",
+    "configuration_disabled"
+]);
+
+function _runProgressPollingNotice(reason) {
+    const notices = {
+        operator: "Progress updates were stopped. The underlying run was not affected.",
+        terminal: "Progress updates stopped because the snapshot reported a terminal state.",
+        association_changed: "Progress updates stopped because a different run became associated.",
+        association_unavailable: "The associated snapshot is not currently available.",
+        duration_limit: "Progress updates stopped after reaching the configured time limit.",
+        request_limit: "Progress updates stopped after reaching the configured request limit.",
+        error_limit: "Progress updates stopped after repeated read failures. No execution action was taken.",
+        possibly_abandoned: "This nonterminal snapshot has not been updated for an extended period. Automatic progress updates were stopped, and no execution action was taken.",
+        blocked_snapshot: "Progress updates stopped because the snapshot could not be read safely.",
+        unsafe_snapshot_id: "Progress updates stopped because the associated snapshot ID was not safe to load.",
+        page_unload: "Progress updates stopped because this page is unloading.",
+        stale_session: "Progress updates stopped because this polling session was no longer current.",
+        configuration_disabled: "Automatic progress updates are disabled."
+    };
+    return notices[reason] || notices.blocked_snapshot;
+}
+
+function _runProgressPollingCurrentAssociationIsSafe() {
+    return currentRunProgressAvailable
+        && typeof currentRunProgressSnapshotId === "string"
+        && RUN_PROGRESS_ASSOCIATION_SAFE_ID_RE.test(currentRunProgressSnapshotId);
+}
+
+function _runProgressPollingNow() {
+    if (typeof performance !== "undefined" && Number.isFinite(performance.now())) return performance.now();
+    return Date.now();
+}
+
+function _runProgressPollingDurationExpired() {
+    if (!runProgressPollingStartedAt) return false;
+    return (_runProgressPollingNow() - runProgressPollingStartedAt) >= (
+        RUN_PROGRESS_POLLING_CONFIGURATION.maximumDurationSeconds * 1000
+    );
+}
+
+function _renderRunProgressPollingControls() {
+    const startButton = document.getElementById("runProgressPollingStartButton");
+    const stopButton = document.getElementById("runProgressPollingStopButton");
+    const status = document.getElementById("runProgressPollingStatus");
+    const associationSafe = _runProgressPollingCurrentAssociationIsSafe();
+    const sessionActive = runProgressPollingActive || runProgressPollingPaused;
+    let message = "Temporary read-only progress updates are ready."
+
+    if (!RUN_PROGRESS_POLLING_CONFIGURATION.enabled) {
+        message = "Automatic progress updates are disabled.";
+    } else if (!associationSafe) {
+        message = "No progress snapshot is associated with the current run.";
+    } else if (runProgressPollingPaused) {
+        message = "Progress updates are paused while this tab is hidden.";
+    } else if (runProgressPollingActive) {
+        message = "Temporary read-only progress updates are active.";
+    } else if (runProgressPollingStopReason) {
+        message = _runProgressPollingNotice(runProgressPollingStopReason);
+    }
+
+    if (startButton) {
+        startButton.disabled = !RUN_PROGRESS_POLLING_CONFIGURATION.enabled
+            || !associationSafe
+            || sessionActive
+            || runProgressRefreshInFlight;
+    }
+    if (stopButton) stopButton.disabled = !sessionActive;
+    if (status) status.textContent = message;
+}
+
+function _clearRunProgressPollingTimeout() {
+    if (runProgressPollingTimeoutId !== null) {
+        window.clearTimeout(runProgressPollingTimeoutId);
+        runProgressPollingTimeoutId = null;
+    }
+}
+
+function stopRunProgressPolling(reason) {
+    const safeReason = RUN_PROGRESS_POLLING_STOP_REASONS.has(reason) ? reason : "blocked_snapshot";
+    _clearRunProgressPollingTimeout();
+    runProgressPollingActive = false;
+    runProgressPollingPaused = false;
+    runProgressPollingSnapshotId = null;
+    runProgressPollingStopReason = safeReason;
+    runProgressPollingSessionToken += 1;
+    _renderCurrentRunProgressAssociation();
+}
+
+function _runProgressPollingCanContinue(token) {
+    if (token !== runProgressPollingSessionToken || !runProgressPollingActive) return false;
+    if (!RUN_PROGRESS_POLLING_CONFIGURATION.enabled) {
+        stopRunProgressPolling("configuration_disabled");
+        return false;
+    }
+    if (!_runProgressPollingCurrentAssociationIsSafe()) {
+        stopRunProgressPolling(currentRunProgressSnapshotId ? "unsafe_snapshot_id" : "association_unavailable");
+        return false;
+    }
+    if (currentRunProgressSnapshotId !== runProgressPollingSnapshotId) {
+        stopRunProgressPolling("association_changed");
+        return false;
+    }
+    if (_runProgressPollingDurationExpired()) {
+        stopRunProgressPolling("duration_limit");
+        return false;
+    }
+    if (runProgressPollingRequestCount >= RUN_PROGRESS_POLLING_CONFIGURATION.maximumRequests) {
+        stopRunProgressPolling("request_limit");
+        return false;
+    }
+    return true;
+}
+
+function _scheduleRunProgressPolling(token) {
+    if (!_runProgressPollingCanContinue(token) || runProgressPollingTimeoutId !== null) return;
+    if (document.hidden) {
+        runProgressPollingPaused = true;
+        _renderCurrentRunProgressAssociation();
+        return;
+    }
+    runProgressPollingPaused = false;
+    runProgressPollingTimeoutId = window.setTimeout(() => {
+        runProgressPollingTimeoutId = null;
+        _performRunProgressPollingRequest(token);
+    }, RUN_PROGRESS_POLLING_CONFIGURATION.intervalSeconds * 1000);
+    _renderCurrentRunProgressAssociation();
+}
+
+async function _performRunProgressPollingRequest(token) {
+    if (!_runProgressPollingCanContinue(token) || runProgressPollingInFlight || runProgressRefreshInFlight) return;
+    if (document.hidden) {
+        runProgressPollingPaused = true;
+        _renderCurrentRunProgressAssociation();
+        return;
+    }
+
+    const snapshotId = runProgressPollingSnapshotId;
+    runProgressPollingPaused = false;
+    runProgressPollingInFlight = true;
+    runProgressRefreshInFlight = true;
+    runProgressPollingRequestCount += 1;
+    _renderCurrentRunProgressAssociation();
+    _runProgressSetLoadStatus("Refreshing associated read-only snapshot...");
+
+    let scheduleNext = false;
+    try {
+        const outcome = await loadRunProgressSnapshot(snapshotId, {
+            expectedAssociatedSnapshotId: snapshotId,
+            requestFailureStatus: "polling_failed",
+            pollingSessionToken: token
+        });
+        if (token !== runProgressPollingSessionToken) return;
+        if (outcome.stale) {
+            stopRunProgressPolling("association_changed");
+            return;
+        }
+        if (!outcome.ok) {
+            if (outcome.status === "snapshot_blocked" || outcome.status === "snapshot_malformed") {
+                stopRunProgressPolling("blocked_snapshot");
+                return;
+            }
+            runProgressPollingConsecutiveErrors += 1;
+            if (runProgressPollingConsecutiveErrors >= RUN_PROGRESS_POLLING_CONFIGURATION.maximumConsecutiveErrors) {
+                stopRunProgressPolling("error_limit");
+                return;
+            }
+            _runProgressSetLoadStatus(outcome.message || "The progress snapshot refresh failed.");
+            scheduleNext = true;
+            return;
+        }
+
+        runProgressPollingConsecutiveErrors = 0;
+        const snapshot = _runProgressObject(outcome.snapshot);
+        const freshness = _runProgressObject(outcome.freshness);
+        if (snapshot.terminal === true) {
+            stopRunProgressPolling("terminal");
+            return;
+        }
+        if (freshness.freshness_status === "possibly_abandoned") {
+            stopRunProgressPolling("possibly_abandoned");
+            return;
+        }
+        scheduleNext = true;
+    } finally {
+        runProgressPollingInFlight = false;
+        runProgressRefreshInFlight = false;
+        _renderCurrentRunProgressAssociation();
+        if (scheduleNext && token === runProgressPollingSessionToken && runProgressPollingActive) {
+            _scheduleRunProgressPolling(token);
+        }
+    }
+}
+
+function startRunProgressPolling() {
+    if (runProgressPollingActive || runProgressPollingPaused || runProgressRefreshInFlight) return;
+    if (!RUN_PROGRESS_POLLING_CONFIGURATION.enabled) {
+        runProgressPollingStopReason = "configuration_disabled";
+        _renderCurrentRunProgressAssociation();
+        return;
+    }
+    if (!_runProgressPollingCurrentAssociationIsSafe()) {
+        runProgressPollingStopReason = currentRunProgressSnapshotId ? "unsafe_snapshot_id" : "association_unavailable";
+        _renderCurrentRunProgressAssociation();
+        return;
+    }
+
+    runProgressPollingSessionToken += 1;
+    runProgressPollingActive = true;
+    runProgressPollingPaused = false;
+    runProgressPollingStartedAt = _runProgressPollingNow();
+    runProgressPollingRequestCount = 0;
+    runProgressPollingConsecutiveErrors = 0;
+    runProgressPollingSnapshotId = currentRunProgressSnapshotId;
+    runProgressPollingStopReason = "";
+    _renderCurrentRunProgressAssociation();
+    _performRunProgressPollingRequest(runProgressPollingSessionToken);
+}
+
+function _handleRunProgressPollingVisibilityChange() {
+    if (!runProgressPollingActive) return;
+    if (document.hidden) {
+        runProgressPollingPaused = true;
+        _clearRunProgressPollingTimeout();
+        _renderCurrentRunProgressAssociation();
+        return;
+    }
+    if (!runProgressPollingPaused) return;
+    runProgressPollingPaused = false;
+    _renderCurrentRunProgressAssociation();
+    _scheduleRunProgressPolling(runProgressPollingSessionToken);
+}
+
+document.addEventListener("visibilitychange", _handleRunProgressPollingVisibilityChange);
+window.addEventListener("pagehide", () => stopRunProgressPolling("page_unload"));
 // /UX.RUN.3 run-progress-panel
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-07-11T00:00:00+09:00",
+  "updated_at": "2026-07-12T00:00:00+09:00",
   "phases": [
     {
       "phase_id": "ROAD.1",
@@ -4763,14 +4763,16 @@
       "phase_id": "UX.LIVE.10",
       "title": "Optional Default-Off Bounded Progress Polling",
       "track": "UX",
-      "status": "proposed",
-      "summary": "Implement the reviewed UX.LIVE.9 contract as a page-local, explicitly started and stopped, GET-only bounded browser reader for the current safe progress snapshot. It may refresh advisory display data only within finite limits and must remain free of execution authority.",
+      "status": "complete",
+      "summary": "Default-off, explicitly activated, page-local browser polling of the currently associated safe run-progress snapshot through the existing GET-only loader. It uses a finite request and duration budget, one request at a time, and deterministic advisory stops without runtime authority.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
       "allowed_files": [
+        "web/app.py",
         "web/templates/index.html",
         "web/static/style.css",
+        "tests/test_bounded_run_progress_polling.py",
         "tests/test_run_progress_polling_plan.py",
         "tests/test_manual_run_progress_refresh.py",
         "tests/test_current_run_snapshot_association.py",
@@ -4790,10 +4792,12 @@
       ],
       "validation": [
         "python -m compileall -q core scripts tests benchmarks web",
-        "python -m pytest tests/test_run_progress_polling_plan.py -q",
-        "python -m pytest tests/test_run_progress_freshness.py tests/test_run_progress_freshness_plan.py -q",
+        "python -m pytest tests/test_bounded_run_progress_polling.py -q",
         "python -m pytest tests/test_manual_run_progress_refresh.py tests/test_current_run_snapshot_association.py -q",
+        "python -m pytest tests/test_run_progress_freshness.py tests/test_run_progress_freshness_plan.py -q",
         "python -m pytest tests/test_run_progress_snapshot_loader.py tests/test_run_progress_ui_panel.py -q",
+        "python -m pytest tests/test_run_progress_multistage_shadow_instrumentation.py tests/test_run_progress_snapshot_shadow_writer.py -q",
+        "python -m pytest tests/test_run_progress_polling_plan.py -q",
         "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
         "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
         "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
@@ -4810,8 +4814,63 @@
       ],
       "expected_artifacts": [],
       "notes": [
-        "UX.LIVE.10 is proposed only. It may implement the UX.LIVE.9 reviewed browser contract with default-off configuration, an explicit secondary Start bounded progress updates control, a Stop progress updates control, one shared GET loader/request guard, a chained bounded schedule, and deterministic terminal, association, limit, error, hidden-tab, and page-unload stops.",
-        "It may not start implicitly, enable the writer, create snapshots or runs, alter execution, add a job system, POST route, long polling, SSE, WebSockets, persistence, browser notifications, cross-tab synchronization, restart/cancel/inspect a run, invoke models/workers/tools, apply patches, run validation or benchmarks, enforce approval, delete artifacts, or grant runtime authority."
+        "UX.LIVE.10 shipped 2026-07-12 as an optional browser-side bounded polling experiment. Missing or false RUN_PROGRESS_POLLING_ENABLED leaves it disabled; a safe associated snapshot plus a deliberate Start progress updates click are required. The page-local session makes one initial GET, chains at least two-second one-shot timeouts only after settlement, has finite duration/request/error limits, and stops on terminal, association, safety, hidden-tab, page-unload, and operator conditions.",
+        "It reuses only GET /ux/run-progress/snapshot/<snapshot_id>, the approved loader response, snapshot renderer, freshness display, and shared in-flight guard. It adds no new route, POST, WebSocket, SSE, long polling, service worker, persistence, database job, writer enablement, snapshot creation, run cancellation/restart, process inspection, model or worker action, patch action, validation/benchmark action, approval enforcement, or runtime authority. Expected status: bounded_run_progress_polling_ready_with_warnings pending real operator dogfooding. Recommended next phase: UX.LIVE.CLOSE - Live Run Progress Branch Checkpoint."
+      ]
+    },
+    {
+      "phase_id": "UX.LIVE.CLOSE",
+      "title": "Live Run Progress Branch Checkpoint",
+      "track": "UX",
+      "status": "proposed",
+      "summary": "Report-only checkpoint for UX.LIVE.1 through UX.LIVE.10 that audits truthful observation coverage, default-off bounded polling safeguards, known limitations, and the absence of runtime authority before freezing the live-progress branch with warnings.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/run_progress_live_branch_checkpoint.py",
+        "scripts/create_run_progress_live_branch_checkpoint.py",
+        "tests/test_run_progress_live_branch_checkpoint.py",
+        "tests/test_bounded_run_progress_polling.py",
+        "tests/test_run_progress_polling_plan.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/ux/run_progress_live_branch_checkpoint/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_run_progress_live_branch_checkpoint.py -q",
+        "python -m pytest tests/test_bounded_run_progress_polling.py tests/test_run_progress_polling_plan.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "UX.LIVE.10"
+      ],
+      "expected_artifacts": [
+        ".agent/ux/run_progress_live_branch_checkpoint/run_progress_live_branch_checkpoint.json",
+        ".agent/ux/run_progress_live_branch_checkpoint/run_progress_live_branch_checkpoint.md"
+      ],
+      "notes": [
+        "UX.LIVE.CLOSE is proposed as a report-only checkpoint. It should audit UX.LIVE.1 through UX.LIVE.10, verify the browser experiment remains default-off, bounded, GET-only, page-local, and non-authoritative, document known limits, and freeze the branch with warnings.",
+        "It must not add polling behavior, change browser/runtime behavior, enable writers, create snapshots, inspect processes, execute work, call models, launch workers, apply patches, run validation or benchmarks, enforce approval, contact networks, write databases, push, merge, or open PRs."
       ]
     },
     {

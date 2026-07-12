@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (101 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 4 OPS + 15 MIRROR + 26 UX).
-- The phase picker currently has two safe candidates: `UX.LIVE.10` and `MIRROR.13`.
-- The top recommendation is `UX.LIVE.10` - Optional Default-Off Bounded Progress Polling.
+- The phase registry is valid (102 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 4 OPS + 15 MIRROR + 27 UX).
+- The phase picker currently has two safe candidates: `UX.LIVE.CLOSE` and `MIRROR.13`.
+- The top recommendation is `UX.LIVE.CLOSE` - Live Run Progress Branch Checkpoint.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -41,7 +41,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 ### Validation State
 
 - Registry validation is passing.
-- The current phase picker result recommends `UX.LIVE.1` after UX.RUN.CLOSE froze the read-only visibility branch.
+- The current phase picker result recommends `UX.LIVE.CLOSE` after UX.LIVE.10 completed the bounded, default-off browser reader.
 - The old roadmap arc is complete and should not be stretched to imply new authorization.
 
 ### Benchmark State
@@ -143,10 +143,10 @@ test-runtime planning branch before executable manifests or runner commands.
 UX.RUN.3 ships a compact read-only panel for loaded progress snapshot artifacts
 after UX.RUN.2 made the progress-stage contract loadable. UX.RUN.CLOSE now freezes
 UX.RUN.1 through UX.RUN.3 as a safe read-only branch. The phase picker recommends
-**UX.LIVE.10 - Optional Default-Off Bounded Progress Polling** after the
-reviewed UX.LIVE.9 report-only contract. UX.LIVE.10 remains proposed and may
-not authorize execution or runtime changes. MIRROR.13 remains a proposed
-Mirror candidate, ranked after UX.LIVE.10.
+**UX.LIVE.CLOSE - Live Run Progress Branch Checkpoint** after the completed
+UX.LIVE.10 browser experiment. UX.LIVE.CLOSE remains proposed and report-only;
+it may audit safeguards but may not authorize execution or runtime changes.
+MIRROR.13 remains a proposed Mirror candidate, ranked after UX.LIVE.CLOSE.
 
 ### Branch CMD — Commander Mode
 
@@ -238,12 +238,12 @@ Recommended branch order:
 4. MODEL - shipped through MODEL.CLOSE
 5. UX - shipped through UX.CLOSE
 6. ADOPT - shipped through ADOPT.MODEL.CLOSE
-7. MIRROR - proposed through MIRROR.13, but currently ranked after UX.LIVE.10
+7. MIRROR - proposed through MIRROR.13, but currently ranked after UX.LIVE.CLOSE
 8. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, HUMAN.N2 defined explicit human confirmation signals before dangerous actions, HUMAN.N3 added dry-run sample token validation against that contract without enforcing runtime behavior, HUMAN.N4 added documentation-only valid, warning, invalid, and blocked sample tokens, HUMAN.CLOSE froze the human authority branch, ADOPT.MODEL.1 adopted the advisory model-role catalog artifact, ADOPT.MODEL.2 verified post-adoption coverage against the active 10-role catalog, ADOPT.MODEL.CLOSE froze the adoption branch through a report-only checkpoint, HARDEN.CLOSE froze the approval-enforcement planning branch, OPS.TEST.CLOSE froze the test-runtime planning branch, UX.RUN.1 defined the read-only run progress visibility contract, UX.RUN.2 made existing progress snapshots loadable through a GET-only boundary, UX.RUN.3 added a read-only snapshot panel, and UX.RUN.CLOSE froze the branch. The current picker recommendation is UX.LIVE.1, which is plan-only and must not add live progress behavior.
+CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, HUMAN.N2 defined explicit human confirmation signals before dangerous actions, HUMAN.N3 added dry-run sample token validation against that contract without enforcing runtime behavior, HUMAN.N4 added documentation-only valid, warning, invalid, and blocked sample tokens, HUMAN.CLOSE froze the human authority branch, ADOPT.MODEL.1 adopted the advisory model-role catalog artifact, ADOPT.MODEL.2 verified post-adoption coverage against the active 10-role catalog, ADOPT.MODEL.CLOSE froze the adoption branch through a report-only checkpoint, HARDEN.CLOSE froze the approval-enforcement planning branch, OPS.TEST.CLOSE froze the test-runtime planning branch, UX.RUN.1 defined the read-only run progress visibility contract, UX.RUN.2 made existing progress snapshots loadable through a GET-only boundary, UX.RUN.3 added a read-only snapshot panel, UX.RUN.CLOSE froze the branch, and UX.LIVE.10 added an optional bounded browser reader. The current picker recommendation is UX.LIVE.CLOSE, a report-only branch checkpoint that must not add live behavior.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -1165,14 +1165,21 @@ runtime, snapshot, or execution behavior. Its expected status is
 `run_progress_polling_plan_ready_with_warnings` because browser dogfooding
 remains future work.
 
-**UX.LIVE.10 - Optional Default-Off Bounded Progress Polling is proposed.**
-UX.LIVE.10 is the current picker recommendation. It may implement only the
-reviewed UX.LIVE.9 browser reader: configuration remains default-off, a safe
-associated snapshot plus an explicit Start control are required, requests reuse
-the existing GET loader and one in-flight guard, and all session limits and stop
-conditions remain deterministic. It must not start implicitly; change the
-writer, snapshots, runtime, or run; add streaming or persistence; or use
-freshness as execution authority.
+**UX.LIVE.10 - Optional Default-Off Bounded Progress Polling is shipped 2026-07-12 (complete).**
+UX.LIVE.10 adds a default-off, page-local browser reader behind an explicit
+Start progress updates control. It reuses the existing GET-only snapshot loader,
+uses one in-flight guard and chained one-shot timeouts, counts finite duration,
+request, and consecutive-error bounds, and stops deterministically for terminal,
+association, safety, hidden-tab, page-unload, and operator conditions. It does
+not supervise or affect the underlying run, writer, snapshot lifecycle, runtime,
+or approval state. Its expected status is
+`bounded_run_progress_polling_ready_with_warnings` pending operator dogfooding.
+
+**UX.LIVE.CLOSE - Live Run Progress Branch Checkpoint is proposed.**
+UX.LIVE.CLOSE is the current picker recommendation. It should audit UX.LIVE.1
+through UX.LIVE.10, confirm default-off and non-authoritative behavior, document
+known observation limits, and freeze the branch with warnings. It must remain a
+report-only checkpoint and must not add or activate browser polling.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
@@ -1370,7 +1377,7 @@ tokens, issue or consume tokens, approve or reject real actions, apply patches,
 validate, benchmark, invoke MCP tools, launch workers, call or route models,
 contact network services, write to a database, change route behavior, change
 auth policy, push, merge, or open PRs. MIRROR.13 remains a proposed Mirror
-candidate, but UX.LIVE.10 is now the current picker recommendation.
+candidate, but UX.LIVE.CLOSE is now the current picker recommendation.
 
 ### OPS.TEST.CLOSE - Test Runtime Operations Branch Checkpoint
 
@@ -1389,7 +1396,7 @@ any executable suite manifests, runner commands, or CI changes are added.
 timeout as pass; hide failures; add executable runner behavior; alter runtime
 routes; change auth; call or route models; launch workers; apply patches; invoke
 MCP tools; contact network services; write to a database; push, merge, or open
-PRs. Current recommended next phase: UX.LIVE.10 - Optional Default-Off Bounded Progress Polling.
+PRs. Current recommended next phase: UX.LIVE.CLOSE - Live Run Progress Branch Checkpoint.
 
 ### HARDEN.N1 - Approval Enforcement Readiness Audit
 

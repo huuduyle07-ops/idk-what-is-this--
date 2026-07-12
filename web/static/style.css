@@ -4947,6 +4947,40 @@ details[open] > .dream-trials-summary::before { content: "\25BE "; }
     color: var(--color-text);
 }
 
+/* UX.LIVE.10: temporary observation controls remain secondary to run actions. */
+.run-progress-polling-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 12px;
+    padding: 9px 10px;
+    border: 1px dashed var(--color-border);
+    border-radius: 6px;
+    background: var(--color-bg);
+}
+
+.run-progress-polling-controls__note,
+.run-progress-polling-status {
+    width: 100%;
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.run-progress-polling-button {
+    padding: 6px 9px;
+    border-color: var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.run-progress-polling-button:not(:disabled):hover {
+    color: var(--color-text);
+}
+
 .run-progress-badge {
     display: inline-flex;
     align-items: center;
