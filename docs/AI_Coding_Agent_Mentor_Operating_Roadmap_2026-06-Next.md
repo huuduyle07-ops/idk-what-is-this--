@@ -18,9 +18,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (100 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 4 OPS + 15 MIRROR + 25 UX).
-- The phase picker currently has two safe candidates: `UX.LIVE.9` and `MIRROR.13`.
-- The top recommendation is `UX.LIVE.9` - Bounded Progress Polling Experiment Plan.
+- The phase registry is valid (101 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 4 OPS + 15 MIRROR + 26 UX).
+- The phase picker currently has two safe candidates: `UX.LIVE.10` and `MIRROR.13`.
+- The top recommendation is `UX.LIVE.10` - Optional Default-Off Bounded Progress Polling.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -143,10 +143,10 @@ test-runtime planning branch before executable manifests or runner commands.
 UX.RUN.3 ships a compact read-only panel for loaded progress snapshot artifacts
 after UX.RUN.2 made the progress-stage contract loadable. UX.RUN.CLOSE now freezes
 UX.RUN.1 through UX.RUN.3 as a safe read-only branch. The phase picker recommends
-**UX.LIVE.9 - Bounded Progress Polling Experiment Plan** after UX.LIVE.8's
-advisory freshness implementation; it remains report-only and does not
-authorize polling or runtime execution changes. MIRROR.13 remains a proposed
-Mirror candidate, ranked after UX.LIVE.9.
+**UX.LIVE.10 - Optional Default-Off Bounded Progress Polling** after the
+reviewed UX.LIVE.9 report-only contract. UX.LIVE.10 remains proposed and may
+not authorize execution or runtime changes. MIRROR.13 remains a proposed
+Mirror candidate, ranked after UX.LIVE.10.
 
 ### Branch CMD — Commander Mode
 
@@ -238,7 +238,7 @@ Recommended branch order:
 4. MODEL - shipped through MODEL.CLOSE
 5. UX - shipped through UX.CLOSE
 6. ADOPT - shipped through ADOPT.MODEL.CLOSE
-7. MIRROR - proposed through MIRROR.13, but currently ranked after UX.LIVE.9
+7. MIRROR - proposed through MIRROR.13, but currently ranked after UX.LIVE.10
 8. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
@@ -1153,12 +1153,26 @@ cancellation, restart, or execution controls. Its expected status is
 `run_progress_freshness_ready_with_warnings` because displayed freshness is
 recalculated only on an operator's manual load or refresh.
 
-**UX.LIVE.9 - Bounded Progress Polling Experiment Plan is proposed.**
-UX.LIVE.9 is the current recommendation. It should remain report-only while
-defining a future default-off experiment: explicit operator enablement,
-minimum interval, maximum duration, terminal/association stop conditions,
-tab-hidden behavior, request deduplication, bounded errors, and no execution
-authority. It must not implement polling in the planning phase.
+**UX.LIVE.9 - Bounded Progress Polling Experiment Plan is shipped 2026-07-12 (complete).**
+UX.LIVE.9 writes a report-only contract for a future default-off experiment:
+explicit operator activation, existing GET-only loader reuse, a two-second
+minimum and three-second default interval, finite five-minute/100-request/three-
+error bounds, one request at a time, terminal and association-change stops,
+hidden-tab pause, bounded normal-interval error handling, page-local session
+state, and accessible advisory statuses. It adds no timer, browser request,
+background refresh, automatic retry, browser control, route, writer, loader,
+runtime, snapshot, or execution behavior. Its expected status is
+`run_progress_polling_plan_ready_with_warnings` because browser dogfooding
+remains future work.
+
+**UX.LIVE.10 - Optional Default-Off Bounded Progress Polling is proposed.**
+UX.LIVE.10 is the current picker recommendation. It may implement only the
+reviewed UX.LIVE.9 browser reader: configuration remains default-off, a safe
+associated snapshot plus an explicit Start control are required, requests reuse
+the existing GET loader and one in-flight guard, and all session limits and stop
+conditions remain deterministic. It must not start implicitly; change the
+writer, snapshots, runtime, or run; add streaming or persistence; or use
+freshness as execution authority.
 
 **MIRROR.13 - Live Trace Frame Capture Quality Plan is proposed.**
 MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
@@ -1356,7 +1370,7 @@ tokens, issue or consume tokens, approve or reject real actions, apply patches,
 validate, benchmark, invoke MCP tools, launch workers, call or route models,
 contact network services, write to a database, change route behavior, change
 auth policy, push, merge, or open PRs. MIRROR.13 remains a proposed Mirror
-candidate, but UX.LIVE.9 is now the current picker recommendation.
+candidate, but UX.LIVE.10 is now the current picker recommendation.
 
 ### OPS.TEST.CLOSE - Test Runtime Operations Branch Checkpoint
 
@@ -1375,7 +1389,7 @@ any executable suite manifests, runner commands, or CI changes are added.
 timeout as pass; hide failures; add executable runner behavior; alter runtime
 routes; change auth; call or route models; launch workers; apply patches; invoke
 MCP tools; contact network services; write to a database; push, merge, or open
-PRs. Current recommended next phase: UX.LIVE.9 - Bounded Progress Polling Experiment Plan.
+PRs. Current recommended next phase: UX.LIVE.10 - Optional Default-Off Bounded Progress Polling.
 
 ### HARDEN.N1 - Approval Enforcement Readiness Audit
 
