@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-07-12T00:00:00+09:00",
+  "updated_at": "2026-07-13T00:00:00+09:00",
   "phases": [
     {
       "phase_id": "ROAD.1",
@@ -4870,25 +4870,25 @@
       ],
       "notes": [
         "UX.LIVE.CLOSE shipped 2026-07-12 as a report-only checkpoint for UX.LIVE.1 through UX.LIVE.10. It records truthful partial progress visibility, default-off writer and polling safeguards, no runtime authority, bounded GET-only browser polling, known experimental limitations, and freezes the live-progress branch with warnings.",
-        "It did not add or activate polling, change browser/runtime behavior, enable writers, create snapshots, inspect processes, execute work, call models, launch workers, apply patches, run validation or benchmarks, enforce approval, contact networks, write databases, push, merge, or open PRs. Recommended next phase: DOGFOOD.1 - Real Operator Run Evaluation."
+        "It did not add or activate polling, change browser/runtime behavior, enable writers, create snapshots, inspect processes, execute work, call models, launch workers, apply patches, run validation or benchmarks, enforce approval, contact networks, write databases, push, merge, or open PRs. Recommended next phase: DOGFOOD.1A - Live Progress Operator Evaluation Framework."
       ]
     },
     {
-      "phase_id": "DOGFOOD.1",
-      "title": "Real Operator Run Evaluation",
+      "phase_id": "DOGFOOD.1A",
+      "title": "Live Progress Operator Evaluation Framework",
       "track": "DOGFOOD",
-      "status": "proposed",
-      "summary": "Report-only real-operator evaluation of the frozen Live Run Progress branch. It will assess whether observed progress, advisory freshness, manual refresh, bounded polling, and default-off discovery reduce uncertainty without being mistaken for validation or approval.",
+      "status": "complete",
+      "summary": "Provide a deterministic, sanitized, report-only framework for recording and evaluating real operator observations. It validates safe input, calculates coverage and uncertainty metrics, flags safety misunderstandings, and writes evidence artifacts without claiming that real evaluation has occurred.",
       "automation_level": "LOCAL_0_OBSERVE",
       "budget_tier": "local_only",
       "risk_level": "low",
       "allowed_files": [
-        "core/real_operator_run_evaluation.py",
-        "scripts/create_real_operator_run_evaluation.py",
-        "tests/test_real_operator_run_evaluation.py",
+        "core/live_progress_operator_dogfood.py",
+        "scripts/create_live_progress_operator_dogfood_report.py",
+        "tests/test_live_progress_operator_dogfood.py",
         "docs/roadmap/phase_registry.json",
         "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
-        ".agent/dogfood/real_operator_run_evaluation/"
+        ".agent/dogfood/live_progress_operator_evaluation/"
       ],
       "forbidden_files": [
         ".env",
@@ -4899,7 +4899,10 @@
       ],
       "validation": [
         "python -m compileall -q core scripts tests benchmarks web",
-        "python -m pytest tests/test_real_operator_run_evaluation.py -q",
+        "python -m pytest tests/test_live_progress_operator_dogfood.py -q",
+        "python -m pytest tests/test_run_progress_live_branch_checkpoint.py -q",
+        "python -m pytest tests/test_bounded_run_progress_polling.py tests/test_manual_run_progress_refresh.py -q",
+        "python -m pytest tests/test_run_progress_freshness.py tests/test_run_progress_snapshot_loader.py -q",
         "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
         "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
         "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
@@ -4915,12 +4918,181 @@
         "UX.LIVE.CLOSE"
       ],
       "expected_artifacts": [
-        ".agent/dogfood/real_operator_run_evaluation/real_operator_run_evaluation.json",
-        ".agent/dogfood/real_operator_run_evaluation/real_operator_run_evaluation.md"
+        ".agent/dogfood/live_progress_operator_evaluation/live_progress_operator_evaluation.json",
+        ".agent/dogfood/live_progress_operator_evaluation/live_progress_operator_evaluation.md"
       ],
       "notes": [
-        "DOGFOOD.1 is proposed and report-only initially. It should evaluate actual runs for uncertainty reduction, observed-stage comprehension, freshness-label utility, manual-refresh sufficiency, bounded-polling usefulness or distraction, default-off discoverability, mistaken validation/approval inference, and whether stage coverage needs expansion.",
-        "It must not enable the writer or polling, alter runtime instrumentation, create snapshots, inspect processes, execute work, call models, launch workers, apply patches, run validation or benchmarks, enforce approval, contact networks, write databases, add server monitoring, push, merge, or open PRs."
+        "DOGFOOD.1 was split before real evidence collection because the first implementation delivered the evaluation framework but contained zero confirmed real runs. DOGFOOD.1A is complete as the framework only; synthetic test fixtures are explicitly excluded from real-run counts.",
+        "It does not enable writer or polling defaults, alter runtime instrumentation, create snapshots, inspect processes, execute work, call models, launch workers, apply patches, run validation or benchmarks, enforce approval, contact networks, write databases, add server monitoring, push, merge, or open PRs. UX.LIVE remains frozen and any corrective work requires a separate approved phase."
+      ]
+    },
+    {
+      "phase_id": "HARDEN.PROGRESS.1",
+      "title": "Early Error Terminal Snapshot Coverage",
+      "track": "HARDEN",
+      "status": "complete",
+      "summary": "Narrow corrective coverage for genuine application errors produced after request_received but before the existing terminal observer. It reuses the established progress run ID, observes error_reported exactly once, preserves the authoritative application error result, and keeps the default-off progress writer isolated from runtime control.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "web/runner.py",
+        "core/run_progress_snapshot_shadow_writer.py",
+        "tests/test_run_progress_early_error_terminal_coverage.py",
+        "tests/test_run_progress_multistage_shadow_instrumentation.py",
+        "tests/test_run_progress_snapshot_shadow_writer.py",
+        "tests/test_run_progress_freshness.py",
+        "tests/test_bounded_run_progress_polling.py",
+        "tests/test_run_progress_live_branch_checkpoint.py",
+        "tests/test_live_progress_operator_dogfood.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/hardening/run_progress_early_error_terminal/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials",
+        "web/templates/index.html",
+        "web/static/style.css"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_run_progress_early_error_terminal_coverage.py -q",
+        "python -m pytest tests/test_run_progress_multistage_shadow_instrumentation.py tests/test_run_progress_snapshot_shadow_writer.py -q",
+        "python -m pytest tests/test_run_progress_freshness.py tests/test_bounded_run_progress_polling.py -q",
+        "python -m pytest tests/test_live_progress_operator_dogfood.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "DOGFOOD.1A"
+      ],
+      "expected_artifacts": [
+        ".agent/hardening/run_progress_early_error_terminal/run_progress_early_error_terminal.json",
+        ".agent/hardening/run_progress_early_error_terminal/run_progress_early_error_terminal.md"
+      ],
+      "notes": [
+        "HARDEN.PROGRESS.1 shipped 2026-07-13 as a narrow corrective phase for the genuine early application-error boundary found by dogfood-error-attempt-001. It reuses the request_received run ID, records error_reported as terminal, keeps prior truthful stages, and leaves the existing application error result unchanged.",
+        "Expected current status: early_error_terminal_coverage_ready_with_warnings because the focused implementation and regression coverage are complete while a real post-fix DOGFOOD.1B repeat remains pending.",
+        "The writer remains default-off and failure-isolated. This phase does not infer errors from freshness, add stages, retry or repair execution, change UI, polling, freshness, loader or association behavior, reopen UX.LIVE, or alter UX.LIVE.CLOSE. Recommended next phase: DOGFOOD.1B - Real Operator Run Evaluation."
+      ]
+    },
+    {
+      "phase_id": "DOGFOOD.1B",
+      "title": "Real Operator Run Evaluation",
+      "track": "DOGFOOD",
+      "status": "proposed",
+      "summary": "Collect and evaluate a minimum set of sanitized observations from actual C.A.T.T.U.S runs using the DOGFOOD.1A framework. Completion requires at least three valid real observations with successful-terminal, error-terminal, and genuine multistage coverage; manual refresh and explicitly started bounded polling are preferred additional coverage.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/live_progress_operator_dogfood.py",
+        "scripts/create_live_progress_operator_dogfood_report.py",
+        "tests/test_live_progress_operator_dogfood.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/dogfood/live_progress_operator_evaluation/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_live_progress_operator_dogfood.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "DOGFOOD.1A",
+        "HARDEN.PROGRESS.1"
+      ],
+      "expected_artifacts": [
+        ".agent/dogfood/live_progress_operator_evaluation/live_progress_operator_evaluation.json",
+        ".agent/dogfood/live_progress_operator_evaluation/live_progress_operator_evaluation.md"
+      ],
+      "notes": [
+        "DOGFOOD.1B remains incomplete when real_run_count is below 3, or when final_response_ready, error_reported, or a genuine nonterminal-before-terminal multistage observation is absent. dogfood_real_evidence_sufficient_with_warnings or dogfood_real_evidence_sufficient is required before completion; insufficient_real_evidence is not sufficient.",
+        "Do not fabricate observations, add synthetic fixtures under the real-run directory, start C.A.T.T.U.S automatically, alter defaults, change runtime or UI behavior, or create a product correction. Complete sanitized observations only after genuine operator runs; manual refresh and explicitly started bounded polling are preferred additional coverage."
+      ]
+    },
+    {
+      "phase_id": "VERIFY.TEST.1",
+      "title": "Test Design and TDD Planning",
+      "track": "VERIFY",
+      "status": "proposed",
+      "summary": "Report-only test-design and TDD planning phase. It will turn completed branch evidence into a deterministic test inventory, behavior matrix, and prioritized red-green-refactor plan without changing runtime behavior or automatically creating a corrective product phase.",
+      "automation_level": "LOCAL_0_OBSERVE",
+      "budget_tier": "local_only",
+      "risk_level": "low",
+      "allowed_files": [
+        "core/test_design_tdd_plan.py",
+        "scripts/create_test_design_tdd_plan.py",
+        "tests/test_test_design_tdd_plan.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md",
+        ".agent/verify/test_design_tdd_plan/"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials"
+      ],
+      "validation": [
+        "python -m compileall -q core scripts tests benchmarks web",
+        "python -m pytest tests/test_test_design_tdd_plan.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --json",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --json",
+        "python benchmarks/run_benchmarks.py --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "DOGFOOD.1B"
+      ],
+      "expected_artifacts": [
+        ".agent/verify/test_design_tdd_plan/test_design_tdd_plan.json",
+        ".agent/verify/test_design_tdd_plan/test_design_tdd_plan.md"
+      ],
+      "notes": [
+        "VERIFY.TEST.1 is proposed and report-only. It may plan tests and TDD sequencing from existing evidence but must not modify product behavior, execute live runs, call models, apply patches, launch workers, alter validation, change benchmarks, or create a product correction automatically.",
+        "Begin only after the minimum real live-progress dogfood evidence has been collected and reviewed in DOGFOOD.1B; it is not the current picker recommendation."
       ]
     },
     {

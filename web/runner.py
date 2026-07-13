@@ -65,6 +65,7 @@ from web.mcp_inspector_processes import stop_mcp_inspectors
 
 _WINDOWS_PATH_HINT_RE = re.compile(r"[A-Za-z]:[\\/][^\s\"'<>|]+")
 _RUN_PROGRESS_SNAPSHOT_ROOT = Path(__file__).resolve().parent.parent
+_EARLY_APPLICATION_ERROR_CATEGORY = "application_error"
 
 
 def run_web_app(flask_app, **run_kwargs) -> None:
@@ -248,18 +249,22 @@ def _maybe_write_run_progress_snapshot_shadow(
     session_id: Any,
     mode: str,
     outcome: str,
+    safe_error_category: str | None = None,
 ) -> dict:
     """Observe one terminal result without changing the result returned to the UI."""
     try:
+        metadata = {
+            "mode": mode,
+            "source_component": "web.runner",
+            "result_type": "terminal_error" if outcome == "error" else "terminal_response",
+        }
+        if outcome == "error" and safe_error_category:
+            metadata["error_category"] = safe_error_category
         safe_write_run_progress_snapshot(
             session_id,
             repo_root=_RUN_PROGRESS_SNAPSHOT_ROOT,
             outcome=outcome,
-            metadata={
-                "mode": mode,
-                "source_component": "web.runner",
-                "result_type": "terminal_error" if outcome == "error" else "terminal_response",
-            },
+            metadata=metadata,
         )
     except Exception:
         # The writer is an optional shadow observer.  Preserve the original run
@@ -611,7 +616,7 @@ def run_agent_web(
                 save_message(session_id, "assistant", answer)
             except Exception as e:
                 print(f"âš ï¸ DB message save skipped: {e}")
-            return {
+            result = {
                 "answer": answer,
                 "context": json.dumps(state.control_result or {}, indent=2, ensure_ascii=False),
                 "graph": json.dumps(state.code_analysis, indent=2),
@@ -625,6 +630,14 @@ def run_agent_web(
                 "runtime_environment_description": runtime_description,
                 **_harness_payload(pre_generation_decision),
             }
+            _maybe_write_run_progress_snapshot_shadow(
+                result=result,
+                session_id=shadow_run_id,
+                mode=mode,
+                outcome="error",
+                safe_error_category=_EARLY_APPLICATION_ERROR_CATEGORY,
+            )
+            return result
 
         if state.control_result and state.control_result.get("scout"):
             scout_files = state.control_result["scout"].get("likely_files", [])

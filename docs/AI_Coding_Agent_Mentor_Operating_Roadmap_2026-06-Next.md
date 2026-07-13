@@ -18,9 +18,8 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (103 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 8 HARDEN + 4 OPS + 1 DOGFOOD + 15 MIRROR + 27 UX).
-- The phase picker currently has two safe candidates: `DOGFOOD.1` and `MIRROR.13`.
-- The top recommendation is `DOGFOOD.1` - Real Operator Run Evaluation.
+- The phase registry is valid (106 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 9 HARDEN + 4 OPS + 2 DOGFOOD + 1 VERIFY + 15 MIRROR + 27 UX).
+- The phase picker recommends `DOGFOOD.1B` - Real Operator Run Evaluation. `VERIFY.TEST.1` remains proposed but waits for DOGFOOD.1B to complete.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
 
@@ -41,7 +40,9 @@ The completed roadmap arc is frozen at the following checkpoint.
 ### Validation State
 
 - Registry validation is passing.
-- The current phase picker result recommends `DOGFOOD.1` after UX.LIVE.CLOSE froze the bounded, default-off browser reader branch with warnings.
+- DOGFOOD.1A completed the pure operator-evaluation framework and generated a safe evidence artifact. It does not fabricate real runs; the artifact remains explicitly insufficient until three to five sanitized real observations are recorded.
+- HARDEN.PROGRESS.1 completed the narrow early-error terminal observation correction on a separate hardening track. It reuses the stable progress run ID, records a genuine early application error as terminal `error_reported`, preserves the application error result, and leaves UX.LIVE, UI, polling, freshness, and defaults unchanged. Its status is `early_error_terminal_coverage_ready_with_warnings` because a genuine post-fix DOGFOOD repeat remains pending.
+- DOGFOOD.1B is proposed to collect the actual sanitized operator evidence: at least three real observations, including success, error, and multistage coverage. The current phase picker recommends DOGFOOD.1B, while UX.LIVE remains frozen and any corrective product work still requires a separately approved phase.
 - The old roadmap arc is complete and should not be stretched to imply new authorization.
 
 ### Benchmark State
@@ -143,10 +144,10 @@ test-runtime planning branch before executable manifests or runner commands.
 UX.RUN.3 ships a compact read-only panel for loaded progress snapshot artifacts
 after UX.RUN.2 made the progress-stage contract loadable. UX.RUN.CLOSE now freezes
 UX.RUN.1 through UX.RUN.3 as a safe read-only branch. The phase picker recommends
-**DOGFOOD.1 - Real Operator Run Evaluation** after UX.LIVE.CLOSE froze the
-browser experiment. DOGFOOD.1 remains proposed and report-only; it may evaluate
+**DOGFOOD.1B - Real Operator Run Evaluation** after UX.LIVE.CLOSE froze the
+browser experiment. DOGFOOD.1B remains proposed and report-only; it may evaluate
 operator understanding and usefulness but may not authorize execution or runtime changes.
-MIRROR.13 remains a proposed Mirror candidate, ranked after DOGFOOD.1.
+MIRROR.13 remains a proposed Mirror candidate, ranked after DOGFOOD.1B.
 
 ### Branch CMD — Commander Mode
 
@@ -238,13 +239,13 @@ Recommended branch order:
 4. MODEL - shipped through MODEL.CLOSE
 5. UX - shipped through UX.CLOSE
 6. ADOPT - shipped through ADOPT.MODEL.CLOSE
-7. DOGFOOD - proposed through DOGFOOD.1 as the current real-use evidence priority
-8. MIRROR - proposed through MIRROR.13, ranked after DOGFOOD.1
+7. DOGFOOD - proposed through DOGFOOD.1B as the current real-use evidence priority
+8. MIRROR - proposed through MIRROR.13, ranked after DOGFOOD.1B
 9. REMOTE
 
 EVAL went first because a live benchmark flake appeared. EVAL.1, EVAL.2, and EVAL.3 are now shipped, giving C.A.T.T.U.S a report-only benchmark ledger, case comparison evidence, and flake classification before relying on larger operational claims.
 
-CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, HUMAN.N2 defined explicit human confirmation signals before dangerous actions, HUMAN.N3 added dry-run sample token validation against that contract without enforcing runtime behavior, HUMAN.N4 added documentation-only valid, warning, invalid, and blocked sample tokens, HUMAN.CLOSE froze the human authority branch, ADOPT.MODEL.1 adopted the advisory model-role catalog artifact, ADOPT.MODEL.2 verified post-adoption coverage against the active 10-role catalog, ADOPT.MODEL.CLOSE froze the adoption branch through a report-only checkpoint, HARDEN.CLOSE froze the approval-enforcement planning branch, OPS.TEST.CLOSE froze the test-runtime planning branch, UX.RUN.1 defined the read-only run progress visibility contract, UX.RUN.2 made existing progress snapshots loadable through a GET-only boundary, UX.RUN.3 added a read-only snapshot panel, UX.RUN.CLOSE froze the branch, and UX.LIVE.CLOSE froze UX.LIVE.1-10 after adding an optional bounded browser reader. The current picker recommendation is DOGFOOD.1, a report-only real-operator evaluation that must not add live behavior.
+CMD is now shipped through CMD.CLOSE: CMD.1-CMD.4 established the original Commander doctrine arc, CMD.N1-CMD.N6 added report-only fracture, preflight, manual assignment, and review-pack structure, and CMD.CLOSE froze the branch before execution-related design. MODEL is also shipped through MODEL.CLOSE, freezing the advisory model-role planning branch. EVAL.CLOSE froze the Evidence Quality branch, HUMAN.N1 mapped human-only review and approval boundaries across the advisory surfaces, HUMAN.N2 defined explicit human confirmation signals before dangerous actions, HUMAN.N3 added dry-run sample token validation against that contract without enforcing runtime behavior, HUMAN.N4 added documentation-only valid, warning, invalid, and blocked sample tokens, HUMAN.CLOSE froze the human authority branch, ADOPT.MODEL.1 adopted the advisory model-role catalog artifact, ADOPT.MODEL.2 verified post-adoption coverage against the active 10-role catalog, ADOPT.MODEL.CLOSE froze the adoption branch through a report-only checkpoint, HARDEN.CLOSE froze the approval-enforcement planning branch, OPS.TEST.CLOSE froze the test-runtime planning branch, UX.RUN.1 defined the read-only run progress visibility contract, UX.RUN.2 made existing progress snapshots loadable through a GET-only boundary, UX.RUN.3 added a read-only snapshot panel, UX.RUN.CLOSE froze the branch, and UX.LIVE.CLOSE froze UX.LIVE.1-10 after adding an optional bounded browser reader. The current picker recommendation is DOGFOOD.1B, a report-only real-operator evaluation that must not add live behavior.
 
 UX remains important because operator clarity is required for daily use. If the operator cannot quickly see evidence, approvals, risk, and common workflow state, the system becomes harder to supervise even when the underlying safety contracts are sound.
 
@@ -1182,8 +1183,23 @@ warnings. It certifies truthful partial progress visibility—not complete runti
 tracing—while retaining default-off writer and polling configuration, advisory
 GET-only observation, bounded browser polling, and no runtime authority.
 
-**DOGFOOD.1 - Real Operator Run Evaluation is proposed.**
-DOGFOOD.1 is the current picker recommendation. It remains report-only initially
+**HARDEN.PROGRESS.1 - Early Error Terminal Snapshot Coverage shipped 2026-07-13 (complete).**
+HARDEN.PROGRESS.1 is a narrow corrective phase outside the frozen UX.LIVE branch.
+It observes the genuine early application-error return boundary after
+`request_received`, reuses the existing safe progress run ID, and records one
+terminal `error_reported` update with monotonic sequence and deterministic
+duplicate handling. The original application error result remains authoritative
+and unchanged, and writer failure remains isolated from that result. No UI,
+polling, freshness, retry, execution, or default behavior changed; no raw error
+message or path is stored. Its status is
+`early_error_terminal_coverage_ready_with_warnings`, with no blocker and one
+warning: a genuine post-fix operator repeat must still be collected separately
+under DOGFOOD.1B. Artifacts:
+`.agent/hardening/run_progress_early_error_terminal/run_progress_early_error_terminal.{json,md}`.
+The phase picker therefore returns to DOGFOOD.1B.
+
+**DOGFOOD.1B - Real Operator Run Evaluation is proposed.**
+DOGFOOD.1B is the current picker recommendation. It remains report-only initially
 and should evaluate real operator runs: progress comprehension, freshness-label
 utility, manual-refresh sufficiency, bounded-polling usefulness, default-off
 discoverability, mistaken validation/approval inference, and whether stage
@@ -1194,7 +1210,7 @@ MIRROR.13 remains the next registered MIRROR candidate. It should plan how to
 improve live trace frame capture quality after the MIRROR.CLOSE3 freeze, while
 keeping Mirror evidence report-only, advisory, non-blocking, and free of runtime
 scoring or UI approval-gate behavior. The current top picker recommendation is
-DOGFOOD.1.
+DOGFOOD.1B.
 
 **UX.1 — Operator Cockpit & Idea Intake Plan is shipped 2026-06-24 (complete).**
 Implemented report-only as `core/operator_cockpit_plan.py` +
@@ -1385,7 +1401,7 @@ tokens, issue or consume tokens, approve or reject real actions, apply patches,
 validate, benchmark, invoke MCP tools, launch workers, call or route models,
 contact network services, write to a database, change route behavior, change
 auth policy, push, merge, or open PRs. MIRROR.13 remains a proposed Mirror
-candidate, but DOGFOOD.1 is now the current picker recommendation.
+candidate, but DOGFOOD.1B is now the current picker recommendation.
 
 ### OPS.TEST.CLOSE - Test Runtime Operations Branch Checkpoint
 
@@ -1404,7 +1420,7 @@ any executable suite manifests, runner commands, or CI changes are added.
 timeout as pass; hide failures; add executable runner behavior; alter runtime
 routes; change auth; call or route models; launch workers; apply patches; invoke
 MCP tools; contact network services; write to a database; push, merge, or open
-PRs. Current recommended next phase: DOGFOOD.1 - Real Operator Run Evaluation.
+PRs. Current recommended next phase: DOGFOOD.1B - Real Operator Run Evaluation.
 
 ### HARDEN.N1 - Approval Enforcement Readiness Audit
 
