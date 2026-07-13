@@ -103,7 +103,7 @@ def test_refresh_has_safe_failure_messages_and_never_renders_a_stale_association
     assert 'setRunProgressRefreshState("idle")' in _refresh_function(js)
 
 
-def test_refresh_keeps_progress_advisory_and_does_not_add_background_or_execution_behaviour():
+def test_refresh_keeps_progress_advisory_while_bounded_polling_avoids_execution_behaviour():
     js = _panel_js()
     template = INDEX_TEMPLATE.read_text(encoding="utf-8")
 
@@ -124,11 +124,9 @@ def test_refresh_keeps_progress_advisory_and_does_not_add_background_or_executio
 
     for forbidden in (
         "setInterval",
-        "setTimeout",
         "requestAnimationFrame",
         "WebSocket",
         "EventSource",
-        "visibilitychange",
         "focus",
         'method: "POST"',
         "enableWriter",
@@ -142,6 +140,8 @@ def test_refresh_keeps_progress_advisory_and_does_not_add_background_or_executio
         "document.cookie",
     ):
         assert forbidden not in js
+    assert "window.setTimeout" in js
+    assert "visibilitychange" in js
 
 
 def test_registry_completes_live_6_and_recommends_live_7():
@@ -152,9 +152,17 @@ def test_registry_completes_live_6_and_recommends_live_7():
     assert by_id["UX.LIVE.6"]["prerequisites"] == ["UX.LIVE.5"]
     assert by_id["UX.LIVE.7"]["status"] == "complete"
     assert by_id["UX.LIVE.7"]["prerequisites"] == ["UX.LIVE.6"]
-    assert by_id["UX.LIVE.8"]["status"] == "proposed"
+    assert by_id["UX.LIVE.8"]["status"] == "complete"
     assert by_id["UX.LIVE.8"]["prerequisites"] == ["UX.LIVE.7"]
+    assert by_id["UX.LIVE.9"]["status"] == "complete"
+    assert by_id["UX.LIVE.9"]["prerequisites"] == ["UX.LIVE.8"]
+    assert by_id["UX.LIVE.10"]["status"] == "complete"
+    assert by_id["UX.LIVE.10"]["prerequisites"] == ["UX.LIVE.9"]
+    assert by_id["UX.LIVE.CLOSE"]["status"] == "complete"
+    assert by_id["UX.LIVE.CLOSE"]["prerequisites"] == ["UX.LIVE.10"]
+    assert by_id["DOGFOOD.1B"]["status"] == "proposed"
+    assert by_id["VERIFY.TEST.1"]["status"] == "proposed"
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="ux-live-6", created_at="t")
     assert report["registry_valid"] is True, report["errors"]
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
-    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["UX.LIVE.8", "MIRROR.13"]
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["DOGFOOD.1B", "VERIFY.TEST.1"]

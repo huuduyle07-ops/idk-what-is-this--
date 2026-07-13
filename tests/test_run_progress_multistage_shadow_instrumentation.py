@@ -206,4 +206,4 @@ def test_registry_marks_live_4_complete_adds_live_5_and_recommends_it():
     assert by_id["UX.LIVE.7"]["status"] == "complete"
     assert by_id["UX.LIVE.7"]["prerequisites"] == ["UX.LIVE.6"]
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="ux-live-4", created_at="t")
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"

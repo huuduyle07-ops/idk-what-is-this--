@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+import core.run_progress_snapshot_loader as snapshot_loader
 from core.phase_picker import pick_phase_candidates, summarize_phase_candidates
 from core.phase_registry import load_phase_registry, validate_phase_registry
 from core.run_progress_snapshot_loader import (
@@ -134,6 +135,47 @@ def test_loads_safe_snapshot_id_read_only(tmp_path):
     assert result["source_path"].endswith(".agent/ux/run_progress_snapshots/run-20260710.json")
     assert "No live progress stream yet" in " ".join(result["warnings"])
     assert path.read_text(encoding="utf-8") == before
+
+
+def test_loader_returns_derived_freshness_without_mutating_the_canonical_snapshot(tmp_path):
+    path = _write_snapshot(
+        tmp_path,
+        "fresh-run",
+        _snapshot(
+            snapshot_id="fresh-run",
+            created_at="2026-07-11T00:00:00+00:00",
+            updated_at="2026-07-11T00:00:00+00:00",
+            terminal=False,
+            sequence_number=1,
+        ),
+    )
+    before = path.read_text(encoding="utf-8")
+
+    result = load_run_progress_snapshot("fresh-run", repo_root=tmp_path)
+
+    assert result["loader_status"] == LOADED_WITH_WARNINGS
+    assert result["freshness"]["freshness_status"] in {
+        "fresh", "recent", "stale", "possibly_abandoned", "unknown"
+    }
+    assert result["freshness"]["runtime_authority"] is False
+    assert result["freshness"]["action_triggered"] is False
+    assert result["freshness"]["actions_available"] == []
+    assert "freshness" not in result["snapshot"]
+    assert path.read_text(encoding="utf-8") == before
+
+
+def test_classifier_failure_is_isolated_from_an_otherwise_safe_loader_result(tmp_path, monkeypatch):
+    _write_snapshot(tmp_path, "classifier-failure", _snapshot(snapshot_id="classifier-failure"))
+
+    def _raise_classifier(_snapshot):
+        raise RuntimeError("isolated test failure")
+
+    monkeypatch.setattr(snapshot_loader, "classify_run_progress_freshness", _raise_classifier)
+    result = load_run_progress_snapshot("classifier-failure", repo_root=tmp_path)
+
+    assert result["loader_status"] == LOADED_WITH_WARNINGS
+    assert result["freshness"]["freshness_status"] == "unknown"
+    assert result["freshness"]["warning_codes"] == ["freshness_classification_failed"]
 
 
 def test_loads_safe_snapshot_id_with_json_extension(tmp_path):
@@ -296,6 +338,7 @@ def test_get_route_loads_snapshot_read_only(client):
     assert body["status"] == LOADED_WITH_WARNINGS
     assert body["snapshot_id"] == "default"
     assert body["result"]["snapshot"]["live_stream_enabled"] is False
+    assert body["result"]["freshness"]["freshness_status"] == "unknown"
     assert body["result"]["recommended_next_phase"]["phase_id"] == "UX.RUN.3"
 
 
@@ -417,14 +460,22 @@ def test_registry_tracks_completed_ux_run_3_and_checkpoint_after_loader():
     assert by_id["UX.LIVE.6"]["prerequisites"] == ["UX.LIVE.5"]
     assert by_id["UX.LIVE.7"]["status"] == "complete"
     assert by_id["UX.LIVE.7"]["prerequisites"] == ["UX.LIVE.6"]
-    assert by_id["UX.LIVE.8"]["status"] == "proposed"
+    assert by_id["UX.LIVE.8"]["status"] == "complete"
     assert by_id["UX.LIVE.8"]["prerequisites"] == ["UX.LIVE.7"]
+    assert by_id["UX.LIVE.9"]["status"] == "complete"
+    assert by_id["UX.LIVE.9"]["prerequisites"] == ["UX.LIVE.8"]
+    assert by_id["UX.LIVE.10"]["status"] == "complete"
+    assert by_id["UX.LIVE.10"]["prerequisites"] == ["UX.LIVE.9"]
+    assert by_id["UX.LIVE.CLOSE"]["status"] == "complete"
+    assert by_id["UX.LIVE.CLOSE"]["prerequisites"] == ["UX.LIVE.10"]
+    assert by_id["DOGFOOD.1B"]["status"] == "proposed"
+    assert by_id["VERIFY.TEST.1"]["status"] == "proposed"
 
 
 def test_phase_picker_recommends_ux_live_plan_after_loader_checkpoint():
     data = load_phase_registry(REGISTRY_PATH)
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="r", created_at="t")
 
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
     safe_ids = [phase["phase_id"] for phase in report["safe_to_prepare"]]
-    assert safe_ids[:2] == ["UX.LIVE.8", "MIRROR.13"]
+    assert safe_ids[:2] == ["DOGFOOD.1B", "VERIFY.TEST.1"]

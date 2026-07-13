@@ -222,9 +222,12 @@ def test_registry_completes_live_9_proposes_live_10_and_picker_recommends_live_1
 
     assert by_id["UX.LIVE.9"]["status"] == "complete"
     assert by_id["UX.LIVE.9"]["prerequisites"] == ["UX.LIVE.8"]
-    assert by_id["UX.LIVE.10"]["status"] == "proposed"
+    assert by_id["UX.LIVE.10"]["status"] == "complete"
     assert by_id["UX.LIVE.10"]["prerequisites"] == ["UX.LIVE.9"]
+    assert by_id["UX.LIVE.CLOSE"]["status"] == "complete"
+    assert by_id["UX.LIVE.CLOSE"]["prerequisites"] == ["UX.LIVE.10"]
+    assert by_id["DOGFOOD.1B"]["status"] == "proposed"
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="ux-live-9", created_at="t")
     assert report["registry_valid"] is True, report["errors"]
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.10"
-    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["UX.LIVE.10", "MIRROR.13"]
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["DOGFOOD.1B", "VERIFY.TEST.1"]

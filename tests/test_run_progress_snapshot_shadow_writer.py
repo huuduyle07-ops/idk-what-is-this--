@@ -259,11 +259,11 @@ def test_get_only_loader_route_returns_generated_snapshot(tmp_path, monkeypatch)
     assert body["result"]["snapshot"]["actions_available"] == []
 
 
-def test_runner_integration_is_single_terminal_shadow_observer_without_live_delivery():
+def test_runner_integration_uses_bounded_terminal_shadow_observers_without_live_delivery():
     source = RUNNER_PATH.read_text(encoding="utf-8")
 
     assert "def _maybe_write_run_progress_snapshot_shadow(" in source
-    assert source.count("_maybe_write_run_progress_snapshot_shadow(") == 3
+    assert source.count("_maybe_write_run_progress_snapshot_shadow(") == 4
     assert "outcome=\"success\"" in source
     assert "outcome=\"error\"" in source
     for forbidden in ("setInterval", "WebSocket", "EventSource", "threading.Thread", "run_progress_events.jsonl"):
@@ -291,4 +291,4 @@ def test_registry_marks_live_3_and_live_4_complete_then_recommends_live_5():
     assert by_id["UX.LIVE.7"]["status"] == "complete"
     assert by_id["UX.LIVE.7"]["prerequisites"] == ["UX.LIVE.6"]
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="ux-live-3", created_at="t")
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"

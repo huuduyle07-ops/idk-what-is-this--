@@ -291,7 +291,7 @@ def test_real_registry_completes_live_2_and_live_3_then_recommends_live_4():
     assert by_id["UX.LIVE.6"]["status"] == "complete"
     assert by_id["UX.LIVE.6"]["prerequisites"] == ["UX.LIVE.5"]
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="ux-live-2", created_at="t")
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
 
 def test_plan_source_has_no_runtime_execution_or_network_path():

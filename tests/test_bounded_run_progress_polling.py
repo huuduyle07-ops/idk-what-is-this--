@@ -199,9 +199,14 @@ def test_registry_completes_live_10_adds_close_and_picker_recommends_close():
 
     assert by_id["UX.LIVE.10"]["status"] == "complete"
     assert by_id["UX.LIVE.10"]["prerequisites"] == ["UX.LIVE.9"]
-    assert by_id["UX.LIVE.CLOSE"]["status"] == "proposed"
+    assert by_id["UX.LIVE.CLOSE"]["status"] == "complete"
     assert by_id["UX.LIVE.CLOSE"]["prerequisites"] == ["UX.LIVE.10"]
+    assert by_id["DOGFOOD.1A"]["status"] == "complete"
+    assert by_id["DOGFOOD.1A"]["prerequisites"] == ["UX.LIVE.CLOSE"]
+    assert by_id["DOGFOOD.1B"]["status"] == "proposed"
+    assert by_id["DOGFOOD.1B"]["prerequisites"] == ["DOGFOOD.1A", "HARDEN.PROGRESS.1"]
+    assert by_id["VERIFY.TEST.1"]["status"] == "proposed"
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="ux-live-10", created_at="t")
     assert report["registry_valid"] is True, report["errors"]
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.CLOSE"
-    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["UX.LIVE.CLOSE", "MIRROR.13"]
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["DOGFOOD.1B", "VERIFY.TEST.1"]

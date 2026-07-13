@@ -257,9 +257,9 @@ def test_phase_picker_recommends_ux_live_plan_after_checkpoint():
     data = load_phase_registry(registry_path)
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="r", created_at="t")
 
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
     safe_ids = [phase["phase_id"] for phase in report["safe_to_prepare"]]
-    assert safe_ids[:2] == ["UX.LIVE.8", "MIRROR.13"]
+    assert safe_ids[:2] == ["DOGFOOD.1B", "VERIFY.TEST.1"]
 
 
 def test_guardrails_have_all_runtime_power_flags_false():

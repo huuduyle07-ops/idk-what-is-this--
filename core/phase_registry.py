@@ -77,6 +77,8 @@ PHASE_ID_PREFIXES: tuple[str, ...] = (
     "ADOPT",
     "CMD",
     "OPS",
+    "DOGFOOD",
+    "VERIFY",
     "A",
     "GOV",
     "F",

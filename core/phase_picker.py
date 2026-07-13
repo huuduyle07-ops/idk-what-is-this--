@@ -93,6 +93,8 @@ TRACK_ORDER: tuple[str, ...] = (
     "HARDEN",
     "OPS",
     "UX",
+    "DOGFOOD",
+    "VERIFY",
     "MIRROR",
     "GOV",
     "A",

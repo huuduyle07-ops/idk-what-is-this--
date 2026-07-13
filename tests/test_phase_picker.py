@@ -1,4 +1,4 @@
-"""Tests for ROAD.2 — Phase Picker / Night Candidate Report (report-only).
+"""Tests for ROAD.2 â€” Phase Picker / Night Candidate Report (report-only).
 
 ROAD.2 reads the ROAD.1 machine-readable phase registry and classifies phases
 into safe-candidate buckets. It recommends candidate phases. It does not execute
@@ -50,7 +50,7 @@ from core.phase_picker import (
 import scripts.create_phase_picker_report as script
 
 
-# ── synthetic registry builders ───────────────────────────────────────────────
+# â”€â”€ synthetic registry builders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def _phase(**over) -> dict:
     data = {
@@ -107,7 +107,7 @@ def _report(data, **kw) -> dict:
     return summarize_phase_candidates(pick_phase_candidates(data), **kw)
 
 
-# ── 1. valid registry produces a report ────────────────────────────────────────
+# â”€â”€ 1. valid registry produces a report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_valid_registry_produces_report():
     pick = pick_phase_candidates(_registry())
@@ -173,7 +173,7 @@ def test_bucket_counts_sum_to_phase_count():
     assert sum(report["bucket_counts"].values()) == report["phase_count"] == 1
 
 
-# ── 2. invalid registry produces no candidates ─────────────────────────────────
+# â”€â”€ 2. invalid registry produces no candidates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_invalid_registry_produces_no_candidates():
     phases = [_phase(phase_id="ROAD.2", merge_allowed=True), _phase(phase_id="AUTO.2a", track="AUTO")]
@@ -201,7 +201,7 @@ def test_none_input_is_invalid_and_empty():
     assert pick["top_recommendation"] is None
 
 
-# ── 3. complete phases → complete_or_history ───────────────────────────────────
+# â”€â”€ 3. complete phases â†’ complete_or_history â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_complete_phase_goes_to_complete_or_history():
     bucket, item = _pick_one(_phase(status="complete"))
@@ -209,7 +209,7 @@ def test_complete_phase_goes_to_complete_or_history():
     assert item["recommended_next_step"] == "no_action_complete"
 
 
-# ── 4. parked / deferred → deferred_or_parked ──────────────────────────────────
+# â”€â”€ 4. parked / deferred â†’ deferred_or_parked â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_parked_phase_goes_to_deferred_or_parked():
     bucket, item = _pick_one(_phase(status="parked"))
@@ -221,7 +221,7 @@ def test_deferred_phase_goes_to_deferred_or_parked():
     assert _bucket_of(_phase(status="deferred")) == "deferred_or_parked"
 
 
-# ── 5-6. blocked budget / risk → blocked ───────────────────────────────────────
+# â”€â”€ 5-6. blocked budget / risk â†’ blocked â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_blocked_budget_goes_to_blocked():
     bucket, item = _pick_one(_phase(budget_tier="blocked"))
@@ -233,7 +233,7 @@ def test_blocked_risk_goes_to_blocked():
     assert _bucket_of(_phase(risk_level="blocked")) == "blocked"
 
 
-# ── 7. merge_allowed=true → blocked ────────────────────────────────────────────
+# â”€â”€ 7. merge_allowed=true â†’ blocked â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_merge_allowed_goes_to_blocked():
     bucket, item = _pick_one(_phase(merge_allowed=True))
@@ -241,7 +241,7 @@ def test_merge_allowed_goes_to_blocked():
     assert any("merge_allowed" in r for r in item["reasons"])
 
 
-# ── 8. human_approval_required=false → blocked (proposed/active) ───────────────
+# â”€â”€ 8. human_approval_required=false â†’ blocked (proposed/active) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_human_approval_false_goes_to_blocked_proposed():
     assert _bucket_of(_phase(status="proposed", human_approval_required=False)) == "blocked"
@@ -251,7 +251,7 @@ def test_human_approval_false_goes_to_blocked_active():
     assert _bucket_of(_phase(status="active", human_approval_required=False)) == "blocked"
 
 
-# ── 9. writes_real_repo=true → blocked (proposed/active) ───────────────────────
+# â”€â”€ 9. writes_real_repo=true â†’ blocked (proposed/active) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_writes_real_repo_goes_to_blocked_proposed():
     assert _bucket_of(_phase(status="proposed", writes_real_repo=True)) == "blocked"
@@ -261,7 +261,7 @@ def test_writes_real_repo_goes_to_blocked_active():
     assert _bucket_of(_phase(status="active", writes_real_repo=True)) == "blocked"
 
 
-# ── missing allowed_files / validation → blocked ───────────────────────────────
+# â”€â”€ missing allowed_files / validation â†’ blocked â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_missing_allowed_files_goes_to_blocked():
     assert _bucket_of(_phase(allowed_files=[])) == "blocked"
@@ -271,7 +271,7 @@ def test_missing_validation_goes_to_blocked():
     assert _bucket_of(_phase(validation=[])) == "blocked"
 
 
-# ── 10. requires_sandbox=true → sandbox_required ───────────────────────────────
+# â”€â”€ 10. requires_sandbox=true â†’ sandbox_required â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_requires_sandbox_goes_to_sandbox_required():
     bucket, item = _pick_one(_phase(requires_sandbox=True))
@@ -279,7 +279,7 @@ def test_requires_sandbox_goes_to_sandbox_required():
     assert item["recommended_next_step"] == "prepare_sandbox_trial_contract"
 
 
-# ── 11. SANDBOX_2_DRAFT_PATCH / patch mention / patch path → sandbox_required ───
+# â”€â”€ 11. SANDBOX_2_DRAFT_PATCH / patch mention / patch path â†’ sandbox_required â”€â”€â”€
 
 def test_sandbox_automation_goes_to_sandbox_required():
     assert _bucket_of(_phase(automation_level="SANDBOX_2_DRAFT_PATCH")) == "sandbox_required"
@@ -295,7 +295,7 @@ def test_patch_path_in_allowed_files_goes_to_sandbox_required():
     assert _bucket_of(phase) == "sandbox_required"
 
 
-# ── 12. REMOTE_3_DRAFT_PR → human_approval_required ────────────────────────────
+# â”€â”€ 12. REMOTE_3_DRAFT_PR â†’ human_approval_required â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_remote_pr_goes_to_human_approval_required():
     bucket, item = _pick_one(_phase(automation_level="REMOTE_3_DRAFT_PR"))
@@ -303,7 +303,7 @@ def test_remote_pr_goes_to_human_approval_required():
     assert item["recommended_next_step"] == "request_human_approval"
 
 
-# ── 13. strong_model_requires_approval → human_approval_required ───────────────
+# â”€â”€ 13. strong_model_requires_approval â†’ human_approval_required â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_strong_model_budget_goes_to_human_approval_required():
     assert _bucket_of(_phase(budget_tier="strong_model_requires_approval")) == "human_approval_required"
@@ -315,13 +315,13 @@ def test_model_calls_allowed_goes_to_human_approval_required():
     assert _bucket_of(phase) == "human_approval_required"
 
 
-# ── 14. network_allowed=true → human_approval_required or blocked ──────────────
+# â”€â”€ 14. network_allowed=true â†’ human_approval_required or blocked â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_network_allowed_goes_to_human_or_blocked():
     assert _bucket_of(_phase(network_allowed=True)) in {"blocked", "human_approval_required"}
 
 
-# ── 15. local observe/prepare low-risk → safe_to_prepare ───────────────────────
+# â”€â”€ 15. local observe/prepare low-risk â†’ safe_to_prepare â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_local_observe_low_risk_goes_to_safe_to_prepare():
     bucket, item = _pick_one(_phase(automation_level="LOCAL_0_OBSERVE", risk_level="low"))
@@ -354,7 +354,7 @@ def test_safe_phase_with_completed_prerequisite_is_ready():
     assert safe["ROAD.2"]["recommended_next_step"] == "prepare_worker_assignment"
 
 
-# ── 16. top recommendation prefers a safe local ROAD phase ─────────────────────
+# â”€â”€ 16. top recommendation prefers a safe local ROAD phase â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_top_recommendation_prefers_safe_local_road_phase():
     phases = [
@@ -367,7 +367,7 @@ def test_top_recommendation_prefers_safe_local_road_phase():
     assert pick["top_recommendation"]["phase_id"] == "ROAD.3"
 
 
-# ── 17. deterministic sorting within a bucket ──────────────────────────────────
+# â”€â”€ 17. deterministic sorting within a bucket â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_deterministic_sorting_within_bucket():
     phases = [
@@ -402,7 +402,7 @@ def test_report_bytes_are_deterministic(tmp_path):
     assert run("a") == run("b")
 
 
-# ── 18. Markdown contains all sections and boundaries ──────────────────────────
+# â”€â”€ 18. Markdown contains all sections and boundaries â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_markdown_contains_all_sections():
     report = _report(
@@ -449,7 +449,7 @@ def test_markdown_shows_top_recommendation():
     assert "ROAD.2" in md
 
 
-# ── 19. CLI writes JSON + Markdown / core writer ───────────────────────────────
+# â”€â”€ 19. CLI writes JSON + Markdown / core writer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def _write_registry(tmp_path: Path, data: dict, name: str = "phase_registry.json") -> Path:
     path = tmp_path / name
@@ -498,7 +498,7 @@ def test_write_phase_picker_report_core(tmp_path):
     assert res["report"]["report_id"] == "cr"
 
 
-# ── 20. CLI exits nonzero on invalid registry unless allow flag ────────────────
+# â”€â”€ 20. CLI exits nonzero on invalid registry unless allow flag â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_cli_exits_nonzero_on_invalid_registry(tmp_path):
     reg = _write_registry(tmp_path, _registry(phases=[_phase(merge_allowed=True)]))
@@ -541,7 +541,7 @@ def test_cli_json_flag_prints_report(tmp_path, capsys):
     assert printed["report_kind"] == "phase_picker_report"
 
 
-# ── 21. seed registry produces expected buckets ────────────────────────────────
+# â”€â”€ 21. seed registry produces expected buckets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _SEED_PATH = Path(__file__).parent.parent / "docs" / "roadmap" / "phase_registry.json"
 
@@ -555,14 +555,14 @@ def test_seed_registry_produces_expected_buckets():
     report = _report(data, report_id="r", created_at="t", registry_path=str(_SEED_PATH))
     assert report["registry_valid"] is True
     assert report["bucket_counts"] == {
-        "safe_to_prepare": 2,
+        "safe_to_prepare": 3,
         "sandbox_required": 0,
         "human_approval_required": 0,
         "blocked": 0,
         "deferred_or_parked": 0,
-        "complete_or_history": 97,
+        "complete_or_history": 103,
     }
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
     assert report["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"
 
 
@@ -570,8 +570,8 @@ def test_seed_safe_candidates_sorted_deterministically():
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     report = _report(data, report_id="r", created_at="t")
     ids = [p["phase_id"] for p in report["safe_to_prepare"]]
-    # Completed phases drop out; UX.LIVE.8 is ranked ahead of MIRROR.13 by track order.
-    assert ids == ["UX.LIVE.8", "MIRROR.13"]
+    # DOGFOOD.1B stays ahead of its dependent VERIFY.TEST.1 and MIRROR.13.
+    assert ids == ["DOGFOOD.1B", "VERIFY.TEST.1", "MIRROR.13"]
 
 
 def test_seed_shipped_phases_are_complete_and_not_recommended():
@@ -580,7 +580,7 @@ def test_seed_shipped_phases_are_complete_and_not_recommended():
     # shipped before that.
     data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
     statuses = {p["phase_id"]: p["status"] for p in data["phases"]}
-    shipped = ["ROAD.1", "ROAD.2", "ROAD.3", "ROAD.4", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3", "MODEL.N1", "MODEL.N2", "MODEL.N3", "MODEL.N4", "MODEL.N5", "MODEL.N6", "MODEL.N7", "MODEL.CLOSE", "EVAL.1", "EVAL.2", "EVAL.3", "EVAL.N1", "EVAL.N2", "EVAL.N3", "EVAL.N4", "EVAL.N5", "EVAL.N6", "EVAL.N7", "EVAL.CLOSE", "HUMAN.N1", "HUMAN.N2", "HUMAN.N3", "HUMAN.N4", "HUMAN.CLOSE", "ADOPT.MODEL.1", "ADOPT.MODEL.2", "ADOPT.MODEL.CLOSE", "CMD.1", "CMD.2", "CMD.3", "CMD.4", "CMD.N1", "CMD.N2", "CMD.N3", "CMD.N4", "CMD.N5", "CMD.N6", "CMD.CLOSE", "HARDEN.N1", "HARDEN.N2", "HARDEN.N3", "HARDEN.N4", "HARDEN.1", "HARDEN.2", "HARDEN.3", "HARDEN.CLOSE", "OPS.TEST.1", "OPS.TEST.2", "OPS.TEST.3", "OPS.TEST.CLOSE", "UX.RUN.1", "UX.RUN.2", "UX.RUN.3", "UX.RUN.CLOSE", "UX.LIVE.1", "UX.LIVE.2", "UX.LIVE.3", "UX.LIVE.4", "UX.LIVE.5", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE", "MIRROR.7", "MIRROR.8", "MIRROR.9", "MIRROR.10", "MIRROR.11", "MIRROR.12", "MIRROR.CLOSE3"]
+    shipped = ["ROAD.1", "ROAD.2", "ROAD.3", "ROAD.4", "AUTO.2a", "AUTO.2b", "AUTO.2c", "MODEL.1", "MODEL.2", "MODEL.3", "MODEL.N1", "MODEL.N2", "MODEL.N3", "MODEL.N4", "MODEL.N5", "MODEL.N6", "MODEL.N7", "MODEL.CLOSE", "EVAL.1", "EVAL.2", "EVAL.3", "EVAL.N1", "EVAL.N2", "EVAL.N3", "EVAL.N4", "EVAL.N5", "EVAL.N6", "EVAL.N7", "EVAL.CLOSE", "HUMAN.N1", "HUMAN.N2", "HUMAN.N3", "HUMAN.N4", "HUMAN.CLOSE", "ADOPT.MODEL.1", "ADOPT.MODEL.2", "ADOPT.MODEL.CLOSE", "CMD.1", "CMD.2", "CMD.3", "CMD.4", "CMD.N1", "CMD.N2", "CMD.N3", "CMD.N4", "CMD.N5", "CMD.N6", "CMD.CLOSE", "HARDEN.N1", "HARDEN.N2", "HARDEN.N3", "HARDEN.N4", "HARDEN.1", "HARDEN.2", "HARDEN.3", "HARDEN.CLOSE", "HARDEN.PROGRESS.1", "OPS.TEST.1", "OPS.TEST.2", "OPS.TEST.3", "OPS.TEST.CLOSE", "UX.RUN.1", "UX.RUN.2", "UX.RUN.3", "UX.RUN.CLOSE", "UX.LIVE.1", "UX.LIVE.2", "UX.LIVE.3", "UX.LIVE.4", "UX.LIVE.5", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE", "MIRROR.7", "MIRROR.8", "MIRROR.9", "MIRROR.10", "MIRROR.11", "MIRROR.12", "MIRROR.CLOSE3"]
     for pid in shipped:
         assert statuses[pid] == "complete", pid
     report = _report(data, report_id="r", created_at="t")
@@ -588,10 +588,10 @@ def test_seed_shipped_phases_are_complete_and_not_recommended():
     assert set(shipped) <= history_ids
     safe = {p["phase_id"] for p in report["safe_to_prepare"]}
     assert not (set(shipped) & safe)
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
 
-# ── purity / constants ─────────────────────────────────────────────────────────
+# â”€â”€ purity / constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_pick_does_not_mutate_input():
     data = _registry(phases=[_phase(), _phase(phase_id="AUTO.2a", track="AUTO")])
@@ -630,7 +630,7 @@ def test_guardrail_note_is_report_only():
     assert report["guardrail_note"] == PHASE_PICKER_GUARDRAIL_NOTE
 
 
-# ── 22. forbidden-token / import guards ────────────────────────────────────────
+# â”€â”€ 22. forbidden-token / import guards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _CORE = Path(__file__).parent.parent / "core" / "phase_picker.py"
 _SCRIPT = Path(__file__).parent.parent / "scripts" / "create_phase_picker_report.py"

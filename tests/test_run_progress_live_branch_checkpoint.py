@@ -86,6 +86,8 @@ def test_warnings_limitations_artifacts_and_script_are_data_only(tmp_path):
     report = _build()
     assert "operator_dogfood_pending" in report["warnings"]
     assert len(report["known_limitations"]) >= 9
+    # This immutable UX.LIVE.CLOSE artifact predates the split and retains its
+    # historical alias; the registry resolves the active chain to DOGFOOD.1A/B.
     assert report["recommended_next_phase"]["phase_id"] == "DOGFOOD.1"
     assert all((PROJECT_ROOT / item["evidence_references"][1]).is_file() for item in report["phase_inventory"])
     direct = write_run_progress_live_branch_checkpoint(report, tmp_path / "direct")
@@ -106,13 +108,17 @@ def test_checkpoint_and_script_do_not_contain_runtime_or_polling_implementation_
         assert forbidden not in source
 
 
-def test_registry_completes_close_proposes_dogfood_and_picker_recommends_it():
+def test_registry_splits_framework_and_real_evaluation_before_verify_planning():
     data = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
     assert by_id["UX.LIVE.CLOSE"]["status"] == "complete"
-    assert by_id["DOGFOOD.1"]["status"] == "proposed"
-    assert by_id["DOGFOOD.1"]["prerequisites"] == ["UX.LIVE.CLOSE"]
+    assert by_id["DOGFOOD.1A"]["status"] == "complete"
+    assert by_id["DOGFOOD.1A"]["prerequisites"] == ["UX.LIVE.CLOSE"]
+    assert by_id["DOGFOOD.1B"]["status"] == "proposed"
+    assert by_id["DOGFOOD.1B"]["prerequisites"] == ["DOGFOOD.1A", "HARDEN.PROGRESS.1"]
+    assert by_id["VERIFY.TEST.1"]["status"] == "proposed"
+    assert by_id["VERIFY.TEST.1"]["prerequisites"] == ["DOGFOOD.1B"]
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="ux-live-close", created_at="t")
     assert report["registry_valid"] is True, report["errors"]
-    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1"
-    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["DOGFOOD.1", "MIRROR.13"]
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["DOGFOOD.1B", "VERIFY.TEST.1"]

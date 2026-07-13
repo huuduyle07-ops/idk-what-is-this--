@@ -1,4 +1,4 @@
-"""Tests for ROAD.1 — Machine-Readable Phase Registry (report-only).
+"""Tests for ROAD.1 â€” Machine-Readable Phase Registry (report-only).
 
 ROAD.1 defines, validates, and summarizes roadmap phase metadata. It does not
 choose work, execute phases, run validation or a benchmark check, call models,
@@ -53,7 +53,7 @@ from core.phase_registry import (
 import scripts.validate_phase_registry as script
 
 
-# ── synthetic registry builders ───────────────────────────────────────────────
+# â”€â”€ synthetic registry builders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def _phase(**over) -> dict:
     data = {
@@ -96,7 +96,7 @@ def _errors(data) -> list[str]:
     return validate_phase_registry(data)["errors"]
 
 
-# ── 1. valid registry passes ──────────────────────────────────────────────────
+# â”€â”€ 1. valid registry passes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_valid_registry_passes():
     result = validate_phase_registry(_registry())
@@ -111,7 +111,7 @@ def test_valid_registry_with_multiple_phases_passes():
     assert result["errors"] == []
 
 
-# ── 2. missing root fields fails ───────────────────────────────────────────────
+# â”€â”€ 2. missing root fields fails â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_missing_phases_root_field_fails():
     data = _registry()
@@ -139,7 +139,7 @@ def test_non_dict_root_fails():
     assert result["errors"]
 
 
-# ── 3. missing phase fields fails ──────────────────────────────────────────────
+# â”€â”€ 3. missing phase fields fails â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_missing_phase_field_fails():
     phase = _phase()
@@ -157,7 +157,7 @@ def test_each_required_phase_field_is_enforced():
         assert any(field in e and "missing" in e for e in errs), field
 
 
-# ── 4. duplicate phase IDs fail ────────────────────────────────────────────────
+# â”€â”€ 4. duplicate phase IDs fail â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_duplicate_phase_ids_fail():
     phases = [_phase(phase_id="ROAD.2"), _phase(phase_id="ROAD.2")]
@@ -166,7 +166,7 @@ def test_duplicate_phase_ids_fail():
     assert any("duplicate" in e.lower() and "ROAD.2" in e for e in result["errors"])
 
 
-# ── 5. invalid enum values fail ────────────────────────────────────────────────
+# â”€â”€ 5. invalid enum values fail â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_invalid_status_fails():
     assert any("status" in e for e in _errors(_registry(phases=[_phase(status="bogus")])))
@@ -185,21 +185,21 @@ def test_invalid_risk_level_fails():
     assert any("risk_level" in e for e in _errors(_registry(phases=[_phase(risk_level="spicy")])))
 
 
-# ── 6. AUTO_4_AUTO_MERGE rejected ──────────────────────────────────────────────
+# â”€â”€ 6. AUTO_4_AUTO_MERGE rejected â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_auto_4_auto_merge_rejected():
     errs = _errors(_registry(phases=[_phase(automation_level="AUTO_4_AUTO_MERGE")]))
     assert any("AUTO_4_AUTO_MERGE" in e for e in errs)
 
 
-# ── 7. merge_allowed=true rejected ─────────────────────────────────────────────
+# â”€â”€ 7. merge_allowed=true rejected â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_merge_allowed_true_rejected():
     errs = _errors(_registry(phases=[_phase(merge_allowed=True)]))
     assert any("merge_allowed" in e for e in errs)
 
 
-# ── 8. human_approval_required=false rejected for proposed/active ──────────────
+# â”€â”€ 8. human_approval_required=false rejected for proposed/active â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_human_approval_false_rejected_for_proposed():
     errs = _errors(_registry(phases=[_phase(status="proposed", human_approval_required=False)]))
@@ -216,7 +216,7 @@ def test_human_approval_false_allowed_for_complete():
     assert not any("human_approval_required" in e for e in errs)
 
 
-# ── 9. model_calls_allowed=true rejected unless budget tier requires approval ──
+# â”€â”€ 9. model_calls_allowed=true rejected unless budget tier requires approval â”€â”€
 
 def test_model_calls_allowed_rejected_for_local_budget():
     errs = _errors(
@@ -234,7 +234,7 @@ def test_model_calls_allowed_ok_when_budget_requires_approval():
     assert not any("model_calls_allowed" in e for e in errs)
 
 
-# ── 10. writes_real_repo=true rejected for proposed/active ─────────────────────
+# â”€â”€ 10. writes_real_repo=true rejected for proposed/active â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_writes_real_repo_rejected_for_proposed():
     errs = _errors(_registry(phases=[_phase(status="proposed", writes_real_repo=True)]))
@@ -246,7 +246,7 @@ def test_writes_real_repo_allowed_for_complete():
     assert not any("writes_real_repo" in e for e in errs)
 
 
-# ── 11-12. empty allowed_files / validation rejected for proposed impl phase ───
+# â”€â”€ 11-12. empty allowed_files / validation rejected for proposed impl phase â”€â”€â”€
 
 def test_empty_allowed_files_rejected_for_proposed():
     errs = _errors(_registry(phases=[_phase(status="proposed", allowed_files=[])]))
@@ -264,7 +264,7 @@ def test_empty_allowed_files_allowed_for_parked():
     assert not any(e.startswith("phase ROAD.2 has empty validation") for e in errs)
 
 
-# ── 13. forbidden_files must include .env, .git, .agent/private ────────────────
+# â”€â”€ 13. forbidden_files must include .env, .git, .agent/private â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_forbidden_files_must_include_required_entries():
     errs = _errors(_registry(phases=[_phase(forbidden_files=[".env", ".git"])]))
@@ -276,7 +276,7 @@ def test_forbidden_files_missing_env_fails():
     assert any("forbidden_files" in e and ".env" in e for e in errs)
 
 
-# ── extra structural rules ─────────────────────────────────────────────────────
+# â”€â”€ extra structural rules â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_non_string_validation_command_rejected():
     errs = _errors(_registry(phases=[_phase(validation=[{"cmd": "python"}])]))
@@ -294,7 +294,7 @@ def test_dangling_prerequisite_warns():
     assert any("NOPE.1" in w for w in result["warnings"])
 
 
-# ── 14. summary counts ─────────────────────────────────────────────────────────
+# â”€â”€ 14. summary counts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def _mixed_registry() -> dict:
     return _registry(
@@ -358,7 +358,7 @@ def test_summary_reports_invalid_registry():
     assert report["errors"]
 
 
-# ── 15. Markdown sections + boundaries ─────────────────────────────────────────
+# â”€â”€ 15. Markdown sections + boundaries â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_markdown_contains_required_sections():
     report = summarize_phase_registry(_mixed_registry(), report_id="r", created_at="t")
@@ -401,7 +401,7 @@ def test_markdown_shows_validation_result():
     assert "INVALID" in invalid
 
 
-# ── 16-18. CLI behaviour ───────────────────────────────────────────────────────
+# â”€â”€ 16-18. CLI behaviour â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def _write_registry(tmp_path: Path, data: dict, name: str = "phase_registry.json") -> Path:
     path = tmp_path / name
@@ -500,7 +500,7 @@ def test_write_phase_registry_report_core(tmp_path):
     assert res["report"]["report_id"] == "cr"
 
 
-# ── 19. seed registry validates ────────────────────────────────────────────────
+# â”€â”€ 19. seed registry validates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _SEED_PATH = Path(__file__).parent.parent / "docs" / "roadmap" / "phase_registry.json"
 
@@ -523,11 +523,11 @@ def test_seed_registry_has_expected_phases():
     assert {
         "ROAD.1", "ROAD.2", "ROAD.3", "ROAD.4", "AUTO.2a", "AUTO.2b", "AUTO.2c",
         "MODEL.1", "MODEL.2", "MODEL.3", "MODEL.N1", "MODEL.N2", "MODEL.N3", "MODEL.N4", "MODEL.N5", "MODEL.N6", "MODEL.N7", "MODEL.CLOSE", "EVAL.1", "EVAL.2", "EVAL.3", "EVAL.N1", "EVAL.N2", "EVAL.N3", "EVAL.N4", "EVAL.N5", "EVAL.N6", "EVAL.N7", "EVAL.CLOSE", "HUMAN.N1", "HUMAN.N2", "HUMAN.N3", "HUMAN.N4", "HUMAN.CLOSE", "ADOPT.MODEL.1", "ADOPT.MODEL.2", "ADOPT.MODEL.CLOSE", "CMD.1", "CMD.2", "CMD.3", "CMD.4", "CMD.N1", "CMD.N2", "CMD.N3", "CMD.N4", "CMD.N5", "CMD.N6", "CMD.CLOSE",
-        "HARDEN.1", "HARDEN.2", "HARDEN.3", "HARDEN.CLOSE", "HARDEN.N1", "HARDEN.N2", "HARDEN.N3", "HARDEN.N4", "OPS.TEST.1", "OPS.TEST.2", "OPS.TEST.3", "OPS.TEST.CLOSE", "UX.RUN.1", "UX.RUN.2", "UX.RUN.3", "UX.1", "UX.2", "UX.3", "UX.4", "UX.5", "UX.6", "UX.7", "UX.8", "UX.9", "UX.10", "UX.11",
+        "HARDEN.1", "HARDEN.2", "HARDEN.3", "HARDEN.CLOSE", "HARDEN.N1", "HARDEN.N2", "HARDEN.N3", "HARDEN.N4", "HARDEN.PROGRESS.1", "OPS.TEST.1", "OPS.TEST.2", "OPS.TEST.3", "OPS.TEST.CLOSE", "UX.RUN.1", "UX.RUN.2", "UX.RUN.3", "UX.1", "UX.2", "UX.3", "UX.4", "UX.5", "UX.6", "UX.7", "UX.8", "UX.9", "UX.10", "UX.11",
         "UX.CLOSE", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE", "MIRROR.7", "MIRROR.8", "MIRROR.9", "MIRROR.10", "MIRROR.11", "MIRROR.12", "MIRROR.CLOSE3", "MIRROR.13",
     } <= ids
-    assert {"UX.RUN.CLOSE", "UX.LIVE.1", "UX.LIVE.2", "UX.LIVE.3", "UX.LIVE.4", "UX.LIVE.5", "UX.LIVE.6", "UX.LIVE.7", "UX.LIVE.8"} <= ids
-    assert len(data["phases"]) == 99
+    assert {"UX.RUN.CLOSE", "UX.LIVE.1", "UX.LIVE.2", "UX.LIVE.3", "UX.LIVE.4", "UX.LIVE.5", "UX.LIVE.6", "UX.LIVE.7", "UX.LIVE.8", "UX.LIVE.9", "UX.LIVE.10", "UX.LIVE.CLOSE", "DOGFOOD.1A", "DOGFOOD.1B", "VERIFY.TEST.1"} <= ids
+    assert len(data["phases"]) == 106
 
 
 def test_seed_registry_is_conservative():
@@ -549,18 +549,37 @@ def test_seed_registry_summary_counts():
         "ADOPT": 3,
         "AUTO": 3,
         "CMD": 11,
+        "DOGFOOD": 2,
+        "VERIFY": 1,
         "EVAL": 11,
-        "HARDEN": 8,
+        "HARDEN": 9,
         "HUMAN": 5,
         "MIRROR": 15,
         "MODEL": 11,
         "OPS": 4,
         "ROAD": 4,
-        "UX": 24,
+        "UX": 27,
     }
 
 
-# ── enum / constant exposure ───────────────────────────────────────────────────
+def test_early_error_hardening_completes_before_real_dogfood_resumes():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    assert "DOGFOOD.1" not in by_id
+    assert by_id["DOGFOOD.1A"]["title"] == "Live Progress Operator Evaluation Framework"
+    assert by_id["DOGFOOD.1A"]["status"] == "complete"
+    assert by_id["DOGFOOD.1A"]["prerequisites"] == ["UX.LIVE.CLOSE"]
+    assert by_id["HARDEN.PROGRESS.1"]["title"] == "Early Error Terminal Snapshot Coverage"
+    assert by_id["HARDEN.PROGRESS.1"]["status"] == "complete"
+    assert by_id["HARDEN.PROGRESS.1"]["prerequisites"] == ["DOGFOOD.1A"]
+    assert by_id["DOGFOOD.1B"]["title"] == "Real Operator Run Evaluation"
+    assert by_id["DOGFOOD.1B"]["status"] == "proposed"
+    assert by_id["DOGFOOD.1B"]["prerequisites"] == ["DOGFOOD.1A", "HARDEN.PROGRESS.1"]
+    assert by_id["VERIFY.TEST.1"]["status"] == "proposed"
+    assert by_id["VERIFY.TEST.1"]["prerequisites"] == ["DOGFOOD.1B"]
+
+
+# â”€â”€ enum / constant exposure â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def test_enums_match_spec():
     assert STATUSES == ("proposed", "active", "complete", "parked", "deferred")
@@ -584,7 +603,7 @@ def test_validate_does_not_mutate_input():
     assert data == snap
 
 
-# ── 20. forbidden-token / import guards ────────────────────────────────────────
+# â”€â”€ 20. forbidden-token / import guards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _CORE = Path(__file__).parent.parent / "core" / "phase_registry.py"
 _SCRIPT = Path(__file__).parent.parent / "scripts" / "validate_phase_registry.py"

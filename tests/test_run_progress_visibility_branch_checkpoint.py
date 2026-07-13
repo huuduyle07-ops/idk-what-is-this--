@@ -292,8 +292,8 @@ def test_real_registry_closes_run_progress_branch_and_recommends_live_5():
     assert by_id["UX.LIVE.6"]["status"] == "complete"
     assert by_id["UX.LIVE.6"]["prerequisites"] == ["UX.LIVE.5"]
     report = summarize_phase_candidates(pick_phase_candidates(data), report_id="ux-run-close", created_at="t")
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
-    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["UX.LIVE.8", "MIRROR.13"]
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+    assert [item["phase_id"] for item in report["safe_to_prepare"][:2]] == ["DOGFOOD.1B", "VERIFY.TEST.1"]
 
 
 def test_checkpoint_source_does_not_execute_runtime_work():

@@ -1,8 +1,8 @@
 """Tests for UX.RUN.3 - Run Progress UI Panel Stub.
 
-The panel may display an existing UX.RUN.2 snapshot through the GET-only loader.
-It must remain read-only: no polling, live run hooks, mutation requests, or
-execution controls.
+The panel may display an existing UX.RUN.2 snapshot through the GET-only loader
+and an explicitly activated, default-off bounded browser reader. It remains
+read-only: no live run hooks, mutation requests, or execution controls.
 """
 from __future__ import annotations
 
@@ -69,7 +69,7 @@ def test_run_progress_panel_exists_in_evidence_area_with_safe_empty_state():
         in panel
     )
     assert "GET-only snapshot display." in panel
-    assert "auto-refresh" in panel
+    assert "Optional progress updates are disabled by default" in panel
     assert "execution, validation, benchmark, worker, model, approval, or token controls" in panel
 
     assert "runProgressPanel" not in _between(
@@ -105,7 +105,13 @@ def test_panel_exposes_every_requested_snapshot_field_without_action_controls():
     ):
         assert f">{field}<" in panel
 
-    assert _button_labels(panel) == ["Refresh progress", "Load associated snapshot", "Load snapshot"]
+    assert _button_labels(panel) == [
+        "Refresh progress",
+        "Load associated snapshot",
+        "Load snapshot",
+        "Start progress updates",
+        "Stop progress updates",
+    ]
     for forbidden in (
         "Apply",
         "Run",
@@ -117,6 +123,35 @@ def test_panel_exposes_every_requested_snapshot_field_without_action_controls():
         "Token",
     ):
         assert forbidden not in _button_labels(panel)
+
+
+def test_panel_displays_derived_freshness_as_secondary_manual_load_advice():
+    panel = _panel()
+    js = _panel_js()
+
+    for field in (
+        "Freshness",
+        "snapshot_age",
+        "terminal_outcome",
+        "freshness_notice",
+        "freshness_warning_codes",
+    ):
+        assert f">{field}<" in panel
+    for element_id in (
+        "runProgressFreshnessStatus",
+        "runProgressFreshnessAge",
+        "runProgressTerminalOutcome",
+        "runProgressFreshnessNotice",
+        "runProgressFreshnessWarnings",
+    ):
+        assert f'id="{element_id}"' in panel
+
+    for status in ("fresh", "recent", "terminal", "stale", "possibly_abandoned", "unknown"):
+        assert f'{status}:' in js
+    assert "const freshness = _runProgressObject(result.freshness);" in js
+    assert "renderRunProgressSnapshot({ ...snapshot, freshness });" in js
+    assert "Optional progress updates are disabled by default" in panel
+    assert "Temporary read-only progress updates" in panel
 
 
 def test_stage_chips_distinguish_every_visibility_state_and_not_run_is_not_passed():
@@ -159,7 +194,6 @@ def test_panel_javascript_uses_only_operator_initiated_get_and_renders_error_sta
         'method: "POST"',
         "method: 'POST'",
         "setInterval",
-        "setTimeout",
         "applyPatch(",
         "generatePatch(",
         "runValidation",
@@ -232,8 +266,15 @@ def test_registry_marks_ux_run_3_and_close_complete_then_adds_live_plan():
     assert by_id["UX.LIVE.6"]["prerequisites"] == ["UX.LIVE.5"]
     assert by_id["UX.LIVE.7"]["status"] == "complete"
     assert by_id["UX.LIVE.7"]["prerequisites"] == ["UX.LIVE.6"]
-    assert by_id["UX.LIVE.8"]["status"] == "proposed"
+    assert by_id["UX.LIVE.8"]["status"] == "complete"
     assert by_id["UX.LIVE.8"]["prerequisites"] == ["UX.LIVE.7"]
+    assert by_id["UX.LIVE.9"]["status"] == "complete"
+    assert by_id["UX.LIVE.9"]["prerequisites"] == ["UX.LIVE.8"]
+    assert by_id["UX.LIVE.10"]["status"] == "complete"
+    assert by_id["UX.LIVE.10"]["prerequisites"] == ["UX.LIVE.9"]
+    assert by_id["UX.LIVE.CLOSE"]["status"] == "complete"
+    assert by_id["UX.LIVE.CLOSE"]["prerequisites"] == ["UX.LIVE.10"]
+    assert by_id["DOGFOOD.1B"]["status"] == "proposed"
 
     report = summarize_phase_candidates(
         pick_phase_candidates(data),
@@ -241,7 +282,7 @@ def test_registry_marks_ux_run_3_and_close_complete_then_adds_live_plan():
         created_at="2026-07-10T00:00:00+09:00",
     )
     assert report["registry_valid"] is True, report["errors"]
-    assert report["top_recommendation"]["phase_id"] == "UX.LIVE.8"
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
     safe_ids = [phase["phase_id"] for phase in report["safe_to_prepare"]]
-    assert safe_ids[:2] == ["UX.LIVE.8", "MIRROR.13"]
+    assert safe_ids[:2] == ["DOGFOOD.1B", "VERIFY.TEST.1"]
 
