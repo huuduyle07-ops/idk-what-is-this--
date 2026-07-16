@@ -15,7 +15,7 @@ from core.index_manifest import (
     fingerprint_file,
     inspect_repository_delta
 )
-
+from core.repo_ignore import compute_policy_fingerprint
 
 VALID_SHA256 = "a" * 64
 
@@ -441,3 +441,270 @@ def test_delta_rejects_manifest_from_other_repository(tmp_path):
             str(repo_b),
             previous=manifest_a,
         )
+
+def test_policy_fingerprint_is_deterministic(tmp_path):
+    first = compute_policy_fingerprint(str(tmp_path))
+    second = compute_policy_fingerprint(str(tmp_path))
+
+    assert first == second
+    assert len(first) == 64
+
+def test_policy_fingerprint_changes_with_gitignore(tmp_path):
+    first = compute_policy_fingerprint(str(tmp_path))
+
+    (tmp_path / ".gitignore").write_text(
+        "*.log\n",
+        encoding="utf-8",
+    )
+
+    second = compute_policy_fingerprint(str(tmp_path))
+
+    assert second != first
+
+def test_policy_fingerprint_changes_with_cattusignore(tmp_path):
+    first = compute_policy_fingerprint(str(tmp_path))
+
+    (tmp_path / ".cattusignore").write_text(
+        "docs/archive/\n",
+        encoding="utf-8",
+    )
+
+    second = compute_policy_fingerprint(str(tmp_path))
+
+    assert second != first
+
+def test_first_scan_does_not_report_policy_changed(tmp_path):
+    (tmp_path / "source.py").write_text(
+        "value = 1\n",
+        encoding="utf-8",
+    )
+
+    _, delta = inspect_repository_delta(str(tmp_path))
+
+    assert delta.policy_changed is False
+
+def test_gitignore_change_reports_policy_changed(tmp_path):
+    source = tmp_path / "source.py"
+    source.write_text("value = 1\n", encoding="utf-8")
+
+    gitignore = tmp_path / ".gitignore"
+    gitignore.write_text("", encoding="utf-8")
+
+    previous, _ = inspect_repository_delta(str(tmp_path))
+
+    gitignore.write_text("*.log\n", encoding="utf-8")
+
+    _, delta = inspect_repository_delta(
+        str(tmp_path),
+        previous=previous,
+    )
+
+    assert delta.policy_changed is True
+    assert "source.py" in delta.unchanged
+    assert ".gitignore" in delta.modified
+
+def test_policy_fingerprint_changes_when_policy_version_changes(
+    tmp_path,
+    monkeypatch,
+):
+    first = compute_policy_fingerprint(str(tmp_path))
+
+    monkeypatch.setattr(
+        "core.repo_ignore.REPO_IGNORE_POLICY_VERSION",
+        "repo_ignore_v2",
+    )
+
+    second = compute_policy_fingerprint(str(tmp_path))
+
+    assert second != first
+
+def test_policy_fingerprint_includes_hard_excludes(
+    tmp_path,
+    monkeypatch,
+):
+    first = compute_policy_fingerprint(str(tmp_path))
+
+    monkeypatch.setattr(
+        "core.repo_ignore.ROOT_ONLY_HARD_EXCLUDES",
+        frozenset({"different-directory"}),
+    )
+
+    second = compute_policy_fingerprint(str(tmp_path))
+
+    assert second != first
+
+def test_persistent_manifest_second_scan_reuses_all_hashes(tmp_path):
+    first = tmp_path / "a.py"
+    second = tmp_path / "b.py"
+
+    first.write_text("a = 1\n", encoding="utf-8")
+    second.write_text("b = 2\n", encoding="utf-8")
+
+    initial_manifest, initial_delta = inspect_repository_delta(
+        str(tmp_path)
+    )
+
+    assert initial_delta.added == ("a.py", "b.py")
+    assert initial_delta.hashes_computed == 2
+
+    save_repository_manifest(
+        str(tmp_path),
+        initial_manifest,
+    )
+
+    loaded = load_repository_manifest(str(tmp_path))
+
+    assert loaded == initial_manifest
+
+    current_manifest, current_delta = inspect_repository_delta(
+        str(tmp_path),
+        previous=loaded,
+    )
+
+    assert current_delta.added == ()
+    assert current_delta.modified == ()
+    assert current_delta.deleted == ()
+    assert current_delta.unchanged == ("a.py", "b.py")
+    assert current_delta.hashes_computed == 0
+    assert current_delta.hashes_reused == 2
+    assert current_delta.policy_changed is False
+    assert current_manifest == initial_manifest
+
+def test_persistent_manifest_rehashes_only_modified_file(tmp_path):
+    first = tmp_path / "a.py"
+    second = tmp_path / "b.py"
+
+    first.write_text("a = 1\n", encoding="utf-8")
+    second.write_text("b = 2\n", encoding="utf-8")
+
+    initial_manifest, _ = inspect_repository_delta(str(tmp_path))
+    save_repository_manifest(str(tmp_path), initial_manifest)
+
+    first.write_text(
+        "a = 1000\n",
+        encoding="utf-8",
+    )
+
+    loaded = load_repository_manifest(str(tmp_path))
+    assert loaded is not None
+
+    current_manifest, delta = inspect_repository_delta(
+        str(tmp_path),
+        previous=loaded,
+    )
+
+    assert delta.added == ()
+    assert delta.modified == ("a.py",)
+    assert delta.deleted == ()
+    assert delta.unchanged == ("b.py",)
+    assert delta.hashes_computed == 1
+    assert delta.hashes_reused == 1
+
+    save_repository_manifest(str(tmp_path), current_manifest)
+
+    reloaded = load_repository_manifest(str(tmp_path))
+    assert reloaded == current_manifest
+
+def test_persistent_manifest_records_deleted_file(tmp_path):
+    removed = tmp_path / "removed.py"
+    kept = tmp_path / "kept.py"
+
+    removed.write_text("removed = True\n", encoding="utf-8")
+    kept.write_text("kept = True\n", encoding="utf-8")
+
+    initial_manifest, _ = inspect_repository_delta(str(tmp_path))
+    save_repository_manifest(str(tmp_path), initial_manifest)
+
+    removed.unlink()
+
+    loaded = load_repository_manifest(str(tmp_path))
+    assert loaded is not None
+
+    current_manifest, delta = inspect_repository_delta(
+        str(tmp_path),
+        previous=loaded,
+    )
+
+    assert delta.deleted == ("removed.py",)
+    assert delta.unchanged == ("kept.py",)
+    assert delta.hashes_computed == 0
+    assert delta.hashes_reused == 1
+
+    save_repository_manifest(str(tmp_path), current_manifest)
+
+    final_manifest = load_repository_manifest(str(tmp_path))
+    assert final_manifest is not None
+    assert "removed.py" not in final_manifest.files
+
+def test_persistent_policy_change_reuses_unaffected_hashes(tmp_path):
+    source = tmp_path / "source.py"
+    ignored_candidate = tmp_path / "generated.log"
+    gitignore = tmp_path / ".gitignore"
+
+    source.write_text("value = 1\n", encoding="utf-8")
+    ignored_candidate.write_text("generated\n", encoding="utf-8")
+    gitignore.write_text("", encoding="utf-8")
+
+    initial_manifest, _ = inspect_repository_delta(str(tmp_path))
+    save_repository_manifest(str(tmp_path), initial_manifest)
+
+    gitignore.write_text(
+        "*.log\n",
+        encoding="utf-8",
+    )
+
+    loaded = load_repository_manifest(str(tmp_path))
+    assert loaded is not None
+
+    _, delta = inspect_repository_delta(
+        str(tmp_path),
+        previous=loaded,
+    )
+
+    assert delta.policy_changed is True
+    assert "generated.log" in delta.deleted
+    assert "source.py" in delta.unchanged
+    assert ".gitignore" in delta.modified
+
+    # source.py reuses its hash; only .gitignore needs rehashing.
+    assert delta.hashes_computed == 1
+    assert delta.hashes_reused == 1
+
+def test_successful_save_leaves_no_temporary_manifest(tmp_path):
+    manifest, _ = inspect_repository_delta(str(tmp_path))
+
+    path = save_repository_manifest(
+        str(tmp_path),
+        manifest,
+    )
+
+    temporary_path = path.with_suffix(path.suffix + ".tmp")
+
+    assert path.is_file()
+    assert not temporary_path.exists()
+
+def test_manifest_path_is_stable_when_repository_membership_changes(
+    tmp_path,
+):
+    first_path = get_repository_manifest_path(
+        str(tmp_path)
+    )
+
+    created = tmp_path / "created.py"
+    created.write_text(
+        "created = True\n",
+        encoding="utf-8",
+    )
+
+    second_path = get_repository_manifest_path(
+        str(tmp_path)
+    )
+
+    created.unlink()
+
+    third_path = get_repository_manifest_path(
+        str(tmp_path)
+    )
+
+    assert second_path == first_path
+    assert third_path == first_path

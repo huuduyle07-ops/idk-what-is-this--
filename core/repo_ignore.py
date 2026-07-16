@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -40,6 +42,8 @@ ROOT_ONLY_HARD_EXCLUDES = frozenset(
         ".codex"
     }
 )
+
+REPO_IGNORE_POLICY_VERSION = "repo_ignore_v1"
 
 _ANY_DEPTH_HARD_EXCLUDES_CASEFOLDED = frozenset(
     name.casefold() for name in ANY_DEPTH_HARD_EXCLUDES
@@ -221,3 +225,50 @@ def _match_spec(
         pattern=matched_pattern,
         reason=f"matched {source} pattern",
     )
+
+def compute_policy_fingerprint(repo_path: str) -> str:
+    """Return a deterministic fingerprint of repository ignore policy."""
+    root = Path(repo_path).expanduser().resolve()
+
+    payload = {
+        "version": REPO_IGNORE_POLICY_VERSION,
+        "any_depth_hard_excludes": sorted(
+            ANY_DEPTH_HARD_EXCLUDES,
+            key=str.casefold,
+        ),
+        "root_only_hard_excludes": sorted(
+            ROOT_ONLY_HARD_EXCLUDES,
+            key=str.casefold,
+        ),
+        "gitignore": _read_optional_policy_file(
+            root / ".gitignore"
+        ),
+        "cattusignore": _read_optional_policy_file(
+            root / ".cattusignore"
+        ),
+        "profile": "baseline",
+    }
+
+    serialized = json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    )
+
+    return hashlib.sha256(
+        serialized.encode("utf-8")
+    ).hexdigest()
+
+
+def _read_optional_policy_file(path: Path) -> str:
+    if not path.is_file():
+        return ""
+
+    try:
+        return path.read_text(
+            encoding="utf-8",
+            errors="replace",
+        )
+    except OSError:
+        return ""

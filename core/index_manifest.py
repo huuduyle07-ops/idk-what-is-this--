@@ -3,12 +3,14 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from config import get_agent_dir
+from config import AGENT_DIR
 from core.repo_librarian import iter_repo_files
+from core.repo_ignore import compute_policy_fingerprint
 
 MANIFEST_VERSION = "repository_manifest_v1"
 MANIFEST_FILENAME = "repository_manifest_v1.json"
@@ -41,11 +43,47 @@ class RepositoryDelta:
     unchanged: tuple[str, ...]
     hashes_computed: int
     hashes_reused: int
+    policy_changed: bool
 
 def get_repository_manifest_path(repo_path: str) -> Path:
     root = Path(repo_path).expanduser().resolve()
-    return get_agent_dir(str(root)) / "index" / MANIFEST_FILENAME
+    storage_key = _stable_repository_storage_key(root)
 
+    return (
+        AGENT_DIR
+        / "repository_manifests"
+        / storage_key
+        / MANIFEST_FILENAME
+    )
+
+def _stable_repository_storage_key(repo_root: Path) -> str:
+    normalized_path = os.path.normcase(
+        str(repo_root.expanduser().resolve())
+    )
+
+    path_hash = hashlib.sha256(
+        normalized_path.encode(
+            "utf-8",
+            errors="replace",
+        )
+    ).hexdigest()[:16]
+
+    readable_name = repo_root.name.casefold().replace(" ", "-")
+    readable_name = re.sub(
+        r"[^a-z0-9-]+",
+        "-",
+        readable_name,
+    )
+    readable_name = re.sub(
+        r"-+",
+        "-",
+        readable_name,
+    ).strip("-")
+
+    if not readable_name:
+        readable_name = "repository"
+
+    return f"{readable_name}-{path_hash}"
 
 def load_repository_manifest(
     repo_path: str,
@@ -332,6 +370,16 @@ def inspect_repository_delta(
             raise ValueError(
                 "previous manifest belongs to another repository"
             )
+    current_policy_fingerprint = (
+        policy_fingerprint
+        or compute_policy_fingerprint(str(root))
+    )
+
+    policy_changed = (
+        previous is not None
+        and previous.policy_fingerprint
+        != current_policy_fingerprint
+    )
 
     previous_files = previous.files if previous is not None else {}
 
@@ -378,7 +426,7 @@ def inspect_repository_delta(
     manifest = RepositoryManifest(
         version=MANIFEST_VERSION,
         repo_root=str(root),
-        policy_fingerprint=policy_fingerprint,
+        policy_fingerprint=current_policy_fingerprint,
         files={
             relative: current_files[relative]
             for relative in sorted(current_files)
@@ -392,6 +440,7 @@ def inspect_repository_delta(
         unchanged=tuple(sorted(unchanged)),
         hashes_computed=hashes_computed,
         hashes_reused=hashes_reused,
+        policy_changed=policy_changed,
     )
 
     return manifest, delta
