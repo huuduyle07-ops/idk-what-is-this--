@@ -1,0 +1,4 @@
+# Files committed to Git but intentionally excluded from
+# the persistent C.A.T.T.U.S repository index.
+
+tests/fixtures/large_generated/

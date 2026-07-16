@@ -1,20 +1,11 @@
 from __future__ import annotations
 
-import json
+import json, os
 from collections import Counter
 from pathlib import Path
 from typing import Any
-
-from config import LANGUAGE_MAP, SUPPORTED_EXTENSIONS, FOLDER_BLACKLIST, get_agent_dir
-
-
-EXTRA_SKIP_DIRS = {
-    ".agent",
-    "Obsidian Graph",
-    "obsidian_graph",
-    "bin",
-    "obj",
-}
+from core.repo_ignore import RepoIgnorePolicy
+from config import LANGUAGE_MAP, SUPPORTED_EXTENSIONS, get_agent_dir
 
 
 # ---- infra-file gating --------------------------------------------------
@@ -62,43 +53,77 @@ def normalize_repo_path(repo_path: str) -> Path:
     return Path(repo_path).expanduser().resolve()
 
 
-def should_skip_relative_path(rel_path: Path) -> bool:
-    """
-    Only inspect path parts relative to repo root.
+def _walk_policy_files(root: Path):
+    """Yield policy-approved repository files deterministically.
 
-    Important:
-    Never apply blacklist to absolute path parts, because parent folders like
-    'test' or 'build' may be outside the actual repo.
+    Ignored directories are removed from ``dir_names`` before ``os.walk``
+    descends into them, avoiding unnecessary traversal of temporary,
+    generated, cache, dependency, and internal artifact trees.
     """
-    skip_dirs = set(FOLDER_BLACKLIST) | EXTRA_SKIP_DIRS
-    return any(part in skip_dirs for part in rel_path.parts)
+    policy = RepoIgnorePolicy.load(root)
+
+    for current_root, dir_names, file_names in os.walk(
+        root,
+        topdown=True,
+        followlinks=False,
+    ):
+        current = Path(current_root)
+
+        try:
+            current_rel = current.relative_to(root)
+        except ValueError:
+            dir_names[:] = []
+            continue
+
+        kept_dirs: list[str] = []
+
+        for name in sorted(dir_names):
+            rel_dir = current_rel / name
+
+            decision = policy.classify(
+                rel_dir,
+                is_dir=True,
+            )
+
+            if not decision.ignored:
+                kept_dirs.append(name)
+
+        # Critical: prevent os.walk from entering ignored directories.
+        dir_names[:] = kept_dirs
+
+        for name in sorted(file_names):
+            path = current / name
+
+            if not path.is_file():
+                continue
+
+            rel = current_rel / name
+
+            decision = policy.classify(
+                rel,
+                is_dir=False,
+            )
+
+            if decision.ignored:
+                continue
+
+            yield path, rel
 
 
 def iter_repo_files(repo_path: str, query: str | None = None):
     """Iterate ``(abs_path, rel_path)`` pairs for files in the repo.
 
-    When ``query`` is ``None`` (the default — indexing time), infra files are
-    skipped. Pass the user's actual query string to let infra files through
-    when they're relevant (e.g. "what's in our Dockerfile?").
+    Repository membership is controlled by RepoIgnorePolicy. Infra files
+    remain query-gated as before.
     """
     root = normalize_repo_path(repo_path)
 
     if not root.exists() or not root.is_dir():
         return
 
-    for path in root.rglob("*"):
-        if not path.is_file():
-            continue
+    for path, rel in _walk_policy_files(root):
+        rel_str = rel.as_posix()
 
-        try:
-            rel = path.relative_to(root)
-        except ValueError:
-            continue
-
-        if should_skip_relative_path(rel):
-            continue
-
-        rel_str = str(rel).replace("\\", "/")
         if not should_include_infra_file(query, rel_str):
             continue
 
@@ -127,23 +152,14 @@ def build_repo_manifest(repo_path: str) -> dict[str, Any]:
             "files": [],
             "indexable_files": [],
             "skipped_files": [],
+            "sample_files": [],
+            "sample_indexable_files": [],            
             "warnings": [],
+
         }
 
-    for path in root.rglob("*"):
-        if not path.is_file():
-            continue
-
-        try:
-            rel = path.relative_to(root)
-        except ValueError:
-            continue
-
-        rel_str = str(rel).replace("\\", "/")
-
-        if should_skip_relative_path(rel):
-            skipped_files.append(rel_str)
-            continue
+    for path, rel in _walk_policy_files(root):
+        rel_str = rel.as_posix()
 
         if not should_include_infra_file(None, rel_str):
             skipped_files.append(rel_str)
@@ -158,9 +174,14 @@ def build_repo_manifest(repo_path: str) -> dict[str, Any]:
             indexable_files.append(rel_str)
 
             lang = LANGUAGE_MAP.get(ext, "unknown")
-            if lang not in {"text", "document", "json", "unknown"}:
+            if lang not in {
+                "text",
+                "document",
+                "json",
+                "unknown",
+            }:
                 language_counts[lang] += 1
-
+    
     primary_language = (
         language_counts.most_common(1)[0][0]
         if language_counts
@@ -212,6 +233,8 @@ def inspect_repo_inventory(repo_path: str) -> dict[str, Any]:
         "sample_indexable_files": manifest["sample_indexable_files"],
         "primary_language": manifest["primary_language"],
         "languages": manifest["languages"],
+        "sample_files": manifest.get("sample_files", []),
+        "sample_indexable_files": manifest.get("sample_indexable_files", []),
         "warnings": manifest["warnings"],
     }
 

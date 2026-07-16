@@ -61,14 +61,13 @@ benchmarks/**/*.out
 benchmarks/reports/
 benchmarks/tmp/
 .agent/benchmarks/
-.tmp
+.tmp/
+.temp/
 .superpowers
 
-pytest.ini
 pytest_cache/
 .pytest_cache/
 pytest/
 .pytest_tmp/
-test.py
 #tests
 #docs
