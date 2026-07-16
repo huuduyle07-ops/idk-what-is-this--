@@ -37,6 +37,7 @@ ROOT_ONLY_HARD_EXCLUDES = frozenset(
         "bin",
         "obj",
         "storage",
+        ".codex"
     }
 )
 

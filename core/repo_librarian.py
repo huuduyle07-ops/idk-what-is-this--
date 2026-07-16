@@ -233,8 +233,8 @@ def inspect_repo_inventory(repo_path: str) -> dict[str, Any]:
         "sample_indexable_files": manifest["sample_indexable_files"],
         "primary_language": manifest["primary_language"],
         "languages": manifest["languages"],
-        "sample_files": manifest.get("sample_files", []),
-        "sample_indexable_files": manifest.get("sample_indexable_files", []),
+        "sample_files": manifest.get("sample_files"),
+        "sample_indexable_files": manifest.get("sample_indexable_files"),
         "warnings": manifest["warnings"],
     }
 
