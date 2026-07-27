@@ -1,9 +1,14 @@
+import re
 from pathlib import Path
+
 from config import LANGUAGE_MAP, SUPPORTED_EXTENSIONS
+from core.dependency_target import (
+    resolve_dependency_target,
+)
+from core.repo_librarian import iter_repo_files
 from core.treesitter_parse import parse_code_with_treesitter
 from graph.schema import ProgramGraph
-from core.repo_librarian import iter_repo_files
-import re
+
 
 SKIP_DIRS = {
     ".git",
@@ -22,11 +27,29 @@ SKIP_DIRS = {
     ".claude"
 }
 
-def build_graph_from_repo(repo_path: str) -> ProgramGraph:
+def build_graph_from_repo(
+    repo_path: str,
+    *,
+    repo_entries=None,
+    repository_files=None,
+) -> ProgramGraph:
     graph = ProgramGraph()
     root = Path(repo_path).resolve()
+    entries = (
+        list(repo_entries)
+        if repo_entries is not None
+        else list(iter_repo_files(repo_path))
+    )
+    files = (
+        set(repository_files)
+        if repository_files is not None
+        else {
+            str(rel_path).replace("\\", "/")
+            for _path, rel_path in entries
+        }
+    )
 
-    for path, rel_path in iter_repo_files(repo_path):
+    for path, rel_path in entries:
         rel = str(rel_path).replace("\\", "/")
 
         ext = path.suffix.lower()
@@ -49,10 +72,24 @@ def build_graph_from_repo(repo_path: str) -> ProgramGraph:
         graph.add_node(rel, "file", rel)
 
         for imp in imports:
-            target_file = resolve_import_to_file(imp, root, rel)
-            if target_file:
-                graph.add_node(target_file, "file", target_file)
-                graph.add_edge(rel, target_file, "imports")
+            target = resolve_dependency_target(
+                repo_root=root,
+                source_file=rel,
+                language=language,
+                raw_target=imp,
+                repository_files=files,
+            )
+            if target.target_file:
+                graph.add_node(
+                    target.target_file,
+                    "file",
+                    target.target_file,
+                )
+                graph.add_edge(
+                    rel,
+                    target.target_file,
+                    "imports",
+                )
 
         for sym in symbols:
             name = sym.get("name")
@@ -77,58 +114,6 @@ def build_graph_from_repo(repo_path: str) -> ProgramGraph:
 
     graph = resolve_call_edges(graph)
     return graph
-
-def resolve_import_to_file(import_name: str, root: Path, current_rel: str | None = None):
-    name = (import_name or "").strip()
-    if not name:
-        return None
-
-    # Tree-sitter usually returns module paths; handle simple fallback forms safely.
-    if name.startswith("from ") and " import " in name:
-        name = name[5:name.index(" import ")].strip()
-    elif name.startswith("import "):
-        # Keep the first import target only (e.g., "import os, sys").
-        name = name[7:].split(",")[0].strip()
-
-    def first_existing(candidates: list[Path]) -> str | None:
-        for candidate in candidates:
-            if candidate.exists():
-                return str(candidate.relative_to(root))
-        return None
-
-    # Relative imports: .foo, ..pkg.mod
-    if name.startswith("."):
-        if not current_rel:
-            return None
-
-        current_dir = Path(current_rel).parent
-        dot_count = len(name) - len(name.lstrip("."))
-        suffix = name[dot_count:]
-
-        anchor = current_dir
-        for _ in range(max(dot_count - 1, 0)):
-            anchor = anchor.parent
-
-        if suffix:
-            rel_mod = suffix.replace(".", "/")
-            resolved = first_existing([
-                root / anchor / f"{rel_mod}.py",
-                root / anchor / rel_mod / "__init__.py",
-            ])
-            if resolved:
-                return resolved
-
-        # `from . import x` often identifies the package itself.
-        resolved = first_existing([root / anchor / "__init__.py"])
-        if resolved:
-            return resolved
-        return None
-
-    rel_mod = name.replace(".", "/")
-    return first_existing([
-        root / f"{rel_mod}.py",
-        root / rel_mod / "__init__.py",
-    ])
 
 def fallback_csharp_symbols(text: str):
     symbols = []

@@ -23,20 +23,34 @@ if root_dir not in sys.path:
 from reasoning.reasoning_engine import build_reasoning_context, analyze_symbol_risk
 from reasoning.decision_engine import decide_patch_action
 from config import LANGUAGE_MAP, SUPPORTED_EXTENSIONS, get_agent_dir
-from core.project_tag import build_project_tag
+from core.repository_identity import (
+    build_code_index_scope,
+    is_code_index_scope,
+)
 from core.repo_librarian import should_include_infra_file
 
 
-def _tag_for(repo_path: Optional[str], project_tag: Optional[str] = None) -> Optional[str]:
-    """Resolve a project_tag, deriving from repo_path when not supplied."""
-    if project_tag:
-        return project_tag
+def _index_scope_for(
+    repo_path: Optional[str],
+    explicit_scope: Optional[str] = None,
+) -> Optional[str]:
+    """Resolve the stable code-index scope.
+
+    A valid repository path always wins. Without a repository,
+    only an already validated code-index scope is accepted.
+    Arbitrary user-facing project tags must never scope code-index DB access.
+    """
     if repo_path:
         try:
-            return build_project_tag(repo_path)
-        except Exception:
+            return build_code_index_scope(repo_path)
+        except (OSError, ValueError):
             return None
+
+    if is_code_index_scope(explicit_scope):
+        return explicit_scope
+
     return None
+
 from core.router import get_model, detect_input_mode, detect_language
 from core.security import is_safe_path
 from core.treesitter_parse import parse_code_with_treesitter
@@ -103,8 +117,11 @@ def dedupe_states(states):
     return result
 
 def trace_execution_flow(query: str, repo_path: str = None, top_k: int = 3) -> str:
-    hits = search_safe_code_units(query, repo_path=repo_path, limit=top_k, project_tag=_tag_for(repo_path))
-    
+    hits = search_safe_code_units(
+        query,
+        repo_path=repo_path,
+        limit=top_k,
+    )
     if not hits:
         if detect_input_mode(query) == "code":
             lang = detect_language(query)
@@ -528,12 +545,22 @@ def search_safe_code_units(
     project_tag: Optional[str] = None,
 ) -> List[Dict]:
     """Wraps search_code_units with safety filtering AND project_tag scoping."""
-    tag = _tag_for(repo_path, project_tag)
+    index_scope = _index_scope_for(
+        repo_path,
+        project_tag,
+    )
     if not retriever_db_enabled():
         return []
 
+    if index_scope is None:
+        return []
+
     try:
-        hits = search_code_units(query, limit=limit * 3, project_tag=tag)
+        hits = search_code_units(
+            query,
+            limit=limit * 3,
+            project_tag=index_scope,
+        )
     except Exception as e:
         print(f"⚠️ DB code-unit search skipped: {e}")
         return []
@@ -575,10 +602,16 @@ def search_dependencies(
     if not retriever_db_enabled():
         return ""
 
-    tag = _tag_for(repo_path, project_tag)
+    index_scope = _index_scope_for(
+        repo_path,
+       project_tag,
+    )
+
+    if index_scope is None:
+        return ""
 
     try:
-        results = search_dependencies_db(query, limit=top_k, project_tag=tag)
+        results = search_dependencies_db(query, limit=top_k, project_tag=index_scope)
     except Exception as e:
         print(f"⚠️ DB dependency search skipped: {e}")
         return ""
@@ -689,7 +722,10 @@ def pick_seed_symbols(query, repo_path: str = None):
 def trace_call_chain(query: str, repo_path: str = None, max_depth: int = 3, fanout: int = 3) -> str:
     if not retriever_db_enabled():
         return ""
-    tag = _tag_for(repo_path)
+    index_scope = _index_scope_for(repo_path)
+
+    if index_scope is None:
+        return ""
     seeds = pick_seed_symbols(query, repo_path=repo_path)
     if not seeds:
         return ""
@@ -703,7 +739,7 @@ def trace_call_chain(query: str, repo_path: str = None, max_depth: int = 3, fano
             return
         visited.add(symbol_name)
 
-        deps = search_dependencies_db(symbol_name, limit=fanout, project_tag=tag)
+        deps = search_dependencies_db(symbol_name, limit=fanout, project_tag=index_scope)
         for dep in deps:
             if dep.get("dependency_type") != "call":
                 continue
@@ -713,7 +749,7 @@ def trace_call_chain(query: str, repo_path: str = None, max_depth: int = 3, fano
             if not tgt:
                 continue
 
-            code_hits = search_safe_code_units(tgt, repo_path=repo_path, limit=1, project_tag=tag)
+            code_hits = search_safe_code_units(tgt, repo_path=repo_path, limit=1, project_tag=index_scope)
 
             snippet = code_hits[0]["content"][:200] if code_hits else ""
 
@@ -840,7 +876,7 @@ def retrieve_context(
 ) -> str:
     route = classify_retrieval_level(query)
     level = route["level"]
-    tag = _tag_for(repo_path, project_tag)
+    index_scope = _index_scope_for(repo_path, project_tag)
 
     blocks = []
     blocks.append(f"Retrieval Level: {level} | confidence={route['confidence']} | scores={route['scores']}")
@@ -924,12 +960,12 @@ Dependency Interpretation:
 
 
     if level in {"meso", "hybrid"}:
-        symbol_hits = search_safe_code_units(query, repo_path=repo_path, limit=8, project_tag=tag)
+        symbol_hits = search_safe_code_units(query, repo_path=repo_path, limit=8, project_tag=index_scope)
         dependency_context = search_dependencies(
             query,
             top_k=5,
             repo_path=repo_path,
-            project_tag=tag,
+            project_tag=index_scope,
         )
         if dependency_context:
             blocks.append(dependency_context)
@@ -954,7 +990,7 @@ Dependency Interpretation:
             blocks.append(micro_context)
         else:
             # nếu không có file cụ thể, dùng code_units toàn repo
-            safe_hits = search_safe_code_units(query, repo_path=repo_path, limit=5, project_tag=tag)
+            safe_hits = search_safe_code_units(query, repo_path=repo_path, limit=5, project_tag=index_scope)
             
             if safe_hits:
                 blocks.append("=== MICRO CODE HITS ===")

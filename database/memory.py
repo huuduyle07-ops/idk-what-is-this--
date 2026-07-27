@@ -924,18 +924,23 @@ def save_code_unit(
     kind: str,
     name: str,
     content: str,
-    embedding: List[float],
+    embedding: Optional[List[float]],
     project_tag: Optional[str] = None,
 ):
     if not db_enabled():
         return
-    query = """
-    INSERT INTO code_units (file_path, kind, name, content, embedding, project_tag)
-    VALUES (%s, %s, %s, %s, %s::vector, %s);
-    """
+
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute(query, (file_path, kind, name, content, str(embedding), project_tag))
+            _insert_code_unit_with_cursor(
+                cur,
+                file_path=file_path,
+                kind=kind,
+                name=name,
+                content=content,
+                embedding=embedding,
+                project_tag=project_tag,
+            )
         conn.commit()
 
 
@@ -963,20 +968,20 @@ def get_tooling_profile(project_tag: str, language: str) -> dict:
     return {}
 
 
-def clear_code_units_for_file(file_path: str, project_tag: Optional[str] = None):
-    """Delete code units for a file. Scoped by project_tag when given so we
-    don't delete a same-named file's symbols belonging to a different project."""
+def clear_code_units_for_file(
+    file_path: str,
+    project_tag: Optional[str] = None,
+):
     if not db_enabled():
         return
-    if project_tag is not None:
-        query = "DELETE FROM code_units WHERE file_path = %s AND project_tag = %s;"
-        params = (file_path, project_tag)
-    else:
-        query = "DELETE FROM code_units WHERE file_path = %s;"
-        params = (file_path,)
+
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute(query, params)
+            _delete_code_units_for_file_with_cursor(
+                cur,
+                file_path=file_path,
+                project_tag=project_tag,
+            )
         conn.commit()
 
 
@@ -996,6 +1001,7 @@ def search_code_units(
                1 - (embedding <=> %s::vector) AS similarity
         FROM code_units
         WHERE project_tag = %s
+          AND embedding IS NOT NULL
         ORDER BY embedding <=> %s::vector
         LIMIT %s;
         """
@@ -1005,6 +1011,7 @@ def search_code_units(
         SELECT file_path, kind, name, content,
                1 - (embedding <=> %s::vector) AS similarity
         FROM code_units
+        WHERE embedding IS NOT NULL
         ORDER BY embedding <=> %s::vector
         LIMIT %s;
         """
@@ -1066,34 +1073,35 @@ def save_dependency(
 ):
     if not db_enabled():
         return
-    query = """
-    INSERT INTO code_dependencies
-        (source_file, target_file, source_symbol, target_symbol, dependency_type, project_tag)
-    VALUES (%s, %s, %s, %s, %s, %s);
-    """
+
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                query,
-                (source_file, target_file, source_symbol, target_symbol, dependency_type, project_tag),
+            _insert_dependency_with_cursor(
+                cur,
+                source_file=source_file,
+                target_file=target_file,
+                source_symbol=source_symbol,
+                target_symbol=target_symbol,
+                dependency_type=dependency_type,
+                project_tag=project_tag,
             )
         conn.commit()
 
 
-def clear_dependencies_for_file(source_file: str, project_tag: Optional[str] = None):
-    """Delete dependency edges for a file. Scoped by project_tag when given so
-    we don't delete the same file path belonging to a different project."""
+def clear_dependencies_for_file(
+    source_file: str,
+    project_tag: Optional[str] = None,
+):
     if not db_enabled():
         return
-    if project_tag is not None:
-        query = "DELETE FROM code_dependencies WHERE source_file = %s AND project_tag = %s;"
-        params = (source_file, project_tag)
-    else:
-        query = "DELETE FROM code_dependencies WHERE source_file = %s;"
-        params = (source_file,)
+
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute(query, params)
+            _delete_dependencies_for_file_with_cursor(
+                cur,
+                source_file=source_file,
+                project_tag=project_tag,
+            )
         conn.commit()
 
 
@@ -1113,6 +1121,7 @@ def search_dependencies(
             SELECT file_path
             FROM code_units
             WHERE project_tag = %s
+              AND embedding IS NOT NULL
             ORDER BY embedding <=> %s::vector
             LIMIT 3
         )
@@ -1132,6 +1141,7 @@ def search_dependencies(
         WITH top_files AS (
             SELECT file_path
             FROM code_units
+            WHERE embedding IS NOT NULL
             ORDER BY embedding <=> %s::vector
             LIMIT 3
         )
@@ -1158,3 +1168,347 @@ def search_dependencies(
         }
         for sf, tf, ss, ts, dt in rows
     ]
+
+def _insert_code_unit_with_cursor(
+    cursor,
+    *,
+    file_path: str,
+    kind: str,
+    name: str,
+    content: str,
+    embedding: Optional[List[float]],
+    project_tag: Optional[str],
+) -> None:
+    query = """
+    INSERT INTO code_units (
+        file_path,
+        kind,
+        name,
+        content,
+        embedding,
+        project_tag
+    )
+    VALUES (%s, %s, %s, %s, %s::vector, %s);
+    """
+
+    embedding_value = (
+        str(embedding)
+        if embedding is not None
+        else None
+    )
+
+    cursor.execute(
+        query,
+        (
+            file_path,
+            kind,
+            name,
+            content,
+            embedding_value,
+            project_tag,
+        ),
+    )
+
+def _delete_code_units_for_file_with_cursor(
+    cursor,
+    *,
+    file_path: str,
+    project_tag: Optional[str],
+) -> None:
+    if project_tag is not None:
+        query = """
+        DELETE FROM code_units
+        WHERE file_path = %s AND project_tag = %s;
+        """
+        params = (file_path, project_tag)
+    else:
+        # Legacy wrapper compatibility only.
+        query = """
+        DELETE FROM code_units
+        WHERE file_path = %s;
+        """
+        params = (file_path,)
+
+    cursor.execute(query, params)
+
+def _insert_dependency_with_cursor(
+    cursor,
+    *,
+    source_file: str,
+    dependency_type: str,
+    target_file: Optional[str] = None,
+    source_symbol: Optional[str] = None,
+    target_symbol: Optional[str] = None,
+    project_tag: Optional[str] = None,
+) -> None:
+    query = """
+    INSERT INTO code_dependencies (
+        source_file,
+        target_file,
+        source_symbol,
+        target_symbol,
+        dependency_type,
+        project_tag
+    )
+    VALUES (%s, %s, %s, %s, %s, %s);
+    """
+    cursor.execute(
+        query,
+        (
+            source_file,
+            target_file,
+            source_symbol,
+            target_symbol,
+            dependency_type,
+            project_tag,
+        ),
+    )
+
+def _delete_dependencies_for_file_with_cursor(
+    cursor,
+    *,
+    source_file: str,
+    project_tag: Optional[str],
+) -> None:
+    if project_tag is not None:
+        query = """
+        DELETE FROM code_dependencies
+        WHERE source_file = %s AND project_tag = %s;
+        """
+        params = (source_file, project_tag)
+    else:
+        query = """
+        DELETE FROM code_dependencies
+        WHERE source_file = %s;
+        """
+        params = (source_file,)
+
+    cursor.execute(query, params)
+
+def _delete_inbound_dependencies_for_file_with_cursor(
+    cursor,
+    *,
+    target_file: str,
+    project_tag: str,
+) -> None:
+    """Delete dependency edges that point to one indexed file.
+
+    This primitive is strict-scope only. Unlike legacy outbound cleanup,
+    it must never offer an unscoped deletion path.
+    """
+    query = """
+    DELETE FROM code_dependencies
+    WHERE target_file = %s
+      AND project_tag = %s;
+    """
+    cursor.execute(
+        query,
+        (
+            target_file,
+            project_tag,
+        ),
+    )
+
+def replace_code_index_for_file(
+    *,
+    file_path: str,
+    index_scope: str,
+    code_units: List[Dict[str, Any]],
+    dependencies: List[Dict[str, Any]],
+) -> int:
+    """Atomically replace all code-index rows for one file.
+
+    Deletes the file's previous units and outbound dependencies, then
+    inserts the supplied replacement rows in one transaction.
+
+    Returns the number of inserted code units. Returns zero when DB
+    persistence is disabled.
+    """
+    if not db_enabled():
+        return 0
+
+    if not index_scope:
+        raise ValueError(
+            "index_scope is required for code-index replacement"
+        )
+
+    with get_conn() as conn:
+        try:
+            with conn.cursor() as cur:
+                _delete_code_units_for_file_with_cursor(
+                    cur,
+                    file_path=file_path,
+                    project_tag=index_scope,
+                )
+                _delete_dependencies_for_file_with_cursor(
+                    cur,
+                    source_file=file_path,
+                    project_tag=index_scope,
+                )
+
+                for dependency in dependencies:
+                    _insert_dependency_with_cursor(
+                        cur,
+                        source_file=file_path,
+                        target_file=dependency.get("target_file"),
+                        source_symbol=dependency.get(
+                            "source_symbol"
+                        ),
+                        target_symbol=dependency.get(
+                            "target_symbol"
+                        ),
+                        dependency_type=dependency[
+                            "dependency_type"
+                        ],
+                        project_tag=index_scope,
+                    )
+
+                for unit in code_units:
+                    _insert_code_unit_with_cursor(
+                        cur,
+                        file_path=file_path,
+                        kind=unit["kind"],
+                        name=unit["name"],
+                        content=unit["content"],
+                        embedding=unit["embedding"],
+                        project_tag=index_scope,
+                    )
+
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+
+    return len(code_units)
+
+def delete_code_index_for_file(
+    *,
+    file_path: str,
+    index_scope: str,
+) -> bool:
+    """Atomically delete one file's units and dependency edges.
+
+    Deletes:
+    - code units belonging to the file,
+    - outbound dependencies whose source is the file,
+    - inbound dependencies whose target is the file.
+    """
+    if not db_enabled():
+        return False
+
+    if not index_scope:
+        raise ValueError(
+            "index_scope is required for code-index deletion"
+        )
+
+    with get_conn() as conn:
+        try:
+            with conn.cursor() as cur:
+                _delete_code_units_for_file_with_cursor(
+                    cur,
+                    file_path=file_path,
+                    project_tag=index_scope,
+                )
+                _delete_dependencies_for_file_with_cursor(
+                    cur,
+                    source_file=file_path,
+                    project_tag=index_scope,
+                )
+                _delete_inbound_dependencies_for_file_with_cursor(
+                    cur,
+                    target_file=file_path,
+                    project_tag=index_scope,
+                )
+
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+
+    return True
+
+def reconcile_code_index_scope(
+    *,
+    index_scope: str,
+    current_files: set[str],
+) -> dict[str, int]:
+    """Atomically remove stale code-index rows from one repository scope."""
+    if not db_enabled():
+        return {
+            "dependencies_deleted": 0,
+            "code_units_deleted": 0,
+        }
+
+    if not index_scope:
+        raise ValueError(
+            "index_scope is required for code-index reconciliation"
+        )
+
+    canonical_files = sorted({
+        str(file_path).replace("\\", "/")
+        for file_path in current_files
+        if str(file_path).strip()
+    })
+
+    if not canonical_files:
+        raise ValueError(
+            "current_files must not be empty for reconciliation"
+        )
+
+    with get_conn() as conn:
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    DELETE FROM code_dependencies
+                    WHERE project_tag = %s
+                      AND (
+                          NOT (
+                              source_file = ANY(%s::text[])
+                          )
+                          OR (
+                              target_file IS NOT NULL
+                              AND NOT (
+                                  target_file = ANY(%s::text[])
+                              )
+                          )
+                      );
+                    """,
+                    (
+                        index_scope,
+                        canonical_files,
+                        canonical_files,
+                    ),
+                )
+                dependencies_deleted = max(
+                    int(cur.rowcount or 0),
+                    0,
+                )
+
+                cur.execute(
+                    """
+                    DELETE FROM code_units
+                    WHERE project_tag = %s
+                      AND NOT (
+                          file_path = ANY(%s::text[])
+                      );
+                    """,
+                    (
+                        index_scope,
+                        canonical_files,
+                    ),
+                )
+                code_units_deleted = max(
+                    int(cur.rowcount or 0),
+                    0,
+                )
+
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+
+    return {
+        "dependencies_deleted": dependencies_deleted,
+        "code_units_deleted": code_units_deleted,
+    }

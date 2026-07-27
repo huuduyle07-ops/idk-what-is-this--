@@ -11,6 +11,9 @@ from typing import Any
 from config import AGENT_DIR
 from core.repo_librarian import iter_repo_files
 from core.repo_ignore import compute_policy_fingerprint
+from core.repository_identity import (
+    build_repository_storage_key,
+)
 
 MANIFEST_VERSION = "repository_manifest_v1"
 MANIFEST_FILENAME = "repository_manifest_v1.json"
@@ -47,7 +50,7 @@ class RepositoryDelta:
 
 def get_repository_manifest_path(repo_path: str) -> Path:
     root = Path(repo_path).expanduser().resolve()
-    storage_key = _stable_repository_storage_key(root)
+    storage_key = build_repository_storage_key(root)
 
     return (
         AGENT_DIR
@@ -56,34 +59,10 @@ def get_repository_manifest_path(repo_path: str) -> Path:
         / MANIFEST_FILENAME
     )
 
-def _stable_repository_storage_key(repo_root: Path) -> str:
-    normalized_path = os.path.normcase(
-        str(repo_root.expanduser().resolve())
-    )
-
-    path_hash = hashlib.sha256(
-        normalized_path.encode(
-            "utf-8",
-            errors="replace",
-        )
-    ).hexdigest()[:16]
-
-    readable_name = repo_root.name.casefold().replace(" ", "-")
-    readable_name = re.sub(
-        r"[^a-z0-9-]+",
-        "-",
-        readable_name,
-    )
-    readable_name = re.sub(
-        r"-+",
-        "-",
-        readable_name,
-    ).strip("-")
-
-    if not readable_name:
-        readable_name = "repository"
-
-    return f"{readable_name}-{path_hash}"
+def _stable_repository_storage_key(
+    repo_root: Path,
+) -> str:
+    return build_repository_storage_key(repo_root)
 
 def load_repository_manifest(
     repo_path: str,

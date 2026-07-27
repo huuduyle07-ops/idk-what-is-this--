@@ -11,7 +11,15 @@ from typing import Optional
 from config import LANGUAGE_MAP, SUPPORTED_EXTENSIONS
 from core.retriever import extract_file_text, build_code_units, get_embedding
 from core.treesitter_parse import parse_code_with_treesitter
-from database.memory import save_code_unit, clear_code_units_for_file, init_db, clear_dependencies_for_file, save_dependency
+from database.memory import (
+    db_enabled as code_index_db_enabled,
+    init_db,
+    reconcile_code_index_scope,
+    replace_code_index_for_file,
+)
+from core.dependency_target import (
+    resolve_dependency_target,
+)
 from graph.project_map import summarize_file, build_project_map, write_project_map
 from core.security import is_safe_path
 from core.project_tag import build_project_tag
@@ -25,37 +33,63 @@ from core.phantom_limb import scan as scan_phantom_limb
 import json
 
 def index_repository(repo_path: str, project_tag: Optional[str] = None):
+    from core.repository_identity import build_code_index_scope
     file_summaries = []
     repo_path = os.path.abspath(repo_path)
 
     # Auto-derive a stable tag if the caller didn't supply one. Same repo →
     # same tag, so re-indexing replaces only this project's rows.
-    if not project_tag:
-        project_tag = build_project_tag(repo_path)
-    
+
+    display_project_tag = (
+        project_tag or build_project_tag(repo_path)
+    )
+
     inventory = inspect_repo_inventory(repo_path)
     if not inventory["ok"]:
         raise RuntimeError(
             "Indexing aborted: repo has 0 indexable files.\n"
             + json.dumps(inventory, indent=2, ensure_ascii=False)
         )
+    index_scope = build_code_index_scope(repo_path)
+    repo_entries = list(iter_repo_files(repo_path))
+
+    repository_files = {
+        rel_path.as_posix()
+        for _file_path, rel_path in repo_entries
+    }
 
     indexable_count = inventory["indexable_count"]
     
-    print(f"🚀 Starting Project-Wide Indexing: {repo_path}  [tag={project_tag}, files={indexable_count}]")
+    print(
+        f"🚀 Starting Project-Wide Indexing: {repo_path} "
+        f"[tag={display_project_tag}, "
+        f"index_scope={index_scope}, "
+        f"files={indexable_count}]"
+    )
 
-    # Ensure DB is initialized
-    db_available = True
-    try:
-        init_db()
-    except Exception as e:
-        db_available = False
-        print(f"⚠️ DB initialization failed: {e}. Indexing will proceed, but results won't be saved.")
+    # Ensure DB is initialized when persistence is enabled.
+    db_available = code_index_db_enabled()
+    persistence_skip_reason = (
+        None
+        if db_available
+        else "persistence_disabled"
+    )
+    if db_available:
+        try:
+            init_db()
+        except Exception as e:
+            db_available = False
+            persistence_skip_reason = "db_initialization_failed"
+            print(
+                f"⚠️ DB initialization failed: {e}. "
+                "Indexing will proceed, but results won't be saved."
+            )
 
     files_indexed = 0
     units_saved = 0
+    indexed_repository_files: set[str] = set()
 
-    for file_path_obj, rel_path_obj in iter_repo_files(repo_path):
+    for file_path_obj, rel_path_obj in repo_entries:
         file_path = str(file_path_obj)
         rel_path = str(rel_path_obj).replace("\\", "/")
 
@@ -70,6 +104,8 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
         ext = file_path_obj.suffix.lower()
         if ext not in SUPPORTED_EXTENSIONS:
             continue
+
+        indexed_repository_files.add(rel_path)
 
         try:
             text = extract_file_text(file_path, repo_path=repo_path)
@@ -135,95 +171,58 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
                     calls=data.get("calls", []),
                 )
             )
-
-            if not units and not data.get("imports") and not data.get("calls"):
-                continue
-            if db_available:
-                try:
-                    clear_code_units_for_file(rel_path, project_tag=project_tag)
-                    clear_dependencies_for_file(rel_path, project_tag=project_tag)
-                except Exception as e:
-                    print(f"⚠️ DB cleanup failed for {rel_path}: {e}")
-                    db_available = False
-
-            for imp in data.get("imports", []):
-                if db_available:
-                    try:
-                        save_dependency(
-                            source_file=rel_path,
-                            target_file=imp,
-                            dependency_type="import",
-                            project_tag=project_tag,
-                        )
-                    except Exception as e:
-                        print(f"⚠️ DB save failed for import in {rel_path}: {e}")
-                        db_available = False
-                
-
-            all_symbol_calls = set()
-            for symbol in data.get("symbols", []):
-                current_func = symbol.get("name")
-
-                for call in symbol.get("calls", []):
-                    all_symbol_calls.add(call)
-                    if db_available:
-                        try:
-                            save_dependency(
-                                source_file=rel_path,
-                                source_symbol=current_func,
-                                target_symbol=call,
-                                dependency_type="call",
-                                project_tag=project_tag,
-                            )
-                        except Exception as e:
-                            print(f"⚠️ DB save failed for call in {rel_path}: {e}")
-                            db_available = False
-
-            file_level_calls = [
-                c for c in data.get("calls", [])
-                if c not in all_symbol_calls
-            ]
-
-            for call in file_level_calls:
-                if db_available:
-                    try:
-                        save_dependency(
-                            source_file=rel_path,
-                            target_symbol=call,
-                            dependency_type="call",
-                            project_tag=project_tag,
-                        )
-                    except Exception as e:
-                        print(f"⚠️ DB save failed for file-level call in {rel_path}: {e}")
-                        db_available = False
-
+            dependency_rows = _build_dependency_rows(
+                repo_path=repo_path,
+                rel_path=rel_path,
+                language=language or "",
+                parsed_data=data,
+                repository_files=repository_files,
+            )
             use_index_embeddings = os.getenv(
                 "INDEX_USE_EMBEDDINGS",
                 "true",
-            ).lower() not in {"0", "false", "no"}
+            ).strip().lower() not in {"false", "0", "no"}
+            unit_rows: list[dict] = []
 
             if db_available:
-                for unit in units:
-                    if use_index_embeddings:
-                        embedding = get_embedding(unit["content"])
-                        embedding_list = embedding.tolist()
-                    else:
-                        embedding_list = []
+                try:
+                    for unit in units:
+                        embedding_list: list[float] | None = None
 
-                    try:
-                        save_code_unit(
-                            file_path=rel_path,
-                            kind=unit["kind"],
-                            name=unit["name"],
-                            content=unit["content"],
-                            embedding=embedding_list,
-                            project_tag=project_tag,
-                        )
-                        units_saved += 1
-                    except Exception as e:
-                        print(f"⚠️ DB save skipped for {rel_path}::{unit.get('name')}: {e}")
-                        db_available = False
-                        break
+                        if use_index_embeddings:
+                            embedding = get_embedding(
+                                unit["content"]
+                            )
+                            if embedding is None:
+                                raise RuntimeError(
+                                    "Embedding provider returned no embedding "
+                                    f"for {rel_path}::{unit.get('name')}"
+                                )
+
+                            embedding_list = embedding.tolist()
+
+                        unit_rows.append({
+                            "kind": unit["kind"],
+                            "name": unit["name"],
+                            "content": unit["content"],
+                            "embedding": embedding_list,
+                        })
+                    inserted_count = replace_code_index_for_file(
+                        file_path=rel_path,
+                        index_scope=index_scope,
+                        code_units=unit_rows,
+                        dependencies=dependency_rows,
+                    )
+                    units_saved += inserted_count
+                except Exception as e:
+                    print(
+                        f"⚠️ Atomic DB replacement failed for "
+                        f"{rel_path}: {e}"
+                    )
+                    db_available = False
+                    persistence_skip_reason = (
+                        "file_replacement_failed"
+                    )
             else:
                 # No DB: still index for project map / control / phantom limb,
                 # but skip persistence and embeddings.
@@ -237,6 +236,37 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
             )
         except Exception as e:
             print(f"ERR: Failed to index {rel_path}: {e}")
+
+    reconciliation = {
+        "performed": False,
+        "dependencies_deleted": 0,
+        "code_units_deleted": 0,
+        "skipped_reason": None,
+    }
+    if db_available:
+        try:
+            cleanup = reconcile_code_index_scope(
+                index_scope=index_scope,
+                current_files=indexed_repository_files,
+            )
+            reconciliation.update({
+                "performed": True,
+                **cleanup,
+            })
+        except Exception as e:
+            reconciliation["skipped_reason"] = (
+                f"reconciliation_failed: {e}"
+            )
+            print(
+                "⚠️ Code-index scope reconciliation failed: "
+                f"{e}"
+            )
+    else:
+        reconciliation["skipped_reason"] = (
+            persistence_skip_reason
+            or "persistence_unavailable_or_failed"
+        )
+
     dna = compute_dna(repo_path)
     save_dna(repo_path, dna)
     print(f"🧬 Code DNA: {dna['indent']}, {dna['naming']}, line~{dna['max_line_pref']}c")
@@ -270,7 +300,11 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
         map_path = None
     else:
         try:
-            graph = build_graph_from_repo(repo_path)
+            graph = build_graph_from_repo(
+                repo_path,
+                repo_entries=repo_entries,
+                repository_files=repository_files,
+            )
         except Exception as e:
             print(f"⚠️ Graph build failed: {e}. Continuing without graph.")
             graph = None
@@ -285,9 +319,11 @@ def index_repository(repo_path: str, project_tag: Optional[str] = None):
         print(f"🗺️ Project map written to: {map_path}")
     return {
         "repo_path": repo_path,
-        "project_tag": project_tag,
+        "project_tag": display_project_tag,
+        "index_scope": index_scope,
         "files_processed": files_indexed,
         "symbols_stored": units_saved,
+        "code_index_reconciliation": reconciliation,
         "project_map": map_path,
         "phantom_limb": {
             "report": phantom_path,
@@ -307,6 +343,83 @@ def should_skip_index_file(file_name: str) -> bool:
             "postgres_auth.txt",
         }
     )
+
+def _build_dependency_rows(
+    *,
+    repo_path: str,
+    rel_path: str,
+    language: str,
+    parsed_data: dict,
+    repository_files: set[str],
+) -> list[dict]:
+    dependencies: list[dict] = []
+    seen: set[tuple] = set()
+
+    def add_dependency(
+        *,
+        dependency_type: str,
+        source_symbol: str | None = None,
+        target_file: str | None = None,
+        target_symbol: str | None = None,
+    ) -> None:
+        if not target_file and not target_symbol:
+            return
+
+        key = (
+            dependency_type,
+            source_symbol,
+            target_file,
+            target_symbol,
+        )
+        if key in seen:
+            return
+
+        seen.add(key)
+        dependencies.append({
+            "dependency_type": dependency_type,
+            "source_symbol": source_symbol,
+            "target_file": target_file,
+            "target_symbol": target_symbol,
+        })
+
+    for raw_import in parsed_data.get("imports", []):
+        target = resolve_dependency_target(
+            repo_root=repo_path,
+            source_file=rel_path,
+            language=language,
+            raw_target=raw_import,
+            repository_files=repository_files,
+        )
+
+        add_dependency(
+            dependency_type="import",
+            target_file=target.target_file,
+            target_symbol=target.target_symbol,
+        )
+
+    symbol_calls: set[str] = set()
+
+    for symbol in parsed_data.get("symbols", []):
+        source_symbol = symbol.get("name")
+
+        for call in symbol.get("calls", []):
+            symbol_calls.add(call)
+            add_dependency(
+                dependency_type="call",
+                source_symbol=source_symbol,
+                target_symbol=call,
+            )
+
+    for call in parsed_data.get("calls", []):
+        if call in symbol_calls:
+            continue
+
+        add_dependency(
+            dependency_type="call",
+            target_symbol=call,
+        )
+
+    return dependencies
 
 if __name__ == "__main__":
     import sys
