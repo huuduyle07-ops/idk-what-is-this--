@@ -7,12 +7,6 @@ from pathlib import Path
 def _patch_runner_basics(monkeypatch, runner, repo: Path, control_result: dict):
     monkeypatch.setattr(
         runner,
-        "inspect_repo_inventory",
-        lambda repo_path: {"ok": True, "file_count": 1},
-    )
-    monkeypatch.setattr(runner, "detect_repo_language", lambda repo_path: "python")
-    monkeypatch.setattr(
-        runner,
         "classify_task",
         lambda query, mode, language, audience: {
             "intent": "bug_fix",
@@ -20,18 +14,37 @@ def _patch_runner_basics(monkeypatch, runner, repo: Path, control_result: dict):
             "language": language,
         },
     )
-    monkeypatch.setattr(runner, "index_repository", lambda repo_path, project_tag=None: {})
+    monkeypatch.setattr(
+        runner,
+        "index_repository",
+        lambda repo_path, project_tag=None, **kwargs: {},
+    )
     monkeypatch.setattr(runner, "clear_graph_cache", lambda repo_path: None)
     monkeypatch.setattr(
         runner,
         "run_preflight_validation",
-        lambda repo_path, language, command=None: {"ran": False, "ok": None},
+        lambda repo_path, language, command=None, **kwargs: {
+            "ran": False,
+            "ok": None,
+        },
     )
-    monkeypatch.setattr(runner, "run_control_structured", lambda query, repo_path: control_result)
-    monkeypatch.setattr(runner, "build_related_snippets", lambda control, repo_path: [])
+    monkeypatch.setattr(
+        runner,
+        "run_control_structured",
+        lambda query, repo_path, **kwargs: control_result,
+    )
+    monkeypatch.setattr(
+        runner,
+        "build_related_snippets",
+        lambda control, repo_path, **kwargs: [],
+    )
     monkeypatch.setattr(runner, "get_engineering_memory", lambda **kwargs: [])
     monkeypatch.setattr(runner, "maybe_enrich_with_scout", lambda **kwargs: kwargs["control_result"])
-    monkeypatch.setattr(runner, "get_or_compute_dna", lambda repo_path: {})
+    monkeypatch.setattr(
+        runner,
+        "get_or_compute_dna",
+        lambda repo_path, **kwargs: {},
+    )
     monkeypatch.setattr(runner, "dna_to_prompt_block", lambda dna, mode="match": "")
     monkeypatch.setattr(runner, "create_session", lambda **kwargs: 123)
     monkeypatch.setattr(runner, "memory_note_exists", lambda *args, **kwargs: True)
@@ -78,6 +91,92 @@ def test_web_runner_returns_harness_metadata_and_skips_model_when_generation_for
     assert result["harness_mode_decision"]["can_apply_patch"] is False
     assert "source context is missing" in result["answer"]
     assert "source_missing" in result["state"]
+
+
+def test_web_runner_propagates_delta_shadow_through_harness_block(
+    tmp_path,
+    monkeypatch,
+):
+    from web import runner
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "app.py").write_text("print('old')\n", encoding="utf-8")
+    control_result = {
+        "patch_intent": {
+            "file": "app.py",
+            "source_snippet": "",
+        },
+        "top_hypothesis": {"confidence": 0.9},
+    }
+    delta_shadow = {
+        "mode": "shadow_only",
+        "manifest": {"status": "loaded"},
+    }
+    _patch_runner_basics(monkeypatch, runner, repo, control_result)
+    monkeypatch.setattr(
+        runner,
+        "index_repository",
+        lambda repo_path, project_tag=None, **kwargs: {
+            "delta_shadow": delta_shadow,
+        },
+    )
+    monkeypatch.setattr(
+        runner,
+        "run_draft_pipeline",
+        lambda state: (_ for _ in ()).throw(AssertionError("model should not be called")),
+    )
+    monkeypatch.setattr(
+        runner,
+        "maybe_run_auto_patch",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("patch should not apply")),
+    )
+
+    result = runner.run_agent_web(
+        "fix app.py",
+        str(repo),
+        runtime_environment="local_windows",
+    )
+
+    assert result["harness_mode"] == "source_missing"
+    assert result["delta_shadow"] == delta_shadow
+    assert control_result["delta_shadow"] == delta_shadow
+
+
+def test_web_runner_propagates_delta_shadow_for_empty_repository(
+    tmp_path,
+    monkeypatch,
+):
+    from web import runner
+
+    repo = tmp_path / "empty-repo"
+    repo.mkdir()
+    delta_shadow = {
+        "mode": "shadow_only",
+        "manifest": {"status": "missing"},
+    }
+    indexing_error = RuntimeError("No indexable files found")
+    indexing_error.delta_shadow = delta_shadow
+
+    def fail_empty_index(*args, **kwargs):
+        raise indexing_error
+
+    monkeypatch.setattr(runner, "index_repository", fail_empty_index)
+    monkeypatch.setattr(
+        runner,
+        "run_draft_pipeline",
+        lambda state: (_ for _ in ()).throw(AssertionError("model should not be called")),
+    )
+
+    result = runner.run_agent_web(
+        "inspect this repository",
+        str(repo),
+        runtime_environment="local_windows",
+    )
+
+    assert result["harness_mode"] == "source_missing"
+    assert "contains 0 indexable files" in result["answer"]
+    assert result["delta_shadow"] == delta_shadow
 
 
 def test_web_runner_surfaces_environment_conflict_deny_and_skips_model(
@@ -243,7 +342,9 @@ def test_web_runner_marks_ungrounded_patch_and_does_not_apply(
     monkeypatch.setattr(
         runner,
         "build_related_snippets",
-        lambda control, repo_path: [{"file": "app.py", "snippet": "print('old')"}],
+        lambda control, repo_path, **kwargs: [
+            {"file": "app.py", "snippet": "print('old')"}
+        ],
     )
     monkeypatch.setattr(
         runner,

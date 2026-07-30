@@ -7,11 +7,27 @@ from graph.obsidian_exporter import export_graph_to_obsidian
 _graph_cache = {}
 
 
-def get_semantic_graph(repo_path: str):
+def get_semantic_graph(repo_path: str, *, inventory=None):
     repo = str(Path(repo_path).resolve())
+    if inventory is not None:
+        from core.repository_inventory import (
+            validate_repository_inventory,
+        )
+
+        validate_repository_inventory(repo, inventory)
+        # Do not let a process-level legacy cache override the current
+        # operation's authoritative membership snapshot or retain that
+        # request-local projection as process-global truth.
+        return build_graph_from_repo(
+            repo,
+            inventory=inventory,
+        )
 
     if repo not in _graph_cache:
-        _graph_cache[repo] = build_graph_from_repo(repo)
+        _graph_cache[repo] = build_graph_from_repo(
+            repo,
+            inventory=inventory,
+        )
 
     return _graph_cache[repo]
 
@@ -33,8 +49,13 @@ def build_obsidian_semantic_context(
     repo_path: str,
     vault_path: str,
     max_chars: int = 4000,
+    *,
+    inventory=None,
 ) -> str:
-    graph = get_semantic_graph(repo_path)
+    graph = get_semantic_graph(
+        repo_path,
+        inventory=inventory,
+    )
 
     export_graph_to_obsidian(graph, vault_path, repo_path=repo_path)
 

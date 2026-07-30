@@ -46,12 +46,6 @@ def _patch_source_missing_run(monkeypatch, runner, repo: Path) -> None:
         "top_hypothesis": {"confidence": 0.9},
     }
     monkeypatch.setattr(runner, "build_project_tag", lambda *_args, **_kwargs: "safe-project")
-    monkeypatch.setattr(
-        runner,
-        "inspect_repo_inventory",
-        lambda _repo_path: {"ok": True, "file_count": 1},
-    )
-    monkeypatch.setattr(runner, "detect_repo_language", lambda _repo_path: "python")
     monkeypatch.setattr(runner, "detect_input_mode", lambda _query: "natural_language")
     monkeypatch.setattr(
         runner,
@@ -67,7 +61,9 @@ def _patch_source_missing_run(monkeypatch, runner, repo: Path) -> None:
     monkeypatch.setattr(
         runner,
         "index_repository",
-        lambda _repo_path, project_tag=None: {"phantom_limb": {}},
+        lambda _repo_path, project_tag=None, **_kwargs: {
+            "phantom_limb": {}
+        },
     )
     monkeypatch.setattr(runner, "clear_graph_cache", lambda _repo_path: None)
     monkeypatch.setattr(runner, "extract_user_validation_command", lambda _query: "")
@@ -79,7 +75,9 @@ def _patch_source_missing_run(monkeypatch, runner, repo: Path) -> None:
     monkeypatch.setattr(
         runner,
         "run_control_structured",
-        lambda _query, _repo_path: copy.deepcopy(control_template),
+        lambda _query, _repo_path, **_kwargs: copy.deepcopy(
+            control_template
+        ),
     )
     monkeypatch.setattr(runner, "build_related_snippets", lambda *_args, **_kwargs: [])
     monkeypatch.setattr(runner, "get_engineering_memory", lambda **_kwargs: [])
@@ -88,7 +86,11 @@ def _patch_source_missing_run(monkeypatch, runner, repo: Path) -> None:
         "maybe_enrich_with_scout",
         lambda **kwargs: kwargs["control_result"],
     )
-    monkeypatch.setattr(runner, "get_or_compute_dna", lambda _repo_path: {})
+    monkeypatch.setattr(
+        runner,
+        "get_or_compute_dna",
+        lambda _repo_path, **_kwargs: {},
+    )
     monkeypatch.setattr(runner, "dna_to_prompt_block", lambda _dna, mode="match": "")
     monkeypatch.setattr(runner, "create_session", lambda **_kwargs: 123)
     monkeypatch.setattr(runner, "save_message", lambda *_args, **_kwargs: None)

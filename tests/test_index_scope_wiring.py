@@ -3,18 +3,25 @@ from pathlib import Path
 from core import indexer as indexer_module
 from core import repository_identity
 from core.retriever import (
+    retrieve_context,
     search_safe_code_units,
     search_dependencies,
 )
 from core.repository_identity import build_code_index_scope
+from core.repository_inventory import (
+    CANONICAL_WALK_SITE,
+    repository_inventory_from_entries,
+)
+
+
 def test_repository_path_overrides_arbitrary_project_tag(
     tmp_path,
     monkeypatch,
 ):
     captured = {}
 
-    def fake_search(query_text, limit, project_tag):
-        captured["scope"] = project_tag
+    def fake_search(query_text, limit, index_scope):
+        captured["scope"] = index_scope
         return []
 
     monkeypatch.setattr(
@@ -88,8 +95,8 @@ def test_valid_explicit_scope_without_repository_is_accepted(
     scope = build_code_index_scope(tmp_path)
     captured = {}
 
-    def fake_search(query_text, limit, project_tag):
-        captured["scope"] = project_tag
+    def fake_search(query_text, limit, index_scope):
+        captured["scope"] = index_scope
         return []
 
     monkeypatch.setattr(
@@ -100,10 +107,37 @@ def test_valid_explicit_scope_without_repository_is_accepted(
     search_safe_code_units(
         "router",
         repo_path=None,
-        project_tag=scope,
+        index_scope=scope,
     )
 
     assert captured["scope"] == scope
+
+
+def test_valid_looking_project_tag_without_repository_is_rejected(
+    tmp_path,
+    monkeypatch,
+):
+    called = False
+
+    def fake_search(*args, **kwargs):
+        nonlocal called
+        called = True
+        return []
+
+    monkeypatch.setattr(
+        "core.retriever.search_code_units",
+        fake_search,
+    )
+
+    result = search_safe_code_units(
+        "router",
+        repo_path=None,
+        project_tag=build_code_index_scope(tmp_path),
+    )
+
+    assert result == []
+    assert called is False
+
 
 def test_dependency_search_uses_repository_scope(
     tmp_path,
@@ -111,8 +145,8 @@ def test_dependency_search_uses_repository_scope(
 ):
     captured = {}
 
-    def fake_search(query_text, limit, project_tag):
-        captured["scope"] = project_tag
+    def fake_search(query_text, limit, index_scope):
+        captured["scope"] = index_scope
         return []
 
     monkeypatch.setattr(
@@ -130,6 +164,107 @@ def test_dependency_search_uses_repository_scope(
     assert captured["scope"] == build_code_index_scope(
         tmp_path
     )
+
+
+def test_top_level_retrieval_never_treats_project_tag_as_scope(
+    tmp_path,
+    monkeypatch,
+):
+    semantic_tag = build_code_index_scope(tmp_path)
+    captured = []
+    monkeypatch.setattr(
+        "core.retriever.classify_retrieval_level",
+        lambda _query: {
+            "level": "meso",
+            "confidence": 1.0,
+            "scores": {
+                "macro": 0,
+                "meso": 1,
+                "micro": 0,
+            },
+        },
+    )
+    monkeypatch.setattr(
+        "core.retriever.trace_execution_flow",
+        lambda *_args, **_kwargs: "",
+    )
+    monkeypatch.setattr(
+        "core.retriever.search_safe_code_units",
+        lambda *_args, **kwargs: (
+            captured.append(kwargs.get("index_scope"))
+            or []
+        ),
+    )
+    monkeypatch.setattr(
+        "core.retriever.search_dependencies",
+        lambda *_args, **kwargs: (
+            captured.append(kwargs.get("index_scope"))
+            or ""
+        ),
+    )
+    monkeypatch.setattr(
+        "core.retriever.trace_call_chain",
+        lambda *_args, **_kwargs: "",
+    )
+
+    retrieve_context(
+        "router",
+        repo_path=None,
+        project_tag=semantic_tag,
+    )
+
+    assert captured == [None, None]
+
+
+def test_top_level_retrieval_accepts_separate_explicit_scope(
+    tmp_path,
+    monkeypatch,
+):
+    scope = build_code_index_scope(tmp_path)
+    captured = []
+    monkeypatch.setattr(
+        "core.retriever.classify_retrieval_level",
+        lambda _query: {
+            "level": "meso",
+            "confidence": 1.0,
+            "scores": {
+                "macro": 0,
+                "meso": 1,
+                "micro": 0,
+            },
+        },
+    )
+    monkeypatch.setattr(
+        "core.retriever.trace_execution_flow",
+        lambda *_args, **_kwargs: "",
+    )
+    monkeypatch.setattr(
+        "core.retriever.search_safe_code_units",
+        lambda *_args, **kwargs: (
+            captured.append(kwargs.get("index_scope"))
+            or []
+        ),
+    )
+    monkeypatch.setattr(
+        "core.retriever.search_dependencies",
+        lambda *_args, **kwargs: (
+            captured.append(kwargs.get("index_scope"))
+            or ""
+        ),
+    )
+    monkeypatch.setattr(
+        "core.retriever.trace_call_chain",
+        lambda *_args, **_kwargs: "",
+    )
+
+    retrieve_context(
+        "router",
+        repo_path=None,
+        project_tag="semantic-only",
+        index_scope=scope,
+    )
+
+    assert captured == [scope, scope]
 
 
 def _write_index_source(
@@ -172,7 +307,13 @@ def _stub_reconciliation_indexer(
 
     def scan_once(repo_path):
         scan_calls.append(repo_path)
-        return list(entries)
+        return repository_inventory_from_entries(
+            repo_path,
+            entries,
+            traversal_count=1,
+            walk_sites=(CANONICAL_WALK_SITE,),
+            sort_entries=True,
+        )
 
     def capture_replacement(**kwargs):
         replacement_calls.append(kwargs)
@@ -192,15 +333,7 @@ def _stub_reconciliation_indexer(
     )
     monkeypatch.setattr(
         indexer_module,
-        "inspect_repo_inventory",
-        lambda _repo_path: {
-            "ok": True,
-            "indexable_count": len(parsed_by_text),
-        },
-    )
-    monkeypatch.setattr(
-        indexer_module,
-        "iter_repo_files",
+        "create_repository_inventory",
         scan_once,
     )
     monkeypatch.setattr(
@@ -261,7 +394,7 @@ def _stub_reconciliation_indexer(
     monkeypatch.setattr(
         indexer_module,
         "compute_dna",
-        lambda _repo_path: {
+        lambda _repo_path, **_kwargs: {
             "indent": "spaces",
             "naming": "snake_case",
             "max_line_pref": 88,
@@ -270,7 +403,7 @@ def _stub_reconciliation_indexer(
     monkeypatch.setattr(
         indexer_module,
         "save_dna",
-        lambda _repo_path, _dna: None,
+        lambda _repo_path, _dna: Path("code_dna.json"),
     )
 
     return replacement_calls, scan_calls
@@ -320,6 +453,8 @@ def test_indexer_reconciles_once_after_successful_pass(
         "code_units_deleted": 1,
         "skipped_reason": None,
     }
+    assert result["project_tag"] is None
+    assert result["index_scope"] == "test-index-scope"
 
 
 def test_indexer_reconciliation_receives_supported_current_files(
@@ -394,18 +529,32 @@ def test_indexer_reconciliation_receives_supported_current_files(
         ),
     )
 
-    indexer_module.index_repository(str(tmp_path))
+    result = indexer_module.index_repository(str(tmp_path))
 
-    assert reconciliation_calls == [{
-        "index_scope": "test-index-scope",
-        "current_files": {"app.py"},
-    }]
+    assert reconciliation_calls == []
+    assert result["code_index_reconciliation"] == {
+        "performed": False,
+        "dependencies_deleted": 0,
+        "code_units_deleted": 0,
+        "skipped_reason": "processing_failed",
+    }
     assert dependency_memberships == [{
         "app.py",
         "settings.yaml",
         "session_log.txt",
         "unsafe.py",
     }]
+    completion = result["completion"]
+    outcomes = {
+        item["file_path"]: item
+        for item in completion["file_outcomes"]
+    }
+    assert completion["trusted_completion"] is False
+    assert completion["manifest_advance_allowed"] is False
+    assert outcomes["unsafe.py"]["processing_status"] == "parse_failed"
+    assert outcomes["unsafe.py"]["error_category"] == (
+        "inventory_entry_unsafe"
+    )
     assert len(scan_calls) == 1
 
 
@@ -453,6 +602,8 @@ def test_indexer_skips_reconciliation_after_replacement_failure(
         "code_units_deleted": 0,
         "skipped_reason": "file_replacement_failed",
     }
+    assert result["completion"]["status"] == "persistence_failed"
+    assert result["completion"]["trusted_completion"] is False
 
 
 def test_parse_failure_does_not_remove_file_from_membership(
@@ -650,6 +801,8 @@ def test_indexer_skips_all_db_work_when_persistence_is_disabled(
         "code_units_deleted": 0,
         "skipped_reason": "persistence_disabled",
     }
+    assert result["completion"]["status"] == "persistence_disabled"
+    assert result["completion"]["persistence_ok"] is False
 
 def test_indexer_reports_reconciliation_failure_without_crashing(
     tmp_path,
@@ -696,3 +849,51 @@ def test_indexer_reports_reconciliation_failure_without_crashing(
             "simulated reconciliation failure"
         ),
     }
+    assert result["completion"]["status"] == "reconciliation_failed"
+    assert result["completion"]["reconciliation_attempted"] is True
+    assert result["completion"]["reconciliation_ok"] is False
+
+
+def test_indexer_result_and_stdout_redact_database_url(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    database_url = (
+        "postgresql://index-user:index-password@"
+        "db.example.test/cattus?token=index-token"
+    )
+    app_path = _write_index_source(
+        tmp_path,
+        "app.py",
+        "app fixture",
+    )
+    _stub_reconciliation_indexer(
+        monkeypatch,
+        entries=[(app_path, Path("app.py"))],
+        parsed_by_text={
+            "app fixture": _parsed_with_function("app"),
+        },
+    )
+    monkeypatch.setattr(
+        indexer_module,
+        "reconcile_code_index_scope",
+        lambda **_kwargs: (
+            _ for _ in ()
+        ).throw(
+            RuntimeError(
+                f"reconciliation failed using {database_url}"
+            )
+        ),
+    )
+
+    result = indexer_module.index_repository(str(tmp_path))
+    stdout_text = capsys.readouterr().out
+    result_text = str(result)
+
+    for rendered in (stdout_text, result_text):
+        assert database_url not in rendered
+        assert "index-user" not in rendered
+        assert "index-password" not in rendered
+        assert "index-token" not in rendered
+        assert "db.example.test/cattus" in rendered

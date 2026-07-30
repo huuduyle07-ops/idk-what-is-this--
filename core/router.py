@@ -11,29 +11,18 @@ if root_dir not in sys.path:
 
 from config import LANGUAGE_MAP, TASK_LABELS, SUPPORTED_EXTENSIONS
 import numpy as np
-from collections import Counter
 
-def detect_repo_language(repo_path: str) -> str:
-    root = Path(repo_path)
-    if not root.exists() or not root.is_dir():
-        return "unknown"
+def detect_repo_language(
+    repo_path: str,
+    *,
+    inventory=None,
+) -> str:
+    from core.repo_librarian import detect_repo_language as _detect
 
-    counts = Counter()
-
-    for p in root.rglob("*"):
-        if not p.is_file():
-            continue
-
-        ext = p.suffix.lower()
-        lang = LANGUAGE_MAP.get(ext)
-
-        if lang and lang not in {"text", "document", "json"}:
-            counts[lang] += 1
-
-    if not counts:
-        return "unknown"
-
-    return counts.most_common(1)[0][0]
+    return _detect(
+        repo_path,
+        inventory=inventory,
+    )
 
 _model = None
 _label_embeddings = None

@@ -9,7 +9,6 @@ The storage root is still the AI project's own `.agent/lessons/` directory.
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import re
@@ -19,6 +18,7 @@ from typing import Any
 
 import config
 from config import get_agent_dir
+from core.repository_identity import build_repository_storage_key
 from core.lesson_quality import (
     AUTO_APPROVED,
     BLOCKED,
@@ -154,31 +154,11 @@ def _safe_repo_path_hint(repo_path: str | None) -> str | None:
 
 
 def repo_scope_id_for_path(repo_path: str | Path | None) -> str:
-    """Return a stable, filesystem-safe scope id for `repo_path`."""
+    """Return the canonical path-derived lesson storage namespace."""
     if repo_path is None or not str(repo_path).strip():
         raise ValueError("repo_path is required for repo-scoped lessons")
 
-    try:
-        resolved = Path(repo_path).expanduser().resolve()
-    except OSError:
-        resolved = Path(repo_path).expanduser().absolute()
-
-    tag = ""
-    try:
-        if resolved.is_dir():
-            from core.project_tag import build_project_tag
-
-            tag = build_project_tag(str(resolved))
-    except Exception:
-        tag = ""
-
-    if tag and tag != "unknown-project":
-        candidate = tag.strip().lower()
-        if _REPO_SCOPE_ID_RE.match(candidate):
-            return candidate
-
-    digest = hashlib.sha256(str(resolved).encode("utf-8", errors="replace")).hexdigest()
-    return f"repo-{digest[:16]}"
+    return build_repository_storage_key(repo_path)
 
 
 def _resolve_repo_scope(

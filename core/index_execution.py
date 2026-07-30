@@ -10,6 +10,7 @@ class EmbeddingCompatibility(str, Enum):
     SAME_DIMENSION_DRIFT = "same_dimension_drift"
     OFF = "off"
     INCOMPATIBLE_DIMENSION = "incompatible_dimension"
+    UNKNOWN = "unknown"
 
 class EmbeddingAction(str, Enum):
     REUSE = "reuse"
@@ -31,6 +32,9 @@ class IndexExecutionPlan:
     to_parse: tuple[str, ...]
     to_delete: tuple[str, ...]
     to_reembed: tuple[str, ...]
+    to_embed: tuple[str, ...]
+    to_replace: tuple[str, ...]
+    unchanged_noop: tuple[str, ...]
 
     embedding_action: EmbeddingAction
 
@@ -40,6 +44,11 @@ class IndexExecutionPlan:
     blocked_reason: str
 
     source_state_changed: bool
+    persistence_enabled: bool
+    identity_execution_allowed: bool
+    deletion_execution_allowed: bool
+    repository_scope: str
+    executable_candidate: bool
 
 def build_index_execution_plan(
     delta: RepositoryDelta,
@@ -49,6 +58,11 @@ def build_index_execution_plan(
     embedding_compatibility: EmbeddingCompatibility,
     force_full_reindex: bool = False,
     force_reindex_reason: str = "",
+    persistence_enabled: bool | None = None,
+    identity_execution_allowed: bool = True,
+    deletion_execution_allowed: bool = True,
+    repository_scope: str = "",
+    descriptive_only: bool = False,
 ) -> IndexExecutionPlan:
     added = tuple(sorted(delta.added))
     modified = tuple(sorted(delta.modified))
@@ -62,8 +76,16 @@ def build_index_execution_plan(
     source_state_changed = bool(
         added or modified or deleted
     )
+    persistence_is_enabled = (
+        database_available
+        if persistence_enabled is None
+        else bool(persistence_enabled)
+    )
+    identity_candidate = bool(identity_execution_allowed)
+    deletion_candidate = bool(deletion_execution_allowed)
+    scope = str(repository_scope)
 
-    if not database_available:
+    if not database_available and not descriptive_only:
         return IndexExecutionPlan(
             added=added,
             modified=modified,
@@ -72,12 +94,72 @@ def build_index_execution_plan(
             to_parse=(),
             to_delete=(),
             to_reembed=(),
+            to_embed=(),
+            to_replace=(),
+            unchanged_noop=unchanged,
             embedding_action=EmbeddingAction.BLOCKED,
             force_full_reindex=False,
             reset_index_scope=False,
             force_reindex_reason="",
             blocked_reason="database_unavailable",
             source_state_changed=source_state_changed,
+            persistence_enabled=persistence_is_enabled,
+            identity_execution_allowed=identity_candidate,
+            deletion_execution_allowed=deletion_candidate,
+            repository_scope=scope,
+            executable_candidate=False,
+        )
+
+    if embedding_compatibility is EmbeddingCompatibility.UNKNOWN:
+        baseline_required = (
+            force_full_reindex
+            or not trusted_index_exists
+        )
+        to_parse = (
+            current_files
+            if baseline_required
+            else tuple(sorted(set(added) | set(modified)))
+        )
+        reason = (
+            force_reindex_reason.strip()
+            or (
+                "explicit_force_reindex"
+                if force_full_reindex
+                else "trusted_index_missing"
+                if not trusted_index_exists
+                else ""
+            )
+        )
+        return IndexExecutionPlan(
+            added=added,
+            modified=modified,
+            deleted=deleted,
+            unchanged=unchanged,
+            to_parse=to_parse,
+            to_delete=deleted,
+            to_reembed=(),
+            # Changed files are embedding/replacement candidates regardless
+            # of whether unchanged vectors can be reused. Unknown signature
+            # compatibility only blocks claims about unchanged-file reuse.
+            to_embed=to_parse,
+            to_replace=(
+                to_parse if persistence_is_enabled else ()
+            ),
+            # Source parsing and changed-file replacement are unnecessary for
+            # unchanged files. Whether their embeddings can also be reused is
+            # explicitly unresolved by the UNKNOWN compatibility status.
+            unchanged_noop=unchanged,
+            embedding_action=EmbeddingAction.BLOCKED,
+            force_full_reindex=baseline_required,
+            reset_index_scope=baseline_required,
+            force_reindex_reason=reason,
+            blocked_reason="embedding_compatibility_unknown",
+            source_state_changed=source_state_changed,
+            persistence_enabled=persistence_is_enabled,
+            identity_execution_allowed=identity_candidate,
+            deletion_execution_allowed=deletion_candidate,
+            repository_scope=scope,
+            executable_candidate=False,
         )
 
     if (
@@ -92,12 +174,20 @@ def build_index_execution_plan(
             to_parse=(),
             to_delete=(),
             to_reembed=(),
+            to_embed=(),
+            to_replace=(),
+            unchanged_noop=unchanged,
             embedding_action=EmbeddingAction.BLOCKED,
             force_full_reindex=False,
             reset_index_scope=False,
             force_reindex_reason="",
             blocked_reason="embedding_dimension_incompatible",
             source_state_changed=source_state_changed,
+            persistence_enabled=persistence_is_enabled,
+            identity_execution_allowed=identity_candidate,
+            deletion_execution_allowed=deletion_candidate,
+            repository_scope=scope,
+            executable_candidate=False,
         )
 
     baseline_required = (
@@ -121,6 +211,11 @@ def build_index_execution_plan(
             is EmbeddingCompatibility.OFF
             else EmbeddingAction.COMPUTE_CHANGED
         )
+        to_embed = (
+            ()
+            if action is EmbeddingAction.DISABLED
+            else current_files
+        )
 
         return IndexExecutionPlan(
             added=added,
@@ -130,12 +225,28 @@ def build_index_execution_plan(
             to_parse=current_files,
             to_delete=deleted,
             to_reembed=(),
+            to_embed=to_embed,
+            to_replace=(
+                current_files
+                if persistence_is_enabled
+                else ()
+            ),
+            unchanged_noop=(),
             embedding_action=action,
             force_full_reindex=True,
             reset_index_scope=True,
             force_reindex_reason=reason,
             blocked_reason="",
             source_state_changed=source_state_changed,
+            persistence_enabled=persistence_is_enabled,
+            identity_execution_allowed=identity_candidate,
+            deletion_execution_allowed=deletion_candidate,
+            repository_scope=scope,
+            executable_candidate=(
+                identity_candidate
+                and (not deleted or deletion_candidate)
+                and persistence_is_enabled
+            ),
         )
 
     to_parse = tuple(
@@ -156,6 +267,15 @@ def build_index_execution_plan(
             to_parse=to_parse,
             to_delete=deleted,
             to_reembed=to_reembed,
+            to_embed=tuple(
+                sorted(set(to_parse) | set(to_reembed))
+            ),
+            to_replace=(
+                tuple(sorted(set(to_parse) | set(to_reembed)))
+                if persistence_is_enabled
+                else ()
+            ),
+            unchanged_noop=(),
             embedding_action=_select_embedding_action(
                 to_parse=to_parse,
                 to_reembed=to_reembed,
@@ -166,6 +286,15 @@ def build_index_execution_plan(
             force_reindex_reason="",
             blocked_reason="",
             source_state_changed=source_state_changed,
+            persistence_enabled=persistence_is_enabled,
+            identity_execution_allowed=identity_candidate,
+            deletion_execution_allowed=deletion_candidate,
+            repository_scope=scope,
+            executable_candidate=(
+                identity_candidate
+                and (not deleted or deletion_candidate)
+                and persistence_is_enabled
+            ),
         )
 
     embedding_action = _select_embedding_action(
@@ -185,12 +314,30 @@ def build_index_execution_plan(
         to_parse=to_parse,
         to_delete=deleted,
         to_reembed=(),
+        to_embed=(
+            ()
+            if embedding_action is EmbeddingAction.DISABLED
+            else to_parse
+        ),
+        to_replace=(
+            to_parse if persistence_is_enabled else ()
+        ),
+        unchanged_noop=unchanged,
         embedding_action=embedding_action,
         force_full_reindex=False,
         reset_index_scope=False,
         force_reindex_reason="",
         blocked_reason="",
         source_state_changed=source_state_changed,
+        persistence_enabled=persistence_is_enabled,
+        identity_execution_allowed=identity_candidate,
+        deletion_execution_allowed=deletion_candidate,
+        repository_scope=scope,
+        executable_candidate=(
+            identity_candidate
+            and (not deleted or deletion_candidate)
+            and persistence_is_enabled
+        ),
     )
 
 def _select_embedding_action(

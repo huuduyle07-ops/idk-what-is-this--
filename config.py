@@ -165,11 +165,11 @@ OUTPUT_FILE = AGENT_DIR / "session_log.txt"
 def get_agent_dir(repo_path: str | None = None) -> Path:
     """Return the .agent directory for a given analyzed repo.
 
-    Subfolder name is the canonical project_tag, so DB and disk share the same key:
-        AI_project/.agent/<project_tag>/
+    Subfolder identity is path-derived and content-independent:
+        AI_project/.agent/<repository_storage_key>/
 
-    Two repos that share a folder name still get distinct subfolders thanks to
-    the fingerprint suffix in project_tag.
+    This helper resolves one path and creates one directory. It never walks the
+    analyzed repository. Human project labels do not choose artifact storage.
     """
     if not repo_path:
         return AGENT_DIR
@@ -177,11 +177,11 @@ def get_agent_dir(repo_path: str | None = None) -> Path:
     if repo_abs == BASE_DIR.resolve():
         return AGENT_DIR
 
-    # Lazy import to avoid a circular dependency at module load time.
-    from core.project_tag import build_project_tag
-    tag = build_project_tag(str(repo_abs))
+    # Lazy import keeps configuration loading lightweight.
+    from core.repository_identity import build_repository_storage_key
+    storage_key = build_repository_storage_key(repo_abs)
 
-    sub = AGENT_DIR / tag
+    sub = AGENT_DIR / storage_key
     sub.mkdir(parents=True, exist_ok=True)
     return sub
 

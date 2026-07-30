@@ -5,6 +5,7 @@ import sys
 
 from cli.interactive import ask_entrypoint, create_agent_state
 from config import WELCOME
+from core.credential_redaction import redact_credentials
 from core.json_utils import extract_json_block
 from core.pipeline import (
     finalize_answer,
@@ -40,7 +41,10 @@ def main() -> None:
     try:
         init_db()
     except Exception as e:
-        print(f"Warning: Database initialization failed: {e}")
+        print(
+            "Warning: Database initialization failed: "
+            f"{redact_credentials(e)}"
+        )
         print("Continuing without database. Some features may not work.")
 
     if len(sys.argv) > 1 and sys.argv[1] == "--index":

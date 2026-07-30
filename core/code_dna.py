@@ -20,9 +20,14 @@ from __future__ import annotations
 
 from collections import Counter
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 import json
 import re
+
+from core.credential_redaction import redact_credentials
+
+if TYPE_CHECKING:
+    from core.repository_inventory import RepositoryInventory
 
 
 # ---------------------------------------------------------------------------
@@ -41,12 +46,6 @@ def _code_extensions() -> set[str]:
             ".cs", ".rs", ".go", ".java", ".kt", ".kts",
             ".html", ".css",
         }
-
-
-_FOLDER_BLACKLIST = {
-    ".git", "node_modules", "venv", ".venv", "__pycache__", ".vscode",
-    ".idea", "dist", "build", ".gemini", "storage", ".claude", ".agent",
-}
 
 
 # ---------------------------------------------------------------------------
@@ -126,7 +125,11 @@ def _classify_comment_style(text: str) -> Optional[str]:
 # ---------------------------------------------------------------------------
 # Main computation
 # ---------------------------------------------------------------------------
-def compute_dna(repo_path: str) -> dict:
+def compute_dna(
+    repo_path: str,
+    *,
+    inventory: "RepositoryInventory | None" = None,
+) -> dict:
     """Walk the repo, return a style-fingerprint dict.
 
     Output dict keys (all stable / safe to read):
@@ -152,15 +155,28 @@ def compute_dna(repo_path: str) -> dict:
     brace_votes = Counter()
     comment_votes = Counter()
 
-    repo_root = Path(repo_path)
+    repo_root = Path(repo_path).expanduser().resolve()
+    from core.repository_inventory import (
+        create_repository_inventory,
+        validate_repository_inventory,
+    )
+
+    if inventory is not None:
+        operation_inventory = validate_repository_inventory(
+            repo_root,
+            inventory,
+        )
+    elif not repo_root.is_dir():
+        return _empty_dna()
+    else:
+        operation_inventory = create_repository_inventory(repo_root)
+
     if not repo_root.is_dir():
         return _empty_dna()
 
-    for p in repo_root.rglob("*"):
-        # Skip blacklisted directories early so we don't walk node_modules etc.
-        if any(part in _FOLDER_BLACKLIST for part in p.parts):
-            continue
-        if not p.is_file() or p.suffix.lower() not in code_exts:
+    for entry in operation_inventory.indexable_entries:
+        p = entry.absolute_path
+        if p.suffix.lower() not in code_exts:
             continue
 
         try:
@@ -245,7 +261,7 @@ def save_dna(repo_path: str, dna: dict) -> Optional[Path]:
         out.write_text(json.dumps(dna, ensure_ascii=False, indent=2), encoding="utf-8")
         return out
     except Exception as e:
-        print(f"⚠️ save_dna failed: {e}")
+        print(f"⚠️ save_dna failed: {redact_credentials(e)}")
         return None
 
 
@@ -260,13 +276,30 @@ def load_dna(repo_path: str) -> Optional[dict]:
         return None
 
 
-def get_or_compute_dna(repo_path: str, force: bool = False) -> dict:
+def get_or_compute_dna(
+    repo_path: str,
+    force: bool = False,
+    *,
+    inventory: "RepositoryInventory | None" = None,
+) -> dict:
     """Convenience: return cached DNA if it exists, otherwise compute + save."""
+    if inventory is not None:
+        from core.repository_inventory import (
+            validate_repository_inventory,
+        )
+
+        validate_repository_inventory(repo_path, inventory)
+        # The on-disk compatibility cache has no inventory/freshness token.
+        # A caller supplying an operation snapshot therefore requires a fresh
+        # projection from that snapshot.
+        dna = compute_dna(repo_path, inventory=inventory)
+        save_dna(repo_path, dna)
+        return dna
     if not force:
         cached = load_dna(repo_path)
         if cached:
             return cached
-    dna = compute_dna(repo_path)
+    dna = compute_dna(repo_path, inventory=inventory)
     save_dna(repo_path, dna)
     return dna
 

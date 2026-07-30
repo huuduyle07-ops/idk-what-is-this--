@@ -28,10 +28,26 @@ def infer_language_from_file(rel_file: str | None) -> str:
         return "unknown"
     return LANGUAGE_MAP.get(Path(rel_file).suffix.lower(), "unknown")
 
-def get_cached_graph(repo_path: str):
+def get_cached_graph(repo_path: str, *, inventory=None):
     repo_abs = os.path.abspath(repo_path)
+    if inventory is not None:
+        from core.repository_inventory import (
+            validate_repository_inventory,
+        )
+
+        validate_repository_inventory(repo_abs, inventory)
+        # Inventory-backed calls are operation-scoped and must not consume a
+        # graph cached from an earlier repository snapshot or publish their
+        # request-local graph into the legacy process cache.
+        return build_graph_from_repo(
+            repo_abs,
+            inventory=inventory,
+        )
     if repo_abs not in _graph_cache:
-        _graph_cache[repo_abs] = build_graph_from_repo(repo_abs)
+        _graph_cache[repo_abs] = build_graph_from_repo(
+            repo_abs,
+            inventory=inventory,
+        )
     return _graph_cache[repo_abs]
 
 def clear_graph_cache(repo_path: str | None = None) -> None:
@@ -91,7 +107,13 @@ def called_names_from_snippet(snippet: str) -> set[str]:
     names |= set(re.findall(r"\b([A-Za-z_][A-Za-z_0-9]*)\s*\(", snippet or ""))
     return {n for n in names if n not in {"if", "for", "while", "switch", "return"}}
 
-def build_related_snippets(control_result: dict, repo_path: str) -> list[dict]:
+def build_related_snippets(
+    control_result: dict,
+    repo_path: str,
+    *,
+    graph=None,
+    inventory=None,
+) -> list[dict]:
     patch = control_result.get("patch_intent") or {}
     evidence = control_result.get("evidence") or []
     source_snippet = patch.get("source_snippet") or ""
@@ -174,7 +196,10 @@ def build_related_snippets(control_result: dict, repo_path: str) -> list[dict]:
             break
 
     # 2. Fallback: search whole graph by called function names
-    graph = get_cached_graph(repo_path)
+    graph = graph or get_cached_graph(
+        repo_path,
+        inventory=inventory,
+    )
 
     for node_id in graph.nodes.keys():
         if len(related) >= 4:
@@ -218,8 +243,18 @@ def build_related_snippets(control_result: dict, repo_path: str) -> list[dict]:
 
     return related[:4]
 
-def select_entry_nodes(query: str, repo_path: str, limit: int = 6) -> list[str]:
-    graph = get_cached_graph(repo_path)
+def select_entry_nodes(
+    query: str,
+    repo_path: str,
+    limit: int = 6,
+    *,
+    graph=None,
+    inventory=None,
+) -> list[str]:
+    graph = graph or get_cached_graph(
+        repo_path,
+        inventory=inventory,
+    )
     print("🐛 DEBUG graph node count:", len(graph.nodes))
     print("🐛 DEBUG first graph nodes:", list(graph.nodes.keys())[:20])
     print("🐛 DEBUG query words:", query_words(query))
@@ -227,7 +262,12 @@ def select_entry_nodes(query: str, repo_path: str, limit: int = 6) -> list[str]:
     project_map = load_project_map(repo_path)
     map_nodes = extract_hotspots_from_project_map(project_map, limit=limit)
 
-    understanding = deep_project_understand(query, repo_path)
+    understanding = deep_project_understand(
+        query,
+        repo_path,
+        graph=graph,
+        inventory=inventory,
+    )
     graph_nodes = [
         f["symbol"]
         for f in understanding.get("findings", [])
@@ -618,13 +658,30 @@ def format_control_context(result: dict) -> str:
     return "\n".join(lines)
 
 
-def run_control_structured(query: str, repo_path: str) -> dict:
-    graph = get_cached_graph(repo_path)
+def run_control_structured(
+    query: str,
+    repo_path: str,
+    *,
+    inventory=None,
+    graph=None,
+) -> dict:
+    if inventory is not None:
+        from core.repository_inventory import (
+            validate_repository_inventory,
+        )
+
+        validate_repository_inventory(repo_path, inventory)
+    graph = graph or get_cached_graph(
+        repo_path,
+        inventory=inventory,
+    )
 
     entry_nodes = select_entry_nodes(
         query=query,
         repo_path=repo_path,
         limit=6,
+        graph=graph,
+        inventory=inventory,
     )
 
     evidence = control_dfs_v2(
@@ -641,6 +698,8 @@ def run_control_structured(query: str, repo_path: str) -> dict:
         query=query,
         repo_path=repo_path,
         top_k=3,
+        graph=graph,
+        inventory=inventory,
     )
 
     return build_control_result(
@@ -651,8 +710,19 @@ def run_control_structured(query: str, repo_path: str) -> dict:
         execution_trace=execution_trace,
     )
 
-def run_control(query: str, repo_path: str) -> str:
-    result = run_control_structured(query, repo_path)
+def run_control(
+    query: str,
+    repo_path: str,
+    *,
+    inventory=None,
+    graph=None,
+) -> str:
+    result = run_control_structured(
+        query,
+        repo_path,
+        inventory=inventory,
+        graph=graph,
+    )
     return format_control_context(result)
 
 def resolve_symbol_to_graph_nodes(graph, symbol: str, query: str = "", limit: int = 3) -> list[str]:

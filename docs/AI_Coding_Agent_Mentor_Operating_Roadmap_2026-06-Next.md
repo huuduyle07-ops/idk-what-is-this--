@@ -18,7 +18,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (106 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 9 HARDEN + 4 OPS + 2 DOGFOOD + 1 VERIFY + 15 MIRROR + 27 UX).
+- The phase registry is valid (113 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 9 HARDEN + 4 OPS + 2 DOGFOOD + 1 VERIFY + 15 MIRROR + 27 UX + 7 INDEX).
 - The phase picker recommends `DOGFOOD.1B` - Real Operator Run Evaluation. `VERIFY.TEST.1` remains proposed but waits for DOGFOOD.1B to complete.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
@@ -51,6 +51,180 @@ The completed roadmap arc is frozen at the following checkpoint.
 - An isolated rerun passed 3/3.
 - No urgent patch is required.
 - The flake still creates a trust question for future benchmark interpretation, which makes benchmark evidence work the strongest next candidate.
+
+### INDEX: Canonical Index Integrity Boundary
+
+- `INDEX.1D.1` shipped the contract-only separation between task-scoped
+  Activation Graphs and the persistent Canonical Incremental Graph.
+- Ordinary narrow coding tasks may use Direct Context or a bounded Activation
+  Graph; they are not required to run canonical repository indexing.
+- Activation Graphs have a sliding 72-hour TTL, lazy dry-run-first cleanup,
+  pin/lease protection, freshness checks before reuse, and no database,
+  manifest, reconciliation, or repository-completeness authority.
+- The Canonical Incremental Graph is explicitly built or refreshed, is isolated
+  from Activation Graph cleanup, and requires confirmed identity plus trusted
+  completion before manifest advancement, reconciliation, epoch replacement,
+  or current/completeness claims.
+- This phase added no graph runtime, route, worker, database write, manifest
+  access, model/API call, embedding, repository scan, or deletion behavior.
+- `INDEX.1D.2A` shipped the canonical physical repository identity primitive:
+  canonical root, repository ID, compatible artifact storage key, strict
+  code-index scope, and optional non-authoritative semantic `project_tag`.
+- Identity now resolves an existing directory and hashes only its normalized
+  physical path. It performs zero repository walks, reads no source content,
+  and is stable across file, Git-object, language, generated-artifact, and
+  architecture-content changes.
+- The canonical code-index writer and retriever share the same path-derived
+  scope and use a strict facade that rejects missing, blank, or semantic-label
+  scopes before database access. Legacy unscoped APIs remain compatibility-only.
+- The confirmed `DATABASE_URL` construction leak and audited index/web/health
+  error sinks now redact PostgreSQL userinfo, query values, and token-shaped
+  assignments.
+- Default manifest storage keys and code-index scopes remain compatible for
+  ordinary root names. Storage slugs longer than 111 characters are bounded for
+  filesystem/lesson-scope safety. Automatic inventory-derived project-tag
+  namespaces cut over to the canonical storage key; old state is retained
+  without migration or deletion.
+- `INDEX.1D.2A` does not add identity confirmation, epoch state transitions,
+  trusted completion, manifest advancement, delta execution, canonical
+  reconciliation changes, or Activation Graph runtime behavior.
+- `INDEX.1D.2B` shipped the persistent identity-confirmation and architecture-
+  epoch state contract. Its stable states are `uninitialized`,
+  `initial_confirmation_required`, `confirmed`,
+  `major_change_confirmation_required`, `archived`, and fail-closed `blocked`.
+- Human decisions are explicit: `same_project` preserves repository identity,
+  epoch, and scope; `new_architecture_epoch` preserves lineage while archiving
+  the prior readable, write-disabled scope; `new_project` reports that
+  rebinding is required; and `reject_or_defer` unlocks no canonical mutation.
+- Confirmed-state permissions are identity-only. They can authorize canonical
+  build, refresh, reconciliation, and applied-manifest advancement in
+  principle, while trusted-current claims and actual trusted-completion
+  evidence remain locked for `INDEX.1D.2C`.
+- Versioned identity state is stored as deterministic JSON beneath the
+  canonical repository-intelligence root, using a bounded storage namespace,
+  strict containment and reparse checks, a per-path lock, a unique
+  same-directory temporary file, `fsync`, and atomic replacement. Malformed,
+  contradictory, wrong-repository, stale-revision, and unsafe-path state fails
+  closed without silently downgrading or repairing confirmed state.
+- Activation Graph operation remains independent and available while canonical
+  identity is uninitialized, awaiting confirmation, awaiting major-change
+  confirmation, or blocked. It gains no power to confirm identity, create an
+  epoch, change a project tag, reconcile canonical rows, or advance a canonical
+  manifest.
+- Supplied legacy namespace evidence produces preservation-only migration
+  warnings. `INDEX.1D.2B` performs no namespace scan, rebinding, migration, or
+  deletion, and adds no production indexing, delta execution, trusted-
+  completion evidence, database or manifest access, reconciliation execution,
+  model/API call, embedding, repository scan, or Activation Graph runtime.
+- `INDEX.1D.2C` shipped the immutable, fail-closed Honest Persistence
+  Completion Contract. Processing, required persistence, reconciliation,
+  auxiliary output, manifest eligibility, and trusted-current eligibility are
+  now independent evidence dimensions rather than one ambiguous success flag.
+- Required added and modified files must be persisted and required deletions
+  must be deleted. A required persistence failure latches failure, records
+  failed and remaining unattempted files, skips reconciliation, and blocks
+  trusted completion even when source processing continues for diagnostics.
+- Persistence disabled is explicitly distinct from persistent success.
+  Applied-manifest advancement requires confirmed identity plus successful
+  required processing, persistence, and reconciliation; pending or blocked
+  identity, partial persistence, skipped reconciliation, and contradictory
+  evidence fail closed.
+- Observed repository state remains scan evidence only and cannot be mistaken
+  for applied persistent state. Completion evidence alone cannot claim
+  repository intelligence is current: matching applied-manifest evidence for
+  the completed run is additionally required, and production manifest commit
+  wiring remains deferred.
+- Database code-index persistence and required scope reconciliation are
+  authoritative. Current ProgramGraph construction, Project Map, Code DNA,
+  Phantom Limb, Obsidian export, presentation/report artifacts, and UI
+  summaries are auxiliary; unknown future authority fails closed.
+- Existing index results remain readable and gain additive completion metadata.
+  `INDEX.1D.2C` adds no production delta dispatch, manifest save, repository
+  scan, model/API or embedding call, schema migration, Activation Graph
+  runtime, legacy namespace migration, or broad execution-flow redesign.
+- `INDEX.1D.3` shipped the Traversal Budget Closure. One immutable,
+  operation-scoped repository inventory now owns canonical membership;
+  downstream indexing, language, Code DNA, dependency, ProgramGraph,
+  project-map, manifest, and project-input web consumers reuse that snapshot
+  instead of independently rediscovering repository files.
+- The canonical index and its project-input web entry path are test-pinned to
+  one full membership traversal. Canonical identity and repeated
+  `get_agent_dir()` calls add zero walks; supplied-inventory graph, manifest,
+  Code DNA, project-map, and dependency consumers add zero membership walks.
+- Supplied inventories fail closed on repository-root mismatch, duplicate or
+  out-of-root entries, contradictory paths, and nondeterministic ordering.
+  Malformed supplied state never triggers a hidden fallback scan. A legacy
+  caller that supplies no inventory may scan once for compatibility.
+- The inventory is a membership snapshot, not persisted repository truth or a
+  content-freshness guarantee. If a file disappears after enumeration,
+  processing records an explicit failure, performs no automatic full rescan,
+  and INDEX.1D.2C denies trusted completion.
+- Traversal diagnostics expose deterministic site labels and reuse booleans
+  without absolute repository paths, source content, environment values, or
+  secrets. INDEX.1D.3 adds no global repository-truth cache, background
+  worker, watcher, retry loop, model/API/network/subprocess inventory, or
+  filesystem deletion.
+- Production delta dispatch, applied-manifest save/advancement, database
+  behavior, graph semantics, legacy namespace migration, and Activation Graph
+  runtime remain unchanged and unauthorized.
+- `INDEX.1E.0` completed the deterministic Delta Integration Preflight and
+  Known-Failure Baseline. It froze observed repository-wide failures by stable
+  node ID, category, INDEX-path intersection, reason, and evidence; duplicate
+  or unclassified records fail closed.
+- The historical preflight readiness decision remains blocked for
+  authoritative delta dispatch. Architecture-epoch scope compatibility,
+  applied-receipt bridging, planner inputs, auxiliary full-repository outputs,
+  and empty-scope reconciliation were not silently declared resolved. Finishing
+  the analysis phase did not grant production execution or manifest authority.
+- `INDEX.1E.1` shipped Manifest Load and Shadow Delta Plan Dispatch at the one
+  canonical seam inside `core.indexer.index_repository`, after the shared
+  `RepositoryInventory` and repository identity context are available and
+  before the existing full-processing loop.
+- The seam now observes the previous applied manifest, builds a current
+  observed manifest from canonical indexable inventory membership, classifies
+  added, modified, deleted, and unchanged files, and calls the existing pure
+  execution planner. Missing applied state is an explicit cold build; invalid,
+  unsupported, root-, repository-, epoch-, or scope-mismatched state fails
+  closed for shadow planning rather than becoming an authoritative empty
+  baseline.
+- Applied and observed manifests remain separate roles. `INDEX.1E.1` does not
+  save, advance, repair, replace, or create an authoritative manifest, and it
+  creates no trusted-current receipt.
+- The additive `delta_shadow` result is schema-versioned, deterministic,
+  bounded, credential-redacted, repository-relative where paths are exposed,
+  and permanently marked non-authoritative. Identity permissions and
+  persistence or embedding compatibility can constrain future executability,
+  but no shadow status grants mutation authority.
+- Embedding compatibility comes from the applied manifest's persisted
+  signature and the current configured signature. Exact matches, same-dimension
+  drift, dimension changes, disabled embeddings, and cold builds are explicit;
+  legacy applied manifests without a signature fail closed for future planning.
+- Production processing remains intentionally full for stable valid entries.
+  No shadow recommendation skips a file or controls parsing, embedding,
+  per-file replacement, deletion, reconciliation, graph construction, Code
+  DNA, Project Map, or Phantom Limb behavior. A post-inventory entry that
+  becomes unsafe is now an explicit processing failure that suppresses its
+  replacement and repository reconciliation independently of the shadow plan.
+- Run B is the defining parity proof: the shadow plan recommends zero
+  changed-file work for an unchanged repository while production still
+  reparses, re-embeds, replaces, and reconciles every current indexable file.
+  That expected mismatch proves observation rather than incremental execution.
+- Canonical and project-input web operations remain pinned to one repository
+  membership walk. Manifest loading is one bounded direct artifact read, and
+  observed-manifest, graph, project-map, Code DNA, and dependency consumers add
+  zero membership walks when given the shared inventory.
+- The frozen pre-`INDEX.1E.1` repository-wide baseline was **6309 passed, 5
+  skipped, and 48 known unrelated failures**. The post-phase comparison is
+  **6366 passed, 6 skipped, and the same 48 failure node IDs**, with zero new,
+  authoritative INDEX, or unclassified failures. Existing failures remain
+  visible rather than skipped, weakened, or converted to blanket `xfail`.
+- `INDEX.1E.1` adds no production delta dispatch, applied-manifest mutation,
+  plan-controlled database or reconciliation change, Activation Graph runtime,
+  legacy namespace migration, model/API/network call, background worker,
+  scheduler, or benchmark behavior change. Descriptor-bound production content
+  reads remain a separate future security-hardening concern.
+- Recommended next phase is `INDEX.1E.2` — Unchanged File Fast Path.
+  `INDEX.1E.2` is not started or authorized by `INDEX.1E.1`.
 
 ## 3. Design Principles
 

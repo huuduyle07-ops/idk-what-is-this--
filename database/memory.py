@@ -10,6 +10,7 @@ if root_dir not in sys.path:
     sys.path.append(root_dir)
 
 from config import DATABASE_URL, DB_ENABLED
+from core.credential_redaction import redact_credentials
 from typing import Optional, List, Dict, Any
 import hashlib
 import json
@@ -43,7 +44,13 @@ def get_pool():
         try:
             _pool = ConnectionPool(DATABASE_URL)
         except Exception as e:
-            raise RuntimeError(f"Could not connect to database at {DATABASE_URL}: {e}")
+            safe_detail = redact_credentials(
+                e,
+                known_secrets=(DATABASE_URL,),
+            )
+            raise RuntimeError(
+                f"database connection failed: {safe_detail}"
+            ) from None
     return _pool
 
 
@@ -62,8 +69,51 @@ def _close_pool() -> None:
         _pool = None
 
 
+def _safe_database_runtime_error(error: object) -> RuntimeError:
+    detail = redact_credentials(
+        error,
+        known_secrets=(DATABASE_URL,),
+    )
+    return RuntimeError(
+        f"database operation failed: {detail}"
+    )
+
+
+class _CredentialRedactingConnectionContext:
+    """Prevent connection/operation errors from restoring configured secrets."""
+
+    def __init__(self, connection_context):
+        self._connection_context = connection_context
+
+    def __enter__(self):
+        try:
+            return self._connection_context.__enter__()
+        except Exception as error:
+            raise _safe_database_runtime_error(error) from None
+
+    def __exit__(self, exc_type, exc, traceback):
+        try:
+            suppress = self._connection_context.__exit__(
+                exc_type,
+                exc,
+                traceback,
+            )
+        except Exception as error:
+            raise _safe_database_runtime_error(error) from None
+
+        if isinstance(exc, Exception) and not suppress:
+            raise _safe_database_runtime_error(exc) from None
+        return suppress
+
+
 def get_conn():
-    return get_pool().connection()
+    try:
+        connection_context = get_pool().connection()
+    except Exception as error:
+        raise _safe_database_runtime_error(error) from None
+    return _CredentialRedactingConnectionContext(
+        connection_context
+    )
 
 
 def init_db():
@@ -972,6 +1022,11 @@ def clear_code_units_for_file(
     file_path: str,
     project_tag: Optional[str] = None,
 ):
+    """Legacy compatibility delete; ``None`` is intentionally unscoped.
+
+    Canonical code-index callers must use ``database.code_index`` with an
+    explicit ``index_scope``. This branch remains only for older callers.
+    """
     if not db_enabled():
         return
 
@@ -1092,6 +1147,11 @@ def clear_dependencies_for_file(
     source_file: str,
     project_tag: Optional[str] = None,
 ):
+    """Legacy compatibility delete; ``None`` is intentionally unscoped.
+
+    Canonical code-index callers must use ``database.code_index`` with an
+    explicit ``index_scope``. This branch remains only for older callers.
+    """
     if not db_enabled():
         return
 
@@ -1277,6 +1337,7 @@ def _delete_dependencies_for_file_with_cursor(
         """
         params = (source_file, project_tag)
     else:
+        # Legacy wrapper compatibility only.
         query = """
         DELETE FROM code_dependencies
         WHERE source_file = %s;

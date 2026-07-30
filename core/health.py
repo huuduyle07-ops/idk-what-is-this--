@@ -21,6 +21,8 @@ import shutil
 import subprocess
 from typing import Literal
 
+from core.credential_redaction import redact_credentials
+
 Status = Literal["ok", "available", "off", "missing", "error"]
 
 
@@ -80,7 +82,15 @@ def check_db() -> dict:
                 cur.fetchone()
         return _check("Database (Postgres)", "ok", "connect+SELECT 1 OK")
     except Exception as e:
-        return _check("Database (Postgres)", "error", str(e)[:160])
+        detail = redact_credentials(
+            e,
+            known_secrets=(db_url,),
+        )
+        return _check(
+            "Database (Postgres)",
+            "error",
+            detail[:160],
+        )
 
 
 # ---------------------------------------------------------------------------

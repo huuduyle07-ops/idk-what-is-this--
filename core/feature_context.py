@@ -3,9 +3,7 @@ from __future__ import annotations
 import json
 import re
 from core.prompter import SCOUT_PROMPT
-from core.repo_librarian import inspect_repo_inventory
 from core.json_utils import extract_json_block
-from config import SUPPORTED_EXTENSIONS
 from pathlib import Path
 
 def extract_scout_snippets(repo_path: str, scout: dict) -> list[dict]:
@@ -91,38 +89,25 @@ def merge_related_snippets(old: list[dict], new: list[dict], limit: int = 8) -> 
 
     return merged
 
-def build_file_inventory(repo_path: str) -> list[dict]:
-    repo = Path(repo_path).resolve()
-    inventory = inspect_repo_inventory(repo_path) or {}
-    allowed_extensions = inventory.get("allowed_extensions", []) or []
-    if not allowed_extensions:
-        # Mirror the indexer's view (config.SUPPORTED_EXTENSIONS) so Scout
-        # doesn't drop files the indexer accepted (e.g. .html, .css, .tsx).
-        allowed_extensions = SUPPORTED_EXTENSIONS
+def build_file_inventory(
+    repo_path: str,
+    *,
+    inventory=None,
+) -> list[dict]:
+    from core.repository_inventory import (
+        create_repository_inventory,
+        validate_repository_inventory,
+    )
 
-    ignored_parts = {
-        "target", ".git", ".agent", "__pycache__",
-        "node_modules", "dist", "build"
-    }
-
-    files = []
-
-    for path in repo.rglob("*"):
-        if not path.is_file():
-            continue
-
-        rel = path.relative_to(repo).as_posix()
-        parts = set(path.relative_to(repo).parts)
-
-        if parts & ignored_parts:
-            continue
-
-        if path.suffix.lower() not in allowed_extensions:
-            continue
-
-        files.append({"path": rel})
-
-    return files[:200]
+    operation_inventory = (
+        validate_repository_inventory(repo_path, inventory)
+        if inventory is not None
+        else create_repository_inventory(repo_path)
+    )
+    return [
+        {"path": entry.relative_path.as_posix()}
+        for entry in operation_inventory.indexable_entries[:200]
+    ]
 
 
 def build_symbol_list_from_control_or_graph(repo_path: str) -> list[dict]:
@@ -182,6 +167,8 @@ def maybe_enrich_with_scout(
     repo_path: str,
     control_result: dict | None,
     force: bool = False,
+    *,
+    inventory=None,
 ) -> dict | None:
     """Enrich control_result with Scout's file/symbol picks.
 
@@ -204,7 +191,10 @@ def maybe_enrich_with_scout(
     print("🧭 SCOUT: retrieving code...")
 
     symbol_list = build_symbol_list_from_control_or_graph(repo_path)
-    file_inventory = build_file_inventory(repo_path)
+    file_inventory = build_file_inventory(
+        repo_path,
+        inventory=inventory,
+    )
 
     prompt = build_scout_prompt(
         query=query,

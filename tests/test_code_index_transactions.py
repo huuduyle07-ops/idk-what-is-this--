@@ -1,13 +1,25 @@
-from database.memory import (
-    _insert_code_unit_with_cursor,
+import copy
+
+from database.code_index import (
     delete_code_index_for_file,
     reconcile_code_index_scope,
     replace_code_index_for_file,
+    search_code_units as search_canonical_code_units,
+    search_dependencies as search_canonical_dependencies,
+)
+from database.memory import (
+    _insert_code_unit_with_cursor,
+    clear_code_units_for_file as legacy_clear_code_units,
+    clear_dependencies_for_file as legacy_clear_dependencies,
     save_code_unit,
     search_code_units,
     search_dependencies,
 )
 import pytest
+
+
+SCOPE = "code-index-example-" + "a" * 32
+OTHER_SCOPE = "code-index-example-" + "b" * 32
 
 
 class FakeCursor:
@@ -126,8 +138,53 @@ def test_replace_file_uses_one_transaction(
     assert conn.commit_count == 1
     assert conn.rollback_count == 0
 
-    for _, params in conn.cursor_instance.executions:
-        assert scope in params
+    executions = conn.cursor_instance.executions
+    assert len(executions) == 4
+
+    code_delete_query, code_delete_params = executions[0]
+    dependency_delete_query, dependency_delete_params = (
+        executions[1]
+    )
+    dependency_insert_query, dependency_insert_params = (
+        executions[2]
+    )
+    unit_insert_query, unit_insert_params = executions[3]
+
+    assert "DELETE FROM code_units" in code_delete_query
+    assert "project_tag = %s" in code_delete_query
+    assert code_delete_params == ("core/router.py", scope)
+
+    assert (
+        "DELETE FROM code_dependencies"
+        in dependency_delete_query
+    )
+    assert "project_tag = %s" in dependency_delete_query
+    assert dependency_delete_params == (
+        "core/router.py",
+        scope,
+    )
+
+    assert "INSERT INTO code_dependencies" in (
+        dependency_insert_query
+    )
+    assert dependency_insert_params == (
+        "core/router.py",
+        "core/config.py",
+        None,
+        None,
+        "import",
+        scope,
+    )
+
+    assert "INSERT INTO code_units" in unit_insert_query
+    assert unit_insert_params == (
+        "core/router.py",
+        "function",
+        "route",
+        "def route(): pass",
+        str([0.0] * 384),
+        scope,
+    )
 
 def test_replace_file_rolls_back_on_failure(
     monkeypatch,
@@ -267,22 +324,49 @@ def test_delete_file_uses_one_transaction(
     assert conn.rollback_count == 0
 
     assert "DELETE FROM code_units" in executions[0][0]
+    assert "project_tag = %s" in executions[0][0]
     assert executions[0][1] == (
         "core/deleted.py",
         scope,
     )
 
     assert "source_file = %s" in executions[1][0]
+    assert "project_tag = %s" in executions[1][0]
     assert executions[1][1] == (
         "core/deleted.py",
         scope,
     )
 
     assert "target_file = %s" in executions[2][0]
+    assert "project_tag = %s" in executions[2][0]
     assert executions[2][1] == (
         "core/deleted.py",
         scope,
     )
+
+
+def test_repository_a_delete_cannot_target_repository_b(
+    monkeypatch,
+):
+    conn = FakeConnection()
+    monkeypatch.setattr(
+        "database.memory.db_enabled",
+        lambda: True,
+    )
+    monkeypatch.setattr(
+        "database.memory.get_conn",
+        lambda: conn,
+    )
+
+    delete_code_index_for_file(
+        file_path="core/deleted.py",
+        index_scope=SCOPE,
+    )
+
+    for _query, params in conn.cursor_instance.executions:
+        assert SCOPE in params
+        assert OTHER_SCOPE not in params
+
 
 def test_delete_file_rolls_back_on_failure(
     monkeypatch,
@@ -549,7 +633,7 @@ def test_reconcile_scope_uses_one_transaction(
     )
 
     result = reconcile_code_index_scope(
-        index_scope="scope",
+        index_scope=SCOPE,
         current_files={
             "core/router.py",
             "core/config.py",
@@ -576,7 +660,7 @@ def test_reconcile_scope_uses_one_transaction(
     assert "source_file = ANY" in dependency_query
     assert "target_file = ANY" in dependency_query
     assert dependency_params == (
-        "scope",
+        SCOPE,
         ["core/config.py", "core/router.py"],
         ["core/config.py", "core/router.py"],
     )
@@ -585,7 +669,7 @@ def test_reconcile_scope_uses_one_transaction(
     assert "project_tag = %s" in unit_query
     assert "file_path = ANY" in unit_query
     assert unit_params == (
-        "scope",
+        SCOPE,
         ["core/config.py", "core/router.py"],
     )
 
@@ -605,7 +689,7 @@ def test_reconcile_scope_deletes_stale_sources_and_targets(
     )
 
     reconcile_code_index_scope(
-        index_scope="scope",
+        index_scope=SCOPE,
         current_files={"core/current.py"},
     )
 
@@ -633,7 +717,7 @@ def test_reconcile_scope_preserves_external_null_targets(
     )
 
     reconcile_code_index_scope(
-        index_scope="scope",
+        index_scope=SCOPE,
         current_files={"core/current.py"},
     )
 
@@ -659,12 +743,11 @@ def test_reconcile_scope_sorts_membership_deterministically(
     )
 
     reconcile_code_index_scope(
-        index_scope="scope",
+        index_scope=SCOPE,
         current_files={
             "zeta.py",
             "core\\router.py",
             "alpha.py",
-            "   ",
         },
     )
 
@@ -683,6 +766,38 @@ def test_reconcile_scope_sorts_membership_deterministically(
     assert unit_params[1] == expected_files
 
 
+def test_reconcile_scope_preserves_filename_edge_spaces(
+    monkeypatch,
+):
+    conn = FakeConnection()
+    monkeypatch.setattr(
+        "database.memory.db_enabled",
+        lambda: True,
+    )
+    monkeypatch.setattr(
+        "database.memory.get_conn",
+        lambda: conn,
+    )
+
+    reconcile_code_index_scope(
+        index_scope=SCOPE,
+        current_files={
+            " leading.py",
+            "trailing.py ",
+        },
+    )
+
+    expected_files = [
+        " leading.py",
+        "trailing.py ",
+    ]
+    dependency_params = conn.cursor_instance.executions[0][1]
+    unit_params = conn.cursor_instance.executions[1][1]
+    assert dependency_params[1] == expected_files
+    assert dependency_params[2] == expected_files
+    assert unit_params[1] == expected_files
+
+
 def test_reconcile_scope_rejects_empty_membership(
     monkeypatch,
 ):
@@ -693,10 +808,10 @@ def test_reconcile_scope_rejects_empty_membership(
 
     with pytest.raises(
         ValueError,
-        match="current_files must not be empty",
+        match="current_files must",
     ):
         reconcile_code_index_scope(
-            index_scope="scope",
+            index_scope=SCOPE,
             current_files={"", "   "},
         )
 
@@ -738,7 +853,7 @@ def test_reconcile_scope_rolls_back_on_unit_cleanup_failure(
         match="simulated database failure",
     ):
         reconcile_code_index_scope(
-            index_scope="scope",
+            index_scope=SCOPE,
             current_files={"core/router.py"},
         )
 
@@ -762,14 +877,111 @@ def test_reconcile_scope_is_noop_when_db_disabled(
     )
 
     result = reconcile_code_index_scope(
-        index_scope="",
-        current_files=set(),
+        index_scope=SCOPE,
+        current_files={"core/router.py"},
     )
 
     assert result == {
         "dependencies_deleted": 0,
         "code_units_deleted": 0,
     }
+
+
+@pytest.mark.parametrize(
+    "operation, kwargs",
+    [
+        (
+            replace_code_index_for_file,
+            {
+                "file_path": "core/router.py",
+                "code_units": [],
+                "dependencies": [],
+            },
+        ),
+        (
+            delete_code_index_for_file,
+            {"file_path": "core/router.py"},
+        ),
+        (
+            reconcile_code_index_scope,
+            {"current_files": {"core/router.py"}},
+        ),
+        (
+            search_canonical_code_units,
+            {"query_text": "router"},
+        ),
+        (
+            search_canonical_dependencies,
+            {"query_text": "router"},
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    "missing_scope",
+    [None, "", "   ", "human-project-label"],
+)
+def test_canonical_code_index_rejects_invalid_scope_before_db_check(
+    monkeypatch,
+    operation,
+    kwargs,
+    missing_scope,
+):
+    monkeypatch.setattr(
+        "database.memory.db_enabled",
+        lambda: (_ for _ in ()).throw(
+            AssertionError("DB state must not be checked")
+        ),
+    )
+
+    with pytest.raises(ValueError, match="index_scope is required"):
+        operation(index_scope=missing_scope, **kwargs)
+
+
+def test_canonical_reconciliation_rejects_none_membership(
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        "database.memory.db_enabled",
+        lambda: (_ for _ in ()).throw(
+            AssertionError("DB state must not be checked")
+        ),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="current_files must not be empty",
+    ):
+        reconcile_code_index_scope(
+            index_scope=SCOPE,
+            current_files=None,
+        )
+
+
+@pytest.mark.parametrize(
+    "invalid_membership",
+    [
+        {None},
+        [object()],
+        "core/router.py",
+        {"", "core/router.py"},
+    ],
+)
+def test_canonical_reconciliation_rejects_malformed_members(
+    monkeypatch,
+    invalid_membership,
+):
+    monkeypatch.setattr(
+        "database.memory.db_enabled",
+        lambda: (_ for _ in ()).throw(
+            AssertionError("DB state must not be checked")
+        ),
+    )
+
+    with pytest.raises(ValueError, match="current_files"):
+        reconcile_code_index_scope(
+            index_scope=SCOPE,
+            current_files=invalid_membership,
+        )
 
 
 def test_reconcile_scope_clamps_negative_rowcounts(
@@ -787,7 +999,7 @@ def test_reconcile_scope_clamps_negative_rowcounts(
     )
 
     result = reconcile_code_index_scope(
-        index_scope="scope",
+        index_scope=SCOPE,
         current_files={"core/router.py"},
     )
 
@@ -829,6 +1041,39 @@ def test_scoped_code_search_excludes_null_embeddings(
     assert params == (
         "[0.1, 0.2]",
         "scope",
+        "[0.1, 0.2]",
+        4,
+    )
+
+
+def test_canonical_code_search_always_passes_scope(
+    monkeypatch,
+):
+    conn = FakeConnection()
+    monkeypatch.setattr(
+        "database.memory.db_enabled",
+        lambda: True,
+    )
+    monkeypatch.setattr(
+        "database.memory._embed_text",
+        lambda _query: [0.1, 0.2],
+    )
+    monkeypatch.setattr(
+        "database.memory.get_conn",
+        lambda: conn,
+    )
+
+    result = search_canonical_code_units(
+        "router",
+        limit=4,
+        index_scope=SCOPE,
+    )
+
+    assert result == []
+    _query, params = conn.cursor_instance.executions[0]
+    assert params == (
+        "[0.1, 0.2]",
+        SCOPE,
         "[0.1, 0.2]",
         4,
     )
@@ -910,6 +1155,39 @@ def test_scoped_dependency_search_excludes_null_embeddings(
     )
 
 
+def test_canonical_dependency_search_always_passes_scope(
+    monkeypatch,
+):
+    conn = FakeConnection()
+    monkeypatch.setattr(
+        "database.memory.db_enabled",
+        lambda: True,
+    )
+    monkeypatch.setattr(
+        "database.memory._embed_text",
+        lambda _query: [0.1, 0.2],
+    )
+    monkeypatch.setattr(
+        "database.memory.get_conn",
+        lambda: conn,
+    )
+
+    result = search_canonical_dependencies(
+        "router",
+        limit=6,
+        index_scope=SCOPE,
+    )
+
+    assert result == []
+    _query, params = conn.cursor_instance.executions[0]
+    assert params == (
+        SCOPE,
+        "[0.1, 0.2]",
+        SCOPE,
+        6,
+    )
+
+
 def test_unscoped_dependency_search_excludes_null_embeddings(
     monkeypatch,
 ):
@@ -946,4 +1224,82 @@ def test_unscoped_dependency_search_excludes_null_embeddings(
         "[0.1, 0.2]",
         6,
     )
+
+
+def test_legacy_unscoped_code_clear_is_characterized(
+    monkeypatch,
+):
+    conn = FakeConnection()
+    monkeypatch.setattr(
+        "database.memory.db_enabled",
+        lambda: True,
+    )
+    monkeypatch.setattr(
+        "database.memory.get_conn",
+        lambda: conn,
+    )
+
+    legacy_clear_code_units("core/legacy.py")
+
+    query, params = conn.cursor_instance.executions[0]
+    assert "DELETE FROM code_units" in query
+    assert "project_tag = %s" not in query
+    assert params == ("core/legacy.py",)
+    assert conn.commit_count == 1
+
+
+def test_legacy_unscoped_dependency_clear_is_characterized(
+    monkeypatch,
+):
+    conn = FakeConnection()
+    monkeypatch.setattr(
+        "database.memory.db_enabled",
+        lambda: True,
+    )
+    monkeypatch.setattr(
+        "database.memory.get_conn",
+        lambda: conn,
+    )
+
+    legacy_clear_dependencies("core/legacy.py")
+
+    query, params = conn.cursor_instance.executions[0]
+    assert "DELETE FROM code_dependencies" in query
+    assert "project_tag = %s" not in query
+    assert params == ("core/legacy.py",)
+    assert conn.commit_count == 1
+
+
+def test_canonical_replacement_does_not_mutate_inputs(
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        "database.memory.db_enabled",
+        lambda: True,
+    )
+    conn = FakeConnection()
+    monkeypatch.setattr(
+        "database.memory.get_conn",
+        lambda: conn,
+    )
+    units = [{
+        "kind": "function",
+        "name": "route",
+        "content": "def route(): pass",
+        "embedding": [0.0],
+    }]
+    dependencies = [{
+        "target_file": "core/config.py",
+        "dependency_type": "import",
+    }]
+    before = copy.deepcopy((units, dependencies))
+
+    replace_code_index_for_file(
+        file_path="core/router.py",
+        index_scope=SCOPE,
+        code_units=units,
+        dependencies=dependencies,
+    )
+
+    assert (units, dependencies) == before
 

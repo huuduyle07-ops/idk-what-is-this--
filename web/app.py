@@ -16,6 +16,7 @@ from reasoning.deep_project_understand import deep_project_understand
 from core.control_engine import run_control_structured, run_control, build_control_prompt
 from agents.gemini_client import run_gemini_request
 from agents.model_stats import ModelStatsScope, format_usage_report
+from core.credential_redaction import redact_credentials
 from core.json_utils import extract_json_block
 from core.validation_command import get_default_validation_command
 from web.runner import run_agent_web
@@ -479,11 +480,19 @@ def index():
                     )
             except Exception as e:
                 import traceback
-                tb = traceback.format_exc()
-                print(f"❌ Pipeline error in mode={mode}:\n{tb}")
-                error = f"Pipeline error: {type(e).__name__}: {e}"
+                safe_error = redact_credentials(e)
+                safe_tb = redact_credentials(traceback.format_exc())
+                print(
+                    f"❌ Pipeline error in mode={mode}:\n"
+                    f"{safe_tb}"
+                )
+                error = (
+                    f"Pipeline error: {type(e).__name__}: "
+                    f"{safe_error}"
+                )
                 result = _empty_result(error)
-                result["validation"] = tb  # show traceback in the validation tab
+                # Safe traceback is shown in the validation tab and persisted.
+                result["validation"] = safe_tb
             finally:
                 _attach_runtime_environment(result, runtime_state)
                 _attach_model_usage(result, model_calls)

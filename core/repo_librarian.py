@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json, os
-from collections import Counter
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from core.repo_ignore import RepoIgnorePolicy
-from config import LANGUAGE_MAP, SUPPORTED_EXTENSIONS, get_agent_dir
+from config import get_agent_dir
+
+if TYPE_CHECKING:
+    from core.repository_inventory import RepositoryInventory
 
 
 # ---- infra-file gating --------------------------------------------------
@@ -99,6 +101,19 @@ def _walk_policy_files(root: Path):
 
             rel = current_rel / name
 
+            if path.is_symlink():
+                try:
+                    target_rel = path.resolve(strict=True).relative_to(
+                        root
+                    )
+                except (OSError, RuntimeError, ValueError):
+                    continue
+                if policy.classify(
+                    target_rel,
+                    is_dir=False,
+                ).ignored:
+                    continue
+
             decision = policy.classify(
                 rel,
                 is_dir=False,
@@ -110,7 +125,12 @@ def _walk_policy_files(root: Path):
             yield path, rel
 
 
-def iter_repo_files(repo_path: str, query: str | None = None):
+def iter_repo_files(
+    repo_path: str,
+    query: str | None = None,
+    *,
+    inventory: "RepositoryInventory | None" = None,
+):
     """Iterate ``(abs_path, rel_path)`` pairs for files in the repo.
 
     Repository membership is controlled by RepoIgnorePolicy. Infra files
@@ -118,26 +138,45 @@ def iter_repo_files(repo_path: str, query: str | None = None):
     """
     root = normalize_repo_path(repo_path)
 
+    if inventory is not None:
+        from core.repository_inventory import (
+            validate_repository_inventory,
+        )
+
+        validated = validate_repository_inventory(root, inventory)
+        if not root.exists() or not root.is_dir():
+            raise NotADirectoryError(
+                f"repo_path is not a directory: {root}"
+            )
+        for entry in validated.entries_for_query(query):
+            yield entry.as_pair()
+        return
+
     if not root.exists() or not root.is_dir():
         return
 
     for path, rel in _walk_policy_files(root):
-        rel_str = rel.as_posix()
-
-        if not should_include_infra_file(query, rel_str):
-            continue
-
-        yield path, rel
+        if should_include_infra_file(query, rel.as_posix()):
+            yield path, rel
 
 
-def build_repo_manifest(repo_path: str) -> dict[str, Any]:
+def build_repo_manifest(
+    repo_path: str,
+    *,
+    inventory: "RepositoryInventory | None" = None,
+) -> dict[str, Any]:
     root = normalize_repo_path(repo_path)
 
-    files: list[str] = []
-    indexable_files: list[str] = []
-    skipped_files: list[str] = []
-    language_counts: Counter[str] = Counter()
-    extension_counts: Counter[str] = Counter()
+    from core.repository_inventory import (
+        create_repository_inventory,
+        validate_repository_inventory,
+    )
+
+    operation_inventory = (
+        validate_repository_inventory(root, inventory)
+        if inventory is not None
+        else None
+    )
 
     if not root.exists() or not root.is_dir():
         return {
@@ -158,70 +197,23 @@ def build_repo_manifest(repo_path: str) -> dict[str, Any]:
 
         }
 
-    for path, rel in _walk_policy_files(root):
-        rel_str = rel.as_posix()
-
-        if not should_include_infra_file(None, rel_str):
-            skipped_files.append(rel_str)
-            continue
-
-        files.append(rel_str)
-
-        ext = path.suffix.lower()
-        extension_counts[ext] += 1
-
-        if ext in SUPPORTED_EXTENSIONS:
-            indexable_files.append(rel_str)
-
-            lang = LANGUAGE_MAP.get(ext, "unknown")
-            if lang not in {
-                "text",
-                "document",
-                "json",
-                "unknown",
-            }:
-                language_counts[lang] += 1
-    
-    primary_language = (
-        language_counts.most_common(1)[0][0]
-        if language_counts
-        else "unknown"
-    )
-
-    warnings: list[str] = []
-
-    if " " in str(root):
-        warnings.append("repo_path contains spaces")
-
-    if not indexable_files:
-        warnings.append("repo has 0 indexable files")
-
-    if primary_language == "unknown":
-        warnings.append("could not infer primary language from file extensions")
-
-    return {
-        "ok": len(indexable_files) > 0,
-        "reason": "" if indexable_files else "0 indexable files found",
-        "repo_root": str(root),
-        "files_total": len(files),
-        "indexable_count": len(indexable_files),
-        "primary_language": primary_language,
-        "languages": dict(language_counts),
-        "extensions": dict(extension_counts),
-        "files": files,
-        "indexable_files": indexable_files,
-        "skipped_files": skipped_files[:50],
-        "sample_files": files[:20],
-        "sample_indexable_files": indexable_files[:20],
-        "warnings": warnings,
-    }
+    if operation_inventory is None:
+        operation_inventory = create_repository_inventory(root)
+    return operation_inventory.summary()
 
 
-def inspect_repo_inventory(repo_path: str) -> dict[str, Any]:
+def inspect_repo_inventory(
+    repo_path: str,
+    *,
+    inventory: "RepositoryInventory | None" = None,
+) -> dict[str, Any]:
     """
     Backward-compatible name for older code.
     """
-    manifest = build_repo_manifest(repo_path)
+    manifest = build_repo_manifest(
+        repo_path,
+        inventory=inventory,
+    )
 
     return {
         "ok": manifest["ok"],
@@ -278,6 +270,13 @@ def load_phantom_limb_report(repo_path: str) -> dict[str, Any]:
     }
 
 
-def detect_repo_language(repo_path: str) -> str:
-    manifest = build_repo_manifest(repo_path)
+def detect_repo_language(
+    repo_path: str,
+    *,
+    inventory: "RepositoryInventory | None" = None,
+) -> str:
+    manifest = build_repo_manifest(
+        repo_path,
+        inventory=inventory,
+    )
     return manifest.get("primary_language", "unknown")

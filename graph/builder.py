@@ -1,13 +1,22 @@
 import re
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from config import LANGUAGE_MAP, SUPPORTED_EXTENSIONS
 from core.dependency_target import (
     resolve_dependency_target,
 )
 from core.repo_librarian import iter_repo_files
+from core.repository_inventory import (
+    CANONICAL_WALK_SITE,
+    repository_inventory_from_entries,
+    validate_repository_inventory,
+)
 from core.treesitter_parse import parse_code_with_treesitter
 from graph.schema import ProgramGraph
+
+if TYPE_CHECKING:
+    from core.repository_inventory import RepositoryInventory
 
 
 SKIP_DIRS = {
@@ -30,24 +39,57 @@ SKIP_DIRS = {
 def build_graph_from_repo(
     repo_path: str,
     *,
+    inventory: "RepositoryInventory | None" = None,
     repo_entries=None,
     repository_files=None,
 ) -> ProgramGraph:
     graph = ProgramGraph()
     root = Path(repo_path).resolve()
-    entries = (
-        list(repo_entries)
-        if repo_entries is not None
-        else list(iter_repo_files(repo_path))
+    if inventory is not None and repo_entries is not None:
+        raise ValueError(
+            "supply inventory or repo_entries, not both"
+        )
+
+    if inventory is not None:
+        operation_inventory = validate_repository_inventory(
+            root,
+            inventory,
+        )
+    else:
+        supplied_entries = repo_entries is not None
+        entries = tuple(
+            repo_entries
+            if supplied_entries
+            else iter_repo_files(str(root))
+        )
+        operation_inventory = repository_inventory_from_entries(
+            root,
+            entries,
+            traversal_count=0 if supplied_entries else 1,
+            walk_sites=(
+                ()
+                if supplied_entries
+                else (CANONICAL_WALK_SITE,)
+            ),
+            sort_entries=not supplied_entries,
+        )
+
+    entries = operation_inventory.indexable_entry_pairs
+    expected_files = set(
+        operation_inventory.relative_paths(None)
     )
-    files = (
-        set(repository_files)
-        if repository_files is not None
-        else {
-            str(rel_path).replace("\\", "/")
-            for _path, rel_path in entries
+    if repository_files is None:
+        files = expected_files
+    else:
+        files = {
+            str(path).replace("\\", "/")
+            for path in repository_files
         }
-    )
+        if files != expected_files:
+            raise ValueError(
+                "repository_files does not match supplied repository "
+                "inventory"
+            )
 
     for path, rel_path in entries:
         rel = str(rel_path).replace("\\", "/")

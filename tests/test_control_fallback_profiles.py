@@ -14,12 +14,16 @@ def test_identity_fallback_does_not_select_benchmark_case_as_top_hypothesis(
     graph.add_node("core/control_engine.py::run_control", "function")
     graph.add_node("web/app.py::create_app", "function")
 
-    monkeypatch.setattr(control_engine, "get_cached_graph", lambda repo_path: graph)
+    monkeypatch.setattr(
+        control_engine,
+        "get_cached_graph",
+        lambda repo_path, **kwargs: graph,
+    )
     monkeypatch.setattr(control_engine, "load_project_map", lambda repo_path: "")
     monkeypatch.setattr(
         control_engine,
         "deep_project_understand",
-        lambda query, repo_path: {"findings": []},
+        lambda query, repo_path, **kwargs: {"findings": []},
     )
     monkeypatch.setattr(control_engine, "trace_execution_flow", lambda **kwargs: "")
     monkeypatch.setattr(control_engine, "load_phantom_limb_report", lambda repo_path: {})

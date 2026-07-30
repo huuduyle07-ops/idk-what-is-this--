@@ -19,8 +19,27 @@ def _has_package_test_script(project_root: Path) -> bool:
         return False
 
 
-def detect_default_preflight_command(language: str, project_root: Path) -> str:
+def detect_default_preflight_command(
+    language: str,
+    project_root: Path,
+    *,
+    inventory=None,
+) -> str:
     lang = (language or "").lower().strip()
+    inventory_paths: tuple[Path, ...] | None = None
+    if inventory is not None:
+        from core.repository_inventory import (
+            validate_repository_inventory,
+        )
+
+        validated = validate_repository_inventory(
+            project_root,
+            inventory,
+        )
+        inventory_paths = tuple(
+            entry.relative_path
+            for entry in validated.entries_for_query(None)
+        )
 
     # C#
     if lang in {"csharp", "cs", "c#"}:
@@ -43,7 +62,15 @@ def detect_default_preflight_command(language: str, project_root: Path) -> str:
     # Rust
     if lang in {"rust", "rs"}:
         if (project_root / "Cargo.toml").exists():
-            if list(project_root.rglob("*_test.rs")) or "tests" in [p.name for p in project_root.iterdir() if p.is_dir()]:
+            has_rust_tests = (
+                any(
+                    path.match("*_test.rs")
+                    for path in inventory_paths
+                )
+                if inventory_paths is not None
+                else any(project_root.rglob("*_test.rs"))
+            )
+            if has_rust_tests or "tests" in [p.name for p in project_root.iterdir() if p.is_dir()]:
                 return "cargo test"
             return "cargo run && echo OK"
         return ""
@@ -64,7 +91,15 @@ def detect_default_preflight_command(language: str, project_root: Path) -> str:
 
     # Go
     if lang in {"go", "golang"}:
-        if list(project_root.rglob("*_test.go")):
+        has_go_tests = (
+            any(
+                path.match("*_test.go")
+                for path in inventory_paths
+            )
+            if inventory_paths is not None
+            else any(project_root.rglob("*_test.go"))
+        )
+        if has_go_tests:
             return "go test ./..."
 
         if (project_root / "main.go").exists():
@@ -99,12 +134,15 @@ def run_preflight_validation(
     repo_path: str,
     language: str,
     command: str | None = None,
+    *,
+    inventory=None,
 ) -> dict[str, Any]:
     project_root = Path(repo_path).resolve()
 
     validation_command = command or detect_default_preflight_command(
         language,
         project_root,
+        inventory=inventory,
     )
 
     if not validation_command:

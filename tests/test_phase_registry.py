@@ -527,7 +527,16 @@ def test_seed_registry_has_expected_phases():
         "UX.CLOSE", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE", "MIRROR.7", "MIRROR.8", "MIRROR.9", "MIRROR.10", "MIRROR.11", "MIRROR.12", "MIRROR.CLOSE3", "MIRROR.13",
     } <= ids
     assert {"UX.RUN.CLOSE", "UX.LIVE.1", "UX.LIVE.2", "UX.LIVE.3", "UX.LIVE.4", "UX.LIVE.5", "UX.LIVE.6", "UX.LIVE.7", "UX.LIVE.8", "UX.LIVE.9", "UX.LIVE.10", "UX.LIVE.CLOSE", "DOGFOOD.1A", "DOGFOOD.1B", "VERIFY.TEST.1"} <= ids
-    assert len(data["phases"]) == 106
+    assert {
+        "INDEX.1D.1",
+        "INDEX.1D.2A",
+        "INDEX.1D.2B",
+        "INDEX.1D.2C",
+        "INDEX.1D.3",
+        "INDEX.1E.0",
+        "INDEX.1E.1",
+    } <= ids
+    assert len(data["phases"]) == 113
 
 
 def test_seed_registry_is_conservative():
@@ -554,12 +563,77 @@ def test_seed_registry_summary_counts():
         "EVAL": 11,
         "HARDEN": 9,
         "HUMAN": 5,
+        "INDEX": 7,
         "MIRROR": 15,
         "MODEL": 11,
         "OPS": 4,
         "ROAD": 4,
         "UX": 27,
     }
+
+
+def test_identity_confirmation_phase_is_complete_after_identity_primitive():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["INDEX.1D.2B"]
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["INDEX.1D.2A"]
+
+
+def test_honest_completion_phase_is_complete_after_identity_confirmation():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["INDEX.1D.2C"]
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["INDEX.1D.2B"]
+
+
+def test_traversal_budget_phase_is_complete_after_honest_completion():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["INDEX.1D.3"]
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["INDEX.1D.2C"]
+
+
+def test_delta_preflight_phase_is_complete_with_dispatch_block_preserved():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["INDEX.1E.0"]
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["INDEX.1D.3"]
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["risk_level"] == "medium"
+    assert phase["writes_real_repo"] is False
+    assert any(
+        "historical readiness decision remains blocked"
+        in note
+        for note in phase["notes"]
+    )
+
+
+def test_shadow_delta_dispatch_phase_is_complete_after_preflight():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["INDEX.1E.1"]
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["INDEX.1E.0"]
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["risk_level"] == "high"
+    assert phase["writes_real_repo"] is False
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["expected_artifacts"] == [
+        ".agent/audits/index-1e-1-shadow-delta-dispatch.json",
+        ".agent/audits/index-1e-1-shadow-delta-dispatch.md",
+        "docs/audits/2026-07-29-index-1e-1-shadow-delta-dispatch.md",
+    ]
 
 
 def test_early_error_hardening_completes_before_real_dogfood_resumes():

@@ -14,6 +14,39 @@ BLACKLIST = {
     "postgres_auth.txt" # Any other secrets
 }
 
+def has_safe_path_components(path_value: str | os.PathLike[str]) -> bool:
+    """Apply the production filename/component deny rules without I/O."""
+    path = Path(path_value)
+    path_parts = {
+        part.name.lower()
+        for part in list(path.parents) + [path]
+        if part.name
+    }
+    if any(black.lower() in path_parts for black in BLACKLIST):
+        return False
+
+    name_lower = path.name.lower()
+    if name_lower == ".env" or name_lower.startswith(".env."):
+        return False
+    if any(
+        key in name_lower
+        for key in (
+            "secret",
+            "credential",
+            "password",
+            "token",
+            "auth_key",
+        )
+    ):
+        return False
+
+    if path.name.startswith("."):
+        if path.name not in {".gitignore", ".github"}:
+            if path.suffix not in {".py", ".md", ".txt", ".json"}:
+                return False
+    return True
+
+
 def is_safe_path(file_path_str: str, allowed_roots: list[str] | None = None) -> bool:
     """
     Checks if a file path is safe to read/upload.
@@ -43,26 +76,6 @@ def is_safe_path(file_path_str: str, allowed_roots: list[str] | None = None) -> 
         if not (path == app_root or app_root in path.parents):
             return False
 
-    # Rule 2: Check blacklist (check ALL parts of the path)
-    path_parts = set(p.name.lower() for p in list(path.parents) + [path])
-    
-    if any(black.lower() in path_parts for black in BLACKLIST):
-        return False
-    
-    # Block env files and secrets
-    name_lower = path.name.lower()
-    if name_lower == ".env" or name_lower.startswith(".env."):
-        return False
-    
-    if any(k in name_lower for k in ["secret", "credential", "password", "token", "auth_key"]):
-        return False
-
-    # Rule 3: Check for sensitive extensions or dotfiles
-    if path.name.startswith("."):
-        # Allow only very specific safe dotfiles
-        if path.name not in {".gitignore", ".github"}:
-             if path.suffix not in {".py", ".md", ".txt", ".json"}:
-                return False
-
-    return True
+    # Rules 2-3: deny sensitive components, names, and unsafe dotfiles.
+    return has_safe_path_components(path)
 

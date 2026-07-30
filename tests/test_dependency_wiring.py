@@ -4,8 +4,10 @@ from collections import Counter
 from pathlib import Path
 
 from core import indexer as indexer_module
+from core import repo_librarian
 from core.indexer import _build_dependency_rows
 from core import repository_identity
+from core.repository_inventory import create_repository_inventory
 from graph import builder as graph_builder
 
 
@@ -393,10 +395,10 @@ def test_graph_builder_uses_precomputed_repository_scan(
         "src/utils.ts",
         utils_text,
     )
-    entries = [
-        (app_path, Path("src/app.ts")),
-        (utils_path, Path("src/utils.ts")),
-    ]
+    inventory = create_repository_inventory(tmp_path)
+    inventory_before = inventory.entry_pairs
+    repository_files = set(inventory.relative_paths(None))
+    repository_files_before = set(repository_files)
     parsed_by_text = {
         app_text: {
             "imports": ["./utils"],
@@ -429,19 +431,60 @@ def test_graph_builder_uses_precomputed_repository_scan(
 
     graph = graph_builder.build_graph_from_repo(
         str(tmp_path),
-        repo_entries=entries,
-        repository_files={
-            "src/app.ts",
-            "src/utils.ts",
-        },
+        inventory=inventory,
+        repository_files=repository_files,
     )
 
+    assert inventory.entry_pairs == inventory_before
+    assert repository_files == repository_files_before
     assert {
         (edge.source, edge.target, edge.type)
         for edge in graph.edges
         if edge.type == "imports"
     } == {
         ("src/app.ts", "src/utils.ts", "imports"),
+    }
+
+
+def test_graph_builder_legacy_path_walks_shared_scanner_once(
+    tmp_path,
+    monkeypatch,
+):
+    _write_source(tmp_path, "app.py", "app fixture")
+    _write_source(
+        tmp_path,
+        "src/nested.py",
+        "nested fixture",
+    )
+    real_walk = repo_librarian._walk_policy_files
+    walk_calls = 0
+
+    def counting_walk(root):
+        nonlocal walk_calls
+        walk_calls += 1
+        yield from real_walk(root)
+
+    monkeypatch.setattr(
+        repo_librarian,
+        "_walk_policy_files",
+        counting_walk,
+    )
+    monkeypatch.setattr(
+        graph_builder,
+        "parse_code_with_treesitter",
+        lambda _text, _language: {
+            "imports": [],
+            "symbols": [],
+            "calls": [],
+        },
+    )
+
+    graph = graph_builder.build_graph_from_repo(str(tmp_path))
+
+    assert walk_calls == 1
+    assert set(graph.nodes) == {
+        "app.py",
+        "src/nested.py",
     }
 
 
@@ -490,14 +533,6 @@ def _stub_indexer(
     monkeypatch.setenv("INDEX_USE_EMBEDDINGS", "true")
     monkeypatch.setattr(
         indexer_module,
-        "inspect_repo_inventory",
-        lambda _repo_path: {
-            "ok": True,
-            "indexable_count": len(parsed_by_text),
-        },
-    )
-    monkeypatch.setattr(
-        indexer_module,
         "is_safe_path",
         lambda _path, allowed_roots: bool(allowed_roots),
     )
@@ -543,7 +578,7 @@ def _stub_indexer(
     monkeypatch.setattr(
         indexer_module,
         "compute_dna",
-        lambda _repo_path: {
+        lambda _repo_path, *, inventory=None: {
             "indent": "spaces",
             "naming": "snake_case",
             "max_line_pref": 88,
@@ -552,7 +587,7 @@ def _stub_indexer(
     monkeypatch.setattr(
         indexer_module,
         "save_dna",
-        lambda _repo_path, _dna: None,
+        lambda _repo_path, _dna: Path("code_dna.json"),
     )
 
     return replacement_calls
@@ -621,11 +656,13 @@ def test_indexer_reuses_repository_scan_for_graph(
     tmp_path,
     monkeypatch,
 ):
-    app_path = _write_source(
+    _write_source(
         tmp_path,
         "app.py",
         "app fixture",
     )
+    inventory = create_repository_inventory(tmp_path)
+    inventory_before = inventory.entry_pairs
     _stub_indexer(
         monkeypatch,
         parsed_by_text={
@@ -633,27 +670,17 @@ def test_indexer_reuses_repository_scan_for_graph(
         },
     )
 
-    scan_calls: list[str] = []
-    entries = [
-        (app_path, Path("app.py")),
-    ]
     captured_graph_args: dict = {}
     graph_sentinel = object()
-
-    def scan_once(repo_path):
-        scan_calls.append(repo_path)
-        return entries
 
     def capture_graph(
         repo_path,
         *,
-        repo_entries,
-        repository_files,
+        inventory,
     ):
         captured_graph_args.update({
             "repo_path": repo_path,
-            "repo_entries": repo_entries,
-            "repository_files": repository_files,
+            "inventory": inventory,
         })
         return graph_sentinel
 
@@ -663,8 +690,14 @@ def test_indexer_reuses_repository_scan_for_graph(
     )
     monkeypatch.setattr(
         indexer_module,
-        "iter_repo_files",
-        scan_once,
+        "create_repository_inventory",
+        lambda _repo_path: (
+            _ for _ in ()
+        ).throw(
+            AssertionError(
+                "supplied inventory must prevent a repository rescan"
+            )
+        ),
     )
     monkeypatch.setattr(
         indexer_module,
@@ -684,11 +717,9 @@ def test_indexer_reuses_repository_scan_for_graph(
 
     result = indexer_module.index_repository(
         str(tmp_path),
+        inventory=inventory,
     )
 
-    assert len(scan_calls) == 1
-    assert captured_graph_args["repo_entries"] == entries
-    assert captured_graph_args["repository_files"] == {
-        "app.py",
-    }
+    assert captured_graph_args["inventory"] is inventory
+    assert inventory.entry_pairs == inventory_before
     assert result["project_map"] == "project-map.md"

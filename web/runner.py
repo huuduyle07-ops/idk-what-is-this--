@@ -8,6 +8,7 @@ from typing import Any
 
 from core.agent_state import AgentState
 from core.code_dna import dna_to_prompt_block, get_or_compute_dna
+from core.credential_redaction import redact_credentials
 from core.control_engine import (
     build_related_snippets,
     clear_graph_cache,
@@ -30,10 +31,9 @@ from core.harness_modes import (
 from core.preflight import run_preflight_validation
 from core.project_tag import build_project_tag
 from core.repo_librarian import (
-    detect_repo_language,
-    inspect_repo_inventory,
     load_phantom_limb_report,
 )
+from core.repository_inventory import create_repository_inventory
 from core.runtime_environment import (
     build_runtime_environment_state,
     describe_runtime_environment,
@@ -435,9 +435,29 @@ def run_agent_web(
             **_harness_payload(base_harness_decision),
         }
 
-    inventory = inspect_repo_inventory(repo_path) if is_project_input else None
+    operation_inventory = (
+        create_repository_inventory(repo_path)
+        if is_project_input
+        else None
+    )
+    inventory = (
+        operation_inventory.summary()
+        if operation_inventory is not None
+        else None
+    )
 
     if is_project_input and not inventory["ok"]:
+        empty_delta_shadow = None
+        try:
+            index_repository(
+                repo_path,
+                project_tag=project_tag,
+                inventory=operation_inventory,
+            )
+        except Exception as exc:
+            candidate_shadow = getattr(exc, "delta_shadow", None)
+            if isinstance(candidate_shadow, dict):
+                empty_delta_shadow = candidate_shadow
         empty_repo_decision = decide_harness_mode(
             repo_root=repo_path,
             runtime_environment=runtime_state["runtime_environment"],
@@ -455,6 +475,11 @@ def run_agent_web(
             "patch": "",
             "validation": "",
             "project_tag": project_tag or "",
+            **(
+                {"delta_shadow": empty_delta_shadow}
+                if isinstance(empty_delta_shadow, dict)
+                else {}
+            ),
             **runtime_state,
             "runtime_environment_description": runtime_description,
             **_harness_payload(empty_repo_decision),
@@ -462,7 +487,7 @@ def run_agent_web(
 
     input_mode = detect_input_mode(query)
     if is_project_input:
-        language = detect_repo_language(repo_path)
+        language = inventory["primary_language"]
         if language == "unknown":
             language = detect_language(query)
     else:
@@ -480,30 +505,59 @@ def run_agent_web(
     print(f"Runtime environment: {runtime_description}")
 
     control_result = None
+    delta_shadow = None
     if is_project_input:
         try:
-            index_result = index_repository(repo_path, project_tag=final_tag)
             clear_graph_cache(repo_path)
+            index_result = index_repository(
+                repo_path,
+                project_tag=final_tag,
+                inventory=operation_inventory,
+                include_operation_artifacts=True,
+            )
+            if isinstance(index_result.get("delta_shadow"), dict):
+                delta_shadow = index_result["delta_shadow"]
+            operation_artifacts = index_result.get(
+                "_operation_artifacts",
+                {},
+            )
+            program_graph = operation_artifacts.get("program_graph")
+            operation_dna = operation_artifacts.get("code_dna")
             preflight_cmd = extract_user_validation_command(query)
 
             preflight = run_preflight_validation(
                 repo_path=repo_path,
                 language=language,
                 command=preflight_cmd or None,
+                inventory=operation_inventory,
             )
             print("🧪 PREFLIGHT:")
             print(json.dumps(preflight, indent=2, ensure_ascii=False))
 
-            control_result = run_control_structured(query, repo_path)
+            control_result = run_control_structured(
+                query,
+                repo_path,
+                inventory=operation_inventory,
+                graph=program_graph,
+            )
             if control_result:
                 control_result["phantom_limb"] = (
                     index_result.get("phantom_limb")
                     or load_phantom_limb_report(repo_path)
                 )
+                if isinstance(
+                    index_result.get("delta_shadow"),
+                    dict,
+                ):
+                    control_result["delta_shadow"] = (
+                        index_result["delta_shadow"]
+                    )
                 control_result["preflight_validation"] = preflight
                 control_result["related_snippets"] = build_related_snippets(
                     control_result,
                     repo_path,
+                    graph=program_graph,
+                    inventory=operation_inventory,
                 )
                 try:
                     eng_mem = get_engineering_memory(
@@ -520,9 +574,17 @@ def run_agent_web(
                     query=query,
                     repo_path=repo_path,
                     control_result=control_result,
+                    inventory=operation_inventory,
                 )
                 dna_mode = "ignore" if task_info.get("ignore_repo_dna") else "match"
-                dna = get_or_compute_dna(repo_path)
+                dna = (
+                    operation_dna
+                    if isinstance(operation_dna, dict)
+                    else get_or_compute_dna(
+                        repo_path,
+                        inventory=operation_inventory,
+                    )
+                )
                 control_result["code_dna"] = dna
                 control_result["code_dna_mode"] = dna_mode
                 control_result["code_dna_prompt"] = dna_to_prompt_block(dna, mode=dna_mode)
@@ -530,14 +592,23 @@ def run_agent_web(
                 control_result["runtime_environment_description"] = runtime_description
 
         except Exception as e:
+            safe_error = redact_credentials(e)
             return {
-                "answer": f"Error: indexing/control failed: {e}",
+                "answer": (
+                    "Error: indexing/control failed: "
+                    f"{safe_error}"
+                ),
                 "context": "",
                 "graph": "",
                 "state": "",
                 "patch": "",
                 "validation": "",
                 "project_tag": final_tag,
+                **(
+                    {"delta_shadow": delta_shadow}
+                    if isinstance(delta_shadow, dict)
+                    else {}
+                ),
                 **runtime_state,
                 "runtime_environment_description": runtime_description,
                 **_harness_payload(base_harness_decision),
@@ -624,6 +695,11 @@ def run_agent_web(
                 "patch": "",
                 "validation": "",
                 "project_tag": final_tag,
+                **(
+                    {"delta_shadow": delta_shadow}
+                    if isinstance(delta_shadow, dict)
+                    else {}
+                ),
                 "patch_loop_attempts": state.patch_loop_attempts,
                 "patch_loop_stop_reason": state.patch_loop_stop_reason,
                 **runtime_state,
@@ -724,6 +800,11 @@ def run_agent_web(
             "patch": json.dumps(state.json_block, indent=2) if state.json_block else "",
             "validation": state.validation_output or "",
             "project_tag": final_tag,
+            **(
+                {"delta_shadow": delta_shadow}
+                if isinstance(delta_shadow, dict)
+                else {}
+            ),
             "patch_loop_attempts": state.patch_loop_attempts,
             "patch_loop_stop_reason": state.patch_loop_stop_reason,
             **runtime_state,
@@ -753,14 +834,20 @@ def run_agent_web(
         )
 
     except Exception as e:
+        safe_error = redact_credentials(e)
         result = {
-            "answer": f"Error: {str(e)}",
+            "answer": f"Error: {safe_error}",
             "context": "",
             "graph": "",
             "state": "",
             "patch": "",
             "validation": "",
             "project_tag": final_tag,
+            **(
+                {"delta_shadow": delta_shadow}
+                if isinstance(delta_shadow, dict)
+                else {}
+            ),
             "patch_loop_attempts": 0,
             "patch_loop_stop_reason": None,
             **runtime_state,

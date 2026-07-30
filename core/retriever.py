@@ -23,6 +23,7 @@ if root_dir not in sys.path:
 from reasoning.reasoning_engine import build_reasoning_context, analyze_symbol_risk
 from reasoning.decision_engine import decide_patch_action
 from config import LANGUAGE_MAP, SUPPORTED_EXTENSIONS, get_agent_dir
+from core.credential_redaction import redact_credentials
 from core.repository_identity import (
     build_code_index_scope,
     is_code_index_scope,
@@ -55,7 +56,10 @@ from core.router import get_model, detect_input_mode, detect_language
 from core.security import is_safe_path
 from core.treesitter_parse import parse_code_with_treesitter
 from graph.project_map import load_project_map
-from database.memory import search_code_units, search_dependencies as search_dependencies_db
+from database.code_index import (
+    search_code_units,
+    search_dependencies as search_dependencies_db,
+)
 from graph.builder import build_graph_from_repo
 from graph.query import explain_symbol, trace_path, impact_analysis, find_callers
 from reasoning.state_reasoner import (
@@ -116,7 +120,14 @@ def dedupe_states(states):
 
     return result
 
-def trace_execution_flow(query: str, repo_path: str = None, top_k: int = 3) -> str:
+def trace_execution_flow(
+    query: str,
+    repo_path: str = None,
+    top_k: int = 3,
+    *,
+    graph=None,
+    inventory=None,
+) -> str:
     hits = search_safe_code_units(
         query,
         repo_path=repo_path,
@@ -169,7 +180,15 @@ def trace_execution_flow(query: str, repo_path: str = None, top_k: int = 3) -> s
             issues = detect_state_issues(trace)
 
             if issues:
-                graph = _get_cached_repo_graph(repo_path) if repo_path else None
+                graph = (
+                    graph
+                    or _get_cached_repo_graph(
+                        repo_path,
+                        inventory=inventory,
+                    )
+                    if repo_path
+                    else None
+                )
                 symbol_name = st["symbol"]
                 if graph:
                     callers = find_callers(graph, symbol_name)
@@ -246,11 +265,28 @@ TEXT_EXTENSIONS = SUPPORTED_EXTENSIONS
 CODE_EXTENSIONS = {ext for ext, lang in LANGUAGE_MAP.items() if lang not in {"document", "text", "json"}}
 
 
-def get_cached_graph(repo_path):
-    if repo_path not in _graph_cache:
+def get_cached_graph(repo_path, *, inventory=None):
+    repo_key = os.path.abspath(repo_path)
+    if inventory is not None:
+        from core.repository_inventory import (
+            validate_repository_inventory,
+        )
+
+        validate_repository_inventory(repo_key, inventory)
+        # A supplied inventory is authoritative for this operation. Never
+        # serve a graph cached by an earlier operation for the same root or
+        # publish request-local membership into the legacy process cache.
+        return build_graph_from_repo(
+            repo_key,
+            inventory=inventory,
+        )
+    if repo_key not in _graph_cache:
         print("🔧 Building graph once...")
-        _graph_cache[repo_path] = build_graph_from_repo(repo_path)
-    return _graph_cache[repo_path]
+        _graph_cache[repo_key] = build_graph_from_repo(
+            repo_key,
+            inventory=inventory,
+        )
+    return _graph_cache[repo_key]
 
 def clear_graph_cache(repo_path: str | None = None) -> None:
     """Invalidate the retriever's module-level graph cache (Phase 13.1).
@@ -543,26 +579,30 @@ def search_safe_code_units(
     repo_path: str = None,
     limit: int = 5,
     project_tag: Optional[str] = None,
+    index_scope: Optional[str] = None,
 ) -> List[Dict]:
-    """Wraps search_code_units with safety filtering AND project_tag scoping."""
-    index_scope = _index_scope_for(
+    """Search one canonical scope; ``project_tag`` is non-authoritative."""
+    resolved_scope = _index_scope_for(
         repo_path,
-        project_tag,
+        index_scope,
     )
     if not retriever_db_enabled():
         return []
 
-    if index_scope is None:
+    if resolved_scope is None:
         return []
 
     try:
         hits = search_code_units(
             query,
             limit=limit * 3,
-            project_tag=index_scope,
+            index_scope=resolved_scope,
         )
     except Exception as e:
-        print(f"⚠️ DB code-unit search skipped: {e}")
+        print(
+            "⚠️ DB code-unit search skipped: "
+            f"{redact_credentials(e)}"
+        )
         return []
     safe = []
     allowed_roots = [repo_path] if repo_path else None
@@ -598,22 +638,30 @@ def search_dependencies(
     top_k: int = 5,
     repo_path: Optional[str] = None,
     project_tag: Optional[str] = None,
+    index_scope: Optional[str] = None,
 ) -> str:
     if not retriever_db_enabled():
         return ""
 
-    index_scope = _index_scope_for(
+    resolved_scope = _index_scope_for(
         repo_path,
-       project_tag,
+        index_scope,
     )
 
-    if index_scope is None:
+    if resolved_scope is None:
         return ""
 
     try:
-        results = search_dependencies_db(query, limit=top_k, project_tag=index_scope)
+        results = search_dependencies_db(
+            query,
+            limit=top_k,
+            index_scope=resolved_scope,
+        )
     except Exception as e:
-        print(f"⚠️ DB dependency search skipped: {e}")
+        print(
+            "⚠️ DB dependency search skipped: "
+            f"{redact_credentials(e)}"
+        )
         return ""
 
     if not results:
@@ -642,12 +690,25 @@ def _extract_symbol_candidates(query: str) -> list[str]:
         result.append(c)
     return result[:8]
 
-def _get_cached_repo_graph(repo_path: str):
+def _get_cached_repo_graph(repo_path: str, *, inventory=None):
     repo_abs = os.path.abspath(repo_path)
+    if inventory is not None:
+        from core.repository_inventory import (
+            validate_repository_inventory,
+        )
+
+        validate_repository_inventory(repo_abs, inventory)
+        return build_graph_from_repo(
+            repo_abs,
+            inventory=inventory,
+        )
     if repo_abs in _graph_cache:
         return _graph_cache[repo_abs]
 
-    graph = build_graph_from_repo(repo_abs)
+    graph = build_graph_from_repo(
+        repo_abs,
+        inventory=inventory,
+    )
     _graph_cache[repo_abs] = graph
     return graph
 
@@ -658,7 +719,13 @@ def expand_candidates(words):
         expanded.add(w.lower())
     return list(expanded)
 
-def retrieve_file_context(query: str, file_path: str, repo_path: str = None) -> str:
+def retrieve_file_context(
+    query: str,
+    file_path: str,
+    repo_path: str = None,
+    *,
+    inventory=None,
+) -> str:
     text = extract_file_text(file_path, repo_path=repo_path, query=query)
     if not text:
         return ""
@@ -667,7 +734,14 @@ def retrieve_file_context(query: str, file_path: str, repo_path: str = None) -> 
 
     if repo_path and os.path.isdir(repo_path):
         try:
-            graph = _get_cached_repo_graph(repo_path) if repo_path else None
+            graph = (
+                _get_cached_repo_graph(
+                    repo_path,
+                    inventory=inventory,
+                )
+                if repo_path
+                else None
+            )
             extra.append("=== PROGRAM GRAPH CONTEXT ===")
             extra.append(f"Graph nodes: {len(graph.nodes)}")
             extra.append(f"Graph edges: {len(graph.edges)}")
@@ -706,8 +780,17 @@ def retrieve_file_context(query: str, file_path: str, repo_path: str = None) -> 
     
     return "\n\n...\n\n".join(extra + chunks)
 
-def pick_seed_symbols(query, repo_path: str = None):
-    hits = search_safe_code_units(query, repo_path=repo_path, limit=10)
+def pick_seed_symbols(
+    query,
+    repo_path: str = None,
+    index_scope: Optional[str] = None,
+):
+    hits = search_safe_code_units(
+        query,
+        repo_path=repo_path,
+        limit=10,
+        index_scope=index_scope,
+    )
 
     keywords = query.lower().split()
 
@@ -719,14 +802,24 @@ def pick_seed_symbols(query, repo_path: str = None):
 
     return ranked[:3]
 
-def trace_call_chain(query: str, repo_path: str = None, max_depth: int = 3, fanout: int = 3) -> str:
+def trace_call_chain(
+    query: str,
+    repo_path: str = None,
+    max_depth: int = 3,
+    fanout: int = 3,
+    index_scope: Optional[str] = None,
+) -> str:
     if not retriever_db_enabled():
         return ""
-    index_scope = _index_scope_for(repo_path)
+    resolved_scope = _index_scope_for(repo_path, index_scope)
 
-    if index_scope is None:
+    if resolved_scope is None:
         return ""
-    seeds = pick_seed_symbols(query, repo_path=repo_path)
+    seeds = pick_seed_symbols(
+        query,
+        repo_path=repo_path,
+        index_scope=resolved_scope,
+    )
     if not seeds:
         return ""
 
@@ -739,7 +832,11 @@ def trace_call_chain(query: str, repo_path: str = None, max_depth: int = 3, fano
             return
         visited.add(symbol_name)
 
-        deps = search_dependencies_db(symbol_name, limit=fanout, project_tag=index_scope)
+        deps = search_dependencies_db(
+            symbol_name,
+            limit=fanout,
+            index_scope=resolved_scope,
+        )
         for dep in deps:
             if dep.get("dependency_type") != "call":
                 continue
@@ -749,7 +846,12 @@ def trace_call_chain(query: str, repo_path: str = None, max_depth: int = 3, fano
             if not tgt:
                 continue
 
-            code_hits = search_safe_code_units(tgt, repo_path=repo_path, limit=1, project_tag=index_scope)
+            code_hits = search_safe_code_units(
+                tgt,
+                repo_path=repo_path,
+                limit=1,
+                index_scope=resolved_scope,
+            )
 
             snippet = code_hits[0]["content"][:200] if code_hits else ""
 
@@ -873,12 +975,24 @@ def retrieve_context(
     file_path: str | None = None,
     repo_path: str = ".",
     project_tag: Optional[str] = None,
+    index_scope: Optional[str] = None,
+    inventory=None,
 ) -> str:
+    """Build retrieval context without granting semantic labels authority.
+
+    ``project_tag`` remains a compatibility/display parameter and is ignored
+    for canonical DB access. A valid repository root wins; otherwise callers
+    must use the separately named, validated ``index_scope`` parameter.
+    """
     route = classify_retrieval_level(query)
     level = route["level"]
-    index_scope = _index_scope_for(repo_path, project_tag)
+    resolved_index_scope = _index_scope_for(
+        repo_path,
+        index_scope,
+    )
 
     blocks = []
+    graph = None
     blocks.append(f"Retrieval Level: {level} | confidence={route['confidence']} | scores={route['scores']}")
     blocks.insert(0, f"""
 You are analyzing a codebase using multi-level context:
@@ -909,7 +1023,10 @@ Dependency Interpretation:
     # === GRAPH REASONING ===
     if repo_path and os.path.isdir(repo_path):
         try:
-            graph = get_cached_graph(repo_path)
+            graph = get_cached_graph(
+                repo_path,
+                inventory=inventory,
+            )
 
             blocks.append("=== PROGRAM GRAPH ===")
             blocks.append(f"Nodes: {len(graph.nodes)}, Edges: {len(graph.edges)}")
@@ -921,6 +1038,7 @@ Dependency Interpretation:
                 semantic_graph_context = build_obsidian_semantic_context(
                     repo_path=str(repo_abs),
                     vault_path=vault_path,
+                    inventory=inventory,
                 )
 
                 if semantic_graph_context:
@@ -947,7 +1065,13 @@ Dependency Interpretation:
 
         except Exception as e:
             blocks.append(f"GRAPH ERROR: {e}")
-    execution_trace = trace_execution_flow(query, repo_path=repo_path, top_k=3)
+    execution_trace = trace_execution_flow(
+        query,
+        repo_path=repo_path,
+        top_k=3,
+        graph=graph,
+        inventory=inventory,
+    )
     if execution_trace:
         blocks.append(execution_trace)
 
@@ -960,17 +1084,28 @@ Dependency Interpretation:
 
 
     if level in {"meso", "hybrid"}:
-        symbol_hits = search_safe_code_units(query, repo_path=repo_path, limit=8, project_tag=index_scope)
+        symbol_hits = search_safe_code_units(
+            query,
+            repo_path=repo_path,
+            limit=8,
+            index_scope=resolved_index_scope,
+        )
         dependency_context = search_dependencies(
             query,
             top_k=5,
             repo_path=repo_path,
-            project_tag=index_scope,
+            index_scope=resolved_index_scope,
         )
         if dependency_context:
             blocks.append(dependency_context)
         # new: trace call chain
-        call_trace = trace_call_chain(query, repo_path=repo_path, max_depth=3, fanout=3)
+        call_trace = trace_call_chain(
+            query,
+            repo_path=repo_path,
+            max_depth=3,
+            fanout=3,
+            index_scope=resolved_index_scope,
+        )
         if call_trace:
             blocks.append("=== CALL CHAIN TRACE ===")
             blocks.append(call_trace)
@@ -985,12 +1120,22 @@ Dependency Interpretation:
     if level in {"micro", "hybrid"}:
         if file_path:
             # dùng flow RAG hiện tại của bạn
-            micro_context = retrieve_file_context(query, file_path, repo_path=repo_path)
+            micro_context = retrieve_file_context(
+                query,
+                file_path,
+                repo_path=repo_path,
+                inventory=inventory,
+            )
             blocks.append("=== MICRO RAG CONTEXT ===")
             blocks.append(micro_context)
         else:
             # nếu không có file cụ thể, dùng code_units toàn repo
-            safe_hits = search_safe_code_units(query, repo_path=repo_path, limit=5, project_tag=index_scope)
+            safe_hits = search_safe_code_units(
+                query,
+                repo_path=repo_path,
+                limit=5,
+                index_scope=resolved_index_scope,
+            )
             
             if safe_hits:
                 blocks.append("=== MICRO CODE HITS ===")

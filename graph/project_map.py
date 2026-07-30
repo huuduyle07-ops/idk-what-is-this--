@@ -203,15 +203,45 @@ def build_project_map(
     file_summaries: List[dict],
     graph=None,
     repo_path: Optional[str] = None,
-    inventory: Optional[dict] = None,
+    inventory=None,
 ) -> str:
+    inventory_summary = None
+    if inventory is not None:
+        from core.repository_inventory import (
+            RepositoryInventory,
+            validate_repository_inventory,
+        )
+
+        if isinstance(inventory, RepositoryInventory):
+            if not repo_path:
+                raise ValueError(
+                    "repo_path is required with RepositoryInventory"
+                )
+            inventory_summary = validate_repository_inventory(
+                repo_path,
+                inventory,
+            ).summary()
+        elif isinstance(inventory, dict):
+            inventory_summary = dict(inventory)
+        else:
+            raise TypeError(
+                "inventory must be RepositoryInventory, dict, or None"
+            )
+
     if not file_summaries:
         repo_name = Path(repo_path).resolve().name if repo_path else "project"
         error_messages = []
-        if inventory:
-            if inventory.get("ok") is False:
-                error_messages.append("- Indexing failed: " + (inventory.get("error") or "unknown error"))
-            if inventory.get("indexable_count") == 0:
+        if inventory_summary:
+            if inventory_summary.get("ok") is False:
+                error_messages.append(
+                    "- Indexing failed: "
+                    + (
+                        inventory_summary.get("error")
+                        or inventory_summary.get("reason")
+                        or "unknown error"
+                    )
+                )
+            if inventory_summary.get("indexable_count") == 0:
                 error_messages.append("- repo has 0 indexable files (check extensions, folder_blacklist)")
         error_section = "\n".join(error_messages) if error_messages else ""
 
