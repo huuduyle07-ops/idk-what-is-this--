@@ -335,6 +335,7 @@ def test_run_a_cold_baseline_processes_every_file(tmp_path, monkeypatch):
         "code_index_reconciliation",
         "completion",
         "delta_shadow",
+        "delta_execution",
         "project_map",
         "phantom_limb",
         "traversal_diagnostics",
@@ -347,6 +348,7 @@ def test_run_a_cold_baseline_processes_every_file(tmp_path, monkeypatch):
         "symbols_stored",
         "code_index_reconciliation",
         "delta_shadow",
+        "delta_execution",
         "project_map",
         "phantom_limb",
         "traversal_diagnostics",
@@ -425,13 +427,8 @@ def test_run_a_cold_baseline_processes_every_file(tmp_path, monkeypatch):
     assert not manifest_path.exists()
 
 
-def test_run_b_no_change_still_reworks_every_file(tmp_path, monkeypatch):
-    """CURRENT behavior: a no-change re-index repeats 100% of the work.
-
-    Ideal incremental target would be: 0 parsed, 0 embedded,
-    0 replacements, 0 deletions. Production is not there yet; this
-    test pins the observed full-rework behavior as evidence.
-    """
+def test_run_b_no_change_skips_authoritative_work(tmp_path, monkeypatch):
+    """A verified applied state authorizes only the zero-delta fast path."""
     repo = _write_repo(tmp_path)
     identity_state = _confirmed_identity(repo)
     _set_manifest_root(monkeypatch, tmp_path)
@@ -444,7 +441,13 @@ def test_run_b_no_change_still_reworks_every_file(tmp_path, monkeypatch):
         identity_state=identity_state,
     )
 
-    _assert_full_rework(counters, expected_files=3)
+    assert counters.files_read == 0
+    assert counters.files_parsed == 0
+    assert counters.embeddings_generated == 0
+    assert counters.db_replacements == 0
+    assert counters.db_deletions == 0
+    assert counters.reconciliation_calls == 0
+    assert counters.repository_walks == 1
     shadow = result["delta_shadow"]
     assert shadow["manifest"]["load_status"] == "loaded"
     assert shadow["manifest"]["previous_applied_present"] is True
@@ -461,26 +464,29 @@ def test_run_b_no_change_still_reworks_every_file(tmp_path, monkeypatch):
     assert shadow["plan"]["deleted_file_actions"] == 0
     assert shadow["plan"]["unchanged_noop_recommendations"] == 3
     actual = shadow["production_execution"]["actual"]
-    assert actual["parsed_files"] == 3
-    assert actual["embedded_files"] == 3
-    assert actual["replacement_attempts"] == 3
-    assert shadow["production_execution"]["comparison"] == {
-        "available": True,
-        "matches_shadow_recommendation": False,
-        "expected_shadow_only_mismatch": True,
-        "unexpected_production_divergence": False,
-        "operational_failure_observed": False,
-        "shadow_plan_remains_valid": True,
-        "deletion": {
-            "planned_files": 0,
-            "actual_direct_file_deletions": 0,
-            "reconciliation_performed": True,
-            "actual_code_units_deleted": 0,
-            "actual_dependencies_deleted": 0,
-            "strategy_matches": True,
-            "path_parity_available": True,
-        },
+    assert actual["parsed_files"] == 0
+    assert actual["embedded_files"] == 0
+    assert actual["replacement_attempts"] == 0
+    execution = result["delta_execution"]
+    assert execution["fast_path_taken"] is True
+    assert execution["actual_work"] == {
+        "content_reads": 0,
+        "authoritative_index_parses": 0,
+        "auxiliary_parses": 0,
+        "parsed_files": 0,
+        "embedded_files": 0,
+        "replacement_calls": 0,
+        "deletion_calls": 0,
+        "reconciliation_calls": 0,
     }
+    assert result["completion"]["persistence_required"] is False
+    assert result["completion"]["persistence_attempted"] is False
+    assert result["completion"]["persistence_ok"] is True
+    assert result["completion"]["trusted_completion"] is True
+    assert result["completion"]["current_claim_basis"] == (
+        "verified_existing_applied_manifest"
+    )
+    assert execution["manifest_advanced"] is False
     assert manifest_path.read_bytes() == before
 
 
@@ -603,6 +609,7 @@ def test_mid_run_replacement_failure_is_explicit_and_latches_abort(
     manifest_path = _seed_applied_manifest(repo, identity_state)
     manifest_before = manifest_path.read_bytes()
     counters = _instrument(monkeypatch, tmp_path)
+    (repo / "alpha.py").write_text("# alpha changed\n", encoding="utf-8")
     database_url = (
         "postgresql://index-user:index-password@"
         "db.example.test/cattus?token=index-token"
@@ -685,6 +692,7 @@ def test_mid_run_embedding_failure_has_independent_failure_stage(
     manifest_path = _seed_applied_manifest(repo, identity_state)
     manifest_before = manifest_path.read_bytes()
     counters = _instrument(monkeypatch, tmp_path)
+    (repo / "alpha.py").write_text("# alpha changed\n", encoding="utf-8")
     embedding_calls: list[str] = []
 
     def fail_second_embedding(text):
@@ -726,6 +734,7 @@ def test_reconciliation_failure_never_advances_applied_manifest(
     manifest_path = _seed_applied_manifest(repo, identity_state)
     manifest_before = manifest_path.read_bytes()
     counters = _instrument(monkeypatch, tmp_path)
+    (repo / "alpha.py").write_text("# alpha changed\n", encoding="utf-8")
 
     def fail_reconciliation(**_kwargs):
         counters.reconciliation_calls += 1

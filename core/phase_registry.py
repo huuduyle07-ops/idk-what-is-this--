@@ -87,6 +87,7 @@ PHASE_ID_PREFIXES: tuple[str, ...] = (
     "MIRROR",
     "UX",
     "INDEX",
+    "CTX",
 )
 
 #: Registry-root fields that must be present.

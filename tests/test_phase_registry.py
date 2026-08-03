@@ -38,6 +38,7 @@ from pathlib import Path
 from core.phase_registry import (
     AUTOMATION_LEVELS,
     BUDGET_TIERS,
+    PHASE_ID_PREFIXES,
     PHASE_REGISTRY_GUARDRAIL_NOTE,
     REPORT_KIND,
     REQUIRED_PHASE_FIELDS,
@@ -535,8 +536,15 @@ def test_seed_registry_has_expected_phases():
         "INDEX.1D.3",
         "INDEX.1E.0",
         "INDEX.1E.1",
+        "INDEX.1E.2",
     } <= ids
-    assert len(data["phases"]) == 113
+    assert {
+        "CTX.SELECT.1",
+        "CTX.SEARCH.1",
+        "CTX.READ.1",
+        "CTX.PATCH.1",
+    } <= ids
+    assert len(data["phases"]) == 118
 
 
 def test_seed_registry_is_conservative():
@@ -558,12 +566,13 @@ def test_seed_registry_summary_counts():
         "ADOPT": 3,
         "AUTO": 3,
         "CMD": 11,
+        "CTX": 4,
         "DOGFOOD": 2,
         "VERIFY": 1,
         "EVAL": 11,
         "HARDEN": 9,
         "HUMAN": 5,
-        "INDEX": 7,
+        "INDEX": 8,
         "MIRROR": 15,
         "MODEL": 11,
         "OPS": 4,
@@ -636,6 +645,136 @@ def test_shadow_delta_dispatch_phase_is_complete_after_preflight():
     ]
 
 
+def test_context_selection_phase_is_complete_and_index_independent():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CTX.SELECT.1"]
+
+    assert phase["title"] == "Bounded Candidate Discovery & File Actionability Contract"
+    assert phase["track"] == "CTX"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == []
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    assert phase["expected_artifacts"] == [
+        ".agent/context_selection/candidate_selection_contract.json",
+        ".agent/context_selection/candidate_selection_contract.md",
+        "docs/designs/2026-08-01-direct-file-candidate-selection.md",
+    ]
+    assert {
+        "config.py",
+        "core/repository_inventory.py",
+        "core/repository_path_policy.py",
+        "core/source_file_policy.py",
+    } <= set(phase["allowed_files"])
+    assert {"database/", "graph/", "patching/", "core/indexer.py"} <= set(
+        phase["forbidden_files"]
+    )
+    assert "python -m pytest -q" not in phase["validation"]
+    assert any("CTX.READ.1" in note for note in phase["notes"])
+
+
+def test_context_search_phase_is_complete_bounded_and_candidate_only():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CTX.SEARCH.1"]
+
+    assert phase["title"] == "Bounded Lexical Search Runtime"
+    assert phase["track"] == "CTX"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["CTX.SELECT.1"]
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "medium"
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert {
+        "core/bounded_lexical_search.py",
+        "core/context_search_runtime.py",
+        "tests/test_bounded_lexical_search.py",
+        "tests/test_context_search_runtime.py",
+    } <= set(phase["allowed_files"])
+    assert {"database/", "graph/", "patching/", "core/indexer.py"} <= set(
+        phase["forbidden_files"]
+    )
+    assert any("CTX.READ.1" in note for note in phase["notes"])
+
+
+def test_context_read_phase_is_complete_bounded_and_never_writable():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CTX.READ.1"]
+
+    assert phase["title"] == "Bounded Direct File Read Runtime"
+    assert phase["track"] == "CTX"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["CTX.SELECT.1", "CTX.SEARCH.1"]
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "medium"
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert {
+        "core/direct_file_reader.py",
+        "core/direct_context_runtime.py",
+        "core/direct_read_receipt.py",
+        "tests/test_direct_file_reader.py",
+        "tests/test_direct_context_runtime.py",
+        "tests/test_direct_read_receipt.py",
+    } <= set(phase["allowed_files"])
+    assert {"database/", "graph/", "patching/", "core/indexer.py"} <= set(
+        phase["forbidden_files"]
+    )
+    assert any("CTX.PATCH.1" in note for note in phase["notes"])
+
+
+def test_context_patch_phase_is_complete_pure_and_never_writable():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CTX.PATCH.1"]
+
+    assert phase["title"] == "Direct Context Patch Candidate Gate"
+    assert phase["track"] == "CTX"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == [
+        "CTX.SELECT.1",
+        "CTX.SEARCH.1",
+        "CTX.READ.1",
+    ]
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "medium"
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert {
+        "core/file_patchability.py",
+        "core/direct_patch_candidate_gate.py",
+        "core/proposed_patch_set.py",
+        "tests/test_file_patchability.py",
+        "tests/test_direct_patch_candidate_gate.py",
+        "tests/test_proposed_patch_set.py",
+    } <= set(phase["allowed_files"])
+    assert {"database/", "graph/", "patching/", "core/indexer.py"} <= set(
+        phase["forbidden_files"]
+    )
+    assert any("CTX.APPLY.0" in note for note in phase["notes"])
+
+
 def test_early_error_hardening_completes_before_real_dogfood_resumes():
     data = load_phase_registry(str(_SEED_PATH))
     by_id = {phase["phase_id"]: phase for phase in data["phases"]}
@@ -666,6 +805,7 @@ def test_enums_match_spec():
     )
     assert BUDGET_TIERS == ("local_only", "cheap_api_allowed", "strong_model_requires_approval", "blocked")
     assert RISK_LEVELS == ("low", "medium", "high", "blocked")
+    assert "CTX" in PHASE_ID_PREFIXES
     assert set(REQUIRED_ROOT_FIELDS) == {"schema_version", "updated_at", "phases"}
 
 

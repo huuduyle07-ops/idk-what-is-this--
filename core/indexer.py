@@ -48,9 +48,10 @@ from core.index_delta_shadow import (
 from core.dependency_target import (
     resolve_dependency_target,
 )
-from graph.project_map import summarize_file, build_project_map, write_project_map
+from graph.project_map import summarize_file, build_project_map, write_project_map, load_project_map
 from core.security import is_safe_path
 from core.repo_librarian import (
+    load_phantom_limb_report,
     write_phantom_limb_report,
 )
 from core.repository_inventory import (
@@ -60,7 +61,8 @@ from core.repository_inventory import (
     should_skip_index_filename,
     validate_repository_inventory,
 )
-from core.code_dna import compute_dna, save_dna
+from core.code_dna import compute_dna, save_dna, load_dna
+from core.index_no_change_fast_path import evaluate_no_change_fast_path
 from core.phantom_limb import scan as scan_phantom_limb
 import json
 
@@ -138,6 +140,193 @@ def index_repository(
         ),
         index_entries=repo_entries,
     )
+    embedding_enabled = (
+        os.getenv("INDEX_USE_EMBEDDINGS", "true").strip().lower()
+        not in {"false", "0", "no"}
+    )
+    fast_path = evaluate_no_change_fast_path(
+        identity_state=identity_state,
+        manifest_load=delta_shadow.get("manifest", {}),
+        delta_shadow=delta_shadow,
+        execution_plan=delta_shadow.get("plan", {}),
+        embedding_runtime={"enabled": embedding_enabled},
+        persistence_mode={
+            "enabled": persistence_enabled,
+            "available": persistence_enabled,
+        },
+    )
+    if fast_path.status == "identity_blocked" and identity_state is not None:
+        # Full processing may still produce non-authoritative diagnostics, but
+        # an unconfirmed/blocked identity never receives canonical DB authority.
+        db_available = False
+        persistence_skip_reason = "identity_blocked"
+    # Web/control currently requires a newly materialized ProgramGraph. There
+    # is no persisted graph receipt, so that consumer explicitly fails closed
+    # to legacy full processing. Direct/CLI runs may reuse bounded auxiliaries.
+    auxiliary_fallback = bool(include_operation_artifacts)
+    if fast_path.eligible and not auxiliary_fallback:
+        from config import get_agent_dir
+        cached_dna = load_dna(repo_path)
+        cached_map = load_project_map(repo_path)
+        map_path = (
+            str(get_agent_dir(repo_path) / "PROJECT_MAP.md")
+            if cached_map
+            else None
+        )
+        phantom_path_obj = get_agent_dir(repo_path) / "PHANTOM_LIMB.json"
+        phantom_path = str(phantom_path_obj) if phantom_path_obj.exists() else None
+        phantom_result = load_phantom_limb_report(repo_path)
+        counts = delta_shadow["delta"]["counts"]
+        reconciliation = {
+            "performed": False,
+            "dependencies_deleted": 0,
+            "code_units_deleted": 0,
+            "skipped_reason": "not_required_verified_unchanged",
+        }
+        delta_execution = {
+            "mode": "verified_no_change_fast_path",
+            "authority": "production",
+            "fast_path_eligible": True,
+            "fast_path_taken": True,
+            "fallback_required": False,
+            "fallback_reason": None,
+            "production_execution": "verified_no_change_fast_path",
+            "counts": dict(counts),
+            "actual_work": {
+                "content_reads": 0,
+                "authoritative_index_parses": 0,
+                "auxiliary_parses": 0,
+                "parsed_files": 0,
+                "embedded_files": 0,
+                "replacement_calls": 0,
+                "deletion_calls": 0,
+                "reconciliation_calls": 0,
+            },
+            "auxiliary": {
+                "code_dna": (
+                    "reused"
+                    if cached_dna is not None
+                    else "not_available_optional"
+                ),
+                "project_map": (
+                    "reused" if map_path else "not_available_optional"
+                ),
+                "phantom_limb": (
+                    "reused" if phantom_path else "not_available_optional"
+                ),
+                "program_graph": "not_requested",
+            },
+            "manifest_saved": False,
+            "manifest_advanced": False,
+            "applied_manifest_unchanged": True,
+            "trusted_completion": True,
+            "trusted_current_claim_allowed": True,
+            "current_claim_basis": "verified_existing_applied_manifest",
+        }
+        delta_shadow = dict(delta_shadow)
+        delta_shadow["authoritative"] = True
+        delta_shadow["mode"] = "verified_no_change_fast_path"
+        delta_shadow["production_execution"] = {
+            **dict(delta_shadow.get("production_execution", {})),
+            "still_full_processing": False,
+            "plan_controls_execution": True,
+            "actual": {
+                "parsed_files": 0,
+                "embedded_files": 0,
+                "replacement_attempts": 0,
+                "direct_file_deletions": 0,
+                "reconciliation_performed": False,
+                "code_units_deleted": 0,
+                "dependencies_deleted": 0,
+            },
+        }
+        completion = {
+            "contract_version": "index_completion_v1",
+            "status": "complete",
+            "identity_status": "confirmed",
+            "repository_id": delta_shadow.get("repository_id"),
+            "active_index_scope": index_scope,
+            "architecture_epoch": delta_shadow.get("architecture_epoch"),
+            "identity_state_revision": getattr(
+                identity_state,
+                "state_revision",
+                None,
+            ),
+            "completion_run_id": completion_run_id,
+            "observed_state_id": observed_state_id,
+            "processing_ok": True,
+            "persistence_required": False,
+            "persistence_attempted": False,
+            "persistence_ok": True,
+            "persistence_aborted_after_failure": False,
+            "unattempted_required_files": [],
+            "reconciliation_required": False,
+            "reconciliation_attempted": False,
+            "reconciliation_ok": True,
+            "reconciliation_skipped_reason": (
+                "not_required_verified_unchanged"
+            ),
+            "auxiliary_graph_ok": None,
+            "trusted_completion": True,
+            "manifest_advance_allowed": False,
+            "trusted_current_claim_allowed": True,
+            "current_claim_requires_manifest_commit": False,
+            "current_claim_basis": "verified_existing_applied_manifest",
+            "failure_stage": None,
+            "failed_files": [],
+            "reasons": ["not required and proven unchanged"],
+            "warnings": [],
+            "file_outcomes": [
+                {
+                    "file_path": path,
+                    "action": "unchanged",
+                    "processing_status": "not_required",
+                    "embedding_status": "not_required",
+                    "persistence_status": "skipped_unchanged",
+                    "embedding_required": False,
+                    "error_category": None,
+                    "error_message": None,
+                }
+                for path in delta_shadow.get("delta", {}).get(
+                    "unchanged",
+                    (),
+                )
+            ],
+            "auxiliary_outcomes": [],
+            "evidence_validated": True,
+            "file_outcome_count": counts["unchanged"],
+            "file_outcome_sample": list(
+                delta_shadow.get("delta", {}).get("unchanged", ())
+            ),
+        }
+        traversal_diagnostics = operation_inventory.diagnostics(
+            inventory_reuse={
+                "code_dna": cached_dna is not None,
+                "dependency_resolver": False,
+                "graph_builder": False,
+                "indexer": True,
+                "manifest": True,
+                "project_map": map_path is not None,
+            }
+        )
+        return {
+            "repo_path": repo_path,
+            "project_tag": semantic_project_tag,
+            "index_scope": index_scope,
+            "files_processed": 0,
+            "symbols_stored": 0,
+            "code_index_reconciliation": reconciliation,
+            "completion": completion,
+            "delta_shadow": delta_shadow,
+            "delta_execution": delta_execution,
+            "project_map": map_path,
+            "phantom_limb": {
+                "report": phantom_path,
+                "count": int(phantom_result.get("count", 0)),
+                "findings": list(phantom_result.get("findings", ())),
+            },
+            "traversal_diagnostics": traversal_diagnostics,
+        }
     if not inventory_summary["ok"]:
         error = RuntimeError(
             "Indexing aborted: repo has 0 indexable files.\n"
@@ -443,7 +632,14 @@ def index_repository(
             else:
                 # No DB: still index for project map / control / phantom limb,
                 # but skip persistence and embeddings.
-                if persistence_enabled:
+                if (
+                    persistence_skip_reason == "identity_blocked"
+                    and identity_state is not None
+                ):
+                    embedding_status = EMBEDDING_STATUS_BLOCKED
+                    file_persistence_status = FILE_PERSISTENCE_BLOCKED
+                    file_error_category = "identity_blocked"
+                elif persistence_enabled:
                     embedding_status = EMBEDDING_STATUS_PENDING
                     file_persistence_status = FILE_PERSISTENCE_PENDING
                     unattempted_required_files.append(rel_path)
@@ -787,6 +983,26 @@ def index_repository(
             "project_map": map_path is not None,
         }
     )
+    completion_payload = completion.to_dict()
+    if (
+        fast_path.status == "identity_blocked"
+        and identity_state is not None
+        and not processing_failed_files
+    ):
+        completion_payload.update({
+            "status": "identity_blocked",
+            "failure_stage": "identity",
+            "trusted_completion": False,
+            "manifest_advance_allowed": False,
+            "trusted_current_claim_allowed": False,
+            "reasons": [
+                "identity confirmation does not authorize canonical mutation"
+            ],
+        })
+    production_actual = delta_shadow.get("production_execution", {}).get(
+        "actual",
+        {},
+    )
     result = {
         "repo_path": repo_path,
         "project_tag": semantic_project_tag,
@@ -794,8 +1010,63 @@ def index_repository(
         "files_processed": files_indexed,
         "symbols_stored": units_saved,
         "code_index_reconciliation": reconciliation,
-        "completion": completion.to_dict(),
+        "completion": completion_payload,
         "delta_shadow": delta_shadow,
+        "delta_execution": {
+            "mode": "legacy_full_processing",
+            "authority": "production",
+            "fast_path_eligible": fast_path.eligible,
+            "fast_path_taken": False,
+            "fallback_required": True,
+            "fallback_reason": (
+                "required_program_graph_unavailable"
+                if auxiliary_fallback and fast_path.eligible
+                else fast_path.status
+            ),
+            "production_execution": "legacy_full_processing",
+            "counts": dict(
+                delta_shadow.get("delta", {}).get("counts", {})
+            ),
+            "actual_work": {
+                "content_reads": None,
+                "authoritative_index_parses": production_actual.get(
+                    "parsed_files",
+                    0,
+                ),
+                "auxiliary_parses": None,
+                "parsed_files": production_actual.get(
+                    "parsed_files",
+                    0,
+                ),
+                "embedded_files": production_actual.get(
+                    "embedded_files",
+                    0,
+                ),
+                "replacement_calls": production_actual.get(
+                    "replacement_attempts",
+                    0,
+                ),
+                "deletion_calls": production_actual.get(
+                    "direct_file_deletions",
+                    0,
+                ),
+                "reconciliation_calls": int(
+                    bool(
+                        production_actual.get(
+                            "reconciliation_performed",
+                            False,
+                        )
+                        or str(
+                            reconciliation.get("skipped_reason", "")
+                        ).startswith("reconciliation_failed")
+                    )
+                ),
+            },
+            "global_zero_parsing_claimed": False,
+            "manifest_saved": False,
+            "manifest_advanced": False,
+            "trusted_completion": completion.trusted_completion,
+        },
         "project_map": map_path,
         "phantom_limb": {
             "report": phantom_path,

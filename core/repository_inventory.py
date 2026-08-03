@@ -2,17 +2,20 @@ from __future__ import annotations
 
 import os
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Mapping
 
 from config import LANGUAGE_MAP, SUPPORTED_EXTENSIONS
 from core.repo_ignore import RepoIgnorePolicy, compute_policy_fingerprint
+from core.repository_path_policy import (
+    MAX_CANONICAL_RELATIVE_PATH_LENGTH,
+    is_safe_repository_relative_path,
+)
 from core.security import has_safe_path_components, is_safe_path
 
 
 CANONICAL_WALK_SITE = "core.repo_librarian._walk_policy_files"
-MAX_CANONICAL_RELATIVE_PATH_LENGTH = 1024
 _CANONICAL_INDEX_SKIP_NAMES = frozenset(
     {
         "session_log.txt",
@@ -23,11 +26,41 @@ _CANONICAL_INDEX_SKIP_NAMES = frozenset(
 
 
 @dataclass(frozen=True, slots=True)
+class RepositoryFileIdentity:
+    """Descriptor-comparable identity captured with repository membership."""
+
+    device: int
+    inode: int
+    mode: int
+    size_bytes: int
+    modified_ns: int
+    changed_ns: int
+    created_ns: int = 0
+
+    @classmethod
+    def from_stat_result(cls, value: os.stat_result) -> "RepositoryFileIdentity":
+        return cls(
+            device=int(value.st_dev),
+            inode=int(value.st_ino),
+            mode=int(value.st_mode),
+            size_bytes=int(value.st_size),
+            modified_ns=int(value.st_mtime_ns),
+            changed_ns=int(value.st_ctime_ns),
+            created_ns=int(getattr(value, "st_birthtime_ns", 0)),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class RepositoryEntry:
     """One immutable repository-membership entry."""
 
     absolute_path: Path
     relative_path: Path
+    file_identity: RepositoryFileIdentity | None = field(
+        default=None,
+        compare=False,
+        repr=False,
+    )
 
     def as_pair(self) -> tuple[Path, Path]:
         return self.absolute_path, self.relative_path
@@ -518,6 +551,7 @@ def _validate_entries(
             RepositoryEntry(
                 absolute_path=absolute,
                 relative_path=Path(relative.as_posix()),
+                file_identity=_capture_file_identity(absolute),
             )
         )
 
@@ -533,6 +567,15 @@ def _validate_entries(
             f"inventory {label} must use deterministic path ordering"
         )
     return ordered
+
+
+def _capture_file_identity(path: Path) -> RepositoryFileIdentity | None:
+    """Capture identity without making unreadable/missing entries look valid."""
+
+    try:
+        return RepositoryFileIdentity.from_stat_result(path.stat())
+    except OSError:
+        return None
 
 
 def _is_default_indexable(entry: RepositoryEntry) -> bool:
@@ -604,62 +647,6 @@ def is_canonical_index_relative_path(
         and should_include_infra_file(None, rendered)
         and has_safe_path_components(relative)
     )
-
-
-def is_safe_repository_relative_path(
-    value: str | os.PathLike[str],
-) -> bool:
-    """Validate one portable, canonical repository-relative spelling."""
-    rendered = (
-        value
-        if isinstance(value, str)
-        else Path(value).as_posix()
-    )
-    if (
-        not isinstance(rendered, str)
-        or not rendered
-        or len(rendered) > MAX_CANONICAL_RELATIVE_PATH_LENGTH
-        or "\\" in rendered
-        or "\x00" in rendered
-        or ":" in rendered
-        or any(
-            ord(char) < 32 or ord(char) == 127
-            for char in rendered
-        )
-    ):
-        return False
-    path = Path(rendered)
-    if (
-        path.is_absolute()
-        or path.drive
-        or not path.parts
-        or path.as_posix() != rendered
-        or any(part in {"", ".", ".."} for part in path.parts)
-    ):
-        return False
-
-    reserved_names = {
-        "CON",
-        "PRN",
-        "AUX",
-        "NUL",
-        "CONIN$",
-        "CONOUT$",
-        *(f"COM{number}" for number in range(1, 10)),
-        *(f"LPT{number}" for number in range(1, 10)),
-    }
-    is_reserved = getattr(os.path, "isreserved", None)
-    for part in path.parts:
-        if callable(is_reserved) and is_reserved(part):
-            return False
-        if (
-            part.rstrip(" .") != part
-            or any(char in part for char in '?*|<>"')
-            or part.split(".", 1)[0].rstrip(" .").upper()
-            in reserved_names
-        ):
-            return False
-    return True
 
 
 def _canonical_path_key(path: Path) -> str:

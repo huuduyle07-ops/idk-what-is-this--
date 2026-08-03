@@ -3,6 +3,8 @@ import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
+from core.source_file_policy import SUPPORTED_EXTENSIONS
+
 # Tải biến môi trường từ .env
 load_dotenv()
 
@@ -34,32 +36,6 @@ if not DEEPSEEK_API_KEY:
 # --- APP SETTINGS ---
 # OUTPUT_FILE is set after BASE_DIR is defined below (anchors log to AI_project root).
 PATCH_LOOP_MAX = 2
-
-# --- FILE DISCOVERY ---
-SUPPORTED_EXTENSIONS = {
-    # text / docs
-    ".txt", ".md", ".pdf", ".docx", ".json",
-    # python
-    ".py",
-    # rust
-    ".rs",
-    # mojo
-    ".mojo",
-    # lua
-    ".lua",
-    # c-family
-    ".c", ".h", ".cpp", ".cxx", ".cc", ".hpp", ".hxx",
-    # csharp
-    ".cs",
-    # web (JS/TS + React)
-    ".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx",
-    # markup / styles
-    ".html", ".htm", ".css", ".scss", ".sass",
-    # go
-    ".go",
-    # java / kotlin
-    ".java", ".kt", ".kts",
-}
 
 FOLDER_BLACKLIST = {
     ".git", "node_modules", "venv", "__pycache__", ".vscode",

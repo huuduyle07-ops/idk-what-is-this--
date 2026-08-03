@@ -18,7 +18,7 @@ The completed roadmap arc is frozen at the following checkpoint.
 - ROAD.2 added the phase picker and night candidate report.
 - ROAD.3 completed the post-MODEL checkpoint audit.
 - ROAD.4 completed the post-EVAL/CMD checkpoint audit (verifies EVAL.1–3 and CMD.1–4).
-- The phase registry is valid (113 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 9 HARDEN + 4 OPS + 2 DOGFOOD + 1 VERIFY + 15 MIRROR + 27 UX + 7 INDEX).
+- The phase registry is valid (118 phases: 3 ADOPT + 4 ROAD + 3 AUTO + 11 MODEL + 11 EVAL + 5 HUMAN + 11 CMD + 9 HARDEN + 4 OPS + 2 DOGFOOD + 1 VERIFY + 15 MIRROR + 27 UX + 8 INDEX + 4 CTX).
 - The phase picker recommends `DOGFOOD.1B` - Real Operator Run Evaluation. `VERIFY.TEST.1` remains proposed but waits for DOGFOOD.1B to complete.
 
 ### AUTO: Remote Safety Contracts, Dry Run Only
@@ -225,6 +225,171 @@ The completed roadmap arc is frozen at the following checkpoint.
   reads remain a separate future security-hardening concern.
 - Recommended next phase is `INDEX.1E.2` — Unchanged File Fast Path.
   `INDEX.1E.2` is not started or authorized by `INDEX.1E.1`.
+
+### CTX: Bounded Direct Context Selection Boundary
+
+- `CTX.SELECT.1` completed the pure Bounded Candidate Discovery and File
+  Actionability Contract. It consumes already-supplied repository inventory
+  records, task terms, filename evidence, and bounded lexical-search results;
+  it does not enumerate or read production file contents.
+- Direct context remains a first-class fallback when canonical indexing is
+  unavailable, unsupported, unnecessary, or blocked. A safe readable file is
+  not excluded merely because its extension lacks canonical parser support.
+- Readability, parser support, canonical indexability, direct-read policy,
+  editability, and understanding confidence are independent capabilities.
+  `SUPPORTED_EXTENSIONS` still controls canonical parser/index eligibility and
+  was not broadened or narrowed by this phase.
+- Security remains a hard boundary. Source and `.env.example` records may be
+  auto-read candidates, `.env` requires explicit human approval, and private
+  keys, credential/session stores, unmanaged binaries, outside-root paths,
+  symlink escapes, and repository-forbidden paths cannot be selected
+  automatically regardless of relevance.
+- Candidate sets preserve the strict hierarchy from repository inventory to
+  candidate files, proposed read files, proposed patch files, and separately
+  approved writable files. This phase produces only the middle three sets and
+  never produces write authorization.
+- Repository-size tiers are deterministic and configurable: small is 0-30
+  readable files, medium is 31-300, and large is more than 300. Small
+  repositories may expose all safe relative paths; medium and large
+  repositories use bounded synopses, evidence, and capped candidate lists.
+- Candidate discovery combines inventory, filename/path evidence, supplied
+  bounded lexical matches, direct-reference evidence, validation/test pairing,
+  and integer actionability scoring. It uses no vector similarity.
+- Lexical-search planning is capped at 200 matches, 40 matched files, 240
+  characters per match, and two expansion rounds. The phase defines requests
+  and consumes supplied results; it does not execute grep, ripgrep, a shell, or
+  a subprocess, and sensitive or binary matches expose no excerpt.
+- Every candidate receives an explainable 0-100 integer actionability score
+  with deterministic stage history and deduplicated evidence. Relevance is not
+  read authority and is not write authority; editability and security states
+  remain hard gates over every score.
+- Proposed read sets are capped at eight files and 1 MiB of estimated bytes,
+  prefer target/dependency/test/configuration diversity, and fail closed or
+  recommend a smaller bounded read when size is unknown or excessive.
+- A proposed patch candidate must be readable, repository-contained,
+  editability-permitted, sufficiently evidenced beyond filename similarity,
+  non-generated, non-vendor, non-sensitive, and linked to validation or an
+  explicit validation-gap warning. Every such record carries
+  `write_authority=false`.
+- Canonical extension metadata and portable repository-relative path-shape
+  validation were extracted into side-effect-free modules without changing
+  canonical inventory membership, indexing behavior, patch safety, or human
+  approval behavior.
+- Selection works without a vector database, embeddings, embedding signatures,
+  canonical manifests, or confirmed canonical identity, including while
+  identity is uninitialized, awaiting confirmation, awaiting major-change
+  confirmation, or blocked. It performs no manifest, database, graph,
+  model/API, embedding, patch, or approval operation.
+- Deterministic JSON and Markdown contracts are generated at
+  `.agent/context_selection/candidate_selection_contract.json` and
+  `.agent/context_selection/candidate_selection_contract.md`; the durable
+  design record is
+  `docs/designs/2026-08-01-direct-file-candidate-selection.md`.
+- `CTX.SEARCH.1` completed the Bounded Lexical Search Runtime. It executes the
+  literal requests produced by CTX.SELECT.1 using only the supplied immutable
+  `RepositoryInventory`; repository membership traversal remains zero
+  additional and no second ignore or scanning subsystem was introduced.
+- Inventory members now carry immutable descriptor-comparable identity. Search
+  opens a validated repository-relative path read-only, compares the opened
+  descriptor with inventory-time device/inode/mode/size/mtime evidence, and
+  rechecks the descriptor after the scan. Replaced, changed, missing,
+  outside-root, and symlink-escaped entries return no excerpt.
+- Search reads incrementally in bounded UTF-8 chunks and caps terms, path
+  scopes, total matches, matched files, per-file matches, excerpts, per-file
+  and total bytes, retained line chunks, considered files, and returned file
+  outcomes. Every reached cap has explicit deterministic truncation metadata.
+- Literal case-sensitive and insensitive matching preserves request-term and
+  candidate-path priority, then repository-relative path, line, and offset.
+  Whole-token evidence is metadata only; all understanding remains raw text
+  and no symbol or AST match is claimed.
+- Unsupported readable text, including a one-file project with an unknown
+  extension, is searchable without canonical parser support. Known or detected
+  binary content, sensitive filenames, credential stores, hard-excluded
+  temporary paths, vendor content, and generated content without an explicit
+  search-only flag fail closed and expose no content.
+- Results project directly into the existing CTX.SELECT.1 supplied lexical
+  result contract. Every layer declares
+  `execution_authority=candidate_discovery_only`, `read_authority=false`, and
+  `write_authority=false`; relevance evidence does not authorize direct reads
+  or patches.
+- CTX.SEARCH.1 uses no vector database, embeddings, canonical manifest,
+  canonical index, confirmed identity, database operation, model/API call,
+  shell command, subprocess search, or repository write. Its design record is
+  `docs/designs/2026-08-01-bounded-lexical-search-runtime.md`.
+- `CTX.READ.1` completed the Bounded Direct File Read Runtime. It accepts only
+  paths present in both the supplied immutable `RepositoryInventory` and the
+  CTX.SELECT proposed-read set; optional match locations are validated against
+  supplied CTX.SEARCH evidence, and the read set is never expanded.
+- Four deterministic modes are available: `full_file`, `match_windows`,
+  `explicit_ranges`, and `header_and_matches`. Overlapping windows and ranges
+  merge deterministically, with default ceilings of eight files, 1 MiB total
+  returned content, 256 KiB per file, 4,000 returned lines, eight match
+  windows, eight merged ranges, and bounded excerpt lines.
+- Direct reads reuse the CTX.SEARCH descriptor boundary, including
+  repository-relative containment, symlink/special-file rejection,
+  `O_NOFOLLOW` where available, inventory identity comparison on the opened
+  descriptor, incremental bounded reads, and identity revalidation afterward.
+- UTF-8, UTF-8 with BOM, and ASCII-as-UTF-8 are supported. Invalid UTF-8 and
+  binary/opaque files return no content. Unsupported readable extensions,
+  including a one-file project, produce usable `raw_text_only` context without
+  parser, AST, semantic, or repository-completeness claims.
+- `.env` requires explicit approval and private keys or credential stores are
+  forbidden; neither returns content. `.env.example` remains auto-readable
+  within budget. Relevance cannot override sensitive-file policy.
+- Every successful read emits an immutable task-operation receipt with exact
+  ranges, scanned/returned counters, descriptor identity, digest scope,
+  decoding, and `read_authority_granted=true`, while `write_authority` and
+  `patch_authority` remain false. The pure freshness helper reports `fresh`,
+  `changed`, `deleted`, `replaced`, or `unverifiable`.
+- The Direct File Context is ephemeral and declares zero indexing, vector,
+  embedding, graph, database, parser, model/API, traversal, search-expansion,
+  write, or patch operations. Canonical identity confirmation and INDEX.1E.2
+  are not prerequisites for safe direct reads.
+- The durable design record is
+  `docs/designs/2026-08-02-bounded-direct-file-read-runtime.md`.
+- `CTX.PATCH.1` completed the pure Direct Context Patch Candidate Gate. It
+  consumes the supplied inventory, CTX.SELECT relevance, successful CTX.READ
+  receipts, targeted current file identities, deterministic patchability
+  evidence, bounded change intentions, and validation mappings; it performs no
+  content read, repository traversal, validation execution, patch generation,
+  or write.
+- Actionability remains the independent answer to file relevance.
+  Patchability is a separate explainable 0-100 integer score for bounded,
+  testable modification suitability. Canonical weights, per-dimension caps,
+  stable evidence-id deduplication, and zero-weight handling of upstream
+  filename/lexical evidence prevent CTX.SELECT, CTX.SEARCH, and CTX.READ facts
+  from being counted twice.
+- Task id, operation id, inventory identity, receipt path, successful read
+  state, and relevant line coverage must agree. The current supplied identity
+  is compared through the stable `fresh`, `changed`, `deleted`, `replaced`, or
+  `unverifiable` receipt decision; only `fresh` can enter a proposed patch set.
+- Capability and security states override every score. Only `editable` and
+  `editable_with_review` may qualify. Read-only content remains supporting;
+  generated output redirects to its authoritative source; sensitive,
+  outside-scope, opaque, and forbidden paths remain blocked. Prior read
+  approval for `.env` does not create patch candidacy.
+- Unsupported safe text may qualify with review and explicit
+  `raw_text_only`, `parser_support=unsupported`, `AST_claimed=false`, and
+  `dependency_completeness_claimed=false` metadata. Unknown blast radius never
+  defaults to low, while high or critical impact uses a dedicated review state.
+- File-level intentions contain only a bounded summary, target ranges,
+  expected behavior, and preservation constraints. Diff, patch, command, and
+  filesystem-write fields are rejected. Validation commands are mapped but
+  never executed; a gap is explicit and penalized.
+- Proposed sets select a minimal coherent implementation target, required
+  adjacent sources, and separately governed test candidates, with hard maxima
+  of four source files, four validation files, and eight files total. Equally
+  plausible unrelated strategies or over-limit required sets produce
+  `human_file_selection_required` instead of arbitrary selection.
+- Every result and file retains `write_authority=false`,
+  `patch_application_authority=false`, `human_approval_required=true`, and
+  `patch_safety_bypassed=false`. Test files additionally retain
+  `test_modification_requires_separate_policy=true`.
+- The durable design record is
+  `docs/designs/2026-08-02-direct-context-patch-candidate-gate.md`.
+- Recommended next phase is `CTX.APPLY.0` - Direct Context Patch Safety
+  Attachment Contract. It must attach CTX candidates to the existing patch
+  safety and human-approval path and must not create an independent write path.
 
 ## 3. Design Principles
 
