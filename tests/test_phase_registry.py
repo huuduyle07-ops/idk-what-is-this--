@@ -543,8 +543,9 @@ def test_seed_registry_has_expected_phases():
         "CTX.SEARCH.1",
         "CTX.READ.1",
         "CTX.PATCH.1",
+        "CTX.APPLY.0",
     } <= ids
-    assert len(data["phases"]) == 118
+    assert len(data["phases"]) == 119
 
 
 def test_seed_registry_is_conservative():
@@ -566,7 +567,7 @@ def test_seed_registry_summary_counts():
         "ADOPT": 3,
         "AUTO": 3,
         "CMD": 11,
-        "CTX": 4,
+        "CTX": 5,
         "DOGFOOD": 2,
         "VERIFY": 1,
         "EVAL": 11,
@@ -773,6 +774,40 @@ def test_context_patch_phase_is_complete_pure_and_never_writable():
         phase["forbidden_files"]
     )
     assert any("CTX.APPLY.0" in note for note in phase["notes"])
+
+
+def test_context_apply_phase_is_complete_and_remains_non_authorizing():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CTX.APPLY.0"]
+
+    assert phase["title"] == "Direct Context Patch Safety Attachment"
+    assert phase["track"] == "CTX"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == [
+        "CTX.SELECT.1",
+        "CTX.SEARCH.1",
+        "CTX.READ.1",
+        "CTX.PATCH.1",
+    ]
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "medium"
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert {
+        "core/direct_context_patch_attachment.py",
+        "core/patch_safety.py",
+        "tests/test_direct_context_patch_attachment.py",
+        "docs/designs/2026-08-02-direct-context-patch-safety-attachment.md",
+    } <= set(phase["allowed_files"])
+    assert {"database/", "graph/", "patching/", "web/", "core/indexer.py"} <= set(
+        phase["forbidden_files"]
+    )
+    assert any("CTX.APPLY.1" in note for note in phase["notes"])
 
 
 def test_early_error_hardening_completes_before_real_dogfood_resumes():

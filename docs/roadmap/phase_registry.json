@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-08-02T00:00:00+07:00",
+  "updated_at": "2026-08-14T00:00:00+09:00",
   "phases": [
     {
       "phase_id": "ROAD.1",
@@ -6646,7 +6646,92 @@
         "The minimal planner permits at most four source files, four validation files, and eight total files. Equally plausible unrelated strategies or required coherent sets above a limit require human file selection instead of arbitrary truncation.",
         "Test files retain test_modification_requires_separate_policy=true. Every file and result has write_authority=false, patch_application_authority=false, human_approval_required=true, and patch_safety_bypassed=false.",
         "The phase performs zero repository traversal, production content reads, validation executions, filesystem writes, patch generation or application, database or graph operations, indexing, embeddings, model calls, or API calls.",
-        "Recommended next phase is CTX.APPLY.0 - Direct Context Patch Safety Attachment Contract. It must attach candidates to the existing patch-safety and human-approval system and must not create an independent write path."
+        "CTX.APPLY.0 attaches only typed, freshly revalidated CTX.PATCH.1 candidates to the existing patch-safety review boundary without creating an apply path or granting write authority."
+      ]
+    },
+    {
+      "phase_id": "CTX.APPLY.0",
+      "title": "Direct Context Patch Safety Attachment",
+      "track": "CTX",
+      "status": "complete",
+      "summary": "Pure, fail-closed attachment adapter that binds typed CTX.PATCH.1 candidates, immutable CTX.READ receipts, supplied repository identity and capabilities, and targeted freshness evidence to the existing patch-safety review boundary without generating or applying patches.",
+      "automation_level": "LOCAL_1_PREPARE",
+      "budget_tier": "local_only",
+      "risk_level": "medium",
+      "allowed_files": [
+        "core/direct_context_patch_attachment.py",
+        "core/patch_safety.py",
+        "core/direct_patch_candidate_gate.py",
+        "core/direct_read_receipt.py",
+        "core/file_capabilities.py",
+        "core/proposed_patch_set.py",
+        "core/repository_identity.py",
+        "core/repository_inventory.py",
+        "core/repository_path_policy.py",
+        "tests/test_direct_context_patch_attachment.py",
+        "tests/test_direct_patch_candidate_gate.py",
+        "tests/test_direct_read_receipt.py",
+        "tests/test_patch_safety.py",
+        "tests/test_patch_safety_chokepoint.py",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "docs/designs/2026-08-02-direct-context-patch-safety-attachment.md",
+        "docs/roadmap/phase_registry.json",
+        "docs/AI_Coding_Agent_Mentor_Operating_Roadmap_2026-06-Next.md"
+      ],
+      "forbidden_files": [
+        ".env",
+        ".git",
+        ".agent/private",
+        "secrets",
+        "credentials",
+        "Dockerfile",
+        "docker-compose.yml",
+        "benchmarks/cases/",
+        "patching/",
+        "database/",
+        "graph/",
+        "web/",
+        "core/indexer.py",
+        "core/index_manifest.py",
+        "core/index_execution.py",
+        "core/index_completion.py",
+        "core/retriever.py"
+      ],
+      "validation": [
+        "python -m pytest tests/test_direct_context_patch_attachment.py tests/test_direct_patch_candidate_gate.py tests/test_direct_read_receipt.py tests/test_patch_safety.py tests/test_patch_safety_chokepoint.py -q",
+        "python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q",
+        "python -m compileall core scripts tests",
+        "python scripts/validate_phase_registry.py --registry docs/roadmap/phase_registry.json --output-root .agent/roadmap",
+        "python scripts/create_phase_picker_report.py --registry docs/roadmap/phase_registry.json --output-root .agent/roadmap",
+        "python benchmarks/run_benchmarks.py --check",
+        "git diff --check"
+      ],
+      "human_approval_required": true,
+      "merge_allowed": false,
+      "network_allowed": false,
+      "model_calls_allowed": false,
+      "writes_real_repo": false,
+      "requires_sandbox": false,
+      "prerequisites": [
+        "CTX.SELECT.1",
+        "CTX.SEARCH.1",
+        "CTX.READ.1",
+        "CTX.PATCH.1"
+      ],
+      "expected_artifacts": [
+        "core/direct_context_patch_attachment.py",
+        "docs/designs/2026-08-02-direct-context-patch-safety-attachment.md"
+      ],
+      "notes": [
+        "The adapter accepts only typed DirectPatchCandidateGateResult, DirectReadReceipt, RepositoryInventory, and FileCapability inputs. A bare or serialized proposal cannot establish task, operation, repository, inventory, or receipt provenance and fails closed.",
+        "Task ID, operation ID, canonical root, repository ID, inventory identity, exact canonical path, receipt identity, bounded target range, capability, and change intention are bound before attachment. Duplicate, traversal, absolute, case-alias, or non-inventory paths fail closed.",
+        "Only fresh caller-supplied targeted identities attach. Changed candidates require reread, deleted candidates are removed, replacements are security-blocked, and unverifiable identities are attachment-blocked. No automatic reread or repository traversal occurs.",
+        "Only declared implementation candidates may become allowed proposed targets. Supporting context, required paths, generated redirects, and validation candidates cannot widen the set; validation files remain non-writable evidence with approved test modification target set to none.",
+        "The existing core.patch_safety.evaluate_patch_safety gate always runs for implementation targets. An optional supplemental policy may narrow but never widen the set. Existing patch routes, CLI flows, executors, and approval storage remain unchanged.",
+        "Every result retains write_authority=false, patch_generation_authority=false, patch_application_authority=false, human_approval_required=true, and patch_safety_bypassed=false. The review request is exact-file and task-bound; generic repository-wide approval is insufficient.",
+        "The phase performs zero repository traversal, production content read, filesystem write, patch generation/application, validation execution, indexing, database, graph, model, or API operation. It creates no approval record and does not claim approval enforcement is installed.",
+        "Recommended next phase is CTX.APPLY.1 - Human-Confirmed Direct Context Patch Handoff."
       ]
     }
   ]

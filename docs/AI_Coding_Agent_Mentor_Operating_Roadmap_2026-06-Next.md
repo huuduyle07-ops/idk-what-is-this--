@@ -387,9 +387,28 @@ The completed roadmap arc is frozen at the following checkpoint.
   `test_modification_requires_separate_policy=true`.
 - The durable design record is
   `docs/designs/2026-08-02-direct-context-patch-candidate-gate.md`.
-- Recommended next phase is `CTX.APPLY.0` - Direct Context Patch Safety
-  Attachment Contract. It must attach CTX candidates to the existing patch
-  safety and human-approval path and must not create an independent write path.
+- `CTX.APPLY.0` completed the Direct Context Patch Safety Attachment. Its pure,
+  in-memory adapter accepts only typed CTX.PATCH.1 results, immutable CTX.READ
+  receipts, a supplied immutable inventory, typed file capabilities, and
+  supplied targeted current identities. It binds task, operation, canonical
+  root/repository identity, inventory, exact paths, receipt/file fingerprints,
+  ranges, and bounded change-intention fingerprints before it exposes a candidate for safety
+  review.
+- The attachment recomputes receipt freshness, rejects aliases and injected or
+  non-inventory files, keeps validation candidates as non-writable evidence,
+  and calls the existing patch-safety gate for implementation targets. It emits
+  an exact-file human-review request only; it neither creates an approval
+  record nor changes existing apply routes, executors, CLI flows, or runtime
+  approval enforcement.
+- Every artifact retains `write_authority=false`,
+  `patch_generation_authority=false`, `patch_application_authority=false`, and
+  `human_approval_required=true`. A later generation/application flow must
+  recheck current file identities, existing patch safety, and explicit human
+  approval, because the attachment is not permanent authority.
+- The durable design record is
+  `docs/designs/2026-08-02-direct-context-patch-safety-attachment.md`.
+- Recommended next phase is `CTX.APPLY.1` - Human-Confirmed Direct Context
+  Patch Handoff.
 
 ## 3. Design Principles
 

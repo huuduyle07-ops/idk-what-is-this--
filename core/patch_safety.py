@@ -133,6 +133,21 @@ def evaluate_patch_safety(
     }
 
 
+def attach_direct_context_to_patch_safety(**kwargs):
+    """Lazily expose the CTX.APPLY.0 adapter from the safety namespace.
+
+    Keeping this import lazy preserves the established, path-only
+    ``evaluate_patch_safety`` import surface and avoids a cycle: the attachment
+    calls this module's existing gate as one of its fail-closed checks.
+    """
+
+    from core.direct_context_patch_attachment import (
+        attach_direct_context_to_patch_safety as _attach,
+    )
+
+    return _attach(**kwargs)
+
+
 def _traversal_reason(raw, project_root) -> str | None:
     if raw is None:
         return "empty path"

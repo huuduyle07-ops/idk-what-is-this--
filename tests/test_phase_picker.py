@@ -560,7 +560,7 @@ def test_seed_registry_produces_expected_buckets():
         "human_approval_required": 0,
         "blocked": 0,
         "deferred_or_parked": 0,
-        "complete_or_history": 115,
+        "complete_or_history": 116,
     }
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
     assert report["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"
@@ -665,7 +665,7 @@ def test_seed_context_selection_phase_is_complete_history():
     assert "CTX.SELECT.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 115
+    assert report["bucket_counts"]["complete_or_history"] == 116
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -720,6 +720,28 @@ def test_seed_context_patch_phase_is_complete_history():
         item["phase_id"] for item in report["complete_or_history"]
     }
     assert "CTX.PATCH.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_context_apply_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CTX.APPLY.0"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == [
+        "CTX.SELECT.1",
+        "CTX.SEARCH.1",
+        "CTX.READ.1",
+        "CTX.PATCH.1",
+    ]
+    assert "CTX.APPLY.0" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "CTX.APPLY.0" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
