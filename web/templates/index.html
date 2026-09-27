@@ -4,13 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="cattus-csrf-token" content="{{ cattus_csrf_token() }}">
+    <meta name="cattus-auth-state" content="{{ cattus_auth_state() }}">
     <title>C.A.T.T.U.S</title> 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='request_integrity.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/dompurify/purify.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='safe_content.js') }}"></script>
+    <script src="{{ url_for('static', filename='workbench_state.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="{{ url_for('static', filename='keybindings.js') }}" defer></script>
 </head>
 {% set page_web_mode = active_web_mode|default('instant') %}
 {% set selected_runtime_environment = current.runtime_environment|default('auto') if current else 'auto' %}
+{% set waiting = (presentation.clarification if presentation is defined and presentation else none) %}
 <body data-product-mode="{{ page_web_mode }}">
 
 <div class="layout">
@@ -343,14 +350,14 @@
 
         <section id="chatModePanel" class="chat-mode-panel" data-mode-panel="chat">
             <div class="chat-thread">
-                {% if current and result and result.answer %}
+                {% if current and (waiting or (result and result.answer)) %}
                 <div class="chat-turn chat-turn--user">
                     <div class="chat-role">You</div>
                     <div class="chat-bubble">{{ current.query }}</div>
                 </div>
                 <div class="chat-turn chat-turn--agent">
                     <div class="chat-role">Agent</div>
-                    <pre class="chat-bubble chat-answer">{{ result.answer }}</pre>
+                    <pre class="chat-bubble chat-answer">{{ waiting.question if waiting else result.answer }}</pre>
                 </div>
                 {% else %}
                 <div class="chat-empty">No answer yet.</div>
@@ -422,7 +429,7 @@
                when a secondary tab is selected programmatically. -->
           <div class="tabs">
             <button type="button" onclick="showTab('answer')">Answer</button>
-            <button type="button" onclick="showTab('patch')">Patch</button>
+            <button type="button" onclick="showTab('patch')" {% if waiting %}hidden disabled{% endif %}>Patch</button>
             <details class="run-details" data-ui-group="chat-run-details">
               <summary class="run-details__summary">Run details</summary>
               <div class="tabs tabs--secondary">
@@ -442,7 +449,7 @@
                preserved verbatim. -->
           <div class="actions actions--primary">
             <button type="button" onclick="generatePatch()">Generate Patch</button>
-            <button type="button" onclick="applyPatch()">Apply / Review Patch</button>
+            <button type="button" onclick="applyPatch()" {% if waiting %}hidden disabled{% endif %}>Apply / Review Patch</button>
           </div>
           <!-- anti-lesson-control-per-run -->
           <!-- Phase 11.7c: per-run-only opt-in for the experimental anti-lesson
@@ -479,7 +486,36 @@
             </details>
           </div>
 
-          <pre id="answer" class="tab-content">{{ result.answer if result else "" }}</pre>
+          <pre id="answer" class="tab-content">{{ waiting.question if waiting else (result.answer if result else "") }}</pre>
+          <div id="repairIntentClarification" {% if not waiting or presentation.clarification_kind != 'repair_intent' %}hidden{% endif %}>
+            {% if waiting and presentation.clarification_kind == 'repair_intent' %}
+            <ol id="repairIntentAlternatives" type="A">
+              {% for alternative in waiting.alternatives %}<li>{{ alternative }}</li>{% endfor %}
+            </ol>
+            <p>You can also describe another intended behavior.</p>
+            {% endif %}
+            <label for="repairIntentAnswer">Your intended behavior</label>
+            <textarea id="repairIntentAnswer" rows="3"></textarea>
+            <button type="button" onclick="submitRepairIntent(false)">Resume repair</button>
+            <button type="button" onclick="submitRepairIntent(true)">Decline to clarify</button>
+          </div>
+          <div id="oopIntentClarification" {% if not waiting or presentation.clarification_kind != 'oop_intent' %}hidden{% endif %}>
+            {% if waiting and presentation.clarification_kind == 'oop_intent' %}
+            <h3>Current code</h3>
+            <ul id="oopIntentFacts">{% for fact in waiting.current_facts %}<li>{{ fact }}</li>{% endfor %}</ul>
+            <h3>Why this may matter</h3>
+            <p>This is a possible interpretation, not a proven defect. Human intent is missing.</p>
+            <ul id="oopIntentObservations">{% for item in waiting.interpretations %}<li>{{ item }}</li>{% endfor %}</ul>
+            <h3>Clarification</h3>
+            <p id="oopIntentQuestion">{{ waiting.question }}</p>
+            <ol id="oopIntentAlternatives" type="A">{% for alternative in waiting.alternatives %}<li>{{ alternative }}</li>{% endfor %}</ol>
+            <p>You can choose one of these meanings or describe another.</p>
+            {% endif %}
+            <label for="oopIntentAnswer">Your intended behavior</label>
+            <textarea id="oopIntentAnswer" rows="3"></textarea>
+            <button type="button" onclick="submitOOPIntent(false)">Continue {{ 'task' if waiting and waiting.task_mode == 'patch' else 'review' }}</button>
+            <button type="button" onclick="submitOOPIntent(true)">Decline to clarify</button>
+          </div>
           <pre id="context" class="tab-content">{{ result.context if result else "" }}</pre>
           <pre id="state" class="tab-content">{{ result.state if result else "" }}</pre>
           <div id="patch" class="tab-content">
@@ -2198,10 +2234,24 @@ function normalizeProductMode(mode) {
     return mode === "chat" ? "chat" : "instant";
 }
 
+// UX.STATE.1: buttons request a workspace mode. WorkbenchState owns the active
+// mode and each mode's execution configuration; _renderWorkbenchMode projects it.
 function setProductMode(mode, options = {}) {
-    const nextMode = normalizeProductMode(mode);
-    const persist = options.persist !== false;
+    const nextMode = WorkbenchState.setMode(normalizeProductMode(mode));
+    if (options.persist !== false) localStorage.setItem("activeProductMode", nextMode);
+}
+
+function _optionLabel(select, value) {
+    const option = select ? Array.from(select.options).find(item => item.value === value) : null;
+    return option ? option.textContent.trim() : value;
+}
+
+function _renderWorkbenchMode(view) {
+    const nextMode = view.mode;
+    const execution = view.execution;
     const webModeInput = document.getElementById("webModeInput");
+    const modeSelect = document.getElementById("modeSelect");
+    const applyPolicy = document.getElementById("applyPolicy");
     const modeTitle = document.getElementById("modeTitle");
     const modeSubtitle = document.getElementById("modeSubtitle");
     const primarySubmit = document.getElementById("primarySubmit");
@@ -2211,8 +2261,10 @@ function setProductMode(mode, options = {}) {
     const newSessionLink = document.getElementById("newSessionLink");
 
     document.body.dataset.productMode = nextMode;
-    if (webModeInput) webModeInput.value = nextMode;
-    if (persist) localStorage.setItem("activeProductMode", nextMode);
+    // The form always carries the active mode's execution, never a hidden rewrite.
+    if (webModeInput) webModeInput.value = execution.web_mode;
+    if (modeSelect) modeSelect.value = execution.mode;
+    if (applyPolicy) applyPolicy.value = execution.apply_policy;
 
     document.querySelectorAll(".mode-switcher__item").forEach(btn => {
         const isActive = btn.dataset.productMode === nextMode;
@@ -2233,9 +2285,10 @@ function setProductMode(mode, options = {}) {
     if (primarySubmit) primarySubmit.textContent = nextMode === "chat" ? "Ask" : "Run";
     if (workbenchCurrentMode) workbenchCurrentMode.textContent = nextMode === "chat" ? "Chat" : "Instant Run";
     if (workbenchSubmitHint) {
+        const behavior = `${_optionLabel(modeSelect, execution.mode)}; Apply policy: ${_optionLabel(applyPolicy, execution.apply_policy)}.`;
         workbenchSubmitHint.textContent = nextMode === "chat"
-            ? "Confirm the current mode with the existing agent form. Ask still requires a deliberate submit."
-            : "Confirm the current mode with the existing agent form. Preview Run still requires a deliberate submit.";
+            ? `Ask answers with ${behavior} Chat never applies. Ask still requires a deliberate submit.`
+            : `Run executes ${behavior} Apply Patch stays a separate human action. Preview Run still requires a deliberate submit.`;
     }
     if (newSessionLink) newSessionLink.href = `/new?web_mode=${encodeURIComponent(nextMode)}`;
     if (queryInput) {
@@ -2247,13 +2300,6 @@ function setProductMode(mode, options = {}) {
         const chipMode = chip.dataset.workbenchMode;
         chip.classList.toggle("workbench-mode-chip--active", chipMode === nextMode);
     });
-
-    if (nextMode === "chat") {
-        const modeSelect = document.getElementById("modeSelect");
-        const applyPolicy = document.getElementById("applyPolicy");
-        if (modeSelect) modeSelect.value = "retrieve";
-        if (applyPolicy) applyPolicy.value = "plan";
-    }
 }
 
 function updateRuntimeEnvironmentCustomFields() {
@@ -2270,14 +2316,20 @@ document.addEventListener("DOMContentLoaded", () => {
     updateRuntimeEnvironmentCustomFields();
 });
 
+function _serializeWorkbenchExecution(form) {
+    // UX.STATE.1: submit exactly the owned execution the page displays.
+    const execution = WorkbenchState.execution();
+    const webModeInput = form.querySelector("#webModeInput");
+    const modeSelect = form.querySelector("#modeSelect");
+    const applyPolicy = form.querySelector("#applyPolicy");
+    if (webModeInput) webModeInput.value = execution.web_mode;
+    if (modeSelect) modeSelect.value = execution.mode;
+    if (applyPolicy) applyPolicy.value = execution.apply_policy;
+}
+
 document.addEventListener("submit", event => {
     if (event.target?.id !== "agentForm") return;
-    if (document.getElementById("webModeInput")?.value === "chat") {
-        const modeSelect = document.getElementById("modeSelect");
-        const applyPolicy = document.getElementById("applyPolicy");
-        if (modeSelect) modeSelect.value = "retrieve";
-        if (applyPolicy) applyPolicy.value = "plan";
-    }
+    _serializeWorkbenchExecution(event.target);
 });
 
 document.querySelectorAll("pre").forEach(p => {
@@ -2774,6 +2826,9 @@ function _renderDreamItemCard(it, opts = {}) {
         : "";
     const dreamActionButtons = [promoteBtn, lessonizeBtn, proposalBtn].filter(Boolean).join("");
     const patchBlockerDetails = _renderPatchBlockerDetails(it);
+    const executableReview = it.review_binding && it.reviewed_patch_plan != null
+        ? `<details class="dream-raw-details" open><summary>Patch to apply</summary><pre class="dream-report-pre">${_escapeHtml(JSON.stringify(it.reviewed_patch_plan, null, 2))}</pre></details>`
+        : "";
     return `
         <div class="dream-item-card">
             ${checkbox}
@@ -2790,6 +2845,7 @@ function _renderDreamItemCard(it, opts = {}) {
                 </div>
                 ${summary ? `<div class="dream-item-card__summary">${summary}</div>` : ""}
                 ${patchBlockerDetails}
+                ${executableReview}
                 ${dreamActionButtons ? `<div class="dream-item-card__actions">${dreamActionButtons}</div>` : ""}
             </div>
         </div>
@@ -2980,16 +3036,130 @@ function _renderPatchCard() {
     `;
 }
 
-// Initial render on page load — parse server-rendered raw JSON into state.
-function _initPatchCardFromRaw() {
+// UX.STATE.1: the displayed candidate, its review outputs, the candidate list
+// and the last action are owned by WorkbenchState. These renderers are their
+// only projection into the page; handlers never write them directly.
+let _renderedReviewKey = null;
+let _renderedCandidatesListId = null;
+let _runValidationText = "";
+
+function renderWorkbench(view) {
+    _renderWorkbenchMode(view);
+    _renderWorkbenchRepository(view);
+    _renderWorkbenchCandidate(view);
+    _renderWorkbenchCandidates(view);
+    _renderWorkbenchCritique(view);
+}
+
+function _renderWorkbenchRepository(view) {
+    const input = document.getElementById("repoPathInput");
+    if (input && input.value.trim() !== view.repository) input.value = view.repository;
+}
+
+function _renderWorkbenchCandidate(view) {
+    const candidate = view.candidate;
+    const review = candidate && view.review && view.review.candidateId === candidate.id ? view.review : null;
+    const output = review ? review.output : null;
+    const described = WorkbenchState.describeAction(view.action);
     const raw = document.getElementById("patchRawJson");
-    if (!raw) return;
-    const txt = raw.innerText.trim();
-    if (!txt) return;
-    try {
-        _setPatchState({ raw: JSON.parse(txt) });
-    } catch {
-        // Server-side rendered something non-JSON; leave card showing the empty state.
+    const candidateText = candidate ? candidate.text : "";
+    if (raw && raw.textContent !== candidateText) raw.textContent = candidateText;
+    _setPatchState({
+        raw: candidate ? candidate.payload : null,
+        risk: output ? output.risk || null : null,
+        validation_command: output ? output.validation_command || null : null,
+        patch_safety: output ? output.patch_safety || null : null,
+        last_action: described ? described.label : null,
+        last_status: described ? described.detail : null,
+    });
+    const reviewKey = review ? review.id : null;
+    if (reviewKey === _renderedReviewKey) return;
+    _renderedReviewKey = reviewKey;
+    const diff = document.getElementById("diff");
+    const validation = document.getElementById("validation");
+    if (diff) diff.innerHTML = output && output.diff ? renderDiff(output.diff) : "";
+    // Without a review of this candidate, Validation shows the run's own output.
+    if (validation) validation.textContent = output ? output.validationText || "" : _runValidationText;
+}
+
+function _renderWorkbenchCandidates(view) {
+    const list = view.candidates;
+    const listId = list ? list.id : null;
+    if (listId === _renderedCandidatesListId) return;
+    _renderedCandidatesListId = listId;
+    const container = document.getElementById("candidates");
+    if (!container) return;
+    container.replaceChildren();
+    if (!list) return;
+    if (!list.items) {
+        container.innerText = list.message || "No candidates";
+        return;
+    }
+
+    list.items.forEach((c, idx) => {
+        const box = document.createElement("div");
+        box.style.border = "1px solid #ddd";
+        box.style.padding = "10px";
+        box.style.marginBottom = "10px";
+
+        // file name
+        const file = c.patch.relative_path || c.patch.file || "unknown";
+
+        const title = document.createElement("div");
+        title.innerText = `Candidate ${idx + 1} (${c.name}) | ${file} | confidence=${c.confidence}`;
+        title.style.fontWeight = "bold";
+
+        const code = document.createElement("pre");
+        code.innerText = JSON.stringify(c.patch, null, 2);
+
+        const btn = document.createElement("button");
+        btn.innerText = "Use this";
+        btn.onclick = () => selectCandidate(idx, list.id);
+
+        box.appendChild(title);
+        box.appendChild(code);
+
+        // 🔥 optional diff preview
+        if (c.patch.diff) {
+            const diffBox = document.createElement("div");
+            diffBox.style.marginTop = "10px";
+            diffBox.style.fontSize = "12px";
+            diffBox.innerHTML = renderDiff(c.patch.diff);
+            box.appendChild(diffBox);
+        }
+
+        box.appendChild(btn);
+        container.appendChild(box);
+    });
+}
+
+function _renderWorkbenchCritique(view) {
+    // A critique belongs to its candidate: once no request owns the slot, clear it.
+    if (view.slots.critique.owner !== null) return;
+    const section = document.getElementById("localCritiqueSection");
+    const main = document.getElementById("localCritiqueMain");
+    const debug = document.getElementById("localCritiqueDebug");
+    const thought = document.getElementById("localCritiqueThought");
+    if (section) section.style.display = "";
+    if (main) main.replaceChildren();
+    if (debug) debug.style.display = "none";
+    if (thought) thought.textContent = "";
+}
+
+function _bindWorkbenchInputs() {
+    const repository = document.getElementById("repoPathInput");
+    const modeSelect = document.getElementById("modeSelect");
+    const applyPolicy = document.getElementById("applyPolicy");
+    if (repository) {
+        for (const type of ["input", "change"]) {
+            repository.addEventListener(type, () => WorkbenchState.setRepository(repository.value));
+        }
+    }
+    if (modeSelect) {
+        modeSelect.addEventListener("change", () => WorkbenchState.setExecutionOption("mode", modeSelect.value));
+    }
+    if (applyPolicy) {
+        applyPolicy.addEventListener("change", () => WorkbenchState.setExecutionOption("apply_policy", applyPolicy.value));
     }
 }
 
@@ -3898,7 +4068,7 @@ function refreshSessionList() {
                    data-session-id="${_escapeHtml(s.id)}"
                    data-archived="${s.archived ? '1' : '0'}">
                   <div class="session-title">${_escapeHtml(s.title || '(untitled)')}</div>
-                  <div class="session-meta">${_escapeHtml(s.web_mode || 'instant')} / ${_escapeHtml(s.mode || '')} - ${_escapeHtml(s.created_at || '')}</div>
+                  <div class="session-meta">${_escapeHtml(s.web_mode || 'instant')} / ${_escapeHtml(s.mode || '')} - ${_escapeHtml(s.status || s.result?.status || '')} ${_escapeHtml(s.created_at || '')}</div>
                   <div class="history-actions" data-ui-group="session-history-actions">
                     <button class="history-btn"
                             onclick="event.stopPropagation(); _archiveSession(this.closest('[data-session-id]').dataset.sessionId, this.closest('[data-session-id]').dataset.archived !== '1')">
@@ -4101,14 +4271,8 @@ function viewDreamRun(date, runId) {
         const items = data.items || [];
         const caseIdeas = data.case_ideas || [];
         const morning = data.morning_report || "(no morning_report.txt)";
-        // Phase 5P.1: the server renders the morning report Markdown to safe
-        // HTML (escape-by-default, no raw HTML), so the viewer shows real
-        // headings / lists / tables instead of a plain preformatted dump.
-        // Fall back to the escaped raw text if the rendered HTML is absent.
-        const morningHtml =
-            (typeof data.morning_report_html === "string" && data.morning_report_html.length > 0)
-                ? `<div class="dream-report-md">${data.morning_report_html}</div>`
-                : `<pre class="dream-report-pre">${_escapeHtml(morning)}</pre>`;
+        // SEC.UI.1: historical report HTML crosses the same client boundary.
+        const morningHtml = '<div class="dream-report-md" id="dreamMorningReport"></div>';
         const rawSummaryPanel = morning.length > 0
             ? `<details class="dream-raw-details"><summary>Raw summary (dream_run_summary.md)</summary><pre class="dream-report-pre">${_escapeHtml(morning)}</pre></details>`
             : "";
@@ -4134,8 +4298,43 @@ function viewDreamRun(date, runId) {
         `;
         const titleLabel = runId ? `${date} · ${runId}` : date;
         openAppModal(`Dream report — ${titleLabel}`, body);
+        const report = document.getElementById("dreamMorningReport");
+        if (typeof data.morning_report_html === "string" && data.morning_report_html.length > 0) {
+            CattusSafeContent.renderHTML(report, data.morning_report_html, morning);
+        } else {
+            const pre = document.createElement("pre");
+            pre.className = "dream-report-pre";
+            CattusSafeContent.renderText(pre, morning);
+            report.replaceChildren(pre);
+        }
     })
     .catch(err => openAppModal("Report error", `<p>${_escapeHtml(err)}</p>`));
+}
+
+// AUTH.DREAM.1: bindings live on this modal's controls, never in global/latest
+// state or session storage. Only an explicit selection binds a displayed item.
+function _selectDreamReview(control) {
+    control._reviewedCandidateBinding = control.checked ? control._offeredDreamBinding : null;
+}
+
+function _mountDreamReview(items) {
+    const list = document.getElementById("dreamApplyList");
+    if (!list) return;
+    list.querySelectorAll(".dream-item-card__check").forEach(control => {
+        const item = items.find(it => String(it.idx) === control.dataset.idx);
+        control._offeredDreamBinding = item && item.review_binding
+            ? Object.freeze({ ...item.review_binding }) : null;
+        control._reviewedCandidateBinding = null;
+        control.disabled = !control._offeredDreamBinding;
+        control.addEventListener("change", () => _selectDreamReview(control));
+    });
+}
+
+function _selectAllDreamReviews(all) {
+    document.querySelectorAll("#dreamApplyList .dream-item-card__check").forEach(control => {
+        control.checked = all.checked && !control.disabled;
+        _selectDreamReview(control);
+    });
 }
 
 function applyDream() {
@@ -4157,7 +4356,7 @@ function applyDream() {
             <div class="dream-apply-controls">
                 <label class="checkbox-label">
                     <input type="checkbox" id="dreamApplySelectAll"
-                           onchange="document.querySelectorAll('.dream-item-card__check').forEach(c => c.checked = this.checked)">
+                           onchange="_selectAllDreamReviews(this)">
                     <span>Select all</span>
                 </label>
             </div>
@@ -4171,30 +4370,43 @@ function applyDream() {
             <button type="button" onclick="closeAppModal()">Cancel</button>
         `;
         openAppModal(`Apply Dream — ${items.length} items in last report`, body, footer);
+        _mountDreamReview(items);
     })
     .catch(err => openAppModal("Apply error", `<p>${_escapeHtml(err)}</p>`));
 }
 
 function _doDreamApply() {
     const repo = _dreamRepo(); if (!repo) return;
-    const selected = Array.from(document.querySelectorAll(".dream-item-card__check"))
-        .filter(c => c.checked)
-        .map(c => c.dataset.idx);
+    const selectedControls = Array.from(document.querySelectorAll("#dreamApplyList .dream-item-card__check"))
+        .filter(c => c.checked);
+    const selected = selectedControls.map(c => c.dataset.idx);
+    const bindings = selectedControls.map(c => c._reviewedCandidateBinding);
     const resultsEl = document.getElementById("dreamApplyResults");
     if (selected.length === 0) {
         if (resultsEl) resultsEl.innerHTML = `<div class="health-empty">Pick at least one item to apply.</div>`;
         return;
     }
 
+    if (bindings.some(binding => !binding)) {
+        if (resultsEl) resultsEl.textContent = "Review the Dream candidate again before Apply.";
+        return;
+    }
     if (resultsEl) resultsEl.innerHTML = `<div class="health-empty">Applying ${selected.length} items…</div>`;
 
     fetch("/dream/apply", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ repo_path: repo, selection: selected.join(",") }),
+        body: new URLSearchParams({ repo_path: repo, selection: selected.join(","), review_bindings: JSON.stringify(bindings) }),
     })
     .then(r => r.json())
     .then(out => {
+        if (out.review_required || (out.results || []).some(result => result.review_required)) {
+            selectedControls.forEach(control => {
+                control.checked = false;
+                control.disabled = true;
+                control._reviewedCandidateBinding = null;
+            });
+        }
         if (out.error) {
             if (resultsEl) resultsEl.innerHTML = `<div class="health-empty">Error: ${_escapeHtml(out.error)}</div>`;
             return;
@@ -8742,15 +8954,18 @@ function openPresentationEvidenceFile(name) {
                 return;
             }
             viewer.hidden = false;
-            // The server renders the Markdown to HTML (with the `tables`
-            // extension), so pipe tables become real <table> elements that
-            // the .evidence-viewer CSS can style.
+            // SEC.UI.1: server-rendered HTML and historical reports are untrusted.
+            const content = document.createElement("div");
+            content.className = "evidence-markdown";
             if (typeof data.html === "string" && data.html.length > 0) {
-                viewer.innerHTML = `<div class="evidence-markdown">${data.html}</div>`;
+                CattusSafeContent.renderHTML(content, data.html, data.content);
             } else {
-                // Fallback: server didn't render HTML; show raw text safely.
-                viewer.innerHTML = `<pre class="evidence-raw">${_escapeHtml(data.content)}</pre>`;
+                const pre = document.createElement("pre");
+                pre.className = "evidence-raw";
+                CattusSafeContent.renderText(pre, data.content);
+                content.append(pre);
             }
+            viewer.replaceChildren(content);
             if (status) status.textContent = `Showing ${data.name} (${data.size} bytes)`;
         })
         .catch(err => {
@@ -9630,7 +9845,7 @@ function seedDreamFromReport(filename) {
 // longer a result-tab, it lives in its own workspace tab now.
 const saved = localStorage.getItem("activeTab");
 const validTabs = ["answer","context","state","patch","validation","usage","diff","candidates"];
-const initialTab = validTabs.includes(saved) ? saved : "answer";
+const initialTab = {{ 'true' if waiting else 'false' }} ? "answer" : (validTabs.includes(saved) ? saved : "answer");
 
 showTab(initialTab);
 
@@ -9642,42 +9857,65 @@ renderMirrorTunnelSummary();
 const hasCurrentSession = "{{ 'true' if current else 'false' }}" === "true";
 const serverProductMode = normalizeProductMode(document.getElementById("webModeInput")?.value || "instant");
 const savedProductMode = normalizeProductMode(localStorage.getItem("activeProductMode") || serverProductMode);
-setProductMode(hasCurrentSession ? serverProductMode : savedProductMode, { persist: false });
 
-// Phase 5 Slice 5: hydrate the Patch card from server-rendered raw JSON.
-_initPatchCardFromRaw();
+// UX.STATE.1: derive workflow state once from the server-rendered page (the
+// Patch card included). From here on WorkbenchState owns every transition.
+_runValidationText = document.getElementById("validation")?.textContent || "";
+WorkbenchState.hydrate({
+    repository: document.getElementById("repoPathInput")?.value || "",
+    mode: hasCurrentSession ? serverProductMode : savedProductMode,
+    instant: {
+        mode: document.getElementById("modeSelect")?.value,
+        apply_policy: document.getElementById("applyPolicy")?.value,
+    },
+    candidateText: document.getElementById("patchRawJson")?.textContent || "",
+    run: {
+        sessionId: {{ (current.id if current else '')|tojson }},
+        repository: {{ (current.repo_path if current else '')|tojson }},
+        // UX.CONTEXT.1: the run's context as displayed, after the page's JSON
+        // formatting pass. Generate requests transport it only from the owner.
+        context: document.getElementById("context")?.textContent || "",
+    },
+});
+WorkbenchState.subscribe(renderWorkbench);
+renderWorkbench(WorkbenchState.snapshot());
+_bindWorkbenchInputs();
 
 
 
 function applyPatch() {
-    // Phase 5 Slice 5: read raw JSON from the dedicated #patchRawJson <pre>
-    // (the visible #patch element is now the structured card).
-    const patchText = document.getElementById("patchRawJson").innerText;
-    const repo = document.querySelector("input[name='repo_path']").value;
-    const policy = document.getElementById("applyPolicy").value;
+    // UX.STATE.1: act on the owned candidate with the active mode's policy; the
+    // response is accepted only for the context and candidate that sent it.
+    WorkbenchState.setRepository(document.querySelector("input[name='repo_path']").value);
+    const view = WorkbenchState.snapshot();
+    const patchText = view.candidate ? view.candidate.text : "";
+    const policy = view.execution.apply_policy;
     const style = document.getElementById("patchStyleSelect")?.value || "safe_minimal";
 
     if (policy === "plan") {
-        document.getElementById("validation").innerText =
-            "Plan only mode: patch was not applied. Review candidate manually.";
+        const recorded = WorkbenchState.refuse("apply", {
+            code: "plan_only_policy",
+            output: { diff: "", validationText: "Plan only mode: patch was not applied. Review candidate manually." },
+        });
+        if (recorded.refused) {
+            alert(recorded.message);
+            return;
+        }
         window.lastAction = "patch";
         showTab("patch");
-        _setPatchState({ last_action: "apply blocked (plan-only policy)" });
+        return;
+    }
+
+    const blocked = WorkbenchState.blocked("apply");
+    if (blocked) {
+        alert(blocked.message);
         return;
     }
 
     // Detect plan vs candidate to route to the right endpoint.
-    let isPlan = false;
-    let opCount = 0;
-    try {
-        const parsed = JSON.parse(patchText);
-        if (Array.isArray(parsed.patch_plan) && parsed.patch_plan.length > 0) {
-            isPlan = true;
-            opCount = parsed.patch_plan.length;
-        }
-    } catch (e) {
-        // Not JSON or no patch_plan — fall through to single-file path.
-    }
+    const parsedPayload = view.candidate.payload;
+    const isPlan = Array.isArray(parsedPayload.patch_plan) && parsedPayload.patch_plan.length > 0;
+    const opCount = isPlan ? parsedPayload.patch_plan.length : 0;
 
     if (policy === "ask") {
         const msg = isPlan
@@ -9686,133 +9924,309 @@ function applyPatch() {
         if (!confirm(msg)) return;
     }
 
+    const ticket = WorkbenchState.begin("apply");
+    if (ticket.refused) {
+        alert(ticket.message);
+        return;
+    }
+    const reviewReceipt = typeof parsedPayload.human_apply_review === "object"
+        ? parsedPayload.human_apply_review
+        : null;
     const endpoint = isPlan ? "/apply_patch_plan" : "/apply_patch";
     fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
-            repo_path: repo,
+            repo_path: ticket.repository,
             patch: patchText,
-            apply_policy: policy,
+            apply_policy: ticket.execution.apply_policy,
             patch_style: style,
+            session_id: {{ (current.id if current else '')|tojson }},
+            human_action_kind: "apply",
+            approved_candidate_fingerprint: reviewReceipt?.candidate_fingerprint || "",
+            approved_eligibility_receipt_fingerprint: reviewReceipt?.eligibility_receipt_fingerprint || "",
         }),
     })
     .then(res => res.json())
     .then(data => {
-        document.getElementById("diff").innerHTML = renderDiff(data.diff || "");
         const msgParts = [];
         if (data.message) msgParts.push(data.message);
         if (data.validation) msgParts.push("--- validation ---\n" + data.validation);
         if (data.rollback_performed) msgParts.push("(rollback performed)");
-        if (Array.isArray(data.applied_ops) && data.applied_ops.length) {
+        if (data.patch_applied && Array.isArray(data.applied_ops) && data.applied_ops.length) {
             msgParts.push(`Applied ${data.applied_ops.length} op(s).`);
         }
-        document.getElementById("validation").innerText = msgParts.join("\n\n");
+        // Phase 5 Slice 5 / Polish: risk, validation_command and patch_safety
+        // are this candidate's review outputs.
+        const settled = WorkbenchState.settle(ticket, {
+            ...WorkbenchState.reviewOutcome("apply", data),
+            candidateText: typeof data.patch === "string" ? data.patch : "",
+            output: {
+                diff: data.diff || "",
+                validationText: msgParts.join("\n\n"),
+                risk: data.risk || null,
+                validation_command: data.validation_command || null,
+                patch_safety: data.patch_safety || null,
+            },
+        });
+        if (!settled.accepted) return;
         window.lastAction = "diff";
         showTab("diff");
-        // Phase 5 Slice 5: feed the new risk + validation_command into the card.
-        // Phase 5 Polish: also feed patch_safety.
-        _setPatchState({
-            risk: data.risk || null,
-            validation_command: data.validation_command || null,
-            patch_safety: data.patch_safety || null,
-            last_action: data.success ? "applied" : "apply failed",
-            last_status: data.message || (data.success ? "OK" : "failed"),
-        });
     })
     .catch(err => {
-        document.getElementById("validation").innerText = `Network error: ${err}`;
-        showTab("validation");
-        _setPatchState({ last_action: "apply error", last_status: String(err) });
+        const settled = WorkbenchState.settle(ticket, {
+            status: "failed",
+            code: "network_error",
+            message: String(err),
+            output: { diff: "", validationText: `Network error: ${err}` },
+        });
+        if (settled.accepted) showTab("validation");
     });
 }
 
+// CONTROL.BOOTSTRAP.1: the Main Intent text exactly as typed (never trimmed or parsed).
+function _mainIntentText() {
+    return document.querySelector("textarea[name='query']")?.value ?? "";
+}
+
+// CONTROL.BOOTSTRAP.1: a fresh ticket (no eligible run) also transports the task
+// it snapshotted at dispatch; a continuation body is unchanged.
+function _withFreshTask(params, ticket) {
+    if (ticket.task !== null) params.append("query", ticket.task);
+    return params;
+}
+
 function generatePatch() {
-    const control = document.getElementById("context").innerText;
-    const repo = document.querySelector("input[name='repo_path']").value;
+    // UX.STATE.1: a response becomes the candidate only for the repository
+    // context and newest request that are still current when it arrives.
+    // UX.CONTEXT.1: CONTROL comes only from the run context the ticket bound to
+    // this repository context; without one, the fresh no-prior-context form.
+    // CONTROL.FRESH.1: that form is the explicit JSON null, never an empty value.
+    WorkbenchState.setRepository(document.querySelector("input[name='repo_path']").value);
     const runtimeEnv = document.querySelector("select[name='runtime_environment']")?.value || "auto";
     // Phase 11.7c: per-run-only field. The server still ignores it unless
     // ANTI_LESSONS_CONTROL_ENABLED=true. Nothing is persisted client-side.
     const antiLessonForRun = document.getElementById("antiLessonControlForRun")?.checked ? "true" : "false";
+    const ticket = WorkbenchState.begin("generate", { task: _mainIntentText() });
+    if (ticket.refused) {
+        alert(ticket.message);
+        return;
+    }
 
     fetch("/generate_patch", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: new URLSearchParams({
-            repo_path: repo,
+        body: _withFreshTask(new URLSearchParams({
+            repo_path: ticket.repository,
             runtime_environment: runtimeEnv,
-            control: control,
+            control: ticket.requestRun ? ticket.requestRun.context : JSON.stringify(null),
             anti_lesson_control_requested: antiLessonForRun
-        })
+        }), ticket)
     })
     .then(res => res.json())
     .then(data => {
+        if (data.status === "waiting_for_clarification") {
+            if (data.clarification_kind === "oop_intent" && data.clarification_session_id) {
+                window.location.assign(`/session/${encodeURIComponent(data.clarification_session_id)}`);
+                return;
+            }
+            const settled = WorkbenchState.settle(ticket, {
+                status: "failed", code: "needs_clarification", message: data.question
+            });
+            if (!settled.accepted) return;
+            WorkbenchState.invalidate("needs_clarification");
+            setRepairIntentWaitingActions(true);
+            window.pendingRepairIntent = {
+                sessionId: data.clarification_session_id, repository: ticket.repository
+            };
+            const answerEl = document.getElementById("answer");
+            if (answerEl) answerEl.textContent = data.question;
+            document.getElementById("repairIntentClarification").hidden = false;
+            showTab("answer");
+            return;
+        }
+        const settled = WorkbenchState.settle(ticket, WorkbenchState.generateOutcome(data));
+        if (!settled.accepted) return;
         if (data.usage) {
             const usageEl = document.getElementById("usage");
             if (usageEl) usageEl.innerText = data.usage;
         }
-        if (data.error) {
+        if (settled.status === "failed") {
             const answerEl = document.getElementById("answer");
-            if (answerEl) answerEl.innerText = data.error;
+            if (answerEl) answerEl.innerText = settled.message;
             window.lastAction = "answer";
             showTab("answer");
             return;
         }
-        if (data.patch) {
-            // Phase 5 Slice 5: write raw JSON to #patchRawJson, then refresh card.
-            document.getElementById("patchRawJson").innerText = data.patch;
-            try {
-                _setPatchState({
-                    raw: JSON.parse(data.patch),
-                    risk: null,
-                    validation_command: null,
-                    patch_safety: null,
-                    last_action: "generated",
-                    last_status: null,
-                });
-            } catch {
-                _setPatchState({ raw: null, last_action: "generated (invalid JSON)" });
-            }
-            window.lastAction = "patch";
-            showTab("patch");
+        window.lastAction = "patch";
+        showTab("patch");
+    })
+    .catch(err => {
+        WorkbenchState.settle(ticket, { status: "failed", code: "network_error", message: String(err) });
+    });
+}
+
+function setRepairIntentWaitingActions(waiting) {
+    for (const handler of ['applyPatch()', "showTab('patch')"]) {
+        const button = document.querySelector(`button[onclick="${handler}"]`);
+        if (button) {
+            button.hidden = waiting;
+            button.disabled = waiting;
         }
+    }
+}
+
+{% if waiting and current and presentation.clarification_kind == 'repair_intent' %}
+window.pendingRepairIntent = {
+    sessionId: {{ waiting.session_id | tojson }},
+    repository: {{ current.repo_path | tojson }}
+};
+{% endif %}
+
+{% if waiting and current and presentation.clarification_kind == 'oop_intent' %}
+window.pendingOOPIntent = {
+    sessionId: {{ waiting.session_id | tojson }},
+    gapId: {{ waiting.gap_id | tojson }},
+    repository: {{ current.repo_path | tojson }}
+};
+{% endif %}
+
+function submitOOPIntent(decline) {
+    const pending = window.pendingOOPIntent;
+    if (!pending) return;
+    const repository = document.querySelector("input[name='repo_path']")?.value || "";
+    if (repository !== pending.repository) return;
+    const answer = document.getElementById("oopIntentAnswer")?.value || "";
+    if (!decline && !answer.trim()) return;
+    fetch("/oop_intent/answer", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({
+            session_id: pending.sessionId, gap_id: pending.gapId,
+            repo_path: repository, answer: answer,
+            decline: decline ? "true" : "false"
+        })
+    }).then(res => res.json()).then(data => {
+        const answerEl = document.getElementById("answer");
+        if (data.status === "rejected") {
+            if (answerEl) answerEl.textContent = `Clarification rejected: ${data.code}`;
+            return;
+        }
+        if (data.patch) {
+            window.location.assign(`/session/${encodeURIComponent(pending.sessionId)}`);
+            return;
+        }
+        if (answerEl) answerEl.textContent = data.answer ||
+            (data.status === "reacquisition_required"
+                ? "The source changed. Please reacquire the review before using this answer."
+                : "Clarification recorded. No code was changed.");
+        document.getElementById("oopIntentClarification").hidden = true;
+        window.pendingOOPIntent = null;
+        showTab("answer");
+    });
+}
+
+function submitRepairIntent(decline) {
+    const pending = window.pendingRepairIntent;
+    if (!pending) return;
+    const repository = document.querySelector("input[name='repo_path']")?.value || "";
+    if (repository !== pending.repository) return;
+    const answer = document.getElementById("repairIntentAnswer")?.value || "";
+    if (!decline && !answer.trim()) return;
+    fetch("/repair_intent/answer", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({
+            session_id: pending.sessionId, repo_path: repository,
+            answer: answer, decline: decline ? "true" : "false"
+        })
+    }).then(res => res.json()).then(data => {
+        const answerEl = document.getElementById("answer");
+        if (data.patch) {
+            const ticket = WorkbenchState.begin("generate", {task: _mainIntentText()});
+            if (ticket.refused) return;
+            const settled = WorkbenchState.settle(ticket, WorkbenchState.generateOutcome(data));
+            if (settled.accepted && settled.status === "succeeded") {
+                document.getElementById("repairIntentClarification").hidden = true;
+                setRepairIntentWaitingActions(false);
+                window.pendingRepairIntent = null;
+                showTab("patch");
+            }
+            return;
+        }
+        if (answerEl) answerEl.textContent =
+            data.status === "reacquisition_required"
+                ? "The source changed while waiting. Fresh compiler evidence is required before repair can resume."
+                : data.status === "clarification_declined"
+                    ? "Clarification declined. No patch was created."
+                    : data.status === "intent_preservation_failed"
+                        ? "The repair author did not preserve your clarification. No patch was created."
+                        : `Clarification could not resume: ${data.code || data.status}`;
+        if (data.status !== "rejected") {
+            document.getElementById("repairIntentClarification").hidden = true;
+            setRepairIntentWaitingActions(false);
+            window.pendingRepairIntent = null;
+        }
+        showTab("answer");
+    }).catch(err => {
+        const answerEl = document.getElementById("answer");
+        if (answerEl) answerEl.textContent = `Clarification network error: ${err}`;
+        showTab("answer");
     });
 }
 
 function undoPatch() {
-    const repo = document.querySelector("input[name='repo_path']").value;
-
-    // Phase 5 Slice 5: read raw JSON from #patchRawJson.
-    let patchText = document.getElementById("patchRawJson").innerText;
+    // UX.STATE.1: Undo succeeds only when DATA.UNDO.1 confirms the exact backup
+    // it restored; every other response is a failed action with its code.
+    WorkbenchState.setRepository(document.querySelector("input[name='repo_path']").value);
+    const current = WorkbenchState.snapshot().candidate;
+    let patchText = current ? current.text : "";
 
     let file = "";
+    let undoBackup = null;
 
     try {
         const parsed = JSON.parse(patchText);
         // Handle both top-level patch and {patch_candidate: {...}} envelopes.
         const inner = parsed.patch_candidate || parsed;
         file = inner.relative_path || inner.file;
+        undoBackup = parsed.undo_backup;
     } catch {
         alert("No valid patch to undo");
         return;
     }
 
+    const ticket = WorkbenchState.begin("undo");
+    if (ticket.refused) {
+        alert(ticket.message);
+        return;
+    }
     fetch("/undo_patch", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
         body: new URLSearchParams({
-            repo_path: repo,
-            file: file
+            repo_path: ticket.repository,
+            file: file,
+            backup_id: undoBackup?.backup_id || "",
+            transaction_id: undoBackup?.transaction_id || ""
         })
     })
     .then(res => res.json())
     .then(data => {
-        alert(data.message);
-        _setPatchState({ last_action: "undone", last_status: data.message || "reverted" });
+        const outcome = WorkbenchState.undoOutcome(data, undoBackup);
+        // A confirmed restore replaces the applied diff; a failure keeps it.
+        const settled = WorkbenchState.settle(ticket, outcome.status === "succeeded"
+            ? { ...outcome, output: { diff: "", validationText: outcome.message } }
+            : outcome);
+        if (settled.accepted) alert(settled.message);
+    })
+    .catch(err => {
+        const settled = WorkbenchState.settle(ticket, { status: "failed", code: "network_error", message: String(err) });
+        if (settled.accepted) alert(settled.message);
     });
 }
 
@@ -9846,86 +10260,53 @@ function renderDiff(diffText) {
 }
 
 function generateCandidates() {
-    const control = document.getElementById("context").innerText;
-    const repo = document.querySelector("input[name='repo_path']").value;
+    // UX.CONTEXT.1: the same run context binding as generatePatch.
+    WorkbenchState.setRepository(document.querySelector("input[name='repo_path']").value);
     const runtimeEnv = document.querySelector("select[name='runtime_environment']")?.value || "auto";
+    const ticket = WorkbenchState.begin("candidates", { task: _mainIntentText() });
+    if (ticket.refused) {
+        alert(ticket.message);
+        return;
+    }
 
     fetch("/generate_candidates", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: new URLSearchParams({
-            control,
-            repo_path: repo,
+        body: _withFreshTask(new URLSearchParams({
+            control: ticket.requestRun ? ticket.requestRun.context : JSON.stringify(null),
+            repo_path: ticket.repository,
             runtime_environment: runtimeEnv
-        })
+        }), ticket)
     })
     .then(res => res.json())
     .then(data => {
+        // 🔥 sort best first
+        const items = Array.isArray(data.candidates)
+            ? data.candidates.slice().sort((a, b) => b.confidence - a.confidence)
+            : null;
+        const settled = WorkbenchState.settle(ticket, items
+            ? { status: "succeeded", items }
+            : { status: "failed", code: "candidates_failed", message: data.error || "No candidates" });
+        if (!settled.accepted) return;
         if (data.usage) {
             const usageEl = document.getElementById("usage");
             if (usageEl) usageEl.innerText = data.usage;
         }
-        const container = document.getElementById("candidates");
-
-        if (!data.candidates) {
-            container.innerText = data.error || "No candidates";
-            window.lastAction = "candidates";
-            showTab("candidates");
-            return;
-        }
-
-        container.innerHTML = "";
-        window.patchCandidates = data.candidates;
-
-        // 🔥 sort best first
-        data.candidates.sort((a, b) => b.confidence - a.confidence);
-
-        data.candidates.forEach((c, idx) => {
-            const box = document.createElement("div");
-            box.style.border = "1px solid #ddd";
-            box.style.padding = "10px";
-            box.style.marginBottom = "10px";
-
-            // file name
-            const file = c.patch.relative_path || c.patch.file || "unknown";
-
-            const title = document.createElement("div");
-            title.innerText = `Candidate ${idx + 1} (${c.name}) | ${file} | confidence=${c.confidence}`;
-            title.style.fontWeight = "bold";
-
-            const code = document.createElement("pre");
-            code.innerText = JSON.stringify(c.patch, null, 2);
-
-            const btn = document.createElement("button");
-            btn.innerText = "Use this";
-            btn.onclick = () => selectCandidate(idx);
-
-            box.appendChild(title);
-            box.appendChild(code);
-
-            // 🔥 optional diff preview
-            if (c.patch.diff) {
-                const diffBox = document.createElement("div");
-                diffBox.style.marginTop = "10px";
-                diffBox.style.fontSize = "12px";
-                diffBox.innerHTML = renderDiff(c.patch.diff);
-                box.appendChild(diffBox);
-            }
-
-            box.appendChild(btn);
-            container.appendChild(box);
-        });
         window.lastAction = "candidates";
         showTab("candidates");
+    })
+    .catch(err => {
+        WorkbenchState.settle(ticket, { status: "failed", code: "network_error", message: String(err) });
     });
 }
 
 function testPatch() {
-    // Phase 5 Slice 5: read raw JSON from #patchRawJson.
-    const patchText = document.getElementById("patchRawJson").innerText;
-    const repo = document.querySelector("input[name='repo_path']").value;
+    // UX.STATE.1: test the owned candidate, never layout-dependent raw text.
+    WorkbenchState.setRepository(document.querySelector("input[name='repo_path']").value);
+    const current = WorkbenchState.snapshot().candidate;
+    const patchText = current ? current.text : "";
     const patchStyle = document.getElementById("patchStyleSelect").value;
 
     let parsed = null;
@@ -9938,6 +10319,11 @@ function testPatch() {
 
     const isPlan = Array.isArray(parsed.patch_plan);
     const endpoint = isPlan ? "/test_patch_plan" : "/test_patch";
+    const ticket = WorkbenchState.begin("test");
+    if (ticket.refused) {
+        alert(ticket.message);
+        return;
+    }
 
     fetch(endpoint, {
         method: "POST",
@@ -9945,53 +10331,64 @@ function testPatch() {
             "Content-Type": "application/x-www-form-urlencoded"
         },
         body: new URLSearchParams({
-            repo_path: repo,
+            repo_path: ticket.repository,
             patch: patchText,
             patch_style: patchStyle
         })
     })
     .then(res => res.json())
     .then(data => {
-        document.getElementById("diff").innerHTML = renderDiff(data.diff || "");
-        document.getElementById("validation").innerText =
-            data.validation || data.message || "No validation output";
+        // Phase 5 Slice 5 / Polish: risk, validation_command and patch_safety
+        // are this candidate's review outputs.
+        const settled = WorkbenchState.settle(ticket, {
+            ...WorkbenchState.reviewOutcome("test", data),
+            output: {
+                diff: data.diff || "",
+                validationText: data.validation || data.message || "No validation output",
+                risk: data.risk || null,
+                validation_command: data.validation_command || null,
+                patch_safety: data.patch_safety || null,
+            },
+        });
+        if (!settled.accepted) return;
         window.lastAction = "diff";
         showTab("diff");
-        // Phase 5 Slice 5: feed risk + validation_command into the card.
-        // Phase 5 Polish: also feed patch_safety.
-        _setPatchState({
-            risk: data.risk || null,
-            validation_command: data.validation_command || null,
-            patch_safety: data.patch_safety || null,
-            last_action: data.success ? "tested" : "test failed",
-            last_status: data.message || (data.success ? "OK" : "failed"),
+    })
+    .catch(err => {
+        WorkbenchState.settle(ticket, {
+            status: "failed",
+            code: "network_error",
+            message: String(err),
+            output: { diff: "", validationText: `Network error: ${err}` },
         });
     });
 }
 
-function selectCandidate(idx) {
-    const c = window.patchCandidates[idx];
-    // Phase 5 Slice 5: write to #patchRawJson and refresh the card.
-    const json = JSON.stringify(c.patch, null, 2);
-    document.getElementById("patchRawJson").innerText = json;
-    _setPatchState({
-        raw: c.patch,
-        risk: null,
-        validation_command: null,
-        patch_safety: null,
-        last_action: "candidate selected",
-        last_status: c.name || `#${idx + 1}`,
-    });
+function selectCandidate(idx, listId) {
+    // UX.STATE.1: only an entry of the current context's list can become the candidate.
+    const selected = WorkbenchState.selectListed(listId, idx);
+    if (selected.refused) {
+        alert(selected.message);
+        return;
+    }
     window.lastAction = "patch";
     showTab("patch");
 }
 
 
 async function localCritique() {
-    // Phase 5 Slice 5: read raw JSON from #patchRawJson.
-    const patchText = document.getElementById("patchRawJson").innerText.trim();
+    // UX.STATE.1: critique the owned candidate; a late result for another
+    // candidate or repository context is never rendered.
+    WorkbenchState.setRepository(document.querySelector("input[name='repo_path']")?.value || "");
+    const current = WorkbenchState.snapshot().candidate;
+    const patchText = current ? current.text : "";
     if (!patchText) {
         alert("No patch to critique — generate a patch first.");
+        return;
+    }
+    const ticket = WorkbenchState.begin("critique");
+    if (ticket.refused) {
+        alert(ticket.message);
         return;
     }
 
@@ -10007,42 +10404,72 @@ async function localCritique() {
     debug.style.display = "none";
     main.innerHTML = "<em>Running local critique…</em>";
 
-    const res = await fetch("/local_critique", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ query, patch: patchText, context: contextText })
-    });
-
-    const data = await res.json();
+    let data;
+    try {
+        const res = await fetch("/local_critique", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ query, patch: patchText, context: contextText })
+        });
+        data = await res.json();
+    } catch (error) {
+        data = { ok: false, error: String(error) };
+    }
+    const settled = WorkbenchState.settle(ticket, data.ok
+        ? { status: "succeeded" }
+        : { status: "failed", code: "critique_failed", message: data.error });
+    if (!settled.accepted) return;
 
     if (!data.ok) {
-        main.innerHTML = `<span class="critique-error">&#x26A0; ${data.error}</span>`;
+        const error = document.createElement("span");
+        error.className = "critique-error";
+        CattusSafeContent.renderText(error, `⚠ ${data.error}`);
+        main.replaceChildren(error);
         return;
     }
 
     const c = data.critic;
-    // Class-per-verdict instead of dynamic inline color.
     const verdictClass = c.verdict === "accept"
         ? "critique-verdict--accept"
         : c.verdict === "reject"
             ? "critique-verdict--reject"
             : "critique-verdict--unclear";
-    const riskHtml = c.risk_flags?.length
-        ? `<div class="critique-section"><strong>Risk flags:</strong> ${c.risk_flags.map(f => `<code>${f}</code>`).join(", ")}</div>`
-        : "";
-    const fixHtml = c.must_fix?.length
-        ? `<div class="critique-section"><strong>Must fix:</strong><ul class="critique-fix-list">${c.must_fix.map(f => `<li>${f}</li>`).join("")}</ul></div>`
-        : "";
-
+    // Application-owned layout stays separate from every model-supplied field.
     main.innerHTML = `
-        <div><strong>Verdict:</strong> <span class="critique-verdict ${verdictClass}">${c.verdict}</span>
-        &nbsp;&nbsp;<strong>Confidence:</strong> ${Math.round((c.confidence || 0) * 100)}%</div>
-        <div class="critique-section"><strong>Summary:</strong> ${c.critic_summary || "—"}</div>
-        ${riskHtml}${fixHtml}`;
+        <div><strong>Verdict:</strong> <span class="critique-verdict ${verdictClass}"></span>
+        &nbsp;&nbsp;<strong>Confidence:</strong> <span class="critique-confidence"></span></div>
+        <div class="critique-section"><strong>Summary:</strong> <span class="critique-summary"></span></div>`;
+    CattusSafeContent.renderText(main.querySelector(".critique-verdict"), c.verdict);
+    CattusSafeContent.renderText(main.querySelector(".critique-confidence"), `${Math.round((c.confidence || 0) * 100)}%`);
+    CattusSafeContent.renderHTML(main.querySelector(".critique-summary"), c.critic_summary || "—");
+
+    if (c.risk_flags?.length) {
+        const risks = document.createElement("div");
+        risks.className = "critique-section";
+        risks.innerHTML = "<strong>Risk flags:</strong> ";
+        c.risk_flags.forEach((flag, index) => {
+            if (index) risks.append(document.createTextNode(", "));
+            const code = document.createElement("code");
+            CattusSafeContent.renderText(code, flag);
+            risks.append(code);
+        });
+        main.append(risks);
+    }
+    if (c.must_fix?.length) {
+        const fixes = document.createElement("div");
+        fixes.className = "critique-section";
+        fixes.innerHTML = '<strong>Must fix:</strong><ul class="critique-fix-list"></ul>';
+        c.must_fix.forEach(fix => {
+            const item = document.createElement("li");
+            CattusSafeContent.renderHTML(item, fix);
+            fixes.querySelector("ul").append(item);
+        });
+        main.append(fixes);
+    }
 
     if (data.thought) {
         debug.style.display = "block";
-        thought.innerText = data.thought;
+        CattusSafeContent.renderText(thought, data.thought);
     }
 }
 
@@ -10210,15 +10637,26 @@ async function uploadFolderFiles(files) {
         formData.append("files", file, file.webkitRelativePath || file.name);
     }
 
-    const res = await fetch("/upload_folder", {
-        method: "POST",
-        body: formData
-    });
-
-    const data = await res.json();
+    // UX.STATE.1: an upload may only replace the repository of the context that
+    // started it; WorkbenchState then renders the new repository input value.
+    WorkbenchState.setRepository(repoInput.value);
+    const ticket = WorkbenchState.begin("upload");
+    let data;
+    try {
+        const res = await fetch("/upload_folder", {
+            method: "POST",
+            body: formData
+        });
+        data = await res.json();
+    } catch (error) {
+        data = { error: String(error) };
+    }
+    const settled = WorkbenchState.settle(ticket, data.repo_path
+        ? { status: "succeeded", repository: data.repo_path }
+        : { status: "failed", code: "upload_failed", message: data.error || "Upload failed." });
+    if (!settled.accepted) return;
 
     if (data.repo_path) {
-        repoInput.value = data.repo_path;
         document.querySelector("input[name='project_tag']").value = data.project_tag;
 
         alert(
@@ -10240,7 +10678,12 @@ function openHelpModal() {
     .then(r => r.text())
     .then(html => {
       const body = document.getElementById('appModalBody');
-      if (body) body.innerHTML = `<div class="help-body">${html}</div>`;
+      if (body) {
+        const content = document.createElement("div");
+        content.className = "help-body";
+        CattusSafeContent.renderHTML(content, html);
+        body.replaceChildren(content);
+      }
     })
     .catch(err => {
       const body = document.getElementById('appModalBody');

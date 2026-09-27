@@ -4,6 +4,12 @@ import os
 from pathlib import Path
 from typing import Any
 
+from core.rollback_outcome import (
+    ROLLBACK_PROTECTION_SEMANTICS_CAPABILITY_ONLY,
+    attach_rollback_outcome,
+    rollback_outcome_from_mapping,
+)
+
 
 ATOMICITY_SCOPE = "patch_ops_only"
 VALIDATION_SIDE_EFFECT_POLICY = "reported_not_rolled_back"
@@ -60,7 +66,13 @@ def atomicity_metadata(
 ) -> dict[str, Any]:
     return {
         "atomicity_scope": ATOMICITY_SCOPE,
+        # Historical name retained as a capability statement: this execution
+        # path has patch-operation rollback machinery.  Actual rollback success
+        # is owned exclusively by rollback_outcome.
         "patch_ops_rollback_protected": True,
+        "patch_ops_rollback_protection_semantics": (
+            ROLLBACK_PROTECTION_SEMANTICS_CAPABILITY_ONLY
+        ),
         "validation_side_effects_in_rollback_scope": False,
         "validation_side_effect_policy": VALIDATION_SIDE_EFFECT_POLICY,
         "sandbox_validation_recommended": True,
@@ -78,10 +90,16 @@ def with_atomicity_metadata(
 ) -> dict[str, Any]:
     if validation_side_effects is None:
         validation_side_effects = result.get("validation_side_effects")
-    return {
+    combined = {
         **atomicity_metadata(validation_side_effects),
         **result,
     }
+    # DATA.ROLLBACK.1: missing or legacy metadata fails closed.  An existing
+    # typed outcome wins over every default or compatibility boolean.
+    return attach_rollback_outcome(
+        combined,
+        rollback_outcome_from_mapping(combined),
+    )
 
 
 def snapshot_repo_files(project_root: str | Path) -> dict[str, FileStamp]:

@@ -545,17 +545,1698 @@ def test_seed_registry_has_expected_phases():
         "CTX.PATCH.1",
         "CTX.APPLY.0",
     } <= ids
-    assert len(data["phases"]) == 119
+    assert {"INPUT.1", "INPUT.2", "INPUT.3"} <= ids
+    assert {"WAITER.1", "WAITER.2"} <= ids
+    assert {"ACQUIRE.1", "ACQUIRE.2", "ACQUIRE.3"} <= ids
+    assert {"EVIDENCE.1", "EVIDENCE.2"} <= ids
+    assert {"CLAIM.1"} <= ids
+    assert {"SYNTHESIS.1"} <= ids
+    assert {"CHECK.1", "CHECK.2"} <= ids
+    assert {
+        "WORKER.DECL.1",
+        "WORKER.DECL.2A",
+        "WORKER.DECL.2A.1",
+        "WORKER.DECL.2A.2",
+        "WORKER.DECL.2B",
+    } <= ids
+    assert "CONTROL.SAFETY.LIVE.1" in ids
+    assert "WAITER.LIVE.1" in ids
+    assert "PATCH.BASIS.LIVE.1" in ids
+    assert "OPS.PATCH.2" in ids
+    assert {
+        "RETRIEVE.LIVE.1",
+        "RETRIEVE.LIVE.2",
+        "RETRIEVE.LIVE.3",
+        "RETRIEVE.LIVE.4",
+    } <= ids
+    assert "ANSWER.GROUND.LIVE.1" in ids
+    assert "DEFECT.PROBE.LIVE.1" in ids
+    assert "VALIDATE.ORACLE.LIVE.1" in ids
+    assert "EXEC.POLICY.LIVE.1" in ids
+    assert "EXEC.APPROVAL.LIVE.1" in ids
+    assert "ANSWER.GROUND.LIVE.2" in ids
+    assert "CONTROL.LOCALIZE.LIVE.2" in ids
+    assert "REPAIR.INTENT.1" in ids
+    assert "REPAIR.INTENT.ADMIT.1" in ids
+    assert "REPAIR.INTENT.UI.1" in ids
+    assert "CTX.OOP.1A" in ids
+    assert "CTX.OOP.1C" in ids
+    assert "OOP.INTENT.UI.1" in ids
+    assert len(data["phases"]) == 205
+
+
+def test_input_understanding_phase_is_registered_and_inert():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["INPUT.1"]
+
+    assert phase["track"] == "INPUT"
+    assert phase["title"] == "Lossless Task Contract & Semantic Waiter Boundary"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["model_calls_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["human_approval_required"] is True
+    assert "core/input_understanding.py" in phase["allowed_files"]
+
+
+def test_semantic_waiter_phase_is_registered_and_inert_by_default():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["INPUT.2"]
+
+    assert phase["track"] == "INPUT"
+    assert phase["title"] == "Semantic Waiter Model Adapter & Semantic Evaluation"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["risk_level"] == "medium"
+    assert phase["prerequisites"] == ["INPUT.1"]
+    assert phase["human_approval_required"] is True
+    assert phase["writes_real_repo"] is False
+    assert phase["merge_allowed"] is False
+    # The phase itself performs no model or network call: the live adapter is
+    # opt-in, off by default, and absent from every validation command.
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert "core/semantic_waiter_adapter.py" in phase["allowed_files"]
+
+
+def test_semantic_waiter_phase_documents_the_registry_schema_mismatch():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    notes = " ".join(by_id["INPUT.2"]["notes"]).lower()
+
+    assert "opt-in" in notes
+    assert "registry" in notes
+
+
+def test_intake_completion_phase_is_registered_and_inert():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["INPUT.3"]
+
+    assert phase["track"] == "INPUT"
+    assert phase["title"] == "Progressive Intake Completion & Clarification Policy"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["prerequisites"] == ["INPUT.2"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    # The optional intake assistant is local-only and opt-in; the phase itself
+    # performs no model and no network call.
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert "core/intake_completion.py" in phase["allowed_files"]
+
+
+def test_intake_completion_phase_keeps_input_1_and_2_frozen():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["INPUT.3"]["forbidden_files"]
+
+    for frozen in (
+        "core/task_contract.py",
+        "core/explicit_evidence.py",
+        "core/semantic_waiter.py",
+        "core/requirement_preservation.py",
+        "core/input_understanding.py",
+        "core/semantic_waiter_adapter.py",
+        "core/semantic_waiter_runner.py",
+        "core/goal_brief.py",
+        "core/mode_router.py",
+    ):
+        assert frozen in forbidden, frozen
+
+
+def test_intake_completion_phase_documents_its_zero_model_guarantee():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    notes = " ".join(by_id["INPUT.3"]["notes"]).lower()
+
+    assert "zero-model-correct" in notes
+    assert "registry" in notes
+    assert "opt-in" in notes
+    assert "no cloud path" in notes
+
+
+def test_execution_waiter_phase_is_registered_and_inert():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WAITER.1"]
+
+    assert phase["track"] == "WAITER"
+    assert phase["title"] == "Deterministic Capability-Based Execution Router"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["prerequisites"] == ["INPUT.3"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    # The phase is pure: no model, no network, no opt-in adapter of any kind.
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert "core/execution_waiter.py" in phase["allowed_files"]
+
+
+def test_execution_waiter_phase_keeps_input_1_to_3_frozen():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["WAITER.1"]["forbidden_files"]
+
+    for module in (
+        "core/task_contract.py",
+        "core/explicit_evidence.py",
+        "core/requirement_preservation.py",
+        "core/semantic_waiter_runner.py",
+        "core/intake_completion.py",
+        "core/input_completion.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_execution_waiter_phase_may_not_touch_live_routing_or_model_selection():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["WAITER.1"]["forbidden_files"]
+
+    for module in (
+        "core/mode_router.py",
+        "core/mixed_mode_intent_router.py",
+        "core/driver_model_routing.py",
+        "core/model_role_registry.py",
+        "core/project_evolution_mode.py",
+        "core/context_selection.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_execution_waiter_phase_documents_its_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    notes = " ".join(by_id["WAITER.1"]["notes"]).lower()
+
+    assert "workflow is not compute" in notes
+    assert "requirements, not permissions" in notes
+    assert "broad is not ongoing" in notes
+    assert "report-only and unwired" in notes
+
+
+def test_evidence_requirement_phase_is_registered_and_inert():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WAITER.2"]
+
+    assert phase["track"] == "WAITER"
+    assert phase["title"] == "Deterministic Evidence Requirement Contract"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["prerequisites"] == ["WAITER.1"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    # The phase is pure: no model, no network, no opt-in adapter of any kind.
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert "core/waiter_evidence.py" in phase["allowed_files"]
+
+
+def test_evidence_requirement_phase_keeps_input_and_waiter_1_frozen():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["WAITER.2"]["forbidden_files"]
+
+    for module in (
+        "core/task_contract.py",
+        "core/explicit_evidence.py",
+        "core/requirement_preservation.py",
+        "core/intake_completion.py",
+        "core/task_shape.py",
+        "core/capability_requirements.py",
+        "core/execution_waiter.py",
+        "core/waiter_receipt.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_evidence_requirement_phase_may_not_touch_acquisition_machinery():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["WAITER.2"]["forbidden_files"]
+
+    for module in (
+        "core/context_selection.py",
+        "core/context_search_runtime.py",
+        "core/retriever.py",
+        "core/indexer.py",
+        "core/repository_inventory.py",
+        "core/mode_router.py",
+        "core/executor.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_evidence_requirement_phase_documents_its_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    notes = " ".join(by_id["WAITER.2"]["notes"]).lower()
+
+    assert "requirement, not acquisition" in notes
+    assert "domain is not role" in notes
+    assert "priority, not sweep" in notes
+    assert "no capability escalation" in notes
+    assert "no required-capability loss" in notes
+    assert "external evidence is never reduced to direct context" in notes
+    assert "no workflow escalation" in notes
+    assert "report-only and unwired" in notes
+
+
+def test_acquisition_request_phase_is_registered_and_inert():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["ACQUIRE.1"]
+
+    assert phase["track"] == "ACQUIRE"
+    assert phase["title"] == "Bounded Evidence Acquisition Request Contract"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["prerequisites"] == ["WAITER.2"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    # The phase is pure: no model, no network, no opt-in adapter of any kind.
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert "core/evidence_acquire_request.py" in phase["allowed_files"]
+
+
+def test_acquisition_request_phase_keeps_input_and_both_waiters_frozen():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["ACQUIRE.1"]["forbidden_files"]
+
+    for module in (
+        "core/task_contract.py",
+        "core/explicit_evidence.py",
+        "core/requirement_preservation.py",
+        "core/intake_completion.py",
+        "core/task_shape.py",
+        "core/capability_requirements.py",
+        "core/execution_waiter.py",
+        "core/waiter_receipt.py",
+        "core/evidence_requirements.py",
+        "core/evidence_policy.py",
+        "core/waiter_evidence.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_acquisition_request_phase_may_not_touch_acquisition_machinery():
+    """The phase that describes acquisition is the phase that may not perform it."""
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["ACQUIRE.1"]["forbidden_files"]
+
+    for module in (
+        "core/context_selection.py",
+        "core/context_search_runtime.py",
+        "core/retriever.py",
+        "core/indexer.py",
+        "core/index_manifest.py",
+        "core/repository_inventory.py",
+        "core/file_candidate_selector.py",
+        "core/direct_file_reader.py",
+        "core/graph_walker.py",
+        "core/mode_router.py",
+        "core/executor.py",
+        "core/validation_execution.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_acquisition_request_phase_documents_its_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    notes = " ".join(by_id["ACQUIRE.1"]["notes"]).lower()
+
+    assert "request, not acquisition" in notes
+    assert "source class is not filename" in notes
+    assert "every budget is finite" in notes
+    assert "budget follows evidence, not workflow" in notes
+    assert "broad is not everything" in notes
+    assert "tiers survive translation" in notes
+    assert "monotonic in both directions" in notes
+    assert "a path is preserved, never produced" in notes
+    assert "workflow immutability" in notes
+    assert "no planning" in notes
+    assert "zero acquisition authority" in notes
+    assert "report-only and unwired" in notes
+
+
+def test_candidate_eligibility_phase_is_registered_and_inert():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["ACQUIRE.2"]
+
+    assert phase["track"] == "ACQUIRE"
+    assert phase["title"] == "Bounded Candidate Eligibility & Selector Bridge"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["prerequisites"] == ["ACQUIRE.1"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    # The phase is pure: no model, no network, no opt-in adapter of any kind.
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert "core/evidence_candidate_pool.py" in phase["allowed_files"]
+
+
+def test_candidate_eligibility_phase_keeps_every_upstream_contract_frozen():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["ACQUIRE.2"]["forbidden_files"]
+
+    for module in (
+        "core/task_contract.py",
+        "core/task_shape.py",
+        "core/capability_requirements.py",
+        "core/execution_waiter.py",
+        "core/evidence_requirements.py",
+        "core/evidence_policy.py",
+        "core/waiter_evidence.py",
+        "core/acquisition_request.py",
+        "core/acquisition_policy.py",
+        "core/evidence_acquire_request.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_candidate_eligibility_phase_may_not_rewrite_ctx_select_or_walk_a_repository():
+    """The phase that bridges to the selector is the phase that may not be one."""
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["ACQUIRE.2"]["forbidden_files"]
+
+    for module in (
+        "core/context_selection.py",
+        "core/file_candidate_selector.py",
+        "core/file_actionability.py",
+        "core/file_capabilities.py",
+        "core/repository_inventory.py",
+        "core/repo_ignore.py",
+        "core/index_manifest.py",
+        "core/indexer.py",
+        "core/graph_walker.py",
+        "core/executor.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_candidate_eligibility_phase_documents_its_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    notes = " ".join(by_id["ACQUIRE.2"]["notes"]).lower()
+
+    assert "candidate is not evidence" in notes
+    assert "explicit-target closure, frozen" in notes
+    assert "target_artifact-equivalent" in notes
+    assert "acquire.2 is closed / frozen" in notes
+    assert "inventory consumed, never built" in notes
+    assert "membership is the only door" in notes
+    assert "extension is not authority" in notes
+    assert "unknown is a safe answer" in notes
+    assert "exclusions and deferrals are hard filters" in notes
+    assert "monotonic narrowing" in notes
+    assert "anti-6087" in notes
+    assert "no required-role loss" in notes
+    assert "selector bridge, not a second selector" in notes
+    assert "zero authority" in notes
+    assert "report-only and unwired" in notes
+
+
+def test_content_acquisition_phase_is_registered_as_a_conditional_read_runtime():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["ACQUIRE.3"]
+
+    assert phase["track"] == "ACQUIRE"
+    assert phase["title"] == "Bounded Content Acquisition & Source Receipt"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "medium"
+    assert phase["prerequisites"] == ["ACQUIRE.2"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    assert "core/content_acquisition.py" in phase["allowed_files"]
+    assert "core/evidence_content_acquisition.py" in phase["allowed_files"]
+    assert "tests/test_evidence_content_acquisition_boundaries.py" in phase[
+        "allowed_files"
+    ]
+
+
+def test_content_acquisition_phase_keeps_upstream_and_live_wiring_frozen():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["ACQUIRE.3"]["forbidden_files"]
+
+    for module in (
+        "core/acquisition_request.py",
+        "core/acquisition_policy.py",
+        "core/evidence_acquire_request.py",
+        "core/candidate_inventory.py",
+        "core/candidate_eligibility.py",
+        "core/eligibility_policy.py",
+        "core/evidence_candidate_pool.py",
+        "core/context_selection.py",
+        "core/file_candidate_selector.py",
+        "core/repository_inventory.py",
+        "core/indexer.py",
+        "core/graph_walker.py",
+        "core/mode_router.py",
+        "core/mixed_mode_intent_router.py",
+        "core/unified_workbench_input_plan.py",
+        "core/project_evolution_mode.py",
+        "core/commander_run_contract.py",
+        "core/executor.py",
+        "core/pipeline.py",
+        "core/validation_execution.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_content_acquisition_phase_documents_schema_limit_and_epistemic_boundary():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    notes = " ".join(by_id["ACQUIRE.3"]["notes"]).lower()
+
+    assert "explicit selection, never self-selection" in notes
+    assert "explicit human-approved authorization" in notes
+    assert "authorization only narrows" in notes
+    assert "candidate-addressed reads, no traversal" in notes
+    assert "payload and receipt are separate" in notes
+    assert "acquired is not verified" in notes
+    assert "registry capability limitation" in notes
+    assert "schema v1 has no field" in notes
+    assert "absent or invalid authorization means zero reads" in notes
+    assert "writes_real_repo=false" in notes
+    assert "registry validation and road.2 phase picking execute nothing" in notes
+    assert "import-time inert and not live-wired" in notes
+    assert "future evidence.1" in notes
+
+
+def test_evidence_verification_phase_is_registered_as_a_deterministic_gate():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["EVIDENCE.1"]
+
+    assert phase["track"] == "EVIDENCE"
+    assert phase["title"] == "Acquired Source Verification & Evidence Promotion Contract"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "medium"
+    assert phase["prerequisites"] == ["ACQUIRE.3"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    for module in (
+        "core/evidence_verification.py",
+        "core/evidence_analyzer.py",
+        "core/evidence_promotion_gate.py",
+        "core/evidence_analyzer_adapter.py",
+    ):
+        assert module in phase["allowed_files"], module
+    for suite in (
+        "tests/test_evidence_verification.py",
+        "tests/test_evidence_verification_boundaries.py",
+        "tests/test_evidence_analyzer_adapter.py",
+        "tests/test_evidence_semantic_provenance.py",
+    ):
+        assert suite in phase["allowed_files"], suite
+
+
+def test_evidence_verification_phase_keeps_acquisition_and_live_wiring_frozen():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["EVIDENCE.1"]["forbidden_files"]
+
+    for module in (
+        "core/content_acquisition.py",
+        "core/evidence_content_acquisition.py",
+        "core/acquisition_request.py",
+        "core/candidate_eligibility.py",
+        "core/evidence_requirements.py",
+        "core/task_contract.py",
+        "core/context_selection.py",
+        "core/file_candidate_selector.py",
+        "core/repository_inventory.py",
+        "core/indexer.py",
+        "core/graph_walker.py",
+        "core/mode_router.py",
+        "core/mixed_mode_intent_router.py",
+        "core/unified_workbench_input_plan.py",
+        "core/project_evolution_mode.py",
+        "core/commander_run_contract.py",
+        "core/executor.py",
+        "core/pipeline.py",
+        "core/validation_execution.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_evidence_verification_phase_documents_its_epistemic_boundary():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    notes = " ".join(by_id["EVIDENCE.1"]["notes"]).lower()
+
+    assert "the proposition arrives, it is never invented" in notes
+    assert "two separate gates, role and relation" in notes
+    assert "expected role is a hypothesis, not a verdict" in notes
+    assert "scope competence is a frozen table" in notes
+    assert "absence needs coverage, a counterexample does not" in notes
+    assert "code existing is not code running" in notes
+    assert "omission is not contradiction" in notes
+    assert "the payload is authoritative and the path is never reopened" in notes
+    assert "spans are bytes somebody read" in notes
+    assert "the model is an analyzer, not the gate" in notes
+    assert "no numeric confidence anywhere" in notes
+    assert "contradiction is verified evidence" in notes
+    assert "no claim synthesis" in notes
+    assert "source content never reaches a receipt" in notes
+    assert "cloud disclosure is a configuration act" in notes
+    assert "one analyzer, one call, no escalation" in notes
+    assert "registry capability limitation" in notes
+    assert "ships no live transport" in notes
+    assert "import-time inert and not live-wired" in notes
+    assert "anti-deepseek negative claim regression" in notes
+    assert "evidence.2 / claim.1" in notes
+    # The closure amendment: a judgement accepted through a deterministic gate
+    # is not a judgement produced by one, and the record has to say which.
+    assert "semantic relation is analyzer-assessed, not deterministically proven" in notes
+    assert "verifiedevidence means tamper-bound" in notes
+    assert "it does not mean the proposition was proven true" in notes
+    assert "evidence.1 closed and frozen" in notes
+
+
+
+def test_evidence_set_assessment_phase_is_registered_as_a_report_only_layer():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["EVIDENCE.2"]
+
+    assert phase["track"] == "EVIDENCE"
+    assert phase["title"] == "Evidence Set Coverage, Conflict & Independence Contract"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["prerequisites"] == ["EVIDENCE.1"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    assert "core/evidence_set_assessment.py" in phase["allowed_files"]
+    for suite in (
+        "tests/test_evidence_set_assessment.py",
+        "tests/test_evidence_set_assessment_boundaries.py",
+    ):
+        assert suite in phase["allowed_files"], suite
+
+
+def test_evidence_set_assessment_phase_keeps_evidence_1_and_acquisition_frozen():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["EVIDENCE.2"]["forbidden_files"]
+
+    for module in (
+        "core/evidence_verification.py",
+        "core/evidence_analyzer.py",
+        "core/evidence_promotion_gate.py",
+        "core/evidence_analyzer_adapter.py",
+        "core/content_acquisition.py",
+        "core/evidence_content_acquisition.py",
+        "core/acquisition_request.py",
+        "core/evidence_requirements.py",
+        "core/context_selection.py",
+        "core/executor.py",
+        "core/pipeline.py",
+        "core/validation_execution.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_evidence_set_assessment_phase_documents_its_epistemic_boundary():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    notes = " ".join(by_id["EVIDENCE.2"]["notes"]).lower()
+
+    assert "one proposition, many records, no claim" in notes
+    assert "counting is not weighing" in notes
+    assert "relations are grouped, never regraded" in notes
+    assert "role presence and directional support are different dimensions" in notes
+    assert "role requirements are supplied, never invented" in notes
+    assert "identical content proves duplication; a different digest proves nothing" in notes
+    assert "independence is consumed, never derived" in notes
+    assert "anti-mirror-tunnel" in notes
+    assert "absence still needs coverage across a set" in notes
+    assert "no producer for coverage or current-state receipts" in notes
+    assert "aggregation cannot upgrade epistemic status" in notes
+    assert "tamper binding is re-derived, never trusted" in notes
+    assert "admission before description" in notes
+    assert "canonical ordering and deterministic identity" in notes
+    assert "no source bytes, no analyzer, no model" in notes
+    assert "claim decision authority is a property, not a field" in notes
+    assert "upstream regression amended, not weakened" in notes
+    assert "deepseek dogfood evidence-set regression" in notes
+    assert "claim.1" in notes
+
+
+def test_claim_assessment_phase_is_registered_as_a_report_only_layer():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CLAIM.1"]
+
+    assert phase["track"] == "CLAIM"
+    assert phase["title"] == "Bounded Proposition Assessment Contract"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["prerequisites"] == ["EVIDENCE.2"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    assert "core/claim_assessment.py" in phase["allowed_files"]
+    for suite in (
+        "tests/test_claim_assessment.py",
+        "tests/test_claim_assessment_boundaries.py",
+    ):
+        assert suite in phase["allowed_files"], suite
+
+
+def test_claim_assessment_phase_keeps_the_whole_evidence_track_frozen():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["CLAIM.1"]["forbidden_files"]
+
+    for module in (
+        "core/evidence_set_assessment.py",
+        "core/evidence_verification.py",
+        "core/evidence_analyzer.py",
+        "core/evidence_promotion_gate.py",
+        "core/evidence_analyzer_adapter.py",
+        "core/content_acquisition.py",
+        "core/evidence_content_acquisition.py",
+        "core/acquisition_request.py",
+        "core/evidence_requirements.py",
+        "core/context_selection.py",
+        "core/executor.py",
+        "core/pipeline.py",
+        "core/validation_execution.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_claim_assessment_phase_documents_its_epistemic_boundary():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    notes = " ".join(by_id["CLAIM.1"]["notes"]).lower()
+
+    assert "one proposition, one assessed set, no truth" in notes
+    assert "supported is not proven" in notes
+    assert "anti-truth-laundering is structural" in notes
+    assert "conflict is terminal and has no winner" in notes
+    assert "no majority, proved statically" in notes
+    assert "duplicates do not strengthen" in notes
+    assert "a different digest is not independence" in notes
+    assert "absence still needs coverage" in notes
+    assert "code existing is not code running" in notes
+    assert "role presence is not directional support" in notes
+    assert "relations are read, never regraded" in notes
+    assert "the entry gate fails closed and repairs nothing" in notes
+    assert "authority is narrow and final claim authority is a property" in notes
+    assert "no source bytes, no paths, no spans, no model" in notes
+    assert "determinism and fingerprint binding" in notes
+    assert "upstream regressions amended, not weakened" in notes
+    assert "deepseek dogfood claim regression" in notes
+    assert "synthesis.1" in notes
+
+
+def test_claim_assessment_phase_emits_no_final_claim_and_no_confidence():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    summary = by_id["CLAIM.1"]["summary"].lower()
+
+    assert "never 'what is ultimately true?'" in summary
+    assert "no true, false, likely_true, probably_false, confidence_high" in summary
+    assert "emits no final claim" in summary
+    assert "calls no model" in summary
+    assert "is not wired into any live product path" in summary
+
+
+def test_structured_synthesis_phase_is_registered_as_report_only_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["SYNTHESIS.1"]
+
+    assert phase["track"] == "SYNTHESIS"
+    assert phase["title"] == "Task-Shaped Claim Composition Contract"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["prerequisites"] == ["CLAIM.1"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    for artifact in (
+        "core/structured_synthesis.py",
+        "tests/test_structured_synthesis.py",
+        "tests/test_structured_synthesis_boundaries.py",
+        "tests/test_claim_assessment_boundaries.py",
+        "docs/designs/2026-08-26-task-shaped-claim-composition-contract.md",
+    ):
+        assert artifact in phase["allowed_files"], artifact
+
+
+def test_structured_synthesis_phase_documents_composition_boundaries_and_gap():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["SYNTHESIS.1"]
+    summary = phase["summary"].lower()
+    notes = " ".join(phase["notes"]).lower()
+
+    assert "report-only" in summary
+    assert "invent" in summary
+    assert "winner selection" in summary
+    assert "final-response generation" in summary
+    assert "task-shaped composition, not claim creation" in notes
+    assert "the preserved user structure is authoritative" in notes
+    assert "explicit bindings only" in notes
+    assert "known missing proposition-binding producer" in notes
+    assert "claim status and semantic basis survive" in notes
+    assert "no winner, score or confidence" in notes
+    assert "output is structured data, not response prose" in notes
+    assert "determinism and tamper binding" in notes
+    assert "authority is narrow and report-only" in notes
+    assert "no source, evidence or model access" in notes
+    assert "deepseek five-way regression" in notes
+    assert "no live wiring" in notes
+    assert "response.1" in notes
+
+
+def test_structured_synthesis_phase_freezes_upstream_and_live_paths():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["SYNTHESIS.1"]["forbidden_files"]
+
+    for module in (
+        "core/task_contract.py",
+        "core/claim_assessment.py",
+        "core/evidence_set_assessment.py",
+        "core/evidence_verification.py",
+        "core/evidence_analyzer.py",
+        "core/evidence_promotion_gate.py",
+        "core/content_acquisition.py",
+        "core/evidence_content_acquisition.py",
+        "core/context_selection.py",
+        "core/mode_router.py",
+        "core/mixed_mode_intent_router.py",
+        "core/unified_workbench_input_plan.py",
+        "core/project_evolution_mode.py",
+        "core/commander_run_contract.py",
+        "core/executor.py",
+        "core/pipeline.py",
+        "core/validation_execution.py",
+    ):
+        assert module in forbidden, module
+
+
+def test_post_run_reconciliation_phase_is_registered_as_report_only_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.1"]
+
+    assert phase["track"] == "CHECK"
+    assert phase["title"] == "Post-Run Contract Reconciliation"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    for artifact in (
+        "core/post_run_reconciliation.py",
+        "core/post_run_observation.py",
+        "tests/test_post_run_reconciliation.py",
+        "tests/test_post_run_reconciliation_boundaries.py",
+        "docs/designs/2026-08-27-post-run-contract-reconciliation.md",
+    ):
+        assert artifact in phase["allowed_files"], artifact
+        assert artifact in phase["expected_artifacts"] or artifact.startswith(
+            "docs/"
+        ), artifact
+
+
+def test_post_run_reconciliation_depends_on_the_execution_branch_not_synthesis():
+    """CHECK.1 shipped after SYNTHESIS.1 but consumes nothing from it."""
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.1"]
+
+    assert phase["prerequisites"] == ["CTX.APPLY.0"]
+    assert "SYNTHESIS.1" not in phase["prerequisites"]
+    assert "CLAIM.1" not in phase["prerequisites"]
+    assert by_id["CTX.APPLY.0"]["status"] == "complete"
+    notes = " ".join(phase["notes"]).lower()
+    assert "execution branch, not the epistemic branch" in notes
+    assert "registry records architecture, not implementation order" in notes
+
+
+def test_post_run_reconciliation_phase_documents_its_reconciliation_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.1"]
+    summary = phase["summary"].lower()
+    notes = " ".join(phase["notes"]).lower()
+
+    assert "report-only" in summary
+    assert "outrank" in summary
+    assert "no semantic goal review" in summary
+    assert "objective facts outrank the self-report" in notes
+    assert "path authority is fail-closed" in notes
+    assert "patch safety is reused, not rediscovered" in notes
+    assert "validation cannot be faked by prose" in notes
+    assert "stale validation cannot certify a later state" in notes
+    assert "no success laundering" in notes
+    assert "preservation obligations hand off to check.2" in notes
+    assert "determinism and tamper binding" in notes
+    assert "authority is narrow and report-only" in notes
+    assert "no diff, source, model or repair loop" in notes
+    assert "one execution unit at a time" in notes
+    assert "deepseek-style execution regression" in notes
+    assert "no live wiring" in notes
+    assert "check.2" in notes
+
+
+def test_post_run_reconciliation_phase_freezes_upstream_and_live_paths():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["CHECK.1"]["forbidden_files"]
+
+    for module in (
+        "core/patch_safety.py",
+        "core/repository_path_policy.py",
+        "core/direct_context_patch_attachment.py",
+        "core/direct_patch_candidate_gate.py",
+        "core/validation_execution.py",
+        "core/validation_command.py",
+        "core/validation_side_effects.py",
+        "core/executor.py",
+        "core/pipeline.py",
+        "core/self_correct_loop.py",
+        "core/worker_result_review.py",
+        "core/worker_runs.py",
+        "core/mirror_tunnel_claim_diff_check.py",
+        "core/project_evolution_mode.py",
+        "core/commander_run_contract.py",
+        "core/mode_router.py",
+        "core/task_contract.py",
+        "core/claim_assessment.py",
+        "core/structured_synthesis.py",
+        "patching/",
+    ):
+        assert module in forbidden, module
+
+
+def test_goal_fidelity_phase_is_registered_as_report_only_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.2"]
+
+    assert phase["track"] == "CHECK"
+    assert phase["title"] == "Post-Run Goal-Fidelity Verification Contract"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    for artifact in (
+        "core/goal_fidelity_review.py",
+        "tests/test_goal_fidelity_review.py",
+        "tests/test_goal_fidelity_review_boundaries.py",
+        "docs/designs/2026-08-27-post-run-goal-fidelity-verification.md",
+    ):
+        assert artifact in phase["allowed_files"], artifact
+        assert artifact in phase["expected_artifacts"] or artifact.startswith(
+            "docs/"
+        ), artifact
+
+
+def test_goal_fidelity_phase_depends_on_both_upstream_branches():
+    """CHECK.2 is the first phase to consume the execution *and* claim branches."""
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.2"]
+
+    assert phase["prerequisites"] == ["CHECK.1", "CLAIM.1"]
+    assert "SYNTHESIS.1" not in phase["prerequisites"]
+    assert by_id["CHECK.1"]["status"] == "complete"
+    assert by_id["CLAIM.1"]["status"] == "complete"
+    notes = " ".join(phase["notes"]).lower()
+    assert "two branches, one join" in notes
+    assert "consumes no synthesis.1" in notes
+
+
+def test_goal_fidelity_phase_documents_its_verification_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.2"]
+    summary = phase["summary"].lower()
+    notes = " ".join(phase["notes"]).lower()
+
+    assert "report-only" in summary
+    assert "never 'should this run be accepted?'" in summary
+    assert "no reviewer model, no reviewer bypass" in notes
+    assert "execution severity is monotonic" in notes
+    assert "no obligation invention" in notes
+    assert "no obligation loss" in notes
+    assert "polarity is supplied, never inferred" in notes
+    assert "claim status is never laundered" in notes
+    assert "a validation receipt is not a semantic claim" in notes
+    assert "semantic basis survives aggregation" in notes
+    assert "post-run state binding is a known gap" in notes
+    assert "no majority, no score, no reduction" in notes
+    assert "determinism and tamper binding" in notes
+    assert "check.2 is not check.3" in notes
+    assert "upstream producers are missing and documented" in notes
+    assert "no live wiring" in notes
+
+
+def test_goal_fidelity_phase_freezes_upstream_and_live_paths():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    forbidden = by_id["CHECK.2"]["forbidden_files"]
+
+    for module in (
+        "core/post_run_reconciliation.py",
+        "core/post_run_observation.py",
+        "core/claim_assessment.py",
+        "core/evidence_set_assessment.py",
+        "core/evidence_verification.py",
+        "core/evidence_analyzer.py",
+        "core/content_acquisition.py",
+        "core/structured_synthesis.py",
+        "core/task_contract.py",
+        "core/patch_safety.py",
+        "core/validation_execution.py",
+        "core/executor.py",
+        "core/self_correct_loop.py",
+        "core/worker_result_review.py",
+        "core/commander_run_contract.py",
+        "core/mode_router.py",
+        "patching/",
+        "agents/",
+    ):
+        assert module in forbidden, module
+
+
+def test_shadow_post_run_wiring_phase_is_registered_as_live_but_shadow_only():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.LIVE.1"]
+
+    assert phase["track"] == "CHECK"
+    assert phase["title"] == "Shadow Post-Run Reconciliation Wiring"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "medium"
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    for artifact in (
+        "core/live_change_observation.py",
+        "core/live_execution_authorization.py",
+        "core/live_worker_report.py",
+        "core/live_validation_receipt.py",
+        "core/post_run_reconciliation_shadow.py",
+        "tests/test_post_run_reconciliation_shadow.py",
+        "tests/test_post_run_reconciliation_shadow_boundaries.py",
+        "docs/designs/2026-08-28-shadow-post-run-reconciliation-wiring.md",
+    ):
+        assert artifact in phase["allowed_files"], artifact
+        assert artifact in phase["expected_artifacts"] or artifact.startswith(
+            "docs/"
+        ), artifact
+
+
+def test_shadow_post_run_wiring_requires_check_1_and_not_check_2():
+    """The live wiring consumes the objective checker only."""
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.LIVE.1"]
+
+    assert phase["prerequisites"] == ["CHECK.1"]
+    assert "CHECK.2" not in phase["prerequisites"]
+    assert "CLAIM.1" not in phase["prerequisites"]
+    assert by_id["CHECK.1"]["status"] == "complete"
+
+
+def test_shadow_post_run_wiring_documents_its_shadow_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.LIVE.1"]
+    summary = phase["summary"].lower()
+    notes = " ".join(phase["notes"]).lower()
+
+    assert "shadow-only" in summary
+    assert "no repository traversal" in summary
+    assert "cannot widen upstream write authority" in summary
+    assert "neither invokes check.2 nor promotes check.1 to enforcement" in summary
+    assert "shadow only, and that is the point" in notes
+    assert "one reconciliation policy" in notes
+    assert "authority is translated, never widened" in notes
+    assert "no prose is parsed" in notes
+    assert "no new repository traversal" in notes
+    assert "state identity is the observed change set" in notes
+    assert "stale validation is detected through the live path" in notes
+    assert "a failed validation still produces a receipt" in notes
+    assert "known empty is not missing" in notes
+    assert "failure is isolated and bounded" in notes
+    assert "the existing artifact store is reused" in notes
+    assert "no repository source write" in notes
+    assert "what is wired, and what is not" in notes
+    assert "check.2 is not invoked and check.3 is not built" in notes
+    assert "default off, enabled for dogfood" in notes
+
+
+def test_shadow_post_run_wiring_freezes_the_checkers_and_the_apply_engines():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.LIVE.1"]
+    forbidden = phase["forbidden_files"]
+
+    for module in (
+        "core/post_run_reconciliation.py",
+        "core/post_run_observation.py",
+        "core/goal_fidelity_review.py",
+        "core/claim_assessment.py",
+        "core/patch_safety.py",
+        "core/repository_path_policy.py",
+        "core/executor.py",
+        "core/pipeline.py",
+        "core/self_correct_loop.py",
+        "core/validator.py",
+        "core/validation_execution.py",
+        "core/validation_side_effects.py",
+        "core/worker_result_review.py",
+        "core/mirror_tunnel_claim_diff_check.py",
+        "patching/",
+        "agents/",
+        "web/",
+    ):
+        assert module in forbidden, module
+        assert module not in phase["allowed_files"], module
+
+
+def test_independent_worker_declaration_phase_is_registered_as_shadow_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.LIVE.1B"]
+
+    assert phase["track"] == "CHECK"
+    assert phase["title"] == "Independent Typed Worker Declaration Wiring"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "medium"
+    assert phase["prerequisites"] == ["CHECK.LIVE.1"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    for artifact in (
+        "core/live_worker_declaration.py",
+        "core/live_worker_report.py",
+        "core/post_run_reconciliation_shadow.py",
+        "core/run_lifecycle.py",
+        "tests/test_live_worker_declaration.py",
+        "tests/test_post_run_reconciliation_shadow.py",
+        "tests/test_post_run_reconciliation_shadow_boundaries.py",
+        "tests/test_post_run_reconciliation_boundaries.py",
+        "docs/designs/2026-08-28-independent-typed-worker-declaration-wiring.md",
+    ):
+        assert artifact in phase["allowed_files"], artifact
+        assert artifact in phase["expected_artifacts"] or artifact.startswith(
+            "docs/"
+        ), artifact
+
+
+def test_independent_worker_declaration_phase_freezes_worker_protocol_and_checkers():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.LIVE.1B"]
+
+    for frozen in (
+        "core/post_run_reconciliation.py",
+        "core/post_run_observation.py",
+        "core/goal_fidelity_review.py",
+        "core/patch_safety.py",
+        "core/repository_path_policy.py",
+        "core/executor.py",
+        "core/pipeline.py",
+        "core/self_correct_loop.py",
+        "core/worker_result_review.py",
+        "core/worker_runs.py",
+        "core/worker_assignment.py",
+        "patching/",
+        "agents/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+
+def test_independent_worker_declaration_phase_documents_the_honest_gap():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {
+        item["phase_id"]: item for item in data["phases"]
+    }["CHECK.LIVE.1B"]
+    summary = phase["summary"].lower()
+    notes = " ".join(phase["notes"]).lower()
+
+    assert "independently supplied typed worker self-report" in summary
+    assert "no production caller" in notes
+    assert "structural independence is enforced" in notes
+    assert "unknown kind stays unknown" in notes
+    assert "legacy preserved" in notes
+    assert "dogfood telemetry" in notes
+    assert "kind mismatch" in notes
+    assert "no cost or power expansion" in notes
+
+
+def test_native_worker_declaration_qualification_is_registered_as_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.1"]
+
+    assert phase["track"] == "WORKER"
+    assert phase["title"] == (
+        "Native Worker Declaration Source Qualification & Wiring"
+    )
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "low"
+    assert phase["prerequisites"] == ["CHECK.LIVE.1B"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    for artifact in (
+        "tests/test_native_worker_declaration_qualification.py",
+        "docs/designs/"
+        "2026-08-28-native-worker-declaration-source-qualification.md",
+    ):
+        assert artifact in phase["allowed_files"], artifact
+        assert artifact in phase["expected_artifacts"], artifact
+
+
+def test_native_worker_declaration_qualification_modifies_no_producer():
+    """A qualification phase may read the wiring, never rewrite it.
+
+    The CHECK.LIVE.1B seam, the worker protocol and every prompt contract the
+    qualification inspected are all forbidden to it, so the recorded outcome
+    cannot have been produced by quietly changing what it was measuring.
+    """
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.1"]
+
+    for frozen in (
+        "core/live_worker_declaration.py",
+        "core/live_worker_report.py",
+        "core/post_run_reconciliation_shadow.py",
+        "core/run_lifecycle.py",
+        "core/post_run_reconciliation.py",
+        "core/post_run_observation.py",
+        "core/goal_fidelity_review.py",
+        "core/claim_assessment.py",
+        "core/prompter.py",
+        "core/control_engine.py",
+        "core/json_utils.py",
+        "core/pipeline.py",
+        "core/executor.py",
+        "core/self_correct_loop.py",
+        "core/worker_result_review.py",
+        "core/worker_runs.py",
+        "patching/patch_gates.py",
+        "scripts/run_subagent_handoff.py",
+        "scripts/run_patch_proposal_queue.py",
+        "patching/",
+        "agents/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+
+def test_native_worker_declaration_qualification_records_the_unavailable_outcome():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["WORKER.DECL.1"]
+    summary = phase["summary"].lower()
+    notes = " ".join(phase["notes"]).lower()
+
+    # The classification itself, not a hedge about it.
+    assert "worker_decl_1_source_unavailable" in summary
+    assert "legacy_plan_derived" in summary
+    assert "outcome is worker_decl_1_source_unavailable, and that is a result" in notes
+
+    # The three findings the classification rests on.
+    assert "no field declaring changed paths" in summary
+    assert "timing is provenance" in notes
+    assert "the near miss is recorded" in notes
+
+    # And the boundary it did not cross.
+    assert "no production module modified" in summary
+    assert "no manufactured source and no silent widening" in notes
+    assert "measurability stays honest" in notes
+    assert "a future producer must fix the stage vocabulary first" in notes
+
+
+def test_strict_patch_response_envelope_is_registered_as_shadow_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.2A"]
+
+    assert phase["track"] == "WORKER"
+    assert phase["title"] == "Strict Structured Patch Response Envelope"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "medium"
+    assert phase["prerequisites"] == ["WORKER.DECL.1"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    for artifact in (
+        "core/worker_patch_envelope.py",
+        "tests/test_worker_patch_envelope.py",
+        "tests/test_worker_patch_envelope_boundaries.py",
+        "docs/designs/2026-08-29-strict-structured-patch-response-envelope.md",
+    ):
+        assert artifact in phase["allowed_files"], artifact
+        assert artifact in phase["expected_artifacts"], artifact
+
+
+def test_strict_patch_response_envelope_freezes_the_channels_it_measures():
+    """It may wire a shadow beside the legacy reader; it may not edit either.
+
+    The legacy extractor, the apply engine, the prompt contracts and every
+    frozen checker stay out of reach, so a recorded compatibility number cannot
+    have been obtained by changing what was being measured.
+    """
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.2A"]
+
+    for frozen in (
+        "core/json_utils.py",
+        "core/prompter.py",
+        "core/control_engine.py",
+        "patching/patch_gates.py",
+        "patching/patch_plan_executor.py",
+        "core/executor.py",
+        "core/self_correct_loop.py",
+        "core/post_run_reconciliation.py",
+        "core/post_run_observation.py",
+        "core/goal_fidelity_review.py",
+        "core/claim_assessment.py",
+        "core/live_worker_declaration.py",
+        "core/live_worker_report.py",
+        "core/post_run_reconciliation_shadow.py",
+        "agents/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    # The producer sites it does wire are allowed, and only those.
+    for wired in (
+        "core/worker_patch_envelope.py",
+        "core/run_lifecycle.py",
+        "core/replay_recorder.py",
+        "core/agent_state.py",
+        "core/pipeline.py",
+        "core/sleeping_consultant.py",
+        "scripts/run_patch_proposal_queue.py",
+    ):
+        assert wired in phase["allowed_files"], wired
+        assert wired not in phase["forbidden_files"], wired
+
+
+def test_strict_patch_response_envelope_documents_the_transport_boundary():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["WORKER.DECL.2A"]
+    summary = phase["summary"].lower()
+    notes = " ".join(phase["notes"]).lower()
+
+    # What the contract actually is.
+    assert "exactly one json object" in summary
+    assert "surrounding_prose_rejected" in summary
+    assert "a protocol, not a second heuristic reader" in notes
+
+    # And the four things it refuses.
+    assert "one response, two parsers, zero extra model calls" in notes
+    assert "reject whole, never truncate" in notes
+    assert "authority cannot enter through the envelope" in notes
+    assert "no change intent yet, on purpose" in notes
+    assert "no prompt change in this phase" in notes
+
+
+def test_strict_envelope_emission_experiment_is_registered_as_shadow_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.2A.1"]
+
+    assert phase["track"] == "WORKER"
+    assert phase["title"] == "Strict Envelope Emission Adoption Experiment"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["risk_level"] == "medium"
+    assert phase["prerequisites"] == ["WORKER.DECL.2A"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert phase["requires_sandbox"] is False
+    for artifact in (
+        "core/strict_envelope_emission.py",
+        "scripts/strict_envelope_emission_baseline.py",
+        "tests/test_strict_envelope_emission.py",
+        "tests/test_strict_envelope_emission_boundaries.py",
+        "docs/designs/2026-08-30-strict-envelope-emission-adoption-experiment.md",
+    ):
+        assert artifact in phase["allowed_files"], artifact
+        assert artifact in phase["expected_artifacts"], artifact
+
+
+def test_strict_envelope_emission_experiment_freezes_what_it_measures():
+    """It may change the request; it may not change the parser or the patch.
+
+    The frozen envelope, the legacy extractor, the patch prompt contracts, the
+    apply engine and every checker stay out of reach, so a recorded adoption
+    number cannot have been obtained by moving the target.
+    """
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.2A.1"]
+
+    for frozen in (
+        "core/worker_patch_envelope.py",
+        "core/json_utils.py",
+        "core/prompter.py",
+        "core/control_engine.py",
+        "policy/decision_helper.py",
+        "patching/patch_gates.py",
+        "patching/patch_plan_executor.py",
+        "core/executor.py",
+        "core/self_correct_loop.py",
+        "core/post_run_reconciliation.py",
+        "core/post_run_reconciliation_shadow.py",
+        "core/live_worker_declaration.py",
+        "core/live_worker_report.py",
+        "core/goal_fidelity_review.py",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    # The one provider adapter it experiments on is allowed; the others are not.
+    assert "agents/gemini_client.py" in phase["allowed_files"]
+    assert "agents/" not in phase["allowed_files"]
+    for other_provider in ("agents/deepseek_client.py", "agents/ollama_client.py"):
+        assert other_provider in phase["forbidden_files"], other_provider
+
+    for wired in (
+        "core/strict_envelope_emission.py",
+        "core/run_lifecycle.py",
+        "core/replay_recorder.py",
+        "core/agent_state.py",
+        "core/pipeline.py",
+        "core/sleeping_consultant.py",
+        "scripts/run_patch_proposal_queue.py",
+    ):
+        assert wired in phase["allowed_files"], wired
+        assert wired not in phase["forbidden_files"], wired
+
+
+def test_strict_envelope_emission_experiment_documents_its_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["WORKER.DECL.2A.1"]
+    summary = phase["summary"].lower()
+    notes = " ".join(phase["notes"]).lower()
+
+    # What actually changed, and what could not.
+    assert "strict_worker_patch_envelope_emission" in summary
+    assert "legacy_prompt, strict_prompt and provider_native_json" in summary
+    assert "the request is the experimental variable, and the only one" in notes
+
+    # And the things it refuses.
+    assert "flag off is argument-identical, not merely equivalent" in notes
+    assert "the parser is not weakened to raise the number" in notes
+    assert "no second call and no repair turn" in notes
+    assert "legacy extraction remains authoritative throughout" in notes
+    assert "no threshold yet, on purpose" in notes
+    assert "no change intent, no checker promotion" in notes
+
+
+
+
+def test_live_strict_envelope_dogfood_is_registered_as_observation_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.2A.2"]
+
+    assert phase["track"] == "WORKER"
+    assert phase["title"] == "Live Strict Envelope Adoption Dogfood"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_0_OBSERVE"
+    assert phase["risk_level"] == "medium"
+    assert phase["prerequisites"] == ["WORKER.DECL.2A.1"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    for artifact in (
+        "docs/designs/2026-08-30-live-strict-envelope-adoption-dogfood.md",
+        ".agent/roadmap/strict_emission_dogfood.json",
+    ):
+        assert artifact in phase["expected_artifacts"], artifact
+
+
+def test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call():
+    """It spends provider calls, and the registry says so in the only way it can.
+
+    ``model_calls_allowed`` is the registry's vocabulary for provider traffic and
+    is legal only under the approval budget tier, so a dogfood phase must carry
+    both.  ``network_allowed`` stays false because ROAD.1 rejects true outright;
+    that flag is not this phase claiming it made no requests.
+    """
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = data["phases"]
+    by_id = {phase["phase_id"]: phase for phase in phases}
+    phase = by_id["WORKER.DECL.2A.2"]
+
+    assert phase["model_calls_allowed"] is True
+    assert phase["budget_tier"] == "strong_model_requires_approval"
+    assert phase["requires_sandbox"] is True
+    # ROAD.1 forbids raw network access for every managed phase, this one included.
+    assert phase["network_allowed"] is False
+    assert not validate_phase_registry(data)["errors"]
+
+    # And it really is the first.  The set of phases allowed to spend provider
+    # calls is enumerated here, deliberately: a phase that wants provider
+    # traffic has to be added to this literal and to pay the approval price
+    # below, so it cannot arrive quietly.  PATCH.AUTHOR.LIVE.1 joined on
+    # 2026-09-09 with a hard cap of one verification-guided revision per run.
+    declared_model_call_phases = {
+        "WORKER.DECL.2A.2",
+        "WORKER.DECL.2B",
+        "PATCH.AUTHOR.LIVE.1",
+        # CONTROL.BOOTSTRAP.1 joined on 2026-09-18 with one bootstrap authoring call per fresh request.
+        "CONTROL.BOOTSTRAP.1",
+    }
+    others = [
+        item for item in phases if item["phase_id"] not in declared_model_call_phases
+    ]
+    assert all(item["model_calls_allowed"] is False for item in others)
+    assert all(item["budget_tier"] == "local_only" for item in others)
+
+    # The invariant is not "there are exactly two"; it is "every declarer is
+    # named here and every declarer pays".  Asserting both directions means a
+    # new phase cannot be added to the set without also being made to pay, and
+    # cannot be made to pay without being named.
+    spenders = {
+        item["phase_id"] for item in phases if item["model_calls_allowed"] is True
+    }
+    assert spenders == declared_model_call_phases
+    for phase_id in sorted(spenders):
+        declarer = by_id[phase_id]
+        assert declarer["budget_tier"] == "strong_model_requires_approval", phase_id
+        assert declarer["human_approval_required"] is True, phase_id
+        assert declarer["network_allowed"] is False, phase_id
+        assert declarer["merge_allowed"] is False, phase_id
+
+
+def test_live_strict_envelope_dogfood_changes_no_production_code():
+    """An observation phase whose diff is a document, the registry and its tests.
+
+    Nothing WORKER.DECL.2A or WORKER.DECL.2A.1 shipped may be edited here: a
+    live adoption number obtained by adjusting the thing being measured would
+    describe nothing.
+    """
+    data = load_phase_registry(str(_SEED_PATH))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.2A.2"]
+
+    assert phase["allowed_files"] == [
+        "docs/designs/2026-08-30-live-strict-envelope-adoption-dogfood.md",
+        "docs/roadmap/phase_registry.json",
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+    ]
+    for allowed in phase["allowed_files"]:
+        assert not allowed.startswith("core/"), allowed
+        assert not allowed.startswith("agents/"), allowed
+        assert not allowed.startswith("scripts/"), allowed
+
+    for frozen in (
+        "core/strict_envelope_emission.py",
+        "core/worker_patch_envelope.py",
+        "core/json_utils.py",
+        "core/prompter.py",
+        "core/control_engine.py",
+        "core/run_lifecycle.py",
+        "core/pipeline.py",
+        "core/sleeping_consultant.py",
+        "agents/gemini_client.py",
+        "scripts/run_patch_proposal_queue.py",
+        "tests/test_strict_envelope_emission.py",
+        "tests/test_worker_patch_envelope.py",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+
+def test_live_strict_envelope_dogfood_reports_observations_not_a_verdict():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["WORKER.DECL.2A.2"]
+    summary = phase["summary"].lower()
+    notes = " ".join(phase["notes"]).lower()
+
+    # What was actually observed, named with the frozen vocabulary.
+    assert "legacy_prompt" in summary
+    assert "strict_prompt" in summary
+    assert "provider_native_json" in summary
+    assert "surrounding_prose_rejected" in summary
+    assert "additional calls caused by strict checking is zero" in summary
+
+    # And the powers it declines.
+    assert "observation only, and it shows in the diff" in notes
+    assert "one call per run, proven at the boundary" in notes
+    assert "the observation is tied to the response it describes" in notes
+    assert "legacy stayed authoritative with a valid strict parse in hand" in notes
+    assert "patch quality is out of scope and stays there" in notes
+    assert "no change intent, no parser relaxation, no promotion" in notes
+    assert "what the evidence does not cover" in notes
+
+    # No adoption rate is published from a handful of runs: the summary says
+    # what happened in each arm and explicitly refuses to derive a policy.
+    assert "no threshold, rate or routing policy is derived from it" in summary
+    for forbidden in ("percent", "%", "compliance rate", "success rate"):
+        assert forbidden not in summary, forbidden
 
 
 def test_seed_registry_is_conservative():
+    """No phase merges or reaches the network, and none writes speculatively.
+
+    A phase may declare model calls, but only by paying the registry's price for
+    them: the approval budget tier, which routes it to human approval and out of
+    the safe-to-prepare bucket.  A phase cannot quietly grant itself provider
+    traffic under ``local_only``.
+
+    ``writes_real_repo`` is the same shape of price.  It is not forbidden - a
+    live production fix such as OPS.PATCH.1 genuinely edits shipped runtime
+    code, and recording that as observation-only would make the registry lie -
+    but it is only ever true for shipped history that already went through
+    human approval and still may not merge itself.  That is the rule the
+    registry validator enforces at ``core/phase_registry.py``; this asserts the
+    seed actually obeys it, so no *proposed* or *active* phase can hold write
+    authority over the real worktree.
+    """
     data = load_phase_registry(str(_SEED_PATH))
     for phase in data["phases"]:
         assert phase["automation_level"] != "AUTO_4_AUTO_MERGE"
         assert phase["merge_allowed"] is False
         assert phase["network_allowed"] is False
-        assert phase["model_calls_allowed"] is False
-        assert phase["writes_real_repo"] is False
+        if phase["writes_real_repo"]:
+            assert phase["status"] == "complete", phase["phase_id"]
+            assert phase["human_approval_required"] is True, phase["phase_id"]
+            assert phase["merge_allowed"] is False, phase["phase_id"]
+        if phase["model_calls_allowed"]:
+            assert phase["budget_tier"] == "strong_model_requires_approval", (
+                phase["phase_id"]
+            )
+            assert phase["human_approval_required"] is True, phase["phase_id"]
+        else:
+            assert phase["budget_tier"] == "local_only", phase["phase_id"]
         for required in (".env", ".git", ".agent/private"):
             assert required in phase["forbidden_files"]
 
@@ -571,14 +2252,24 @@ def test_seed_registry_summary_counts():
         "DOGFOOD": 2,
         "VERIFY": 1,
         "EVAL": 11,
-        "HARDEN": 9,
+        "HARDEN": 16,
         "HUMAN": 5,
-        "INDEX": 8,
+        # RETRIEVE.LIVE.* is an ID namespace inside INDEX, not a new track.
+        "INDEX": 12,
+        "ACQUIRE": 3,
+        "CLAIM": 1,
+        "EVIDENCE": 2,
+        "INPUT": 4,
+        "SYNTHESIS": 1,
+            "CHECK": 9,
+            "CONTROL": 23,
+            "WAITER": 5,
+        "WORKER": 5,
         "MIRROR": 15,
         "MODEL": 11,
-        "OPS": 4,
+        "OPS": 22,
         "ROAD": 4,
-        "UX": 27,
+            "UX": 31,
     }
 
 
@@ -841,6 +2532,11 @@ def test_enums_match_spec():
     assert BUDGET_TIERS == ("local_only", "cheap_api_allowed", "strong_model_requires_approval", "blocked")
     assert RISK_LEVELS == ("low", "medium", "high", "blocked")
     assert "CTX" in PHASE_ID_PREFIXES
+    assert "INPUT" in PHASE_ID_PREFIXES
+    assert "SYNTHESIS" in PHASE_ID_PREFIXES
+    assert "CHECK" in PHASE_ID_PREFIXES
+    assert "CONTROL" in PHASE_ID_PREFIXES
+    assert "PATCH" in PHASE_ID_PREFIXES
     assert set(REQUIRED_ROOT_FIELDS) == {"schema_version", "updated_at", "phases"}
 
 
@@ -953,3 +2649,1282 @@ def test_guardrail_note_present_and_clean():
     assert "report-only" in PHASE_REGISTRY_GUARDRAIL_NOTE.lower()
     report = summarize_phase_registry(_registry(), report_id="r", created_at="t")
     assert report["guardrail_note"] == PHASE_REGISTRY_GUARDRAIL_NOTE
+
+
+def test_pre_execution_change_intent_phase_is_registered_with_frozen_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["WORKER.DECL.2B"]
+    assert phase["title"] == "Pre-Execution Change Intent Channel"
+    assert phase["track"] == "WORKER"
+    assert phase["status"] == "active"
+    assert phase["prerequisites"] == ["WORKER.DECL.2A.2"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert "core/post_run_reconciliation.py" in phase["forbidden_files"]
+    assert "core/goal_fidelity_review.py" in phase["forbidden_files"]
+    summary = phase["summary"]
+    assert "same already-scheduled strict worker invocation" in summary
+    assert "not evidential independence" in summary
+    assert "zero model calls" in summary
+    assert "Legacy extraction remains the only executable plan source" in summary
+
+
+def test_byte_preserving_patch_apply_phase_is_registered_as_a_live_fix():
+    """OPS.PATCH.1 is recorded as what it is: a production write-path fix.
+
+    It is the registry's first ``writes_real_repo`` phase, because it is the
+    first phase that edited shipped runtime code rather than observing it.
+    Recording it as observation-only would misdescribe a live change.
+    """
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["OPS.PATCH.1"]
+
+    assert phase["title"] == "Byte-Preserving Multi-File Apply & Rollback"
+    assert phase["track"] == "OPS"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["CHECK.LIVE.1"]
+
+    # A live fix, not a report: it touches the executor and says so.
+    assert phase["writes_real_repo"] is True
+    assert "patching/patch_plan_executor.py" in phase["allowed_files"]
+    assert "patching/patch_plan_executor.py" in phase["expected_artifacts"]
+
+    # And it still pays every price the registry charges for that.
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["budget_tier"] == "local_only"
+    assert phase["requires_sandbox"] is False
+
+
+def test_byte_preserving_patch_apply_phase_freezes_everything_but_the_write():
+    """Write fidelity only: no authority, policy or matching surface moves."""
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["OPS.PATCH.1"]
+
+    for frozen in (
+        "core/patch_safety.py",
+        "core/repository_path_policy.py",
+        "core/validator.py",
+        "core/validation_execution.py",
+        "core/validation_side_effects.py",
+        "core/run_lifecycle.py",
+        "core/post_run_reconciliation.py",
+        "core/post_run_reconciliation_shadow.py",
+        "core/live_worker_declaration.py",
+        "core/pre_execution_change_intent.py",
+        "patching/patch_engine.py",
+        "patching/patch_gates.py",
+        "benchmarks/cases/",
+        "web/",
+        "agents/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+
+def test_byte_preserving_patch_apply_phase_states_the_byte_invariant():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["OPS.PATCH.1"]
+    summary = phase["summary"]
+    notes = " ".join(phase["notes"])
+
+    # The defect, in the terms that make it reproducible.
+    assert "Path.write_text()" in summary
+    assert "os.linesep" in summary
+    assert "line-ending-only diff" in summary
+
+    # The invariant, stated in bytes rather than in content.
+    assert "restored verbatim on rollback" in summary
+    assert "keeps its own newline convention" in summary
+
+    # The things it refused to change, and the honest schema note.
+    assert "literal grounding" in summary
+    assert "no repository traversal" in summary
+    assert "not report-only" in summary
+    assert "Registry schema limitation" in notes
+    assert "Benchmark blind spot" in notes
+
+
+def test_validation_recovery_phase_is_registered_as_a_live_fix():
+    """OPS.VALIDATE.1 is recorded as what it is: a production validation fix.
+
+    Like OPS.PATCH.1 it writes real repository code, so it pays the registry's
+    full price for that - human approval, no merge, no network, no model calls -
+    rather than being filed as observation.
+    """
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["OPS.VALIDATE.1"]
+
+    assert phase["title"] == "Real Repository Validation Recovery"
+    assert phase["track"] == "OPS"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["OPS.PATCH.1"]
+
+    assert phase["writes_real_repo"] is True
+    for live_file in (
+        "core/preflight.py",
+        "core/validation_command.py",
+        "core/validator.py",
+        "core/validation_outcome.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+    assert "core/validation_outcome.py" in phase["expected_artifacts"]
+
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["budget_tier"] == "local_only"
+    assert phase["requires_sandbox"] is False
+
+
+def test_validation_recovery_phase_freezes_authority_and_neighbours():
+    """Validation is evidence and safety input; it grants nothing."""
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["OPS.VALIDATE.1"]
+
+    for frozen in (
+        "core/patch_safety.py",
+        "core/repository_path_policy.py",
+        "core/post_run_reconciliation.py",
+        "core/control_engine.py",
+        "core/prompter.py",
+        "core/indexer.py",
+        "core/repo_librarian.py",
+        "cli/interactive.py",
+        "patching/patch_engine.py",
+        "patching/patch_gates.py",
+        "benchmarks/cases/",
+        "web/",
+        "agents/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+
+def test_validation_recovery_phase_states_the_three_way_invariant():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["OPS.VALIDATE.1"]
+    summary = phase["summary"]
+    notes = " ".join(phase["notes"])
+
+    # The defect, in the terms that make it reproducible.
+    assert "bare PATH pytest" in summary
+    assert "arrived as 'validation passed'" in summary
+    assert "flat root-level" in summary
+
+    # The invariant, stated as three answers rather than one boolean.
+    assert "passed, failed or inconclusive" in summary
+    assert "never a test failure nor a pass" in summary
+    assert "keep their grounding semantics" in summary
+
+    # The things it refused to change, and the honest schema note.
+    assert "byte-exact rollback is unchanged" in summary
+    assert "no repository traversal" in summary
+    assert "not report-only" in summary
+    assert "Registry schema limitation" in notes
+    assert "CLI.RUNTIME.1" in notes
+    assert "CONTROL.SAFETY.LIVE.1" in notes
+
+
+def test_control_safety_phase_is_registered_as_a_live_fix():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "CONTROL.SAFETY.LIVE.1"
+    ]
+
+    assert phase["title"] == "Localization Rank / Patch Authority Separation"
+    assert phase["track"] == "CONTROL"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["OPS.VALIDATE.1"]
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["budget_tier"] == "local_only"
+
+
+def test_control_safety_phase_records_authority_and_scope_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "CONTROL.SAFETY.LIVE.1"
+    ]
+    notes = " ".join(phase["notes"])
+
+    for live_file in (
+        "core/control_engine.py",
+        "core/pipeline.py",
+        "core/postprocess_gates.py",
+        "policy/decision_helper.py",
+        "tests/test_control_safety_live.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    for frozen in (
+        "core/indexer.py",
+        "core/retriever.py",
+        "core/validation_outcome.py",
+        "core/patch_safety.py",
+        "core/context_selection.py",
+        "patching/patch_plan_executor.py",
+        "benchmarks/cases/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    assert "non-probabilistic and non-authoritative" in notes
+    assert "write_authority=false" in notes
+    assert "calc.py" in notes
+    assert "WAITER.LIVE.1" in notes
+    assert "Zero added model calls, network calls or repository traversals" in notes
+
+
+def test_live_task_shape_routing_phase_is_registered_as_a_live_routing_fix():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["WAITER.LIVE.1"]
+
+    assert phase["title"] == "Live Task-Shape Routing & Change-Need Separation"
+    assert phase["track"] == "WAITER"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["CONTROL.SAFETY.LIVE.1"]
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["budget_tier"] == "local_only"
+
+    summary = phase["summary"]
+    # The three shapes it separates, and the boundary it does not cross.
+    assert "ANALYSIS, DEFECT_REPAIR and EXPLICIT_CHANGE" in summary
+    assert "before patch-localization CONTROL" in summary
+    assert "not report-only" in summary
+
+
+def test_live_task_shape_routing_phase_records_reuse_and_authority_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["WAITER.LIVE.1"]
+    notes = " ".join(phase["notes"])
+
+    for live_file in (
+        "core/live_task_shape.py",
+        "core/live_task_routing.py",
+        "core/analysis_evidence.py",
+        "core/control_engine.py",
+        "core/pipeline.py",
+        "web/runner.py",
+        "cli/interactive.py",
+        "tests/test_waiter_live_routing.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    # The frozen contracts were reused, never edited.
+    for frozen in (
+        "core/task_shape.py",
+        "core/execution_waiter.py",
+        "core/capability_requirements.py",
+        "core/waiter_receipt.py",
+        "core/semantic_waiter.py",
+        "core/input_understanding.py",
+        "core/explicit_evidence.py",
+        "core/preflight.py",
+        "core/validation_outcome.py",
+        "core/patch_safety.py",
+        "patching/patch_plan_executor.py",
+        "benchmarks/cases/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    assert "live compatibility adapter" in notes
+    assert "model_call_count >= 1" in notes
+    assert "change_need_source" in notes
+    assert "write_authority=false" in notes
+    assert "never an automatic write" in notes
+    assert "Zero added model calls, network calls, index builds or graph traversals" in notes
+    assert "WORKER.DECL.2B (parked, untouched)" in notes
+
+
+def test_candidate_sandbox_validation_phase_is_registered_as_a_live_gate():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["OPS.PATCH.2"]
+
+    assert phase["title"] == "Explicit-Change Candidate Sandbox Validation"
+    assert phase["track"] == "OPS"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["PATCH.BASIS.LIVE.1"]
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+
+
+def test_candidate_sandbox_validation_phase_records_reuse_and_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["OPS.PATCH.2"]
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+
+    for live_file in (
+        "core/candidate_sandbox_validation.py",
+        "core/pipeline.py",
+        "tests/test_candidate_sandbox_validation.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    # The sandbox, the apply primitive, the validation vocabulary and the basis
+    # were reused, never edited.
+    for frozen in (
+        "core/sandbox_self_evolution_runner.py",
+        "core/sandbox_runner.py",
+        "patching/patch_plan_executor.py",
+        "core/validation_outcome.py",
+        "core/validation_command.py",
+        "core/patch_safety.py",
+        "core/patch_basis.py",
+        "policy/decision_helper.py",
+        "core/indexer.py",
+        "core/retriever.py",
+        "benchmarks/cases/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    for term in (
+        "explicit_change_request",
+        "candidate_validation",
+        "approval_ready",
+        "fingerprint",
+        "disposable managed sandbox",
+        "apply_patch_plan",
+        "OPS.VALIDATE.1",
+        "legacy_unvalidated",
+        "EXEC.AUTH.LIVE.1",
+    ):
+        assert term in text, term
+
+    assert "no git stash, git reset or git clean" in text.lower()
+    assert "passed != write_authority" in text
+    assert "Zero added model calls and zero added network calls" in text
+    assert "Not report-only" in text
+    # This phase does not spawn planning/readiness/closure siblings.
+    ids = {item["phase_id"] for item in data["phases"]}
+    for forbidden in (
+        "OPS.PATCH.2.PLAN",
+        "OPS.PATCH.2.READINESS",
+        "OPS.PATCH.2.CLOSE",
+    ):
+        assert forbidden not in ids, forbidden
+
+
+def test_typed_patch_basis_phase_is_registered_as_the_live_control_fix():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "PATCH.BASIS.LIVE.1"
+    ]
+
+    assert phase["title"] == "Typed Patch Basis & Failure-Relevance Binding"
+    assert phase["track"] == "CONTROL"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["WAITER.LIVE.1"]
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["requires_sandbox"] is False
+
+
+def test_typed_patch_basis_phase_records_binding_scope_and_frozen_boundaries():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "PATCH.BASIS.LIVE.1"
+    ]
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+
+    for live_file in (
+        "core/patch_basis.py",
+        "core/control_engine.py",
+        "core/pipeline.py",
+        "policy/decision_helper.py",
+        "tests/test_patch_basis_live.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    for frozen in (
+        "core/live_task_shape.py",
+        "core/live_task_routing.py",
+        "core/preflight.py",
+        "core/validation_outcome.py",
+        "core/patch_safety.py",
+        "core/direct_context_patch_attachment.py",
+        "patching/patch_plan_executor.py",
+        "patching/patch_gates.py",
+        "core/indexer.py",
+        "core/retriever.py",
+        "benchmarks/cases/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    for term in (
+        "grounded_defect",
+        "explicit_change_request",
+        "direct_executed_reference",
+        "graph causality",
+        "Every replacement target",
+        "write_authority=false",
+        "Zero added model calls",
+        "timeout",
+        "not report-only",
+    ):
+        assert term in text, term
+
+
+def test_query_symbol_entry_recall_phase_is_registered_as_a_live_fix():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "RETRIEVE.LIVE.2"
+    ]
+
+    assert phase["title"] == (
+        "Query-to-Symbol Entry Recall & Identifier Decomposition"
+    )
+    assert phase["track"] == "INDEX"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["RETRIEVE.LIVE.1"]
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["budget_tier"] == "local_only"
+    assert "not report-only" in phase["summary"]
+
+
+def test_query_symbol_entry_recall_phase_freezes_ranking_and_authority():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "RETRIEVE.LIVE.2"
+    ]
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+
+    for live_file in (
+        "core/identifier_recall.py",
+        "core/control_engine.py",
+        "reasoning/deep_project_understand.py",
+        "tests/test_query_symbol_entry_recall.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    for frozen in (
+        "core/code_dna.py",
+        "core/localization_candidate.py",
+        "core/treesitter_parse.py",
+        "core/indexer.py",
+        "core/retriever.py",
+        "core/repository_inventory.py",
+        "core/context_profiles.py",
+        "core/patch_basis.py",
+        "core/candidate_sandbox_validation.py",
+        "core/live_execution_authorization.py",
+        "core/validation_outcome.py",
+        "core/validation_command.py",
+        "core/validation_execution.py",
+        "core/validator.py",
+        "core/preflight.py",
+        "core/executor.py",
+        "core/patch_safety.py",
+        "core/pipeline.py",
+        "graph/builder.py",
+        "graph/weights.py",
+        "patching/",
+        "policy/",
+        "agents/",
+        "database/",
+        "web/",
+        "benchmarks/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    for term in (
+        "exact_symbol",
+        "identifier_token",
+        "multi_token_identifier",
+        "indentation -> indent",
+        "cat does not retrieve concatenate",
+        "Call nodes remain structural-only",
+        "zero ranking-coefficient changes",
+        "zero model calls",
+        "zero embedding/vector calls",
+        "zero network calls",
+        "zero added repository traversal",
+        "zero authority change",
+        "_classify_indent remains deliberately broken",
+    ):
+        assert term.lower() in text.lower(), term
+
+    ids = {item["phase_id"] for item in data["phases"]}
+    for forbidden_phase in (
+        "RETRIEVE.LIVE.2.PLAN",
+        "RETRIEVE.LIVE.2.READINESS",
+        "RETRIEVE.LIVE.2.CLOSE",
+    ):
+        assert forbidden_phase not in ids
+
+
+def test_production_query_recall_unification_phase_is_registered_as_live_fix():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "RETRIEVE.LIVE.3"
+    ]
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+
+    assert phase["title"] == "Production Query-Recall Path Unification"
+    assert phase["track"] == "INDEX"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["RETRIEVE.LIVE.2"]
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert "not report-only" in phase["summary"]
+
+    for live_file in (
+        "core/identifier_recall.py",
+        "core/control_engine.py",
+        "tests/test_production_query_recall_path.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    for frozen in (
+        "core/code_dna.py",
+        "core/localization_candidate.py",
+        "core/treesitter_parse.py",
+        "core/indexer.py",
+        "core/retriever.py",
+        "core/patch_basis.py",
+        "core/live_execution_authorization.py",
+        "core/pipeline.py",
+        "reasoning/deep_project_understand.py",
+        "graph/builder.py",
+        "graph/weights.py",
+        "patching/",
+        "policy/",
+        "agents/",
+        "web/",
+        "benchmarks/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    for term in (
+        "FIRST DIVERGENCE",
+        "ONE CANONICAL RAW-QUERY RESOLVER",
+        "VISIBLE FACTS",
+        "NO NEW MATCHING POWER",
+        "NAVIGATION ONLY",
+        "zero new morphology rules",
+        "_classify_indent",
+    ):
+        assert term in text, term
+
+
+def test_answer_entity_grounding_phase_is_registered_as_live_truthfulness_fix():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "ANSWER.GROUND.LIVE.1"
+    ]
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+
+    assert "ANSWER" in PHASE_ID_PREFIXES
+    assert phase["title"] == (
+        "Repository Entity Claim Grounding & Evidence-Bounded Fallback"
+    )
+    assert phase["track"] == "CHECK"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["RETRIEVE.LIVE.3"]
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+
+    for live_file in (
+        "core/answer_entity_grounding.py",
+        "core/agent_state.py",
+        "core/session_io.py",
+        "cli/interactive.py",
+        "main.py",
+        "web/runner.py",
+        "tests/test_answer_entity_grounding.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    for frozen in (
+        "core/code_dna.py",
+        "core/identifier_recall.py",
+        "core/localization_candidate.py",
+        "core/control_engine.py",
+        "core/retriever.py",
+        "core/indexer.py",
+        "core/repository_inventory.py",
+        "core/patch_basis.py",
+        "core/live_execution_authorization.py",
+        "core/execution_outcome_telemetry.py",
+        "core/validation_execution.py",
+        "core/executor.py",
+        "core/patch_safety.py",
+        "patching/",
+        "policy/",
+        "agents/",
+        "database/",
+        "graph/",
+        "reasoning/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    for term in (
+        "ENTITY IDENTITY, NOT SEMANTIC TRUTH",
+        "CHECK.2 remains unwired",
+        "LAST DISPLAY-SAFE BOUNDARY",
+        "No new walk",
+        "user_supplied_unverified",
+        "unverified_model_assertion",
+        "Confidence is absent",
+        "never silently replaced",
+        "authority_effect=none",
+        "patch_candidate=null",
+        "Historical artifacts are not rewritten",
+        "no PLAN, READINESS, or CLOSE siblings",
+    ):
+        assert term.lower() in text.lower(), term
+
+    ids = {item["phase_id"] for item in data["phases"]}
+    for forbidden_phase in (
+        "ANSWER.GROUND.LIVE.1.PLAN",
+        "ANSWER.GROUND.LIVE.1.READINESS",
+        "ANSWER.GROUND.LIVE.1.CLOSE",
+    ):
+        assert forbidden_phase not in ids
+
+
+def test_answer_symbol_grounding_phase_is_registered_as_live_truthfulness_fix():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "ANSWER.GROUND.LIVE.2"
+    ]
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+
+    assert "ANSWER" in PHASE_ID_PREFIXES
+    assert phase["title"] == "Bare Symbol & Qualified Member Claim Grounding"
+    assert phase["track"] == "CHECK"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["ANSWER.GROUND.LIVE.1"]
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+
+    for live_file in (
+        "core/answer_entity_grounding.py",
+        "core/repository_symbol_membership.py",
+        "tests/test_answer_symbol_grounding.py",
+        "tests/test_answer_entity_grounding.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    for frozen in (
+        "core/code_dna.py",
+        "core/identifier_recall.py",
+        "core/localization_candidate.py",
+        "core/control_engine.py",
+        "core/retriever.py",
+        "core/indexer.py",
+        "core/repository_inventory.py",
+        "core/patch_basis.py",
+        "core/live_execution_authorization.py",
+        "core/validation_execution.py",
+        "core/executor.py",
+        "core/patch_safety.py",
+        "patching/",
+        "policy/",
+        "agents/",
+        "database/",
+        "graph/",
+        "reasoning/",
+        "web/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    for term in (
+        "ONE BOUNDARY, NOT A SECOND CHECKER",
+        "no answer_entity_grounding_v2",
+        "ENTITY IDENTITY, NOT SEMANTIC TRUTH",
+        "_classify_indent is not fixed here",
+        "CHECK.2 remains unwired",
+        "FILE AND SYMBOL GROUNDING STAY DISTINCT",
+        "never validates OtherClass.method",
+        "No new walk",
+        "ambiguous_symbol",
+        "unverified_model_assertion",
+        "Confidence is absent",
+        "never silently substitutes another symbol",
+        "authority_effect=none",
+        "retrieval_effect=none",
+        "Historical artifacts are not rewritten",
+        "no PLAN, READINESS, or CLOSE siblings",
+        "not report-only",
+    ):
+        assert term.lower() in text.lower(), term
+
+    ids = {item["phase_id"] for item in data["phases"]}
+    for forbidden_phase in (
+        "ANSWER.GROUND.LIVE.2.PLAN",
+        "ANSWER.GROUND.LIVE.2.READINESS",
+        "ANSWER.GROUND.LIVE.2.CLOSE",
+        "RETRIEVE.LIVE.5",
+    ):
+        assert forbidden_phase not in ids
+
+
+def test_bounded_defect_probe_phase_is_registered_as_live_execution_evidence():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "DEFECT.PROBE.LIVE.1"
+    ]
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+
+    assert "DEFECT" in PHASE_ID_PREFIXES
+    assert phase["title"] == "Bounded Defect Reproduction Evidence"
+    assert phase["track"] == "OPS"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == [
+        "WAITER.LIVE.1",
+        "CONTROL.SAFETY.LIVE.1",
+        "PATCH.BASIS.LIVE.1",
+        "OPS.VALIDATE.1",
+        "OPS.VALIDATE.2",
+        "RETRIEVE.LIVE.1",
+        "RETRIEVE.LIVE.2",
+        "RETRIEVE.LIVE.3",
+        "ANSWER.GROUND.LIVE.1",
+    ]
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+
+    for live_file in (
+        "core/defect_probe.py",
+        "core/defect_probe_worker.py",
+        "core/control_engine.py",
+        "core/patch_basis.py",
+        "core/live_task_routing.py",
+        "tests/test_defect_probe_live.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    for frozen in (
+        "core/code_dna.py",
+        "core/identifier_recall.py",
+        "core/localization_candidate.py",
+        "core/indexer.py",
+        "core/retriever.py",
+        "core/validation_outcome.py",
+        "core/validation_bytecode_cache.py",
+        "core/validation_execution.py",
+        "core/preflight.py",
+        "core/patch_safety.py",
+        "core/executor.py",
+        "core/pipeline.py",
+        "patching/",
+        "policy/",
+        "agents/",
+        "database/",
+        "graph/",
+        "reasoning/",
+        "web/",
+        "benchmarks/cases/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    for term in (
+        "Whole-repository validation",
+        "independently",
+        "model_authored",
+        "invalid_probe",
+        "static worker",
+        "validation_budget_exhausted",
+        "bounded_defect_reproduction",
+        "write_authority=false",
+        "T1/T2/T3",
+        "observed=4space",
+        "expected=2space",
+        "_classify_indent remains deliberately unfixed",
+        "zero model calls",
+        "zero network",
+        "not report-only",
+    ):
+        assert term.lower() in text.lower(), term
+
+    ids = {item["phase_id"] for item in data["phases"]}
+    for forbidden_phase in (
+        "DEFECT.PROBE.LIVE.1.PLAN",
+        "DEFECT.PROBE.LIVE.1.READINESS",
+        "DEFECT.PROBE.LIVE.1.CLOSE",
+    ):
+        assert forbidden_phase not in ids
+
+
+def test_bounded_targeted_repository_validation_is_registered_as_live_ops():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "OPS.VALIDATE.3"
+    ]
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+
+    assert phase["title"] == "Bounded Targeted Repository Validation"
+    assert phase["track"] == "OPS"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["DEFECT.PROBE.LIVE.1"]
+    assert phase["requires_sandbox"] is True
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+
+    for live_file in (
+        "core/targeted_repository_validation.py",
+        "core/pipeline.py",
+        "cli/interactive.py",
+        "tests/test_targeted_repository_validation.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    for frozen in (
+        "core/code_dna.py",
+        "core/identifier_recall.py",
+        "core/retriever.py",
+        "core/validation_outcome.py",
+        "core/validation_bytecode_cache.py",
+        "core/validation_execution.py",
+        "core/preflight.py",
+        "core/candidate_sandbox_validation.py",
+        "core/live_execution_authorization.py",
+        "core/patch_safety.py",
+        "core/control_engine.py",
+        "core/defect_probe.py",
+        "patching/",
+        "policy/",
+        "agents/",
+        "database/",
+        "graph/",
+        "reasoning/",
+        "web/",
+        "benchmarks/cases/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    for term in (
+        "THREE FACTS",
+        "no_relevant_existing_checks",
+        "selection_budget_exceeded",
+        "same check set",
+        "selected_validation_check_modified",
+        "validation_budget_exhausted",
+        "targeted_validation_authority_effect=none",
+        "T1/T2/T3",
+        "Zero model calls",
+        "new repository traversal",
+        "global-timeout increase",
+        "_classify_indent remains unfixed",
+        "not report-only",
+    ):
+        assert term.lower() in text.lower(), term
+
+    ids = {item["phase_id"] for item in data["phases"]}
+    for forbidden_phase in (
+        "OPS.VALIDATE.3.PLAN",
+        "OPS.VALIDATE.3.READINESS",
+        "OPS.VALIDATE.3.CLOSE",
+    ):
+        assert forbidden_phase not in ids
+
+
+def test_immutable_candidate_defect_closure_is_registered_as_live_ops():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "DEFECT.PROBE.LIVE.2"
+    ]
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+
+    assert phase["title"] == "Immutable Pre/Post Candidate Reproduction Closure"
+    assert phase["track"] == "OPS"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["OPS.VALIDATE.3"]
+    assert phase["requires_sandbox"] is True
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+
+    for live_file in (
+        "core/candidate_defect_probe.py",
+        "core/defect_probe.py",
+        "core/pipeline.py",
+        "tests/test_defect_probe_live.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    for frozen in (
+        "core/code_dna.py",
+        "core/candidate_sandbox_validation.py",
+        "core/targeted_repository_validation.py",
+        "core/validation_bytecode_cache.py",
+        "core/validation_execution.py",
+        "core/patch_safety.py",
+        "core/live_execution_authorization.py",
+        "patching/",
+        "policy/",
+        "agents/",
+        "database/",
+        "graph/",
+        "reasoning/",
+        "web/",
+        "benchmarks/cases/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    for term in (
+        "same probe",
+        "Probe fingerprints",
+        "Candidate fingerprints",
+        "patch safety",
+        "real patching.patch_plan_executor.apply_patch_plan",
+        "model_authored",
+        "invalid_comparison",
+        "still_reproduced",
+        "changed_but_unresolved",
+        "inconclusive",
+        "targeted failure",
+        "full validation",
+        "candidate_probe_authority_effect=none",
+        "T1/T2/T3",
+        "observed=4space",
+        "2space",
+        "byte-identical",
+        "Zero model calls",
+        "not report-only",
+    ):
+        assert term.lower() in text.lower(), term
+
+    ids = {item["phase_id"] for item in data["phases"]}
+    for forbidden_phase in (
+        "DEFECT.PROBE.LIVE.2.PLAN",
+        "DEFECT.PROBE.LIVE.2.READINESS",
+        "DEFECT.PROBE.LIVE.2.CLOSE",
+    ):
+        assert forbidden_phase not in ids
+
+
+def test_existing_check_oracle_role_is_registered_as_live_ops():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "VALIDATE.ORACLE.LIVE.1"
+    ]
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+
+    assert "VALIDATE" in PHASE_ID_PREFIXES
+    assert phase["title"] == (
+        "Existing Check Role & Candidate-Oracle Conflict Classification"
+    )
+    assert phase["track"] == "OPS"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["DEFECT.PROBE.LIVE.2"]
+    assert phase["requires_sandbox"] is False
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+
+    for live_file in (
+        "core/check_oracle_assessment.py",
+        "core/phase_registry.py",
+        "core/pipeline.py",
+        "tests/test_check_oracle_assessment.py",
+        "tests/test_targeted_repository_validation.py",
+        "tests/test_defect_probe_live.py",
+    ):
+        assert live_file in phase["allowed_files"], live_file
+
+    for frozen in (
+        "core/code_dna.py",
+        "core/identifier_recall.py",
+        "core/localization_candidate.py",
+        "core/retriever.py",
+        "core/targeted_repository_validation.py",
+        "core/defect_probe.py",
+        "core/candidate_defect_probe.py",
+        "core/validation_outcome.py",
+        "core/validation_execution.py",
+        "core/live_execution_authorization.py",
+        "core/execution_outcome_telemetry.py",
+        "patching/",
+        "policy/",
+        "agents/",
+        "database/",
+        "graph/",
+        "reasoning/",
+        "web/",
+        "benchmarks/cases/",
+    ):
+        assert frozen in phase["forbidden_files"], frozen
+        assert frozen not in phase["allowed_files"], frozen
+
+    for term in (
+        "check_execution_outcome",
+        "defect_preservation_oracle",
+        "candidate_regression_oracle",
+        "conflict_unresolved",
+        "insufficient_basis",
+        "Model-only",
+        "failed remains failed",
+        "not their names",
+        "probe fingerprint",
+        "candidate-modified",
+        "not inconsistent_input",
+        "check_oracle_authority_effect=none",
+        "T1/T2/T3",
+        "Zero model calls",
+        "no PLAN, READINESS or CLOSE siblings",
+        "not report-only",
+    ):
+        assert term.lower() in text.lower(), term
+
+    ids = {item["phase_id"] for item in data["phases"]}
+    for forbidden_phase in (
+        "VALIDATE.ORACLE.LIVE.1.PLAN",
+        "VALIDATE.ORACLE.LIVE.1.READINESS",
+        "VALIDATE.ORACLE.LIVE.1.CLOSE",
+    ):
+        assert forbidden_phase not in ids
+
+
+def test_execution_eligibility_policy_is_registered_as_live_ops():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "EXEC.POLICY.LIVE.1"
+    ]
+
+    assert phase["title"] == (
+        "Evidence-Bounded Large-Repository Execution Eligibility"
+    )
+    assert phase["track"] == "OPS"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["VALIDATE.ORACLE.LIVE.1"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["requires_sandbox"] is False
+
+    for live_file in (
+        "core/execution_eligibility_policy.py",
+        "core/pipeline.py",
+        "tests/test_execution_eligibility_policy.py",
+        "tests/test_defect_probe_live.py",
+    ):
+        assert live_file in phase["allowed_files"]
+
+    for frozen in (
+        "core/code_dna.py",
+        "core/patch_safety.py",
+        "core/defect_probe.py",
+        "core/candidate_defect_probe.py",
+        "core/targeted_repository_validation.py",
+        "core/check_oracle_assessment.py",
+        "core/live_execution_authorization.py",
+        "core/execution_outcome_telemetry.py",
+        "policy/decision_helper.py",
+        "patching/",
+        "agents/",
+        "graph/",
+        "web/",
+    ):
+        assert frozen in phase["forbidden_files"]
+        assert frozen not in phase["allowed_files"]
+
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+    for term in (
+        "full_validation_required",
+        "bounded_evidence_human_review",
+        "policy_eligible=true != execution_authorized=true",
+        "defect_preservation_oracle",
+        "candidate_regression_oracle",
+        "validation_budget_exhausted",
+        "legacy_unassessed",
+        "Zero model calls",
+        "_classify_indent remains intentionally broken",
+        "not report-only",
+    ):
+        assert term in text
+
+    ids = {item["phase_id"] for item in data["phases"]}
+    for forbidden_phase in (
+        "EXEC.POLICY.PLAN",
+        "EXEC.POLICY.READINESS",
+        "EXEC.POLICY.CLOSE",
+    ):
+        assert forbidden_phase not in ids
+
+
+def test_human_apply_binding_is_registered_as_live_ops():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "EXEC.APPROVAL.LIVE.1"
+    ]
+
+    assert phase["title"] == (
+        "Human Apply Binding, Freshness Revalidation & Authorization Handoff"
+    )
+    assert phase["track"] == "OPS"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["EXEC.POLICY.LIVE.1"]
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is True
+
+    for live_file in (
+        "core/human_apply_authorization.py",
+        "core/pipeline.py",
+        "core/run_lifecycle.py",
+        "web/routes/patch_routes.py",
+        "web/templates/index.html",
+        "tests/test_human_apply_authorization.py",
+    ):
+        assert live_file in phase["allowed_files"]
+
+    for frozen in (
+        "core/code_dna.py",
+        "core/patch_safety.py",
+        "core/execution_eligibility_policy.py",
+        "core/defect_probe.py",
+        "core/targeted_repository_validation.py",
+        "policy/decision_helper.py",
+        "agents/",
+        "graph/",
+    ):
+        assert frozen in phase["forbidden_files"]
+        assert frozen not in phase["allowed_files"]
+
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+    for term in (
+        "live human authority boundary",
+        "exact candidate",
+        "freshness revalidation",
+        "pre-mutation authorization",
+        "manual_apply_action",
+        "bounded_evidence_human_review",
+        "no bounded auto-apply",
+        "Zero model calls",
+        "Zero network calls",
+        "no repository traversal",
+        "_classify_indent remains intentionally broken",
+        "not report-only",
+    ):
+        assert term.lower() in text.lower(), term
+
+    ids = {item["phase_id"] for item in data["phases"]}
+    for forbidden_phase in (
+        "EXEC.APPROVAL.PLAN",
+        "EXEC.APPROVAL.READINESS",
+        "EXEC.APPROVAL.CLOSE",
+    ):
+        assert forbidden_phase not in ids
+
+
+def test_repository_specificity_entry_ordering_is_registered_as_live_ordering_fix():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = {item["phase_id"]: item for item in data["phases"]}["RETRIEVE.LIVE.4"]
+    text = phase["summary"] + " " + " ".join(phase["notes"])
+
+    assert "RETRIEVE" in PHASE_ID_PREFIXES
+    assert phase["title"] == "Repository-Specificity Weighted Entry Ordering"
+    # RETRIEVE.* is an ID namespace inside INDEX, not a new track.
+    assert phase["track"] == "INDEX"
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["ANSWER.GROUND.LIVE.2"]
+    assert phase["writes_real_repo"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["merge_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["model_calls_allowed"] is False
+    assert phase["requires_sandbox"] is False
+    assert phase["budget_tier"] == "local_only"
+
+    for live_file in (
+        "core/identifier_recall.py",
+        "tests/test_repository_specificity_entry_ordering.py",
+        "docs/designs/2026-09-06-repository-specificity-weighted-entry-ordering.md",
+    ):
+        assert live_file in phase["allowed_files"]
+
+    # The phase must not be able to edit the target it is retrieving, the
+    # candidate-eligibility surface, downstream ranking, or authority.
+    for frozen in (
+        "core/code_dna.py",
+        "core/localization_candidate.py",
+        "core/treesitter_parse.py",
+        "core/patch_basis.py",
+        "graph/weights.py",
+        "graph/penalty.py",
+    ):
+        assert frozen in phase["forbidden_files"]
+    assert "core/identifier_recall.py" not in phase["forbidden_files"]
+
+    for term in (
+        "ordering",
+        "repository-local lexical specificity",
+        "token_idf",
+        "identifier_precision",
+        "candidate-level document frequency",
+        "matched candidate population before the cap is byte-identical",
+        "entry cap of 6",
+        "_QUERY_STOP_WORDS is unchanged",
+        "no model call",
+        "no embedding",
+        "no network call",
+        "no repository traversal",
+        "no persisted index",
+        "navigation evidence",
+        "intentionally unfixed",
+        "not report-only",
+    ):
+        assert term.lower() in text.lower(), term
+
+    ids = {item["phase_id"] for item in data["phases"]}
+    for forbidden_phase in (
+        "RETRIEVE.LIVE.4.PLAN",
+        "RETRIEVE.LIVE.4.READINESS",
+        "RETRIEVE.LIVE.4.CLOSE",
+    ):
+        assert forbidden_phase not in ids

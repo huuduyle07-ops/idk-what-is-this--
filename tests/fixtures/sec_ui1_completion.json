@@ -1,0 +1,399 @@
+{
+  "phase_id": "SEC.UI.1",
+  "started": "2026-09-13",
+  "report_finalized": "2026-09-14",
+  "status": "complete",
+  "remediates": "SEC-01",
+  "scope": "Audited Evidence Viewer and Local Critique boundary; same-kind Help modal and historical Dream summary consumers",
+  "policy_version": "sec_ui1_v1",
+  "sanitizer": {
+    "name": "DOMPurify",
+    "version": "3.4.11",
+    "delivery": "local vendored browser asset",
+    "sha256": "dbabb5b205a333ec49c8c09e7fca30ef66df0523bb8bc0fa9ea843841f111dbd",
+    "bytes": 28438
+  },
+  "audit_regression": {
+    "payload": "<img src=\"missing-audit-image\" onerror=\"this.setAttribute('data-audit-executed','true')\">",
+    "pre": "executed=true using actual entry handler and real route",
+    "post": {
+      "executed": false,
+      "image_element_present": false,
+      "text": "[Image: omitted]"
+    },
+    "history_reloads": 2,
+    "raw_report_and_session_bytes_preserved": true
+  },
+  "tests": {
+    "focused": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "30",
+      "time": "71.724",
+      "timestamp": "2026-09-13T21:25:00.633045+09:00",
+      "hostname": "LAPTOP-UFO8SCOQ"
+    },
+    "browser_cases": 24,
+    "source_governance_cases": 6,
+    "focused_cases": [
+      {
+        "name": "test_exact_audit_payload_is_historical_and_pre_was_executed",
+        "seconds": "0.001",
+        "result": "passed"
+      },
+      {
+        "name": "test_bounded_sink_ownership",
+        "seconds": "0.005",
+        "result": "passed"
+      },
+      {
+        "name": "test_vendored_dependency_pin_and_no_build_dependency",
+        "seconds": "0.001",
+        "result": "passed"
+      },
+      {
+        "name": "test_frozen_entry_bytes_and_original_audit_preserved",
+        "seconds": "0.032",
+        "result": "passed"
+      },
+      {
+        "name": "test_reversal_reconstructs_entry_without_repinning_history",
+        "seconds": "0.020",
+        "result": "passed"
+      },
+      {
+        "name": "test_one_registered_remediation_phase_and_picker_history",
+        "seconds": "0.012",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[audit_onerror]",
+        "seconds": "9.062",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[script]",
+        "seconds": "2.498",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[events]",
+        "seconds": "2.442",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[javascript_markdown]",
+        "seconds": "2.597",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[javascript_html]",
+        "seconds": "2.597",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[control_url]",
+        "seconds": "2.478",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[data_url]",
+        "seconds": "2.475",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[vbscript]",
+        "seconds": "2.534",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[svg]",
+        "seconds": "2.550",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[mathml]",
+        "seconds": "2.521",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[documents]",
+        "seconds": "2.476",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[style]",
+        "seconds": "2.480",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[image]",
+        "seconds": "2.419",
+        "result": "passed"
+      },
+      {
+        "name": "test_evidence_security_matrix[mutation_xss]",
+        "seconds": "2.658",
+        "result": "passed"
+      },
+      {
+        "name": "test_real_browser_exact_audit_pre_then_post_and_reload",
+        "seconds": "2.908",
+        "result": "passed"
+      },
+      {
+        "name": "test_safe_markdown_fidelity_navigation_diff_and_local_assets",
+        "seconds": "2.641",
+        "result": "passed"
+      },
+      {
+        "name": "test_local_critique_all_model_fields_and_error_are_untrusted",
+        "seconds": "2.542",
+        "result": "passed"
+      },
+      {
+        "name": "test_sanitizer_failure_never_falls_back_to_html[missing]",
+        "seconds": "2.573",
+        "result": "passed"
+      },
+      {
+        "name": "test_sanitizer_failure_never_falls_back_to_html[throws]",
+        "seconds": "2.573",
+        "result": "passed"
+      },
+      {
+        "name": "test_sanitizer_failure_never_falls_back_to_html[wrong_type]",
+        "seconds": "2.714",
+        "result": "passed"
+      },
+      {
+        "name": "test_server_markdown_failure_uses_literal_source",
+        "seconds": "2.456",
+        "result": "passed"
+      },
+      {
+        "name": "test_same_policy_help_modal_and_historical_dream_report",
+        "seconds": "2.540",
+        "result": "passed"
+      },
+      {
+        "name": "test_rendering_overhead_without_browser_startup",
+        "seconds": "4.470",
+        "result": "passed"
+      },
+      {
+        "name": "test_deterministic_dom_output_and_private_sanitizer_policy",
+        "seconds": "4.274",
+        "result": "passed"
+      }
+    ],
+    "broad_affected": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "559",
+      "time": "16.361",
+      "timestamp": "2026-09-13T21:23:27.761776+09:00",
+      "hostname": "LAPTOP-UFO8SCOQ"
+    },
+    "broad_modules": [
+      "tests/test_benchmark_web.py",
+      "tests/test_dream_report_markdown_rendering.py",
+      "tests/test_evidence_quality_panel_loader.py",
+      "tests/test_evidence_quality_panel_ui.py",
+      "tests/test_evidence_spread_web.py",
+      "tests/test_explain_evidence_ui.py",
+      "tests/test_harness_modes_web.py",
+      "tests/test_help_route.py",
+      "tests/test_phase_picker.py",
+      "tests/test_phase_registry.py",
+      "tests/test_presentation_evidence_pack.py",
+      "tests/test_presentation_evidence_routes.py",
+      "tests/test_runtime_environment_web.py",
+      "tests/test_web_mutation_auth_gate.py",
+      "tests/test_web_mutation_surface_audit.py",
+      "tests/test_web_patch_helpers.py",
+      "tests/test_web_runner_shutdown.py",
+      "tests/test_web_ui_command_hierarchy.py",
+      "tests/test_web_ui_cutoff_1.py",
+      "tests/test_web_ui_demo_flow.py",
+      "tests/test_web_ui_history_controls.py",
+      "tests/test_web_ui_information_architecture.py",
+      "tests/test_web_ui_lesson_merge_controls.py",
+      "tests/test_web_ui_result_readability.py"
+    ],
+    "compileall": "passed",
+    "registry_cli": "valid; 181 phases; HARDEN 10",
+    "picker_cli": "valid; 177 history; DOGFOOD.1B unchanged",
+    "benchmark_check": {
+      "checked": 54,
+      "errors": 0
+    },
+    "git_diff_check": "passed"
+  },
+  "performance": {
+    "browser": "151.0.7922.34",
+    "browser_startup_ms": 1931.57,
+    "reports": [
+      {
+        "size": "small",
+        "source_bytes": 449,
+        "html_bytes": 812,
+        "markdown_ms": 1.956,
+        "safe_render_ms": 0.3,
+        "baseline_insert_ms": 0,
+        "overhead_ms": 0.3
+      },
+      {
+        "size": "medium",
+        "source_bytes": 8980,
+        "html_bytes": 16307,
+        "markdown_ms": 32.337,
+        "safe_render_ms": 3.5,
+        "baseline_insert_ms": 0.7,
+        "overhead_ms": 2.8
+      },
+      {
+        "size": "large",
+        "source_bytes": 89800,
+        "html_bytes": 163287,
+        "markdown_ms": 329.221,
+        "safe_render_ms": 30.7,
+        "baseline_insert_ms": 6.9,
+        "overhead_ms": 23.8
+      }
+    ]
+  },
+  "startup": {
+    "startup": "web.runner.launch_web(open_browser=False)",
+    "root_status": 200,
+    "startup_to_http_ms": 2977.236,
+    "assets": {
+      "/static/safe_content.js": {
+        "status": 200,
+        "bytes": 4065
+      },
+      "/static/vendor/dompurify/purify.min.js": {
+        "status": 200,
+        "bytes": 28438
+      },
+      "/static/keybindings.js": {
+        "status": 200,
+        "bytes": 4065
+      },
+      "/static/style.css": {
+        "status": 200,
+        "bytes": 151186
+      }
+    },
+    "model_calls": 0,
+    "external_network_calls": 0
+  },
+  "zero_deltas": {
+    "live_model_calls": 0,
+    "external_network_calls": 0,
+    "backend_mutation_semantics": 0,
+    "auth_origin": 0,
+    "track_a_semantics": 0,
+    "candidate_identity_or_receipts": 0,
+    "theme_framework_redesign": 0
+  },
+  "browser_network_contract": "Real loopback app requests. Existing Mermaid CDN URL fulfilled by local test stub; all other nonlocal browser requests blocked and asserted absent. No CSP header.",
+  "attribution": {
+    "modified_entry_files": [
+      "core/phase_registry.py",
+      "docs/roadmap/phase_registry.json",
+      "tests/test_help_route.py",
+      "tests/test_phase_picker.py",
+      "tests/test_phase_registry.py",
+      "tests/test_web_ui_command_hierarchy.py",
+      "tests/test_web_ui_cutoff_1.py",
+      "tests/test_web_ui_demo_flow.py",
+      "tests/test_web_ui_information_architecture.py",
+      "tests/test_web_ui_result_readability.py",
+      "web/app.py",
+      "web/templates/index.html"
+    ],
+    "new_files": [
+      "web/static/safe_content.js",
+      "web/static/vendor/dompurify/purify.min.js",
+      "web/static/vendor/dompurify/LICENSE",
+      "web/static/vendor/dompurify/README.md",
+      "requirements_browser.txt",
+      "tests/test_sec_ui1.py",
+      "tests/fixtures/sec_ui1_frozen_boundaries.json",
+      "tests/fixtures/sec_ui1_reversal.json",
+      "tests/fixtures/sec_ui1_completion.json",
+      "docs/designs/2026-09-13-untrusted-evidence-active-content-boundary.md"
+    ],
+    "frozen_production_and_audit_files": 452,
+    "historical_audit_unchanged": true,
+    "historical_fixtures_repinned": false,
+    "entry_file_reversal_manifest": "tests/fixtures/sec_ui1_reversal.json"
+  },
+  "files_changed": [
+    "core/phase_registry.py",
+    "docs/designs/2026-09-13-untrusted-evidence-active-content-boundary.md",
+    "docs/roadmap/phase_registry.json",
+    "requirements_browser.txt",
+    "tests/fixtures/sec_ui1_completion.json",
+    "tests/fixtures/sec_ui1_frozen_boundaries.json",
+    "tests/fixtures/sec_ui1_reversal.json",
+    "tests/test_help_route.py",
+    "tests/test_phase_picker.py",
+    "tests/test_phase_registry.py",
+    "tests/test_sec_ui1.py",
+    "tests/test_web_ui_command_hierarchy.py",
+    "tests/test_web_ui_cutoff_1.py",
+    "tests/test_web_ui_demo_flow.py",
+    "tests/test_web_ui_information_architecture.py",
+    "tests/test_web_ui_result_readability.py",
+    "web/app.py",
+    "web/static/safe_content.js",
+    "web/static/vendor/dompurify/LICENSE",
+    "web/static/vendor/dompurify/README.md",
+    "web/static/vendor/dompurify/purify.min.js",
+    "web/templates/index.html"
+  ],
+  "source_sha256": {
+    "core/phase_registry.py": "555ea6cdd9f88920a909cb4c6cccb3fdd3a9a6815fff00788fa1b425e6a803ea",
+    "docs/designs/2026-09-13-untrusted-evidence-active-content-boundary.md": "f13062b36357a61a42bfd0fcfdd969d08ef3c47675140c5c940d1eb5378fbecd",
+    "docs/roadmap/phase_registry.json": "d4c3c7f43bed17accdabd386765cd036c280f874a9b0a2f7165da621b1ad983d",
+    "requirements_browser.txt": "e5cebe39aa313960aec0b05495ea9b9efc49244e32ec825a7de8d7ad366b5e71",
+    "tests/fixtures/sec_ui1_frozen_boundaries.json": "91c64a80341267cd1025ce47da19573735c717a91aa9c4cbf33c1f07a69f6107",
+    "tests/fixtures/sec_ui1_reversal.json": "b9de3398d8a5691d918de8f875a8d539a10a65695938b00b0b20fb863b970771",
+    "tests/test_help_route.py": "38a30ff09f53e1436daec5e8d9d0ff7cea9f728040d03a9e8d6ccd1aeee36459",
+    "tests/test_phase_picker.py": "d6af5f6ad60775ba7eb8b343100b7bbadac5ce0e569a5e176bd7f3de3feaa58d",
+    "tests/test_phase_registry.py": "e88e9678ec25d98bab0cb847aca81af7b046d00cd75b9c9ad14db088edf3d30c",
+    "tests/test_sec_ui1.py": "2611e336030c6aab6647239cd62ebd62159f3fc552f5a89ef66c0c6f26d7e462",
+    "tests/test_web_ui_command_hierarchy.py": "78ad3de35e8c4ade70746fcabaf65fab040879c9265a860d7755c11150d3d48e",
+    "tests/test_web_ui_cutoff_1.py": "a5be83339af58d824f2f4d2d7fb60d3eac97591ed175134d52fd5e41f636713c",
+    "tests/test_web_ui_demo_flow.py": "c3dea119d5dcb73af8c3956a5a4423005410ec7465ed22ec4ffbb7301d0078e0",
+    "tests/test_web_ui_information_architecture.py": "dac582482ec682a55722c3a1c57de2eb21d460f95714f181123f931c3fea80f7",
+    "tests/test_web_ui_result_readability.py": "8a946c00d58c2ec80b5ffc1ee828dc561d9eb7058b2fadc03821f50d54fddc29",
+    "web/app.py": "ed7aab3b4ae346480fea7b40219afc486588804361b2e5d488567ec71874f232",
+    "web/static/safe_content.js": "f60cc819d554958b69f1897178111931ad7770726d9306dc3fd0637afb251745",
+    "web/static/vendor/dompurify/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "web/static/vendor/dompurify/README.md": "86f7e2e30f3b3cac27a0b59bb6c6a7f74e77fdc81afd696465b32b9b8a171a14",
+    "web/static/vendor/dompurify/purify.min.js": "dbabb5b205a333ec49c8c09e7fca30ef66df0523bb8bc0fa9ea843841f111dbd",
+    "web/templates/index.html": "d53a8faa3e7b1fa6e16b336e214267d04262b825c0ac97f31c377fdfeeda56c0"
+  },
+  "deferred": [
+    "DATA-01",
+    "EXEC-01",
+    "AUTH-01",
+    "DATA-02",
+    "SEC-02",
+    "UX-01",
+    "UX-02",
+    "UX-03",
+    "UX-04",
+    "UX-05",
+    "UX-06",
+    "CSP follow-up"
+  ],
+  "sec_01_closed": true
+}

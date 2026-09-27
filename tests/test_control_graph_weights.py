@@ -123,23 +123,33 @@ def test_control_dfs_prioritizes_graph_weight_when_query_relevance_is_tied(monke
     assert "app.py::a_low" not in symbols
 
 
-def test_control_dfs_visits_high_penalty_file_neighbor_first(monkeypatch, tmp_path):
+def test_control_dfs_visits_high_penalty_neighbor_first(monkeypatch, tmp_path):
+    """Neighbour ordering follows the penalty-boosted weight.
+
+    The neighbours are symbols rather than bare file nodes because RETRIEVE.
+    LIVE.1 refuses a structural node as a localization candidate, and because
+    that is the shape production actually produces: ``resolved_call`` edges
+    are built from the symbol table and never target a file node.  What this
+    test pins - that the higher-penalty neighbour is the one visited under a
+    neighbour limit of one, and that the penalty reaches the evidence row - is
+    unchanged.
+    """
     graph = ProgramGraph()
     graph.add_node("entry.py::start", "function")
-    graph.add_node("low.py", "file")
-    graph.add_node("high.py", "file")
-    graph.add_edge("entry.py::start", "low.py", "resolved_call")
-    graph.add_edge("entry.py::start", "high.py", "resolved_call")
+    graph.add_node("low.py::run", "function")
+    graph.add_node("high.py::run", "function")
+    graph.add_edge("entry.py::start", "low.py::run", "resolved_call")
+    graph.add_edge("entry.py::start", "high.py::run", "resolved_call")
 
     fake = PenaltyResult(
-        penalty_map={"high.py": 10.0},
+        penalty_map={"high.py::run": 10.0},
         unmatched_paths=[],
-        blocked_counts={"high.py": 2},
+        blocked_counts={"high.py::run": 2},
         transient_counts={},
     )
     monkeypatch.setattr(weights_module, "build_penalty_map", lambda g, rp: fake)
     _stub_explain_helpers(monkeypatch, {
-        "entry.py::start": ["high.py", "low.py"],
+        "entry.py::start": ["high.py::run", "low.py::run"],
     })
 
     evidence = control_engine.control_dfs_v2(
@@ -150,9 +160,9 @@ def test_control_dfs_visits_high_penalty_file_neighbor_first(monkeypatch, tmp_pa
     )
 
     symbols = {item["symbol"] for item in evidence}
-    assert "high.py" in symbols
-    assert "low.py" not in symbols
-    high_row = next(item for item in evidence if item["symbol"] == "high.py")
+    assert "high.py::run" in symbols
+    assert "low.py::run" not in symbols
+    high_row = next(item for item in evidence if item["symbol"] == "high.py::run")
     assert high_row["graph_weight"] >= 10.0  # penalty boost is in evidence
 
 

@@ -242,7 +242,7 @@ def test_patch_if_safe_routes_debt_to_patch_generation(tmp_path, monkeypatch):
     assert saved["items"][0]["status"] == "ready_to_apply"
 
 
-def test_dream_patch_generation_hydrates_markdown_source_from_scout(
+def test_dream_source_hydration_does_not_mint_patch_authority(
     tmp_path,
     monkeypatch,
 ):
@@ -294,7 +294,12 @@ def test_dream_patch_generation_hydrates_markdown_source_from_scout(
         },
     )
 
-    assert patch == {"patch_plan": [{"op": "noop"}]}
+    # Scout still acquires the exact source for inspection, but source
+    # acquisition alone is not executed defect evidence.  A model plan that
+    # ignores that boundary is rejected before the dream apply lifecycle.
+    assert patch["patch_plan"] is None
+    assert patch["control_patch_candidate_rejected"] is True
+    assert patch["needs_escalation"] is True
     assert control["patch_intent"]["target_file"] == "NOTE.md"
     assert "Status: TODO_GAMMA2_NOTE" in control["patch_intent"]["source_snippet"]
 

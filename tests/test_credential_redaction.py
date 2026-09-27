@@ -328,7 +328,9 @@ def test_web_runner_error_payload_redacts_database_url(
     )
 
     result = runner.run_agent_web(
-        "review app.py",
+        # WAITER.LIVE.1: only a change route indexes, so only a change route can
+        # fail while indexing. A review request answers from documents instead.
+        "fix the failing behaviour in app.py",
         str(repo),
         runtime_environment="local_windows",
     )

@@ -113,8 +113,11 @@ def _patch_source_missing_run(monkeypatch, runner, repo: Path) -> None:
 
 
 def _run_source_missing(runner, repo: Path) -> dict:
+    # WAITER.LIVE.1: the source_missing harness gate is a patch-generation gate,
+    # so this fixture states a defect claim.  A read-only order is not asked for
+    # a source snippet and never reaches that gate.
     return runner.run_agent_web(
-        f"Analyze unavailable input {RAW_REQUEST_SENTINEL}",
+        f"Fix the broken behaviour in unavailable input {RAW_REQUEST_SENTINEL}",
         str(repo),
         runtime_environment="local_linux",
     )

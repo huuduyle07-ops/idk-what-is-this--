@@ -10,7 +10,7 @@ Covers:
 7.  POST with X-CATTUS-Web-Token correct token is allowed
 8.  POST with Authorization: Bearer <token> correct token is allowed
 9.  Cross-origin POST is rejected
-10. Same-origin POST is allowed
+10. Same-origin POST with its session-bound CSRF token is allowed (AUTH.WEB.1)
 11. Missing Origin/Referer does not block token-authenticated API request
 12. Existing mutation route is blocked without auth under configured token
 13. Existing mutation route is allowed with correct auth token
@@ -22,36 +22,39 @@ from __future__ import annotations
 import ast
 import os
 from pathlib import Path
-from unittest.mock import MagicMock
 
 import pytest
+from werkzeug.datastructures import Headers
 
 from web.auth_gate import (
     GateDecision,
     extract_web_auth_token,
     is_loopback_host,
-    origin_matches_request,
     should_allow_mutation,
 )
+from web.browser_session import csrf_token_for, mint_session, read_session
+from web.request_origin import parse_origin
 
 
 # ── helpers ────────────────────────────────────────────────────────────────────
 
 def _headers(**kw):
-    """Return a mock headers object whose .get() looks up keys case-sensitively."""
-    data = dict(kw)
-    mock = MagicMock()
-    mock.get = lambda key, default=None: data.get(key, default)
-    return mock
+    """Return real request headers (case-insensitive, multi-valued)."""
+    return Headers(list(kw.items()))
 
 
-def _allow(method="POST", remote_addr="127.0.0.1", headers=None, host="localhost", token=""):
+def _allow(method="POST", remote_addr="127.0.0.1", headers=None, host="localhost", token="", csrf=False):
+    """``host`` is the one allowed origin; ``csrf`` adds a valid session-bound CSRF proof."""
+    allowed = parse_origin(host if "://" in host else f"http://{host}")
+    session, cookie = mint_session(authenticated=False, configured_token=token)
     return should_allow_mutation(
         method=method,
         remote_addr=remote_addr,
         headers=headers or _headers(),
-        host=host,
         configured_token=token,
+        allowed_origins=frozenset({allowed}) if allowed else frozenset(),
+        browser_session=read_session([cookie], configured_token=token),
+        csrf_submissions=(csrf_token_for(session),) if csrf else (),
     )
 
 
@@ -158,14 +161,18 @@ def test_cross_origin_post_rejected_even_with_token():
 
 def test_same_origin_post_allowed_no_token():
     h = _headers(Origin="http://127.0.0.1:5000")
-    d = _allow(method="POST", remote_addr="127.0.0.1", headers=h, host="127.0.0.1:5000", token="")
+    d = _allow(method="POST", remote_addr="127.0.0.1", headers=h, host="127.0.0.1:5000", token="", csrf=True)
     assert d.allowed is True
+    d = _allow(method="POST", remote_addr="127.0.0.1", headers=h, host="127.0.0.1:5000", token="")
+    assert d.allowed is False and d.code == "csrf_missing"
 
 
 def test_same_origin_post_allowed_with_token():
     h = _headers(Origin="http://localhost:5000", **{"X-CATTUS-Web-Token": "tok"})
-    d = _allow(method="POST", remote_addr="127.0.0.1", headers=h, host="localhost:5000", token="tok")
+    d = _allow(method="POST", remote_addr="127.0.0.1", headers=h, host="localhost:5000", token="tok", csrf=True)
     assert d.allowed is True
+    d = _allow(method="POST", remote_addr="127.0.0.1", headers=h, host="localhost:5000", token="tok")
+    assert d.allowed is False and d.code == "csrf_missing"
 
 
 # ── 11. Missing Origin/Referer does not block token-authenticated API request ──

@@ -13,9 +13,21 @@ them. Because every lifecycle executor (executor / patch_plan_executor /
 preflight / mutation_oracle) reaches the shell only through this one function,
 screening it protects the default path AND the DB/profile path at once.
 
-What 13.6 deliberately does NOT change: shell=True stays, the default command
+What 13.6 deliberately did NOT change: shell=True stays, the default command
 table (``get_default_validation_command``) is untouched, and the validation
 output classifier (``classify_validation_output``) is untouched.
+
+OPS.VALIDATE.1 update. The screened sink is now
+``core.validator.run_validation_command_detailed``; ``run_validation_command``
+is the ``(ok, output)`` wrapper over it, so the screen still lives in exactly
+one function and every lifecycle executor still reaches the shell only through
+it.  Two 13.6 scope pins genuinely moved, and are re-pinned below rather than
+deleted: the default command table now emits ``python -m pytest`` instead of a
+bare ``pytest``, and the classifier gained the two infrastructure categories
+that separate "nothing was checked" from "the code is broken".  The shell is
+still used for every command that needs one - a plain ``python ...`` command is
+run as argv so it binds to the current interpreter, which is a *narrower* use
+of the shell, not a wider one.
 
 Safety of THIS suite: tests that exercise the sink with destructive commands
 install a ``subprocess.run`` spy first, so no destructive command can ever
@@ -143,11 +155,17 @@ def test_extract_user_validation_command_returns_benign_command_verbatim():
 # --------------------------------------------------------------------------- #
 def test_run_validation_command_calls_the_safety_screen():
     tree = _module_tree("core/validator.py")
-    func = _find_function(tree, "run_validation_command")
-    assert func is not None
-    assert "validation_command_safety_issue" in _called_names(func), (
-        "run_validation_command must screen the command before executing it"
+    sink = _find_function(tree, "run_validation_command_detailed")
+    assert sink is not None
+    assert "validation_command_safety_issue" in _called_names(sink), (
+        "the validation sink must screen the command before executing it"
     )
+
+    # The compatibility wrapper must not become a second, unscreened door.
+    wrapper = _find_function(tree, "run_validation_command")
+    assert wrapper is not None
+    assert "run_validation_command_detailed" in _called_names(wrapper)
+    assert "subprocess" not in _called_names(wrapper)
 
 
 # --------------------------------------------------------------------------- #
@@ -201,7 +219,15 @@ def test_blocked_result_message_includes_safety_reason(monkeypatch, tmp_path):
 def test_benign_command_reaches_subprocess_run(monkeypatch, tmp_path, command):
     calls = _install_subprocess_spy(monkeypatch)
     ok, output = validator.run_validation_command(command, cwd=str(tmp_path))
-    assert [c["command"] for c in calls] == [command]
+    assert len(calls) == 1
+    passed = calls[0]["command"]
+    if isinstance(passed, list):
+        # OPS.VALIDATE.1: a plain python command is executed as argv bound to
+        # this interpreter, so the tail of the command must survive verbatim.
+        assert passed[0] == sys.executable
+        assert command.split()[0].lower() in {"python", "python3", "py"}
+    else:
+        assert passed == command
     assert ok is True
 
 
@@ -231,7 +257,11 @@ def test_all_lifecycle_validation_runs_through_the_screened_sink():
         "core/mutation_oracle.py",
     ):
         tree = _module_tree(rel_path)
-        assert "run_validation_command" in _called_names(tree), rel_path
+        called = _called_names(tree)
+        assert called & {
+            "run_validation_command",
+            "run_validation_command_detailed",
+        }, rel_path
         roots = {m.split(".", 1)[0] for m in _imported_modules(tree)}
         assert "subprocess" not in roots, (
             f"{rel_path} imports subprocess and could bypass the screened sink"
@@ -241,10 +271,28 @@ def test_all_lifecycle_validation_runs_through_the_screened_sink():
 # --------------------------------------------------------------------------- #
 # 7 (scope). shell=True is retained in this phase.
 # --------------------------------------------------------------------------- #
-def test_run_validation_command_still_uses_shell_true():
-    tree = _module_tree("core/validator.py")
-    func = _find_function(tree, "run_validation_command")
-    assert _subprocess_run_uses_shell_true(func)
+def test_shell_execution_is_narrowed_never_widened(monkeypatch, tmp_path):
+    """The shell still runs shell-shaped commands, and nothing more.
+
+    13.6 pinned ``shell=True`` so the hardening could not quietly change how
+    commands execute.  OPS.VALIDATE.1 removes the shell from exactly one
+    family - a bare ``python ...`` command with no shell syntax in it - so the
+    active interpreter is used instead of whatever PATH happens to resolve.
+    Every other command still goes to the shell, which is what this now pins.
+    """
+    calls = _install_subprocess_spy(monkeypatch)
+    validator.run_validation_command("npm test && npm run build", cwd=str(tmp_path))
+    validator.run_validation_command("pytest -q", cwd=str(tmp_path))
+    assert [c["kwargs"]["shell"] for c in calls] == [True, True]
+    assert [c["command"] for c in calls] == [
+        "npm test && npm run build",
+        "pytest -q",
+    ]
+
+    calls.clear()
+    validator.run_validation_command("python -m pytest", cwd=str(tmp_path))
+    assert calls[0]["kwargs"]["shell"] is False
+    assert calls[0]["command"] == [sys.executable, "-m", "pytest"]
 
 
 # --------------------------------------------------------------------------- #
@@ -254,7 +302,7 @@ def test_run_validation_command_still_uses_shell_true():
 def test_safety_screen_invoked_by_user_path_and_shared_sink():
     assert _functions_calling_screen() == {
         "extract_user_validation_command",
-        "run_validation_command",
+        "run_validation_command_detailed",
     }
 
 
@@ -262,18 +310,25 @@ def test_safety_screen_invoked_by_user_path_and_shared_sink():
 # Scope 8 & 9 regression pins: the hardening must not touch the default command
 # table or the validation output classifier.
 # --------------------------------------------------------------------------- #
-def test_default_command_table_is_unchanged(tmp_path):
+def test_default_command_table_selects_the_current_interpreter(tmp_path):
+    """13.6's scope pin, re-pinned at OPS.VALIDATE.1's corrected value.
+
+    A bare ``pytest`` is exactly what the field test could not run: the active
+    virtualenv owned pytest, PATH did not, and C.A.T.T.U.S could not validate
+    its own repository.  The table now names the interpreter instead.
+    """
     py_with_tests = tmp_path / "py_with_tests"
     (py_with_tests / "tests").mkdir(parents=True)
     py_empty = tmp_path / "py_empty"
     py_empty.mkdir()
 
-    assert get_default_validation_command("python", py_with_tests) == "pytest"
+    assert get_default_validation_command("python", py_with_tests) == "python -m pytest"
     assert get_default_validation_command("python", py_empty) == "python -m unittest"
     assert get_default_validation_command("klingon", py_empty) == ""
 
 
-def test_validation_output_classifier_is_unchanged():
+def test_validation_output_classifier_keeps_its_code_taxonomy():
+    """The code categories are untouched; only infrastructure ones were added."""
     from core.validator import classify_validation_output
 
     assert classify_validation_output("AssertionError: boom")["category"] == "assertion_failure"
@@ -285,7 +340,7 @@ def test_hardening_is_isolated_to_the_screen():
     # The chokepoint only gained the safety screen; it must not reach into the
     # default command table or the output classifier.
     tree = _module_tree("core/validator.py")
-    func = _find_function(tree, "run_validation_command")
+    func = _find_function(tree, "run_validation_command_detailed")
     called = _called_names(func)
     assert "validation_command_safety_issue" in called
     assert "get_default_validation_command" not in called

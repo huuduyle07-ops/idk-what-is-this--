@@ -1,0 +1,231 @@
+{
+  "phase_id": "PATCH.AUTHOR.SPAN.1",
+  "files": {
+    "docs/roadmap/phase_registry.json": {
+      "entry_sha256": "870ceddc8e7792275a5be955cdcff2232cc2345cbf1e7bb71713923a683e69e0",
+      "post_sha256": "bb70321d020b7063b0ae42af9c911206899aa9c25ffa832e75d4bb8976cc7141",
+      "hunks": [
+        {
+          "before": "        \"VALIDATION. Focused tests are deterministic and offline. The separately user-authorized single read-only Java replay uses only existing bootstrap and author provider calls, with no Apply. Its next measured blocker is recorded without remediation.\",\n        \"ATTRIBUTION. Reversible authoring seams reconstruct entry bytes before older frozen receipts; original receipts are not repinned.\"\n      ]\n    }\n  ]\n}\n",
+          "after": "        \"VALIDATION. Focused tests are deterministic and offline. The separately user-authorized single read-only Java replay uses only existing bootstrap and author provider calls, with no Apply. Its next measured blocker is recorded without remediation.\",\n        \"ATTRIBUTION. Reversible authoring seams reconstruct entry bytes before older frozen receipts; original receipts are not repinned.\"\n      ]\n    },\n    {\n      \"phase_id\": \"PATCH.AUTHOR.SPAN.1\",\n      \"title\": \"Repair-Envelope Target / Replacement Alignment\",\n      \"track\": \"CONTROL\",\n      \"status\": \"complete\",\n      \"summary\": \"Expose the existing measured replacement envelope separately from the primary semantic target. Initial and revision authors quote one coherent original interval; exact unique targets, definition counts and readonly gaps are checked before the unchanged containment and PATCH.MINIMAL gates. No span rewrite, member selection, new wire format or execution authority.\",\n      \"automation_level\": \"LOCAL_1_PREPARE\",\n      \"budget_tier\": \"local_only\",\n      \"risk_level\": \"medium\",\n      \"allowed_files\": [\n        \"core/candidate_replacement_span.py\",\n        \"core/authoring_repair_scope.py\",\n        \"core/candidate_authoring_context.py\",\n        \"core/patch_authoring_contract.py\",\n        \"core/control_engine.py\",\n        \"core/candidate_revision.py\",\n        \"tests/test_patch_author_span1.py\",\n        \"tests/_patch_author_span1_maintenance.py\",\n        \"tests/_patch_author_scope1_maintenance.py\",\n        \"tests/test_phase_registry.py\",\n        \"tests/test_phase_picker.py\",\n        \"docs/roadmap/phase_registry.json\",\n        \"tests/fixtures/patch_author_span1_reversal.json\",\n        \"tests/fixtures/patch_author_span1_frozen.json\",\n        \"tests/fixtures/patch_author_span1_completion.json\",\n        \"docs/designs/2026-09-22-repair-envelope-target-replacement-alignment.md\"\n      ],\n      \"forbidden_files\": [\n        \".env\",\n        \".git\",\n        \".agent/private\",\n        \"secrets\",\n        \"credentials\",\n        \"core/repair_scope.py\",\n        \"core/patch_basis.py\",\n        \"policy/\",\n        \"patching/\",\n        \"core/candidate_verification.py\",\n        \"core/authoritative_binding_context.py\",\n        \"core/immutable_result_fields.py\",\n        \"core/local_binding_novelty.py\",\n        \"web/\",\n        \"agents/\",\n        \"docs/audits/\"\n      ],\n      \"validation\": [\n        \"python -m pytest tests/test_patch_author_span1.py tests/test_patch_author_scope1.py -q\",\n        \"python -m pytest tests/test_patch_authoring_context_live3.py tests/test_patch_authoring_contract_live2.py tests/test_candidate_revision_live.py -q\",\n        \"python -m pytest tests/test_patch_basis_scope1.py tests/test_patch_basis_target1.py tests/test_preflight_request1.py tests/test_control_fresh1.py tests/test_control_bootstrap1.py -q\",\n        \"python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q\",\n        \"python -m compileall -q core tests benchmarks\",\n        \"python benchmarks/run_benchmarks.py --check\",\n        \"git diff --check\"\n      ],\n      \"human_approval_required\": true,\n      \"merge_allowed\": false,\n      \"network_allowed\": false,\n      \"model_calls_allowed\": false,\n      \"writes_real_repo\": true,\n      \"requires_sandbox\": false,\n      \"prerequisites\": [\n        \"PATCH.AUTHOR.SCOPE.1\"\n      ],\n      \"expected_artifacts\": [\n        \"tests/fixtures/patch_author_span1_completion.json\",\n        \"docs/designs/2026-09-22-repair-envelope-target-replacement-alignment.md\"\n      ],\n      \"notes\": [\n        \"SPAN ALIGNMENT ONLY. Reuse AuthoringRepairScope.replacement_source and member_ranges. Exact sub-envelopes remain supported only with coherent replacement semantics; canonical envelope quoting is required by the multi-member prompt. Typed author_output_status distinguishes span failures while retaining historical containment classification.\",\n        \"FROZEN. Measured membership, primary localization, CONTROL/PREFLIGHT/BASIS, minimality, raw CRLF application, Java verification, Twosum policy, task text, UI/security/mutation and execution authority are unchanged.\",\n        \"VALIDATION. Offline deterministic tests; one separately user-authorized fresh read-only Java replay, no Apply and no additional span-selection provider call. Stop at the next measured blocker.\",\n        \"ATTRIBUTION. Preserve SCOPE.1 completion and frozen evidence. Test-only reversal strips only this phase before applying existing historical pins.\"\n      ]\n    }\n  ]\n}\n"
+        }
+      ]
+    },
+    "core/control_engine.py": {
+      "entry_sha256": "4d6339ab4ab28f37d80df773f77d30968f74a8e25f95f41a143f97005a6ef5a4",
+      "post_sha256": "ef3641ccc6b4480954ea0a1aa9404da72ed9404a485729d9e562ed9758093bbe",
+      "hunks": [
+        {
+          "before": "    target_quote_rule = \"Use source_snippet as target_snippet verbatim.\"\n    primary_scope_rule = \"PATCH TARGET remains the primary grounded target and must remain included.\"\n    if authoring_context.authoring_repair_scope is not None and len(repair_scope.members) > 1:\n        target_quote_rule = \"Use the measured repair-set contract's bounded replacement_source quotation rules.\"\n        primary_scope_rule = \"PATCH TARGET remains the primary grounded target; editing every member is not required.\"\n\r\n    return f\"\"\"\\\r\n",
+          "after": "    target_quote_rule = \"Use source_snippet as target_snippet verbatim.\"\n    primary_scope_rule = \"PATCH TARGET remains the primary grounded target and must remain included.\"\n    if authoring_context.authoring_repair_scope is not None and len(repair_scope.members) > 1:\n        target_quote_rule = \"For multi-member edits, quote replacement_envelope.original_snippet verbatim as target_snippet and replace that same envelope.\"\n        primary_scope_rule = \"PATCH TARGET remains the primary grounded target; editing every member is not required.\"\n\r\n    return f\"\"\"\\\r\n"
+        }
+      ]
+    },
+    "core/candidate_revision.py": {
+      "entry_sha256": "4709b3214bb5d2729f42f55a6b13bdce70cf29f6fccdf42c97356dba656e89d9",
+      "post_sha256": "55a64a9f6564b1fad33f6547a7904792578d9e98b40b481d968f40c12266a05a",
+      "hunks": [
+        {
+          "before": "OUTPUT_WRONG_TARGET_FILE = \"revision_candidate_names_a_different_file\"\r\nOUTPUT_WRONG_TARGET_SYMBOL = \"revision_candidate_names_a_different_symbol\"\r\nOUTPUT_NOT_BASED_ON_ORIGINAL_SOURCE = \"revision_candidate_is_not_based_on_the_original_source\"\r\nOUTPUT_REJECTION_REASONS: tuple[str, ...] = (\r\n    OUTPUT_NO_RESPONSE,\r\n    OUTPUT_PROVIDER_ERROR,\r\n    OUTPUT_NO_JSON_PAYLOAD,\r\n",
+          "after": "OUTPUT_WRONG_TARGET_FILE = \"revision_candidate_names_a_different_file\"\r\nOUTPUT_WRONG_TARGET_SYMBOL = \"revision_candidate_names_a_different_symbol\"\r\nOUTPUT_NOT_BASED_ON_ORIGINAL_SOURCE = \"revision_candidate_is_not_based_on_the_original_source\"\r\nfrom core.candidate_replacement_span import SPAN_REJECTION_REASONS\r\n\r\nOUTPUT_REJECTION_REASONS: tuple[str, ...] = (\r\n    *SPAN_REJECTION_REASONS,\r\n    OUTPUT_NO_RESPONSE,\r\n    OUTPUT_PROVIDER_ERROR,\r\n    OUTPUT_NO_JSON_PAYLOAD,\r\n"
+        },
+        {
+          "before": "        try:\r\n            authoring_context.revision_prompt(receipt)  # baseline and freshness proof\r\n            repair.validate_candidate(block)\r\n        except (AuthoringScopeError, ValueError):\r\n            return _rejected_output(OUTPUT_NOT_BASED_ON_ORIGINAL_SOURCE)\r\n        original_source = repair.replacement_source\r\n    rebased = rebase_onto_original_source(\r\n        original_source=original_source,\r\n        target_snippet=target,\r\n        patched_snippet=patched,\r\n    )\r\n    if rebased is None:\r\n        return _rejected_output(OUTPUT_NOT_BASED_ON_ORIGINAL_SOURCE)\r\n    base, replacement = rebased\r\n",
+          "after": "        try:\r\n            authoring_context.revision_prompt(receipt)  # baseline and freshness proof\r\n            repair.validate_candidate(block)\r\n        except AuthoringScopeError as exc:\r\n            return _rejected_output(exc.reason if exc.reason in SPAN_REJECTION_REASONS\r\n                                    else OUTPUT_NOT_BASED_ON_ORIGINAL_SOURCE)\r\n        except ValueError:\r\n            return _rejected_output(OUTPUT_NOT_BASED_ON_ORIGINAL_SOURCE)\r\n        # Preserve the exact validated pair, including supported sub-envelopes.\r\n        # A model-selected quote is never expanded to a different candidate.\r\n        rebased = (target, patched)\r\n    else:\r\n        rebased = rebase_onto_original_source(\r\n            original_source=original_source,\r\n            target_snippet=target,\r\n            patched_snippet=patched,\r\n        )\r\n    if rebased is None:\r\n        return _rejected_output(OUTPUT_NOT_BASED_ON_ORIGINAL_SOURCE)\r\n    base, replacement = rebased\r\n"
+        }
+      ]
+    },
+    "core/candidate_authoring_context.py": {
+      "entry_sha256": "cdea5f38f36c466ac93e7f9a3e044880a8554def3f39fe115fdf111d12264e71",
+      "post_sha256": "f41ff481f9f470da49d5cc44ac1dbec708f28277deef9be357575365e93e1281",
+      "hunks": [
+        {
+          "before": "        return context, source\n\n    @property\n    def scope_text(self) -> str:\n        if self.authoring_repair_scope is not None and len(self.authoring_repair_scope.measured.members) > 1:\n            return \"AUTHORITATIVE AUTHORING SCOPE:\\n\" + json.dumps({\n                \"version\": \"candidate_authoring_scope_v2\",\n                \"source_path\": self.source_path,\n                \"target_symbol\": self.target_symbol,\n                \"authoring_repair_scope\": self.authoring_repair_scope.as_dict(),\n            }, ensure_ascii=False, sort_keys=True, indent=2)\n        if self.authoring_repair_scope is not None:\n",
+          "after": "        return context, source\n\n    @property\n    def replacement_envelope(self) -> dict | None:\n        repair = self.authoring_repair_scope\n        if repair is None or len(repair.measured.members) < 2:\n            return None\n        from core.candidate_replacement_span import canonical_replacement_envelope\n        return canonical_replacement_envelope(repair)\n\n    @property\n    def scope_text(self) -> str:\n        if self.authoring_repair_scope is not None and len(self.authoring_repair_scope.measured.members) > 1:\n            return \"AUTHORITATIVE AUTHORING SCOPE:\\n\" + json.dumps({\n                \"version\": \"candidate_authoring_scope_v3_replacement_envelope\",\n                \"source_path\": self.source_path,\n                \"target_symbol\": self.target_symbol,\n                \"primary_target\": {\"file\": self.source_path, \"symbol\": self.target_symbol,\n                                   \"source_snippet\": self.source_snippet},\n                \"replacement_envelope\": self.replacement_envelope,\n                \"authoring_repair_scope\": self.authoring_repair_scope.as_dict(),\n            }, ensure_ascii=False, sort_keys=True, indent=2)\n        if self.authoring_repair_scope is not None:\n"
+        },
+        {
+          "before": "    def as_telemetry(self) -> dict[str, str]:\n        return {\n            **self.contract.as_telemetry(),\n            \"authoring_scope_version\": (\"candidate_authoring_scope_v2\"\n                if self.authoring_repair_scope is not None and len(self.authoring_repair_scope.measured.members) > 1\n                else SCOPE_VERSION),\n            \"authoring_scope_fingerprint\": self.scope_fingerprint,\n",
+          "after": "    def as_telemetry(self) -> dict[str, str]:\n        return {\n            **self.contract.as_telemetry(),\n            \"authoring_scope_version\": (\"candidate_authoring_scope_v3_replacement_envelope\"\n                if self.authoring_repair_scope is not None and len(self.authoring_repair_scope.measured.members) > 1\n                else SCOPE_VERSION),\n            \"authoring_scope_fingerprint\": self.scope_fingerprint,\n"
+        }
+      ]
+    },
+    "core/authoring_repair_scope.py": {
+      "entry_sha256": "7375d7eed503cf59a76444a7a0336f5815995f8533a71eeb47727cc0d7cb6d58",
+      "post_sha256": "e118f8eb4bb22513efb55258833280245c41b0c7d01c5fc1564263dd2e7a01bc",
+      "hunks": [
+        {
+          "before": "                raise AuthoringScopeError(\"author_scope_invalid_candidate\")\n            if max(len(old.encode(\"utf-8\")), len(new.encode(\"utf-8\"))) > MAX_REPAIR_SOURCE_BYTES:\n                raise AuthoringScopeError(\"author_scope_budget_exceeded\")\n            if self.source.count(old) != 1:\n                raise AuthoringScopeError(\"author_scope_ambiguous_quote\")\n            start = self.source.index(old)\n            end = start + len(old)\n            if start < self.member_ranges[0][0] or end > self.member_ranges[-1][1]:\n                raise AuthoringScopeError(\"authoring_scope_violation\")\n            if any(start < stop and begin < end for begin, stop in ranges):\n                raise AuthoringScopeError(\"author_scope_overlapping_operations\")\n            ranges.append((start, end))\n",
+          "after": "                raise AuthoringScopeError(\"author_scope_invalid_candidate\")\n            if max(len(old.encode(\"utf-8\")), len(new.encode(\"utf-8\"))) > MAX_REPAIR_SOURCE_BYTES:\n                raise AuthoringScopeError(\"author_scope_budget_exceeded\")\n            if len(self.measured.members) > 1:\n                from core.candidate_replacement_span import validate_replacement_span\n                start, end = validate_replacement_span(self, old, new)\n            else:\n                if self.source.count(old) != 1:\n                    raise AuthoringScopeError(\"author_scope_ambiguous_quote\")\n                start = self.source.index(old)\n                end = start + len(old)\n                if start < self.member_ranges[0][0] or end > self.member_ranges[-1][1]:\n                    raise AuthoringScopeError(\"authoring_scope_violation\")\n            if any(start < stop and begin < end for begin, stop in ranges):\n                raise AuthoringScopeError(\"author_scope_overlapping_operations\")\n            ranges.append((start, end))\n"
+        },
+        {
+          "before": "                          if (begin <= start+a < start+b <= stop if a != b\n                              else begin < start+a < stop)]\n                if len(owners) != 1:\n                    raise AuthoringScopeError(\"authoring_scope_violation\")\n                touched.add(owners[0])\n                member_changes[owners[0]].append((start+a, start+b, new[c:d]))\n",
+          "after": "                          if (begin <= start+a < start+b <= stop if a != b\n                              else begin < start+a < stop)]\n                if len(owners) != 1:\n                    if len(self.measured.members) > 1:\n                        from core.candidate_replacement_span import ReplacementSpanError\n                        raise ReplacementSpanError(\"readonly_gap_modified\", \"authoring_scope_violation\")\n                    raise AuthoringScopeError(\"authoring_scope_violation\")\n                touched.add(owners[0])\n                member_changes[owners[0]].append((start+a, start+b, new[c:d]))\n"
+        },
+        {
+          "before": "        touched = repair.validate_candidate(block)\n    except AuthoringScopeError as exc:\n        block.update(patch_candidate=None, patch_plan=None, needs_escalation=True,\n                     authoring_scope_status=exc.reason, authoring_scope_candidate_fingerprint=fingerprint)\n        return False\n    block.update(authoring_scope_status=\"within_measured_repair_scope\",\n                 authoring_scope_touched_definitions=list(touched),\n                 authoring_scope_candidate_fingerprint=fingerprint)\n",
+          "after": "        touched = repair.validate_candidate(block)\n    except AuthoringScopeError as exc:\n        block.update(patch_candidate=None, patch_plan=None, needs_escalation=True,\n                     authoring_scope_status=getattr(exc, \"scope_reason\", exc.reason),\n                     authoring_scope_candidate_fingerprint=fingerprint)\n        if len(repair.measured.members) > 1:\n            block[\"author_output_status\"] = exc.reason\n        return False\n    if len(repair.measured.members) > 1:\n        block[\"author_output_status\"] = \"valid_replacement_span\"\n    block.update(authoring_scope_status=\"within_measured_repair_scope\",\n                 authoring_scope_touched_definitions=list(touched),\n                 authoring_scope_candidate_fingerprint=fingerprint)\n"
+        }
+      ]
+    },
+    "core/patch_authoring_contract.py": {
+      "entry_sha256": "8f4a0c45efafe4f38b34c17f8003f4ce411ad311529d3c1e8c522a58eb9b29e5",
+      "post_sha256": "4040bc851ea611f6c4e7e9852e10e87eb6424e3764c9d7e14cecb99e22e0ee42",
+      "hunks": [
+        {
+          "before": "retain their existing read capabilities; no import modification is authorized.\nVisible context and the source between members are read-only.\nUse the existing single-file patch_candidate shape. Keep target_node_name equal\nto the primary symbol. target_snippet may quote replacement_source verbatim, or\na unique bounded portion of it. Preserve every byte outside the measured members\nin patched_snippet, including intervening definitions and whitespace.\nNo new definitions, files, imports or extra targets may be proposed.\nThe measured set is permitted for drafting even when it contains several methods.\nDraft permission does not certify safety, minimality or completeness.\n",
+          "after": "retain their existing read capabilities; no import modification is authorized.\nVisible context and the source between members are read-only.\nUse the existing single-file patch_candidate shape. Keep target_node_name equal\nto the primary symbol; it identifies the semantic target, not the replacement span.\nCANONICAL REPLACEMENT ENVELOPE: replacement_envelope.original_snippet is the exact\nprovided baseline interval, separate from primary_target.source_snippet, member\nsnippets and whole-file read-only context. For edits spanning multiple measured\nmembers, copy that entire original_snippet verbatim into target_snippet and put\nits replacement in patched_snippet. Both fields must describe the SAME interval.\nNever quote only the primary member while supplying other members in the\nreplacement: their original definitions would remain outside the replaced span.\nAn existing exact unique sub-envelope is allowed only when the replacement is\nself-consistent for precisely that interval; do not insert copies of members\noutside it. The canonical envelope is the maximum allowed original interval.\nPreserve every byte outside the measured members in patched_snippet, including\nintervening definitions, comments, annotations, blank lines and whitespace.\nMembers inside the envelope may remain unchanged; not every member must differ.\nMalformed spans are rejected, never silently expanded or rewritten.\nNo new definitions, files, imports or extra targets may be proposed.\nThe measured set is permitted for drafting even when it contains several methods.\nDraft permission does not certify safety, minimality or completeness.\n"
+        },
+        {
+          "before": "def for_measured_repair_scope(contract: PatchAuthoringContract) -> PatchAuthoringContract:\n    \"\"\"Called only after admission of a complete multi-member BASIS scope.\"\"\"\n    return replace(\n        contract, version=\"patch_authoring_contract_v3_measured_repair\",\n        phase_id=\"PATCH.AUTHOR.SCOPE.1\",\n        candidate_language_block=contract.candidate_language_block + \"\\n\\n\" + MEASURED_REPAIR_AUTHORING_RULES,\n    )\n",
+          "after": "def for_measured_repair_scope(contract: PatchAuthoringContract) -> PatchAuthoringContract:\n    \"\"\"Called only after admission of a complete multi-member BASIS scope.\"\"\"\n    return replace(\n        contract, version=\"patch_authoring_contract_v4_replacement_envelope\",\n        phase_id=\"PATCH.AUTHOR.SPAN.1\",\n        candidate_language_block=contract.candidate_language_block + \"\\n\\n\" + MEASURED_REPAIR_AUTHORING_RULES,\n    )\n"
+        }
+      ]
+    },
+    "tests/test_phase_registry.py": {
+      "entry_sha256": "338a94f3bd452b17f0792bcbae3c6368e81a3128035785728e33c54e2539258e",
+      "post_sha256": "583f807e290729abd3bc83f26c8b3b01eb110f04a3413bf6d0ff991624702109",
+      "hunks": [
+        {
+          "before": "    assert \"EXEC.APPROVAL.LIVE.1\" in ids\r\n    assert \"ANSWER.GROUND.LIVE.2\" in ids\r\n    assert \"CONTROL.LOCALIZE.LIVE.2\" in ids\r\n    assert len(data[\"phases\"]) == 195\n\r\n\r\ndef test_input_understanding_phase_is_registered_and_inert():\r\n",
+          "after": "    assert \"EXEC.APPROVAL.LIVE.1\" in ids\r\n    assert \"ANSWER.GROUND.LIVE.2\" in ids\r\n    assert \"CONTROL.LOCALIZE.LIVE.2\" in ids\r\n    assert len(data[\"phases\"]) == 196\n\r\n\r\ndef test_input_understanding_phase_is_registered_and_inert():\r\n"
+        },
+        {
+          "before": "        \"INPUT\": 4,\r\n        \"SYNTHESIS\": 1,\r\n            \"CHECK\": 9,\r\n            \"CONTROL\": 15,\n            \"WAITER\": 5,\r\n        \"WORKER\": 5,\r\n        \"MIRROR\": 15,\r\n",
+          "after": "        \"INPUT\": 4,\r\n        \"SYNTHESIS\": 1,\r\n            \"CHECK\": 9,\r\n            \"CONTROL\": 16,\n            \"WAITER\": 5,\r\n        \"WORKER\": 5,\r\n        \"MIRROR\": 15,\r\n"
+        }
+      ]
+    },
+    "tests/test_phase_picker.py": {
+      "entry_sha256": "2a9a1f0f4e02d1e7e604362ca34cc6182f85096da38c725488949f23e8452a33",
+      "post_sha256": "641601bf4b8d91531582b1c0e86a6ca1326a1bbe2bef66bba0f92635581eaf59",
+      "hunks": [
+        {
+          "before": "        \"human_approval_required\": 0,\r\n        \"blocked\": 0,\r\n        \"deferred_or_parked\": 0,\r\n        \"complete_or_history\": 191,\r\n    }\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n    assert report[\"top_recommendation\"][\"recommended_next_step\"] == \"prepare_worker_assignment\"\r\n",
+          "after": "        \"human_approval_required\": 0,\r\n        \"blocked\": 0,\r\n        \"deferred_or_parked\": 0,\r\n        \"complete_or_history\": 192,\r\n    }\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n    assert report[\"top_recommendation\"][\"recommended_next_step\"] == \"prepare_worker_assignment\"\r\n"
+        },
+        {
+          "before": "    assert \"CTX.SELECT.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"CTX.SELECT.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"ACQUIRE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"ACQUIRE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"EVIDENCE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"EVIDENCE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"EVIDENCE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"EVIDENCE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert phase[\"prerequisites\"] == [\"EVIDENCE.2\"]\r\n    assert \"CLAIM.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CLAIM.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert phase[\"prerequisites\"] == [\"EVIDENCE.2\"]\r\n    assert \"CLAIM.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CLAIM.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"SYNTHESIS.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"SYNTHESIS.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert phase[\"prerequisites\"] == [\"CTX.APPLY.0\"]\r\n    assert \"CHECK.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert phase[\"prerequisites\"] == [\"CTX.APPLY.0\"]\r\n    assert \"CHECK.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert phase[\"prerequisites\"] == [\"CHECK.1\", \"CLAIM.1\"]\r\n    assert \"CHECK.2\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.2\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert phase[\"prerequisites\"] == [\"CHECK.1\", \"CLAIM.1\"]\r\n    assert \"CHECK.2\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.2\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"CHECK.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"CHECK.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"CHECK.LIVE.1B\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"CHECK.LIVE.1B\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.2A\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.2A\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.2A.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.2A.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.2A.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.2A.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"sandbox_required\"] == 1\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_candidate_sandbox_validation_phase_is_complete_history():\r\n",
+          "after": "        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"sandbox_required\"] == 1\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_candidate_sandbox_validation_phase_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"OPS.PATCH.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_typed_patch_basis_phase_is_complete_history():\r\n",
+          "after": "    assert \"OPS.PATCH.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_typed_patch_basis_phase_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"PATCH.BASIS.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_query_symbol_entry_recall_phase_is_complete_history():\r\n",
+          "after": "    assert \"PATCH.BASIS.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_query_symbol_entry_recall_phase_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"RETRIEVE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_production_query_recall_unification_is_complete_history():\r\n",
+          "after": "    assert \"RETRIEVE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_production_query_recall_unification_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"RETRIEVE.LIVE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_answer_entity_grounding_is_complete_check_history():\r\n",
+          "after": "    assert \"RETRIEVE.LIVE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_answer_entity_grounding_is_complete_check_history():\r\n"
+        },
+        {
+          "before": "    assert \"ANSWER.GROUND.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_answer_symbol_grounding_is_complete_check_history():\r\n",
+          "after": "    assert \"ANSWER.GROUND.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_answer_symbol_grounding_is_complete_check_history():\r\n"
+        },
+        {
+          "before": "    assert \"ANSWER.GROUND.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_bounded_defect_probe_is_complete_ops_history():\r\n",
+          "after": "    assert \"ANSWER.GROUND.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_bounded_defect_probe_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"DEFECT.PROBE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_bounded_targeted_validation_is_complete_ops_history():\r\n",
+          "after": "    assert \"DEFECT.PROBE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_bounded_targeted_validation_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"OPS.VALIDATE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_immutable_candidate_defect_closure_is_complete_ops_history():\r\n",
+          "after": "    assert \"OPS.VALIDATE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_immutable_candidate_defect_closure_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"DEFECT.PROBE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_existing_check_oracle_role_is_complete_ops_history():\r\n",
+          "after": "    assert \"DEFECT.PROBE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_existing_check_oracle_role_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"VALIDATE.ORACLE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_execution_eligibility_policy_is_complete_ops_history():\r\n",
+          "after": "    assert \"VALIDATE.ORACLE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_execution_eligibility_policy_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"EXEC.POLICY.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_human_apply_binding_is_complete_ops_history():\r\n",
+          "after": "    assert \"EXEC.POLICY.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_human_apply_binding_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"EXEC.APPROVAL.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n\r\n\r\ndef test_seed_repository_specificity_entry_ordering_is_complete_index_history():\r\n",
+          "after": "    assert \"EXEC.APPROVAL.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n\r\n\r\ndef test_seed_repository_specificity_entry_ordering_is_complete_index_history():\r\n"
+        },
+        {
+          "before": "    assert \"RETRIEVE.LIVE.4\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 191\r\n",
+          "after": "    assert \"RETRIEVE.LIVE.4\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 192\r\n"
+        }
+      ]
+    },
+    "tests/_patch_author_scope1_maintenance.py": {
+      "entry_sha256": "cf0bccbc5a547f3f7e48374c12c61b1e7b2fa5d213d3089899ec2c39ed07488b",
+      "post_sha256": "105189d2dcbd56aea02752c7d5a612033fcc7f3152441093cc449d792b1778ef",
+      "hunks": [
+        {
+          "before": "\n\ndef before_patch_author_scope1(relative: str, content: bytes) -> bytes:\n    receipt = json.loads((ROOT/'tests/fixtures/patch_author_scope1_reversal.json').read_text(encoding='utf-8'))\n    record = receipt['files'].get(relative)\n    if record is None:\n",
+          "after": "\n\ndef before_patch_author_scope1(relative: str, content: bytes) -> bytes:\n    from tests._patch_author_span1_maintenance import before_patch_author_span1\n\n    content = before_patch_author_span1(relative, content)\n    receipt = json.loads((ROOT/'tests/fixtures/patch_author_scope1_reversal.json').read_text(encoding='utf-8'))\n    record = receipt['files'].get(relative)\n    if record is None:\n"
+        }
+      ]
+    }
+  }
+}

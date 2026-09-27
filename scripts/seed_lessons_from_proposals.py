@@ -289,9 +289,16 @@ def _validation_summary(validation: dict[str, Any]) -> dict[str, Any]:
 
 
 def _apply_summary(apply_result: dict[str, Any]) -> dict[str, Any]:
+    from core.rollback_outcome import (
+        rollback_disqualifies_success_evidence,
+        rollback_outcome_from_mapping,
+    )
+
+    rollback = rollback_outcome_from_mapping(apply_result)
     summary = {
         "success": apply_result.get("success"),
-        "rollback_performed": apply_result.get("rollback_performed"),
+        **rollback.as_payload_fields(),
+        "rollback_happened": rollback_disqualifies_success_evidence(apply_result),
         "applied_ops_count": len(apply_result.get("applied_ops") or []),
     }
     error = _truncate(apply_result.get("error"))

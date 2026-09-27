@@ -698,11 +698,29 @@ def run_case(case_file: Path) -> dict[str, Any]:
         raise FileNotFoundError(f"Missing buggy_repo: {buggy_repo}")
 
     validation_command = case.get("validation_command", "").strip()
+    auto_detect_validation = bool(case.get("auto_detect_validation"))
+    if auto_detect_validation and not validation_command:
+        # Deliberately the production selector, not a benchmark copy of it:
+        # the point of these cases is that the shipped detector is what has to
+        # choose. `buggy_repo` is the same tree the run is about to be given.
+        from core.validation_command import get_default_validation_command
+
+        validation_command = (
+            get_default_validation_command(
+                str(case.get("language") or ""),
+                buggy_repo,
+            )
+            or ""
+        ).strip()
     patch_style = case.get("patch_style", "balanced")
     agent_mode = case.get("agent_mode", "reviewer")
     prompt = case.get("prompt", "").strip()
 
-    if validation_command and "Validation command:" not in prompt:
+    if (
+        validation_command
+        and not auto_detect_validation
+        and "Validation command:" not in prompt
+    ):
         prompt += f"\n\nValidation command: {validation_command}"
 
     started = time.time()
@@ -855,7 +873,6 @@ def check_case(case_file: Path) -> dict[str, Any]:
     required = [
         "name",
         "language",
-        "validation_command",
         "expected_changed_files",
         "forbidden_changed_files",
         "prompt",
@@ -863,6 +880,18 @@ def check_case(case_file: Path) -> dict[str, Any]:
     for field in required:
         if field not in case or case[field] in ("", None):
             errors.append(f"Missing required field: {field}")
+
+    # OPS.VALIDATE.1 - a case may omit `validation_command` *only* by opting in
+    # to auto-detection, which is what makes the production detector part of
+    # the run instead of a hardcoded string bypassing it. Requiring the opt-in
+    # keeps a typo from silently becoming "detect something, anything".
+    auto_detect = bool(case.get("auto_detect_validation"))
+    if not auto_detect and not str(case.get("validation_command") or "").strip():
+        errors.append("Missing required field: validation_command")
+    if auto_detect and str(case.get("validation_command") or "").strip():
+        errors.append(
+            "auto_detect_validation cases must not also set validation_command"
+        )
 
     if not buggy_repo.exists():
         errors.append(f"Missing buggy_repo: {buggy_repo}")

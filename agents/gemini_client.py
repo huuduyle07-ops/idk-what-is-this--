@@ -31,7 +31,26 @@ def safe_print(text: str) -> None:
     encoding = sys.stdout.encoding or "utf-8"
     print(text.encode(encoding, errors="replace").decode(encoding))
 
-def run_gemini_request(prompt: str, file_paths: list[str] | None = None) -> str:
+def _generation_config(response_mime_type: str | None):
+    """Build the one request config, adding a transport argument only if asked.
+
+    WORKER.DECL.2A.1: with the experiment off, ``response_mime_type`` is None and
+    the config is constructed from exactly the keywords it always was, so the
+    request on the wire is unchanged. When it is set, the provider's own JSON
+    transport mode is attached to *this* request — it never adds a second one.
+    """
+    config_kwargs: dict[str, object] = {"temperature": 0.0}
+    if response_mime_type:
+        config_kwargs["response_mime_type"] = response_mime_type
+    return genai_types.GenerateContentConfig(**config_kwargs)
+
+
+def run_gemini_request(
+    prompt: str,
+    file_paths: list[str] | None = None,
+    *,
+    response_mime_type: str | None = None,
+) -> str:
     api_key = GOOGLE_API_KEY
 
     # Fail fast before doing security/upload work.
@@ -85,7 +104,7 @@ def run_gemini_request(prompt: str, file_paths: list[str] | None = None) -> str:
             response = client.models.generate_content(
                 model=model_name,
                 contents=contents,
-                config=genai_types.GenerateContentConfig(temperature=0.0),
+                config=_generation_config(response_mime_type),
             )
 
             output = response.text if getattr(response, "text", None) else "Gemini returned no text."
@@ -116,6 +135,8 @@ def run_gemini_request_2(
     prompt: str,
     repo_path: str | None = None,
     file_paths: list[str] | None = None,
+    *,
+    response_mime_type: str | None = None,
 ) -> str:
     api_key = GOOGLE_API_KEY
     if not api_key:
@@ -176,7 +197,7 @@ def run_gemini_request_2(
             response = client.models.generate_content(
                 model=model_name,
                 contents=contents,
-                config=genai_types.GenerateContentConfig(temperature=0.0),
+                config=_generation_config(response_mime_type),
             )
             record_model_call(
                 model_name,

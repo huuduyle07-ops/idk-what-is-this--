@@ -2,6 +2,8 @@ import re
 from pathlib import Path
 from typing import Optional
 
+from core.control_engine import refresh_control_safety
+
 
 def _find_matching_brace(text: str, open_idx: int) -> Optional[int]:
     depth = 0
@@ -163,9 +165,9 @@ def hydrate_control_source_from_scout(
             patch_intent["source_snippet"] = snippet
 
             top["symbol"] = symbol or rel_path
-            top["confidence"] = max(float(top.get("confidence") or 0.0), 0.55)
-            top["recommended_action"] = "patch"
-
-            return control_result
+            # Exact source acquisition improves context, not defect evidence or
+            # patch authority.  CONTROL's safety projection keeps the candidate
+            # localization-only unless executed failure evidence binds to it.
+            return refresh_control_safety(control_result)
 
     return control_result

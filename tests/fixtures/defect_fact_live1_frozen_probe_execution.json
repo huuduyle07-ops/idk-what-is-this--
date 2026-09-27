@@ -1,0 +1,27 @@
+{
+  "schema_version": "defect_fact_live_1_frozen_probe_execution_v1",
+  "phase_id": "DEFECT.FACT.LIVE.1",
+  "notes": [
+    "AST digests of the DEFECT.PROBE.LIVE.1 execution surface, taken from the pre-change baseline and verified identical after this phase.",
+    "DEFECT.FACT.LIVE.1 changes probe contract construction only; every name pinned here is what runs a contract once one exists.",
+    "derive_indentation_probe_from_preserved_task is pinned by body and signature because only its docstring changed, and its literal pattern is pinned separately: the old adapter was demoted, never widened.",
+    "CONTROL.LOCALIZE.LIVE.2's whole-file digest for core/defect_probe.py was re-pinned in the same change; this fixture is what keeps the invariant that digest used to carry."
+  ],
+  "functions": {
+    "execute_defect_probe": "ad7cb0148fa7ff115d4fde3fda659f3ee6adc339f4cdb2093a128d69896b6acf",
+    "_validate_contract": "434a7d6cad182b49f5c551e665d3e43cd6b546cf563799b120fa3d2120330da6",
+    "_invalid_receipt": "7a303ec7b1a7ee9483f98b01d84135ae4f4b6c4a1f3c1e7817a0599f1732b6b8",
+    "build_python_function_probe": "2085095659991ccf56db7e0c8a6661d5ff3a1704b5424b4b53e8a407f1ab96b1",
+    "build_existing_pytest_probe": "3cd491366296d4d68fcc0896c277b4a4db21f663ded884717a9fc481ac61b312",
+    "build_probe_target_binding": "1158029d6324854489b140e4819d9b3955277bc12e29da20a87d2a05938e6747",
+    "_nested_indentation_fixture": "6aa9a597c24294c679bf8b36a4e2e7bf43f5bf5e3446cde4753d0a0f6d51f476",
+    "unavailable_probe_receipt": "02e4d9e084e9d300a602261e78b83400bd37d9492514cace920c4c4dfb7d56eb",
+    "reproduced_probe_target": "e67793503a332529079cdc5d65e00c8b9ca4dd2310428826ce5d1d63acdec11f",
+    "attach_defect_probe_receipt": "9271ae8e9829eead4b2e6b556eb79d8eff197b79204527c2cb21aba4854c277f",
+    "DefectProbeContract": "2335fe7a86a99dd113f4f29ce88880165f982d19dd3a39f4fbd85d2f24dc6e25",
+    "DefectProbeReceipt": "9ebeed8b48d9ec31cd1d99578fbc1d19a8991d96552501172ea4922591a0b104",
+    "ProbeTargetBinding": "0252f64a12ed0c89f0c5969257195063028203145a47214b30243541ca66f0bf"
+  },
+  "legacy_adapter_body": "51cd9e0696258f541ae796a61a0a7dea2b9ba8e022a9c50227271fa183e0aade",
+  "legacy_adapter_regex": "\n    r\"\\b(?P<expected>[1-8])\\s*(?:-|\\s)\\s*spaces?\\s+indentation\\s+\"\n    r\"is\\s+classified\\s+as\\s+(?P<observed>[1-8])\\s*(?:-|\\s)\\s*spaces?\\b\",\n    re.IGNORECASE,"
+}

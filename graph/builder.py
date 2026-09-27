@@ -112,6 +112,15 @@ def build_graph_from_repo(
             symbols = fallback_csharp_symbols(text)
 
         graph.add_node(rel, "file", rel)
+        # Recorded while the file is already open, so RETRIEVE.LIVE.1's span
+        # consistency check costs no read and no second traversal.  Assigned
+        # after add_node because an earlier file's import may already have
+        # created this node, and add_node leaves an existing node alone.
+        # The length is of the re-encoded text, which is exactly the buffer
+        # the parser reported its offsets against.
+        file_metadata = graph.nodes[rel].metadata
+        file_metadata["language"] = language
+        file_metadata["source_bytes"] = len(text.encode("utf-8"))
 
         for imp in imports:
             target = resolve_dependency_target(
@@ -139,7 +148,17 @@ def build_graph_from_repo(
                 continue
 
             sym_id = f"{rel}::{name}"
-            graph.add_node(sym_id, sym.get("kind", "symbol"), name)
+            graph.add_node(
+                sym_id,
+                sym.get("kind", "symbol"),
+                name,
+                file=rel,
+                language=language,
+                # Byte offsets into the UTF-8 buffer the parser read, the same
+                # contract patching/patch_engine.py already slices with.
+                start=sym.get("start"),
+                end=sym.get("end"),
+            )
             graph.add_edge(rel, sym_id, "contains")
 
             for step in sym.get("execution_flow", []):
@@ -198,7 +217,9 @@ def resolve_call_edges(graph):
         if not edge.target.startswith("call::"):
             continue
 
-        call_name = edge.target.replace("call::", "")
+        # removeprefix, not replace: a call name that itself contains the
+        # marker must not be mangled on its way to the symbol table.
+        call_name = edge.target.removeprefix("call::")
         targets = symbol_by_name.get(call_name, [])
 
         for real_target in targets:

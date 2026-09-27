@@ -217,7 +217,9 @@ def test_missing_target_file_returns_friendly_failure_in_patch_plan_executor(tmp
 
     assert result["success"] is False
     assert "target file does not exist" in result["error"]
-    assert result["rollback_performed"] is True
+    assert result["rollback_performed"] is False
+    assert result["rollback_attempted"] is False
+    assert result["rollback_status"] == "not_required"
     assert result["failed_op"]["relative_path"] == "src/missing.py"
 
 
@@ -268,6 +270,7 @@ def test_validation_routed_through_run_validation_command_in_patch_plan_executor
     monkeypatch, tmp_path
 ):
     import core.validator as validator
+    from core.validator import ValidationRun
     from patching.patch_plan_executor import apply_patch_plan
 
     repo = tmp_path / "repo"
@@ -276,9 +279,9 @@ def test_validation_routed_through_run_validation_command_in_patch_plan_executor
 
     def fake_run(command, cwd, timeout=30):
         calls.append((command, cwd))
-        return True, "all good"
+        return ValidationRun(ok=True, output="all good", exit_code=0)
 
-    monkeypatch.setattr(validator, "run_validation_command", fake_run)
+    monkeypatch.setattr(validator, "run_validation_command_detailed", fake_run)
 
     result = apply_patch_plan(
         str(repo),
@@ -294,6 +297,7 @@ def test_validation_routed_through_run_validation_command_in_patch_plan_executor
 def test_validation_routed_through_run_validation_command_in_single_file_executor(
     monkeypatch, tmp_path
 ):
+    from core.validator import ValidationRun
     import config
     import core.executor as executor_mod
     from core.executor import Executor
@@ -315,10 +319,10 @@ def test_validation_routed_through_run_validation_command_in_single_file_executo
 
     def fake_run(command, cwd, timeout=30):
         calls.append((command, cwd))
-        return True, "ok"
+        return ValidationRun(ok=True, output="ok", exit_code=0)
 
     monkeypatch.setattr(config, "MUTATION_ORACLE_ENABLED", False, raising=False)
-    monkeypatch.setattr(executor_mod, "run_validation_command", fake_run)
+    monkeypatch.setattr(executor_mod, "run_validation_command_detailed", fake_run)
 
     result = Executor(str(repo)).run(patch, language="python", validation_command="pytest -q")
 

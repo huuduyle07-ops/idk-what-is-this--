@@ -218,7 +218,7 @@ def test_current_patch_plan_executor_rejects_path_traversal_without_policy_gate(
         ".agent/session.json",
     ],
 )
-def test_current_patch_plan_executor_allows_policy_protected_categories_without_safety_gate(
+def test_prepared_patch_plan_rejects_policy_protected_categories_before_mutation(
     tmp_path, relative_path
 ):
     from patching.patch_plan_executor import apply_patch_plan
@@ -228,11 +228,12 @@ def test_current_patch_plan_executor_allows_policy_protected_categories_without_
 
     result = apply_patch_plan(str(repo), _create_plan(relative_path))
 
-    assert result["success"] is True
-    assert result["error"] is None
-    assert (repo / relative_path).read_text(encoding="utf-8") == (
-        "created by characterization test\n"
-    )
+    # EXEC.PLAN.1 now runs the existing policy during preparation too.
+    assert result["success"] is False
+    assert result["code"] == "unsafe_target"
+    assert result["mutation_attempted"] is False
+    assert result["recovery_attempted"] is False
+    assert not (repo / relative_path).exists()
 
 
 def test_hardened_run_lifecycle_calls_evaluate_patch_safety_before_executor(

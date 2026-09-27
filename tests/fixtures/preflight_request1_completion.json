@@ -1,0 +1,296 @@
+{
+  "phase": "PREFLIGHT.REQUEST.1",
+  "completed_on": "2026-09-18",
+  "closed_residuals": [
+    "CONTROL.BOOTSTRAP.1: static reading could only suspect a compiler defect; the compile_evidence gap it recorded had no executable, bounded, harness-owned measurement"
+  ],
+  "transition": "typed evidence gap -> EvidenceNeed -> deterministic policy -> JavaCompileDiagnosticAdapter -> DiagnosticEvidenceReceipt -> CONTROL preflight_validation -> unchanged DEFECT.FACT / PATCH.BASIS",
+  "executable_evidence_kinds": [
+    "compile_evidence"
+  ],
+  "unsupported_evidence_needs": {
+    "deferred": [
+      "test_evidence",
+      "runtime_evidence"
+    ],
+    "not_a_diagnostic_measurement": [
+      "additional_source",
+      "user_clarification"
+    ],
+    "unknown_evidence_kind": "every other spelling (shell_command, run_anything, preflight_validation, docker_exec, docker_container_status, mcp_health, plugin_connection, skill_requirement, ...)"
+  },
+  "policy_decisions": [
+    "admitted",
+    "unsupported_evidence_need",
+    "unauthorized_target",
+    "language_unsupported",
+    "target_budget_exceeded",
+    "malformed_evidence_need"
+  ],
+  "diagnostic_outcomes": [
+    "compile_passed",
+    "compile_failed",
+    "tool_unavailable",
+    "diagnostic_timeout",
+    "diagnostic_inconclusive",
+    "adapter_error"
+  ],
+  "cycle_statuses": [
+    "no_evidence_need",
+    "no_admitted_need",
+    "evidence_measured",
+    "preflight_source_changed",
+    "preflight_binding_mismatch"
+  ],
+  "owners": {
+    "evidence_need_and_policy": "web/preflight_request.py: derive_evidence_needs, decide_evidence_need",
+    "java_adapter": "web/preflight_request.py: JavaCompileDiagnosticAdapter (the only argv builder)",
+    "receipt": "web/preflight_request.py: DiagnosticEvidenceReceipt",
+    "handoff": "web/preflight_request.py: compile_evidence_handoff -> CONTROL preflight_validation",
+    "cycle": "web/preflight_request.py: run_preflight_request, preflight_bootstrapped_control",
+    "defect_reasoning": "core/control_engine.py refresh_control_safety + core/patch_basis.py, unchanged",
+    "generate_seam": "web/app.py: generate_patch / generate_candidates fresh branch"
+  },
+  "adapter": {
+    "argv": "<javac> -J-Duser.language=en -J-Duser.country=US -J-XX:-UsePerfData -J-Dstdout.encoding=UTF-8 -J-Dstderr.encoding=UTF-8 -encoding UTF-8 -proc:none -implicit:none -sourcepath <isolated-empty> -classpath <isolated-empty> -d <isolated-output> -Xmaxerrs 100 -Xmaxwarns 100 <exact target>",
+    "availability": "absolute PATH directories outside the repository, .exe/.com only, then javac -version",
+    "working_directory": "canonical repository root (the version probe runs in the isolated directory)",
+    "inherited_environment": [
+      "PATH",
+      "SYSTEMROOT",
+      "SYSTEMDRIVE",
+      "WINDIR"
+    ],
+    "isolated_environment": [
+      "TEMP",
+      "TMP",
+      "TMPDIR"
+    ],
+    "limits": {
+      "process_timeout_seconds": 60.0,
+      "version_probe_timeout_seconds": 30.0,
+      "cycle_budget_seconds": 180.0,
+      "max_output_bytes": 65536,
+      "max_evidence_chars": 8000,
+      "max_diagnostics": 32,
+      "max_targets": 8
+    },
+    "compile_strategy": "independent per target; at most one grouped compile of explicit targets for unresolved names"
+  },
+  "java_dogfood": {
+    "tool": "javac 26.0.2.1 (Windows 11)",
+    "pre": {
+      "Twosum.java": "unmeasured",
+      "MainApp.java": "unmeasured",
+      "defect_established": false,
+      "patch_basis": "unresolved",
+      "recommended_action": "needs_grounding"
+    },
+    "post": {
+      "Twosum.java": {
+        "outcome": "compile_passed",
+        "exit_status": 0,
+        "diagnostics": 0
+      },
+      "MainApp.java": {
+        "outcome": "compile_failed",
+        "exit_status": 1,
+        "diagnostics": [
+          [
+            9,
+            9,
+            "non-static method increment() cannot be referenced from a static context"
+          ],
+          [
+            10,
+            42,
+            "non-static variable counter cannot be referenced from a static context"
+          ]
+        ]
+      },
+      "grounded_hypothesis": "MainApp.java::main",
+      "patch_basis": "grounded_defect",
+      "patch_basis_source": "executed_validation_failure",
+      "failure_binding": {
+        "kind": "direct_location",
+        "file": "MainApp.java",
+        "line": 9,
+        "col": 9
+      },
+      "write_authority": false,
+      "downstream_prompt": "localized to MainApp.java::main with [PREFLIGHT VALIDATION]",
+      "patch_candidate": "may remain null",
+      "repository_unchanged": true,
+      "class_files_in_repository": 0
+    }
+  },
+  "crlf_blocker_encountered": false,
+  "model_calls_in_tests": 0,
+  "external_network_requests": 0,
+  "diagnostic_model_calls_per_request": 0,
+  "max_diagnostic_cycles_per_request": 1,
+  "frozen_production_deltas": {
+    "web/control_bootstrap.py": 0,
+    "web/control_context.py": 0,
+    "core/control_engine.py": 0,
+    "core/patch_basis.py": 0,
+    "core/validation_outcome.py": 0,
+    "core/preflight.py": 0,
+    "core/validator.py": 0,
+    "core/pipeline.py": 0,
+    "core/direct_context_runtime.py": 0,
+    "core/direct_file_reader.py": 0,
+    "core/direct_read_receipt.py": 0,
+    "core/live_task_routing.py": 0,
+    "patching/patch_gates.py": 0,
+    "web/templates/index.html": 0,
+    "web/static/workbench_state.js": 0,
+    "web/routes/patch_routes.py": 0,
+    "web/runner.py": 0,
+    "web/session_store.py": 0,
+    "agents/gemini_client.py": 0
+  },
+  "graph_index_embedding_traversal_delta": {
+    "canonical_graph_operations": 0,
+    "activation_graph_operations": 0,
+    "indexing_operations": 0,
+    "embedding_operations": 0,
+    "repository_membership_traversals": 0
+  },
+  "deferred": [
+    "CAPABILITY.BROKER.1",
+    "CRLF remediation"
+  ],
+  "out_of_scope": [
+    "arbitrary shell execution",
+    "model-provided command execution",
+    "Docker mutation",
+    "MCP/plugin installation",
+    "generic capability broker",
+    "repository-wide discovery",
+    "graph/index/embeddings",
+    "Maven/Gradle",
+    "patch authoring changes",
+    "auto-apply",
+    "UX-05",
+    "UX-06",
+    "T6 Round 11"
+  ],
+  "results": {
+    "status": "complete",
+    "focused": {
+      "tests/test_preflight_request1.py": {
+        "passed": 97,
+        "failed": 0,
+        "skipped": 0
+      },
+      "chain_and_governance": {
+        "files": [
+          "tests/test_control_bootstrap1.py",
+          "tests/test_control_fresh1.py",
+          "tests/test_auth_web1.py",
+          "tests/test_auth_web_read1.py",
+          "tests/test_ux_state1.py",
+          "tests/test_ux_context1.py",
+          "tests/test_phase_registry.py",
+          "tests/test_phase_picker.py"
+        ],
+        "passed": 780,
+        "failed": 0,
+        "skipped": 1
+      },
+      "wall_clock_seconds": 62.7
+    },
+    "adjacent": {
+      "files": [
+        "tests/test_defect_fact_live.py",
+        "tests/test_patch_basis_live.py",
+        "tests/test_control_safety_live.py",
+        "tests/test_validation_command_safety.py",
+        "tests/test_validation_execution_safety.py",
+        "tests/test_repository_validation_recovery.py",
+        "tests/test_direct_context_runtime.py",
+        "tests/test_direct_file_reader.py",
+        "tests/test_direct_read_receipt.py",
+        "tests/test_direct_context_patch_attachment.py",
+        "tests/test_commander_preflight_contract.py",
+        "tests/test_index_delta_preflight.py",
+        "tests/test_validation_timeout_and_bytecode_freshness.py"
+      ],
+      "passed": 411,
+      "failed": 0,
+      "skipped": 2
+    },
+    "broad": {
+      "files": 325,
+      "file_list": "CONTROL.BOOTSTRAP.1's 321-file broad set + test_control_safety_live, test_validation_execution_safety, test_repository_validation_recovery, test_preflight_request1",
+      "passed": 8900,
+      "failed": 50,
+      "skipped": 38,
+      "wall_clock": "28m24s",
+      "failed_node_ids_identical_to": "tests/test_control_bootstrap1.py's recorded broad baseline (the 49 known plus test_context_selection_contract)",
+      "new_failures": 0,
+      "notes": [
+        "A first broad run found AUTH.WEB.1's raw frozen-manifest pin of core/phase_registry.py; it now reads AUTH.WEB.1's post-state through before_auth_web_read1.",
+        "test_analysis_multiroot_evidence::test_two_literals_for_one_repository_are_one_evidence_source fails only under a ~205-character --basetemp (the session scratchpad); it passes with a short basetemp and with the default tmp_tests, so the final broad run used a short basetemp."
+      ]
+    },
+    "red_green_toggles": {
+      "generate_seam": "web/app.py restored to CONTROL.BOOTSTRAP.1 bytes: 7 route tests fail for genuine reasons (KeyError preflight_request x5, KeyError code x2) and 7 equivalence/containment tests fail because the reversal helper refuses already-reverted bytes; all 14 pass restored; digest verified",
+      "evidence_handoff": "build_error category neutralized: 4 reassessment/route tests fail (patch_basis unresolved, inspection-only prompts); all 4 pass restored; digest verified",
+      "relativize_sibling_paths": "old regex fails the sibling-path test; fixed regex passes",
+      "grouped_output": "grouped failure output leaked another target's diagnostics (red) until only attributed blocks were handed off (green)",
+      "ignored_key_bound": "40 unbounded names (red) until capped at 16 x 64 characters (green)"
+    },
+    "performance": {
+      "policy_decision_us": 9.3,
+      "adapter_construction_us": 0.6,
+      "receipt_normalization_us": 8.0,
+      "version_probe_ms": 320.7,
+      "process_launch_ms": 149.8,
+      "compile_process_ms": 985.8,
+      "harness_overhead_ms": 7.6,
+      "cycle_total_ms": 1463.9
+    },
+    "gates": {
+      "compileall": "exit 0, no output",
+      "benchmarks_check": "54 checked, 0 errors",
+      "git_diff_check": "exit 0; new files clean"
+    }
+  },
+  "existing_files_changed": [
+    "web/app.py",
+    "core/phase_registry.py",
+    "docs/roadmap/phase_registry.json",
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py",
+    "tests/_control_bootstrap1_maintenance.py",
+    "tests/test_control_bootstrap1.py",
+    "tests/test_auth_web1.py"
+  ],
+  "new_files": [
+    "web/preflight_request.py",
+    "tests/test_preflight_request1.py",
+    "tests/_preflight_request1_maintenance.py",
+    "tests/fixtures/preflight_request1_reversal.json",
+    "tests/fixtures/preflight_request1_frozen_boundaries.json",
+    "tests/fixtures/preflight_request1_completion.json",
+    "docs/designs/2026-09-18-typed-diagnostic-evidence-request.md"
+  ],
+  "source_sha256": {
+    "web/app.py": "ffbdaf8247a4142e1a2dfcbddad62753d15ab651f377e825fcc1a4c978f8a855",
+    "core/phase_registry.py": "ee58fbecb76c5752b8a8beb6a05f9aaf7d2bd7e3c290155b280807a8c2236cf2",
+    "docs/roadmap/phase_registry.json": "9fdef8ecc3608043763c3cb98833cca2ea4be91278d34d96ba5e06ba2e5dd41f",
+    "tests/test_phase_registry.py": "3b339994042d683a77a1ffb8461c68161dd8d79c2ea093f0e064fb4999764521",
+    "tests/test_phase_picker.py": "2e3f2f29d94f26040c7e9a91ed45c34b9774472a7b7a7e16e4389aad1ba4eb09",
+    "tests/_control_bootstrap1_maintenance.py": "97b486bdc9fb8c32543c920d6666dbae41f79120a7cc81ab8727803ec85ddd2d",
+    "tests/test_control_bootstrap1.py": "8ac5df9db937c118e897d78ac5b260e144664cf5f5ba98ce05a16c7e27ac39d9",
+    "tests/test_auth_web1.py": "b8ebbde78081687ee83d8d7c17b2a7ca868191a85eb0750f3e2b211f7ff15a8c",
+    "web/preflight_request.py": "ed44fcad97512ff5497fe8fea82f048343da9f3de49186880f28f8a8a38cabb8",
+    "tests/test_preflight_request1.py": "4a551742c72c848fc809afdcc8989487df43e1723f78097240bc7a05f392bd41",
+    "tests/_preflight_request1_maintenance.py": "ab1d071e0ff7151dfb97399a73b500715d5736bde49ba7027717be2932d02123",
+    "tests/fixtures/preflight_request1_reversal.json": "9d6a868d4dc4b3de0e4d8c6c67eed614fcf2b256ea521618c304fb409fb1ec05",
+    "tests/fixtures/preflight_request1_frozen_boundaries.json": "21ef754dfa64e3e1ad87bf4756724abee694e11327499a0cb8e0986307c2a0bd",
+    "docs/designs/2026-09-18-typed-diagnostic-evidence-request.md": "45e86307e6425787cd1796f0b271403ac2ef95e360fae3a08f7712b9a0fbf812"
+  }
+}

@@ -1,0 +1,1927 @@
+{
+  "schema": "cattus_harness_blackbox_audit_v1",
+  "audit_date": "2026-09-10",
+  "assembled_at_utc": "2026-09-10T08:03:09.007309+00:00",
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "git_head": "4dac7faf54838e13fa15e1e6c911695a7d501015",
+  "counts": {
+    "passed": 18,
+    "failed": 10,
+    "error": 0,
+    "skipped": 0
+  },
+  "total_cases": 28,
+  "source_snapshot_note": "Selected source hashes collected after all runs; not a pre/post immutability guarantee for the whole working tree. User uncommitted changes included.",
+  "source_sha256_after_runs": {
+    "main.py": "814180337434b19889cf5759d8a7d098459fef6c711430fffd33f9bb3de050a9",
+    "config.py": "8aeb8a79e86188d838c00c2cdef0e79253c81bd7612db67c4e2a467f0097d2a6",
+    "cli/interactive.py": "6aca451e7ca24cab5fa72af27f1f46edfc4d47c0a89f3287eecad9d308ae9453",
+    "core/pipeline.py": "d135ecda9de9ed6c22f55dba6b599e545c68132faade268bc8ca0bbcb2bdf10d",
+    "core/control_engine.py": "8d0b55141f24d2e5ac244774452d3a9434d455b8a0f424968f4f6824b9e63ee6",
+    "core/local_binding_novelty.py": "e77959dff4c82cfa344ba271ee25074edb7171591617c8796cca35f34f055a2b",
+    "core/candidate_revision.py": "61a93256028e9a0494c7b2c92fcbf9f657df9960cc253bebf7a0785ec9ca4d4e",
+    "core/candidate_mutation_effect.py": "82690b47ef875eaaf7091ce4b81efe595e397075f392a79462046afe1ff6ffd1",
+    "core/behavioral_matrix.py": "bc56a56212f92ff84dc5b1f52c442421d22c2d6804dccb2341ea0d19660ea0d4",
+    "core/targeted_repository_validation.py": "116cded9cf6f07bf9b53d2e20f45beef2a6643a23898f7a4ea5e8ea16ee7e1e5",
+    "core/live_task_shape.py": "4ea39655bdb1c1ca2763913e082bde5d821ae7f8c2d1c1cf27ea24c518cf2bf4",
+    "core/sleeping_consultant.py": "ecee1964d2a6a1d1577ad80daeae2283f7b3153141d7db67e38bbfc821bb90c0",
+    "core/executor.py": "53b782256a4b714017a808b04e0c5c4393048909b2f078d68f482f45e0395507",
+    "web/runner.py": "6b4e907c6ed14bc89dcaebe27541280b113a62babe01a8b570be6e368a666e6e",
+    "web/routes/patch_routes.py": "37cfaf54148155cb643764d5f3b3fc86cb34ccb9cb3deb9ce8da1f022277b31f",
+    "database/memory.py": "185195d3d74b2f2a1bb6ea674040d54b0b8dbeeb90b7ff13a304f0d4c679c339"
+  },
+  "scope": [
+    "Offline provider-controlled harness acceptance tests; no live model accuracy, token cost or customer latency measurement.",
+    "Public entrypoints and real domain routing/gates/filesystem/subprocess validation. Synthetic repositories only.",
+    "CLI deeper execution cases substitute session creation adapter; fourth CLI case retains DB-disabled crash.",
+    "Suites completed in separate processes; this file combines existing evidence without rerunning them.",
+    "Revision suite includes five intentional real 30-second preflight timeouts.",
+    "Failed cases assert customer contracts; some expose documented scope limitations, not newly introduced regressions."
+  ],
+  "suites": [
+    {
+      "name": "cli",
+      "test_file": "tests/test_harness_blackbox_cli.py",
+      "evidence_format": "JUnit XML with per-case properties",
+      "pytest_summary_seconds": 7.03,
+      "log": ".tmp/blackbox-20260910-cli-v2.log",
+      "log_sha256": "876b768cf544beee1b31d739652ff856eedee91e26e9f65c8f48720a67809d87",
+      "junit": ".tmp/blackbox-20260910-cli-v2.xml",
+      "junit_sha256": "a23b07b4118dd335fa82e0827e72c6a09c2a3a25e50c481df716db613be01b8f",
+      "cases": [
+        {
+          "name": "test_terminal_read_only_request_cannot_execute_model_supplied_edit_plan",
+          "status": "passed",
+          "pytest_case_seconds": 1.414,
+          "properties": {
+            "evidence": {
+              "model_calls": 2,
+              "subtask_calls": 0,
+              "elapsed_sec": 0.0605,
+              "source_unchanged": true,
+              "source_after": "def calculate_postage(weight):\n    return weight + 1\n",
+              "auto_patch_enabled": false,
+              "persistence_adapter": true,
+              "error": null
+            }
+          },
+          "failure": null
+        },
+        {
+          "name": "test_terminal_planner_respects_disabled_automatic_writes",
+          "status": "failed",
+          "pytest_case_seconds": 3.389,
+          "properties": {
+            "evidence": {
+              "model_calls": 4,
+              "subtask_calls": 1,
+              "elapsed_sec": 3.3821,
+              "source_unchanged": false,
+              "source_after": "def calculate_postage(weight):\n    return weight + 2\n",
+              "auto_patch_enabled": false,
+              "persistence_adapter": true,
+              "error": null
+            }
+          },
+          "failure": "AssertionError: AUTO_PATCH_ENABLED=false must preserve customer source until explicit apply; {\"model_calls\": 4, \"subtask_calls\": 1, \"elapsed_sec\": 3.3821, \"source_unchanged\": false, \"source_after\": \"def calculate_postage(weight):\\n    return weight + 2\\n\", \"auto_patch_enabled\": false, \"persistence_adapter\": true, \"error\": null}\nassert False"
+        },
+        {
+          "name": "test_terminal_provider_failure_halts_without_modifying_source",
+          "status": "passed",
+          "pytest_case_seconds": 1.665,
+          "properties": {
+            "evidence": {
+              "model_calls": 2,
+              "subtask_calls": 0,
+              "elapsed_sec": 1.6512,
+              "source_unchanged": true,
+              "source_after": "def calculate_postage(weight):\n    return weight + 1\n",
+              "auto_patch_enabled": false,
+              "persistence_adapter": true,
+              "error": null
+            }
+          },
+          "failure": null
+        },
+        {
+          "name": "test_terminal_starts_without_database_when_persistence_is_disabled",
+          "status": "failed",
+          "pytest_case_seconds": 0.019,
+          "properties": {
+            "evidence": {
+              "model_calls": 0,
+              "subtask_calls": 0,
+              "elapsed_sec": 0.0123,
+              "source_unchanged": true,
+              "source_after": "def calculate_postage(weight):\n    return weight + 1\n",
+              "auto_patch_enabled": false,
+              "persistence_adapter": false,
+              "error": "RuntimeError: DB disabled"
+            }
+          },
+          "failure": "AssertionError: DB_ENABLED=false should support a local CLI session; {\"model_calls\": 0, \"subtask_calls\": 0, \"elapsed_sec\": 0.0123, \"source_unchanged\": true, \"source_after\": \"def calculate_postage(weight):\\n    return weight + 1\\n\", \"auto_patch_enabled\": false, \"persistence_adapter\": false, \"error\": \"RuntimeError: DB disabled\"}\nassert 'RuntimeError: DB disabled' is None"
+        }
+      ],
+      "counts": {
+        "passed": 2,
+        "failed": 2,
+        "error": 0,
+        "skipped": 0
+      },
+      "test_source_sha256_after_run": "3e6a0a93bac19d455033c93efa7b79fd3a8d49b15ef5a6da6155bf6cbd4ac03c"
+    },
+    {
+      "name": "revision",
+      "test_file": "tests/test_harness_blackbox_revision.py",
+      "evidence_format": "JUnit XML with per-case properties",
+      "pytest_summary_seconds": 202.46,
+      "log": ".tmp/blackbox-20260910-coding.log",
+      "log_sha256": "48fe1c84655bf8645464a7ef3fb5bbc6ca11e474da407fe2cf5ac1278a61df97",
+      "junit": ".tmp/blackbox-20260910-coding.xml",
+      "junit_sha256": "d4edb3faf65d1997f81895393ce025daa822f9d69f69b937e7b77873dcf9966f",
+      "cases": [
+        {
+          "name": "test_public_runner_accepts_a_correct_locally_novel_candidate_without_writing",
+          "status": "passed",
+          "pytest_case_seconds": 38.215,
+          "properties": {
+            "elapsed_sec": 36.54,
+            "validation_profile": "timeout",
+            "injected_timeout_sec": 30,
+            "provider_calls": 1,
+            "verification_status": "verified",
+            "revision_outcome": "not_eligible"
+          },
+          "failure": null
+        },
+        {
+          "name": "test_public_runner_uses_counterexamples_to_revise_once_without_writing",
+          "status": "passed",
+          "pytest_case_seconds": 42.233,
+          "properties": {
+            "elapsed_sec": 42.217,
+            "validation_profile": "timeout",
+            "injected_timeout_sec": 30,
+            "provider_calls": 2,
+            "verification_status": "verified",
+            "revision_outcome": "revised_candidate_verified"
+          },
+          "failure": null
+        },
+        {
+          "name": "test_public_runner_rejects_a_revision_that_breaks_preserved_behavior",
+          "status": "passed",
+          "pytest_case_seconds": 42.687,
+          "properties": {
+            "elapsed_sec": 42.673,
+            "validation_profile": "timeout",
+            "injected_timeout_sec": 30,
+            "provider_calls": 2,
+            "verification_status": "rejected",
+            "revision_outcome": "revised_candidate_rejected"
+          },
+          "failure": null
+        },
+        {
+          "name": "test_public_runner_rejects_exact_noop_without_spending_a_retry",
+          "status": "passed",
+          "pytest_case_seconds": 0.902,
+          "properties": {
+            "elapsed_sec": 0.89,
+            "validation_profile": "auto",
+            "injected_timeout_sec": 0,
+            "provider_calls": 1,
+            "verification_status": "None",
+            "revision_outcome": "not_eligible"
+          },
+          "failure": null
+        },
+        {
+          "name": "test_public_runner_cannot_move_a_revision_to_another_file",
+          "status": "passed",
+          "pytest_case_seconds": 37.309,
+          "properties": {
+            "elapsed_sec": 37.292,
+            "validation_profile": "timeout",
+            "injected_timeout_sec": 30,
+            "provider_calls": 2,
+            "verification_status": "rejected",
+            "revision_outcome": "revision_output_invalid"
+          },
+          "failure": null
+        },
+        {
+          "name": "test_public_runner_accepts_equivalent_correct_fstring_implementation",
+          "status": "failed",
+          "pytest_case_seconds": 0.935,
+          "properties": {
+            "elapsed_sec": 0.924,
+            "validation_profile": "auto",
+            "injected_timeout_sec": 0,
+            "provider_calls": 1,
+            "verification_status": "None",
+            "revision_outcome": "not_eligible"
+          },
+          "failure": "AssertionError: Python's f-string prefix is not an external identifier\nassert None\n +  where None = <built-in method get of dict object at 0x000001DFF2AF20C0>('patch_candidate')\n +    where <built-in method get of dict object at 0x000001DFF2AF20C0> = {'summary': 'Correct describe_margin in margin_meter.py.', 'confidence': 0.2, 'needs_escalation': True, 'patch_candidate': None, ...}.get"
+        },
+        {
+          "name": "test_public_runner_can_revise_when_the_customer_supplies_a_failing_suite",
+          "status": "failed",
+          "pytest_case_seconds": 2.546,
+          "properties": {
+            "elapsed_sec": 2.54,
+            "validation_profile": "suite",
+            "injected_timeout_sec": 0,
+            "provider_calls": 1,
+            "verification_status": "unavailable",
+            "revision_outcome": "not_eligible"
+          },
+          "failure": "assert 1 == 2\n +  where 1 = len(['You are a verifier/patch writer inside an agentic coding system.\\n\\n[STYLE & CONSTRAINTS — authoritative, overrides ...conds\": 30,\\n  \"validation_budget_exhausted\": false,\\n  \"python_bytecode_cache_isolated\": true,\\n  \"locations\": []\\n}'])"
+        },
+        {
+          "name": "test_public_runner_accepts_a_fix_that_turns_failing_targeted_checks_green",
+          "status": "failed",
+          "pytest_case_seconds": 37.153,
+          "properties": {
+            "elapsed_sec": 37.145,
+            "validation_profile": "timeout",
+            "injected_timeout_sec": 30,
+            "provider_calls": 1,
+            "verification_status": "inconclusive",
+            "revision_outcome": "not_eligible"
+          },
+          "failure": "AssertionError: assert 'inconclusive' == 'verified'\n  \n  - verified\n  + inconclusive"
+        }
+      ],
+      "counts": {
+        "passed": 5,
+        "failed": 3,
+        "error": 0,
+        "skipped": 0
+      },
+      "test_source_sha256_after_run": "326770c32b6b101b914b000215901e98dcc309ebc228565c6439e8fe234d23ca"
+    },
+    {
+      "name": "dream",
+      "test_file": "tests/test_harness_blackbox_dream.py",
+      "evidence_format": "JUnit XML with per-case properties",
+      "pytest_summary_seconds": 3.16,
+      "log": ".tmp/blackbox-20260910-dream-final2-results.txt",
+      "log_sha256": "61db0e5a2747ff34de0b51f974da07e1e99fca0427c650b03bec98da93742faf",
+      "junit": ".tmp/blackbox-20260910-dream-final2-junit.xml",
+      "junit_sha256": "ae4ed82b7b9def247f0e2fffd0f9aa37b21bcc0639c99015b6898412b6f26c07",
+      "cases": [
+        {
+          "name": "test_default_dream_leaves_reviewable_plans_and_preserves_user_code",
+          "status": "passed",
+          "pytest_case_seconds": 0.037,
+          "properties": {
+            "blackbox_observation": {
+              "provider_stage_counts": {
+                "planning": 2,
+                "scout": 0,
+                "patch_generation": 0,
+                "total": 2
+              },
+              "items": [
+                {
+                  "title": "Change version() in app.py to return 2 instead of 1",
+                  "status": "planned_no_patch",
+                  "validation_artifact_exists": false
+                },
+                {
+                  "title": "Expose version information in a CLI",
+                  "status": "planned_no_patch",
+                  "validation_artifact_exists": false
+                }
+              ],
+              "source_unchanged": true,
+              "report_dir": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\blackbox-20260910-dream-final2\\test_default_dream_leaves_revi0\\artifacts\\repo-992c6a879b97f8fc\\dreams\\2026-09-10\\120314-run",
+              "database_enabled": false,
+              "database_alias_enabled": false,
+              "database_pool_created": false
+            }
+          },
+          "failure": null
+        },
+        {
+          "name": "test_provider_exception_is_visible_and_next_queue_item_still_completes",
+          "status": "passed",
+          "pytest_case_seconds": 0.034,
+          "properties": {
+            "blackbox_observation": {
+              "provider_stage_counts": {
+                "planning": 2,
+                "scout": 0,
+                "patch_generation": 0,
+                "total": 2
+              },
+              "items": [
+                {
+                  "title": "First task",
+                  "status": "error",
+                  "validation_artifact_exists": false
+                },
+                {
+                  "title": "Second task",
+                  "status": "planned_no_patch",
+                  "validation_artifact_exists": false
+                }
+              ],
+              "source_unchanged": true,
+              "report_dir": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\blackbox-20260910-dream-final2\\test_provider_exception_is_vis0\\artifacts\\repo-0aa4a62e49eae11c\\dreams\\2026-09-10\\120314-run",
+              "database_enabled": false,
+              "database_alias_enabled": false,
+              "database_pool_created": false
+            }
+          },
+          "failure": null
+        },
+        {
+          "name": "test_provider_error_text_is_not_reported_as_a_completed_plan",
+          "status": "failed",
+          "pytest_case_seconds": 0.02,
+          "properties": {
+            "blackbox_observation": {
+              "provider_stage_counts": {
+                "planning": 2,
+                "scout": 0,
+                "patch_generation": 0,
+                "total": 2
+              },
+              "items": [
+                {
+                  "title": "Unavailable-provider task",
+                  "status": "planned_no_patch",
+                  "validation_artifact_exists": false
+                },
+                {
+                  "title": "Independent valid task",
+                  "status": "planned_no_patch",
+                  "validation_artifact_exists": false
+                }
+              ],
+              "source_unchanged": true,
+              "report_dir": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\blackbox-20260910-dream-final2\\test_provider_error_text_is_no0\\artifacts\\repo-0c67a0120a27e50b\\dreams\\2026-09-10\\120314-run",
+              "database_enabled": false,
+              "database_alias_enabled": false,
+              "database_pool_created": false
+            }
+          },
+          "failure": "AssertionError: ('A provider error is being presented as a useful completed plan', {'kind': 'debt', 'title': 'Unavailable-provider task', 'idx': 1, 'status': 'planned_no_patch', ...})\nassert 'planned_no_patch' in {'error', 'failed', 'provider_error'}"
+        },
+        {
+          "name": "test_queue_item_plan_only_is_respected_under_global_patch_mode",
+          "status": "failed",
+          "pytest_case_seconds": 0.068,
+          "properties": {
+            "blackbox_observation": {
+              "provider_stage_counts": {
+                "planning": 2,
+                "scout": 1,
+                "patch_generation": 1,
+                "total": 4
+              },
+              "items": [
+                {
+                  "title": "Change version() in app.py to return 2 instead of 1",
+                  "status": "planned_no_patch",
+                  "validation_artifact_exists": false,
+                  "grounding_rejection": "CONTROL has no exact-source candidate bound to genuine executed failure evidence."
+                }
+              ],
+              "source_unchanged": true,
+              "report_dir": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\blackbox-20260910-dream-final2\\test_queue_item_plan_only_is_r0\\artifacts\\repo-31008ef433e3a4b0\\dreams\\2026-09-10\\120314-run",
+              "database_enabled": false,
+              "database_alias_enabled": false,
+              "database_pool_created": false
+            }
+          },
+          "failure": "AssertionError: ('An item explicitly configured plan_only requested patch generation', [{'kind': 'bug', 'dream_type': 'bug_investigation', 'action_level': 'plan_only', 'title': 'Change version() in app.py to return 2 instead of 1', ...}])\nassert not ['You are inspecting a repository candidate selected by CONTROL navigation.\\n\\n[CONTROL LOCALIZATION — NON-AUTHORITATI...eeds_escalation\": false\\n}\\n\\n- Set patch_candidate=null, patch_plan=null, confidence=0.0, and needs_escalation=true.']\n +  where ['You are inspecting a repository candidate selected by CONTROL navigation.\\n\\n[CONTROL LOCALIZATION — NON-AUTHORITATI...eeds_escalation\": false\\n}\\n\\n- Set patch_candidate=null, patch_plan=null, confidence=0.0, and needs_escalation=true.'] = _patch_calls(['You are in Dream planning mode.\\n\\nYour job is to create a plan first. Do not write any code patch.\\nDo not require ...lse` and explain via `recommended_steps` and `risks`.\\n- Do NOT skip the item. Always return the JSON object above.\\n'])"
+        },
+        {
+          "name": "test_string_false_does_not_authorize_patch_generation",
+          "status": "failed",
+          "pytest_case_seconds": 0.044,
+          "properties": {
+            "blackbox_observation": {
+              "provider_stage_counts": {
+                "planning": 2,
+                "scout": 1,
+                "patch_generation": 1,
+                "total": 4
+              },
+              "items": [
+                {
+                  "title": "Change version() in app.py to return 2 instead of 1",
+                  "status": "planned_no_patch",
+                  "validation_artifact_exists": false,
+                  "grounding_rejection": "CONTROL has no exact-source candidate bound to genuine executed failure evidence."
+                }
+              ],
+              "source_unchanged": true,
+              "report_dir": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\blackbox-20260910-dream-final2\\test_string_false_does_not_aut0\\artifacts\\repo-f2c433c290c4410c\\dreams\\2026-09-10\\120315-run",
+              "database_enabled": false,
+              "database_alias_enabled": false,
+              "database_pool_created": false
+            }
+          },
+          "failure": "AssertionError: (\"The malformed model value safe_to_patch_now='false' triggered patch generation\", [{'kind': 'debt', 'title': 'Change version() in app.py to return 2 instead of 1', 'idx': 1, 'status': 'planned_no_patch', ...}])\nassert not ['You are inspecting a repository candidate selected by CONTROL navigation.\\n\\n[CONTROL LOCALIZATION — NON-AUTHORITATI...eeds_escalation\": false\\n}\\n\\n- Set patch_candidate=null, patch_plan=null, confidence=0.0, and needs_escalation=true.']\n +  where ['You are inspecting a repository candidate selected by CONTROL navigation.\\n\\n[CONTROL LOCALIZATION — NON-AUTHORITATI...eeds_escalation\": false\\n}\\n\\n- Set patch_candidate=null, patch_plan=null, confidence=0.0, and needs_escalation=true.'] = _patch_calls(['You are in Dream planning mode.\\n\\nYour job is to create a plan first. Do not write any code patch.\\nDo not require ...lse` and explain via `recommended_steps` and `risks`.\\n- Do NOT skip the item. Always return the JSON object above.\\n'])"
+        },
+        {
+          "name": "test_unverified_candidate_is_not_ready_even_when_planner_claims_safe",
+          "status": "passed",
+          "pytest_case_seconds": 1.097,
+          "properties": {
+            "blackbox_observation": {
+              "provider_stage_counts": {
+                "planning": 2,
+                "scout": 1,
+                "patch_generation": 1,
+                "total": 4
+              },
+              "items": [
+                {
+                  "title": "Change version() in app.py to return 2 instead of 1",
+                  "status": "planned_no_patch",
+                  "validation_artifact_exists": false,
+                  "grounding_rejection": "CONTROL has no exact-source candidate bound to genuine executed failure evidence."
+                }
+              ],
+              "source_unchanged": true,
+              "report_dir": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\blackbox-20260910-dream-final2\\test_unverified_candidate_is_n0\\artifacts\\repo-f13f92d7f1bdc9a3\\dreams\\2026-09-10\\120315-run",
+              "database_enabled": false,
+              "database_alias_enabled": false,
+              "database_pool_created": false
+            }
+          },
+          "failure": null
+        }
+      ],
+      "counts": {
+        "passed": 3,
+        "failed": 3,
+        "error": 0,
+        "skipped": 0
+      },
+      "test_source_sha256_after_run": "a0e8c7834d067af72fd3241d8f7c8d0298963e28cae533a0c53206b033c88d67"
+    },
+    {
+      "name": "http",
+      "test_file": "tests/test_harness_blackbox_http.py",
+      "evidence_format": "Completed pytest summary and named failures; passing names from unchanged test source, no individual durations recorded",
+      "pytest_summary_seconds": 24.29,
+      "log": ".tmp/blackbox-20260910-http-run.log",
+      "log_sha256": "0377c872a7a841c05d7dc18b9d14f48cb51d68195c6fb95e38eb55540802e026",
+      "cases": [
+        {
+          "name": "test_full_read_only_request_cannot_execute_adversarial_model_patch",
+          "status": "passed",
+          "pytest_case_seconds": null,
+          "properties": {}
+        },
+        {
+          "name": "test_full_read_only_provider_failure_is_visible_without_success_claim",
+          "status": "passed",
+          "pytest_case_seconds": null,
+          "properties": {}
+        },
+        {
+          "name": "test_full_explicit_change_then_human_apply_persists_actual_success",
+          "status": "passed",
+          "pytest_case_seconds": null,
+          "properties": {}
+        },
+        {
+          "name": "test_unambiguous_change_wording_is_routed_to_change_workflow",
+          "status": "failed",
+          "pytest_case_seconds": null,
+          "properties": {}
+        },
+        {
+          "name": "test_full_generated_review_cannot_be_reused_after_binding_changes[different_repository]",
+          "status": "passed",
+          "pytest_case_seconds": null,
+          "properties": {}
+        },
+        {
+          "name": "test_full_generated_review_cannot_be_reused_after_binding_changes[edited_source]",
+          "status": "passed",
+          "pytest_case_seconds": null,
+          "properties": {}
+        },
+        {
+          "name": "test_full_generated_review_cannot_be_reused_after_binding_changes[changed_candidate]",
+          "status": "passed",
+          "pytest_case_seconds": null,
+          "properties": {}
+        },
+        {
+          "name": "test_public_test_patch_runs_real_validation_without_changing_working_repo",
+          "status": "passed",
+          "pytest_case_seconds": null,
+          "properties": {}
+        },
+        {
+          "name": "test_public_apply_validation_failure_rolls_back_and_reports_actual_state",
+          "status": "passed",
+          "pytest_case_seconds": null,
+          "properties": {}
+        },
+        {
+          "name": "test_public_apply_risk_refusal_does_not_claim_validation_failed",
+          "status": "failed",
+          "pytest_case_seconds": null,
+          "properties": {}
+        }
+      ],
+      "counts": {
+        "passed": 8,
+        "failed": 2,
+        "error": 0,
+        "skipped": 0
+      },
+      "test_source_sha256_after_run": "cd1ff05e98b7fc0d582e6a90b32abdbc1571c0b10169c49033dd91cd5c1cbdd2"
+    }
+  ],
+  "revision_failure_receipts": {
+    "test_public_runner_accepts_a_f0": {
+      "raw_result_path": ".tmp/blackbox-20260910-coding/test_public_runner_accepts_a_f0/result.json",
+      "raw_sha256": "86144c999fffeb9e37e24e61e1f1eaff1ee5ccf2f81b401a6ccc9c2c03e5d940",
+      "fields": {
+        "candidate_effect_phase_id": "PATCH.MINIMAL.LIVE.1",
+        "candidate_effect_schema_version": "patch_minimal_live_1_v1",
+        "candidate_effect_status": "mutating",
+        "candidate_effect_rejection_reason": "",
+        "candidate_effect_candidate_fingerprint": "41d71863b1c84063fa51f38acbbae43e03444468afeb6fdc9a8c5329f7925f3e",
+        "candidate_effect_authored": true,
+        "candidate_effect_accepted": true,
+        "candidate_effect_operations": [
+          {
+            "index": 0,
+            "op": "replace_snippet",
+            "relative_path": "margin_meter.py",
+            "effect": "mutating"
+          }
+        ],
+        "candidate_effect_receipt": {
+          "phase_id": "PATCH.MINIMAL.LIVE.1",
+          "schema_version": "patch_minimal_live_1_v1",
+          "status": "mutating",
+          "rejection_reason": "",
+          "candidate_fingerprint": "41d71863b1c84063fa51f38acbbae43e03444468afeb6fdc9a8c5329f7925f3e",
+          "candidate_authored": true,
+          "candidate_accepted": true,
+          "operations": [
+            {
+              "index": 0,
+              "op": "replace_snippet",
+              "relative_path": "margin_meter.py",
+              "effect": "mutating"
+            }
+          ],
+          "exact_no_op_operation_count": 0,
+          "mutating_operation_count": 1,
+          "undetermined_operation_count": 0,
+          "effect_fingerprint": "748eaa68f355fe0b614c9c99176a2e2a1591ef3347bf83672c9aece166069de8"
+        },
+        "candidate_effect_fingerprint": "748eaa68f355fe0b614c9c99176a2e2a1591ef3347bf83672c9aece166069de8",
+        "candidate_effect_evaluation_seconds": 1.5e-05,
+        "candidate_effect_model_calls": 0,
+        "candidate_effect_network_calls": 0,
+        "candidate_effect_repository_reads": 0,
+        "candidate_effect_repository_mutations": 0,
+        "candidate_novelty_novel_identifiers": [
+          "amount",
+          "unit"
+        ],
+        "candidate_novelty_unexplained_identifiers": [],
+        "candidate_novelty_admitted": true,
+        "candidate_novelty_phase_id": "PATCH.MINIMAL.LIVE.2",
+        "candidate_novelty_schema_version": "patch_minimal_live_2_v1",
+        "candidate_novelty_language": "python",
+        "candidate_novelty_language_supported": true,
+        "candidate_novelty_candidate_shape": "definition",
+        "candidate_novelty_containing_functions": [
+          "describe_margin"
+        ],
+        "candidate_novelty_classification": {
+          "local_binding_novelty": {
+            "names": [
+              "amount",
+              "unit"
+            ],
+            "count": 2,
+            "scopes": [
+              {
+                "name": "amount",
+                "scope": "describe_margin",
+                "binding_kinds": [
+                  "assignment",
+                  "loop_target"
+                ],
+                "load_count": 5
+              },
+              {
+                "name": "unit",
+                "scope": "describe_margin",
+                "binding_kinds": [
+                  "assignment"
+                ],
+                "load_count": 3
+              }
+            ]
+          },
+          "structural_novelty": {
+            "names": [],
+            "count": 0
+          },
+          "external_reference_novelty": {
+            "names": [],
+            "count": 0
+          },
+          "import_novelty": {
+            "names": [],
+            "count": 0
+          },
+          "scope_declaration_novelty": {
+            "names": [],
+            "count": 0
+          },
+          "attribute_store_novelty": {
+            "names": [],
+            "count": 0
+          },
+          "unresolved_novelty": {
+            "names": [],
+            "count": 0
+          }
+        },
+        "candidate_novelty_local_binding_names": [
+          "amount",
+          "unit"
+        ],
+        "candidate_novelty_local_binding_count": 2,
+        "candidate_novelty_findings": [],
+        "candidate_novelty_caps": {
+          "max_novel_local_bindings": 3,
+          "novel_local_bindings": 2,
+          "max_touched_functions": 1,
+          "touched_functions": 1,
+          "max_changed_lines": 24,
+          "changed_lines": 17,
+          "binding_budget_exceeded": false,
+          "function_budget_exceeded": false,
+          "line_budget_exceeded": false,
+          "exceeded": false
+        },
+        "candidate_novelty_reason": "bounded_local_identifier_novelty",
+        "candidate_novelty_blocking_reasons": [],
+        "candidate_novelty_receipt": {
+          "phase_id": "PATCH.MINIMAL.LIVE.2",
+          "schema_version": "patch_minimal_live_2_v1",
+          "language": "python",
+          "language_supported": true,
+          "candidate_shape": "definition",
+          "containing_functions": [
+            "describe_margin"
+          ],
+          "novelty_classification": {
+            "local_binding_novelty": {
+              "names": [
+                "amount",
+                "unit"
+              ],
+              "count": 2,
+              "scopes": [
+                {
+                  "name": "amount",
+                  "scope": "describe_margin",
+                  "binding_kinds": [
+                    "assignment",
+                    "loop_target"
+                  ],
+                  "load_count": 5
+                },
+                {
+                  "name": "unit",
+                  "scope": "describe_margin",
+                  "binding_kinds": [
+                    "assignment"
+                  ],
+                  "load_count": 3
+                }
+              ]
+            },
+            "structural_novelty": {
+              "names": [],
+              "count": 0
+            },
+            "external_reference_novelty": {
+              "names": [],
+              "count": 0
+            },
+            "import_novelty": {
+              "names": [],
+              "count": 0
+            },
+            "scope_declaration_novelty": {
+              "names": [],
+              "count": 0
+            },
+            "attribute_store_novelty": {
+              "names": [],
+              "count": 0
+            },
+            "unresolved_novelty": {
+              "names": [],
+              "count": 0
+            }
+          },
+          "findings": [],
+          "caps": {
+            "max_novel_local_bindings": 3,
+            "novel_local_bindings": 2,
+            "max_touched_functions": 1,
+            "touched_functions": 1,
+            "max_changed_lines": 24,
+            "changed_lines": 17,
+            "binding_budget_exceeded": false,
+            "function_budget_exceeded": false,
+            "line_budget_exceeded": false,
+            "exceeded": false
+          },
+          "bounded_local_novelty_allowed": true,
+          "reason": "bounded_local_identifier_novelty",
+          "blocking_reasons": [],
+          "novelty_fingerprint": "f95f94a0736d720804b500b8ee64e51b6286bbdd5a56bd4583667be274cd6d36"
+        },
+        "candidate_novelty_fingerprint": "f95f94a0736d720804b500b8ee64e51b6286bbdd5a56bd4583667be274cd6d36",
+        "candidate_novelty_candidate_fingerprint": "41d71863b1c84063fa51f38acbbae43e03444468afeb6fdc9a8c5329f7925f3e",
+        "candidate_novelty_classification_seconds": 0.001052,
+        "candidate_novelty_model_calls": 0,
+        "candidate_novelty_network_calls": 0,
+        "candidate_novelty_repository_reads": 0,
+        "candidate_novelty_repository_mutations": 0,
+        "behavioral_matrix_phase_id": "DEFECT.PROBE.LIVE.4",
+        "behavioral_matrix_schema_version": "behavioral_matrix_live_4_v1",
+        "behavioral_matrix_status": "fixed_and_preserved",
+        "behavioral_matrix_subject_kind": "indentation_style",
+        "behavioral_matrix_case_count": 4,
+        "behavioral_matrix_cases": [
+          {
+            "case_id": "indentation_style.primary.2space",
+            "role": "primary_defect",
+            "provenance": "explicit_user_fact",
+            "subject_kind": "indentation_style",
+            "expected": "2space",
+            "baseline_observed": "4space",
+            "baseline_result": "reproduced",
+            "baseline_status": "reproduced",
+            "candidate_observed": "2space",
+            "candidate_result": "not_reproduced",
+            "candidate_status": "fixed",
+            "reason": ""
+          },
+          {
+            "case_id": "indentation_style.generalize.2space.deep",
+            "role": "defect_generalization",
+            "provenance": "system_derived_subject_invariant",
+            "subject_kind": "indentation_style",
+            "expected": "2space",
+            "baseline_observed": "4space",
+            "baseline_result": "reproduced",
+            "baseline_status": "reproduced",
+            "candidate_observed": "2space",
+            "candidate_result": "not_reproduced",
+            "candidate_status": "fixed",
+            "reason": ""
+          },
+          {
+            "case_id": "indentation_style.preserve.4space",
+            "role": "preservation",
+            "provenance": "system_derived_behavior_preservation",
+            "subject_kind": "indentation_style",
+            "expected": "4space",
+            "baseline_observed": "4space",
+            "baseline_result": "not_reproduced",
+            "baseline_status": "satisfied",
+            "candidate_observed": "4space",
+            "candidate_result": "not_reproduced",
+            "candidate_status": "preserved",
+            "reason": ""
+          },
+          {
+            "case_id": "indentation_style.preserve.4space.deep",
+            "role": "preservation_generalization",
+            "provenance": "system_derived_subject_invariant",
+            "subject_kind": "indentation_style",
+            "expected": "4space",
+            "baseline_observed": "4space",
+            "baseline_result": "not_reproduced",
+            "baseline_status": "satisfied",
+            "candidate_observed": "4space",
+            "candidate_result": "not_reproduced",
+            "candidate_status": "preserved",
+            "reason": ""
+          }
+        ],
+        "behavioral_matrix_rejection_reasons": [],
+        "behavioral_matrix_timings": {
+          "matrix_construction_sec": 0.000193,
+          "matrix_baseline_sec": 0.935378,
+          "matrix_candidate_probe_sec": 1.320784,
+          "matrix_reduction_sec": 6.3e-05,
+          "matrix_total_sec": 2.569899
+        },
+        "behavioral_matrix_authority_effect": "none",
+        "behavioral_matrix": {
+          "phase_id": "DEFECT.PROBE.LIVE.4",
+          "schema_version": "behavioral_matrix_live_4_v1",
+          "subject_kind": "indentation_style",
+          "case_count": 4,
+          "cases": [
+            {
+              "case_id": "indentation_style.primary.2space",
+              "role": "primary_defect",
+              "provenance": "explicit_user_fact",
+              "subject_kind": "indentation_style",
+              "expected": "2space",
+              "baseline_observed": "4space",
+              "baseline_result": "reproduced",
+              "baseline_status": "reproduced",
+              "candidate_observed": "2space",
+              "candidate_result": "not_reproduced",
+              "candidate_status": "fixed",
+              "reason": ""
+            },
+            {
+              "case_id": "indentation_style.generalize.2space.deep",
+              "role": "defect_generalization",
+              "provenance": "system_derived_subject_invariant",
+              "subject_kind": "indentation_style",
+              "expected": "2space",
+              "baseline_observed": "4space",
+              "baseline_result": "reproduced",
+              "baseline_status": "reproduced",
+              "candidate_observed": "2space",
+              "candidate_result": "not_reproduced",
+              "candidate_status": "fixed",
+              "reason": ""
+            },
+            {
+              "case_id": "indentation_style.preserve.4space",
+              "role": "preservation",
+              "provenance": "system_derived_behavior_preservation",
+              "subject_kind": "indentation_style",
+              "expected": "4space",
+              "baseline_observed": "4space",
+              "baseline_result": "not_reproduced",
+              "baseline_status": "satisfied",
+              "candidate_observed": "4space",
+              "candidate_result": "not_reproduced",
+              "candidate_status": "preserved",
+              "reason": ""
+            },
+            {
+              "case_id": "indentation_style.preserve.4space.deep",
+              "role": "preservation_generalization",
+              "provenance": "system_derived_subject_invariant",
+              "subject_kind": "indentation_style",
+              "expected": "4space",
+              "baseline_observed": "4space",
+              "baseline_result": "not_reproduced",
+              "baseline_status": "satisfied",
+              "candidate_observed": "4space",
+              "candidate_result": "not_reproduced",
+              "candidate_status": "preserved",
+              "reason": ""
+            }
+          ],
+          "matrix_status": "fixed_and_preserved",
+          "rejection_reasons": [],
+          "candidate_fingerprint": "41d71863b1c84063fa51f38acbbae43e03444468afeb6fdc9a8c5329f7925f3e",
+          "probe_fingerprint": "65874288e3e65e171140d2be284fa451754e93b842cf95ab567cad3e887b3f29",
+          "authority_effect": "none"
+        },
+        "targeted_validation_status": "inconclusive",
+        "targeted_validation_category": "baseline_targeted_failed",
+        "targeted_validation_budget": 20,
+        "targeted_validation_reason": "selected existing checks already fail on the baseline; no delta score is inferred",
+        "targeted_validation_timings": {
+          "selection_seconds": 0.000235,
+          "baseline_sandbox_create_seconds": 0.004815,
+          "baseline_targeted_validation_seconds": 1.652847,
+          "baseline_cleanup_seconds": 0.002074,
+          "candidate_sandbox_create_seconds": 0.006869,
+          "candidate_apply_seconds": 0.001343,
+          "candidate_targeted_validation_seconds": 1.436431,
+          "candidate_cleanup_seconds": 0.002722,
+          "total_seconds": 3.108578
+        },
+        "targeted_validation_sandbox_cleanup_ok": true,
+        "targeted_validation_authority_effect": "none",
+        "targeted_validation_model_calls": 0,
+        "targeted_validation_network_calls": 0,
+        "targeted_validation_selection_traversals": 0,
+        "candidate_verification_phase_id": "CANDIDATE.VERIFY.LIVE.1",
+        "candidate_verification_schema_version": "candidate_verification_live_1_v1",
+        "candidate_verification_status": "inconclusive",
+        "candidate_verification_profile": "grounded_defect_bounded_evidence",
+        "candidate_verification_candidate_fingerprint": "41d71863b1c84063fa51f38acbbae43e03444468afeb6fdc9a8c5329f7925f3e",
+        "candidate_verification_sandbox_status": "supporting",
+        "candidate_verification_patch_safety_status": "supporting",
+        "candidate_verification_paired_probe_status": "supporting",
+        "candidate_verification_targeted_validation_status": "inconclusive",
+        "candidate_verification_oracle_status": "supporting",
+        "candidate_verification_components": [
+          {
+            "component": "patch_safety",
+            "verdict": "supporting",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "component": "exact_candidate_sandbox",
+            "verdict": "supporting",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "component": "paired_defect_probe",
+            "verdict": "supporting",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "component": "targeted_validation",
+            "verdict": "inconclusive",
+            "reason": "required_evidence_inconclusive",
+            "detail": "baseline_targeted_failed"
+          },
+          {
+            "component": "oracle_assessment",
+            "verdict": "supporting",
+            "reason": "",
+            "detail": ""
+          }
+        ],
+        "candidate_verification_rejection_reasons": [
+          "required_evidence_inconclusive"
+        ],
+        "candidate_verification_accepted_limitations": [
+          "full_validation_budget_exhausted"
+        ],
+        "candidate_verification_probe_fingerprint": "65874288e3e65e171140d2be284fa451754e93b842cf95ab567cad3e887b3f29",
+        "candidate_verification_targeted_check_set_fingerprint": "c4c55ecf46d7bd32c1e548928946d4ef8540e4ba6627a3418c4f9fd22095d874",
+        "candidate_verification_patch_safety_binding": "41d71863b1c84063fa51f38acbbae43e03444468afeb6fdc9a8c5329f7925f3e",
+        "candidate_verification_receipt": {
+          "phase_id": "CANDIDATE.VERIFY.LIVE.1",
+          "schema_version": "candidate_verification_live_1_v1",
+          "status": "inconclusive",
+          "policy_profile": "grounded_defect_bounded_evidence",
+          "candidate_fingerprint": "41d71863b1c84063fa51f38acbbae43e03444468afeb6fdc9a8c5329f7925f3e",
+          "components": [
+            {
+              "component": "patch_safety",
+              "verdict": "supporting",
+              "reason": "",
+              "detail": ""
+            },
+            {
+              "component": "exact_candidate_sandbox",
+              "verdict": "supporting",
+              "reason": "",
+              "detail": ""
+            },
+            {
+              "component": "paired_defect_probe",
+              "verdict": "supporting",
+              "reason": "",
+              "detail": ""
+            },
+            {
+              "component": "targeted_validation",
+              "verdict": "inconclusive",
+              "reason": "required_evidence_inconclusive",
+              "detail": "baseline_targeted_failed"
+            },
+            {
+              "component": "oracle_assessment",
+              "verdict": "supporting",
+              "reason": "",
+              "detail": ""
+            }
+          ],
+          "rejection_reasons": [
+            "required_evidence_inconclusive"
+          ],
+          "accepted_limitations": [
+            "full_validation_budget_exhausted"
+          ],
+          "probe_fingerprint": "65874288e3e65e171140d2be284fa451754e93b842cf95ab567cad3e887b3f29",
+          "targeted_check_set_fingerprint": "c4c55ecf46d7bd32c1e548928946d4ef8540e4ba6627a3418c4f9fd22095d874",
+          "patch_safety_binding": "41d71863b1c84063fa51f38acbbae43e03444468afeb6fdc9a8c5329f7925f3e",
+          "review_ready": false,
+          "visible_for_debugging": true,
+          "needs_escalation": true,
+          "execution_authorized": false,
+          "final_repository_changed": false,
+          "authority_effect": "none",
+          "verification_fingerprint": "ed8cbef5c0b6b9b5ef5cab874bf6f23fcd7731f07847df4e308401a65ff7daba"
+        },
+        "candidate_verification_fingerprint": "ed8cbef5c0b6b9b5ef5cab874bf6f23fcd7731f07847df4e308401a65ff7daba",
+        "candidate_verification_needs_escalation": true,
+        "candidate_verification_execution_authorized": false,
+        "candidate_verification_final_repository_changed": false,
+        "candidate_verification_authority_effect": "none",
+        "candidate_verification_auto_apply_effect": "none",
+        "candidate_verification_model_calls": 0,
+        "candidate_verification_network_calls": 0,
+        "candidate_verification_repository_mutations": 0,
+        "candidate_verification_timings": {
+          "verification_reduction_sec": 0.000168
+        },
+        "candidate_verification_mutation_enabled": false,
+        "candidate_revision_phase_id": "PATCH.AUTHOR.LIVE.1",
+        "candidate_revision_schema_version": "candidate_revision_live_1_v1",
+        "candidate_revision_eligible": false,
+        "candidate_revision_attempted": false,
+        "candidate_revision_trigger": "none",
+        "candidate_revision_attempt_count": 0,
+        "candidate_revision_outcome": "not_eligible",
+        "candidate_revision_ineligible_reasons": [
+          "candidate_verification_did_not_reject"
+        ],
+        "candidate_revision_previous_candidate_fingerprint": "",
+        "candidate_revision_revised_candidate_fingerprint": "",
+        "candidate_revision_evidence_fingerprint": "",
+        "candidate_revision_counterexample_count": 0,
+        "candidate_revision_preserved_case_count": 0,
+        "candidate_revision_output_rejection_reason": "",
+        "candidate_revision_provider": "",
+        "candidate_revision_model": "",
+        "candidate_revision_author_selection": "",
+        "candidate_revision_latency_seconds": 0.0,
+        "candidate_revision_evidence_seconds": 3e-05,
+        "candidate_revision_input_chars": 0,
+        "candidate_revision_output_chars": 0,
+        "candidate_revision_present": false,
+        "candidate_revision_model_calls": 0,
+        "candidate_revision_model_call_budget_consumed": 0,
+        "candidate_revision_model_call_budget_remaining": 1,
+        "candidate_revision_network_calls": 0,
+        "candidate_revision_retrieval_calls": 0,
+        "candidate_revision_repository_traversals": 0,
+        "candidate_revision_repository_mutations": 0,
+        "candidate_revision_reviewer_calls": 0,
+        "candidate_revision_authority_effect": "none",
+        "candidate_revision_receipt": {
+          "phase_id": "PATCH.AUTHOR.LIVE.1",
+          "schema_version": "candidate_revision_live_1_v1",
+          "eligible": false,
+          "attempted": false,
+          "trigger": "none",
+          "attempt_count": 0,
+          "outcome": "not_eligible",
+          "ineligible_reasons": [
+            "candidate_verification_did_not_reject"
+          ],
+          "previous_candidate_fingerprint": "",
+          "revised_candidate_fingerprint": "",
+          "evidence_fingerprint": "",
+          "counterexample_count": 0,
+          "preserved_case_count": 0,
+          "output_rejection_reason": "",
+          "provider": "",
+          "model": "",
+          "author_selection": "",
+          "latency_seconds": 0.0,
+          "evidence_seconds": 3e-05,
+          "input_chars": 0,
+          "output_chars": 0,
+          "revised_candidate_present": false,
+          "model_call_budget_consumed": 0,
+          "model_call_budget_remaining": 1,
+          "authority_effect": "none",
+          "execution_authorized": false,
+          "final_repository_changed": false
+        },
+        "issues": [
+          {
+            "severity": "high",
+            "type": "candidate_verification",
+            "file": "",
+            "symbol": "",
+            "reason": "A required verification component reached no verdict.",
+            "fix": "Read the candidate verification evidence before approving anything; the candidate is not verified.",
+            "code": "required_evidence_inconclusive"
+          }
+        ],
+        "baseline_targeted_outcome": "failed",
+        "candidate_targeted_outcome": "passed",
+        "baseline_checks_executed": [
+          "quality/test_margin_meter.py::test_describe_margin_depth_only_layout",
+          "quality/test_margin_meter.py::test_describe_margin_empty_layout",
+          "quality/test_margin_meter.py::test_describe_margin_four_space_layout",
+          "quality/test_margin_meter.py::test_describe_margin_two_space_layout"
+        ],
+        "candidate_checks_executed": [
+          "quality/test_margin_meter.py::test_describe_margin_depth_only_layout",
+          "quality/test_margin_meter.py::test_describe_margin_empty_layout",
+          "quality/test_margin_meter.py::test_describe_margin_four_space_layout",
+          "quality/test_margin_meter.py::test_describe_margin_two_space_layout"
+        ],
+        "patch_safety": {
+          "ok": true,
+          "blocked_paths": [],
+          "reasons": []
+        }
+      }
+    },
+    "test_public_runner_accepts_equ0": {
+      "raw_result_path": ".tmp/blackbox-20260910-coding/test_public_runner_accepts_equ0/result.json",
+      "raw_sha256": "b577a54b5eec1eea281e0cc93b278a8f89555fb66fdd37ab86408d7afd4fe984",
+      "fields": {
+        "candidate_novelty_novel_identifiers": [
+          "amount",
+          "f",
+          "unit"
+        ],
+        "candidate_novelty_unexplained_identifiers": [
+          "f"
+        ],
+        "candidate_novelty_admitted": false,
+        "candidate_novelty_phase_id": "PATCH.MINIMAL.LIVE.2",
+        "candidate_novelty_schema_version": "patch_minimal_live_2_v1",
+        "candidate_novelty_language": "python",
+        "candidate_novelty_language_supported": true,
+        "candidate_novelty_candidate_shape": "definition",
+        "candidate_novelty_containing_functions": [
+          "describe_margin"
+        ],
+        "candidate_novelty_classification": {
+          "local_binding_novelty": {
+            "names": [
+              "amount",
+              "unit"
+            ],
+            "count": 2,
+            "scopes": [
+              {
+                "name": "amount",
+                "scope": "describe_margin",
+                "binding_kinds": [
+                  "assignment",
+                  "loop_target"
+                ],
+                "load_count": 5
+              },
+              {
+                "name": "unit",
+                "scope": "describe_margin",
+                "binding_kinds": [
+                  "assignment"
+                ],
+                "load_count": 3
+              }
+            ]
+          },
+          "structural_novelty": {
+            "names": [],
+            "count": 0
+          },
+          "external_reference_novelty": {
+            "names": [],
+            "count": 0
+          },
+          "import_novelty": {
+            "names": [],
+            "count": 0
+          },
+          "scope_declaration_novelty": {
+            "names": [],
+            "count": 0
+          },
+          "attribute_store_novelty": {
+            "names": [],
+            "count": 0
+          },
+          "unresolved_novelty": {
+            "names": [],
+            "count": 0
+          }
+        },
+        "candidate_novelty_local_binding_names": [
+          "amount",
+          "unit"
+        ],
+        "candidate_novelty_local_binding_count": 2,
+        "candidate_novelty_findings": [],
+        "candidate_novelty_caps": {
+          "max_novel_local_bindings": 3,
+          "novel_local_bindings": 2,
+          "max_touched_functions": 1,
+          "touched_functions": 1,
+          "max_changed_lines": 24,
+          "changed_lines": 17,
+          "binding_budget_exceeded": false,
+          "function_budget_exceeded": false,
+          "line_budget_exceeded": false,
+          "exceeded": false
+        },
+        "candidate_novelty_reason": "bounded_local_identifier_novelty",
+        "candidate_novelty_blocking_reasons": [],
+        "candidate_novelty_receipt": {
+          "phase_id": "PATCH.MINIMAL.LIVE.2",
+          "schema_version": "patch_minimal_live_2_v1",
+          "language": "python",
+          "language_supported": true,
+          "candidate_shape": "definition",
+          "containing_functions": [
+            "describe_margin"
+          ],
+          "novelty_classification": {
+            "local_binding_novelty": {
+              "names": [
+                "amount",
+                "unit"
+              ],
+              "count": 2,
+              "scopes": [
+                {
+                  "name": "amount",
+                  "scope": "describe_margin",
+                  "binding_kinds": [
+                    "assignment",
+                    "loop_target"
+                  ],
+                  "load_count": 5
+                },
+                {
+                  "name": "unit",
+                  "scope": "describe_margin",
+                  "binding_kinds": [
+                    "assignment"
+                  ],
+                  "load_count": 3
+                }
+              ]
+            },
+            "structural_novelty": {
+              "names": [],
+              "count": 0
+            },
+            "external_reference_novelty": {
+              "names": [],
+              "count": 0
+            },
+            "import_novelty": {
+              "names": [],
+              "count": 0
+            },
+            "scope_declaration_novelty": {
+              "names": [],
+              "count": 0
+            },
+            "attribute_store_novelty": {
+              "names": [],
+              "count": 0
+            },
+            "unresolved_novelty": {
+              "names": [],
+              "count": 0
+            }
+          },
+          "findings": [],
+          "caps": {
+            "max_novel_local_bindings": 3,
+            "novel_local_bindings": 2,
+            "max_touched_functions": 1,
+            "touched_functions": 1,
+            "max_changed_lines": 24,
+            "changed_lines": 17,
+            "binding_budget_exceeded": false,
+            "function_budget_exceeded": false,
+            "line_budget_exceeded": false,
+            "exceeded": false
+          },
+          "bounded_local_novelty_allowed": true,
+          "reason": "bounded_local_identifier_novelty",
+          "blocking_reasons": [],
+          "novelty_fingerprint": "f95f94a0736d720804b500b8ee64e51b6286bbdd5a56bd4583667be274cd6d36"
+        },
+        "candidate_novelty_fingerprint": "f95f94a0736d720804b500b8ee64e51b6286bbdd5a56bd4583667be274cd6d36",
+        "candidate_novelty_candidate_fingerprint": "12fe9e9c9947c9afa3231905139b533fcc47edde8c887b34d0124e8895c39a90",
+        "candidate_novelty_classification_seconds": 0.001049,
+        "candidate_novelty_model_calls": 0,
+        "candidate_novelty_network_calls": 0,
+        "candidate_novelty_repository_reads": 0,
+        "candidate_novelty_repository_mutations": 0,
+        "candidate_revision_phase_id": "PATCH.AUTHOR.LIVE.1",
+        "candidate_revision_schema_version": "candidate_revision_live_1_v1",
+        "candidate_revision_eligible": false,
+        "candidate_revision_attempted": false,
+        "candidate_revision_trigger": "none",
+        "candidate_revision_attempt_count": 0,
+        "candidate_revision_outcome": "not_eligible",
+        "candidate_revision_ineligible_reasons": [
+          "patch_basis_is_not_grounded_defect"
+        ],
+        "candidate_revision_previous_candidate_fingerprint": "",
+        "candidate_revision_revised_candidate_fingerprint": "",
+        "candidate_revision_evidence_fingerprint": "",
+        "candidate_revision_counterexample_count": 0,
+        "candidate_revision_preserved_case_count": 0,
+        "candidate_revision_output_rejection_reason": "",
+        "candidate_revision_provider": "",
+        "candidate_revision_model": "",
+        "candidate_revision_author_selection": "",
+        "candidate_revision_latency_seconds": 0.0,
+        "candidate_revision_evidence_seconds": 1.6e-05,
+        "candidate_revision_input_chars": 0,
+        "candidate_revision_output_chars": 0,
+        "candidate_revision_present": false,
+        "candidate_revision_model_calls": 0,
+        "candidate_revision_model_call_budget_consumed": 0,
+        "candidate_revision_model_call_budget_remaining": 1,
+        "candidate_revision_network_calls": 0,
+        "candidate_revision_retrieval_calls": 0,
+        "candidate_revision_repository_traversals": 0,
+        "candidate_revision_repository_mutations": 0,
+        "candidate_revision_reviewer_calls": 0,
+        "candidate_revision_authority_effect": "none",
+        "candidate_revision_receipt": {
+          "phase_id": "PATCH.AUTHOR.LIVE.1",
+          "schema_version": "candidate_revision_live_1_v1",
+          "eligible": false,
+          "attempted": false,
+          "trigger": "none",
+          "attempt_count": 0,
+          "outcome": "not_eligible",
+          "ineligible_reasons": [
+            "patch_basis_is_not_grounded_defect"
+          ],
+          "previous_candidate_fingerprint": "",
+          "revised_candidate_fingerprint": "",
+          "evidence_fingerprint": "",
+          "counterexample_count": 0,
+          "preserved_case_count": 0,
+          "output_rejection_reason": "",
+          "provider": "",
+          "model": "",
+          "author_selection": "",
+          "latency_seconds": 0.0,
+          "evidence_seconds": 1.6e-05,
+          "input_chars": 0,
+          "output_chars": 0,
+          "revised_candidate_present": false,
+          "model_call_budget_consumed": 0,
+          "model_call_budget_remaining": 1,
+          "authority_effect": "none",
+          "execution_authorized": false,
+          "final_repository_changed": false
+        },
+        "issues": [
+          {
+            "severity": "high",
+            "type": "policy",
+            "file": "margin_meter.py",
+            "symbol": "describe_margin",
+            "novelty_reason": "unresolved_novel_identifier",
+            "reason": "safe_minimal mode rejected the AI's patch as unresolved_novel_identifier: ['f'] is not present in the source and not a bounded local binding of the existing (context reference; not the localized target) function being (context reference; not the localized target) edited.",
+            "fix": "Provide more context or use balanced/vibe mode."
+          }
+        ]
+      }
+    },
+    "test_public_runner_can_revise_0": {
+      "raw_result_path": ".tmp/blackbox-20260910-coding/test_public_runner_can_revise_0/result.json",
+      "raw_sha256": "7699bae2ef14f1da9d2fab08572b2eb55384ef23a9e5c1d2c16045c95de7e745",
+      "fields": {
+        "candidate_effect_phase_id": "PATCH.MINIMAL.LIVE.1",
+        "candidate_effect_schema_version": "patch_minimal_live_1_v1",
+        "candidate_effect_status": "mutating",
+        "candidate_effect_rejection_reason": "",
+        "candidate_effect_candidate_fingerprint": "b2a787f9aea2af23584fae91e3bcf17e856e2edf85af9ecb8fca36163a42ea2e",
+        "candidate_effect_authored": true,
+        "candidate_effect_accepted": true,
+        "candidate_effect_operations": [
+          {
+            "index": 0,
+            "op": "replace_snippet",
+            "relative_path": "margin_meter.py",
+            "effect": "mutating"
+          }
+        ],
+        "candidate_effect_receipt": {
+          "phase_id": "PATCH.MINIMAL.LIVE.1",
+          "schema_version": "patch_minimal_live_1_v1",
+          "status": "mutating",
+          "rejection_reason": "",
+          "candidate_fingerprint": "b2a787f9aea2af23584fae91e3bcf17e856e2edf85af9ecb8fca36163a42ea2e",
+          "candidate_authored": true,
+          "candidate_accepted": true,
+          "operations": [
+            {
+              "index": 0,
+              "op": "replace_snippet",
+              "relative_path": "margin_meter.py",
+              "effect": "mutating"
+            }
+          ],
+          "exact_no_op_operation_count": 0,
+          "mutating_operation_count": 1,
+          "undetermined_operation_count": 0,
+          "effect_fingerprint": "6244dfcda85c38ec653b6f9a1384d9cb1be8d6348bbaf92c6958107191284780"
+        },
+        "candidate_effect_fingerprint": "6244dfcda85c38ec653b6f9a1384d9cb1be8d6348bbaf92c6958107191284780",
+        "candidate_effect_evaluation_seconds": 1.3e-05,
+        "candidate_effect_model_calls": 0,
+        "candidate_effect_network_calls": 0,
+        "candidate_effect_repository_reads": 0,
+        "candidate_effect_repository_mutations": 0,
+        "candidate_verification_phase_id": "CANDIDATE.VERIFY.LIVE.1",
+        "candidate_verification_schema_version": "candidate_verification_live_1_v1",
+        "candidate_verification_status": "unavailable",
+        "candidate_verification_profile": "grounded_defect_bounded_evidence",
+        "candidate_verification_candidate_fingerprint": "b2a787f9aea2af23584fae91e3bcf17e856e2edf85af9ecb8fca36163a42ea2e",
+        "candidate_verification_sandbox_status": "unavailable",
+        "candidate_verification_patch_safety_status": "supporting",
+        "candidate_verification_paired_probe_status": "unavailable",
+        "candidate_verification_targeted_validation_status": "unavailable",
+        "candidate_verification_oracle_status": "not_applicable",
+        "candidate_verification_components": [
+          {
+            "component": "patch_safety",
+            "verdict": "supporting",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "component": "exact_candidate_sandbox",
+            "verdict": "unavailable",
+            "reason": "required_evidence_missing",
+            "detail": "candidate defect probe recorded no candidate application"
+          },
+          {
+            "component": "paired_defect_probe",
+            "verdict": "unavailable",
+            "reason": "required_evidence_missing",
+            "detail": "no candidate defect closure receipt was recorded"
+          },
+          {
+            "component": "targeted_validation",
+            "verdict": "unavailable",
+            "reason": "required_evidence_missing",
+            "detail": "targeted validation did not run"
+          },
+          {
+            "component": "oracle_assessment",
+            "verdict": "not_applicable",
+            "reason": "",
+            "detail": "there was no selected check set to classify"
+          }
+        ],
+        "candidate_verification_rejection_reasons": [
+          "required_evidence_missing"
+        ],
+        "candidate_verification_accepted_limitations": [],
+        "candidate_verification_probe_fingerprint": "",
+        "candidate_verification_targeted_check_set_fingerprint": "",
+        "candidate_verification_patch_safety_binding": "b2a787f9aea2af23584fae91e3bcf17e856e2edf85af9ecb8fca36163a42ea2e",
+        "candidate_verification_receipt": {
+          "phase_id": "CANDIDATE.VERIFY.LIVE.1",
+          "schema_version": "candidate_verification_live_1_v1",
+          "status": "unavailable",
+          "policy_profile": "grounded_defect_bounded_evidence",
+          "candidate_fingerprint": "b2a787f9aea2af23584fae91e3bcf17e856e2edf85af9ecb8fca36163a42ea2e",
+          "components": [
+            {
+              "component": "patch_safety",
+              "verdict": "supporting",
+              "reason": "",
+              "detail": ""
+            },
+            {
+              "component": "exact_candidate_sandbox",
+              "verdict": "unavailable",
+              "reason": "required_evidence_missing",
+              "detail": "candidate defect probe recorded no candidate application"
+            },
+            {
+              "component": "paired_defect_probe",
+              "verdict": "unavailable",
+              "reason": "required_evidence_missing",
+              "detail": "no candidate defect closure receipt was recorded"
+            },
+            {
+              "component": "targeted_validation",
+              "verdict": "unavailable",
+              "reason": "required_evidence_missing",
+              "detail": "targeted validation did not run"
+            },
+            {
+              "component": "oracle_assessment",
+              "verdict": "not_applicable",
+              "reason": "",
+              "detail": "there was no selected check set to classify"
+            }
+          ],
+          "rejection_reasons": [
+            "required_evidence_missing"
+          ],
+          "accepted_limitations": [],
+          "probe_fingerprint": "",
+          "targeted_check_set_fingerprint": "",
+          "patch_safety_binding": "b2a787f9aea2af23584fae91e3bcf17e856e2edf85af9ecb8fca36163a42ea2e",
+          "review_ready": false,
+          "visible_for_debugging": true,
+          "needs_escalation": true,
+          "execution_authorized": false,
+          "final_repository_changed": false,
+          "authority_effect": "none",
+          "verification_fingerprint": "e67547a3f3d9d50ff06c8f9d2b08f39daf211d4fc976e5a60a5f1e74c441865b"
+        },
+        "candidate_verification_fingerprint": "e67547a3f3d9d50ff06c8f9d2b08f39daf211d4fc976e5a60a5f1e74c441865b",
+        "candidate_verification_needs_escalation": true,
+        "candidate_verification_execution_authorized": false,
+        "candidate_verification_final_repository_changed": false,
+        "candidate_verification_authority_effect": "none",
+        "candidate_verification_auto_apply_effect": "none",
+        "candidate_verification_model_calls": 0,
+        "candidate_verification_network_calls": 0,
+        "candidate_verification_repository_mutations": 0,
+        "candidate_verification_timings": {
+          "verification_reduction_sec": 8.4e-05
+        },
+        "candidate_verification_mutation_enabled": false,
+        "candidate_revision_phase_id": "PATCH.AUTHOR.LIVE.1",
+        "candidate_revision_schema_version": "candidate_revision_live_1_v1",
+        "candidate_revision_eligible": false,
+        "candidate_revision_attempted": false,
+        "candidate_revision_trigger": "none",
+        "candidate_revision_attempt_count": 0,
+        "candidate_revision_outcome": "not_eligible",
+        "candidate_revision_ineligible_reasons": [
+          "candidate_sandbox_apply_did_not_succeed"
+        ],
+        "candidate_revision_previous_candidate_fingerprint": "",
+        "candidate_revision_revised_candidate_fingerprint": "",
+        "candidate_revision_evidence_fingerprint": "",
+        "candidate_revision_counterexample_count": 0,
+        "candidate_revision_preserved_case_count": 0,
+        "candidate_revision_output_rejection_reason": "",
+        "candidate_revision_provider": "",
+        "candidate_revision_model": "",
+        "candidate_revision_author_selection": "",
+        "candidate_revision_latency_seconds": 0.0,
+        "candidate_revision_evidence_seconds": 1.3e-05,
+        "candidate_revision_input_chars": 0,
+        "candidate_revision_output_chars": 0,
+        "candidate_revision_present": false,
+        "candidate_revision_model_calls": 0,
+        "candidate_revision_model_call_budget_consumed": 0,
+        "candidate_revision_model_call_budget_remaining": 1,
+        "candidate_revision_network_calls": 0,
+        "candidate_revision_retrieval_calls": 0,
+        "candidate_revision_repository_traversals": 0,
+        "candidate_revision_repository_mutations": 0,
+        "candidate_revision_reviewer_calls": 0,
+        "candidate_revision_authority_effect": "none",
+        "candidate_revision_receipt": {
+          "phase_id": "PATCH.AUTHOR.LIVE.1",
+          "schema_version": "candidate_revision_live_1_v1",
+          "eligible": false,
+          "attempted": false,
+          "trigger": "none",
+          "attempt_count": 0,
+          "outcome": "not_eligible",
+          "ineligible_reasons": [
+            "candidate_sandbox_apply_did_not_succeed"
+          ],
+          "previous_candidate_fingerprint": "",
+          "revised_candidate_fingerprint": "",
+          "evidence_fingerprint": "",
+          "counterexample_count": 0,
+          "preserved_case_count": 0,
+          "output_rejection_reason": "",
+          "provider": "",
+          "model": "",
+          "author_selection": "",
+          "latency_seconds": 0.0,
+          "evidence_seconds": 1.3e-05,
+          "input_chars": 0,
+          "output_chars": 0,
+          "revised_candidate_present": false,
+          "model_call_budget_consumed": 0,
+          "model_call_budget_remaining": 1,
+          "authority_effect": "none",
+          "execution_authorized": false,
+          "final_repository_changed": false
+        },
+        "issues": [
+          {
+            "severity": "high",
+            "type": "candidate_verification",
+            "file": "",
+            "symbol": "",
+            "reason": "A required verification component produced no evidence at all.",
+            "fix": "Read the candidate verification evidence before approving anything; the candidate is not verified.",
+            "code": "required_evidence_missing"
+          }
+        ],
+        "patch_safety": {
+          "ok": true,
+          "blocked_paths": [],
+          "reasons": []
+        }
+      }
+    }
+  },
+  "http_failure_responses": {
+    "routing": {
+      "raw_path": ".tmp/blackbox-20260910-http/test_unambiguous_change_wordin0/run_result.json",
+      "result": {
+        "elapsed_seconds": 0.014689200004795566,
+        "provider_calls": 1,
+        "session": {
+          "id": "20260910115820",
+          "title": "Change app.py: make advance(value) retur",
+          "query": "Change app.py: make advance(value) return value + 2 instead of value + 1.",
+          "repo_path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\blackbox-20260910-http\\test_unambiguous_change_wordin0\\repo",
+          "mode": "full",
+          "result": {
+            "answer": "{\n  \"summary\": \"Change advance in app.py as requested; awaiting Apply.\",\n  \"confidence\": 0.95,\n  \"needs_escalation\": false,\n  \"patch_basis\": \"explicit_change_request\",\n  \"patch_candidate\": {\n    \"file\": \"app.py\",\n    \"relative_path\": \"app.py\",\n    \"target_symbol\": \"advance\",\n    \"target_node_name\": \"advance\",\n    \"target_node_kind\": \"function\",\n    \"original_snippet\": \"def advance(value):\\n    return value + 1\\n\",\n    \"target_snippet\": \"def advance(value):\\n    return value + 1\\n\",\n    \"patched_snippet\": \"def advance(value):\\n    return value + 2\\n\",\n    \"confidence\": 0.95\n  },\n  \"candidate_effect_phase_id\": \"PATCH.MINIMAL.LIVE.1\",\n  \"candidate_effect_schema_version\": \"patch_minimal_live_1_v1\",\n  \"candidate_effect_status\": \"mutating\",\n  \"candidate_effect_rejection_reason\": \"\",\n  \"candidate_effect_candidate_fingerprint\": \"41fdae34c48d48c756bfdf9537e27ccd9c00f7c79213f956d843a52ce2921725\",\n  \"candidate_effect_authored\": true,\n  \"candidate_effect_accepted\": true,\n  \"candidate_effect_operations\": [\n    {\n      \"index\": 0,\n      \"op\": \"replace_snippet\",\n      \"relative_path\": \"app.py\",\n      \"effect\": \"mutating\"\n    }\n  ],\n  \"candidate_effect_receipt\": {\n    \"phase_id\": \"PATCH.MINIMAL.LIVE.1\",\n    \"schema_version\": \"patch_minimal_live_1_v1\",\n    \"status\": \"mutating\",\n    \"rejection_reason\": \"\",\n    \"candidate_fingerprint\": \"41fdae34c48d48c756bfdf9537e27ccd9c00f7c79213f956d843a52ce2921725\",\n    \"candidate_authored\": true,\n    \"candidate_accepted\": true,\n    \"operations\": [\n      {\n        \"index\": 0,\n        \"op\": \"replace_snippet\",\n        \"relative_path\": \"app.py\",\n        \"effect\": \"mutating\"\n      }\n    ],\n    \"exact_no_op_operation_count\": 0,\n    \"mutating_operation_count\": 1,\n    \"undetermined_operation_count\": 0,\n    \"effect_fingerprint\": \"b5bed3e56009d132c34417c704ecc36e598356cd79a28991308d73175cda0a14\"\n  },\n  \"candidate_effect_fingerprint\": \"b5bed3e56009d132c34417c704ecc36e598356cd79a28991308d73175cda0a14\",\n  \"candidate_effect_evaluation_seconds\": 1.4e-05,\n  \"candidate_effect_model_calls\": 0,\n  \"candidate_effect_network_calls\": 0,\n  \"candidate_effect_repository_reads\": 0,\n  \"candidate_effect_repository_mutations\": 0,\n  \"exact_no_op_operation_count\": 0,\n  \"mutating_operation_count\": 1,\n  \"undetermined_operation_count\": 0,\n  \"execution_telemetry_schema_version\": \"exec_auth_live_1_execution_telemetry_v1\",\n  \"authority_scope\": \"control_or_planning\",\n  \"execution_authorized\": false,\n  \"execution_authority_source\": \"none\",\n  \"execution_authorization_denied_reason\": \"no_change_requested\",\n  \"human_approval_required_for_execution\": true,\n  \"execution_attempted\": false,\n  \"mutation_observed\": false,\n  \"patch_applied\": false,\n  \"application_status\": \"not_attempted\",\n  \"rollback_performed\": false,\n  \"final_repository_changed\": false,\n  \"final_validation_outcome\": \"not_run\",\n  \"final_state_observation\": \"not_attempted\",\n  \"observed_changed_paths\": [],\n  \"execution_summary\": \"No patch was applied: no repository change was requested. The repository was not modified by this run.\",\n  \"execution_authorization\": {\n    \"execution_authorized\": false,\n    \"execution_authority_source\": \"none\",\n    \"execution_authorization_denied_reason\": \"no_change_requested\",\n    \"human_approval_required_for_execution\": true\n  },\n  \"execution_outcome\": {\n    \"execution_attempted\": false,\n    \"mutation_observed\": false,\n    \"patch_applied\": false,\n    \"application_status\": \"not_attempted\",\n    \"rollback_performed\": false,\n    \"final_repository_changed\": false,\n    \"final_validation_outcome\": \"not_run\",\n    \"final_state_observation\": \"not_attempted\",\n    \"observed_changed_paths\": []\n  },\n  \"answer_entity_grounding\": {\n    \"schema_version\": \"answer_ground_live_3_v1\",\n    \"phase_id\": \"ANSWER.GROUND.LIVE.1\",\n    \"phase_ids\": [\n      \"ANSWER.GROUND.LIVE.1\",\n      \"ANSWER.GROUND.LIVE.2\",\n      \"ANSWER.GROUND.LIVE.3\"\n    ],\n    \"asserted_entity_count\": 2,\n    \"grounded_entity_count\": 2,\n    \"unverified_entity_count\": 0,\n    \"asserted_path_count\": 1,\n    \"asserted_symbol_count\": 1,\n    \"grounded_symbol_count\": 1,\n    \"unverified_symbol_count\": 0,\n    \"ambiguous_symbol_count\": 0,\n    \"action\": \"unchanged\",\n    \"remediation_scope\": \"entity_span\",\n    \"surrounding_text_preserved\": true,\n    \"unverified_entities\": [],\n    \"entity_statuses\": [\n      {\n        \"entity\": \"app.py\",\n        \"path\": \"app.py\",\n        \"symbol\": null,\n        \"repository_id\": \"repo-be729e49ae4e2d5ee7784f5bd5fcb5b1\",\n        \"status\": \"grounded_existing\",\n        \"kind\": \"path\"\n      },\n      {\n        \"entity\": \"app.py::advance\",\n        \"path\": \"app.py\",\n        \"symbol\": \"advance\",\n        \"repository_id\": \"repo-be729e49ae4e2d5ee7784f5bd5fcb5b1\",\n        \"status\": \"grounded_existing\",\n        \"kind\": \"symbol\"\n      }\n    ],\n    \"receipt_truncated\": false,\n    \"evidence_gaps\": [],\n    \"timing_seconds\": {\n      \"extraction\": 0.000358,\n      \"membership_check\": 4e-05,\n      \"total\": 0.001025\n    },\n    \"authority_effect\": \"none\",\n    \"retrieval_effect\": \"none\"\n  }\n}",
+            "context": "",
+            "graph": "{}",
+            "state": "{\n  \"harness_mode_decision\": {\n    \"mode\": \"normal_patch\",\n    \"can_generate_patch\": true,\n    \"can_apply_patch\": true,\n    \"reason\": \"Runtime, path, source, and grounding evidence allow normal patch flow.\",\n    \"warnings\": [],\n    \"evidence\": {\n      \"repo_root\": \"C:\\\\Users\\\\Admin\\\\Documents\\\\Code\\\\J.A.R.V.I.S\\\\districts\\\\C.A.T.T.U.S\\\\.tmp\\\\blackbox-20260910-http\\\\test_unambiguous_change_wordin0\\\\repo\",\n      \"runtime_environment\": \"local_windows\",\n      \"request_path\": \"C:\\\\Users\\\\Admin\\\\Documents\\\\Code\\\\J.A.R.V.I.S\\\\districts\\\\C.A.T.T.U.S\\\\.tmp\\\\blackbox-20260910-http\\\\test_unambiguous_change_wordin0\\\\repo\",\n      \"target_path\": \"\",\n      \"detected_path_environment\": \"local_windows\",\n      \"source_context_present\": true,\n      \"grounding_failed\": false,\n      \"index_degraded\": false,\n      \"patch_gates_passed\": true\n    }\n  }\n}\n\n",
+            "patch": "{\n  \"summary\": \"Change advance in app.py as requested; awaiting Apply.\",\n  \"confidence\": 0.95,\n  \"needs_escalation\": false,\n  \"patch_basis\": \"explicit_change_request\",\n  \"patch_candidate\": {\n    \"file\": \"app.py\",\n    \"relative_path\": \"app.py\",\n    \"target_symbol\": \"advance\",\n    \"target_node_name\": \"advance\",\n    \"target_node_kind\": \"function\",\n    \"original_snippet\": \"def advance(value):\\n    return value + 1\\n\",\n    \"target_snippet\": \"def advance(value):\\n    return value + 1\\n\",\n    \"patched_snippet\": \"def advance(value):\\n    return value + 2\\n\",\n    \"confidence\": 0.95\n  },\n  \"candidate_effect_phase_id\": \"PATCH.MINIMAL.LIVE.1\",\n  \"candidate_effect_schema_version\": \"patch_minimal_live_1_v1\",\n  \"candidate_effect_status\": \"mutating\",\n  \"candidate_effect_rejection_reason\": \"\",\n  \"candidate_effect_candidate_fingerprint\": \"41fdae34c48d48c756bfdf9537e27ccd9c00f7c79213f956d843a52ce2921725\",\n  \"candidate_effect_authored\": true,\n  \"candidate_effect_accepted\": true,\n  \"candidate_effect_operations\": [\n    {\n      \"index\": 0,\n      \"op\": \"replace_snippet\",\n      \"relative_path\": \"app.py\",\n      \"effect\": \"mutating\"\n    }\n  ],\n  \"candidate_effect_receipt\": {\n    \"phase_id\": \"PATCH.MINIMAL.LIVE.1\",\n    \"schema_version\": \"patch_minimal_live_1_v1\",\n    \"status\": \"mutating\",\n    \"rejection_reason\": \"\",\n    \"candidate_fingerprint\": \"41fdae34c48d48c756bfdf9537e27ccd9c00f7c79213f956d843a52ce2921725\",\n    \"candidate_authored\": true,\n    \"candidate_accepted\": true,\n    \"operations\": [\n      {\n        \"index\": 0,\n        \"op\": \"replace_snippet\",\n        \"relative_path\": \"app.py\",\n        \"effect\": \"mutating\"\n      }\n    ],\n    \"exact_no_op_operation_count\": 0,\n    \"mutating_operation_count\": 1,\n    \"undetermined_operation_count\": 0,\n    \"effect_fingerprint\": \"b5bed3e56009d132c34417c704ecc36e598356cd79a28991308d73175cda0a14\"\n  },\n  \"candidate_effect_fingerprint\": \"b5bed3e56009d132c34417c704ecc36e598356cd79a28991308d73175cda0a14\",\n  \"candidate_effect_evaluation_seconds\": 1.4e-05,\n  \"candidate_effect_model_calls\": 0,\n  \"candidate_effect_network_calls\": 0,\n  \"candidate_effect_repository_reads\": 0,\n  \"candidate_effect_repository_mutations\": 0,\n  \"exact_no_op_operation_count\": 0,\n  \"mutating_operation_count\": 1,\n  \"undetermined_operation_count\": 0,\n  \"execution_telemetry_schema_version\": \"exec_auth_live_1_execution_telemetry_v1\",\n  \"authority_scope\": \"control_or_planning\",\n  \"execution_authorized\": false,\n  \"execution_authority_source\": \"none\",\n  \"execution_authorization_denied_reason\": \"no_change_requested\",\n  \"human_approval_required_for_execution\": true,\n  \"execution_attempted\": false,\n  \"mutation_observed\": false,\n  \"patch_applied\": false,\n  \"application_status\": \"not_attempted\",\n  \"rollback_performed\": false,\n  \"final_repository_changed\": false,\n  \"final_validation_outcome\": \"not_run\",\n  \"final_state_observation\": \"not_attempted\",\n  \"observed_changed_paths\": [],\n  \"execution_summary\": \"No patch was applied: no repository change was requested. The repository was not modified by this run.\",\n  \"execution_authorization\": {\n    \"execution_authorized\": false,\n    \"execution_authority_source\": \"none\",\n    \"execution_authorization_denied_reason\": \"no_change_requested\",\n    \"human_approval_required_for_execution\": true\n  },\n  \"execution_outcome\": {\n    \"execution_attempted\": false,\n    \"mutation_observed\": false,\n    \"patch_applied\": false,\n    \"application_status\": \"not_attempted\",\n    \"rollback_performed\": false,\n    \"final_repository_changed\": false,\n    \"final_validation_outcome\": \"not_run\",\n    \"final_state_observation\": \"not_attempted\",\n    \"observed_changed_paths\": []\n  },\n  \"answer_entity_grounding\": {\n    \"schema_version\": \"answer_ground_live_3_v1\",\n    \"phase_id\": \"ANSWER.GROUND.LIVE.1\",\n    \"phase_ids\": [\n      \"ANSWER.GROUND.LIVE.1\",\n      \"ANSWER.GROUND.LIVE.2\",\n      \"ANSWER.GROUND.LIVE.3\"\n    ],\n    \"asserted_entity_count\": 2,\n    \"grounded_entity_count\": 2,\n    \"unverified_entity_count\": 0,\n    \"asserted_path_count\": 1,\n    \"asserted_symbol_count\": 1,\n    \"grounded_symbol_count\": 1,\n    \"unverified_symbol_count\": 0,\n    \"ambiguous_symbol_count\": 0,\n    \"action\": \"unchanged\",\n    \"remediation_scope\": \"entity_span\",\n    \"surrounding_text_preserved\": true,\n    \"unverified_entities\": [],\n    \"entity_statuses\": [\n      {\n        \"entity\": \"app.py\",\n        \"path\": \"app.py\",\n        \"symbol\": null,\n        \"repository_id\": \"repo-be729e49ae4e2d5ee7784f5bd5fcb5b1\",\n        \"status\": \"grounded_existing\",\n        \"kind\": \"path\"\n      },\n      {\n        \"entity\": \"app.py::advance\",\n        \"path\": \"app.py\",\n        \"symbol\": \"advance\",\n        \"repository_id\": \"repo-be729e49ae4e2d5ee7784f5bd5fcb5b1\",\n        \"status\": \"grounded_existing\",\n        \"kind\": \"symbol\"\n      }\n    ],\n    \"receipt_truncated\": false,\n    \"evidence_gaps\": [],\n    \"timing_seconds\": {\n      \"extraction\": 0.000358,\n      \"membership_check\": 4e-05,\n      \"total\": 0.001025\n    },\n    \"authority_effect\": \"none\",\n    \"retrieval_effect\": \"none\"\n  }\n}",
+            "validation": "",
+            "answer_entity_grounding": {
+              "schema_version": "answer_ground_live_3_v1",
+              "phase_id": "ANSWER.GROUND.LIVE.1",
+              "phase_ids": [
+                "ANSWER.GROUND.LIVE.1",
+                "ANSWER.GROUND.LIVE.2",
+                "ANSWER.GROUND.LIVE.3"
+              ],
+              "asserted_entity_count": 2,
+              "grounded_entity_count": 2,
+              "unverified_entity_count": 0,
+              "asserted_path_count": 1,
+              "asserted_symbol_count": 1,
+              "grounded_symbol_count": 1,
+              "unverified_symbol_count": 0,
+              "ambiguous_symbol_count": 0,
+              "action": "unchanged",
+              "remediation_scope": "entity_span",
+              "surrounding_text_preserved": true,
+              "unverified_entities": [],
+              "entity_statuses": [
+                {
+                  "entity": "app.py",
+                  "path": "app.py",
+                  "symbol": null,
+                  "repository_id": "repo-be729e49ae4e2d5ee7784f5bd5fcb5b1",
+                  "status": "grounded_existing",
+                  "kind": "path"
+                },
+                {
+                  "entity": "app.py::advance",
+                  "path": "app.py",
+                  "symbol": "advance",
+                  "repository_id": "repo-be729e49ae4e2d5ee7784f5bd5fcb5b1",
+                  "status": "grounded_existing",
+                  "kind": "symbol"
+                }
+              ],
+              "receipt_truncated": false,
+              "evidence_gaps": [],
+              "timing_seconds": {
+                "extraction": 0.000358,
+                "membership_check": 4e-05,
+                "total": 0.001025
+              },
+              "authority_effect": "none",
+              "retrieval_effect": "none"
+            },
+            "project_tag": "repo-be729e49ae4e2d5e",
+            "live_route": {
+              "schema_version": "waiter_live_1_route_receipt_v1",
+              "phase_id": "WAITER.LIVE.1",
+              "task_shape": "needs_clarification",
+              "change_requested": false,
+              "defect_claim_present": false,
+              "defect_established": false,
+              "change_need_source": "unresolved",
+              "selected_workflow": "clarification",
+              "patch_localization_allowed": false,
+              "preflight_validation_required": false,
+              "repository_indexing_allowed": false,
+              "source_grounding": "none",
+              "control_source_snippet_required": false,
+              "repository_available": true,
+              "preservation_passed": true,
+              "reasons": [
+                "no_determinable_obligation"
+              ],
+              "obligations": [
+                "Change app.py: make advance(value) return value + 2 instead of value + 1"
+              ],
+              "obligation_preservation": {
+                "schema_version": "input_preserve_live_1_obligation_set_v1",
+                "phase_id": "INPUT.PRESERVE.LIVE.1",
+                "accepted_obligation_count": 1,
+                "preserved_obligation_count": 1,
+                "clause_count": 1,
+                "input_chars": 73,
+                "obligation_chars": 72,
+                "preview_truncated": false,
+                "authoritative_truncated": false,
+                "overflow_status": "none"
+              },
+              "behavioral_expectations": [],
+              "requested_paths": [
+                "app.py"
+              ],
+              "subjects": [],
+              "waiter_workflow": "instant_run",
+              "write_authority": false,
+              "patch_application_authority": false,
+              "human_approval_required": true,
+              "authority": {
+                "routing_execution_authority": false,
+                "execution_authority": false,
+                "repository_read_authority": false,
+                "repository_write_authority": false,
+                "patch_authority": false,
+                "validation_authority": false,
+                "benchmark_authority": false,
+                "worker_launch_authority": false,
+                "provider_selection_authority": false,
+                "model_selection_authority": false,
+                "model_escalation_authority": false,
+                "dream_authority": false,
+                "project_evolution_authority": false,
+                "planning_authority": false,
+                "context_selection_authority": false,
+                "human_approval_required": true
+              },
+              "guardrails": {
+                "execution_performed": false,
+                "workflow_dispatch_performed": false,
+                "plan_generated": false,
+                "repository_scan_performed": false,
+                "repository_read_performed": false,
+                "context_selection_performed": false,
+                "read_set_generated": false,
+                "reconnaissance_performed": false,
+                "patch_generation_performed": false,
+                "patch_application_performed": false,
+                "validation_run": false,
+                "benchmark_run_performed": false,
+                "model_call_performed": false,
+                "provider_selected": false,
+                "network_call_performed": false,
+                "web_search_performed": false,
+                "semantic_reinterpretation_performed": false
+              },
+              "authority_source": "existing patch safety, CTX.PATCH/CTX.APPLY, AUTO_PATCH_ENABLED, runtime authorization and human approval where required"
+            },
+            "patch_loop_attempts": 0,
+            "patch_loop_stop_reason": null,
+            "runtime_environment": "local_windows",
+            "runtime_environment_custom_name": "",
+            "runtime_environment_notes": "",
+            "runtime_environment_description": "Local Windows",
+            "harness_mode": "normal_patch",
+            "harness_mode_decision": {
+              "mode": "normal_patch",
+              "can_generate_patch": true,
+              "can_apply_patch": true,
+              "reason": "Runtime, path, source, and grounding evidence allow normal patch flow.",
+              "warnings": [],
+              "evidence": {
+                "repo_root": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\blackbox-20260910-http\\test_unambiguous_change_wordin0\\repo",
+                "runtime_environment": "local_windows",
+                "request_path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\blackbox-20260910-http\\test_unambiguous_change_wordin0\\repo",
+                "target_path": "",
+                "detected_path_environment": "local_windows",
+                "source_context_present": true,
+                "grounding_failed": false,
+                "index_degraded": false,
+                "patch_gates_passed": true
+              }
+            },
+            "harness_warnings": [],
+            "run_progress_snapshot_id": null,
+            "run_progress_available": false,
+            "run_progress_writer_enabled": false,
+            "run_progress_association_mode": "advisory",
+            "run_progress_notice": "Progress snapshot unavailable because shadow progress writing was disabled.",
+            "usage": "{\n  \"summary\": {\n    \"attempts\": 0,\n    \"fallback_count\": 0,\n    \"selected_model\": null,\n    \"models_by_role\": {},\n    \"input_tokens\": 0,\n    \"output_tokens\": 0,\n    \"total_tokens\": 0,\n    \"estimated_cost_usd\": 0.0,\n    \"costed_calls\": 0,\n    \"unknown_cost_calls\": 0,\n    \"by_role\": {}\n  },\n  \"calls\": []\n}",
+            "model_calls": []
+          },
+          "created_at": "2026-09-10T11:58:20",
+          "project_tag": "repo-be729e49ae4e2d5e",
+          "patch_style": "safe_minimal",
+          "ignore_repo_dna": false,
+          "web_mode": "instant",
+          "runtime_environment": "local_windows",
+          "runtime_environment_custom_name": "",
+          "runtime_environment_notes": "",
+          "harness_mode": "normal_patch",
+          "harness_warnings": []
+        }
+      }
+    },
+    "refusal_message": {
+      "raw_path": ".tmp/blackbox-20260910-http/test_public_apply_risk_refusal0/apply_result.json",
+      "result": {
+        "application_status": "rolled_back",
+        "approved_candidate_fingerprint": "41fdae34c48d48c756bfdf9537e27ccd9c00f7c79213f956d843a52ce2921725",
+        "approved_eligibility_receipt_fingerprint": "",
+        "authority_scope": "control_or_planning",
+        "diff": "--- original\n+++ patched\n@@ -1,2 +1,2 @@\n def advance(value):\n-    return value + 1\n+    return value + 2",
+        "execution_attempted": true,
+        "execution_authority_source": "manual_apply_action",
+        "execution_authorization": {
+          "execution_authority_source": "manual_apply_action",
+          "execution_authorization_denied_reason": "",
+          "execution_authorized": true,
+          "human_approval_required_for_execution": false
+        },
+        "execution_authorization_denied_reason": "",
+        "execution_authorized": true,
+        "execution_outcome": {
+          "application_status": "rolled_back",
+          "execution_attempted": true,
+          "final_repository_changed": false,
+          "final_state_observation": "plan_named_paths",
+          "final_validation_outcome": "unavailable",
+          "mutation_observed": true,
+          "observed_changed_paths": [],
+          "patch_applied": false,
+          "rollback_performed": true
+        },
+        "execution_summary": "Patch execution was authorized under a human apply action and attempted. Validation recorded no typed outcome. Changes were rolled back; the repository was restored.",
+        "execution_telemetry_schema_version": "exec_auth_live_1_execution_telemetry_v1",
+        "final_repository_changed": false,
+        "final_state_observation": "plan_named_paths",
+        "final_validation_outcome": "unavailable",
+        "human_apply_authorization": {
+          "approved_candidate_fingerprint": "41fdae34c48d48c756bfdf9537e27ccd9c00f7c79213f956d843a52ce2921725",
+          "approved_eligibility_receipt_fingerprint": "",
+          "authority_source": "manual_apply_action",
+          "authorization_receipt_fingerprint": "e80ee4ee49ee2bff5c6e0b7e990c3d5d7162e18b5a73d76d80a623071273e951",
+          "authorization_status": "authorized",
+          "candidate_fingerprint": "41fdae34c48d48c756bfdf9537e27ccd9c00f7c79213f956d843a52ce2921725",
+          "denial_reason": "",
+          "eligibility_receipt_fingerprint": "",
+          "freshness_status": "current",
+          "human_action_kind": "apply",
+          "human_approval_received": true,
+          "legacy_compatibility": true,
+          "patch_safety_binding": "e39d9ddc3bf510d71cb6b645b56709538253564c4f7647499a7e5b8f7f602012",
+          "phase_id": "EXEC.APPROVAL.LIVE.1",
+          "policy_profile": "explicit_change_manual_review",
+          "repository_identity": "repo-01b72b0230004b8131376b67a7f887c4",
+          "review_receipt_fingerprint": "",
+          "schema_version": "exec_approval_live_1_authorization_v1",
+          "source_state_fingerprint": "",
+          "timings": {
+            "authorization_total_seconds": 0.000198,
+            "freshness_revalidation_seconds": 0.0
+          }
+        },
+        "human_apply_authorization_denial_reason": "",
+        "human_apply_authorization_fingerprint": "e80ee4ee49ee2bff5c6e0b7e990c3d5d7162e18b5a73d76d80a623071273e951",
+        "human_apply_authorization_status": "authorized",
+        "human_approval_received": true,
+        "human_approval_required_for_execution": false,
+        "message": "You approved this exact candidate and execution was attempted, but validation failed. The patch was rolled back; no change remains.",
+        "mutation_observed": true,
+        "observed_changed_paths": [],
+        "patch": "{\n  \"summary\": \"Change advance in app.py as requested; awaiting Apply.\",\n  \"confidence\": 0.95,\n  \"needs_escalation\": false,\n  \"patch_basis\": \"explicit_change_request\",\n  \"patch_candidate\": {\n    \"file\": \"app.py\",\n    \"relative_path\": \"app.py\",\n    \"target_symbol\": \"advance\",\n    \"original_snippet\": \"def advance(value):\\n    return value + 1\\n\",\n    \"target_snippet\": \"def advance(value):\\n    return value + 1\\n\",\n    \"patched_snippet\": \"def advance(value):\\n    return value + 2\\n\",\n    \"confidence\": 0.95\n  },\n  \"human_approval_received\": true,\n  \"approved_candidate_fingerprint\": \"41fdae34c48d48c756bfdf9537e27ccd9c00f7c79213f956d843a52ce2921725\",\n  \"approved_eligibility_receipt_fingerprint\": \"\",\n  \"human_apply_authorization_status\": \"authorized\",\n  \"human_apply_authorization_denial_reason\": \"\",\n  \"human_apply_authorization\": {\n    \"schema_version\": \"exec_approval_live_1_authorization_v1\",\n    \"phase_id\": \"EXEC.APPROVAL.LIVE.1\",\n    \"candidate_fingerprint\": \"41fdae34c48d48c756bfdf9537e27ccd9c00f7c79213f956d843a52ce2921725\",\n    \"approved_candidate_fingerprint\": \"41fdae34c48d48c756bfdf9537e27ccd9c00f7c79213f956d843a52ce2921725\",\n    \"eligibility_receipt_fingerprint\": \"\",\n    \"approved_eligibility_receipt_fingerprint\": \"\",\n    \"policy_profile\": \"explicit_change_manual_review\",\n    \"human_action_kind\": \"apply\",\n    \"human_approval_received\": true,\n    \"freshness_status\": \"current\",\n    \"patch_safety_binding\": \"e39d9ddc3bf510d71cb6b645b56709538253564c4f7647499a7e5b8f7f602012\",\n    \"source_state_fingerprint\": \"\",\n    \"repository_identity\": \"repo-01b72b0230004b8131376b67a7f887c4\",\n    \"authorization_status\": \"authorized\",\n    \"denial_reason\": \"\",\n    \"authority_source\": \"manual_apply_action\",\n    \"review_receipt_fingerprint\": \"\",\n    \"timings\": {\n      \"freshness_revalidation_seconds\": 0.0,\n      \"authorization_total_seconds\": 0.000198\n    },\n    \"legacy_compatibility\": true,\n    \"authorization_receipt_fingerprint\": \"e80ee4ee49ee2bff5c6e0b7e990c3d5d7162e18b5a73d76d80a623071273e951\"\n  },\n  \"human_apply_authorization_fingerprint\": \"e80ee4ee49ee2bff5c6e0b7e990c3d5d7162e18b5a73d76d80a623071273e951\",\n  \"execution_telemetry_schema_version\": \"exec_auth_live_1_execution_telemetry_v1\",\n  \"authority_scope\": \"control_or_planning\",\n  \"execution_authorized\": true,\n  \"execution_authority_source\": \"manual_apply_action\",\n  \"execution_authorization_denied_reason\": \"\",\n  \"human_approval_required_for_execution\": false,\n  \"execution_attempted\": true,\n  \"mutation_observed\": true,\n  \"patch_applied\": false,\n  \"application_status\": \"rolled_back\",\n  \"rollback_performed\": true,\n  \"final_repository_changed\": false,\n  \"final_validation_outcome\": \"unavailable\",\n  \"final_state_observation\": \"plan_named_paths\",\n  \"observed_changed_paths\": [],\n  \"execution_summary\": \"Patch execution was authorized under a human apply action and attempted. Validation recorded no typed outcome. Changes were rolled back; the repository was restored.\",\n  \"execution_authorization\": {\n    \"execution_authorized\": true,\n    \"execution_authority_source\": \"manual_apply_action\",\n    \"execution_authorization_denied_reason\": \"\",\n    \"human_approval_required_for_execution\": false\n  },\n  \"execution_outcome\": {\n    \"execution_attempted\": true,\n    \"mutation_observed\": true,\n    \"patch_applied\": false,\n    \"application_status\": \"rolled_back\",\n    \"rollback_performed\": true,\n    \"final_repository_changed\": false,\n    \"final_validation_outcome\": \"unavailable\",\n    \"final_state_observation\": \"plan_named_paths\",\n    \"observed_changed_paths\": []\n  }\n}",
+        "patch_applied": false,
+        "patch_safety": {
+          "blocked_paths": [],
+          "ok": true,
+          "reasons": []
+        },
+        "risk": {
+          "level": "medium",
+          "reasons": [
+            "Patch applied via literal replace."
+          ],
+          "score": 2
+        },
+        "rollback_performed": true,
+        "success": false,
+        "validation": null,
+        "validation_command": "python -m pytest"
+      }
+    }
+  }
+}

@@ -1,0 +1,1370 @@
+{
+  "phase_id": "PATCH.AUTHOR.SCOPE.1",
+  "completed_on": "2026-09-22",
+  "previous_audit": {
+    "phase_id": "DOGFOOD.JAVA.2",
+    "thread_id": "01a0c307-add8-7131-9ea7-6d911149fc37",
+    "unchanged": true,
+    "result": "patch_candidate=null; needs_escalation=true; author refused multi-method scope"
+  },
+  "old_scope": "one primary definition; measured repair-set evidence was not represented as author capability",
+  "owner": "CandidateAuthoringContext.authoring_repair_scope",
+  "membership_owner": "PATCH.BASIS.SCOPE.1 RepairScope",
+  "primary_target": "MainApp.java::m1",
+  "editable_members": [
+    "MainApp.java::m1",
+    "MainApp.java::m2",
+    "MainApp.java::m3"
+  ],
+  "bounds": {
+    "max_definitions": 8,
+    "max_aggregate_source_bytes": 16384,
+    "max_replacement_envelope_bytes": 16384,
+    "max_canonical_projection_bytes": 65536
+  },
+  "single_member_contract_unchanged": true,
+  "initial_revision_parity": true,
+  "member_bindings_separate": true,
+  "source_read_is_not_edit_authority": true,
+  "no_new_candidate_representation": true,
+  "frozen_semantics": [
+    "PATCH.MINIMAL",
+    "PATCH.BASIS.TARGET.1",
+    "PATCH.BASIS.SCOPE.1",
+    "CONTROL.FRESH.1",
+    "CONTROL.BOOTSTRAP.1",
+    "PREFLIGHT.REQUEST.1",
+    "CANDIDATE.VERIFY",
+    "EXEC.APPROVAL",
+    "OPS.PATCH",
+    "DATA.UNDO",
+    "DATA.ROLLBACK",
+    "AUTH.DREAM",
+    "UI/security/mutation",
+    "Track A outside this authoring scope",
+    "T6 Round 11"
+  ],
+  "focused_live_provider_calls": 0,
+  "focused_external_network_calls": 0,
+  "scope_selection_model_calls_added": 0,
+  "deterministic_overhead": {
+    "construction_ms": {
+      "median": 23.075099976267666,
+      "max": 32.30369999073446
+    },
+    "render_ms": {
+      "median": 3.052600019145757,
+      "max": 21.57510002143681
+    },
+    "full_prompt_ms": {
+      "median": 68.06780002079904,
+      "max": 110.58139998931438
+    },
+    "validation_ms": {
+      "median": 10.179899982176721,
+      "max": 28.06919999420643
+    }
+  },
+  "baseline_attribution": [
+    {
+      "path": "core/control_engine.py",
+      "version": "entry",
+      "result": "AssertionError: ('core/control_engine.py', 'patch_author_live3_reversal.json')"
+    },
+    {
+      "path": "core/control_engine.py",
+      "version": "current",
+      "result": "AssertionError: ('core/control_engine.py', 'patch_author_live3_reversal.json')"
+    },
+    {
+      "path": "tests/test_phase_registry.py",
+      "version": "entry",
+      "result": "AssertionError: tests/test_phase_registry.py"
+    },
+    {
+      "path": "tests/test_phase_registry.py",
+      "version": "current",
+      "result": "AssertionError: tests/test_phase_registry.py"
+    }
+  ],
+  "definition_attribution": {
+    "core/control_engine.py": {
+      "changed": [
+        "enforce_control_grounding_on_payload",
+        "authoring_context_for_control_result",
+        "build_control_prompt"
+      ],
+      "added": []
+    },
+    "core/pipeline.py": {
+      "changed": [
+        "run_draft_pipeline",
+        "_maybe_revise_rejected_candidate",
+        "finalize_answer"
+      ],
+      "added": [
+        "_enforce_measured_authoring_scope"
+      ]
+    },
+    "core/candidate_revision.py": {
+      "changed": [
+        "parse_revised_candidate",
+        "build_revision_prompt"
+      ],
+      "added": []
+    },
+    "core/candidate_authoring_context.py": {
+      "changed": [
+        "CandidateAuthoringContext"
+      ],
+      "added": []
+    },
+    "core/patch_authoring_contract.py": {
+      "changed": [],
+      "added": [
+        "for_measured_repair_scope"
+      ]
+    }
+  },
+  "live_java": {
+    "phase_id": "PATCH.AUTHOR.SCOPE.1",
+    "task": "Help me check if the code in twosum.java and MainApp.java is ok, then fix them",
+    "target": "C:\\Users\\Admin\\Documents\\Code\\Side quest\\java",
+    "fresh_control": null,
+    "write_authority": false,
+    "execution_authorized": false,
+    "auto_apply": false,
+    "apply_invoked": false,
+    "human_approval_required": true,
+    "scope_selection_model_calls": 0,
+    "provider_calls": [
+      {
+        "kind": "bootstrap",
+        "prompt_sha256": "51c64cfc6625bf89549b325b0f60d87bfc8ec3b28464fa079636894c88ac1ce1",
+        "seconds": 3.024963299976662
+      },
+      {
+        "kind": "author",
+        "prompt_sha256": "fd677683442586caaf1d035b176a90d587da0d8f0438eb5e94cc136376f6799d",
+        "seconds": 86.24597029999131
+      }
+    ],
+    "candidate_produced": true,
+    "task_text_remains_generate_patch": true,
+    "repair_scope": {
+      "phase_id": "PATCH.BASIS.SCOPE.1",
+      "status": "complete",
+      "reason": "source_definition_order",
+      "primary_target": {
+        "file": "MainApp.java",
+        "symbol": "m1"
+      },
+      "members": [
+        {
+          "file": "MainApp.java",
+          "symbol": "m1",
+          "kind": "function",
+          "span": {
+            "start_line": 7,
+            "end_line": 13
+          },
+          "source_snippet": "void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }",
+          "diagnostics": [
+            {
+              "file": "MainApp.java",
+              "line": 12,
+              "col": 49,
+              "severity": "error",
+              "kind": "compiler_error",
+              "message": "cannot find symbol"
+            }
+          ]
+        },
+        {
+          "file": "MainApp.java",
+          "symbol": "m2",
+          "kind": "function",
+          "span": {
+            "start_line": 15,
+            "end_line": 21
+          },
+          "source_snippet": "void m2()\n    {\n        int no2 = 20;   //local variable\n        System.out.println(\"Result 4 : \"+(no2 + no));\n        System.out.println(\"Result 5 : \"+(no2 + no + sno));\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n    }",
+          "diagnostics": [
+            {
+              "file": "MainApp.java",
+              "line": 20,
+              "col": 49,
+              "severity": "error",
+              "kind": "compiler_error",
+              "message": "cannot find symbol"
+            }
+          ]
+        },
+        {
+          "file": "MainApp.java",
+          "symbol": "m3",
+          "kind": "function",
+          "span": {
+            "start_line": 23,
+            "end_line": 29
+          },
+          "source_snippet": "static void m3()\n    {\n        int no3 = 30;   //local variable\n        System.out.println(\"Result 7 : \"+(no3 + no));\n        System.out.println(\"Result 8 : \"+(no3 + sno));\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n    }",
+          "diagnostics": [
+            {
+              "file": "MainApp.java",
+              "line": 26,
+              "col": 49,
+              "severity": "error",
+              "kind": "compiler_error",
+              "message": "non-static variable no cannot be referenced from a static context"
+            },
+            {
+              "file": "MainApp.java",
+              "line": 28,
+              "col": 43,
+              "severity": "error",
+              "kind": "compiler_error",
+              "message": "cannot find symbol"
+            },
+            {
+              "file": "MainApp.java",
+              "line": 28,
+              "col": 49,
+              "severity": "error",
+              "kind": "compiler_error",
+              "message": "cannot find symbol"
+            }
+          ]
+        }
+      ],
+      "evidence_fingerprint": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e",
+      "source_fingerprint": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+      "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93",
+      "control_fingerprint": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+      "authority": {
+        "write_authority": false,
+        "execution_authorized": false,
+        "auto_apply": false
+      }
+    },
+    "crlf_result": "not_reached",
+    "java_candidate_validation": "not_reached",
+    "patch_minimal_result": "not_reached",
+    "candidate_fingerprint": "d39dae24f688357177abc41a40b915bdba4d1f08f8a6280800407313b8c8290f",
+    "authoring_scope_result": "authoring_scope_violation",
+    "first_remaining_blocker": "AUTHOR_OUTPUT_VALIDITY",
+    "elapsed_seconds": 97.53160610003397,
+    "all_target_files_unchanged": true
+  },
+  "live_authoring_scope": {
+    "phase_id": "PATCH.AUTHOR.SCOPE.1",
+    "file": "MainApp.java",
+    "primary_symbol": "m1",
+    "members": [
+      {
+        "file": "MainApp.java",
+        "symbol": "m1",
+        "kind": "function",
+        "span": {
+          "start_line": 7,
+          "end_line": 13
+        },
+        "source_snippet": "void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }",
+        "diagnostics": [
+          {
+            "file": "MainApp.java",
+            "line": 12,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          }
+        ],
+        "bindings": {
+          "available_baseline_bindings": [],
+          "proof_source_identities": [],
+          "source_path": "MainApp.java",
+          "source_sha256": "",
+          "target_source_sha256": "",
+          "target_symbol": "m1",
+          "version": "candidate_authoring_scope_v1"
+        }
+      },
+      {
+        "file": "MainApp.java",
+        "symbol": "m2",
+        "kind": "function",
+        "span": {
+          "start_line": 15,
+          "end_line": 21
+        },
+        "source_snippet": "void m2()\n    {\n        int no2 = 20;   //local variable\n        System.out.println(\"Result 4 : \"+(no2 + no));\n        System.out.println(\"Result 5 : \"+(no2 + no + sno));\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n    }",
+        "diagnostics": [
+          {
+            "file": "MainApp.java",
+            "line": 20,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          }
+        ],
+        "bindings": {
+          "available_baseline_bindings": [],
+          "proof_source_identities": [],
+          "source_path": "MainApp.java",
+          "source_sha256": "",
+          "target_source_sha256": "",
+          "target_symbol": "m2",
+          "version": "candidate_authoring_scope_v1"
+        }
+      },
+      {
+        "file": "MainApp.java",
+        "symbol": "m3",
+        "kind": "function",
+        "span": {
+          "start_line": 23,
+          "end_line": 29
+        },
+        "source_snippet": "static void m3()\n    {\n        int no3 = 30;   //local variable\n        System.out.println(\"Result 7 : \"+(no3 + no));\n        System.out.println(\"Result 8 : \"+(no3 + sno));\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n    }",
+        "diagnostics": [
+          {
+            "file": "MainApp.java",
+            "line": 26,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "non-static variable no cannot be referenced from a static context"
+          },
+          {
+            "file": "MainApp.java",
+            "line": 28,
+            "col": 43,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          },
+          {
+            "file": "MainApp.java",
+            "line": 28,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          }
+        ],
+        "bindings": {
+          "available_baseline_bindings": [],
+          "proof_source_identities": [],
+          "source_path": "MainApp.java",
+          "source_sha256": "",
+          "target_source_sha256": "",
+          "target_symbol": "m3",
+          "version": "candidate_authoring_scope_v1"
+        }
+      }
+    ],
+    "evidence_source": "PATCH.BASIS.SCOPE.1",
+    "evidence_fingerprint": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e",
+    "source_fingerprint": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+    "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93",
+    "control_fingerprint": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+    "replacement_source": "void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }\n\n    void m2()\n    {\n        int no2 = 20;   //local variable\n        System.out.println(\"Result 4 : \"+(no2 + no));\n        System.out.println(\"Result 5 : \"+(no2 + no + sno));\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n    }\n\n    static void m3()\n    {\n        int no3 = 30;   //local variable\n        System.out.println(\"Result 7 : \"+(no3 + no));\n        System.out.println(\"Result 8 : \"+(no3 + sno));\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n    }",
+    "write_authority": false,
+    "execution_authorized": false,
+    "auto_apply": false,
+    "human_approval_required": true
+  },
+  "live_authoring_prompt": "You are a verifier/patch writer inside an agentic coding system.\n\n[STYLE & CONSTRAINTS — authoritative, overrides later rules]\nPATCH STYLE: safe_minimal\n- allow_new_api: False\n- allow_multifile_patch: False\n- patch_basis: grounded_defect\n- patch_basis_accepted: True\n- auto_apply_allowed: False\n- human_approval_required: True\n\nPatch style rules:\n- Use only APIs, fields, functions, and classes already present in the provided context.\n- Do not introduce new fields, methods, classes, imports, or framework assumptions.\n- Prefer the smallest single-file edit.\n- If a safe patch requires missing context, set needs_escalation=true.\n\nSAFE_MINIMAL — HARD CONSTRAINTS:\nCandidate references must come from authoritative baseline bindings shown in\nAUTHORITATIVE AUTHORING SCOPE, permitted bounded candidate-local bindings, or\nthe gate's existing source-snippet, language-keyword and supported-builtin classes.\nBaseline locals remain subject to initialization and lexical shadowing; their\npresence does not prove a value at an arbitrary point in the function.\nA proven repository-local immutable result may expose its declared read-only\ndata fields. This permission is limited to proven reads in bounded straight-line\nreturn expressions, directly or through a single unaliased local assignment\nbefore use. It grants no new method, property, chained member, field call, write,\ndelete, module-namespace or dynamic access permission.\nCandidate-local novelty remains bounded by PATCH.MINIMAL; it does not permit\nnew external capabilities. Deterministic PATCH.MINIMAL remains final authority.\n\nFORBIDDEN in patched_snippet:\n- Unproven new external references or member capabilities.\n- New imports, new helper functions, new type declarations.\n- Behavioural redesign — only fix the literal bug.\n\nIf a correct fix would require any of the above:\n  set patch_candidate=null, confidence<=0.3, needs_escalation=true,\n  and explain in `summary` what is missing from context.\n\n[MEASURED REPAIR-SET AUTHORING CONTRACT]\nYou may draft changes inside exactly the measured repair members in\nAUTHORITATIVE AUTHORING SCOPE. The primary target remains separate and unchanged.\nAccount for all associated compiler diagnostics; you need not edit every member.\nMember-local bindings belong only to their named member. Proven file imports\nretain their existing read capabilities; no import modification is authorized.\nVisible context and the source between members are read-only.\nUse the existing single-file patch_candidate shape. Keep target_node_name equal\nto the primary symbol. target_snippet may quote replacement_source verbatim, or\na unique bounded portion of it. Preserve every byte outside the measured members\nin patched_snippet, including intervening definitions and whitespace.\nNo new definitions, files, imports or extra targets may be proposed.\nThe measured set is permitted for drafting even when it contains several methods.\nDraft permission does not certify safety, minimality or completeness.\nExisting PATCH.MINIMAL (including its one-function limit), verification and human\napproval remain downstream authorities and may reject this draft.\nwrite_authority=false; execution_authorized=false; auto_apply=false.\n\nAUTHORITATIVE AUTHORING SCOPE:\n{\n  \"authoring_repair_scope\": {\n    \"auto_apply\": false,\n    \"control_fingerprint\": \"8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a\",\n    \"evidence_fingerprint\": \"0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e\",\n    \"evidence_source\": \"PATCH.BASIS.SCOPE.1\",\n    \"execution_authorized\": false,\n    \"file\": \"MainApp.java\",\n    \"human_approval_required\": true,\n    \"members\": [\n      {\n        \"bindings\": {\n          \"available_baseline_bindings\": [],\n          \"proof_source_identities\": [],\n          \"source_path\": \"MainApp.java\",\n          \"source_sha256\": \"\",\n          \"target_source_sha256\": \"\",\n          \"target_symbol\": \"m1\",\n          \"version\": \"candidate_authoring_scope_v1\"\n        },\n        \"diagnostics\": [\n          {\n            \"col\": 49,\n            \"file\": \"MainApp.java\",\n            \"kind\": \"compiler_error\",\n            \"line\": 12,\n            \"message\": \"cannot find symbol\",\n            \"severity\": \"error\"\n          }\n        ],\n        \"file\": \"MainApp.java\",\n        \"kind\": \"function\",\n        \"source_snippet\": \"void m1()\\n    {\\n        int no1 = 10;   //local variable\\n        System.out.println(\\\"Result 1 : \\\"+(no1 + no));\\n        System.out.println(\\\"Result 2 : \\\"+(no1 + no + sno));\\n        System.out.println(\\\"Result 3 : \\\"+(no1 + no2));\\n    }\",\n        \"span\": {\n          \"end_line\": 13,\n          \"start_line\": 7\n        },\n        \"symbol\": \"m1\"\n      },\n      {\n        \"bindings\": {\n          \"available_baseline_bindings\": [],\n          \"proof_source_identities\": [],\n          \"source_path\": \"MainApp.java\",\n          \"source_sha256\": \"\",\n          \"target_source_sha256\": \"\",\n          \"target_symbol\": \"m2\",\n          \"version\": \"candidate_authoring_scope_v1\"\n        },\n        \"diagnostics\": [\n          {\n            \"col\": 49,\n            \"file\": \"MainApp.java\",\n            \"kind\": \"compiler_error\",\n            \"line\": 20,\n            \"message\": \"cannot find symbol\",\n            \"severity\": \"error\"\n          }\n        ],\n        \"file\": \"MainApp.java\",\n        \"kind\": \"function\",\n        \"source_snippet\": \"void m2()\\n    {\\n        int no2 = 20;   //local variable\\n        System.out.println(\\\"Result 4 : \\\"+(no2 + no));\\n        System.out.println(\\\"Result 5 : \\\"+(no2 + no + sno));\\n        System.out.println(\\\"Result 6 : \\\"+(no2 + no1));\\n    }\",\n        \"span\": {\n          \"end_line\": 21,\n          \"start_line\": 15\n        },\n        \"symbol\": \"m2\"\n      },\n      {\n        \"bindings\": {\n          \"available_baseline_bindings\": [],\n          \"proof_source_identities\": [],\n          \"source_path\": \"MainApp.java\",\n          \"source_sha256\": \"\",\n          \"target_source_sha256\": \"\",\n          \"target_symbol\": \"m3\",\n          \"version\": \"candidate_authoring_scope_v1\"\n        },\n        \"diagnostics\": [\n          {\n            \"col\": 49,\n            \"file\": \"MainApp.java\",\n            \"kind\": \"compiler_error\",\n            \"line\": 26,\n            \"message\": \"non-static variable no cannot be referenced from a static context\",\n            \"severity\": \"error\"\n          },\n          {\n            \"col\": 43,\n            \"file\": \"MainApp.java\",\n            \"kind\": \"compiler_error\",\n            \"line\": 28,\n            \"message\": \"cannot find symbol\",\n            \"severity\": \"error\"\n          },\n          {\n            \"col\": 49,\n            \"file\": \"MainApp.java\",\n            \"kind\": \"compiler_error\",\n            \"line\": 28,\n            \"message\": \"cannot find symbol\",\n            \"severity\": \"error\"\n          }\n        ],\n        \"file\": \"MainApp.java\",\n        \"kind\": \"function\",\n        \"source_snippet\": \"static void m3()\\n    {\\n        int no3 = 30;   //local variable\\n        System.out.println(\\\"Result 7 : \\\"+(no3 + no));\\n        System.out.println(\\\"Result 8 : \\\"+(no3 + sno));\\n        System.out.println(\\\"Result 9 : \\\"+(no1 + no2 + no3));\\n    }\",\n        \"span\": {\n          \"end_line\": 29,\n          \"start_line\": 23\n        },\n        \"symbol\": \"m3\"\n      }\n    ],\n    \"phase_id\": \"PATCH.AUTHOR.SCOPE.1\",\n    \"primary_symbol\": \"m1\",\n    \"replacement_source\": \"void m1()\\n    {\\n        int no1 = 10;   //local variable\\n        System.out.println(\\\"Result 1 : \\\"+(no1 + no));\\n        System.out.println(\\\"Result 2 : \\\"+(no1 + no + sno));\\n        System.out.println(\\\"Result 3 : \\\"+(no1 + no2));\\n    }\\n\\n    void m2()\\n    {\\n        int no2 = 20;   //local variable\\n        System.out.println(\\\"Result 4 : \\\"+(no2 + no));\\n        System.out.println(\\\"Result 5 : \\\"+(no2 + no + sno));\\n        System.out.println(\\\"Result 6 : \\\"+(no2 + no1));\\n    }\\n\\n    static void m3()\\n    {\\n        int no3 = 30;   //local variable\\n        System.out.println(\\\"Result 7 : \\\"+(no3 + no));\\n        System.out.println(\\\"Result 8 : \\\"+(no3 + sno));\\n        System.out.println(\\\"Result 9 : \\\"+(no1 + no2 + no3));\\n    }\",\n    \"repository_id\": \"java-f0fc418b6355ebbe9c8fbcb27b899b93\",\n    \"source_fingerprint\": \"6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39\",\n    \"write_authority\": false\n  },\n  \"source_path\": \"MainApp.java\",\n  \"target_symbol\": \"m1\",\n  \"version\": \"candidate_authoring_scope_v2\"\n}\n\n[REPO STYLE HINT — lower priority than correctness]\nREPO STYLE: indent=4space, naming=mixed, line~60c, brace=allman, avg_func~13l. Match this in patched_snippet.\n\n[STYLE RULE]\n- Match repo style when writing patched_snippet: indentation, naming convention, brace/comment style.\n- Correctness > grounding > validation > style.\n\n[PATCH OUTPUT FORMAT — safe_minimal]\nUse patch_candidate ONLY. Do NOT emit patch_plan. Do NOT create files.\nIf the fix would require new files or multi-file changes, set\npatch_candidate=null and needs_escalation=true.\n\npatch_candidate (single-file existing-code fix):\n{\n  \"patch_candidate\": {\n    \"file\": \"...\",\n    \"relative_path\": \"...\",\n    \"target_node_name\": \"...\",\n    \"target_node_kind\": \"function|class\",\n    \"target_snippet\": \"...\",\n    \"patched_snippet\": \"...\"\n  }\n}\n\npatch_plan (multi-file or new-file work):\n{\n  \"patch_plan\": [\n    {\"op\": \"create_file\",     \"relative_path\": \"src/aml.rs\", \"content\": \"...\"},\n    {\"op\": \"replace_snippet\", \"relative_path\": \"src/main.rs\",\n     \"target_snippet\": \"mod agent;\",\n     \"patched_snippet\": \"mod agent;\\nmod aml;\"}\n  ]\n}\n\nRules:\n- Output EITHER patch_candidate OR patch_plan, never both.\n- Use patch_candidate only when editing one existing file.\n- Use patch_plan when creating files, editing multiple files, or changing APIs across files.\n- Every relative_path MUST stay inside the repo (no absolute paths, no '..').\n- Every patch_candidate.target_snippet must be an exact quote from the target file.\n- If it is not found, reject/demote the candidate before final result.\n\nsafe_minimal-specific: patch_plan is FORBIDDEN. Single existing file or escalate.\n\n[CONTROL]\nsymbol=MainApp.java::m1\nissue_hint=Compilation error due to undefined variable usage\nlocalization_score=0.0\nlocalization_strength=weak\nconfidence_kind=localization_rank_legacy\ndefect_established=True\naction=grounded_defect_candidate\nlanguage=java\nlocalization_reasons=The variable 'no2' is used in m1() but is not defined in the scope of m1() or as\n\n\n[PATCH TARGET]\nfile=MainApp.java\nsymbol=m1\nkind=function\n\nsource_snippet:\n```java\nvoid m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }\n```\n\n[MEASURED REPAIR SCOPE — authoritative compiler evidence]\nReceipt-bound sources and member diagnostics are projected without alteration in AUTHORITATIVE AUTHORING SCOPE above.\n\n[RELATED CONTEXT — evidence only, do not patch directly unless PATCH TARGET changes]\n--- RELATED SNIPPET [1] ---\nrole=requested_target\nfile=Twosum.java\nsymbol=\n\n```java\nimport java.util.HashMap;\nimport java.util.Map;\n\nclass Solution{\n    public int[] twoSum(int[] nums, int target){\n        Map<Integer, Integer> map = new HashMap<>();\n\n        for (int i = 0; i < nums.length; i++){\n            int complement = target - nums[i];\n            if (map.containsKey(complement)){\n                return new int[] { map.get(complement), i};\n            }\n            map.put(nums[i], i);\n        }\n        return new int[] {};\n    }\n}\n\npublic class Twosum{\n    public static void main(String[] args){\n        Solution solver = new Solution();\n        int[] result = solver.twoSum(new int[]{3, 2, 4}, 6);\n\n        System.out.println(\"Result: [\" + result[0] + \",\" + result[1] + \"]\");\n    }\n}\n```\n\n--- RELATED SNIPPET [2] ---\nrole=requested_target\nfile=MainApp.java\nsymbol=\n\n```java\npublic class MainApp\n{\n    int no = 100;   //instance variable\n\n    static int sno = 200;   //static variable\n\n    void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }\n\n    void m2()\n    {\n        int no2 = 20;   //local variable\n        System.out.println(\"Result 4 : \"+(no2 + no));\n        System.out.println(\"Result 5 : \"+(no2 + no + sno));\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n    }\n\n    static void m3()\n    {\n        int no3 = 30;   //local variable\n        System.out.println(\"Result 7 : \"+(no3 + no));\n        System.out.println(\"Result 8 : \"+(no3 + sno));\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n    }\n\n    public static void main(String[] args)\n    {\n        MainApp obj = new MainApp();\n        obj.m1();\n        obj.m2();\n\n        MainApp.m3();  //static method can be directly called by class name\n    }\n}\n\n```\n\n[PHANTOM LIMB SUGGESTIONS - structural hints, not proof]\nNo phantom limb suggestions.\n\n[USER]\nGenerate patch\n\n[RULES]\n\nStyle block above is authoritative.\nUse the measured repair-set contract's bounded replacement_source quotation rules.\nMake the smallest edit that satisfies constraints.\nPATCH TARGET remains the primary grounded target; editing every member is not required.\nWhen [MEASURED REPAIR SCOPE] is present, its exact members are the only\nadditional same-file definitions the compiler receipt grounds for this repair.\nDo not add a file or definition because it is adjacent, a sibling, or otherwise\nappears related.  The source and diagnostics in that section are authoritative.\nDo not invent identifiers unless style explicitly permits it.\nIf source does not support a safe fix, return patch_candidate=null and needs_escalation=true.\nOnly a genuine executed preflight failure may ground a defect; inconclusive or passing validation may not.\nFix compile/build errors before guessing runtime/gameplay logic.\nDo not speculate about architecture or behavior until compiler/runtime errors are resolved.\nIf preflight stack trace points to a callee and the current source_snippet is the caller, infer the smallest caller-side fix first.\nFor TypeError caused by primitive/object argument mismatch, prefer reordering existing arguments before changing function bodies.\nIf the patch can be made by reordering identifiers already present in source_snippet, it is allowed in safe_minimal.\nRELATED CONTEXT is evidence only for normal bug-fix tasks.\nUse RELATED CONTEXT to verify callees, signatures, tests, and stack traces.\nReturn ONLY valid JSON matching this schema:\n\nReturn JSON:\n{\n  \"summary\": \"...\",\n  \"issues\": [...],\n  \"patch_candidate\": null | {...},\n  \"patch_plan\": null | [\n    {\"op\": \"create_file\", \"relative_path\": \"...\", \"content\": \"...\"},\n    {\"op\": \"replace_snippet\", \"relative_path\": \"...\", \"target_snippet\": \"...\", \"patched_snippet\": \"...\"}\n  ],\n  \"confidence\": 0.0,\n  \"needs_escalation\": false\n}\n\n\n[PREFLIGHT VALIDATION]\n{\n  \"ran\": true,\n  \"ok\": false,\n  \"outcome\": \"failed\",\n  \"category\": \"build_error\",\n  \"command\": \"javac -J-Duser.language=en -J-Duser.country=US -J-XX:-UsePerfData -J-Dstdout.encoding=UTF-8 -J-Dstderr.encoding=UTF-8 -encoding UTF-8 -proc:none -implicit:none -sourcepath <isolated-empty> -classpath <isolated-empty> -d <isolated-output> -Xmaxerrs 100 -Xmaxwarns 100 MainApp.java\",\n  \"reason\": \"Compilation failed under the recorded javac invocation for: MainApp.java.\",\n  \"hint\": \"Measured by PREFLIGHT.REQUEST.1. A compiler result is not behavioral, test or patch evidence.\",\n  \"output\": \"MainApp.java:12: error: cannot find symbol\\n        System.out.println(\\\"Result 3 : \\\"+(no1 + no2));\\n                                                ^\\n  symbol:   variable no2\\n  location: class MainApp\\nMainApp.java:20: error: cannot find symbol\\n        System.out.println(\\\"Result 6 : \\\"+(no2 + no1));\\n                                                ^\\n  symbol:   variable no1\\n  location: class MainApp\\nMainApp.java:26: error: non-static variable no cannot be referenced from a static context\\n        System.out.println(\\\"Result 7 : \\\"+(no3 + no));\\n                                                ^\\nMainApp.java:28: error: cannot find symbol\\n        System.out.println(\\\"Result 9 : \\\"+(no1 + no2 + no3));\\n                                          ^\\n  symbol:   variable no1\\n  location: class MainApp\\nMainApp.java:28: error: cannot find symbol\\n        System.out.println(\\\"Result 9 : \\\"+(no1 + no2 + no3));\\n                                                ^\\n  symbol:   variable no2\\n  location: class MainApp\\n5 errors\\n\",\n  \"locations\": [\n    {\n      \"kind\": \"compiler_error\",\n      \"language\": \"java\",\n      \"file\": \"MainApp.java\",\n      \"line\": 12,\n      \"col\": 49,\n      \"severity\": \"error\",\n      \"message\": \"cannot find symbol\"\n    },\n    {\n      \"kind\": \"compiler_error\",\n      \"language\": \"java\",\n      \"file\": \"MainApp.java\",\n      \"line\": 20,\n      \"col\": 49,\n      \"severity\": \"error\",\n      \"message\": \"cannot find symbol\"\n    },\n    {\n      \"kind\": \"compiler_error\",\n      \"language\": \"java\",\n      \"file\": \"MainApp.java\",\n      \"line\": 26,\n      \"col\": 49,\n      \"severity\": \"error\",\n      \"message\": \"non-static variable no cannot be referenced from a static context\"\n    },\n    {\n      \"kind\": \"compiler_error\",\n      \"language\": \"java\",\n      \"file\": \"MainApp.java\",\n      \"line\": 28,\n      \"col\": 43,\n      \"severity\": \"error\",\n      \"message\": \"cannot find symbol\"\n    },\n    {\n      \"kind\": \"compiler_error\",\n      \"language\": \"java\",\n      \"file\": \"MainApp.java\",\n      \"line\": 28,\n      \"col\": 49,\n      \"severity\": \"error\",\n      \"message\": \"cannot find symbol\"\n    }\n  ],\n  \"timed_out\": false,\n  \"timeout_seconds\": 60,\n  \"validation_budget_exhausted\": false,\n  \"python_bytecode_cache_isolated\": false,\n  \"evidence_source\": \"PREFLIGHT.REQUEST.1\",\n  \"evidence_kind\": \"compile_evidence\",\n  \"measured\": true,\n  \"adapter\": \"java_compile_diagnostic/1\",\n  \"tool_version\": \"javac 26.0.2.1\",\n  \"receipt_fingerprint\": \"0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e\",\n  \"control_sha256\": \"8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a\",\n  \"repository_id\": \"java-f0fc418b6355ebbe9c8fbcb27b899b93\",\n  \"source_fingerprints\": [\n    {\n      \"path\": \"MainApp.java\",\n      \"sha256\": \"6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39\"\n    }\n  ],\n  \"compile_mode\": \"independent_per_target\",\n  \"targets\": [\n    {\n      \"path\": \"MainApp.java\",\n      \"outcome\": \"compile_failed\",\n      \"reason\": \"\",\n      \"compile_mode\": \"independent\",\n      \"errors\": 5,\n      \"warnings\": 0\n    }\n  ],\n  \"semantics\": \"compile_passed proves only that a target compiled under the recorded javac invocation and environment; it does not establish behavioral correctness, test results or patch correctness. compile_failed proves only that compilation failed under that invocation; it does not decide which change is correct. Neither grants patch, write, execution or approval authority.\",\n  \"authority\": {\n    \"write_authority\": false,\n    \"patch_authority\": false,\n    \"execution_authorized\": false,\n    \"patch_applied\": false,\n    \"human_approval_granted\": false\n  }\n}",
+  "live_author_output": {
+    "summary": "The patch addresses multiple compilation errors related to undefined or inaccessible variables within methods `m1`, `m2`, and `m3`. Specifically, it resolves 'cannot find symbol' errors for `no2` in `m1`, `no1` in `m2`, and `no1`, `no2` in `m3`. It also fixes a 'non-static variable cannot be referenced from a static context' error for `no` in `m3`. The fix is implemented by minimally removing the problematic variable references from the arithmetic expressions, ensuring the code compiles without introducing new variables, changing variable scopes, or altering method signatures, in adherence to `safe_minimal` constraints.",
+    "issues": [
+      {
+        "file": "MainApp.java",
+        "line": 12,
+        "col": 49,
+        "kind": "compiler_error",
+        "message": "cannot find symbol: variable no2"
+      },
+      {
+        "file": "MainApp.java",
+        "line": 20,
+        "col": 49,
+        "kind": "compiler_error",
+        "message": "cannot find symbol: variable no1"
+      },
+      {
+        "file": "MainApp.java",
+        "line": 26,
+        "col": 49,
+        "kind": "compiler_error",
+        "message": "non-static variable no cannot be referenced from a static context"
+      },
+      {
+        "file": "MainApp.java",
+        "line": 28,
+        "col": 43,
+        "kind": "compiler_error",
+        "message": "cannot find symbol: variable no1"
+      },
+      {
+        "file": "MainApp.java",
+        "line": 28,
+        "col": 49,
+        "kind": "compiler_error",
+        "message": "cannot find symbol: variable no2"
+      }
+    ],
+    "patch_candidate": {
+      "file": "MainApp.java",
+      "relative_path": "MainApp.java",
+      "target_node_name": "m1",
+      "target_node_kind": "function",
+      "target_snippet": "void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }",
+      "patched_snippet": "void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1));\n    }\n\n    void m2()\n    {\n        int no2 = 20;   //local variable\n        System.out.println(\"Result 4 : \"+(no2 + no));\n        System.out.println(\"Result 5 : \"+(no2 + no + sno));\n        System.out.println(\"Result 6 : \"+(no2));\n    }\n\n    static void m3()\n    {\n        int no3 = 30;   //local variable\n        System.out.println(\"Result 7 : \"+(no3));\n        System.out.println(\"Result 8 : \"+(no3 + sno));\n        System.out.println(\"Result 9 : \"+(no3));\n    }"
+    },
+    "patch_plan": null,
+    "confidence": 1.0,
+    "needs_escalation": false
+  },
+  "live_post_authoring_gate": {
+    "summary": "The patch addresses multiple compilation errors related to undefined or inaccessible variables within methods `m1`, `m2`, and `m3`. Specifically, it resolves 'cannot find symbol' errors for `no2` in `m1`, `no1` in `m2`, and `no1`, `no2` in `m3`. It also fixes a 'non-static variable cannot be referenced from a static context' error for `no` in `m3`. The fix is implemented by minimally removing the problematic variable references from the arithmetic expressions, ensuring the code compiles without introducing new variables, changing variable scopes, or altering method signatures, in adherence to `safe_minimal` constraints.",
+    "issues": [
+      {
+        "file": "MainApp.java",
+        "line": 12,
+        "col": 49,
+        "kind": "compiler_error",
+        "message": "cannot find symbol: variable no2"
+      },
+      {
+        "file": "MainApp.java",
+        "line": 20,
+        "col": 49,
+        "kind": "compiler_error",
+        "message": "cannot find symbol: variable no1"
+      },
+      {
+        "file": "MainApp.java",
+        "line": 26,
+        "col": 49,
+        "kind": "compiler_error",
+        "message": "non-static variable no cannot be referenced from a static context"
+      },
+      {
+        "file": "MainApp.java",
+        "line": 28,
+        "col": 43,
+        "kind": "compiler_error",
+        "message": "cannot find symbol: variable no1"
+      },
+      {
+        "file": "MainApp.java",
+        "line": 28,
+        "col": 49,
+        "kind": "compiler_error",
+        "message": "cannot find symbol: variable no2"
+      }
+    ],
+    "patch_candidate": null,
+    "patch_plan": null,
+    "confidence": 1.0,
+    "needs_escalation": true,
+    "authoring_scope_status": "authoring_scope_violation",
+    "authoring_scope_candidate_fingerprint": "d39dae24f688357177abc41a40b915bdba4d1f08f8a6280800407313b8c8290f"
+  },
+  "live_provider_usage": {
+    "bootstrap": {
+      "summary": {
+        "attempts": 1,
+        "fallback_count": 0,
+        "selected_model": "gemini-3.1-flash-lite",
+        "models_by_role": {
+          "draft": "gemini-3.1-flash-lite"
+        },
+        "input_tokens": 1602,
+        "output_tokens": 347,
+        "total_tokens": 1949,
+        "estimated_cost_usd": 0.000921,
+        "costed_calls": 1,
+        "unknown_cost_calls": 0,
+        "by_role": {
+          "draft": {
+            "calls": 1,
+            "input_tokens": 1602,
+            "output_tokens": 347,
+            "total_tokens": 1949,
+            "estimated_cost_usd": 0.000921
+          }
+        }
+      },
+      "calls": [
+        {
+          "call": 1,
+          "model": "gemini-3.1-flash-lite",
+          "provider": "google",
+          "role": "draft",
+          "success": true,
+          "input_tokens": 1602,
+          "output_tokens": 347,
+          "total_tokens": 1949,
+          "estimated_cost_usd": 0.000921,
+          "cost_rates_per_1m": {
+            "input": 0.25,
+            "output": 1.5
+          },
+          "cost_source": "google_gemini_paid_standard_2026-05-18"
+        }
+      ]
+    },
+    "author": {
+      "summary": {
+        "attempts": 4,
+        "fallback_count": 3,
+        "selected_model": "gemini-2.5-flash",
+        "models_by_role": {
+          "draft": "gemini-2.5-flash"
+        },
+        "input_tokens": 5910,
+        "output_tokens": 5269,
+        "total_tokens": 11179,
+        "estimated_cost_usd": 0.0149455,
+        "costed_calls": 1,
+        "unknown_cost_calls": 0,
+        "by_role": {
+          "draft": {
+            "calls": 4,
+            "input_tokens": 5910,
+            "output_tokens": 5269,
+            "total_tokens": 11179,
+            "estimated_cost_usd": 0.0149455
+          }
+        }
+      },
+      "calls": [
+        {
+          "call": 1,
+          "model": "gemini-3.1-flash-lite",
+          "provider": "google",
+          "role": "draft",
+          "success": false,
+          "cost_rates_per_1m": {
+            "input": 0.25,
+            "output": 1.5
+          },
+          "cost_source": "google_gemini_paid_standard_2026-05-18",
+          "cost_note": "token_usage_unavailable",
+          "error": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+        },
+        {
+          "call": 2,
+          "model": "gemini-3-flash-preview",
+          "provider": "google",
+          "role": "draft",
+          "success": false,
+          "cost_rates_per_1m": {
+            "input": 0.5,
+            "output": 3.0
+          },
+          "cost_source": "google_gemini_paid_standard_2026-05-18",
+          "cost_note": "token_usage_unavailable",
+          "error": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+        },
+        {
+          "call": 3,
+          "model": "gemini-2.5-flash-lite",
+          "provider": "google",
+          "role": "draft",
+          "success": false,
+          "cost_rates_per_1m": {
+            "input": 0.1,
+            "output": 0.4
+          },
+          "cost_source": "google_gemini_paid_standard_2026-05-18",
+          "cost_note": "token_usage_unavailable",
+          "error": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+        },
+        {
+          "call": 4,
+          "model": "gemini-2.5-flash",
+          "provider": "google",
+          "role": "draft",
+          "success": true,
+          "input_tokens": 5910,
+          "output_tokens": 5269,
+          "total_tokens": 11179,
+          "thinking_tokens": 4341,
+          "estimated_cost_usd": 0.0149455,
+          "cost_rates_per_1m": {
+            "input": 0.3,
+            "output": 2.5
+          },
+          "cost_source": "google_gemini_paid_standard_2026-05-18"
+        }
+      ]
+    }
+  },
+  "live_preflight_receipt": {
+    "phase_id": "PREFLIGHT.REQUEST.1",
+    "schema_version": "preflight_request_v1",
+    "status": "evidence_measured",
+    "reason": "",
+    "repository": {
+      "canonical_root": "C:\\Users\\Admin\\Documents\\Code\\Side quest\\java",
+      "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93"
+    },
+    "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+    "cycles": 1,
+    "requested_evidence": [
+      {
+        "kind": "compile_evidence",
+        "targets": [
+          "MainApp.java"
+        ],
+        "language": "java",
+        "reason": "The code in MainApp.java contains multiple scope and static context errors that prevent compilation.",
+        "provenance": "evidence_gaps[0]",
+        "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+        "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93",
+        "identity": "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc"
+      }
+    ],
+    "rejected_evidence": [],
+    "ignored_item_keys": [],
+    "policy": [
+      {
+        "provenance": "evidence_gaps[0]",
+        "identity": "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc",
+        "kind": "compile_evidence",
+        "decision": "admitted",
+        "reason": "",
+        "adapter": "java_compile_diagnostic"
+      }
+    ],
+    "source_freshness": {
+      "MainApp.java": "fresh"
+    },
+    "diagnostics": [
+      {
+        "schema_version": "preflight_request_v1",
+        "phase_id": "PREFLIGHT.REQUEST.1",
+        "evidence_kind": "compile_evidence",
+        "adapter": {
+          "id": "java_compile_diagnostic",
+          "version": "1"
+        },
+        "tool": "javac",
+        "tool_version": "javac 26.0.2.1",
+        "tool_available": true,
+        "attempted": true,
+        "outcome": "compile_failed",
+        "reason": "",
+        "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93",
+        "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+        "need_identities": [
+          "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc"
+        ],
+        "compile_mode": "independent_per_target",
+        "working_directory": "repository_root",
+        "environment_keys": [
+          "PATH",
+          "SYSTEMDRIVE",
+          "SYSTEMROOT",
+          "TEMP",
+          "TMP",
+          "TMPDIR",
+          "WINDIR"
+        ],
+        "version_probe": {
+          "attempted": true,
+          "exit_status": 0,
+          "timed_out": false,
+          "elapsed_ms": 936.073
+        },
+        "targets": [
+          {
+            "path": "MainApp.java",
+            "language": "java",
+            "source_sha256": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+            "attempted": true,
+            "outcome": "compile_failed",
+            "reason": "",
+            "compile_mode": "independent",
+            "group": [],
+            "independent_outcome": null,
+            "exit_status": 1,
+            "timed_out": false,
+            "elapsed_ms": 1940.475,
+            "error_count": 5,
+            "warning_count": 0,
+            "diagnostics": [
+              {
+                "file": "MainApp.java",
+                "reported_file": "MainApp.java",
+                "line": 12,
+                "column": 49,
+                "severity": "error",
+                "message": "cannot find symbol",
+                "text": "MainApp.java:12: error: cannot find symbol\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp"
+              },
+              {
+                "file": "MainApp.java",
+                "reported_file": "MainApp.java",
+                "line": 20,
+                "column": 49,
+                "severity": "error",
+                "message": "cannot find symbol",
+                "text": "MainApp.java:20: error: cannot find symbol\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n                                                ^\n  symbol:   variable no1\n  location: class MainApp"
+              },
+              {
+                "file": "MainApp.java",
+                "reported_file": "MainApp.java",
+                "line": 26,
+                "column": 49,
+                "severity": "error",
+                "message": "non-static variable no cannot be referenced from a static context",
+                "text": "MainApp.java:26: error: non-static variable no cannot be referenced from a static context\n        System.out.println(\"Result 7 : \"+(no3 + no));\n                                                ^"
+              },
+              {
+                "file": "MainApp.java",
+                "reported_file": "MainApp.java",
+                "line": 28,
+                "column": 43,
+                "severity": "error",
+                "message": "cannot find symbol",
+                "text": "MainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                          ^\n  symbol:   variable no1\n  location: class MainApp"
+              },
+              {
+                "file": "MainApp.java",
+                "reported_file": "MainApp.java",
+                "line": 28,
+                "column": 49,
+                "severity": "error",
+                "message": "cannot find symbol",
+                "text": "MainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp"
+              }
+            ],
+            "stdout": {
+              "bytes_total": 0,
+              "bytes_captured": 0,
+              "truncated": false,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "text": ""
+            },
+            "stderr": {
+              "bytes_total": 1029,
+              "bytes_captured": 1029,
+              "truncated": false,
+              "sha256": "208f28e428d317061a2a76297a2f78ac5ce5bb51e2cf77890f11c3a0875218ca",
+              "text": "MainApp.java:12: error: cannot find symbol\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp\nMainApp.java:20: error: cannot find symbol\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n                                                ^\n  symbol:   variable no1\n  location: class MainApp\nMainApp.java:26: error: non-static variable no cannot be referenced from a static context\n        System.out.println(\"Result 7 : \"+(no3 + no));\n                                                ^\nMainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                          ^\n  symbol:   variable no1\n  location: class MainApp\nMainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp\n5 errors\n"
+            },
+            "invocation": "javac -J-Duser.language=en -J-Duser.country=US -J-XX:-UsePerfData -J-Dstdout.encoding=UTF-8 -J-Dstderr.encoding=UTF-8 -encoding UTF-8 -proc:none -implicit:none -sourcepath <isolated-empty> -classpath <isolated-empty> -d <isolated-output> -Xmaxerrs 100 -Xmaxwarns 100 MainApp.java"
+          }
+        ],
+        "exit_statuses": {
+          "MainApp.java": 1
+        },
+        "process_timeout_seconds": 60.0,
+        "timing_ms": {
+          "adapter_construction": 6.336,
+          "tool_probe": 936.073,
+          "process_launch": 97.341,
+          "process_wait": 1843.134,
+          "normalization": 1.334,
+          "cleanup": 8.195,
+          "total": 2897.023
+        },
+        "operational_warnings": [],
+        "semantics": "compile_passed proves only that a target compiled under the recorded javac invocation and environment; it does not establish behavioral correctness, test results or patch correctness. compile_failed proves only that compilation failed under that invocation; it does not decide which change is correct. Neither grants patch, write, execution or approval authority.",
+        "authority": {
+          "write_authority": false,
+          "patch_authority": false,
+          "execution_authorized": false,
+          "patch_applied": false,
+          "human_approval_granted": false
+        },
+        "evidence_fingerprint": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e"
+      }
+    ],
+    "need_receipts": {
+      "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e"
+    },
+    "handoff": {
+      "attached": true,
+      "field": "preflight_validation",
+      "outcome": "failed",
+      "category": "build_error"
+    },
+    "timing_ms": {
+      "policy": 1.42,
+      "freshness": 0.888,
+      "total": 2904.459,
+      "harness_overhead": 27.911
+    },
+    "executable_commands_accepted": 0,
+    "model_calls": 0,
+    "network_operations": 0,
+    "repository_traversals": 0,
+    "graph_operations": 0,
+    "index_operations": 0,
+    "embedding_operations": 0,
+    "authority": {
+      "write_authority": false,
+      "patch_authority": false,
+      "execution_authorized": false,
+      "patch_applied": false,
+      "human_approval_granted": false
+    }
+  },
+  "live_bootstrap_receipt": {
+    "phase_id": "CONTROL.BOOTSTRAP.1",
+    "provenance": "fresh_bootstrap",
+    "status": "control_bootstrapped",
+    "reason": null,
+    "field": null,
+    "repository": {
+      "canonical_root": "C:\\Users\\Admin\\Documents\\Code\\Side quest\\java",
+      "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93"
+    },
+    "task": {
+      "sha256": "09980b9b525a3d6d322d34c06da46edbdeeeade94d5d7d775a8e37d7c7bd33f2",
+      "char_count": 78,
+      "task_shape": "defect_repair",
+      "selected_workflow": "defect_repair_patch",
+      "preservation_passed": true
+    },
+    "requested_targets": [
+      "twosum.java",
+      "MainApp.java"
+    ],
+    "evidence_targets": [
+      "Twosum.java",
+      "MainApp.java"
+    ],
+    "localized_patch_targets": null,
+    "targets": [
+      {
+        "requested": "twosum.java",
+        "path": "Twosum.java",
+        "status": "read",
+        "reason": "",
+        "size_bytes": 741,
+        "language": "java"
+      },
+      {
+        "requested": "MainApp.java",
+        "path": "MainApp.java",
+        "status": "read",
+        "reason": "",
+        "size_bytes": 1076,
+        "language": "java"
+      }
+    ],
+    "sources": [
+      {
+        "path": "Twosum.java",
+        "requested": "twosum.java",
+        "language": "java",
+        "size_bytes": 741,
+        "lines": 26,
+        "sha256": "b6164c74cd30eeaabf6368346b36e08e23fdf2afb6f36471bcf12e611decfc8c",
+        "freshness": "fresh"
+      },
+      {
+        "path": "MainApp.java",
+        "requested": "MainApp.java",
+        "language": "java",
+        "size_bytes": 1076,
+        "lines": 39,
+        "sha256": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+        "freshness": "fresh"
+      }
+    ],
+    "budget": {
+      "requested_target_count": 2,
+      "requested_target_count_complete": true,
+      "accepted_file_limit": 8,
+      "aggregate_requested_bytes": 1817,
+      "max_total_bytes": 1048576,
+      "max_bytes_per_file": 262144,
+      "max_lines_per_file": 4000
+    },
+    "bytes_read": 1817,
+    "model_calls": 1,
+    "prompt_sha256": "51c64cfc6625bf89549b325b0f60d87bfc8ec3b28464fa079636894c88ac1ce1",
+    "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+    "evidence_gap_needs": [
+      "compile_evidence"
+    ],
+    "discarded_item_keys": [],
+    "executable_commands_accepted": 0,
+    "repository_traversals": 0,
+    "graph_operations": 0,
+    "index_operations": 0,
+    "embedding_operations": 0,
+    "authority": {
+      "defect_established": false,
+      "patch_basis_established": false,
+      "write_authority": false,
+      "patch_authority": false,
+      "human_approval_granted": false,
+      "execution_performed": false
+    },
+    "persisted": false,
+    "usage": "{\n  \"summary\": {\n    \"attempts\": 1,\n    \"fallback_count\": 0,\n    \"selected_model\": \"gemini-3.1-flash-lite\",\n    \"models_by_role\": {\n      \"draft\": \"gemini-3.1-flash-lite\"\n    },\n    \"input_tokens\": 1602,\n    \"output_tokens\": 347,\n    \"total_tokens\": 1949,\n    \"estimated_cost_usd\": 0.000921,\n    \"costed_calls\": 1,\n    \"unknown_cost_calls\": 0,\n    \"by_role\": {\n      \"draft\": {\n        \"calls\": 1,\n        \"input_tokens\": 1602,\n        \"output_tokens\": 347,\n        \"total_tokens\": 1949,\n        \"estimated_cost_usd\": 0.000921\n      }\n    }\n  },\n  \"calls\": [\n    {\n      \"call\": 1,\n      \"model\": \"gemini-3.1-flash-lite\",\n      \"provider\": \"google\",\n      \"role\": \"draft\",\n      \"success\": true,\n      \"input_tokens\": 1602,\n      \"output_tokens\": 347,\n      \"total_tokens\": 1949,\n      \"estimated_cost_usd\": 0.000921,\n      \"cost_rates_per_1m\": {\n        \"input\": 0.25,\n        \"output\": 1.5\n      },\n      \"cost_source\": \"google_gemini_paid_standard_2026-05-18\"\n    }\n  ]\n}"
+  },
+  "live_before_files": {
+    "armstrong.java": {
+      "sha256": "c5df23eb11358dcabcc93da39de57b791fb75f63904169f0bb6d9c2b5f6c2422",
+      "bytes": 586,
+      "mtime_ns": 1789367351737754600
+    },
+    "bank.java": {
+      "sha256": "361a600f98447b05876e3d0fbf3a6ea56e4bcf82abf588df6fb09a312fc7d806",
+      "bytes": 1144,
+      "mtime_ns": 1789973144378200400
+    },
+    "BankAccount.class": {
+      "sha256": "d71ced44380a37609f954b1a2f99115c6b526c64ae7543cf9945b1b21f7b85c6",
+      "bytes": 1344,
+      "mtime_ns": 1789971784960277700
+    },
+    "fibonacci.java": {
+      "sha256": "0d462d1bff4a6d8c8db963343030a558b6f98c956e65656d34212e4cd02345db",
+      "bytes": 142,
+      "mtime_ns": 1789367700053684800
+    },
+    "library.java": {
+      "sha256": "96bbbd21f528616adf68674bc2561a679a20618f2a67491fbfc624b5f171f635",
+      "bytes": 624,
+      "mtime_ns": 1789971107105370400
+    },
+    "MainApp.class": {
+      "sha256": "861b89fc437033d1b890a742a9ef834f5cb6e12b4d16a34ee67debebcdf0b88f",
+      "bytes": 1403,
+      "mtime_ns": 1789360058566547000
+    },
+    "MainApp.java": {
+      "sha256": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+      "bytes": 1076,
+      "mtime_ns": 1789363985057404200
+    },
+    "Number.class": {
+      "sha256": "f5aacd34d00a08e742e9c87ca89d3354287cc03d693152d5dc90ad8599885fc1",
+      "bytes": 943,
+      "mtime_ns": 1789366664425430400
+    },
+    "Number.java": {
+      "sha256": "b2c14795b46840946dbd30ac887f1b1e82572356ea58a0f6a7ed5db6abdb3a27",
+      "bytes": 249,
+      "mtime_ns": 1789366835549383800
+    },
+    "Solution.class": {
+      "sha256": "0bc15508dbc170f22092bc80ffafa8945e3fef67b7a5bfab585c4ae6217b136e",
+      "bytes": 731,
+      "mtime_ns": 1788765184807275500
+    },
+    "star.class": {
+      "sha256": "ebf3e39afff1604ec2d8a355885ddc3a03791a03c0a8ed552abe5adb04744f4e",
+      "bytes": 586,
+      "mtime_ns": 1789370262680193400
+    },
+    "star.java": {
+      "sha256": "695b7f8adb414fd62aa6804facfbe8e05401a0415f2389137d3d872837c1268e",
+      "bytes": 476,
+      "mtime_ns": 1789964234233973700
+    },
+    "Student.class": {
+      "sha256": "d4763b44c30f29f654d683a6a00f01c116bcbfc0671def6cdfcaf5cb47498b01",
+      "bytes": 2963,
+      "mtime_ns": 1789968370617959600
+    },
+    "student.java": {
+      "sha256": "f373fbf64bcdec6f8a72b4631455ccb164326605a1cd4cf15d75a311025da4d9",
+      "bytes": 2398,
+      "mtime_ns": 1789971069961752000
+    },
+    "Students.class": {
+      "sha256": "5f1e6f7c9b30c97e243f016cffc7d1c25c6ba54fee3ae7781f7e469dfc2c8071",
+      "bytes": 611,
+      "mtime_ns": 1789968370485071800
+    },
+    "Twosum.class": {
+      "sha256": "0bc62faf57345cf83697c76db4c3b6b8b006f22f068b2aa4b2b07d5870dd2665",
+      "bytes": 938,
+      "mtime_ns": 1788765184877833300
+    },
+    "Twosum.java": {
+      "sha256": "b6164c74cd30eeaabf6368346b36e08e23fdf2afb6f36471bcf12e611decfc8c",
+      "bytes": 741,
+      "mtime_ns": 1788765178157863900
+    }
+  },
+  "live_after_files": {
+    "armstrong.java": {
+      "sha256": "c5df23eb11358dcabcc93da39de57b791fb75f63904169f0bb6d9c2b5f6c2422",
+      "bytes": 586,
+      "mtime_ns": 1789367351737754600
+    },
+    "bank.java": {
+      "sha256": "361a600f98447b05876e3d0fbf3a6ea56e4bcf82abf588df6fb09a312fc7d806",
+      "bytes": 1144,
+      "mtime_ns": 1789973144378200400
+    },
+    "BankAccount.class": {
+      "sha256": "d71ced44380a37609f954b1a2f99115c6b526c64ae7543cf9945b1b21f7b85c6",
+      "bytes": 1344,
+      "mtime_ns": 1789971784960277700
+    },
+    "fibonacci.java": {
+      "sha256": "0d462d1bff4a6d8c8db963343030a558b6f98c956e65656d34212e4cd02345db",
+      "bytes": 142,
+      "mtime_ns": 1789367700053684800
+    },
+    "library.java": {
+      "sha256": "96bbbd21f528616adf68674bc2561a679a20618f2a67491fbfc624b5f171f635",
+      "bytes": 624,
+      "mtime_ns": 1789971107105370400
+    },
+    "MainApp.class": {
+      "sha256": "861b89fc437033d1b890a742a9ef834f5cb6e12b4d16a34ee67debebcdf0b88f",
+      "bytes": 1403,
+      "mtime_ns": 1789360058566547000
+    },
+    "MainApp.java": {
+      "sha256": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+      "bytes": 1076,
+      "mtime_ns": 1789363985057404200
+    },
+    "Number.class": {
+      "sha256": "f5aacd34d00a08e742e9c87ca89d3354287cc03d693152d5dc90ad8599885fc1",
+      "bytes": 943,
+      "mtime_ns": 1789366664425430400
+    },
+    "Number.java": {
+      "sha256": "b2c14795b46840946dbd30ac887f1b1e82572356ea58a0f6a7ed5db6abdb3a27",
+      "bytes": 249,
+      "mtime_ns": 1789366835549383800
+    },
+    "Solution.class": {
+      "sha256": "0bc15508dbc170f22092bc80ffafa8945e3fef67b7a5bfab585c4ae6217b136e",
+      "bytes": 731,
+      "mtime_ns": 1788765184807275500
+    },
+    "star.class": {
+      "sha256": "ebf3e39afff1604ec2d8a355885ddc3a03791a03c0a8ed552abe5adb04744f4e",
+      "bytes": 586,
+      "mtime_ns": 1789370262680193400
+    },
+    "star.java": {
+      "sha256": "695b7f8adb414fd62aa6804facfbe8e05401a0415f2389137d3d872837c1268e",
+      "bytes": 476,
+      "mtime_ns": 1789964234233973700
+    },
+    "Student.class": {
+      "sha256": "d4763b44c30f29f654d683a6a00f01c116bcbfc0671def6cdfcaf5cb47498b01",
+      "bytes": 2963,
+      "mtime_ns": 1789968370617959600
+    },
+    "student.java": {
+      "sha256": "f373fbf64bcdec6f8a72b4631455ccb164326605a1cd4cf15d75a311025da4d9",
+      "bytes": 2398,
+      "mtime_ns": 1789971069961752000
+    },
+    "Students.class": {
+      "sha256": "5f1e6f7c9b30c97e243f016cffc7d1c25c6ba54fee3ae7781f7e469dfc2c8071",
+      "bytes": 611,
+      "mtime_ns": 1789968370485071800
+    },
+    "Twosum.class": {
+      "sha256": "0bc62faf57345cf83697c76db4c3b6b8b006f22f068b2aa4b2b07d5870dd2665",
+      "bytes": 938,
+      "mtime_ns": 1788765184877833300
+    },
+    "Twosum.java": {
+      "sha256": "b6164c74cd30eeaabf6368346b36e08e23fdf2afb6f36471bcf12e611decfc8c",
+      "bytes": 741,
+      "mtime_ns": 1788765178157863900
+    }
+  },
+  "live_candidate_span_observation": {
+    "quoted_definition": "m1",
+    "replacement_definitions": [
+      "m1",
+      "m2",
+      "m3"
+    ],
+    "effect_if_applied": "m2 and m3 would be inserted beside their existing definitions",
+    "accepted_touched_definitions": null,
+    "scope_rejection": "authoring_scope_violation"
+  },
+  "next_phase_recommendation": "A separate AUTHOR_OUTPUT_VALIDITY investigation of target/replacement span alignment. No PATCH.MINIMAL, CRLF, or Java validation change is justified by this replay.",
+  "write_authority": false,
+  "execution_authorized": false,
+  "auto_apply": false,
+  "human_approval_required": true,
+  "checks_pending": [],
+  "existing_files_changed": [
+    "docs/roadmap/phase_registry.json",
+    "core/candidate_authoring_context.py",
+    "core/control_engine.py",
+    "core/candidate_revision.py",
+    "core/pipeline.py",
+    "core/patch_authoring_contract.py",
+    "tests/_patch_basis_scope1_maintenance.py",
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py"
+  ],
+  "new_files": [
+    "core/authoring_repair_scope.py",
+    "tests/test_patch_author_scope1.py",
+    "tests/_patch_author_scope1_maintenance.py",
+    "tests/fixtures/patch_author_scope1_reversal.json",
+    "tests/fixtures/patch_author_scope1_frozen.json",
+    "tests/fixtures/patch_author_scope1_completion.json",
+    "docs/designs/2026-09-21-measured-repair-set-authoring-scope.md"
+  ],
+  "frozen_file_count": 1514,
+  "validation": {
+    "Focused scope + LIVE.3 + BASIS.SCOPE": {
+      "passed": 87,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "87 passed, 1 warning in 50.36s",
+      "log": ".tmp/patch-author-scope1/closure.log",
+      "failures": []
+    },
+    "BASIS.TARGET / PREFLIGHT / CONTROL / registry / picker": {
+      "passed": 627,
+      "failed": 9,
+      "skipped": 1,
+      "summary": "9 failed, 627 passed, 1 skipped, 3 warnings in 149.40s (0:02:29)",
+      "log": ".tmp/patch-author-scope1/boundaries-final.log",
+      "failures": [
+        "FAILED tests/test_preflight_request1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_control_bootstrap1_post_state",
+        "FAILED tests/test_preflight_request1.py::test_frozen_phase_boundaries_are_byte_exact",
+        "FAILED tests/test_preflight_request1.py::test_completion_receipt_pins_every_phase_source_and_records_the_measurement",
+        "FAILED tests/test_control_fresh1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_ux_context1_post_state",
+        "FAILED tests/test_control_fresh1.py::test_frozen_phase_boundaries_are_byte_exact",
+        "FAILED tests/test_control_fresh1.py::test_completion_receipt_pins_every_phase_source_and_records_the_bootstrap_boundary",
+        "FAILED tests/test_control_bootstrap1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_control_fresh1_post_state",
+        "FAILED tests/test_control_bootstrap1.py::test_frozen_phase_boundaries_are_byte_exact",
+        "FAILED tests/test_control_bootstrap1.py::test_completion_receipt_pins_every_phase_source_and_records_the_bootstrap"
+      ]
+    },
+    "Security / mutation / Undo / rollback / AUTH.DREAM": {
+      "passed": 750,
+      "failed": 13,
+      "skipped": 0,
+      "summary": "13 failed, 750 passed, 1 warning in 210.20s (0:03:30)",
+      "log": ".tmp/patch-author-scope1/security-final.log",
+      "failures": [
+        "FAILED tests/test_sec_ui1.py::test_frozen_entry_bytes_and_original_audit_preserved",
+        "FAILED tests/test_sec_ui1.py::test_reversal_reconstructs_entry_without_repinning_history",
+        "FAILED tests/test_auth_web1.py::test_reversal_receipt_reconstructs_every_entry_file",
+        "FAILED tests/test_auth_web1.py::test_frozen_phase_and_track_a_boundaries_are_byte_exact",
+        "FAILED tests/test_auth_web1.py::test_completion_receipt_pins_every_phase_source",
+        "FAILED tests/test_auth_web_read1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_auth_web1_post_state",
+        "FAILED tests/test_auth_web_read1.py::test_frozen_phase_boundaries_are_byte_exact",
+        "FAILED tests/test_auth_web_read1.py::test_completion_receipt_pins_every_phase_source",
+        "FAILED tests/test_auth_dream1.py::test_exact_frozen_entry_reversal - Assertio...",
+        "FAILED tests/test_data_undo1.py::test_frozen_entry_hashes_and_reviewable_reversal",
+        "FAILED tests/test_data_rollback1.py::test_reversal_receipt_reconstructs_every_entry_file",
+        "FAILED tests/test_data_rollback1.py::test_completion_receipt_pins_every_phase_source",
+        "FAILED tests/test_exec_plan1.py::test_exact_entry_reversal_and_frozen_surfaces"
+      ]
+    },
+    "Affected pipeline / executor / envelope / byte fidelity": {
+      "passed": 157,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "157 passed, 1 warning in 11.19s",
+      "log": ".tmp/patch-author-scope1/broad-final.log",
+      "failures": []
+    },
+    "Registry and picker separately": {
+      "passed": 267,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "267 passed in 4.42s",
+      "log": ".tmp/patch-author-scope1/registry-tests.log",
+      "failures": []
+    },
+    "tests/test_patch_authoring_contract_live2.py": {
+      "passed": 42,
+      "failed": 2,
+      "skipped": 0,
+      "summary": "2 failed, 42 passed, 1 warning in 98.26s (0:01:38)",
+      "log": ".tmp/patch-author-scope1/author-test_patch_authoring_contract_live2.log",
+      "failures": [
+        "FAILED tests/test_patch_authoring_contract_live2.py::test_the_change_is_a_reversible_containment_proof",
+        "FAILED tests/test_patch_authoring_contract_live2.py::test_the_containment_is_one_new_accessor_and_four_touched_definitions"
+      ]
+    },
+    "tests/test_candidate_revision_live.py": {
+      "passed": 97,
+      "failed": 1,
+      "skipped": 0,
+      "summary": "1 failed, 97 passed, 1 warning in 235.41s (0:03:55)",
+      "log": ".tmp/patch-author-scope1/author-test_candidate_revision_live.log",
+      "failures": [
+        "FAILED tests/test_candidate_revision_live.py::test_every_frozen_file_is_byte_identical"
+      ]
+    },
+    "tests/test_indent_runtime1.py": {
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "27 passed, 1 warning in 1.18s",
+      "log": ".tmp/patch-author-scope1/author-test_indent_runtime1.log",
+      "failures": []
+    },
+    "tests/test_indent_semantics1.py": {
+      "passed": 147,
+      "failed": 1,
+      "skipped": 1,
+      "summary": "1 failed, 147 passed, 1 skipped, 1 warning in 152.60s (0:02:32)",
+      "log": ".tmp/patch-author-scope1/author-test_indent_semantics1.log",
+      "failures": [
+        "FAILED tests/test_indent_semantics1.py::test_every_frozen_boundary_is_byte_identical"
+      ]
+    },
+    "tests/test_answer_coherence_live1.py": {
+      "passed": 34,
+      "failed": 1,
+      "skipped": 24,
+      "summary": "1 failed, 34 passed, 24 skipped, 1 warning in 8.38s",
+      "log": ".tmp/patch-author-scope1/author-test_answer_coherence_live1.log",
+      "failures": [
+        "FAILED tests/test_answer_coherence_live1.py::test_every_frozen_boundary_is_byte_identical"
+      ]
+    },
+    "tests/test_patch_minimal_live.py": {
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "48 passed, 1 warning in 25.02s",
+      "log": ".tmp/patch-author-scope1/gates-test_patch_minimal_live.log",
+      "failures": []
+    },
+    "tests/test_patch_minimal_novelty_live.py": {
+      "passed": 79,
+      "failed": 2,
+      "skipped": 0,
+      "summary": "2 failed, 79 passed, 1 warning in 55.57s",
+      "log": ".tmp/patch-author-scope1/gates-test_patch_minimal_novelty_live.log",
+      "failures": [
+        "FAILED tests/test_patch_minimal_novelty_live.py::test_every_other_frozen_boundary_file_is_byte_identical[defect_probe_live4_frozen_boundaries.json]",
+        "FAILED tests/test_patch_minimal_novelty_live.py::test_every_other_frozen_boundary_file_is_byte_identical[candidate_verify_live1_frozen_boundaries.json]"
+      ]
+    },
+    "tests/test_patch_minimal_binding_context_live3.py": {
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "24 passed, 1 warning in 4.02s",
+      "log": ".tmp/patch-author-scope1/gates-test_patch_minimal_binding_context_live3.log",
+      "failures": []
+    },
+    "tests/test_patch_minimal_result_fields_live3.py": {
+      "passed": 107,
+      "failed": 1,
+      "skipped": 0,
+      "summary": "1 failed, 107 passed, 1 warning in 20.28s",
+      "log": ".tmp/patch-author-scope1/gates-test_patch_minimal_result_fields_live3.log",
+      "failures": [
+        "FAILED tests/test_patch_minimal_result_fields_live3.py::test_combined_phase_frozen_bytes_and_reversal_receipt"
+      ]
+    },
+    "tests/test_candidate_verification.py": {
+      "passed": 57,
+      "failed": 1,
+      "skipped": 0,
+      "summary": "1 failed, 57 passed, 1 warning in 116.44s (0:01:56)",
+      "log": ".tmp/patch-author-scope1/gates-test_candidate_verification.log",
+      "failures": [
+        "FAILED tests/test_candidate_verification.py::test_frozen_prerequisite_files_are_untouched"
+      ]
+    },
+    "tests/test_candidate_sandbox_validation.py": {
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "40 passed, 1 warning in 66.61s (0:01:06)",
+      "log": ".tmp/patch-author-scope1/gates-test_candidate_sandbox_validation.log",
+      "failures": []
+    },
+    "tests/test_execution_eligibility_policy.py": {
+      "passed": 36,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "36 passed, 1 warning in 1.81s",
+      "log": ".tmp/patch-author-scope1/gates-test_execution_eligibility_policy.log",
+      "failures": []
+    },
+    "tests/test_human_apply_authorization.py": {
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "22 passed in 10.04s",
+      "log": ".tmp/patch-author-scope1/gates-test_human_apply_authorization.log",
+      "failures": []
+    },
+    "tests/test_control_safety_live.py": {
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "15 passed, 1 warning in 2.78s",
+      "log": ".tmp/patch-author-scope1/gates-test_control_safety_live.log",
+      "failures": []
+    },
+    "tests/test_patch_safety_chokepoint.py": {
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "22 passed, 1 warning in 3.46s",
+      "log": ".tmp/patch-author-scope1/gates-test_patch_safety_chokepoint.log",
+      "failures": []
+    },
+    "tests/test_dream_apply_safety.py": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "1 passed, 1 warning in 3.31s",
+      "log": ".tmp/patch-author-scope1/gates-test_dream_apply_safety.log",
+      "failures": []
+    }
+  },
+  "focused_test_count": 41,
+  "quality_checks": {
+    "compileall": "passed",
+    "benchmarks_check": {
+      "checked": 54,
+      "errors": 0
+    },
+    "git_diff_check": "passed",
+    "registry": "valid",
+    "full_suite_run": false,
+    "no_full_suite_green_claim": true
+  },
+  "historical_failure_count": 31,
+  "historical_failure_reason": "All failed assertions name historical reconstruction of core/control_engine.py or tests/test_phase_registry.py; both reproduce from captured phase-entry bytes. Original frozen receipts are not changed.",
+  "final_java_hash_recheck": true,
+  "phase_source_sha256": {
+    "docs/roadmap/phase_registry.json": "870ceddc8e7792275a5be955cdcff2232cc2345cbf1e7bb71713923a683e69e0",
+    "core/candidate_authoring_context.py": "cdea5f38f36c466ac93e7f9a3e044880a8554def3f39fe115fdf111d12264e71",
+    "core/control_engine.py": "4d6339ab4ab28f37d80df773f77d30968f74a8e25f95f41a143f97005a6ef5a4",
+    "core/candidate_revision.py": "4709b3214bb5d2729f42f55a6b13bdce70cf29f6fccdf42c97356dba656e89d9",
+    "core/pipeline.py": "3d1ac391c238bf04487a21be489ac6bc3a9223d0eb5e3bd78b4000d4b985c7a4",
+    "core/patch_authoring_contract.py": "8f4a0c45efafe4f38b34c17f8003f4ce411ad311529d3c1e8c522a58eb9b29e5",
+    "tests/_patch_basis_scope1_maintenance.py": "18ed7c1b0e83743e61c9923d78af5395a4f9847261a8245d61c637f68788a6f3",
+    "tests/test_phase_registry.py": "338a94f3bd452b17f0792bcbae3c6368e81a3128035785728e33c54e2539258e",
+    "tests/test_phase_picker.py": "2a9a1f0f4e02d1e7e604362ca34cc6182f85096da38c725488949f23e8452a33",
+    "core/authoring_repair_scope.py": "7375d7eed503cf59a76444a7a0336f5815995f8533a71eeb47727cc0d7cb6d58",
+    "tests/test_patch_author_scope1.py": "b2b9a16c6a0b6bd36c90709abb9737dc902049e91d672e01c2cc5a5b10e3ca87",
+    "tests/_patch_author_scope1_maintenance.py": "cf0bccbc5a547f3f7e48374c12c61b1e7b2fa5d213d3089899ec2c39ed07488b",
+    "tests/fixtures/patch_author_scope1_reversal.json": "554f5d7d251316ca9da232e7f0d427b3be4f992c1b5e1c2c84a4ea2eb837b6f5",
+    "tests/fixtures/patch_author_scope1_frozen.json": "7d5e953ccb387a91a2599e11f59e20485a89a0153657df1b2f6ec22e2562d0a3"
+  }
+}

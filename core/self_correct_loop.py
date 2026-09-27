@@ -20,7 +20,7 @@ def _result_to_attempt_record(idx: int, result: ExecutionResult) -> Dict[str, An
         "message": result.message,
         "validation_ok": result.validation_ok,
         "validation_output": result.validation_output,
-        "rollback_performed": result.rollback_performed,
+        **result.rollback_payload_fields(),
         "failure_info": result.failure_info,
         "target_file": result.target_file,
         "patch_safety": result.patch_safety,
@@ -103,7 +103,24 @@ def run_self_correct_loop(
                 "final_phase": result.phase,
             }
 
-        # Environment failures are not the AI's fault — do not waste the second shot.
+        # A new attempt would use the unresolved state as its baseline and can
+        # overwrite the only retained recovery bytes. Require manual repair
+        # before continuing a loop whose automatic recovery did not complete.
+        if result.rollback_outcome.status in {"incomplete", "unverifiable"}:
+            return {
+                "success": False,
+                "chosen_patch": None,
+                "attempts": attempts,
+                "final_phase": result.phase,
+                "stop_reason": "rollback_requires_manual_recovery",
+            }
+
+        # An inconclusive validation is not the AI's fault - and it is not
+        # evidence the patch is wrong either. Re-prompting against a
+        # missing toolchain, an absent test runner, a suite that collected
+        # nothing, or (OPS.VALIDATE.2) a command the validator stopped at its
+        # own budget would ask the model to fix a defect nobody observed, so
+        # the loop stops instead of spending its second shot.
         if result.phase == "validation_environment_failed":
             return {
                 "success": False,

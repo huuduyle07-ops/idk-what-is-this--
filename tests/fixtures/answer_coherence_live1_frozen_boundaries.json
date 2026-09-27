@@ -1,0 +1,40 @@
+{
+  "schema_version": "answer_coherence_live1_frozen_boundaries_v1",
+  "phase_id": "ANSWER.COHERENCE.LIVE.1",
+  "notes": [
+    "Pinned at the bytes this phase shipped against, which already include the 2026-09-10 harness remediation. They are evaluated through tests/_harness_maintenance.py::before_later_receipts, so a later phase that edits one of these files records its own receipt instead of re-pinning.",
+    "What stayed frozen, by file: revision generation and parsing (candidate_revision), verification (candidate_verification), behavioral probes and the matrix (defect_probe, candidate_defect_probe, paired_defect_probe, behavioral_matrix, behavioral_expectation), safe_minimal and novelty (patch_gates, local_binding_novelty), the no-op gate (candidate_mutation_effect), targeted validation (targeted_repository_validation, check_oracle_assessment), authority (execution_eligibility_policy, live_execution_authorization, human_apply_authorization, execution_outcome_telemetry, decision_helper), grounding and display (answer_entity_grounding, localization_handoff), the authoring contract and prompts (patch_authoring_contract, prompter, control_engine), routing (live_task_routing, live_task_shape), T6's target (code_dna), and the display/persistence runners (session_io, web/runner, web/session_store, main)."
+  ],
+  "files": {
+    "core/candidate_revision.py": "61a93256028e9a0494c7b2c92fcbf9f657df9960cc253bebf7a0785ec9ca4d4e",
+    "core/candidate_verification.py": "c259837a1680c6aed15e8fb09ed7f0d0b85a5c7179351be562a5e817797be1a8",
+    "core/behavioral_matrix.py": "bc56a56212f92ff84dc5b1f52c442421d22c2d6804dccb2341ea0d19660ea0d4",
+    "core/behavioral_expectation.py": "2411f412c1b4ec43cf0fac2ad46c895d01b3631819a91a08791c1d3405a290a6",
+    "core/defect_probe.py": "813dda87bdf7ff0241e5f7475db56666a8f1f0e6e8faa3f422ce902f8768c2c1",
+    "core/candidate_defect_probe.py": "9794d3ef412f564e95497c580181c35598e43853234419613cb79842b6d8a7bc",
+    "core/paired_defect_probe.py": "be426bf7576e21beff41772a3f4a605bfcbc933185183414f84e92cb785f800f",
+    "core/candidate_mutation_effect.py": "82690b47ef875eaaf7091ce4b81efe595e397075f392a79462046afe1ff6ffd1",
+    "core/candidate_sandbox_validation.py": "73d7a3d3de4b2e666b5ac486f693883ff247c99da4e0dd577e051e2a203bf626",
+    "core/local_binding_novelty.py": "e77959dff4c82cfa344ba271ee25074edb7171591617c8796cca35f34f055a2b",
+    "core/targeted_repository_validation.py": "eb8897c866c7bf8198270077494a9df055fc375b884397e8fcf999b00e68e9d9",
+    "core/check_oracle_assessment.py": "cb4cf70e0fa37fca10f5a5b17d6a2b291d42a9b9d956618d4e3fb67b2a5a2f56",
+    "core/execution_eligibility_policy.py": "54721c5f9bcab07b74eabb1e6bcc5cafb8af404717aab09ce9af8f935963c2b5",
+    "core/execution_outcome_telemetry.py": "29f22090a31ef137a06280475fe5183b224ca691639f39a0ae4b42063c6270ce",
+    "core/live_execution_authorization.py": "72785ea65de0bf88e18c32ce3617170451c666ad7a03162183c921789ab8c784",
+    "core/human_apply_authorization.py": "7f65a55cf237193ead702f0a99f3668f649e7efabe7c2618e244cd9518c94e89",
+    "core/answer_entity_grounding.py": "a1d3a6542a4cb1dd133b484c77e7f6c6def7df9edd4ce0dd16125f40ecc62987",
+    "core/localization_handoff.py": "d763e37a868e3c507676bebad6e98afc1e61246987c782bad763e725d3f832f5",
+    "core/patch_authoring_contract.py": "3ea9b2a608320dd3b905e966fc9363fe203d26cd79c3eb8489e5edb95f9e6209",
+    "core/prompter.py": "dee45048a7bee3c92d29766ff2924939159a1a65ddd8a22ecff3e07aae192279",
+    "core/control_engine.py": "8d0b55141f24d2e5ac244774452d3a9434d455b8a0f424968f4f6824b9e63ee6",
+    "core/code_dna.py": "8725b73cea83d010c6d84b896bda524e32b249021d3fada8197d9f27e6d1efc5",
+    "core/session_io.py": "6e5843a06f2ac4015999a0437303a36b8c5439807d2efbf01529ff3c6fdd79f2",
+    "core/live_task_routing.py": "5b178cd1871fd082ff5346d4696c2a981fbf8ee5c196a51dcc47480bed95cdc5",
+    "core/live_task_shape.py": "c9c9c2fd1f38a9016e97d2ed5ef41ae2a4770fb44e9f79d83597fe4131cfccb0",
+    "patching/patch_gates.py": "f9751b47f3abd63af8585ca0424413232b33023de8ede0a788b652429a0b6cc7",
+    "policy/decision_helper.py": "c512a43b53b47babc48c6016eef83e105e64ac8ff5c1f388f1937978d0bd5930",
+    "web/runner.py": "6b4e907c6ed14bc89dcaebe27541280b113a62babe01a8b570be6e368a666e6e",
+    "web/session_store.py": "2d1bb4422d959273f4316fb3237c86b4af8d933f78f8b50ebeb17213794716ca",
+    "main.py": "631c90a2af57352da9e415fcbf587d7ee0500486c05d84209b91a12eacffa1e1"
+  }
+}

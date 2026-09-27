@@ -556,11 +556,11 @@ def test_seed_registry_produces_expected_buckets():
     assert report["registry_valid"] is True
     assert report["bucket_counts"] == {
         "safe_to_prepare": 3,
-        "sandbox_required": 0,
+        "sandbox_required": 1,
         "human_approval_required": 0,
         "blocked": 0,
         "deferred_or_parked": 0,
-        "complete_or_history": 116,
+        "complete_or_history": 201,
     }
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
     assert report["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"
@@ -665,7 +665,7 @@ def test_seed_context_selection_phase_is_complete_history():
     assert "CTX.SELECT.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 116
+    assert report["bucket_counts"]["complete_or_history"] == 201
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -742,6 +742,274 @@ def test_seed_context_apply_phase_is_complete_history():
         item["phase_id"] for item in report["complete_or_history"]
     }
     assert "CTX.APPLY.0" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_content_acquisition_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["ACQUIRE.3"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["ACQUIRE.2"]
+    assert "ACQUIRE.3" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "ACQUIRE.3" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_evidence_verification_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["EVIDENCE.1"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["ACQUIRE.3"]
+    assert "EVIDENCE.1" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "EVIDENCE.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_evidence_set_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["EVIDENCE.2"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["EVIDENCE.1"]
+    assert "EVIDENCE.2" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "EVIDENCE.2" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_claim_assessment_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CLAIM.1"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["EVIDENCE.2"]
+    assert "CLAIM.1" in {item["phase_id"] for item in report["complete_or_history"]}
+    assert "CLAIM.1" not in {item["phase_id"] for item in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_structured_synthesis_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["SYNTHESIS.1"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["CLAIM.1"]
+    assert "SYNTHESIS.1" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "SYNTHESIS.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_post_run_reconciliation_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.1"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    # The execution branch, not the epistemic branch that shipped just before it.
+    assert phase["prerequisites"] == ["CTX.APPLY.0"]
+    assert "CHECK.1" in {item["phase_id"] for item in report["complete_or_history"]}
+    assert "CHECK.1" not in {item["phase_id"] for item in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_goal_fidelity_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.2"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    # The first phase that genuinely joins the execution and epistemic branches.
+    assert phase["prerequisites"] == ["CHECK.1", "CLAIM.1"]
+    assert "CHECK.2" in {item["phase_id"] for item in report["complete_or_history"]}
+    assert "CHECK.2" not in {item["phase_id"] for item in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_shadow_post_run_wiring_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.LIVE.1"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    # The live wiring consumes the objective checker only; CHECK.2 stays out.
+    assert phase["prerequisites"] == ["CHECK.1"]
+    assert "CHECK.LIVE.1" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "CHECK.LIVE.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_independent_worker_declaration_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["CHECK.LIVE.1B"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["CHECK.LIVE.1"]
+    assert "CHECK.LIVE.1B" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "CHECK.LIVE.1B" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_native_worker_declaration_qualification_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.1"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "WORKER"
+    assert phase["prerequisites"] == ["CHECK.LIVE.1B"]
+    assert "WORKER.DECL.1" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "WORKER.DECL.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_strict_patch_response_envelope_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.2A"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "WORKER"
+    assert phase["prerequisites"] == ["WORKER.DECL.1"]
+    assert "WORKER.DECL.2A" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "WORKER.DECL.2A" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_strict_envelope_emission_experiment_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.2A.1"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "WORKER"
+    assert phase["prerequisites"] == ["WORKER.DECL.2A"]
+    assert "WORKER.DECL.2A.1" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "WORKER.DECL.2A.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+
+
+def test_seed_live_strict_envelope_dogfood_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = by_id["WORKER.DECL.2A.2"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "WORKER"
+    assert phase["prerequisites"] == ["WORKER.DECL.2A.1"]
+    assert "WORKER.DECL.2A.2" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "WORKER.DECL.2A.2" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["safe_to_prepare"] == 3
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+
+
+def test_seed_model_call_phase_is_never_recommended_as_safe_to_prepare():
+    """A phase that spends provider calls can never land in the safe bucket.
+
+    ``_is_safe`` requires ``model_calls_allowed`` false and a preparable budget
+    tier, so the one phase declaring a model call stays out of the night queue
+    on two independent counts, not merely because it is already complete.
+    """
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    by_id = {phase["phase_id"]: phase for phase in data["phases"]}
+    phase = dict(by_id["WORKER.DECL.2A.2"])
+    assert phase["model_calls_allowed"] is True
+
+    # Re-open the completed phase; it must still not be recommended.
+    phase["status"] = "proposed"
+    others = [p for p in data["phases"] if p["phase_id"] != "WORKER.DECL.2A.2"]
+    reopened = {**data, "phases": others + [phase]}
+    report = _report(reopened, report_id="r", created_at="t")
+
+    assert "WORKER.DECL.2A.2" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
@@ -909,3 +1177,270 @@ def test_no_proposal_import_or_worker_launch():
 def test_no_auto_merge_execution():
     for bad in ("auto_merge(", "perform_merge", "perform_auto_merge", "merge_to_real", "git_merge"):
         assert bad not in _BOTH, f"Found auto-merge token {bad!r}"
+
+
+def test_seed_pre_execution_change_intent_phase_remains_active_for_live_v2():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}["WORKER.DECL.2B"]
+    report = _report(data, report_id="r", created_at="t")
+    assert phase["status"] == "active"
+    assert phase["prerequisites"] == ["WORKER.DECL.2A.2"]
+    assert "WORKER.DECL.2B" in {
+        item["phase_id"] for item in report["sandbox_required"]
+    }
+    assert "WORKER.DECL.2B" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["sandbox_required"] == 1
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_candidate_sandbox_validation_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}["OPS.PATCH.2"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["PATCH.BASIS.LIVE.1"]
+    assert "OPS.PATCH.2" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "OPS.PATCH.2" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_typed_patch_basis_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "PATCH.BASIS.LIVE.1"
+    ]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["prerequisites"] == ["WAITER.LIVE.1"]
+    assert "PATCH.BASIS.LIVE.1" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "PATCH.BASIS.LIVE.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_query_symbol_entry_recall_phase_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "RETRIEVE.LIVE.2"
+    ]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "INDEX"
+    assert phase["prerequisites"] == ["RETRIEVE.LIVE.1"]
+    assert "RETRIEVE.LIVE.2" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "RETRIEVE.LIVE.2" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_production_query_recall_unification_is_complete_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "RETRIEVE.LIVE.3"
+    ]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "INDEX"
+    assert phase["prerequisites"] == ["RETRIEVE.LIVE.2"]
+    assert "RETRIEVE.LIVE.3" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "RETRIEVE.LIVE.3" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_answer_entity_grounding_is_complete_check_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "ANSWER.GROUND.LIVE.1"
+    ]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "CHECK"
+    assert phase["prerequisites"] == ["RETRIEVE.LIVE.3"]
+    assert "ANSWER.GROUND.LIVE.1" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "ANSWER.GROUND.LIVE.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_answer_symbol_grounding_is_complete_check_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "ANSWER.GROUND.LIVE.2"
+    ]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "CHECK"
+    assert phase["prerequisites"] == ["ANSWER.GROUND.LIVE.1"]
+    assert "ANSWER.GROUND.LIVE.2" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "ANSWER.GROUND.LIVE.2" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_bounded_defect_probe_is_complete_ops_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "DEFECT.PROBE.LIVE.1"
+    ]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "OPS"
+    assert phase["prerequisites"] == [
+        "WAITER.LIVE.1",
+        "CONTROL.SAFETY.LIVE.1",
+        "PATCH.BASIS.LIVE.1",
+        "OPS.VALIDATE.1",
+        "OPS.VALIDATE.2",
+        "RETRIEVE.LIVE.1",
+        "RETRIEVE.LIVE.2",
+        "RETRIEVE.LIVE.3",
+        "ANSWER.GROUND.LIVE.1",
+    ]
+    assert "DEFECT.PROBE.LIVE.1" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "DEFECT.PROBE.LIVE.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_bounded_targeted_validation_is_complete_ops_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "OPS.VALIDATE.3"
+    ]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "OPS"
+    assert phase["prerequisites"] == ["DEFECT.PROBE.LIVE.1"]
+    assert "OPS.VALIDATE.3" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "OPS.VALIDATE.3" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_immutable_candidate_defect_closure_is_complete_ops_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "DEFECT.PROBE.LIVE.2"
+    ]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "OPS"
+    assert phase["prerequisites"] == ["OPS.VALIDATE.3"]
+    assert "DEFECT.PROBE.LIVE.2" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "DEFECT.PROBE.LIVE.2" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_existing_check_oracle_role_is_complete_ops_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "VALIDATE.ORACLE.LIVE.1"
+    ]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "OPS"
+    assert phase["prerequisites"] == ["DEFECT.PROBE.LIVE.2"]
+    assert "VALIDATE.ORACLE.LIVE.1" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "VALIDATE.ORACLE.LIVE.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_execution_eligibility_policy_is_complete_ops_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "EXEC.POLICY.LIVE.1"
+    ]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "OPS"
+    assert phase["prerequisites"] == ["VALIDATE.ORACLE.LIVE.1"]
+    assert "EXEC.POLICY.LIVE.1" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "EXEC.POLICY.LIVE.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_human_apply_binding_is_complete_ops_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "EXEC.APPROVAL.LIVE.1"
+    ]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "OPS"
+    assert phase["prerequisites"] == ["EXEC.POLICY.LIVE.1"]
+    assert "EXEC.APPROVAL.LIVE.1" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "EXEC.APPROVAL.LIVE.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201
+
+
+def test_seed_repository_specificity_entry_ordering_is_complete_index_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}["RETRIEVE.LIVE.4"]
+    report = _report(data, report_id="r", created_at="t")
+
+    assert phase["status"] == "complete"
+    assert phase["track"] == "INDEX"
+    assert phase["prerequisites"] == ["ANSWER.GROUND.LIVE.2"]
+    assert "RETRIEVE.LIVE.4" in {
+        item["phase_id"] for item in report["complete_or_history"]
+    }
+    assert "RETRIEVE.LIVE.4" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]
+    }
+    assert report["bucket_counts"]["complete_or_history"] == 201

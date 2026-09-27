@@ -2200,28 +2200,68 @@ This is an active AI engineering project, not a tiny demo. The code already incl
 
 ## Web App Security
 
+Every state-changing request (POST, PUT, PATCH, DELETE) passes one gate, `web/auth_gate.py`, before any route runs. Browser requests and API clients follow separate contracts (AUTH.WEB.1). Every other request (GET, HEAD, OPTIONS) is served only under a trusted `Host` (AUTH.WEB.READ.1, see [Trusted host for reads](#trusted-host-for-reads)).
+
+### Browser requests: exact origin, CSRF token, authentication
+
+A request that carries browser metadata (`Origin`, `Sec-Fetch-*` or `Referer`) must pass three independent checks, in this order:
+
+1. **Exact origin.** `Origin` must equal an allowed origin as a whole: scheme, host and port. `http://localhost:5000`, `http://127.0.0.1:5000`, `https://localhost:5000` and `http://localhost:5001` are four different origins. A missing, `null`, repeated or malformed `Origin` is rejected.
+2. **CSRF token.** Each page gets a token bound to its browser session. `web/static/request_integrity.js` sends it with every same-origin `fetch` (`X-CSRF-Token` header) and native POST form (`csrf_token` field).
+3. **Authentication.** With `WEB_AUTH_TOKEN` set, a signed-in browser session or a valid token header. Without it, a loopback client.
+
+A valid token never makes a wrong origin acceptable, and a correct origin never replaces the token.
+
 ### `WEB_AUTH_TOKEN` (optional)
 
-When set, all mutating HTTP requests to the web app (POST, PUT, PATCH, DELETE) require this token in one of:
+When set, the UI shows a **Sign in** panel. The token is sent once, in a POST body to `/auth/login`, and the server answers with a derived session cookie (`HttpOnly`, `SameSite=Lax`, `Secure` over HTTPS). The token itself is never rendered into pages or scripts, kept by the browser or placed in a URL. A browser session ends when the server restarts, when `WEB_AUTH_TOKEN` changes, or after 12 hours; the panel then asks you to sign in again.
+
+API and CLI clients (requests without browser metadata) keep sending the token in a header, without a CSRF token:
 
 - Header: `X-CATTUS-Web-Token: <token>`
 - Header: `Authorization: Bearer <token>`
 
-If `WEB_AUTH_TOKEN` is **not set**, mutating requests are allowed only from loopback addresses (127.0.0.1, ::1, localhost). Any non-loopback client receives `403 Forbidden`.
+If `WEB_AUTH_TOKEN` is **not set**, mutating requests are allowed only from loopback addresses (127.0.0.1, ::1, localhost). Any non-loopback client receives `403 Forbidden`. Browser requests still need the exact origin and the CSRF token.
 
 > **Warning:** If you expose the web app beyond localhost (e.g., `host=0.0.0.0`), you **must** set `WEB_AUTH_TOKEN` to prevent unauthenticated remote access to mutation routes such as `/apply_patch`, `/dream/apply`, `/mcp/inspector/launch`, and `/harness/controls/apply-env`.
+
+### `WEB_ALLOWED_ORIGINS` (optional)
+
+By default the only allowed browser origin is the address the server listens on, for example `http://127.0.0.1:5000` for `python main.py --web`. It is never taken from the request's `Host` or `Origin` header, and a server listening on `0.0.0.0` has no default browser origin.
+
+Set `WEB_ALLOWED_ORIGINS` to a comma-separated list of complete origins to replace that default, for example when you open the app as `localhost`, through a published Docker port or behind a reverse proxy:
+
+```text
+WEB_ALLOWED_ORIGINS=http://127.0.0.1:5000,http://localhost:5000
+```
+
+Each entry is `scheme://host[:port]` with `http` or `https`. Scheme and host are case-insensitive, and a missing port means 80 or 443. Paths, wildcards and user info make an entry invalid; invalid entries are skipped with a printed warning, never widened into a pattern, and at most 16 entries are read. For the Docker Compose service (port `5056:5000`), set `WEB_ALLOWED_ORIGINS=http://localhost:5056` together with `WEB_AUTH_TOKEN`.
+
+### Trusted host for reads
+
+Pages, static files and every read route are served only when the request's `Host` header names this server: the host and port of an allowed origin (the listening address, or the `WEB_ALLOWED_ORIGINS` entries above). A DNS-rebinding page, for example `http://evil.example:5000` resolved to 127.0.0.1, therefore receives no repository source, evidence, reports, sessions, Dream artifacts or browser session. The check runs in one WSGI boundary (`web/read_host.py`) before any route, redirect, static file or session, and `Host`, `Origin`, `Referer` and `X-Forwarded-*` never add a trusted host.
+
+- `localhost`, `127.0.0.1` and `::1` are different hosts, and the port always counts. With the default `http://127.0.0.1:5000`, the addresses `http://localhost:5000` and `http://127.0.0.1:7999` are refused.
+- A `Host` without a port matches only an origin on its scheme's default port: `https://cattus.example` accepts `Host: cattus.example` and `Host: cattus.example:443`.
+- A well-formed host this server is not configured for gets `421 Misdirected Request`; a missing, repeated or malformed `Host` gets `400 Bad Request`. The refusal is JSON (plain text for page navigations) with `error_code` `host_not_allowed`, `host_missing`, `host_ambiguous` or `host_malformed`, and carries no data, cookie or redirect.
+- A server listening on `0.0.0.0` or `::` without `WEB_ALLOWED_ORIGINS` refuses every page and read.
+- API and CLI read clients need no token, CSRF token or `Origin`; they only have to use a configured address, for example `curl http://127.0.0.1:5000/health`.
+- `WEB_AUTH_TOKEN` authenticates mutations only. Reads are not authenticated in either mode, so any client that can reach the server and send a configured `Host` can read. The host check stops browsers on other sites, not other clients on the network.
+
+Deployment notes:
+
+- `python main.py --web`: nothing to configure; open `http://127.0.0.1:5000`.
+- `WEB_HOST=localhost`: the server binds the resolved loopback address (`127.0.0.1`), so the `http://localhost:5000` address it opens is refused until you set `WEB_ALLOWED_ORIGINS=http://localhost:5000` (list `http://127.0.0.1:5000` too to keep both).
+- Docker Compose (`5056:5000`, `WEB_HOST=0.0.0.0`): set `WEB_ALLOWED_ORIGINS=http://localhost:5056`. Without it the published UI returns 421. A probe inside the container must send that host, for example `curl -H "Host: localhost:5056" http://127.0.0.1:5000/health`.
+- Reverse proxy or TLS termination: list the public origin (`https://cattus.example`) and forward the public `Host` (nginx: `proxy_set_header Host $host;`). `X-Forwarded-Host` and `X-Forwarded-Proto` are ignored, because the app has no trusted-proxy configuration.
 
 ### `WEB_SECRET_KEY` (optional)
 
 Flask secret key. If not set, a dev-only insecure placeholder is used. This is safe for local development but **must** be set to a strong random value for any network-exposed deployment.
 
-### Cross-Origin Mutation
-
-Cross-origin mutating requests are always rejected (403) regardless of token. Clients must originate from the same host as the web app.
-
 ### Local Development
 
-With default settings (no `WEB_AUTH_TOKEN`), the web app accepts mutating requests only from localhost. This is the expected behavior for local development.
+With default settings (no `WEB_AUTH_TOKEN`), open the app at the address it prints (`http://127.0.0.1:5000`); mutating requests are accepted from that page on this machine only. Other addresses for the same server, such as `http://localhost:5000`, are refused unless they are listed in `WEB_ALLOWED_ORIGINS`.
 
 ## Short Summary
 

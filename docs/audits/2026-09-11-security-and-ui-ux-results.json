@@ -1,0 +1,377 @@
+{
+  "date": "2026-09-11",
+  "kind": "remaining_security_and_ui_ux_audit",
+  "production_files_modified_by_audit": false,
+  "scope": "New isolated probes, source review of historical open issues, real browser UI on synthetic local repository. No live model or database calls; no broad regression rerun.",
+  "interpretation": "Passing audit probes assert vulnerable behavior. They do not mean the project is fixed or secure.",
+  "web_boundaries": {
+    "date": "2026-09-11",
+    "scope": "Production Flask routes; synthetic files only; DB/provider/network disabled; no runtime source edits",
+    "origin_cases": [
+      {
+        "case": "same_origin",
+        "origin": "http://localhost:5000",
+        "request_origin": "http://localhost:5000",
+        "status": 200,
+        "ok": true,
+        "created_json_exists": true
+      },
+      {
+        "case": "different_port",
+        "origin": "http://localhost:7999",
+        "request_origin": "http://localhost:5000",
+        "status": 200,
+        "ok": true,
+        "created_json_exists": true
+      },
+      {
+        "case": "different_loopback_host",
+        "origin": "http://127.0.0.1:7999",
+        "request_origin": "http://localhost:5000",
+        "status": 200,
+        "ok": true,
+        "created_json_exists": true
+      },
+      {
+        "case": "unrelated_host",
+        "origin": "http://attacker.invalid:7999",
+        "request_origin": "http://localhost:5000",
+        "status": 403,
+        "ok": null,
+        "created_json_exists": false
+      }
+    ],
+    "undo_cross_repo": {
+      "status": 200,
+      "body": {
+        "message": "Undo successful",
+        "success": true
+      },
+      "repo_b_before": "SYNTHETIC_REPO_B_SOURCE = 28\n",
+      "repo_b_after": "SYNTHETIC_REPO_A_PRIVATE = 17\n",
+      "backup_from_a_deleted": true,
+      "repo_b_now_matches_a": true,
+      "seeded_backup": true
+    },
+    "evidence_html": {
+      "status": 200,
+      "ok": true,
+      "input": "<img src=\"invalid-audit-image\" onerror=\"window.__cattusAuditXss = true\">\n",
+      "rendered": "<p><img src=\"invalid-audit-image\" onerror=\"window.__cattusAuditXss = true\"></p>",
+      "active_onerror_preserved": true,
+      "csp": null,
+      "browser_execution_tested": false,
+      "sink": "web/templates/index.html:8749"
+    },
+    "source_hashes": {
+      "web/auth_gate.py": "38ebbf1a600788489e8b8cdf0fab65bc09feecd40edae5ffacee7a9e54fbdd94",
+      "web/app.py": "4cf6c6ab7c784450e43938cf94a4c81662fd4ebe30633aac8a4524f12d95a7c1",
+      "web/routes/patch_routes.py": "8df896df677ddf19ffd7797217c48faf527f677b33d13b574e5027b479825121",
+      "web/templates/index.html": "bf5baa505e110a96a89449c21331bc81874db7ad398840395bee2c6203630531",
+      "web/patch_helpers.py": "de536b99435ee3dc0be881712b251de371a4cd45d0c357a58ddd41d0a28484a9"
+    }
+  },
+  "runtime": {
+    "date": "2026-09-11",
+    "scope": "Three new offline, isolated probes; no live provider/database/network. Runtime and repository tests were not edited.",
+    "probe_semantics": "Passing tests assert the vulnerable observed behavior; this is not evidence of fixes.",
+    "new_findings": {
+      "malformed_op_partial_live_apply": {
+        "http_status": 500,
+        "created_file_remains": true,
+        "created_content": "partial write\n",
+        "response_is_json": false,
+        "provider_calls": 0
+      },
+      "dream_apply_report_identity": {
+        "reviewed_report": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\audit-runtime-20260911-dream-isolated\\test_dream_apply_uses_differen0\\agent_dir\\repo-ca88b87f53798378\\dreams\\2026-09-11\\120000-run",
+        "reviewed_item": "Reviewed item A",
+        "http_status": 200,
+        "apply_response": {
+          "results": [
+            {
+              "application_status": "applied",
+              "authority_scope": "control_or_planning",
+              "execution_attempted": true,
+              "execution_authority_source": "manual_apply_action",
+              "execution_authorization": {
+                "execution_authority_source": "manual_apply_action",
+                "execution_authorization_denied_reason": "",
+                "execution_authorized": true,
+                "human_approval_required_for_execution": false
+              },
+              "execution_authorization_denied_reason": "",
+              "execution_authorized": true,
+              "execution_outcome": {
+                "application_status": "applied",
+                "execution_attempted": true,
+                "final_repository_changed": true,
+                "final_state_observation": "plan_named_paths",
+                "final_validation_outcome": "passed",
+                "mutation_observed": true,
+                "observed_changed_paths": [
+                  "unreviewed.txt"
+                ],
+                "patch_applied": true,
+                "rollback_performed": false
+              },
+              "execution_summary": "You approved this exact candidate. It was applied under the manual Apply authority path (human apply action). Validation passed. Repository changes remain on disk.",
+              "execution_telemetry_schema_version": "exec_auth_live_1_execution_telemetry_v1",
+              "final_repository_changed": true,
+              "final_state_observation": "plan_named_paths",
+              "final_validation_outcome": "passed",
+              "human_approval_required_for_execution": false,
+              "idx": 1,
+              "message": "applied, but commit failed: fatal: not a git repository (or any of the parent directories): .git\n",
+              "mutation_observed": true,
+              "observed_changed_paths": [
+                "unreviewed.txt"
+              ],
+              "patch_applied": true,
+              "rollback_performed": false,
+              "status": "applied",
+              "title": "Unreviewed item B"
+            }
+          ]
+        },
+        "reviewed_file_exists": false,
+        "unreviewed_file_exists": true,
+        "provider_calls": 0
+      },
+      "rollback_failure_visibility": {
+        "result": {
+          "atomicity_scope": "patch_ops_only",
+          "patch_ops_rollback_protected": true,
+          "validation_side_effects_in_rollback_scope": false,
+          "validation_side_effect_policy": "reported_not_rolled_back",
+          "sandbox_validation_recommended": true,
+          "validation_side_effects": {
+            "supported": false,
+            "reason": "validation not run",
+            "created": [],
+            "modified": [],
+            "deleted": [],
+            "summary": {
+              "created": 0,
+              "modified": 0,
+              "deleted": 0
+            }
+          },
+          "success": false,
+          "failed_op_index": 1,
+          "failed_op": {
+            "op": "replace_snippet",
+            "relative_path": "missing.py",
+            "target_snippet": "x",
+            "patched_snippet": "y"
+          },
+          "error": "replace_snippet: target file does not exist: missing.py",
+          "rollback_performed": true,
+          "applied_ops": [
+            {
+              "op": "replace_snippet",
+              "relative_path": "app.py",
+              "target_snippet": "VALUE = 1",
+              "patched_snippet": "VALUE = 2"
+            }
+          ],
+          "diffs": [
+            "--- a/app.py\n+++ b/app.py\n@@ -1 +1 @@\n-VALUE = 1\n+VALUE = 2"
+          ]
+        },
+        "final_bytes_hex": "56414c5545203d20320a",
+        "original_bytes_hex": "56414c5545203d20310a",
+        "restore_fault_injected": true
+      }
+    },
+    "historical_source_status": {
+      "single_file_crlf": "Still raw UTF-8 decode then text write newline=CRLF at patch_engine.py:284,311,436; historical probe not rerun.",
+      "backup_ownership": "Still fixed .bak copy and unlink at patch_engine.py:64-75; historical probe not rerun.",
+      "legacy_self_correction": "Still raw returned retry payload fed to Executor at self_correct_loop.py:75,148 and pipeline.py:3380-3403; no refreshed scope/basis authorization in callback; historical probe not rerun.",
+      "session_lost_update": "Still whole JSON read/write at session_store.py:14,20; historical probe not rerun.",
+      "validation_process_tree": "Still subprocess.run timeout on direct child at validator.py:310,334 and validation_execution.py:308,332; no process-group/tree cleanup; historical probe not rerun.",
+      "dream_commit_existing_index": "Still git add touched followed by unscoped git commit at web/app.py:1086,1090; identified already in 09/09 audit; no staged-changes probe rerun."
+    },
+    "source_sha256": {
+      "patching/patch_plan_executor.py": "b1a874c1de5818c80981bd2eb27f996e4d252f7728421d6d38a84427b0b75222",
+      "web/app.py": "4cf6c6ab7c784450e43938cf94a4c81662fd4ebe30633aac8a4524f12d95a7c1",
+      "web/templates/index.html": "bf5baa505e110a96a89449c21331bc81874db7ad398840395bee2c6203630531",
+      "core/run_lifecycle.py": "1e5653d7c608e28fa22d22f90f37a39ce9e1cbd0a6c83ea68cc70a276bf0c4e0",
+      "core/validation_side_effects.py": "92ab9df92764ebb540410db609e0803408c4760e88fb9f909ac9b15897e04511",
+      "patching/patch_engine.py": "33b475c229be10e6dce78fbc6979cc5334df9c60f8cfc4a39e1c36be28e41da1",
+      "core/self_correct_loop.py": "098b4a7776bee24eafe41b96faedf8baee2533e8f16d2e04cd6ba1f7af0894b3",
+      "web/session_store.py": "2d1bb4422d959273f4316fb3237c86b4af8d933f78f8b50ebeb17213794716ca",
+      "core/validator.py": "515dfc18a7cf7fb7a21357ba173e9566fadad0a9ca165d7bebd184b293f22b2f",
+      "core/validation_execution.py": "c1776d1e917e9b90634ab55333c2dceed812b7e494f57693cecaa6e512b3194d"
+    },
+    "probe_file_sha256": "ddd8b66df2b7e7b010da273784e95b72699eed6340634959bdecb7a32a6d6bc8",
+    "evidence_runs": [
+      ".tmp/audit-runtime-20260911-probes/results-retained.xml",
+      ".tmp/audit-runtime-20260911-probes/results-dream-isolated.xml"
+    ],
+    "isolation_note": "Initial Dream probe Git searched parent repository and failed opening read-only index.lock; no Git mutation. Final Dream evidence rerun with GIT_CEILING_DIRECTORIES to prevent parent discovery; git reports not a repository, while genuine file Apply and pytest validation succeed."
+  },
+  "ui_handlers": {
+    "date": "2026-09-11",
+    "method": "Actual handler source evaluated with deterministic DOM/fetch adapters; no provider or real patch calls",
+    "results": [
+      {
+        "case": "undo_failed_response",
+        "actual": {
+          "raw": null,
+          "last_action": "undone",
+          "last_status": "Backup not found"
+        },
+        "backend": {
+          "success": false,
+          "message": "Backup not found"
+        },
+        "bug": true
+      },
+      {
+        "case": "generate_out_of_order_after_repository_switch",
+        "currentRepo": "B",
+        "displayedPatch": {
+          "summary": "A",
+          "patch_candidate": {
+            "relative_path": "a.py"
+          }
+        },
+        "submittedRepos": [
+          "A",
+          "B"
+        ],
+        "bug": true
+      },
+      {
+        "case": "model_output_reaches_html_sink",
+        "unescapedMarkerPresent": true,
+        "html": "\n        <div><strong>Verdict:</strong> <span class=\"critique-verdict critique-verdict--accept\">accept</span>\n        &nbsp;&nbsp;<strong>Confidence:</strong> 90%</div>\n        <div class=\"critique-section\"><strong>Summary:</strong> <img src=\"x\" onerror=\"window.__uiAuditMarker=1\"></div>\n        ",
+        "scriptExecutionTested": false
+      },
+      {
+        "case": "mode_round_trip",
+        "initial": {
+          "mode": "full",
+          "policy": "ask"
+        },
+        "after": {
+          "mode": "retrieve",
+          "policy": "plan",
+          "button": "Run"
+        },
+        "bug": true
+      }
+    ]
+  },
+  "cdn_failure": {
+    "date": "2026-09-11",
+    "method": "Full inline production JavaScript executed in VM with Jinja expressions replaced by null and DOM adapter; Mermaid omitted to model CDN unavailability. No network.",
+    "case": "mermaid_cdn_unavailable",
+    "initializationError": "ReferenceError: mermaid is not defined",
+    "patchStateError": "ReferenceError: Cannot access '_currentPatchState' before initialization",
+    "bug": true
+  },
+  "auth_ui": {
+    "page_status": 200,
+    "native_form_present": true,
+    "token_header_name_in_rendered_ui": false,
+    "unauthenticated_form_status": 401,
+    "unauthenticated_form_reason": true,
+    "authenticated_control_status": 200,
+    "provider_calls": 0,
+    "browser_token_submission_tested": false
+  },
+  "browser": {
+    "method": "Real Flask routes, template and JavaScript; synthetic repo/session; scripted _run_mode solely for producing a harmless result. Evidence viewer route and handler were not replaced.",
+    "evidence_xss": {
+      "executed": "true",
+      "status": "Showing 00_evidence_index.md (117 bytes)",
+      "viewer": "<div class=\"evidence-markdown\"><h1 id=\"synthetic-audit-evidence\">Synthetic audit evidence</h1>\n<p><img src=\"missing-audit-image\" onerror=\"this.setAttribute('data-audit-executed','true')\" data-audit-executed=\"true\"></p></div>"
+    },
+    "payload_effect": "Only set data-audit-executed=true on its own synthetic image. No data exfiltration or mutation endpoint calls.",
+    "initial_desktop": {
+      "viewport_width": 1280,
+      "viewport_height": 720,
+      "run_top_px": 1310.4,
+      "document_height_px": 2181,
+      "visible_layout_controls": 47
+    },
+    "initial_narrow_at_scroll_zero": {
+      "viewport_width": 390,
+      "viewport_height": 844,
+      "run_top_px": 2393.325,
+      "document_height_px": 3506,
+      "document_scroll_width_px": 375
+    },
+    "screenshots": [
+      "docs/audits/assets/2026-09-11-ui/desktop.png",
+      "docs/audits/assets/2026-09-11-ui/narrow.png"
+    ],
+    "timing_not_benchmarked": true,
+    "token_browser_submission_completed": false
+  },
+  "source_sha256_verified_at_report": {
+    "web/auth_gate.py": "38ebbf1a600788489e8b8cdf0fab65bc09feecd40edae5ffacee7a9e54fbdd94",
+    "web/app.py": "4cf6c6ab7c784450e43938cf94a4c81662fd4ebe30633aac8a4524f12d95a7c1",
+    "web/routes/patch_routes.py": "8df896df677ddf19ffd7797217c48faf527f677b33d13b574e5027b479825121",
+    "web/templates/index.html": "bf5baa505e110a96a89449c21331bc81874db7ad398840395bee2c6203630531",
+    "web/patch_helpers.py": "de536b99435ee3dc0be881712b251de371a4cd45d0c357a58ddd41d0a28484a9",
+    "patching/patch_plan_executor.py": "b1a874c1de5818c80981bd2eb27f996e4d252f7728421d6d38a84427b0b75222",
+    "core/run_lifecycle.py": "1e5653d7c608e28fa22d22f90f37a39ce9e1cbd0a6c83ea68cc70a276bf0c4e0",
+    "core/validation_side_effects.py": "92ab9df92764ebb540410db609e0803408c4760e88fb9f909ac9b15897e04511",
+    "patching/patch_engine.py": "33b475c229be10e6dce78fbc6979cc5334df9c60f8cfc4a39e1c36be28e41da1",
+    "core/self_correct_loop.py": "098b4a7776bee24eafe41b96faedf8baee2533e8f16d2e04cd6ba1f7af0894b3",
+    "web/session_store.py": "2d1bb4422d959273f4316fb3237c86b4af8d933f78f8b50ebeb17213794716ca",
+    "core/validator.py": "515dfc18a7cf7fb7a21357ba173e9566fadad0a9ca165d7bebd184b293f22b2f",
+    "core/validation_execution.py": "c1776d1e917e9b90634ab55333c2dceed812b7e494f57693cecaa6e512b3194d",
+    "web/static/style.css": "ba7a4f8b158ae9b0e0a4644f9b04e3693028b04af91d9f959a45084e92fe43fb",
+    "web/static/keybindings.js": "90bb05f155fd071720835444b057202c4252ac60324fd703dbfea4f9e201305c",
+    "agents/ollama_client.py": "d03af4d2c97f2123b1e5da0e00890c7e17a5feb1a11111b848f4a18a1ced1229"
+  },
+  "source_sizes": {
+    "web/templates/index.html": {
+      "bytes": 539420,
+      "lines": 11081
+    },
+    "web/static/style.css": {
+      "bytes": 151186,
+      "lines": 6724
+    },
+    "web/app.py": {
+      "bytes": 163513,
+      "lines": 4157
+    }
+  },
+  "probe_sources": {
+    ".tmp/audit-web-20260911-boundaries.py": {
+      "sha256": "8de41308024dc12b4f6ae9e4d59fa29f409637d785a57282e0f1f1397a32aa55",
+      "text": "from __future__ import annotations\nimport json, os, sys, socket, hashlib\nfrom pathlib import Path\nfrom unittest.mock import patch\nROOT = Path.cwd().resolve()\nOUT = ROOT / '.tmp' / 'audit-web-20260911-boundaries'\nOUT.mkdir(parents=True, exist_ok=True)\nsys.path.insert(0, str(ROOT))\nfor key, val in {'DB_ENABLED':'false','DATABASE_URL':'','DATABASE_URL_LOCAL':'','DATABASE_URL_DOCKER':'','INDEX_USE_EMBEDDINGS':'false','ROUTER_USE_EMBEDDINGS':'false','RETRIEVER_USE_DB':'false','EMBEDDING_PROVIDER':'off','WEB_AUTH_TOKEN':'','PYTHONDONTWRITEBYTECODE':'1'}.items(): os.environ[key] = val\nimport config\nconfig.AGENT_DIR = OUT / 'agent'\nconfig.STORAGE_PATH = OUT / 'storage'\nconfig.AGENT_DIR.mkdir(exist_ok=True)\nconfig.STORAGE_PATH.mkdir(exist_ok=True)\nconfig.OUTPUT_FILE = OUT / 'session_log.txt'\nconfig.DB_ENABLED = False\nconfig.DATABASE_URL = ''\nos.chdir(OUT)\ndef no_network(*a, **kw): raise AssertionError('network not allowed')\nwith patch.object(socket.socket, 'connect', no_network), patch.object(socket, 'create_connection', no_network):\n    from web import app as wa\n    from web.routes import patch_routes\n    wa.app.config['TESTING'] = True\n    backups = OUT / 'backups'\n    backups.mkdir(exist_ok=True)\n    wa.BACKUP_DIR = patch_routes.BACKUP_DIR = backups\n    client = wa.app.test_client()\n    repo_a, repo_b = OUT / 'repo_a', OUT / 'repo_b'\n    repo_a.mkdir(exist_ok=True)\n    repo_b.mkdir(exist_ok=True)\n    # Real reference-import mutation reached from a different HTTP origin.\n    origin_cases = []\n    for label, origin in [('same_origin','http://localhost:5000'), ('different_port','http://localhost:7999'), ('different_loopback_host','http://127.0.0.1:7999'), ('unrelated_host','http://attacker.invalid:7999')]:\n        response = client.post('/dream/references/import', base_url='http://localhost:5000', headers={'Origin': origin}, data={'repo_path':str(repo_a),'topic':'Audit '+label, 'raw_input':'Synthetic import: '+label}, environ_base={'REMOTE_ADDR':'127.0.0.1'})\n        body = response.get_json(silent=True)\n        origin_cases.append({'case':label,'origin':origin,'request_origin':'http://localhost:5000','status':response.status_code,'ok':body.get('ok') if body else None,'created_json_exists':Path(body['json_path']).is_file() if body and body.get('json_path') else False})\n    # Shared backup name carries no repo identity. Seed exactly one genuine-shaped backup.\n    a_before = 'SYNTHETIC_REPO_A_PRIVATE = 17\\n'\n    b_before = 'SYNTHETIC_REPO_B_SOURCE = 28\\n'\n    (repo_a / 'app.py').write_text(a_before, encoding='utf-8', newline='')\n    (repo_b / 'app.py').write_text(b_before, encoding='utf-8', newline='')\n    backup = backups / 'app.py_1789110000.0.bak'\n    backup.write_text(a_before, encoding='utf-8', newline='')\n    response = client.post('/undo_patch', data={'repo_path':str(repo_b),'file':'app.py'})\n    undo = {'status':response.status_code,'body':response.get_json(),'repo_b_before':b_before,'repo_b_after':(repo_b/'app.py').read_text(),'backup_from_a_deleted':not backup.exists(),'repo_b_now_matches_a':(repo_b/'app.py').read_text() == a_before,'seeded_backup':True}\n    # Public evidence renderer passes active HTML into its frontend innerHTML sink.\n    payload = '<img src=\"invalid-audit-image\" onerror=\"window.__cattusAuditXss = true\">\\n'\n    evidence = repo_a / '.agent' / 'presentation_evidence'\n    evidence.mkdir(parents=True, exist_ok=True)\n    (evidence / 'audit.md').write_text(payload, encoding='utf-8', newline='')\n    response = client.get('/presentation/evidence/file', query_string={'repo_path':str(repo_a),'name':'audit.md','as':'html'})\n    body = response.get_json()\n    rendered = body.get('html', '')\n    (OUT / 'evidence-response.html').write_text(rendered, encoding='utf-8', newline='')\n    xss = {'status':response.status_code,'ok':body.get('ok'),'input':payload,'rendered':rendered,'active_onerror_preserved':'onerror=\"window.__cattusAuditXss = true\"' in rendered,'csp':response.headers.get('Content-Security-Policy'),'browser_execution_tested':False,'sink':'web/templates/index.html:8749'}\n    result = {'date':'2026-09-11','scope':'Production Flask routes; synthetic files only; DB/provider/network disabled; no runtime source edits','origin_cases':origin_cases,'undo_cross_repo':undo,'evidence_html':xss,'source_hashes':{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in ['web/auth_gate.py','web/app.py','web/routes/patch_routes.py','web/templates/index.html','web/patch_helpers.py']}}\n    (OUT / 'results.json').write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding='utf-8')\n    print(json.dumps(result, indent=2, ensure_ascii=True))\n"
+    },
+    ".tmp/audit-runtime-20260911-probes/test_runtime_remaining.py": {
+      "sha256": "ddd8b66df2b7e7b010da273784e95b72699eed6340634959bdecb7a32a6d6bc8",
+      "text": "from __future__ import annotations\nimport json\nfrom pathlib import Path\nimport pytest\nfrom tests.test_harness_blackbox_http import harness\n\n\ndef record(root, name, data):\n    (root / (name + '.json')).write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')\n\n\ndef test_malformed_op_causes_partial_live_apply(harness):\n    from web import app as web_app\n    web_app.app.config['PROPAGATE_EXCEPTIONS'] = False\n    plan = [\n        {'op': 'create_file', 'relative_path': 'created.txt', 'content': 'partial write\\n'},\n        {'op': 7, 'relative_path': 'other.txt'},\n    ]\n    response = harness.client.post('/apply_patch_plan', headers=harness.headers, data={\n        'repo_path': str(harness.repo), 'patch_style': 'balanced', 'apply_policy': 'ask',\n        'patch': json.dumps({'patch_basis': 'explicit_change_request', 'patch_plan': plan}),\n    })\n    evidence = {'http_status': response.status_code, 'created_file_remains': (harness.repo / 'created.txt').exists(),\n                'created_content': (harness.repo / 'created.txt').read_text(),\n                'response_is_json': response.is_json, 'provider_calls': len(harness.calls)}\n    record(harness.root, 'malformed_op_partial_apply', evidence)\n    assert evidence['http_status'] == 500\n    assert evidence['created_file_remains'] is True\n    assert evidence['provider_calls'] == 0\n\n\ndef test_dream_apply_uses_different_report_than_reviewed(harness, monkeypatch):\n    monkeypatch.setenv(\"GIT_CEILING_DIRECTORIES\", str(harness.repo.parent))\n    from core import dream_artifacts\n    root = dream_artifacts.dreams_root(str(harness.repo)) / '2026-09-11'\n    def report(run, filename, title):\n        path = root / run\n        item_dir = path / '1-item'\n        item_dir.mkdir(parents=True)\n        plan = [{'op': 'create_file', 'relative_path': filename, 'content': title + '\\n'}]\n        (item_dir / 'patch_plan.json').write_text(json.dumps(plan), encoding='utf-8')\n        data = {'items': [{'idx': 1, 'title': title, 'kind': 'bug', 'status': 'ready_to_apply', 'item_dir_name': '1-item'}]}\n        (path / 'list.json').write_text(json.dumps(data), encoding='utf-8')\n        return path\n    first = report('120000-run', 'reviewed.txt', 'Reviewed item A')\n    listed = harness.client.get('/dream/list', query_string={'repo_path': str(harness.repo)}, headers=harness.headers).get_json()\n    second = report('120001-run', 'unreviewed.txt', 'Unreviewed item B')\n    response = harness.client.post('/dream/apply', headers=harness.headers, data={'repo_path': str(harness.repo), 'selection': '1'})\n    result = response.get_json()\n    evidence = {'reviewed_report': listed['report_dir'], 'reviewed_item': listed['items'][0]['title'],\n                'http_status': response.status_code, 'apply_response': result,\n                'reviewed_file_exists': (harness.repo / 'reviewed.txt').exists(),\n                'unreviewed_file_exists': (harness.repo / 'unreviewed.txt').exists(), 'provider_calls': len(harness.calls)}\n    record(harness.root, 'dream_apply_report_identity', evidence)\n    assert listed['items'][0]['title'] == 'Reviewed item A'\n    assert result['results'][0]['title'] == 'Unreviewed item B'\n    assert result['results'][0]['status'] == 'applied'\n    assert evidence['unreviewed_file_exists'] is True\n    assert evidence['reviewed_file_exists'] is False\n    assert evidence['provider_calls'] == 0\n\n\ndef test_rollback_failure_reports_performed_and_protected(tmp_path, monkeypatch):\n    from patching.patch_plan_executor import apply_patch_plan\n    target = tmp_path / 'app.py'\n    before = b'VALUE = 1\\n'\n    target.write_bytes(before)\n    write = Path.write_bytes\n    def fail_restore(path, data):\n        if path == target and data == before:\n            raise PermissionError('injected restore failure')\n        return write(path, data)\n    monkeypatch.setattr(Path, 'write_bytes', fail_restore)\n    result = apply_patch_plan(str(tmp_path), [\n        {'op': 'replace_snippet', 'relative_path': 'app.py', 'target_snippet': 'VALUE = 1', 'patched_snippet': 'VALUE = 2'},\n        {'op': 'replace_snippet', 'relative_path': 'missing.py', 'target_snippet': 'x', 'patched_snippet': 'y'},\n    ])\n    evidence = {'result': result, 'final_bytes_hex': target.read_bytes().hex(), 'original_bytes_hex': before.hex(),\n                'restore_fault_injected': True}\n    record(tmp_path, 'rollback_failure_visibility', evidence)\n    assert result['rollback_performed'] is True\n    assert result['patch_ops_rollback_protected'] is True\n    assert target.read_bytes() != before\n    assert 'injected restore failure' not in json.dumps(result)\n"
+    },
+    ".tmp/audit-ui-source-20260911-handlers.cjs": {
+      "sha256": "2e9925b466fee83d8f4c0d8acba21c6b919585a697c91f3dbdf8928925c765fb",
+      "text": "const fs = require('fs');\nconst vm = require('vm');\nconst source = fs.readFileSync('web/templates/index.html', 'utf8');\nfunction slice(a,b) { return source.slice(source.indexOf(a), source.indexOf(b, source.indexOf(a))); }\nfunction context() {\n  const elements = new Map();\n  const e = id => { if (!elements.has(id)) elements.set(id, { innerText: '', innerHTML: '', value: '', style: {}, dataset: {}, classList:{toggle(){}} }); return elements.get(id); };\n  const state = {raw: null}; const tabs=[]; const requests=[];\n  const ctx={document:{getElementById:e,querySelector:s=>s.includes('repo_path')?e('repo'):s.includes('query')?e('query'):null, querySelectorAll:()=>[],body:{dataset:{}}},window:{}, URLSearchParams, Math, JSON, alert:()=>{}, _setPatchState:u=>Object.assign(state,u), showTab:t=>tabs.push(t), localStorage:{setItem(){}}, console, fetch:(url,opts)=>new Promise(resolve=>requests.push({url,opts,resolve}))};\n  vm.createContext(ctx); return {ctx,e,state,tabs,requests};\n}\nasync function settle() { for(let i=0;i<8;i++) await Promise.resolve(); }\n(async()=>{\n const results=[];\n {\n  const s=context(); s.e('repo').value='repo';s.e('patchRawJson').innerText=JSON.stringify({patch_candidate:{relative_path:'app.py'}});\n  vm.runInContext(slice('function undoPatch()', 'function escapeHtml('),s.ctx);s.ctx.undoPatch();s.requests[0].resolve({json:async()=>({success:false,message:'Backup not found'})});await settle();\n  results.push({case:'undo_failed_response',actual:s.state,backend:{success:false,message:'Backup not found'},bug:s.state.last_action==='undone'});\n }\n {\n  const s=context();s.e('context').innerText='CONTROL for repo A';s.e('repo').value='A';\n  vm.runInContext(slice('function generatePatch()', 'function undoPatch()'),s.ctx);s.ctx.generatePatch();s.e('repo').value='B';s.e('context').innerText='CONTROL for repo B';s.ctx.generatePatch();\n  s.requests[1].resolve({json:async()=>({patch:JSON.stringify({summary:'B',patch_candidate:{relative_path:'b.py'}})})});await settle();\n  s.requests[0].resolve({json:async()=>({patch:JSON.stringify({summary:'A',patch_candidate:{relative_path:'a.py'}})})});await settle();\n  results.push({case:'generate_out_of_order_after_repository_switch',currentRepo:s.e('repo').value,displayedPatch:s.state.raw,submittedRepos:s.requests.map(x=>x.opts.body.get('repo_path')),bug:s.e('repo').value==='B'&&s.state.raw.summary==='A'});\n }\n {\n  const s=context();s.e('patchRawJson').innerText='{}';\n  vm.runInContext(slice('async function localCritique()', 'const repoInput ='),s.ctx); const p=s.ctx.localCritique();\n  const marker='<img src=\"x\" onerror=\"window.__uiAuditMarker=1\">';\n  s.requests[0].resolve({json:async()=>({ok:true,critic:{verdict:'accept',confidence:0.9,critic_summary:marker,risk_flags:[],must_fix:[]}})});await p;\n  results.push({case:'model_output_reaches_html_sink',unescapedMarkerPresent:s.e('localCritiqueMain').innerHTML.includes(marker),html:s.e('localCritiqueMain').innerHTML,scriptExecutionTested:false});\n }\n {\n  const s=context();s.e('modeSelect').value='full';s.e('applyPolicy').value='ask';\n  vm.runInContext(slice('function normalizeProductMode(', 'function updateRuntimeEnvironmentCustomFields('),s.ctx);s.ctx.setProductMode('chat');s.ctx.setProductMode('instant');\n  results.push({case:'mode_round_trip',initial:{mode:'full',policy:'ask'},after:{mode:s.e('modeSelect').value,policy:s.e('applyPolicy').value,button:s.e('primarySubmit').textContent},bug:s.e('applyPolicy').value==='plan'});\n }\n console.log(JSON.stringify({date:'2026-09-11',method:'Actual handler source evaluated with deterministic DOM/fetch adapters; no provider or real patch calls',results},null,2));\n})().catch(e=>{console.error(e);process.exitCode=1});\n"
+    },
+    ".tmp/audit-ui-source-20260911-cdn.cjs": {
+      "sha256": "c963e35464e0ee9b0c27874dcdd1f98a1f4fa65f66abeea212c0778370861b8b",
+      "text": "const fs=require('fs'),vm=require('vm');\nconst source=fs.readFileSync('web/templates/index.html','utf8');\nconst start=source.indexOf('<script>')+'<script>'.length;\nconst original=source.slice(start,source.indexOf('</script>',start));\n// Only render template expression placeholders. Production JS behavior is unchanged.\nconst script=original.replace(/\\{\\{[\\s\\S]*?\\}\\}/g,'null');\nconst ctx={window:{},document:{documentElement:{setAttribute(){}},querySelectorAll:()=>[],addEventListener(){},getElementById:()=>null},localStorage:{getItem:()=>null,setItem(){}},console};\nvm.createContext(ctx);\nlet initializationError=null,patchStateError=null;\ntry{vm.runInContext(script,ctx,{timeout:3000});}catch(e){initializationError=String(e);}\ntry{vm.runInContext('_setPatchState({last_action:\"review\"})',ctx,{timeout:3000});}catch(e){patchStateError=String(e);}\nconsole.log(JSON.stringify({date:'2026-09-11',method:'Full inline production JavaScript executed in VM with Jinja expressions replaced by null and DOM adapter; Mermaid omitted to model CDN unavailability. No network.',case:'mermaid_cdn_unavailable',initializationError,patchStateError,bug:initializationError==='ReferenceError: mermaid is not defined'&&!!patchStateError},null,2));\n"
+    },
+    ".tmp/audit_auth_ui_20260911.py": {
+      "sha256": "b837104b6325ea66cdaabd490042b3879a443bfc31bab9e7264dd7def8ce3cf7",
+      "text": "\"\"\"Audit probe: assert the observed UI/auth gap, not a fixed behavior.\"\"\"\nimport json\nfrom pathlib import Path\nfrom tests.test_harness_blackbox_http import harness\n\n\ndef test_token_enabled_native_form_has_no_auth_transport(harness):\n    page = harness.client.get('/')\n    html = page.get_data(as_text=True)\n    # The native form has no token transport; an empty submit avoids any model.\n    rejected = harness.client.post('/', data={'query': '', 'repo_path': ''})\n    allowed = harness.client.post('/', headers=harness.headers,\n                                  data={'query': '', 'repo_path': ''})\n    result = {\n        'page_status': page.status_code,\n        'native_form_present': 'id=\"agentForm\"' in html and 'method=\"POST\"' in html,\n        'token_header_name_in_rendered_ui': 'X-CATTUS-Web-Token' in html,\n        'unauthenticated_form_status': rejected.status_code,\n        'unauthenticated_form_reason': 'no token provided' in rejected.get_data(as_text=True),\n        'authenticated_control_status': allowed.status_code,\n        'provider_calls': len(harness.calls),\n        'browser_token_submission_tested': False,\n    }\n    (harness.root / 'auth-ui.json').write_text(json.dumps(result, indent=2), encoding='utf-8')\n    assert result['page_status'] == 200\n    assert result['native_form_present'] is True\n    assert result['token_header_name_in_rendered_ui'] is False\n    assert result['unauthenticated_form_status'] == 401\n    assert result['unauthenticated_form_reason'] is True\n    assert result['authenticated_control_status'] == 200\n    assert result['provider_calls'] == 0\n"
+    },
+    ".tmp/audit_ui_20260911_server.py": {
+      "sha256": "6acd5966bd60c08aef760c05f60cca572e410e2e30da6c558167b861c14c1e98",
+      "text": "\"\"\"Isolated UI audit: real Flask/template/JS, synthetic sessions and run output.\"\"\"\nimport os\nimport sys\nimport json\nimport time\nfrom pathlib import Path\n\nROOT = Path(__file__).resolve().parents[1]\nsys.path.insert(0, str(ROOT))\nWORK = ROOT / '.tmp' / 'audit-ui-20260911'\nWORK.mkdir(parents=True, exist_ok=True)\nfor key, value in {\n    'DB_ENABLED': 'false', 'DATABASE_URL': '', 'DATABASE_URL_LOCAL': '',\n    'INDEX_USE_EMBEDDINGS': 'false', 'ROUTER_USE_EMBEDDINGS': 'false',\n    'RETRIEVER_USE_EMBEDDINGS': 'false', 'RETRIEVER_USE_DB': 'false',\n    'EMBEDDING_PROVIDER': 'off', 'WEB_AUTH_TOKEN': os.environ.get('AUDIT_UI_TOKEN', ''),\n    'RUN_PROGRESS_POLLING_ENABLED': 'false', 'PYTHONDONTWRITEBYTECODE': '1',\n}.items():\n    os.environ[key] = value\nimport config\nconfig.AGENT_DIR = WORK / '.agent'\nconfig.STORAGE_PATH = WORK / 'storage'\nconfig.OUTPUT_FILE = WORK / 'session_log.txt'\nfor path in (config.AGENT_DIR, config.STORAGE_PATH):\n    path.mkdir(exist_ok=True)\nos.chdir(WORK)\nfrom web import app as web_app\nfrom web import session_store\nsession_store.SESSION_FILE = WORK / 'sessions.json'\nsession_store.SESSION_FILE.write_text('[]', encoding='utf-8')\nrepo = WORK / 'demo-repo'\nrepo.mkdir(exist_ok=True)\n(repo / 'app.py').write_text('def advance(value):\\n    return value + 1\\n', encoding='utf-8')\n\ndef scripted_run(**kwargs):\n    # A deliberate 8 second delay reveals the actual browser waiting behavior.\n    time.sleep(8)\n    return {\n        'answer': 'Audit fixture: app.py contains advance(value), which returns value + 1. No source files were changed.',\n        'context': 'Synthetic repository evidence: app.py', 'graph': '',\n        'state': '', 'patch': '', 'validation': 'No validation was requested.',\n    }, kwargs.get('project_tag')\n\nweb_app._run_mode = scripted_run\nweb_app.app.run(host='127.0.0.1', port=5187, debug=False, use_reloader=False)\n"
+    }
+  },
+  "runs": {
+    "runtime_three_probes": "...                                                                      [100%]\n============================== warnings summary ===============================\n.tmp/audit-runtime-20260911-probes/test_runtime_remaining.py::test_malformed_op_causes_partial_live_apply\n  C:\\Users\\Admin\\AppData\\Roaming\\Python\\Python314\\site-packages\\google\\genai\\types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17\n    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n3 passed, 1 warning in 6.13s\n",
+    "dream_isolation_repeat": ".                                                                        [100%]\n============================== warnings summary ===============================\n.tmp/audit-runtime-20260911-probes/test_runtime_remaining.py::test_dream_apply_uses_different_report_than_reviewed\n  C:\\Users\\Admin\\AppData\\Roaming\\Python\\Python314\\site-packages\\google\\genai\\types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17\n    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n1 passed, 2 deselected, 1 warning in 4.31s\n",
+    "auth_ui_junit": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"0\" failures=\"0\" skipped=\"0\" tests=\"1\" time=\"2.795\" timestamp=\"2026-09-11T21:53:08.723697+09:00\" hostname=\"LAPTOP-UFO8SCOQ\"><testcase classname=\".tmp.audit_auth_ui_20260911\" name=\"test_token_enabled_native_form_has_no_auth_transport\" time=\"2.616\" /></testsuite></testsuites>"
+  }
+}

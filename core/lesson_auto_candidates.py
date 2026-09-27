@@ -38,6 +38,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from core.rollback_outcome import rollback_disqualifies_success_evidence
+
 # Uniform result statuses returned by every public function.
 STATUS_DISABLED = "disabled"
 STATUS_CREATED = "created"
@@ -377,12 +379,16 @@ def _dream_candidate_from_artifact(artifact: dict[str, Any]) -> dict[str, Any] |
             "touched_forbidden_files": _touched_forbidden_files(files),
             "missing_expected_files": [],
             "patch_kind": "patch_plan",
-            "rollback_happened": bool(artifact.get("rollback_performed")),
+            "rollback_happened": rollback_disqualifies_success_evidence(artifact),
             "changed_files": files,
             "diff": artifact.get("diff") or "",
             "diffs": artifact.get("diffs") or [],
         }
 
+    # Embedded historical candidates cannot erase negative rollback evidence
+    # from their enclosing execution receipt.
+    if rollback_disqualifies_success_evidence(artifact):
+        candidate["rollback_happened"] = True
     files = candidate.get("changed_files")
     if not isinstance(files, list) or not [str(f) for f in files if str(f).strip()]:
         return None

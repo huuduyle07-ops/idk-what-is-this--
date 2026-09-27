@@ -1,0 +1,283 @@
+{
+  "phase": "UX.CONTEXT.1",
+  "completed_on": "2026-09-17",
+  "closed_residuals": [
+    "UX.STATE.1 limitation: Generate combined the displayed run's CONTROL context with the current repository input"
+  ],
+  "remaining_findings": [
+    "UX-05",
+    "UX-06"
+  ],
+  "out_of_scope": [
+    "UX-05",
+    "UX-06",
+    "visual redesign",
+    "read-authentication changes",
+    "PREFLIGHT.REQUEST.1",
+    "T6 Round 11",
+    "UX.RESILIENCE.1"
+  ],
+  "existing_files_changed": [
+    "web/static/workbench_state.js",
+    "web/templates/index.html",
+    "docs/roadmap/phase_registry.json",
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py",
+    "tests/_ux_state1_maintenance.py",
+    "tests/test_ux_state1.py"
+  ],
+  "new_files": [
+    "tests/_ux_context1_maintenance.py",
+    "tests/test_ux_context1.py",
+    "tests/test_ux_context1_browser.py",
+    "tests/fixtures/ux_context1_reversal.json",
+    "tests/fixtures/ux_context1_frozen_boundaries.json",
+    "tests/fixtures/ux_context1_completion.json",
+    "docs/designs/2026-09-17-run-repository-context-binding.md"
+  ],
+  "owners": {
+    "workflow_state": "web/static/workbench_state.js::WorkbenchState (extended; no new owner or global)",
+    "run_binding": "WorkbenchState serverRun (hydration only) and derived requestRun",
+    "generate_serialization": "web/templates/index.html::generatePatch and generateCandidates read ticket.requestRun",
+    "transport": "web/static/request_integrity.js (unchanged)",
+    "backend": "web/app.py /generate_patch and /generate_candidates (unchanged)"
+  },
+  "state_model": {
+    "run_provenance": [
+      "sessionId",
+      "repository",
+      "source",
+      "contextGeneration",
+      "context"
+    ],
+    "run_sources": [
+      "server",
+      "none"
+    ],
+    "request_run": "derived on every snapshot: the displayed run while run.source is server and run.contextGeneration equals the current generation, otherwise null; never stored",
+    "binding": "hydration only: the generation current at hydration when the server-recorded repository equals the hydrated repository, otherwise null",
+    "ticket_added_field": "requestRun, captured at dispatch for KINDS with requestRun: true (generate, candidates); null for every other kind",
+    "snapshot_added_field": "requestRun"
+  },
+  "request_field_inventory": {
+    "/generate_patch": {
+      "repo_path": "repository-bound: ticket.repository (unchanged)",
+      "runtime_environment": "repository-independent configuration: form select (unchanged)",
+      "control": "run-bound: #context.innerText -> ticket.requestRun.context or the fresh empty form",
+      "anti_lesson_control_requested": "repository-independent user intent: per-run checkbox (unchanged)"
+    },
+    "/generate_candidates": {
+      "control": "run-bound: #context.innerText -> ticket.requestRun.context or the fresh empty form",
+      "repo_path": "repository-bound: ticket.repository (unchanged)",
+      "runtime_environment": "repository-independent configuration: form select (unchanged)"
+    },
+    "related_unchanged": {
+      "/local_critique context": "run-bound, sent with the candidate and no repository; a candidate exists only alongside the run that produced or hydrated it",
+      "/apply_patch session_id": "run-bound; the backend already refuses to persist onto a session whose recorded repository differs"
+    }
+  },
+  "policies": {
+    "repository_change": "UX.STATE.1 invalidation unchanged; the displayed run stays visible and becomes ineligible",
+    "switch_back": "typing the old path back is a new generation; the run stays ineligible until explicitly selected again",
+    "explicit_history": "selecting a run (history link or reload) hydrates it; eligible only when its recorded repository matches",
+    "mismatched_history": "viewable, never transported",
+    "same_repository": "inputs that trim to the same repository keep the binding; continuation unchanged",
+    "ineligible_form": "control empty: the fresh no-prior-context form a New Session page sends; the backend answers Invalid control JSON before any harness decision or model call",
+    "hydrated_value": "#context.textContent once, after the page's JSON formatting pass: byte-identical to the entry's default-layout request, JSON-identical when the Context tab was visible"
+  },
+  "entry_behavior": {
+    "template_sha256": "ba8ad87f324c70abfcdbb733dd30dcb2c5eb543964d2c0ac7222d0f71af6f11d",
+    "state_module_sha256": "36916265f62cc12ae63a6316ac2bca90d0b3c3767d8091b8b568e333e3fc67cd",
+    "repository_a_to_b": "Generate Patch and Generate Candidates sent repo_path B with run A's CONTROL",
+    "switch_back": "A -> B -> A sent run A's CONTROL (no binding existed)",
+    "browser_restored_history": "historical run A re-rendered with restored input B sent B with run A's CONTROL",
+    "java_two_file_request": "repository B (Greeter.java, Main.java) requests carried run A's a.py CONTROL",
+    "layout": "#context.innerText carried newlines only while the Context tab was visible"
+  },
+  "post_behavior": {
+    "repository_a_to_b": "repo_path B with control empty; the real backend answers Invalid control JSON; zero provider calls",
+    "same_repository": "request bodies byte-identical to the entry (produced and history runs, both handlers)",
+    "switch_back": "control empty until the run is explicitly selected again, then run A's CONTROL",
+    "browser_restored_history": "repo_path B with control empty; run A still displayed",
+    "java_two_file_request": "repo_path B with control empty for both handlers; Java files unchanged; zero provider calls",
+    "in_flight": "the dispatched request keeps its captured context; its late response is still context_changed",
+    "layout": "transported bytes identical whichever result tab is visible"
+  },
+  "model_calls": 0,
+  "external_network_requests": 0,
+  "frozen_production_deltas": {
+    "backend_routes_and_web_app": 0,
+    "human_apply_authorization_and_candidate_fingerprint": 0,
+    "AUTH.WEB.1_transport": 0,
+    "AUTH.WEB.READ.1_host_boundary": 0,
+    "SEC.UI.1_sanitizer_and_sinks": 0,
+    "DATA.UNDO.1_owner_and_transport": 0,
+    "AUTH.DREAM.1_review_binding": 0,
+    "EXEC.PLAN.1": 0,
+    "DATA.ROLLBACK.1": 0,
+    "Track_A": 0,
+    "UX-02_stale_response_acceptance": 0,
+    "UX-03_action_and_undo_outcomes": 0,
+    "UX-04_mode_and_execution": 0,
+    "candidate_state_and_provenance": 0
+  },
+  "limitations": [
+    "Without an eligible run, Generate shows the backend's generic 'Invalid control JSON', as on a New Session page.",
+    "After Back navigation Chromium restores a typed repository into the input after hydration; WorkbenchState reconciles at the next input event or dispatch, and a render in between writes the owned value back.",
+    "Continuing from a run after a repository change takes a new selection of that run (history link or reload); there is no in-page run picker.",
+    "On a hydration mismatch (only if a browser restores the input before the page script) the server-rendered candidate still takes the hydrated repository, as in UX.STATE.1; Chromium restores after hydration.",
+    "UX-05 and UX-06 remain open."
+  ],
+  "performance": {
+    "browser": {
+      "post": {
+        "snapshot_us": 0.5,
+        "ticket_and_body_us": 63.0,
+        "body_length": 724
+      },
+      "entry": {
+        "snapshot_us": 0.5,
+        "ticket_and_body_us": 417.5,
+        "body_length": 724
+      }
+    },
+    "method": "Chromium, real page after a produced run; median per-operation microseconds of 9 batches x 200 operations. ticket_and_body serializes the Generate Candidates body the way each state's handler does (entry: #context.innerText read plus begin; post: begin plus ticket.requestRun). A second run measured post 44.5 / entry 291.5 us.",
+    "requests": "no transition or measurement issues a request; every scenario asserts its captured request body"
+  },
+  "test_runs": [
+    {
+      "scope": "entry_ui_baseline",
+      "selection": "74 files: UX.STATE.1's UI-related set plus AUTH.DREAM.1, EXEC.PLAN.1, DATA.ROLLBACK.1, harness modes web, mutation gate/surface, picker, help route and both UX.STATE.1 suites, on untouched entry bytes",
+      "passed": 1971,
+      "failed": 0,
+      "duration_seconds": 388.24
+    },
+    {
+      "scope": "red_before_implementation",
+      "selection": "tests/test_ux_context1_browser.py on untouched production bytes (empty reversal receipt, so PRE and POST ran on the same entry bytes)",
+      "tests": 26,
+      "passed": 7,
+      "failed": 19,
+      "duration_seconds": 86.34,
+      "note": "failures were behavioral or missing provenance: repository B requests carried run A's CONTROL (browser-restored history and Java two-file request), requestRun/run provenance absent, entry bytes differed by Context-tab visibility; the 7 passes were the 5 PRE tests and the two entry-versus-entry parity/performance tests"
+    },
+    {
+      "scope": "static_suite_before_governance",
+      "selection": "tests/test_ux_context1.py after the implementation, before registry and receipts",
+      "passed": 6,
+      "failed": 4,
+      "note": "written after the production change (containment and serialization checks); the 4 failures were the missing registry entry, reversal coverage, frozen manifest and this receipt"
+    },
+    {
+      "scope": "red_green_toggle",
+      "selection": "tests/test_ux_context1_browser.py POST tests (PRE, parity, tab-layout and performance tests deselected) with web/templates/index.html and web/static/workbench_state.js at reconstructed entry bytes",
+      "entry": {
+        "passed": 0,
+        "failed": 18,
+        "duration_seconds": 60.67
+      },
+      "restored": {
+        "passed": 18,
+        "failed": 0,
+        "duration_seconds": 61.36
+      },
+      "digests_after_restore": {
+        "web/templates/index.html": "c5a7b8bb509a5531335bbdbffd9a7c7c2ab840dea0efe7d99b533b70970e53a2",
+        "web/static/workbench_state.js": "0d02fb42b3df6eb271d92161f5c54e4a4427e2472c71919748a2898944b61350"
+      }
+    },
+    {
+      "scope": "chain_users_after_maintenance",
+      "selection": "tests/test_ux_context1.py, tests/test_ux_state1.py, tests/test_auth_web_read1.py, tests/test_auth_web1.py after hooking before_ux_state1 into before_ux_context1",
+      "passed": 292,
+      "failed": 2,
+      "note": "the 2 failures were this phase's frozen manifest and this receipt, not yet written"
+    },
+    {
+      "scope": "focused",
+      "selection": "tests/test_ux_context1.py and tests/test_ux_context1_browser.py",
+      "passed": 35,
+      "failed": 1,
+      "duration_seconds": 97.27,
+      "note": "the failure was this receipt not yet written"
+    },
+    {
+      "scope": "affected_broad_first",
+      "files": 235,
+      "selection": "UX.STATE.1's 233-file affected set plus tests/test_ux_context1.py and tests/test_ux_context1_browser.py",
+      "passed": 5788,
+      "failed": 53,
+      "skipped": 26,
+      "duration_seconds": 2351.43,
+      "failures_ab": "49 failure node ids identical to UX.STATE.1's broad baseline; 4 shared node ids changed status and were investigated before any conclusion",
+      "investigation": {
+        "repository_scanners": "tests.test_evidence_acquire_request::test_acquire_1_is_not_reachable_from_any_live_path, tests.test_evidence_candidate_pool::test_acquire_2_is_not_reachable_from_any_live_path and tests.test_waiter_evidence::test_waiter_2_is_not_reachable_from_any_live_path rglob every *.py outside paths with a 'tests' part. This phase's scratch entry snapshot was stored flattened as .tmp/ux-context1/entry/tests__test_phase_registry.py, which dropped that part. Reproduced alone (3 failed); the snapshots were re-laid out to mirror repository paths as earlier phases do (digests re-verified, reversal receipt rebuilt byte-identical); then 3 passed. No shipped file was involved.",
+        "junction_rename": "tests.test_data_rollback1_store_edges::test_junction_inserted_between_baseline_and_manifest_is_rejected raised PermissionError WinError 5 renaming a directory 18 ms after writing a file into it, under broad-run load (39 min versus 26 min for UX.STATE.1's run). It imports only core.failed_rollback_recovery, core.repository_identity, core.repository_path_policy and core.rollback_outcome, all byte-identical to entry. Its file passed alone, and the test passed 6 of 6 alone: a Windows handle race, not attributable to this phase."
+      },
+      "entry_ui_ab": "all 1971 node ids of the 74-file entry UI baseline passed in this run"
+    },
+    {
+      "scope": "affected_broad_final",
+      "files": 235,
+      "selection": "the same 235 files after the scratch snapshots were re-laid out",
+      "passed": 5792,
+      "failed": 49,
+      "skipped": 26,
+      "duration_seconds": 2107.32,
+      "failures_ab": "the 49 failure node ids and their first-line messages equal UX.STATE.1's recorded broad baseline exactly (24 files); no shared node changed status; the +36 passes are exactly the new UX.CONTEXT.1 tests",
+      "entry_ui_ab": "all 1971 node ids of the 74-file entry UI baseline passed",
+      "categories": {
+        "ux_context1_static": {
+          "passed": 10
+        },
+        "ux_context1_browser": {
+          "passed": 26
+        },
+        "ux_state1_full": {
+          "passed": 54
+        },
+        "browser_suites": {
+          "passed": 213
+        },
+        "history_session_ui": {
+          "passed": 57
+        },
+        "generate_request_serialization": {
+          "passed": 109
+        },
+        "security_auth_frozen": {
+          "passed": 626
+        },
+        "registry_picker": {
+          "passed": 267
+        }
+      }
+    }
+  ],
+  "checks": {
+    "compileall": "passed",
+    "benchmark_cases_check": "54 checked, 0 errors",
+    "git_diff_check": "passed (36 pre-existing line-ending notices, identical to UX.STATE.1's)",
+    "registry_phases": 189,
+    "ux_track_phases": 29,
+    "complete_or_history": 185,
+    "phase_picker_top_recommendation": "DOGFOOD.1B",
+    "tree_delta_against_entry_snapshot": "7 changed and 7 new files, exactly the lists above; nothing removed",
+    "chromium": "Playwright Chromium headless; Mermaid CDN stubbed in-route; all other external requests aborted and asserted empty"
+  },
+  "source_sha256": {
+    "web/static/workbench_state.js": "0d02fb42b3df6eb271d92161f5c54e4a4427e2472c71919748a2898944b61350",
+    "web/templates/index.html": "c5a7b8bb509a5531335bbdbffd9a7c7c2ab840dea0efe7d99b533b70970e53a2",
+    "docs/roadmap/phase_registry.json": "b03e5103a7efa9d34cdc25030f4b332171ddb6d8d9320b314d71966f509c1b13",
+    "tests/test_phase_registry.py": "14a89ead670881947f8678857c25497b6e78a1570a7cb67f870d7b640536cc0f",
+    "tests/test_phase_picker.py": "56418dc45e2d44f5e3e7d9ffd8dc8e3aa2f516a6eb88f7ff943fd3c16e284aa8",
+    "tests/_ux_state1_maintenance.py": "2e8443d2170b566e63803a4f9e3894a1879925bccf83ff6e9077236442288219",
+    "tests/test_ux_state1.py": "0fa4f68a1ef0c2975fef513119ba7de9cfed76b16d1c2a75d3b08ca035d57d8f",
+    "tests/_ux_context1_maintenance.py": "03c21ba747f5876521eb075a935624b413d65bd6abed57654b2eaed9642832a6",
+    "tests/test_ux_context1.py": "e7f4a4d5f2864343a61160d6d98e2e6893b823d5bf2f067545e2e3d3b72fb88e",
+    "tests/test_ux_context1_browser.py": "bf48e98ce6664714ead93d4f6a55c8781be9fa59cfe02f280fc017746fcbe4cb",
+    "tests/fixtures/ux_context1_reversal.json": "877e9dbef5bb348a5cb76f04acd18a7dd21340d6828602eba4998347d3979245",
+    "tests/fixtures/ux_context1_frozen_boundaries.json": "97967918d5e3e0e1b8bd8731f1023aae6be8885d903ceda6f1b1093475383d11",
+    "docs/designs/2026-09-17-run-repository-context-binding.md": "4b9a7630e7e8c9792c0fca612c48db7ceedbea84ba0879e019a0952ca5e31567"
+  }
+}

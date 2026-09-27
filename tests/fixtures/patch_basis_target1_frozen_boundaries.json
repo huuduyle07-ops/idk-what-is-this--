@@ -1,0 +1,110 @@
+{
+  "phase": "PATCH.BASIS.TARGET.1",
+  "purpose": "Files this phase must not move. Target-source grounding changed only how a target symbol is admitted; patch basis, defect facts, authoring, minimality, verification, authority, CONTROL/PREFLIGHT and the web surface are frozen.",
+  "groups": {
+    "patch_basis_and_defect_fact": [
+      "core/patch_basis.py",
+      "core/defect_probe.py",
+      "core/candidate_defect_probe.py",
+      "core/validation_outcome.py",
+      "core/localization_handoff.py",
+      "core/localization_candidate.py",
+      "core/localization_relevance.py"
+    ],
+    "PATCH.MINIMAL_and_PATCH.AUTHOR": [
+      "core/patch_authoring_contract.py",
+      "core/candidate_authoring_context.py",
+      "core/candidate_revision.py",
+      "core/candidate_verification.py",
+      "core/candidate_sandbox_validation.py",
+      "core/behavioral_matrix.py",
+      "patching/patch_gates.py",
+      "patching/patch_engine.py",
+      "patching/patch_plan_executor.py"
+    ],
+    "authoring_prompt": [
+      "core/prompter.py",
+      "core/pipeline.py"
+    ],
+    "CONTROL.FRESH_BOOTSTRAP_PREFLIGHT": [
+      "web/control_bootstrap.py",
+      "web/control_context.py",
+      "web/preflight_request.py",
+      "core/preflight.py",
+      "core/validator.py",
+      "core/phase_registry.py"
+    ],
+    "authority": [
+      "core/live_execution_authorization.py",
+      "core/execution_eligibility_policy.py",
+      "core/human_apply_authorization.py",
+      "core/undo_backup.py",
+      "core/validation_command.py"
+    ],
+    "backend_web": [
+      "web/app.py",
+      "web/routes/patch_routes.py",
+      "web/runner.py",
+      "web/session_store.py",
+      "web/auth_gate.py"
+    ],
+    "static_and_template": [
+      "web/templates/index.html",
+      "web/static/workbench_state.js",
+      "web/static/request_integrity.js"
+    ],
+    "extractor_consumers": [
+      "graph/builder.py",
+      "core/retriever.py",
+      "core/indexer.py",
+      "core/code_parse.py"
+    ],
+    "audit": [
+      "docs/designs/2026-09-18-typed-diagnostic-evidence-request.md"
+    ]
+  },
+  "sha256": {
+    "core/behavioral_matrix.py": "fb2780744746942a9d8fb24d2760cd4a7938de77e28b1f53f72477ee356d28ae",
+    "core/candidate_authoring_context.py": "b8f005d4c4185e8ef8f063310e3f56c9199339e1cb0e8e2174b1f8c848d57f96",
+    "core/candidate_defect_probe.py": "9794d3ef412f564e95497c580181c35598e43853234419613cb79842b6d8a7bc",
+    "core/candidate_revision.py": "b2c86cb9bd19dcb9d819b668ec46da5b5b7b4d87d9b7581811e0d91b06d7d29f",
+    "core/candidate_sandbox_validation.py": "73d7a3d3de4b2e666b5ac486f693883ff247c99da4e0dd577e051e2a203bf626",
+    "core/candidate_verification.py": "c259837a1680c6aed15e8fb09ed7f0d0b85a5c7179351be562a5e817797be1a8",
+    "core/code_parse.py": "4b70351e1c0e43f82b03cec9316b8f9313ce4153af2d904a848c64eedd0c5d51",
+    "core/defect_probe.py": "d1e0ec1b6e8d7b3026c4efc66a82ec04129827dba1b700e0e6a4658f709f8c74",
+    "core/execution_eligibility_policy.py": "54721c5f9bcab07b74eabb1e6bcc5cafb8af404717aab09ce9af8f935963c2b5",
+    "core/human_apply_authorization.py": "7f65a55cf237193ead702f0a99f3668f649e7efabe7c2618e244cd9518c94e89",
+    "core/indexer.py": "93dff28fa4e4c6808b65bf8f11094c5d228c84ec7a517c28ce570a73f354faef",
+    "core/live_execution_authorization.py": "72785ea65de0bf88e18c32ce3617170451c666ad7a03162183c921789ab8c784",
+    "core/localization_candidate.py": "90c49b7ae2447eb0f9f1715b1db06119ee92757499f2b0a1e99c2b11a1b27783",
+    "core/localization_handoff.py": "d763e37a868e3c507676bebad6e98afc1e61246987c782bad763e725d3f832f5",
+    "core/localization_relevance.py": "4dbe61eee856be4c0239c9a13d4a8779b14d42c600deb5050aaf21c63ee37b0e",
+    "core/patch_authoring_contract.py": "43974718069a3a8db9b46ffbcb2ddaf4dfe1d526cd47352839219402f1afb638",
+    "core/patch_basis.py": "c3031916020d71e6ee8471dfb43330b5329247cd202004f48dbe707d8670bb6c",
+    "core/phase_registry.py": "ee58fbecb76c5752b8a8beb6a05f9aaf7d2bd7e3c290155b280807a8c2236cf2",
+    "core/pipeline.py": "be8036f02a5c554a0e191d9b03fcab52a0d76df21fd818b7857ccc11afdd133b",
+    "core/preflight.py": "28edd0ca1008553f88a369f7c4eee21b6d5095b3ee48f557e414c29451f01808",
+    "core/prompter.py": "dee45048a7bee3c92d29766ff2924939159a1a65ddd8a22ecff3e07aae192279",
+    "core/retriever.py": "f2b2e75b1673f6dbd9fb88df62ea161dca09121a2d5c4fc56c842c8081110d7f",
+    "core/undo_backup.py": "1c5c6cd16f00dd08c56232e30fc4d378c178a996dd8820dedf19c3b4e9b17050",
+    "core/validation_command.py": "585f9af510d9f357c36e8e134f25578c7d162c6b70088d22378274eec7223c96",
+    "core/validation_outcome.py": "7717607e41a85891498d8525f13ddc5132bae940783bb5ade237319fc23d99bc",
+    "core/validator.py": "515dfc18a7cf7fb7a21357ba173e9566fadad0a9ca165d7bebd184b293f22b2f",
+    "docs/designs/2026-09-18-typed-diagnostic-evidence-request.md": "45e86307e6425787cd1796f0b271403ac2ef95e360fae3a08f7712b9a0fbf812",
+    "graph/builder.py": "cfcd6f1844b43b76e7ec5e790b3a9777da85a359445367759480acee51965365",
+    "patching/patch_engine.py": "33b475c229be10e6dce78fbc6979cc5334df9c60f8cfc4a39e1c36be28e41da1",
+    "patching/patch_gates.py": "069ff2cba10256f761b99840e37f7b574fbcfdcb07d205f3aeace47237c1a809",
+    "patching/patch_plan_executor.py": "111ee91975b484579e5dbd0fc3c18de862fad7bc2f179b7af88082c7572776e8",
+    "web/app.py": "ffbdaf8247a4142e1a2dfcbddad62753d15ab651f377e825fcc1a4c978f8a855",
+    "web/auth_gate.py": "7dbcc67fe8cbbe18b554f413beae8b0f4ed5a5c3613de9b54ab39571a9117c87",
+    "web/control_bootstrap.py": "76a6d59f654b2f76d7933a7a134fd9796382973fbb56b8f9b50141172e3f090b",
+    "web/control_context.py": "8d36ef26dac6c2f9af4130663fa158d5cfd8d6083bc3a8ad61cb3a453eba970f",
+    "web/preflight_request.py": "ed44fcad97512ff5497fe8fea82f048343da9f3de49186880f28f8a8a38cabb8",
+    "web/routes/patch_routes.py": "19fc0272e812ec4394c774b1940ade3ef0e2843ef447cdc54e51dcdd938c8a55",
+    "web/runner.py": "6b4e907c6ed14bc89dcaebe27541280b113a62babe01a8b570be6e368a666e6e",
+    "web/session_store.py": "d89322a78a49ac9ba8beef2086eff32190fe6a16dd9810bd73ebe906b9488214",
+    "web/static/request_integrity.js": "234a4ece3048bed04030cbd237a32ec862558d08f8869e48288d23c8ef66846e",
+    "web/static/workbench_state.js": "843be0a0bbfbfc9c22eb23f5e5ae04695d4daf3d32ac77eef9ca2772a0f76f39",
+    "web/templates/index.html": "3bdb72c51028b1317cd5ce82c5859a4b34f7f1cc0de2218ac26340ef649fc80c"
+  }
+}

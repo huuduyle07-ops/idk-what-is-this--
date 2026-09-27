@@ -60,15 +60,18 @@ def test_dream_apply_blocks_unsafe_patch_plan_before_apply(tmp_path, monkeypatch
         return subprocess.CompletedProcess(args=[], returncode=0)
 
     monkeypatch.setattr(web_app.dream_artifacts, "latest_report_dir", lambda _repo: report_dir)
+    monkeypatch.setattr(web_app.dream_artifacts, "dreams_root", lambda _repo: report_dir.parent.parent)
     monkeypatch.setattr(web_app, "inspect_repo_inventory", lambda _repo: {"primary_language": "python"})
     monkeypatch.setattr(web_app, "run_patch_plan_with_artifacts", fake_apply)
     monkeypatch.setattr(subprocess, "run", fake_subprocess_run)
 
     web_app.app.config["TESTING"] = True
     client = web_app.app.test_client()
+    reviewed = client.get("/dream/list", query_string={"repo_path": str(repo)}).get_json()
+    binding = reviewed["items"][0]["review_binding"]
     resp = client.post(
         "/dream/apply",
-        data={"repo_path": str(repo), "selection": "1"},
+        data={"repo_path": str(repo), "selection": "1", "review_bindings": json.dumps([binding])},
     )
 
     assert resp.status_code == 200

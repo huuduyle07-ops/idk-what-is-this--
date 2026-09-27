@@ -3,6 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal, Any
 
+from core.patch_basis import (
+    PATCH_BASIS_GROUNDED_DEFECT,
+    has_legitimate_patch_basis,
+    normalize_patch_basis,
+)
+
 PatchStyle = Literal["safe_minimal", "balanced", "vibe"]
 
 
@@ -14,7 +20,10 @@ class PatchPolicy:
     allow_statement_level_patch: bool
     require_exact_target_match: bool
     require_validation_for_apply: bool
+    patch_basis: str
+    patch_basis_accepted: bool
     auto_apply_allowed: bool
+    human_approval_required: bool
     prompt_rules: list[str]
 
 
@@ -41,10 +50,33 @@ def build_patch_policy(
     repo_manifest: dict[str, Any] | None = None,
     language: str = "unknown",
     has_validation_command: bool = False,
+    patch_confidence: float = 0.0,
+    defect_grounded: bool = False,
+    patch_basis: str | None = None,
     control_confidence: float = 0.0,
 ) -> PatchPolicy:
+    """Build patch/apply policy from patch facts, never localization rank.
+
+    ``control_confidence`` remains in the call signature so historical callers
+    and replay artifacts stay readable.  It is the deprecated CONTROL
+    localization value and intentionally grants nothing.  ``patch_confidence``
+    is the model patch writer's separate self-assessment. ``patch_basis`` is the
+    typed reason a patch may be considered.  ``defect_grounded`` remains as a
+    compatibility input for historical callers and projects only to
+    ``grounded_defect``; it is not the conceptual policy input for new callers.
+
+    A legitimate basis is still not auto-apply authority.  In particular an
+    ``explicit_change_request`` is accepted for patch-safety/human review but
+    never enables automatic application here.
+    """
+    del control_confidence
     patch_style = normalize_patch_style(style)
     repo_manifest = repo_manifest or {}
+    effective_patch_basis = normalize_patch_basis(patch_basis)
+    if patch_basis is None and defect_grounded:
+        effective_patch_basis = PATCH_BASIS_GROUNDED_DEFECT
+    patch_basis_accepted = has_legitimate_patch_basis(effective_patch_basis)
+    defect_basis = effective_patch_basis == PATCH_BASIS_GROUNDED_DEFECT
 
     repo_warnings = repo_manifest.get("warnings", [])
     primary_language = repo_manifest.get("primary_language", language)
@@ -57,10 +89,14 @@ def build_patch_policy(
             allow_statement_level_patch=True,
             require_exact_target_match=True,
             require_validation_for_apply=False,
+            patch_basis=effective_patch_basis,
+            patch_basis_accepted=patch_basis_accepted,
             auto_apply_allowed=(
-                control_confidence >= 0.75
+                defect_basis
+                and patch_confidence >= 0.75
                 and primary_language != "unknown"
             ),
+            human_approval_required=True,
             prompt_rules=[
                 "Use only APIs, fields, functions, and classes already present in the provided context.",
                 "Do not introduce new fields, methods, classes, imports, or framework assumptions.",
@@ -77,11 +113,15 @@ def build_patch_policy(
             allow_statement_level_patch=True,
             require_exact_target_match=True,
             require_validation_for_apply=True,
+            patch_basis=effective_patch_basis,
+            patch_basis_accepted=patch_basis_accepted,
             auto_apply_allowed=(
-                control_confidence >= 0.8
+                defect_basis
+                and patch_confidence >= 0.8
                 and primary_language != "unknown"
                 and has_validation_command
             ),
+            human_approval_required=True,
             prompt_rules=[
                 "You may propose a design-level fix, but patch_candidate must stay grounded in existing code.",
                 "Do not introduce unknown APIs in patched_snippet unless they are visible in repo context.",
@@ -98,7 +138,10 @@ def build_patch_policy(
         allow_statement_level_patch=True,
         require_exact_target_match=True,
         require_validation_for_apply=True,
+        patch_basis=effective_patch_basis,
+        patch_basis_accepted=patch_basis_accepted,
         auto_apply_allowed=False,
+        human_approval_required=True,
         prompt_rules=[
             "You may propose broader changes, new fields, or new helper APIs if they serve the user's goal.",
             "Clearly mark assumptions.",
@@ -114,7 +157,10 @@ def policy_to_prompt_block(policy: PatchPolicy) -> str:
         f"PATCH STYLE: {policy.style}",
         f"- allow_new_api: {policy.allow_new_api}",
         f"- allow_multifile_patch: {policy.allow_multifile_patch}",
+        f"- patch_basis: {policy.patch_basis}",
+        f"- patch_basis_accepted: {policy.patch_basis_accepted}",
         f"- auto_apply_allowed: {policy.auto_apply_allowed}",
+        f"- human_approval_required: {policy.human_approval_required}",
         "",
         "Patch style rules:",
     ]

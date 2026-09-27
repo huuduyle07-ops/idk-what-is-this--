@@ -1,0 +1,280 @@
+{
+  "phase": "CONTROL.FRESH.1",
+  "purpose": "Test-only exact reversal before older immutable phase receipts.",
+  "files": {
+    "web/app.py": {
+      "entry_sha256": "a1f9565c0c0805485f2bfa8794469ded24702ee9d03f44dfe90fab1e44584778",
+      "post_sha256": "f2b3f3fa555712345104db16cd1d494da69a01af509bdfc18eca298894e2701c",
+      "hunks": [
+        {
+          "before": "from core.validation_command import get_default_validation_command\r\nfrom web.runner import run_agent_web\r\nfrom web.dream_report_markdown import render_dream_report_markdown\r\nfrom agents.deepseek_client import run_deepseek_review\r\nfrom config import get_agent_dir, FOLDER_BLACKLIST\r\nfrom core.project_tag import build_project_tag, fingerprint_repo  # re-exported for legacy callers\r\n",
+          "after": "from core.validation_command import get_default_validation_command\r\nfrom web.runner import run_agent_web\r\nfrom web.dream_report_markdown import render_dream_report_markdown\r\nfrom web.control_context import control_context_from_form\r\nfrom agents.deepseek_client import run_deepseek_review\r\nfrom config import get_agent_dir, FOLDER_BLACKLIST\r\nfrom core.project_tag import build_project_tag, fingerprint_repo  # re-exported for legacy callers\r\n"
+        },
+        {
+          "before": "@app.route(\"/generate_patch\", methods=[\"POST\"])\r\ndef generate_patch():\r\n    repo_path = request.form.get(\"repo_path\", \"\")\r\n    control_json = request.form.get(\"control\", \"\")\r\n\r\n    try:\r\n        control = json.loads(control_json)\r\n    except Exception:\r\n        return {\"error\": \"Invalid control JSON\"}\r\n\r\n    harness_block = _patch_generation_harness_block(repo_path, control)\r\n    if harness_block:\r\n",
+          "after": "@app.route(\"/generate_patch\", methods=[\"POST\"])\r\ndef generate_patch():\r\n    repo_path = request.form.get(\"repo_path\", \"\")\r\n    # CONTROL.FRESH.1: only prior CONTROL continues.  A fresh start stops at the\r\n    # bootstrap boundary and malformed CONTROL is rejected, both as typed answers.\r\n    control_context = control_context_from_form(request.form)\r\n    if control_context.control is None:\r\n        return control_context.response()\r\n    control = control_context.control\r\n\r\n    harness_block = _patch_generation_harness_block(repo_path, control)\r\n    if harness_block:\r\n"
+        },
+        {
+          "before": "\r\n@app.route(\"/generate_candidates\", methods=[\"POST\"])\r\ndef generate_candidates():\r\n    control_json = request.form[\"control\"]\r\n    repo_path = (request.form.get(\"repo_path\") or \"\").strip() or None\r\n\r\n    try:\r\n        control = json.loads(control_json)\r\n    except Exception:\r\n        return {\"error\": \"Invalid control JSON\"}\r\n\r\n    harness_block = _patch_generation_harness_block(repo_path, control)\r\n    if harness_block:\r\n",
+          "after": "\r\n@app.route(\"/generate_candidates\", methods=[\"POST\"])\r\ndef generate_candidates():\r\n    # CONTROL.FRESH.1: the same owner and typed answers as /generate_patch.\r\n    control_context = control_context_from_form(request.form)\r\n    repo_path = (request.form.get(\"repo_path\") or \"\").strip() or None\r\n\r\n    if control_context.control is None:\r\n        return control_context.response()\r\n    control = control_context.control\r\n\r\n    harness_block = _patch_generation_harness_block(repo_path, control)\r\n    if harness_block:\r\n"
+        }
+      ]
+    },
+    "web/templates/index.html": {
+      "entry_sha256": "c5a7b8bb509a5531335bbdbffd9a7c7c2ab840dea0efe7d99b533b70970e53a2",
+      "post_sha256": "a7e54cf535de7477de4d8aee1303b42c0fecc0c8c984dcb1af8ac0257ba9de11",
+      "hunks": [
+        {
+          "before": "    // context and newest request that are still current when it arrives.\r\n    // UX.CONTEXT.1: CONTROL comes only from the run context the ticket bound to\r\n    // this repository context; without one, the fresh no-prior-context form.\r\n    WorkbenchState.setRepository(document.querySelector(\"input[name='repo_path']\").value);\r\n    const runtimeEnv = document.querySelector(\"select[name='runtime_environment']\")?.value || \"auto\";\r\n    // Phase 11.7c: per-run-only field. The server still ignores it unless\r\n",
+          "after": "    // context and newest request that are still current when it arrives.\r\n    // UX.CONTEXT.1: CONTROL comes only from the run context the ticket bound to\r\n    // this repository context; without one, the fresh no-prior-context form.\r\n    // CONTROL.FRESH.1: that form is the explicit JSON null, never an empty value.\r\n    WorkbenchState.setRepository(document.querySelector(\"input[name='repo_path']\").value);\r\n    const runtimeEnv = document.querySelector(\"select[name='runtime_environment']\")?.value || \"auto\";\r\n    // Phase 11.7c: per-run-only field. The server still ignores it unless\r\n"
+        },
+        {
+          "before": "        body: new URLSearchParams({\r\n            repo_path: ticket.repository,\r\n            runtime_environment: runtimeEnv,\r\n            control: ticket.requestRun ? ticket.requestRun.context : \"\",\r\n            anti_lesson_control_requested: antiLessonForRun\r\n        })\r\n    })\r\n",
+          "after": "        body: new URLSearchParams({\r\n            repo_path: ticket.repository,\r\n            runtime_environment: runtimeEnv,\r\n            control: ticket.requestRun ? ticket.requestRun.context : JSON.stringify(null),\r\n            anti_lesson_control_requested: antiLessonForRun\r\n        })\r\n    })\r\n"
+        },
+        {
+          "before": "            \"Content-Type\": \"application/x-www-form-urlencoded\"\r\n        },\r\n        body: new URLSearchParams({\r\n            control: ticket.requestRun ? ticket.requestRun.context : \"\",\r\n            repo_path: ticket.repository,\r\n            runtime_environment: runtimeEnv\r\n        })\r\n",
+          "after": "            \"Content-Type\": \"application/x-www-form-urlencoded\"\r\n        },\r\n        body: new URLSearchParams({\r\n            control: ticket.requestRun ? ticket.requestRun.context : JSON.stringify(null),\r\n            repo_path: ticket.repository,\r\n            runtime_environment: runtimeEnv\r\n        })\r\n"
+        }
+      ]
+    },
+    "docs/roadmap/phase_registry.json": {
+      "entry_sha256": "b03e5103a7efa9d34cdc25030f4b332171ddb6d8d9320b314d71966f509c1b13",
+      "post_sha256": "633a946e99838e38999ea021baae7fe334eb80e3f8ff85b279688f88fb8c7823",
+      "hunks": [
+        {
+          "before": "        \"Same-repository continuation is byte-identical to UX.STATE.1 in the default layout and JSON-identical in every layout (the entry's innerText read carried newlines only while the Context tab was visible). A repository change, an upload into another repository or the generic invalidation hook ends the binding for good on the page; typing the old path back does not restore it; selecting a run from history (or reloading it) binds it again only to its own recorded repository. Local Critique, Test, Apply and Undo are unchanged.\",\n        \"Frozen: backend routes and authority, request_integrity.js, AUTH.WEB.1, AUTH.WEB.READ.1, SEC.UI.1, DATA.UNDO.1, EXEC.PLAN.1, AUTH.DREAM.1, DATA.ROLLBACK.1, Track A and UX.STATE.1's stale-response (UX-02), action/Undo (UX-03) and mode (UX-04) semantics. UX-05, UX-06, redesign, read authentication, PREFLIGHT.REQUEST.1, T6 Round 11 and UX.RESILIENCE.1 remain out of scope. No live model or external network calls.\"\n      ]\n    }\n  ]\n}\n",
+          "after": "        \"Same-repository continuation is byte-identical to UX.STATE.1 in the default layout and JSON-identical in every layout (the entry's innerText read carried newlines only while the Context tab was visible). A repository change, an upload into another repository or the generic invalidation hook ends the binding for good on the page; typing the old path back does not restore it; selecting a run from history (or reloading it) binds it again only to its own recorded repository. Local Critique, Test, Apply and Undo are unchanged.\",\n        \"Frozen: backend routes and authority, request_integrity.js, AUTH.WEB.1, AUTH.WEB.READ.1, SEC.UI.1, DATA.UNDO.1, EXEC.PLAN.1, AUTH.DREAM.1, DATA.ROLLBACK.1, Track A and UX.STATE.1's stale-response (UX-02), action/Undo (UX-03) and mode (UX-04) semantics. UX-05, UX-06, redesign, read authentication, PREFLIGHT.REQUEST.1, T6 Round 11 and UX.RESILIENCE.1 remain out of scope. No live model or external network calls.\"\n      ]\n    },\n    {\n      \"phase_id\": \"CONTROL.FRESH.1\",\n      \"title\": \"Explicit No-Prior-Run Context Contract\",\n      \"track\": \"CONTROL\",\n      \"status\": \"complete\",\n      \"summary\": \"Close the contract mismatch UX.CONTEXT.1 exposed: without an eligible run, Generate Patch and Generate Candidates sent an empty control value that the backend answered as malformed (Invalid control JSON). One pure owner, web/control_context.py, now gives the control field three distinct meanings: a CONTROL object is prior continuation input for the unchanged pipeline; the explicit JSON null is a typed fresh-bootstrap-required state answered fresh_control_required at the bootstrap boundary, with no harness, prompt, provider, graph, retrieval, preflight or mutation; anything else is a structured invalid_control_json or invalid_control_request rejection. A fresh Generate is not executable yet: CONTROL.BOOTSTRAP.1 is required before a fresh task can proceed into CONTROL-dependent analysis and provider stages.\",\n      \"automation_level\": \"LOCAL_1_PREPARE\",\n      \"budget_tier\": \"local_only\",\n      \"risk_level\": \"medium\",\n      \"allowed_files\": [\n        \"web/control_context.py\",\n        \"web/app.py\",\n        \"web/templates/index.html\",\n        \"tests/test_control_fresh1.py\",\n        \"tests/test_control_fresh1_browser.py\",\n        \"tests/_control_fresh1_maintenance.py\",\n        \"tests/_ux_context1_maintenance.py\",\n        \"tests/test_ux_context1.py\",\n        \"tests/test_ux_context1_browser.py\",\n        \"tests/test_ux_state1.py\",\n        \"tests/test_auth_web1.py\",\n        \"tests/test_auth_web_read1.py\",\n        \"tests/fixtures/control_fresh1_*.json\",\n        \"docs/roadmap/phase_registry.json\",\n        \"tests/test_phase_registry.py\",\n        \"tests/test_phase_picker.py\",\n        \"docs/designs/2026-09-18-explicit-no-prior-run-control-context.md\"\n      ],\n      \"forbidden_files\": [\n        \".env\",\n        \".git\",\n        \".agent/private\",\n        \"agents/\",\n        \"core/\",\n        \"patching/\",\n        \"web/auth_gate.py\",\n        \"web/request_origin.py\",\n        \"web/browser_session.py\",\n        \"web/read_host.py\",\n        \"web/routes/\",\n        \"web/runner.py\",\n        \"web/session_store.py\",\n        \"web/static/workbench_state.js\",\n        \"web/static/request_integrity.js\",\n        \"web/static/safe_content.js\",\n        \"web/static/vendor/\",\n        \"docker-compose.yml\",\n        \"docs/audits/\"\n      ],\n      \"validation\": [\n        \"python -m pytest tests/test_control_fresh1.py tests/test_control_fresh1_browser.py -q\",\n        \"python -m pytest tests/test_ux_context1.py tests/test_ux_context1_browser.py tests/test_ux_state1.py tests/test_ux_state1_browser.py -q\",\n        \"python -m pytest tests/test_harness_modes_web.py tests/test_anti_lesson_control_injection.py tests/test_runtime_environment_web.py tests/test_unified_workbench_behavior_preservation.py tests/test_web_ui_history_controls.py tests/test_history_management.py tests/test_current_run_snapshot_association.py -q\",\n        \"python -m pytest tests/test_data_undo1.py tests/test_auth_dream1.py tests/test_sec_ui1.py tests/test_exec_plan1.py tests/test_data_rollback1.py tests/test_auth_web1.py tests/test_auth_web1_browser.py tests/test_auth_web_read1.py tests/test_auth_web_read1_browser.py -q\",\n        \"python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q\",\n        \"python -m compileall -q core patching web scripts tests\",\n        \"python benchmarks/run_benchmarks.py --check\",\n        \"git diff --check\"\n      ],\n      \"human_approval_required\": true,\n      \"merge_allowed\": false,\n      \"network_allowed\": false,\n      \"model_calls_allowed\": false,\n      \"writes_real_repo\": true,\n      \"requires_sandbox\": false,\n      \"prerequisites\": [\n        \"UX.CONTEXT.1\"\n      ],\n      \"expected_artifacts\": [\n        \"docs/designs/2026-09-18-explicit-no-prior-run-control-context.md\",\n        \"web/control_context.py\",\n        \"tests/test_control_fresh1.py\",\n        \"tests/test_control_fresh1_browser.py\",\n        \"tests/fixtures/control_fresh1_completion.json\",\n        \"tests/fixtures/control_fresh1_frozen_boundaries.json\",\n        \"tests/fixtures/control_fresh1_reversal.json\"\n      ],\n      \"notes\": [\n        \"web/control_context.py is the only reader of the control field and is pure standard-library code. Exactly one value is required (missing or repeated: invalid_control_request). The exact text null is the typed fresh_bootstrap_required state; any other JSON null spelling is invalid_control_request (non_canonical_null). Empty, whitespace-only, non-JSON (NaN and Infinity included), non-object, wrongly shaped CONTROL fields and objects without a non-null top_hypothesis, hypotheses, patch_intent or related_snippets are invalid_control_json with a reason (and the field), keeping the Invalid control JSON text.\",\n        \"Both Generate routes call the owner once before any other stage, and prior CONTROL continues into their byte-identical harness, prompt, provider and grounding tail. WorkbenchState stays authoritative: the handlers send the ticket's frozen run context when requestRun exists and JSON.stringify(null) otherwise. The state module, UX-02, UX-03, UX-04 and UX.CONTEXT.1 run and repository provenance are unchanged, and same-repository continuation bodies are byte-identical to UX.CONTEXT.1.\",\n        \"A fresh Generate now reaches the bootstrap boundary but is not executable: it creates no session, run id, CONTROL receipt, candidate or execution result and reaches no harness, prompt, provider, graph, retrieval, preflight or mutation. CONTROL.BOOTSTRAP.1 is required before a fresh task can proceed into CONTROL-dependent analysis and provider stages. Frozen: Track A, execution and human Apply authority, Local Critique, AUTH.DREAM.1, AUTH.WEB.1, AUTH.WEB.READ.1, SEC.UI.1, DATA.UNDO.1, EXEC.PLAN.1 and DATA.ROLLBACK.1; UX-05, UX-06, UX.RESILIENCE.1, PREFLIGHT.REQUEST.1 and T6 Round 11 remain out of scope. No live model or external network calls.\"\n      ]\n    }\n  ]\n}\n"
+        }
+      ]
+    },
+    "tests/test_phase_registry.py": {
+      "entry_sha256": "14a89ead670881947f8678857c25497b6e78a1570a7cb67f870d7b640536cc0f",
+      "post_sha256": "0379dcd23a5a765623b3ce3d373dba2c96b63e10ef51a9866c990e0ab34b8e6c",
+      "hunks": [
+        {
+          "before": "    assert \"EXEC.APPROVAL.LIVE.1\" in ids\r\n    assert \"ANSWER.GROUND.LIVE.2\" in ids\r\n    assert \"CONTROL.LOCALIZE.LIVE.2\" in ids\r\n    assert len(data[\"phases\"]) == 189\r\n\r\n\r\ndef test_input_understanding_phase_is_registered_and_inert():\r\n",
+          "after": "    assert \"EXEC.APPROVAL.LIVE.1\" in ids\r\n    assert \"ANSWER.GROUND.LIVE.2\" in ids\r\n    assert \"CONTROL.LOCALIZE.LIVE.2\" in ids\r\n    assert len(data[\"phases\"]) == 190\r\n\r\n\r\ndef test_input_understanding_phase_is_registered_and_inert():\r\n"
+        },
+        {
+          "before": "        \"INPUT\": 4,\r\n        \"SYNTHESIS\": 1,\r\n            \"CHECK\": 9,\r\n            \"CONTROL\": 9,\r\n            \"WAITER\": 5,\r\n        \"WORKER\": 5,\r\n        \"MIRROR\": 15,\r\n",
+          "after": "        \"INPUT\": 4,\r\n        \"SYNTHESIS\": 1,\r\n            \"CHECK\": 9,\r\n            \"CONTROL\": 10,\r\n            \"WAITER\": 5,\r\n        \"WORKER\": 5,\r\n        \"MIRROR\": 15,\r\n"
+        }
+      ]
+    },
+    "tests/test_phase_picker.py": {
+      "entry_sha256": "56418dc45e2d44f5e3e7d9ffd8dc8e3aa2f516a6eb88f7ff943fd3c16e284aa8",
+      "post_sha256": "2648ddf1e8ea081c3d059877aabb7855c7aac0cf41f5e26544fd44a23d95477c",
+      "hunks": [
+        {
+          "before": "        \"human_approval_required\": 0,\r\n        \"blocked\": 0,\r\n        \"deferred_or_parked\": 0,\r\n        \"complete_or_history\": 185,\r\n    }\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n    assert report[\"top_recommendation\"][\"recommended_next_step\"] == \"prepare_worker_assignment\"\r\n",
+          "after": "        \"human_approval_required\": 0,\r\n        \"blocked\": 0,\r\n        \"deferred_or_parked\": 0,\r\n        \"complete_or_history\": 186,\r\n    }\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n    assert report[\"top_recommendation\"][\"recommended_next_step\"] == \"prepare_worker_assignment\"\r\n"
+        },
+        {
+          "before": "    assert \"CTX.SELECT.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"CTX.SELECT.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"ACQUIRE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"ACQUIRE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"EVIDENCE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"EVIDENCE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"EVIDENCE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"EVIDENCE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert phase[\"prerequisites\"] == [\"EVIDENCE.2\"]\r\n    assert \"CLAIM.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CLAIM.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert phase[\"prerequisites\"] == [\"EVIDENCE.2\"]\r\n    assert \"CLAIM.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CLAIM.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"SYNTHESIS.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"SYNTHESIS.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert phase[\"prerequisites\"] == [\"CTX.APPLY.0\"]\r\n    assert \"CHECK.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert phase[\"prerequisites\"] == [\"CTX.APPLY.0\"]\r\n    assert \"CHECK.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert phase[\"prerequisites\"] == [\"CHECK.1\", \"CLAIM.1\"]\r\n    assert \"CHECK.2\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.2\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert phase[\"prerequisites\"] == [\"CHECK.1\", \"CLAIM.1\"]\r\n    assert \"CHECK.2\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.2\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"CHECK.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"CHECK.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"CHECK.LIVE.1B\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"CHECK.LIVE.1B\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.2A\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.2A\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.2A.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.2A.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.2A.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.2A.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"sandbox_required\"] == 1\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_candidate_sandbox_validation_phase_is_complete_history():\r\n",
+          "after": "        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"sandbox_required\"] == 1\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_candidate_sandbox_validation_phase_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"OPS.PATCH.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_typed_patch_basis_phase_is_complete_history():\r\n",
+          "after": "    assert \"OPS.PATCH.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_typed_patch_basis_phase_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"PATCH.BASIS.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_query_symbol_entry_recall_phase_is_complete_history():\r\n",
+          "after": "    assert \"PATCH.BASIS.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_query_symbol_entry_recall_phase_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"RETRIEVE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_production_query_recall_unification_is_complete_history():\r\n",
+          "after": "    assert \"RETRIEVE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_production_query_recall_unification_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"RETRIEVE.LIVE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_answer_entity_grounding_is_complete_check_history():\r\n",
+          "after": "    assert \"RETRIEVE.LIVE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_answer_entity_grounding_is_complete_check_history():\r\n"
+        },
+        {
+          "before": "    assert \"ANSWER.GROUND.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_answer_symbol_grounding_is_complete_check_history():\r\n",
+          "after": "    assert \"ANSWER.GROUND.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_answer_symbol_grounding_is_complete_check_history():\r\n"
+        },
+        {
+          "before": "    assert \"ANSWER.GROUND.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_bounded_defect_probe_is_complete_ops_history():\r\n",
+          "after": "    assert \"ANSWER.GROUND.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_bounded_defect_probe_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"DEFECT.PROBE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_bounded_targeted_validation_is_complete_ops_history():\r\n",
+          "after": "    assert \"DEFECT.PROBE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_bounded_targeted_validation_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"OPS.VALIDATE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_immutable_candidate_defect_closure_is_complete_ops_history():\r\n",
+          "after": "    assert \"OPS.VALIDATE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_immutable_candidate_defect_closure_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"DEFECT.PROBE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_existing_check_oracle_role_is_complete_ops_history():\r\n",
+          "after": "    assert \"DEFECT.PROBE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_existing_check_oracle_role_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"VALIDATE.ORACLE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_execution_eligibility_policy_is_complete_ops_history():\r\n",
+          "after": "    assert \"VALIDATE.ORACLE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_execution_eligibility_policy_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"EXEC.POLICY.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_human_apply_binding_is_complete_ops_history():\r\n",
+          "after": "    assert \"EXEC.POLICY.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_human_apply_binding_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"EXEC.APPROVAL.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n\r\n\r\ndef test_seed_repository_specificity_entry_ordering_is_complete_index_history():\r\n",
+          "after": "    assert \"EXEC.APPROVAL.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n\r\n\r\ndef test_seed_repository_specificity_entry_ordering_is_complete_index_history():\r\n"
+        },
+        {
+          "before": "    assert \"RETRIEVE.LIVE.4\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 185\r\n",
+          "after": "    assert \"RETRIEVE.LIVE.4\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 186\r\n"
+        }
+      ]
+    },
+    "tests/_ux_context1_maintenance.py": {
+      "entry_sha256": "03c21ba747f5876521eb075a935624b413d65bd6abed57654b2eaed9642832a6",
+      "post_sha256": "32edc9088b016e33332ba0f86a4aa8fc33c0581069696b1f74484148a44aae99",
+      "hunks": [
+        {
+          "before": "\ndef before_ux_context1(relative: str, content: bytes | None = None) -> bytes:\n    current = (ROOT / relative).read_bytes() if content is None else content\n    receipt = json.loads(\n        (ROOT / \"tests/fixtures/ux_context1_reversal.json\").read_text(encoding=\"utf-8\")\n    )\n",
+          "after": "\ndef before_ux_context1(relative: str, content: bytes | None = None) -> bytes:\n    current = (ROOT / relative).read_bytes() if content is None else content\n    # Later CONTROL.FRESH.1 is reversed first so UX.CONTEXT.1's immutable\n    # post-state remains the input to this historical reversal.\n    from tests._control_fresh1_maintenance import before_control_fresh1\n\n    current = before_control_fresh1(relative, current)\n    receipt = json.loads(\n        (ROOT / \"tests/fixtures/ux_context1_reversal.json\").read_text(encoding=\"utf-8\")\n    )\n"
+        }
+      ]
+    },
+    "tests/test_ux_context1.py": {
+      "entry_sha256": "e7f4a4d5f2864343a61160d6d98e2e6893b823d5bf2f067545e2e3d3b72fb88e",
+      "post_sha256": "ed86ea5234984ceaacc61f8ee7eb9ac0d5e55210dbd0ed4987b162c2896443ad",
+      "hunks": [
+        {
+          "before": ")\n\n\ndef _current(relative: str) -> str:\n    # Byte-exact (CRLF kept) so it compares with the reconstructed entry bytes.\n    return (ROOT / relative).read_bytes().decode(\"utf-8\")\n\n\ndef _entry(relative: str) -> str:\n",
+          "after": ")\n\n\ndef _post_state(relative: str) -> bytes:\n    # UX.CONTEXT.1's own post-state: later CONTROL.FRESH.1 edits are reversed first.\n    from tests._control_fresh1_maintenance import before_control_fresh1\n\n    return before_control_fresh1(relative)\n\n\ndef _current(relative: str) -> str:\n    # Byte-exact (CRLF kept) so it compares with the reconstructed entry bytes.\n    return _post_state(relative).decode(\"utf-8\")\n\n\ndef _entry(relative: str) -> str:\n"
+        },
+        {
+          "before": "    for relative, record in receipt[\"files\"].items():\n        restored = before_ux_context1(relative)\n        assert hashlib.sha256(restored).hexdigest() == record[\"entry_sha256\"] == anchors[relative], relative\n        assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == record[\"post_sha256\"], relative\n\n\ndef test_frozen_phase_boundaries_are_byte_exact():\n    manifest = json.loads((FIXTURES / \"ux_context1_frozen_boundaries.json\").read_text(encoding=\"utf-8\"))\n    assert manifest[\"phase\"] == \"UX.CONTEXT.1\"\n    for relative, digest in manifest[\"sha256\"].items():\n        assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == digest, relative\n    groups = manifest[\"groups\"]\n    for group in (\"UX.STATE.1\", \"AUTH.WEB.1\", \"AUTH.WEB.READ.1\", \"SEC.UI.1\", \"DATA.UNDO.1\", \"EXEC.PLAN.1\",\n                  \"AUTH.DREAM.1\", \"DATA.ROLLBACK.1\", \"Track_A\", \"backend_web\", \"static_assets\", \"audit\"):\n",
+          "after": "    for relative, record in receipt[\"files\"].items():\n        restored = before_ux_context1(relative)\n        assert hashlib.sha256(restored).hexdigest() == record[\"entry_sha256\"] == anchors[relative], relative\n        assert hashlib.sha256(_post_state(relative)).hexdigest() == record[\"post_sha256\"], relative\n\n\ndef test_frozen_phase_boundaries_are_byte_exact():\n    manifest = json.loads((FIXTURES / \"ux_context1_frozen_boundaries.json\").read_text(encoding=\"utf-8\"))\n    assert manifest[\"phase\"] == \"UX.CONTEXT.1\"\n    for relative, digest in manifest[\"sha256\"].items():\n        assert hashlib.sha256(_post_state(relative)).hexdigest() == digest, relative\n    groups = manifest[\"groups\"]\n    for group in (\"UX.STATE.1\", \"AUTH.WEB.1\", \"AUTH.WEB.READ.1\", \"SEC.UI.1\", \"DATA.UNDO.1\", \"EXEC.PLAN.1\",\n                  \"AUTH.DREAM.1\", \"DATA.ROLLBACK.1\", \"Track_A\", \"backend_web\", \"static_assets\", \"audit\"):\n"
+        },
+        {
+          "before": "    expected.remove(\"tests/fixtures/ux_context1_completion.json\")\n    assert set(receipt[\"source_sha256\"]) == expected\n    for relative, digest in receipt[\"source_sha256\"].items():\n        assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == digest, relative\n",
+          "after": "    expected.remove(\"tests/fixtures/ux_context1_completion.json\")\n    assert set(receipt[\"source_sha256\"]) == expected\n    for relative, digest in receipt[\"source_sha256\"].items():\n        assert hashlib.sha256(_post_state(relative)).hexdigest() == digest, relative\n"
+        }
+      ]
+    },
+    "tests/test_ux_context1_browser.py": {
+      "entry_sha256": "bf48e98ce6664714ead93d4f6a55c8781be9fa59cfe02f280fc017746fcbe4cb",
+      "post_sha256": "24b24cb517151957402cd0f48e7a4081c2f0fd07b73af7d3cb3cef9db6e0a722",
+      "hunks": [
+        {
+          "before": "\nimport pytest\n\nfrom tests.test_ux_state1_browser import (  # noqa: F401  (chromium and live are fixtures)\n    PATCH_A, RUN_VALIDATION, _await_held, _click, _flush, _fulfill, _load, _open_more_actions, _snapshot,\n    chromium, live,\n",
+          "after": "\nimport pytest\n\nfrom tests.test_control_fresh1 import FRESH_ANSWER, FRESH_WIRE\nfrom tests.test_ux_state1_browser import (  # noqa: F401  (chromium and live are fixtures)\n    PATCH_A, RUN_VALIDATION, _await_held, _click, _flush, _fulfill, _load, _open_more_actions, _snapshot,\n    chromium, live,\n"
+        },
+        {
+          "before": "GENERATE = (\"generatePatch()\", \"/generate_patch\")\nCANDIDATES = (\"generateCandidates()\", \"/generate_candidates\")\nDISPATCHES = pytest.mark.parametrize(\"dispatch\", [GENERATE, CANDIDATES], ids=[\"generate_patch\", \"generate_candidates\"])\nFRESH_FORM_ANSWER = {\"error\": \"Invalid control JSON\"}\n\n\ndef _server_context(control: dict) -> str:\n",
+          "after": "GENERATE = (\"generatePatch()\", \"/generate_patch\")\nCANDIDATES = (\"generateCandidates()\", \"/generate_candidates\")\nDISPATCHES = pytest.mark.parametrize(\"dispatch\", [GENERATE, CANDIDATES], ids=[\"generate_patch\", \"generate_candidates\"])\n# CONTROL.FRESH.1 made the fresh no-prior-context form explicit (JSON null) and gave it a typed\n# bootstrap-boundary answer; the empty form and \"Invalid control JSON\" stay pinned there as PRE.\nFRESH_FORM = FRESH_WIRE\nFRESH_FORM_ANSWER = FRESH_ANSWER\n\n\ndef _server_context(control: dict) -> str:\n"
+        },
+        {
+          "before": "    assert after[\"contextGeneration\"] == before[\"contextGeneration\"] + 1\n\n    held = _dispatch(ctx, dispatch)\n    assert _sent(held) == _expected(ctx, dispatch, ctx.repo_b, \"\")\n    assert not _carries_run_a(held)\n    # The fresh no-prior-context form the backend already answers, without a model call.\n    assert _continue(ctx, held) == FRESH_FORM_ANSWER\n    assert ctx.calls == []\n\n",
+          "after": "    assert after[\"contextGeneration\"] == before[\"contextGeneration\"] + 1\n\n    held = _dispatch(ctx, dispatch)\n    assert _sent(held) == _expected(ctx, dispatch, ctx.repo_b, FRESH_FORM)\n    assert not _carries_run_a(held)\n    # The fresh no-prior-context form, answered at the bootstrap boundary without a model call.\n    assert _continue(ctx, held) == FRESH_FORM_ANSWER\n    assert ctx.calls == []\n\n"
+        },
+        {
+          "before": "    assert view[\"run\"] == before[\"run\"] and view[\"requestRun\"] is None\n    for dispatch in (GENERATE, CANDIDATES):\n        held = _dispatch(ctx, dispatch)\n        assert _sent(held) == _expected(ctx, dispatch, ctx.repo_a, \"\")\n        _release(ctx, held)\n\n    # Explicitly selecting the run again is what restores continuation.\n",
+          "after": "    assert view[\"run\"] == before[\"run\"] and view[\"requestRun\"] is None\n    for dispatch in (GENERATE, CANDIDATES):\n        held = _dispatch(ctx, dispatch)\n        assert _sent(held) == _expected(ctx, dispatch, ctx.repo_a, FRESH_FORM)\n        _release(ctx, held)\n\n    # Explicitly selecting the run again is what restores continuation.\n"
+        },
+        {
+          "before": "    assert json.loads(_page_context(page)) == CONTROL_A\n    for dispatch in (GENERATE, CANDIDATES):\n        held = _dispatch(ctx, dispatch)\n        assert _sent(held) == _expected(ctx, dispatch, ctx.repo_b, \"\")\n        assert not _carries_run_a(held)\n        _release(ctx, held)\n    view = _snapshot(page)\n",
+          "after": "    assert json.loads(_page_context(page)) == CONTROL_A\n    for dispatch in (GENERATE, CANDIDATES):\n        held = _dispatch(ctx, dispatch)\n        assert _sent(held) == _expected(ctx, dispatch, ctx.repo_b, FRESH_FORM)\n        assert not _carries_run_a(held)\n        _release(ctx, held)\n    view = _snapshot(page)\n"
+        },
+        {
+          "before": "    page.fill(\"textarea[name='query']\", JAVA_TWO_FILE_REQUEST)\n    for dispatch in (GENERATE, CANDIDATES):\n        held = _dispatch(ctx, dispatch)\n        assert _sent(held) == _expected(ctx, dispatch, ctx.repo_b, \"\")\n        assert not _carries_run_a(held)\n        assert _continue(ctx, held) == FRESH_FORM_ANSWER\n    assert {relative: (ctx.repo_b / relative).read_bytes() for relative in JAVA_PROJECT} == JAVA_PROJECT\n",
+          "after": "    page.fill(\"textarea[name='query']\", JAVA_TWO_FILE_REQUEST)\n    for dispatch in (GENERATE, CANDIDATES):\n        held = _dispatch(ctx, dispatch)\n        assert _sent(held) == _expected(ctx, dispatch, ctx.repo_b, FRESH_FORM)\n        assert not _carries_run_a(held)\n        assert _continue(ctx, held) == FRESH_FORM_ANSWER\n    assert {relative: (ctx.repo_b / relative).read_bytes() for relative in JAVA_PROJECT} == JAVA_PROJECT\n"
+        }
+      ]
+    },
+    "tests/test_ux_state1.py": {
+      "entry_sha256": "0fa4f68a1ef0c2975fef513119ba7de9cfed76b16d1c2a75d3b08ca035d57d8f",
+      "post_sha256": "7380b09ebf5703449eeac358f941dd7e3cf00d04cdeb52fd5d66e846a5bbe398",
+      "hunks": [
+        {
+          "before": "    manifest = json.loads((FIXTURES / \"ux_state1_frozen_boundaries.json\").read_text(encoding=\"utf-8\"))\n    assert manifest[\"phase\"] == \"UX.STATE.1\"\n    for relative, digest in manifest[\"sha256\"].items():\n        assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == digest, relative\n    groups = manifest[\"groups\"]\n    for group in (\"AUTH.WEB.1\", \"AUTH.WEB.READ.1\", \"SEC.UI.1\", \"DATA.UNDO.1\", \"EXEC.PLAN.1\", \"AUTH.DREAM.1\",\n                  \"DATA.ROLLBACK.1\", \"Track_A\", \"backend_web\", \"static_assets\", \"audit\"):\n",
+          "after": "    manifest = json.loads((FIXTURES / \"ux_state1_frozen_boundaries.json\").read_text(encoding=\"utf-8\"))\n    assert manifest[\"phase\"] == \"UX.STATE.1\"\n    for relative, digest in manifest[\"sha256\"].items():\n        assert hashlib.sha256(_before_ux_context1(relative)).hexdigest() == digest, relative\n    groups = manifest[\"groups\"]\n    for group in (\"AUTH.WEB.1\", \"AUTH.WEB.READ.1\", \"SEC.UI.1\", \"DATA.UNDO.1\", \"EXEC.PLAN.1\", \"AUTH.DREAM.1\",\n                  \"DATA.ROLLBACK.1\", \"Track_A\", \"backend_web\", \"static_assets\", \"audit\"):\n"
+        }
+      ]
+    },
+    "tests/test_auth_web1.py": {
+      "entry_sha256": "dc72f4a4df969757210aa3a0bdb9a6e4e699b72fc8c1a2f29c9617804d25bdd5",
+      "post_sha256": "562a5fad1ddc4ffefbec39c1a5e934da8aa1e7661828573054810c65975da306",
+      "hunks": [
+        {
+          "before": "    for group in (\"SEC.UI.1\", \"DATA.UNDO.1\", \"EXEC.PLAN.1\", \"AUTH.DREAM.1\", \"DATA.ROLLBACK.1\", \"Track_A\", \"audit\"):\n        assert groups[group] and set(groups[group]) <= set(manifest[\"sha256\"]), group\n    old, _ = _definitions(__import__(\"tests._auth_web1_maintenance\", fromlist=[\"x\"]).before_auth_web1(\"web/app.py\"))\n    new, _ = _definitions((ROOT / \"web/app.py\").read_bytes())\n    for name, digest in manifest[\"web_app_definitions\"].items():\n        assert new[name] == digest == old[name], name\n\n",
+          "after": "    for group in (\"SEC.UI.1\", \"DATA.UNDO.1\", \"EXEC.PLAN.1\", \"AUTH.DREAM.1\", \"DATA.ROLLBACK.1\", \"Track_A\", \"audit\"):\n        assert groups[group] and set(groups[group]) <= set(manifest[\"sha256\"]), group\n    old, _ = _definitions(__import__(\"tests._auth_web1_maintenance\", fromlist=[\"x\"]).before_auth_web1(\"web/app.py\"))\n    # AUTH.WEB.1's post-state definitions: later phases' receipts are undone first.\n    new, _ = _definitions(__import__(\"tests._auth_web_read1_maintenance\", fromlist=[\"x\"]).before_auth_web_read1(\n        \"web/app.py\"))\n    for name, digest in manifest[\"web_app_definitions\"].items():\n        assert new[name] == digest == old[name], name\n\n"
+        }
+      ]
+    },
+    "tests/test_auth_web_read1.py": {
+      "entry_sha256": "4216c1d9bd81cabdb841b392842679f18a232396a230cf5707f4a532b679ab35",
+      "post_sha256": "2c38ba911dd8745ae5cd14dc3a87e8b6b3783a7b2b02b5ed969fc9aeec96a3bb",
+      "hunks": [
+        {
+          "before": "    assert _read(client, \"//new\", ATTACKER_HOST).headers[\"Location\"] == \"http://evil.example:5000/\"\n    # ...and those two statements are the whole production delta in web/app.py.\n    old, old_statements = _definitions(_before_auth_web_read1(\"web/app.py\"))\n    new, new_statements = _definitions((ROOT / \"web/app.py\").read_bytes())\n    assert old == new\n    assert [statement for statement in old_statements if statement not in new_statements] == []\n    added = [statement for statement in new_statements if statement not in old_statements]\n",
+          "after": "    assert _read(client, \"//new\", ATTACKER_HOST).headers[\"Location\"] == \"http://evil.example:5000/\"\n    # ...and those two statements are the whole production delta in web/app.py.\n    old, old_statements = _definitions(_before_auth_web_read1(\"web/app.py\"))\n    new, new_statements = _definitions(_before_ux_state1(\"web/app.py\"))\n    assert old == new\n    assert [statement for statement in old_statements if statement not in new_statements] == []\n    added = [statement for statement in new_statements if statement not in old_statements]\n"
+        },
+        {
+          "before": "        assert groups[group] and set(groups[group]) <= set(manifest[\"sha256\"]), group\n    assert {\"web/auth_gate.py\", \"web/request_origin.py\", \"web/browser_session.py\",\n            \"web/static/request_integrity.js\"} <= set(groups[\"AUTH.WEB.1\"])\n    current, _ = _definitions((ROOT / \"web/app.py\").read_bytes())\n    entry, _ = _definitions(_before_auth_web_read1(\"web/app.py\"))\n    assert manifest[\"web_app_definitions\"] == current == entry\n\n",
+          "after": "        assert groups[group] and set(groups[group]) <= set(manifest[\"sha256\"]), group\n    assert {\"web/auth_gate.py\", \"web/request_origin.py\", \"web/browser_session.py\",\n            \"web/static/request_integrity.js\"} <= set(groups[\"AUTH.WEB.1\"])\n    current, _ = _definitions(_before_ux_state1(\"web/app.py\"))\n    entry, _ = _definitions(_before_auth_web_read1(\"web/app.py\"))\n    assert manifest[\"web_app_definitions\"] == current == entry\n\n"
+        }
+      ]
+    }
+  }
+}

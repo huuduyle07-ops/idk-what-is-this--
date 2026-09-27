@@ -1,0 +1,134 @@
+{
+  "schema_version": "indent_semantics1_reversal_v1",
+  "phase_id": "INDENT.SEMANTICS.1",
+  "reason": "INDENT.SEMANTICS.1 gives every indentation_style matrix case a declared input language and a reference reading from core/indentation_observation.py, appends three fixed preservation cases, bumps the matrix receipt schema to _v2 and names itself in discrimination_phase_ids (core/behavioral_matrix.py), and accepts INDENT as a phase-id namespace (core/phase_registry.py). Every earlier phase that pins these files is evaluated against history: tests/_harness_maintenance.py undoes these hunks, asserting both digests, before any older receipt's.",
+  "chain": {
+    "core/behavioral_matrix.py": "this receipt's pre_sha256 is DEFECT.PROBE.LIVE.5's reversal post_sha256, the digest PATCH.AUTHOR.LIVE.1, PATCH.AUTHOR.LIVE.2 and ANSWER.COHERENCE.LIVE.1 all pin; no later receipt touched this file",
+    "core/phase_registry.py": "no earlier fixture pins this file; the receipt proves the only edit is the one INDENT namespace entry"
+  },
+  "new_module": "core/indentation_observation.py",
+  "reversals": [
+    {
+      "path": "core/behavioral_matrix.py",
+      "pre_sha256": "bc56a56212f92ff84dc5b1f52c442421d22c2d6804dccb2341ea0d19660ea0d4",
+      "post_sha256": "3d2c62cd4283e1cd347a04d55b5ce77923c7f85d8278cb03a72e4c84a2dc6dce",
+      "hunks": [
+        {
+          "post": "\"\"\"DEFECT.PROBE.LIVE.4/.5 — the behavioral discrimination matrix for one subject.\n\nINDENT.SEMANTICS.1 changes what a case *declares* and appends three cases; it\nchanges nothing about how a case runs.  Every earlier oracle read the leading\nwhitespace of every physical line, and for Python that set carries\ncontinuation alignment, string interiors, comment-only and whitespace-only\nrows beside the block indentation the subject is about.  The smallest measured\nshape::\n\n    def f(a,\n          b):\n        pass\n\nreads as widths 6 and 4 — a 2-space unit — while its only block step is 4, and\na docstring with a 6-wide interior row does the same.  So each case now names\nthe language of its *input* — never inferred from the file the function under\ntest lives in — and carries the reference reading of that input from\n:mod:`core.indentation_observation`: tokenize structure for Python, the generic\nphysical reading, explicitly weaker, for everything else.  The five LIVE.5\ncases keep their ids, bytes, expectations, roles and provenance and are\ndeclared Python.  Three fixed preservation cases follow them: the continuation\nshape and the docstring shape, both 4space, and one Go sample indented with\ntabs, which keeps a reading that only knows Python structure from being\nrewarded for answering None on source it cannot structure.\n\nThe candidate is still called with the text and nothing else.  The language\ntravels with the case to the reference path and stops there.\n\nEverything below this paragraph is DEFECT.PROBE.LIVE.5's, unchanged.\n\nDEFECT.PROBE.LIVE.5 appends one case to the matrix this module already builds,\nand changes nothing else.  Round-9 black-box evidence measured a candidate that\n",
+          "pre": "\"\"\"DEFECT.PROBE.LIVE.4/.5 — the behavioral discrimination matrix for one subject.\n\nDEFECT.PROBE.LIVE.5 appends one case to the matrix this module already builds,\nand changes nothing else.  Round-9 black-box evidence measured a candidate that\n"
+        },
+        {
+          "post": "    build_python_function_probe,\n    execute_defect_probe,\n)\n# INDENT.SEMANTICS.1 — the one observation authority.  The matrix only asks it\n# to read a case's own fixture under the case's own declared language.\nfrom core.indentation_observation import (\n    LANGUAGE_PYTHON,\n    STYLE_4SPACE,\n    STYLE_TAB,\n    SourceIndentationAssessment,\n    assess_indentation_observation,\n    observe_source_indentation,\n)\nfrom core.paired_defect_probe import (\n    ORACLE_UNAVAILABLE,\n    PAIRED_CHANGED_BUT_UNRESOLVED,\n",
+          "pre": "    build_python_function_probe,\n    execute_defect_probe,\n)\nfrom core.paired_defect_probe import (\n    ORACLE_UNAVAILABLE,\n    PAIRED_CHANGED_BUT_UNRESOLVED,\n"
+        },
+        {
+          "post": "#: a widened oracle, and the phases whose discrimination the matrix carries are\n#: named here instead.  A stored LIVE.4 receipt keeps saying exactly what it\n#: said: four cases, no skew case, and no claim that LIVE.5 ran.\n#:\n#: INDENT.SEMANTICS.1 §55 bumps it to ``_v2``, by the same rule that kept\n#: ``_v1``: that phase gives *every case record* five fields it never had — the\n#: input's declared language and the reference reading's tier, claim strength,\n#: fallback reason and value.  Nothing is renamed or removed, so every\n#: ``.get()`` reader keeps working, but the serialized case shape grew, and\n#: ``core/evidence_verification.py`` is the precedent for saying so with\n#: ``_v2``.  A stored ``_v1`` receipt keeps saying exactly what it said: no\n#: case in it declared a language, and nothing in it claims this phase ran.\nRECEIPT_SCHEMA_VERSION = \"behavioral_matrix_live_4_v2\"\n#: The phases whose bounded discrimination this matrix executes, in order.\n#: ``PHASE_ID`` stays the phase that owns the structure; this says what the\n#: structure now measures, so a reader can determine from the receipt alone that\n",
+          "pre": "#: a widened oracle, and the phases whose discrimination the matrix carries are\n#: named here instead.  A stored LIVE.4 receipt keeps saying exactly what it\n#: said: four cases, no skew case, and no claim that LIVE.5 ran.\nRECEIPT_SCHEMA_VERSION = \"behavioral_matrix_live_4_v1\"\n#: The phases whose bounded discrimination this matrix executes, in order.\n#: ``PHASE_ID`` stays the phase that owns the structure; this says what the\n#: structure now measures, so a reader can determine from the receipt alone that\n"
+        },
+        {
+          "post": "DISCRIMINATION_PHASE_IDS: tuple[str, ...] = (\n    \"DEFECT.PROBE.LIVE.4\",\n    \"DEFECT.PROBE.LIVE.5\",\n    \"INDENT.SEMANTICS.1\",\n)\n\n# ── Case roles (§3) ───────────────────────────────────────────────────────────\n",
+          "pre": "DISCRIMINATION_PHASE_IDS: tuple[str, ...] = (\n    \"DEFECT.PROBE.LIVE.4\",\n    \"DEFECT.PROBE.LIVE.5\",\n)\n\n# ── Case roles (§3) ───────────────────────────────────────────────────────────\n"
+        },
+        {
+          "post": "ROLE_DEFECT_GENERALIZATION = \"defect_generalization\"\n#: Behavior the baseline already had, which a fix must not trade away.\nROLE_PRESERVATION = \"preservation\"\n#: The same, under the depth-variant shape — and, since INDENT.SEMANTICS.1,\n#: under the continuation, multi-line string and non-Python shapes.\nROLE_PRESERVATION_GENERALIZATION = \"preservation_generalization\"\nCASE_ROLES: tuple[str, ...] = (\n    ROLE_PRIMARY_DEFECT,\n",
+          "pre": "ROLE_DEFECT_GENERALIZATION = \"defect_generalization\"\n#: Behavior the baseline already had, which a fix must not trade away.\nROLE_PRESERVATION = \"preservation\"\n#: The same, under the depth-variant shape.\nROLE_PRESERVATION_GENERALIZATION = \"preservation_generalization\"\nCASE_ROLES: tuple[str, ...] = (\n    ROLE_PRIMARY_DEFECT,\n"
+        },
+        {
+          "post": "    return tuple(unit for unit in SUBJECT_SPACE_UNITS if unit_width % unit == 0)\n\n\n# ── Declared input language (INDENT.SEMANTICS.1 §5/§21/§22) ──────────────────\n#\n# A case's language describes the text the case hands to the function under\n# test, never the file that function lives in: ``core/code_dna.py`` is Python,\n# and ``_classify_indent`` still classifies Go, TypeScript and HTML for\n# ``compute_dna``.  The language reaches the reference reading and nothing else.\n#: Every ordinary, depth-only and skew fixture is a Python sample of the\n#: subject.  The four ``level_N`` ones tokenize without parsing, which is why\n#: the observer is tokenize and not a parser.\nINPUT_LANGUAGE_PYTHON = LANGUAGE_PYTHON\nINPUT_LANGUAGE_GO = \"go\"\n\n#: §24 — the measured minimal continuation shape: one row aligned 6 spaces\n#: inside brackets and one block step of 4.\nCONTINUATION_FIXTURE = \"def f(a,\\n      b):\\n    pass\\n\"\n#: §25 — 4-space block indentation around a docstring whose interior row is 6\n#: spaces wide.  It parses; the interior is string content, not a block.\nMULTILINE_STRING_FIXTURE = (\n    'def f():\\n    \"\"\"Summary.\\n      detail\\n    \"\"\"\\n    return 1\\n'\n)\n#: §26 — Go indented with tabs.  The generic reading answers ``tab`` and the\n#: baseline already does; a reading that knows only Python structure answers\n#: ``None``, because braces leave tokenize no block to see.\nGO_TAB_FIXTURE = \"package main\\n\\nfunc main() {\\n\\tif true {\\n\\t\\tprintln(1)\\n\\t}\\n}\\n\"\n\n\ndef _declared_input_fields(\n    input_language: str, reference: SourceIndentationAssessment | None\n) -> dict[str, Any]:\n    \"\"\"§29 — what the case's input declared, and how its reference read it.\n\n    Tier and claim strength are reported beside the value and never folded\n    into it: a heuristic ``tab`` and a structural ``tab`` are different\n    evidence.  No fixture text is repeated here; the case's contract holds it.\n    \"\"\"\n\n    return {\n        \"input_language\": input_language,\n        \"observation_tier\": reference.observation_tier if reference else None,\n        \"claim_strength\": reference.claim_strength if reference else None,\n        \"fallback_reason\": (\n            reference.observation.fallback_reason if reference else None\n        ),\n        \"reference_assessment\": reference.value if reference else None,\n    }\n\n\n# ── Case and result records ───────────────────────────────────────────────────\n\n@dataclass(frozen=True, slots=True)\n",
+          "pre": "    return tuple(unit for unit in SUBJECT_SPACE_UNITS if unit_width % unit == 0)\n\n\n# ── Case and result records ───────────────────────────────────────────────────\n\n@dataclass(frozen=True, slots=True)\n"
+        },
+        {
+          "post": "    expected: Any\n    contract: DefectProbeContract\n    derivation: str\n    #: INDENT.SEMANTICS.1 — the language of the text this case hands to the\n    #: function under test.  Empty for a case that declares none.\n    input_language: str = \"\"\n    #: The reference reading of that text under that language.  Evidence about\n    #: the input, carried beside the case; it never reaches the candidate.\n    reference: SourceIndentationAssessment | None = None\n\n    def __post_init__(self) -> None:\n        if self.role not in CASE_ROLES:\n",
+          "pre": "    expected: Any\n    contract: DefectProbeContract\n    derivation: str\n\n    def __post_init__(self) -> None:\n        if self.role not in CASE_ROLES:\n"
+        },
+        {
+          "post": "            raise ValueError(\n                \"only the primary case may carry explicit user provenance\"\n            )\n        if self.reference is not None and (\n            self.reference.language != self.input_language\n        ):\n            # INDENT.SEMANTICS.1 §5 — a reference read under any language but\n            # the one the input declares is a reading of some other input.\n            raise ValueError(\"a case reference must read the case's declared language\")\n\n    @property\n    def is_defect_case(self) -> bool:\n",
+          "pre": "            raise ValueError(\n                \"only the primary case may carry explicit user provenance\"\n            )\n\n    @property\n    def is_defect_case(self) -> bool:\n"
+        },
+        {
+          "post": "            \"subject_kind\": self.subject_kind,\n            \"expected\": self.expected,\n            \"derivation\": self.derivation,\n            **_declared_input_fields(self.input_language, self.reference),\n        }\n\n\n",
+          "pre": "            \"subject_kind\": self.subject_kind,\n            \"expected\": self.expected,\n            \"derivation\": self.derivation,\n        }\n\n\n"
+        },
+        {
+          "post": "    baseline_result: str = \"\"\n    candidate_result: str = \"\"\n    reason: str = \"\"\n    #: INDENT.SEMANTICS.1 §29 — carried from the case, unchanged.\n    input_language: str = \"\"\n    reference: SourceIndentationAssessment | None = None\n\n    def __post_init__(self) -> None:\n        if self.role not in CASE_ROLES:\n",
+          "pre": "    baseline_result: str = \"\"\n    candidate_result: str = \"\"\n    reason: str = \"\"\n\n    def __post_init__(self) -> None:\n        if self.role not in CASE_ROLES:\n"
+        },
+        {
+          "post": "            \"candidate_result\": self.candidate_result,\n            \"candidate_status\": self.candidate_status,\n            \"reason\": self.reason,\n            **_declared_input_fields(self.input_language, self.reference),\n        }\n\n\n",
+          "pre": "            \"candidate_result\": self.candidate_result,\n            \"candidate_status\": self.candidate_status,\n            \"reason\": self.reason,\n        }\n\n\n"
+        },
+        {
+          "post": "    behavior_fact: BehavioralExpectation,\n    primary_contract: DefectProbeContract,\n) -> tuple[BehavioralMatrixCase, ...]:\n    \"\"\"The one production subject: eight cases over one indentation fact.\n\n    ``expected_value`` and ``observed_value`` name two widths.  Each contributes\n    an ordinary case — the ones LIVE.2 and LIVE.3 already built, reused here\n",
+          "pre": "    behavior_fact: BehavioralExpectation,\n    primary_contract: DefectProbeContract,\n) -> tuple[BehavioralMatrixCase, ...]:\n    \"\"\"The one production subject: five cases over one indentation fact.\n\n    ``expected_value`` and ``observed_value`` name two widths.  Each contributes\n    an ordinary case — the ones LIVE.2 and LIVE.3 already built, reused here\n"
+        },
+        {
+          "post": "    at the claimed width, which is the shape the Round-9 candidate could not\n    classify.  The four LIVE.4 cases keep their identifiers, their contracts and\n    their positions; the new one is appended, never inserted.\n\n    INDENT.SEMANTICS.1 declares every one of those a Python input and appends\n    three fixed preservation cases after them, the same three for every fact:\n    see :func:`_declared_input_cases`.\n    \"\"\"\n\n    expected = _INDENT_VALUE_RE.fullmatch(behavior_fact.expected_value)\n",
+          "pre": "    at the claimed width, which is the shape the Round-9 candidate could not\n    classify.  The four LIVE.4 cases keep their identifiers, their contracts and\n    their positions; the new one is appended, never inserted.\n    \"\"\"\n\n    expected = _INDENT_VALUE_RE.fullmatch(behavior_fact.expected_value)\n"
+        },
+        {
+          "post": "                ),\n            )\n        )\n\n    # INDENT.SEMANTICS.1 §22 — the cases above are built exactly as before and\n    # each is a Python sample of the subject; declaring that is what lets the\n    # reference path read them by block structure.  Then §24–§28: three fixed\n    # cases, appended after every historical one, never inserted between them.\n    return tuple(\n        [_declared(case, INPUT_LANGUAGE_PYTHON) for case in cases]\n        + _declared_input_cases(target=target, behavior_fact=behavior_fact)\n    )\n\n\ndef _declared(case: BehavioralMatrixCase, language: str) -> BehavioralMatrixCase:\n    \"\"\"INDENT.SEMANTICS.1 — one case, declaring its input and its reference.\n\n    The reference is read from the case's own fixture under the case's own\n    declared language, by the one observation authority.  Nothing about the\n    contract changes: same fixture bytes, same expectation, same fingerprint.\n    \"\"\"\n\n    (text,) = case.contract.structured_input[\"args\"]\n    return replace(\n        case,\n        input_language=language,\n        reference=assess_indentation_observation(\n            observe_source_indentation(text, language=language)\n        ),\n    )\n\n\ndef _declared_input_cases(\n    *,\n    target: ProbeTargetBinding,\n    behavior_fact: BehavioralExpectation,\n) -> list[BehavioralMatrixCase]:\n    \"\"\"INDENT.SEMANTICS.1 §24–§26 — three fixed preservation cases.\n\n    Their fixtures and expected values are constants, not derived from the\n    fact, from a candidate or from any reading of them: the continuation shape\n    and the docstring shape are 4space because a style is a *block* unit, and\n    the Go sample is ``tab`` because that is what the baseline already answers\n    and a fix must not trade it away.  The Go case's reference is the generic\n    physical reading and says so; it preserves behavior and derives no\n    structural expectation of any kind (§30).\n    \"\"\"\n\n    subject = behavior_fact.subject_kind\n    requirement = (\n        f\"not a user requirement: the user's requirement is \"\n        f\"{behavior_fact.expected_value} and it belongs to the primary case\"\n    )\n    specs = (\n        (\n            f\"{subject}.preserve.{STYLE_4SPACE}.continuation\",\n            MATRIX_PROVENANCE_SUBJECT_INVARIANT,\n            STYLE_4SPACE,\n            CONTINUATION_FIXTURE,\n            INPUT_LANGUAGE_PYTHON,\n            (\n                \"subject invariant: a style is a block indentation unit, so a \"\n                \"Python sample whose only block step is 4 spaces is 4space \"\n                \"however its continuation rows inside brackets are aligned\"\n            ),\n            (\n                \"the deterministic fixture is valid Python whose only block \"\n                \"step is 4 spaces and whose one continuation row is aligned 6 \"\n                \"spaces inside brackets; alignment inside brackets is not \"\n                \"indentation evidence\"\n            ),\n        ),\n        (\n            f\"{subject}.preserve.{STYLE_4SPACE}.multiline_string\",\n            MATRIX_PROVENANCE_SUBJECT_INVARIANT,\n            STYLE_4SPACE,\n            MULTILINE_STRING_FIXTURE,\n            INPUT_LANGUAGE_PYTHON,\n            (\n                \"subject invariant: a style is a block indentation unit, so a \"\n                \"Python sample whose only block step is 4 spaces is 4space \"\n                \"whatever widths appear inside its multi-line strings\"\n            ),\n            (\n                \"the deterministic fixture is valid Python indented 4 spaces \"\n                \"per block around a docstring whose interior row is 6 spaces \"\n                \"wide; text inside a string is not indentation evidence\"\n            ),\n        ),\n        (\n            f\"{subject}.preserve.{STYLE_TAB}.go\",\n            MATRIX_PROVENANCE_BEHAVIOR_PRESERVATION,\n            STYLE_TAB,\n            GO_TAB_FIXTURE,\n            INPUT_LANGUAGE_GO,\n            (\n                \"compatibility: tab-indented Go is classified tab by the \"\n                \"generic reading the baseline already applies, and a fix must \"\n                \"not trade that away; that reading is heuristic, so the case \"\n                \"preserves behavior and derives no structural expectation\"\n            ),\n            (\n                \"the deterministic fixture is Go indented with tabs and \"\n                \"declared go, so its reference reading is the generic physical \"\n                \"one and only heuristic; tab is what the unpatched code \"\n                \"already produces\"\n            ),\n        ),\n    )\n    return [\n        _declared(\n            BehavioralMatrixCase(\n                case_id=case_id,\n                role=ROLE_PRESERVATION_GENERALIZATION,\n                provenance=provenance,\n                subject_kind=subject,\n                expected=expected,\n                contract=build_python_function_probe(\n                    target=target,\n                    args=(fixture,),\n                    expected=expected,\n                    probe_basis=PROBE_BASIS_TASK_FACT_ADAPTER,\n                    input_basis=INPUT_BASIS_TASK_FACT_ADAPTER,\n                    expected_behavior_basis=EXPECTATION_BASIS_TASK_FACT_ADAPTER,\n                    provenance_reference=(\n                        f\"system-derived {ROLE_PRESERVATION_GENERALIZATION} case \"\n                        f\"for the {subject} subject; {fixture_note}; its \"\n                        f\"expected result {expected} is {requirement}\"\n                    ),\n                ),\n                derivation=derivation,\n            ),\n            language,\n        )\n        for (\n            case_id,\n            provenance,\n            expected,\n            fixture,\n            language,\n            derivation,\n            fixture_note,\n        ) in specs\n    ]\n\n\ndef _depth_only_contract(\n",
+          "pre": "                ),\n            )\n        )\n    return tuple(cases)\n\n\ndef _depth_only_contract(\n"
+        },
+        {
+          "post": "        candidate_observed=candidate.observed if candidate is not None else None,\n        candidate_result=candidate.result if candidate is not None else \"\",\n        reason=reason,\n        input_language=case.input_language,\n        reference=case.reference,\n    )\n\n\n",
+          "pre": "        candidate_observed=candidate.observed if candidate is not None else None,\n        candidate_result=candidate.result if candidate is not None else \"\",\n        reason=reason,\n    )\n\n\n"
+        },
+        {
+          "post": "        \"distribution_skew_case_is_bounded_and_fixed\": True,\n        \"skew_case_expectation_derived_from_bounded_source\": True,\n        \"ambiguous_skew_shape_is_omitted_not_decided\": True,\n        # INDENT.SEMANTICS.1 — the input declares its language; nothing\n        # guesses it, and the candidate never sees it.\n        \"case_input_language_declared\": True,\n        \"reference_reading_is_language_aware\": True,\n        \"continuation_and_multiline_string_cases_are_fixed\": True,\n        \"non_python_compatibility_case_is_fixed\": True,\n        \"input_language_inferred_from_target_path\": False,\n        \"candidate_receives_input_language\": False,\n        \"heuristic_reference_labelled_structural\": False,\n        \"preservation_baseline_precondition_required\": True,\n        \"one_candidate_sandbox_for_every_case\": True,\n        \"primary_baseline_reused_not_reprobed\": True,\n",
+          "pre": "        \"distribution_skew_case_is_bounded_and_fixed\": True,\n        \"skew_case_expectation_derived_from_bounded_source\": True,\n        \"ambiguous_skew_shape_is_omitted_not_decided\": True,\n        \"preservation_baseline_precondition_required\": True,\n        \"one_candidate_sandbox_for_every_case\": True,\n        \"primary_baseline_reused_not_reprobed\": True,\n"
+        },
+        {
+          "post": "    \"DISCRIMINATION_PHASE_IDS\",\n    \"SKEW_DEPTHS\",\n    \"SUBJECT_SPACE_UNITS\",\n    \"INPUT_LANGUAGE_PYTHON\",\n    \"INPUT_LANGUAGE_GO\",\n    \"CONTINUATION_FIXTURE\",\n    \"MULTILINE_STRING_FIXTURE\",\n    \"GO_TAB_FIXTURE\",\n    \"BehavioralMatrixCase\",\n    \"MatrixCaseResult\",\n    \"BehavioralMatrixReceipt\",\n",
+          "pre": "    \"DISCRIMINATION_PHASE_IDS\",\n    \"SKEW_DEPTHS\",\n    \"SUBJECT_SPACE_UNITS\",\n    \"BehavioralMatrixCase\",\n    \"MatrixCaseResult\",\n    \"BehavioralMatrixReceipt\",\n"
+        }
+      ],
+      "top_level_definitions_pre": 21,
+      "top_level_definitions_post": 24,
+      "added_definitions": [
+        "_declared",
+        "_declared_input_cases",
+        "_declared_input_fields"
+      ],
+      "removed_definitions": [],
+      "changed_definitions": [
+        "BehavioralMatrixCase",
+        "MatrixCaseResult",
+        "_indentation_matrix_cases",
+        "behavioral_matrix_guardrails",
+        "resolve_matrix_case"
+      ],
+      "added_assignments": [
+        "CONTINUATION_FIXTURE",
+        "GO_TAB_FIXTURE",
+        "INPUT_LANGUAGE_GO",
+        "INPUT_LANGUAGE_PYTHON",
+        "MULTILINE_STRING_FIXTURE"
+      ],
+      "changed_assignments": [
+        "DISCRIMINATION_PHASE_IDS",
+        "RECEIPT_SCHEMA_VERSION",
+        "__all__"
+      ]
+    },
+    {
+      "path": "core/phase_registry.py",
+      "pre_sha256": "76705e82b8edb7c24418cb8491ec6bc80a75d5a871e766f4c0d46ae9e12de19c",
+      "post_sha256": "14eb8a507020075288275365d441e166ca0d0e9385e2d3210469f46dfdd89cfa",
+      "hunks": [
+        {
+          "post": "    # EXEC, DEFECT and VALIDATE above: no registry track was added and nothing\r\n    # in the schema, the counts or the report grew a new dimension.\r\n    \"CANDIDATE\",\r\n    # INDENT.* names indentation-subject semantic-contract slices inside the\r\n    # existing OPS track, which already owns the behavioral matrix whose\r\n    # reference reading these phases define.  An ID namespace only, exactly\r\n    # like DEFECT and CANDIDATE above: no registry track was added and nothing\r\n    # in the schema, the counts or the report grew a new dimension.\r\n    \"INDENT\",\r\n)\r\n\r\n#: Registry-root fields that must be present.\r\n",
+          "pre": "    # EXEC, DEFECT and VALIDATE above: no registry track was added and nothing\r\n    # in the schema, the counts or the report grew a new dimension.\r\n    \"CANDIDATE\",\r\n)\r\n\r\n#: Registry-root fields that must be present.\r\n"
+        }
+      ],
+      "top_level_definitions_pre": 16,
+      "top_level_definitions_post": 16,
+      "added_definitions": [],
+      "removed_definitions": [],
+      "changed_definitions": [],
+      "added_assignments": [],
+      "changed_assignments": [
+        "PHASE_ID_PREFIXES"
+      ]
+    }
+  ]
+}

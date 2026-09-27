@@ -7,6 +7,8 @@ from pathlib import Path
 
 from pathspec import PathSpec
 
+from core.source_file_policy import SYMBOL_EXTRACTION_VERSION
+
 ANY_DEPTH_HARD_EXCLUDES = frozenset(
     {
         ".git",
@@ -227,11 +229,25 @@ def _match_spec(
     )
 
 def compute_policy_fingerprint(repo_path: str) -> str:
-    """Return a deterministic fingerprint of repository ignore policy."""
+    """Return a deterministic fingerprint of repository indexing policy.
+
+    Two things decide whether a stored index record is still usable: which
+    files the repository admits (the ignore policy) and what extraction
+    produces from them (``SYMBOL_EXTRACTION_VERSION``).  Both belong in the
+    fingerprint the manifest stores.
+
+    RETRIEVE.LIVE.1 added the second.  Without it a parser correctness fix
+    lands in code while unchanged files keep serving symbol artifacts built by
+    the broken parser, indefinitely - the fix would be real and invisible.  A
+    version bump changes this fingerprint once, which the existing delta path
+    already turns into a single full re-index; steady-state incremental
+    indexing is unaffected and no run is forced to rebuild.
+    """
     root = Path(repo_path).expanduser().resolve()
 
     payload = {
         "version": REPO_IGNORE_POLICY_VERSION,
+        "symbol_extraction": SYMBOL_EXTRACTION_VERSION,
         "any_depth_hard_excludes": sorted(
             ANY_DEPTH_HARD_EXCLUDES,
             key=str.casefold,

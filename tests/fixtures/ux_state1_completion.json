@@ -1,0 +1,327 @@
+{
+  "phase": "UX.STATE.1",
+  "completed_on": "2026-09-17",
+  "closed_findings": [
+    "UX-02",
+    "UX-03",
+    "UX-04"
+  ],
+  "remaining_findings": [
+    "UX-05",
+    "UX-06"
+  ],
+  "out_of_scope": [
+    "UX-05",
+    "UX-06",
+    "broad visual redesign",
+    "durable job architecture",
+    "sensitive-read token authentication",
+    "PREFLIGHT.REQUEST.1",
+    "T6 Round 11",
+    "UX.RESILIENCE.1"
+  ],
+  "existing_files_changed": [
+    "web/templates/index.html",
+    "docs/roadmap/phase_registry.json",
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py",
+    "tests/_auth_web_read1_maintenance.py",
+    "tests/test_auth_web_read1.py",
+    "tests/test_auth_web1.py",
+    "tests/test_data_undo1.py",
+    "tests/test_web_ui_command_hierarchy.py",
+    "tests/test_web_ui_cutoff_1.py",
+    "tests/test_web_ui_demo_flow.py",
+    "tests/test_web_ui_information_architecture.py",
+    "tests/test_web_ui_result_readability.py"
+  ],
+  "new_files": [
+    "web/static/workbench_state.js",
+    "tests/_ux_state1_maintenance.py",
+    "tests/test_ux_state1.py",
+    "tests/test_ux_state1_browser.py",
+    "tests/fixtures/ux_state1_reversal.json",
+    "tests/fixtures/ux_state1_frozen_boundaries.json",
+    "tests/fixtures/ux_state1_completion.json",
+    "docs/designs/2026-09-17-repository-run-candidate-state-ownership.md"
+  ],
+  "owners": {
+    "workflow_state": "web/static/workbench_state.js::WorkbenchState",
+    "projection": "web/templates/index.html::renderWorkbench (single subscriber)",
+    "submit_serialization": "web/templates/index.html::_serializeWorkbenchExecution",
+    "transport": "web/static/request_integrity.js (unchanged)",
+    "undo_authority": "core/undo_backup.py::UndoBackupStore via /undo_patch (unchanged)",
+    "apply_authority": "web/routes/patch_routes.py human Apply authorization (unchanged)",
+    "dream_review_binding": "AUTH.DREAM.1 modal controls (unchanged)"
+  },
+  "state_model": {
+    "fields": [
+      "hydrated",
+      "contextGeneration",
+      "repository",
+      "run",
+      "mode",
+      "instant",
+      "execution",
+      "candidate",
+      "candidates",
+      "review",
+      "action",
+      "slots"
+    ],
+    "candidate_provenance": [
+      "id",
+      "source",
+      "requestId",
+      "contextGeneration",
+      "repository",
+      "runSessionId",
+      "backendCandidateFingerprint",
+      "text",
+      "payload"
+    ],
+    "ticket": [
+      "id",
+      "kind",
+      "slot",
+      "contextGeneration",
+      "repository",
+      "candidateId",
+      "execution"
+    ],
+    "telemetry": [
+      "requestSequence",
+      "contextGeneration",
+      "lastInvalidation",
+      "ignoredStaleResponses",
+      "lastIgnored"
+    ],
+    "action_statuses": [
+      "idle",
+      "pending",
+      "succeeded",
+      "failed"
+    ]
+  },
+  "slot_ownership": {
+    "generate": {
+      "slot": "candidate",
+      "concurrency": "latest",
+      "candidate_bound": false
+    },
+    "candidates": {
+      "slot": "candidates",
+      "concurrency": "latest",
+      "candidate_bound": false
+    },
+    "test": {
+      "slot": "review",
+      "concurrency": "single",
+      "candidate_bound": true
+    },
+    "apply": {
+      "slot": "review",
+      "concurrency": "single",
+      "candidate_bound": true,
+      "mutation": true
+    },
+    "undo": {
+      "slot": "review",
+      "concurrency": "single",
+      "candidate_bound": true,
+      "mutation": true
+    },
+    "critique": {
+      "slot": "critique",
+      "concurrency": "latest",
+      "candidate_bound": true
+    },
+    "upload": {
+      "slot": "repository",
+      "concurrency": "latest",
+      "candidate_bound": false
+    },
+    "main_run": "native form POST reloads the page; no in-page response competes"
+  },
+  "stale_policy": {
+    "order": [
+      "context_changed",
+      "candidate_changed",
+      "superseded",
+      "already_settled"
+    ],
+    "effect": "ignored; only ignoredStaleResponses and lastIgnored change",
+    "abort_controller": "not used; synchronous Flask handlers keep running and abort would only hide outcomes"
+  },
+  "undo_success_rule": "success === true and backup_id equal to the sent receipt and transaction_id present (equal to the sent one when sent) and restored_sha256 is 64 lowercase hex; otherwise failed with the backend code, undo_failed, or undo_receipt_incomplete",
+  "mode_model": {
+    "workspace_modes": [
+      "chat",
+      "instant"
+    ],
+    "chat_execution": {
+      "mode": "retrieve",
+      "apply_policy": "plan",
+      "source": "server forces retrieve for web_mode=chat; Chat never applies"
+    },
+    "instant_execution": "last explicit #modeSelect/#applyPolicy choice; hydrated from the server-rendered form",
+    "primary_action": {
+      "chat": "Ask",
+      "instant": "Run",
+      "hint": "states the owned execution mode and apply policy"
+    },
+    "shared_fields": [
+      "agent_mode",
+      "patch_style",
+      "ignore_repo_dna",
+      "runtime_environment"
+    ]
+  },
+  "entry_behavior": {
+    "template_sha256": "b8b3e9fc5cd73f399315bf3eeae1315f34247b6e3d005afa6fcd9c55d7bdd231",
+    "ux02_repositories": "late repository-A response replaced candidate B and usage; Test sent A's patch with repo_path B",
+    "ux02_same_repository": "older response replaced the newer candidate",
+    "ux03": "success:false (audit exact) and a real stale_target refusal both recorded 'undone'",
+    "ux04": "Full + Ask before apply -> Chat -> Instant Run became Retrieve + Plan only, button Run",
+    "raw_json_innertext": "Test/Apply/Undo/Critique read #patchRawJson.innerText, empty while the Patch tab is visible and Raw JSON is collapsed; Test Run Patch sent nothing"
+  },
+  "post_behavior": {
+    "ux02": "stale responses ignored (context_changed / superseded); candidate, usage, answer, review and controls stay bound to the current context",
+    "ux03": "every non-confirmed Undo response is a failed action with its code; a real success is 'undone'",
+    "ux04": "Instant configuration survives Chat round trips; submit carries exactly the displayed execution"
+  },
+  "model_calls": 0,
+  "external_network_requests": 0,
+  "frozen_production_deltas": {
+    "backend_routes_and_web_app": 0,
+    "human_apply_authorization_and_candidate_fingerprint": 0,
+    "AUTH.WEB.1_transport": 0,
+    "AUTH.WEB.READ.1_host_boundary": 0,
+    "SEC.UI.1_sanitizer_and_sinks": 0,
+    "DATA.UNDO.1_owner_and_transport": 0,
+    "AUTH.DREAM.1_review_binding": 0,
+    "EXEC.PLAN.1": 0,
+    "DATA.ROLLBACK.1": 0,
+    "Track_A": 0
+  },
+  "limitations": [
+    "Editing the repository input invalidates the displayed candidate on the first changed character; typing the old path back does not restore it (reload the session).",
+    "A mutation response made stale by a repository switch is recorded only in debug telemetry and in the server's persisted session/backup state.",
+    "Generate still combines the displayed run's CONTROL context with the current repository input.",
+    "Repository-scoped auxiliary panels outside the candidate workflow (Dream runs, benchmarks, evidence pack) keep their own request handling.",
+    "UX-05: a missing Mermaid CDN still stops the page script before hydration; UX-06 keyboard/focus remains open."
+  ],
+  "performance": {
+    "browser": {
+      "execution_option_render_us": 24.0,
+      "mode_round_trip_render_us": 51.0,
+      "repository_invalidation_render_us": 24.5,
+      "stale_request_settle_us": 51.0
+    },
+    "method": "Chromium, real page with the subscribed renderer; median per-operation microseconds of 9 batches x 200 operations, median of 3 runs. mode_round_trip is two transitions (Chat, Instant); stale_request_settle is begin + repository invalidation + ignored settle. No network request is issued by any transition.",
+    "requests": "every scenario asserts its exact POST count; a second Undo while one is pending issues no request"
+  },
+  "test_runs": [
+    {
+      "scope": "entry_ui_baseline",
+      "selection": "72 UI-related files (every test reading index.html, request_integrity, safe_content or the workbench, plus AUTH.DREAM.1, EXEC.PLAN.1, DATA.ROLLBACK.1, harness modes web, mutation gate/surface, picker, help route) on untouched entry bytes",
+      "passed": 1917,
+      "failed": 0,
+      "duration_seconds": 264.39
+    },
+    {
+      "scope": "red_before_implementation",
+      "selection": "tests/test_ux_state1.py and tests/test_ux_state1_browser.py on entry bytes (no state module)",
+      "tests": 42,
+      "passed": 0,
+      "failed": 42,
+      "note": "browser failures are behavioral: repository A overwrote B, older same-repository request won, success:false and real Undo failures recorded 'undone', Full + Ask became Retrieve + Plan, Test sent nothing while Raw JSON was collapsed"
+    },
+    {
+      "scope": "red_green_toggle",
+      "selection": "tests/test_ux_state1_browser.py POST tests (PRE tests deselected) with web/templates/index.html at entry bytes and web/static/workbench_state.js moved aside",
+      "entry": {
+        "passed": 0,
+        "failed": 33,
+        "duration_seconds": 95.18
+      },
+      "restored": "both files restored; sha256 verified (index.html ba8ad87f…, workbench_state.js 36916265…)"
+    },
+    {
+      "scope": "ui_set_after_template_before_test_maintenance",
+      "selection": "the same 72 UI-related files",
+      "passed": 1898,
+      "failed": 19,
+      "note": "all expected before governance: 8 script-count pins, 2 DATA.UNDO.1 pins recording UX-03 as deferred, AUTH.WEB.1 template body pin, AUTH.WEB.READ.1 raw frozen pin, 7 reversal-chain checks on index.html; every behavioral suite (AUTH.DREAM.1, SEC.UI.1, AUTH.WEB.1 browsers, UX.11) passed"
+    },
+    {
+      "scope": "chain_users_after_maintenance",
+      "selection": "33 files: every reversal-chain user and pin suite (HARDEN phases, Track-A pin suites, AUTH.WEB.1/READ.1 incl. browser), script-count files, registry/picker and both UX.STATE.1 suites",
+      "passed": 1874,
+      "failed": 2,
+      "skipped": 25,
+      "duration_seconds": 1053.81,
+      "failures": [
+        "tests.test_patch_minimal_novelty_live::test_a_locally_novel_candidate_cannot_bypass_the_behavioral_matrix (known baseline KeyError 'candidate_verification_status', in the recorded 49)",
+        "tests.test_ux_state1::test_completion_receipt_pins_every_phase_source (receipt not yet written)"
+      ]
+    },
+    {
+      "scope": "focused",
+      "selection": "tests/test_ux_state1.py and tests/test_ux_state1_browser.py",
+      "passed": 53,
+      "failed": 1,
+      "duration_seconds": 104.27,
+      "note": "the failure was this receipt not yet written"
+    },
+    {
+      "scope": "browser_repeat",
+      "selection": "tests/test_ux_state1_browser.py",
+      "passed": 39,
+      "failed": 0,
+      "duration_seconds": 104.74
+    },
+    {
+      "scope": "affected_broad",
+      "files": 233,
+      "selection": "AUTH.WEB.1's 228-file affected set (every test importing web or reading index.html, reversal-chain users, DATA.ROLLBACK.1 edge suites, AUTH.WEB.1 suites, registry/picker and phase-advance checks) plus AUTH.WEB.READ.1's two suites, tests/test_patch_authoring_context_live3.py and both UX.STATE.1 suites",
+      "passed": 5756,
+      "failed": 49,
+      "skipped": 26,
+      "duration_seconds": 1573.54,
+      "failures_ab": "the 49 failure node ids equal the recorded AUTH.WEB.1/READ.1 baseline exactly; re-running their 24 files on reconstructed entry bytes (13 changed files reverted, 8 new files moved aside) gave the same 49 node ids with identical first-line messages (49 failed / 415 passed in both), and all 21 phase files were restored and digest-verified"
+    }
+  ],
+  "checks": {
+    "compileall": "passed",
+    "benchmark_cases_check": "54 checked, 0 errors",
+    "git_diff_check": "passed (pre-existing line-ending notices only)",
+    "registry_phases": 188,
+    "ux_track_phases": 28,
+    "complete_or_history": 184,
+    "phase_picker_top_recommendation": "DOGFOOD.1B",
+    "chromium": "Playwright Chromium headless; Mermaid CDN stubbed in-route; all other external requests aborted and asserted empty"
+  },
+  "source_sha256": {
+    "web/templates/index.html": "ba8ad87f324c70abfcdbb733dd30dcb2c5eb543964d2c0ac7222d0f71af6f11d",
+    "docs/roadmap/phase_registry.json": "bfbcef9b7934ce0e6f3fced7e251cf4b57062ba3c502b2cf0d561b4e5129e81d",
+    "tests/test_phase_registry.py": "676fdefdad504565e3936a42371bdc5a40f81e9bc1d9c32a01579cfe50a97670",
+    "tests/test_phase_picker.py": "3ad200d1bb4cc52184b92329f26cec0c821bcadc6a1638f390fc7b1bc4e5e754",
+    "tests/_auth_web_read1_maintenance.py": "41777b20261f6a0c7e319fbb459ed3683ef5868fcaa14ce160e4294a47cfab9c",
+    "tests/test_auth_web_read1.py": "4216c1d9bd81cabdb841b392842679f18a232396a230cf5707f4a532b679ab35",
+    "tests/test_auth_web1.py": "dc72f4a4df969757210aa3a0bdb9a6e4e699b72fc8c1a2f29c9617804d25bdd5",
+    "tests/test_data_undo1.py": "db3b90cd6587760cd491032a70fca3a094f69b5521b333fd0674897caf42368c",
+    "tests/test_web_ui_command_hierarchy.py": "0a121ed2425efe08c21697f3de138d5a0f1010c910f021057468ed68701332bc",
+    "tests/test_web_ui_cutoff_1.py": "0ba542ec1cb68446c2852ae6ee98f17d4e579e4fb4ebe840d6adf939c5a9b913",
+    "tests/test_web_ui_demo_flow.py": "dea2ae7880da3a6d7c51de6420389101c4d05ec9882a70b36a3b2426f16aac8e",
+    "tests/test_web_ui_information_architecture.py": "7290cbf828371690b775ef743b8cb8456f3254d7d626e43023bcd7424fa24879",
+    "tests/test_web_ui_result_readability.py": "8af0c264ad16d19b8a7538ec7bffa64dbc559bee78b894b9792bf66b432943c8",
+    "web/static/workbench_state.js": "36916265f62cc12ae63a6316ac2bca90d0b3c3767d8091b8b568e333e3fc67cd",
+    "tests/_ux_state1_maintenance.py": "b61290c6695c27392bc411e8ab397f4fafcdc3c90ae98d697d9fefb05ef4a7e4",
+    "tests/test_ux_state1.py": "ab65cc04cd151e5e9ab86dae1017279a62d4dcc4cd61664dab0e44af7b64ba20",
+    "tests/test_ux_state1_browser.py": "192b71260c089f31351b8f162360ae93b9064d1b1266eb3e226f7a4e101665e9",
+    "tests/fixtures/ux_state1_reversal.json": "f755fac120130c6f004982acfb95a83eb69e3286b210690eea4bec402d45d697",
+    "tests/fixtures/ux_state1_frozen_boundaries.json": "fe916c485e3e5325aac6cd7cf0796abdfe5ba7f807bb680fb4a49d7bc6c7c43a",
+    "docs/designs/2026-09-17-repository-run-candidate-state-ownership.md": "10622794f6626f84d071c97357d564a83e66bc8b927f03c329409a63ceedffe4"
+  }
+}

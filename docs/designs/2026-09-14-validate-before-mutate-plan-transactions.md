@@ -1,0 +1,110 @@
+# EXEC.PLAN.1 — Validate-Before-Mutate & Transaction Containment
+
+Completed 2026-09-14. EXEC-01 is closed for the patch-plan executor and the audited web/API plan path. A malformed later operation is rejected before any target mutation. Once a valid transaction starts, bounded execution failures are contained, recovery is attempted, and final state is independently inspected. Recovery can fail; the response reports the unresolved targets and directories instead of asserting success.
+
+Only this phase was implemented. Track A, SEC.UI.1, and the durable DATA.UNDO.1 contract remain frozen. AUTH-01, DATA-02, SEC-02, UX-01 through UX-06 and T6 Round 11 were not implemented. Original 2026-09-11 audit files remain byte-identical.
+
+1. **Exact files changed.** Nine existing files changed and seven files were added, listed below. Entry bytes for all 1,439 captured files are either unchanged or exactly reconstructed by nine explicitly hashed reversals. Scratch scripts, isolated repositories, logs, JUnit results and performance data live in `.tmp/exec-plan1/`; they are verification artifacts, not production changes. No staging, commit, stash, reset or clean was used.
+2. **Old flow.** `apply_patch_plan` iterated raw dictionaries, parsed the next discriminator and path, then wrote that operation before examining the next one. Its rollback list grew as execution proceeded.
+3. **Root cause.** `(op.get("op") or "").strip()` was outside the per-write exception handler. `op: 7` in operation two raised after operation one had created a file; the exception bypassed rollback and reached Flask.
+4. **Preparer owner.** `patching/patch_plan_transaction.py::prepare_patch_plan` owns complete schema, UTF-8 payload and path preparation. `apply_patch_plan` calls it before the transaction executor. The two plan routes precheck through this same owner before replay creation or dry-run cloning. No lifecycle, authority, candidate or validation owner was rewritten.
+5. **Prepared plan.** Frozen `PreparedPatchPlan` contains a resolved repository root and an immutable tuple of operations. It is internal execution state, not an authorization receipt, JSON deserialization API, repository identity or durable backup.
+6. **Prepared operation.** Frozen `PreparedOperation` holds kind, canonical physical repository-relative path, resolved contained target, ordinal, validated strings, and the validated requested spelling used only for compatible diff/result labels. Execution consumes these fields, never arbitrary raw dictionaries. Mutating the input after preparation cannot redirect execution.
+7. **Complete schema.** The executor accepts a nonempty JSON list of operation objects. Only `create_file` and `replace_snippet` are supported. A string discriminator is trimmed using the existing rule; case folding and new aliases are not added. `relative_path` takes precedence over the existing `file` fallback. Both supplied path fields must be strings; at least one must be nonempty. `create_file.content` defaults to the existing empty-string value only when absent. `replace_snippet` requires string `target_snippet` and `patched_snippet`, including the existing empty-snippet behavior.
+8. **Type validation.** Parser operations run only after exact JSON type checks, so booleans do not pass as integers or strings. Numeric/list/object/null discriminators, paths or content are rejected structurally. UTF-8 encoding errors, including escaped lone surrogates, are rejected before writes. Public `apply_patch_plan` also validates the types of its validation options.
+9. **Unknown fields.** The direct executor historically ignored extras; it continues accepting and discarding them. An irrelevant `overwrite`, nested edit object or annotation never becomes authority. The separate strict worker-envelope allow-lists remain unchanged and stricter. No new flags, enums, nested edit dialect or operation vocabulary were introduced. Normalized applied-operation receipts omit ignored extras.
+10. **Path safety timing.** Every target is checked with the existing `evaluate_patch_safety` policy during preparation, including resolved physical paths. The established containment and contained-symlink behavior are reused; standard `ntpath.splitdrive` covers drive-relative spellings. One rejected target prevents the entire plan from starting. Direct executor calls now also enforce the policy categories already enforced by the web/lifecycle gate; four prior characterization cases were updated with explicit reversal attribution. The established route safety and authorization refusal receipts are preserved.
+11. **Same-target semantics.** Operations remain ordered and are never collapsed. Create then replace and repeated replacements work as before. Duplicate create or a later missing snippet remains an ordered execution precondition failure and triggers recovery if mutation has begun. Schema/path validity is fully prepared; file existence, decoding and snippet applicability remain runtime preconditions so sequential patch meaning is preserved.
+12. **Snapshot model.** After preparation, and before the first write, `snapshot_targets` captures every target. `TargetBaseline` records aliases, existence, exact bytes, SHA-256 and mode. Resolved aliases and hard links share one physical byte snapshot; absent targets are grouped by normalized physical path. A later unreadable target prevents every write.
+13. **Before-exists.** Absent targets have `before_exists=false`, `before_bytes=None` and no before hash. Existing empty files have `before_exists=true`, `b""` and the SHA-256 of empty bytes. Recovery distinguishes these states.
+14. **Byte fidelity.** Snapshots and restoration use bytes, without decoding/re-encoding the baseline. LF, CRLF, missing terminal newline, UTF-8/BOM, NUL and arbitrary original bytes are preserved. Replacement still requires UTF-8 as before; a non-UTF-8 file can be snapshotted/restored but is not newly editable. Existing first-occurrence and universal-newline matching/write mapping remains unchanged.
+15. **Execution boundary.** `execute_prepared_patch_plan` holds the process-local plan lock around complete snapshot, ordered mutation, existing validation and any recovery. Execution does not parse raw operation data. File targets are physically rechecked before access and immediately before writes.
+16. **Exception containment.** One outer `Exception` boundary catches bounded I/O, permission, partial-write, diff-generation and validation-runner failures. Snapshot failures also return structured results before mutation. Error responses contain stable messages and categories, without newly exposing caught stack traces. Process termination, power loss and recovery from a killed process are outside this in-memory contract.
+17. **Recovery algorithm.** On failure after any mutation attempt, visit baselines in reverse first-target order, attempt every target/alias, restore captured bytes or original absence, then remove only empty directories whose creation identity is still owned by this transaction. One restore exception never prevents attempts on other targets. There is no recursive directory deletion.
+18. **Recovery verification.** After all restoration attempts, independently re-resolve, read/hash, and inspect existence/mode for every target. A restore helper that silently does nothing is detected. Remaining created directories are inspected separately.
+19. **Remaining changes.** `remaining_changed_paths` is computed from final state compared with each captured baseline, not from caught exceptions. Canonical repository-relative paths are sorted deterministically. An inaccessible target or changed containment cannot be verified and is conservatively reported as unresolved; this is not an assertion that unreadable bytes were measured. `remaining_created_directories` separately reports unresolved directory side effects.
+20. **Structured status.** Transaction-local fields are `mutation_attempted`, `recovery_attempted`, nullable `recovery_complete`, `remaining_changed_paths` and `remaining_created_directories`. Codes are `invalid_plan_schema`, `unsupported_operation`, `unsafe_target`, `precondition_failed`, `execution_failed` and `recovery_incomplete`; the latter retains the originating `failure_code`. Generic `rollback_performed`, `patch_ops_rollback_protected` and validation-side-effect defaults are unchanged.
+21. **Audit PRE.** The test executes the actual entry route and executor under the real Flask/lifecycle/authorization path using an isolated repository. Entry executor SHA-256 is `b1a874c1de5818c80981bd2eb27f996e4d252f7728421d6d38a84427b0b75222`, matching the original audit. `[create_file(created.txt), {"op": 7, "relative_path": "other.txt"}]` leaves `partial write\n` in the first file and returns HTTP 500/non-JSON. Provider calls: zero.
+22. **Audit POST.** The same current-route request returns HTTP 200 JSON with `invalid_plan_schema`, ordinal 1, no mutation attempt, no recovery attempt and zero mutation-primitive calls. The complete isolated repository tree is unchanged; `created.txt` is absent.
+23. **Malformed first.** Structured rejection; zero writes, creates, deletes or snapshots.
+24. **Malformed middle.** Identical no-mutation/no-snapshot property.
+25. **Malformed last.** Identical no-mutation/no-snapshot property across files.
+26. **Unsupported operation.** Well-typed unknown names, case-changed names and delete/rename/write inventions fail preparation. They are never ignored or added.
+27. **Unsafe target.** Traversal, absolute external paths, drive/UNC/rooted Windows forms, protected categories, NUL paths and real directory-junction escapes invalidate the entire plan. In-repository junction aliases remain supported. Retargeting a prepared physical parent before snapshot is rejected without mutation.
+28. **Valid multi-file plan.** Both direct and real HTTP positives execute all operations in order, preserve intended final bytes and existing validation/success semantics, and report no recovery attempt. Submitted path casing remains in result/diff labels.
+29. **Runtime failure.** A later write failure, a partial binary write, a post-write diff exception, a safe-validation exception and a validation-snapshot exception all produce structured failure and verified recovery. Successful recovery yields exact baseline files and an empty remaining-change list.
+30. **Recovery failure.** Both a raised restore error and a silent no-op restore produce `recovery_incomplete`, `recovery_attempted=true`, `recovery_complete=false` and exactly `a.txt` as the measured divergent target in the two-file fixture. The unchanged second file is excluded. HTTP failures remain JSON and do not say the plan was rolled back successfully. Generic rollback booleans retain their old values; DATA-02 remains open.
+31. **Create rollback.** Created files, including create-then-replace targets, are removed and absence is independently verified. Pre-existing files are restored to bytes instead of deleted.
+32. **Delete rollback.** Delete is unsupported and remains unsupported. A fault fixture deletes an existing captured target during a later I/O failure and proves recovery restores its exact bytes, including binary baselines; this does not introduce a delete operation.
+33. **Directories.** Creation attempts are recorded before `mkdir`. Once stat succeeds, device/inode proves ownership for empty-directory cleanup. A directory created immediately before an exception or whose ownership cannot be verified is retained and reported as unresolved. Pre-existing directories and nonempty directories survive. Parent-chain work is bounded by the named targets, without recursive repository enumeration.
+34. **API JSON.** Both `/apply_patch_plan` and `/test_patch_plan` reject malformed outer JSON shapes and malformed nested operations with structured JSON. The apply route transports transaction-local recovery facts. Dry-run safety refusals preserve the gate and include local rejection fields. No browser/template changes were required.
+35. **HTTP 500.** The exact audited malformed plan can no longer produce its partial-write HTML 500. Tested bounded execution failures also return JSON. This is not a global guarantee for unrelated Flask routes, infrastructure failures or process termination.
+36. **DATA.UNDO.1 delta.** Zero semantic delta. `core/undo_backup.py`, `web/app.py`, Undo browser transport and the single-file backup producer remain unchanged from entry; the route edit is confined to plan handling. Its durable identity, hashes, consumption and process-local Undo lock remain separate. The only Undo-named edit is a test-only historical reversal adapter.
+37. **DATA-02 delta.** No generic rollback truthfulness harmonization, no changed `validation_side_effects` defaults, and no broader receipt redesign. Incomplete recovery is reported by new transaction-local fields and truthful plan failure text. DATA-02 is not closed.
+38. **AUTH-01 delta.** Dream latest-report selection, reviewed candidate identity and Apply binding are unchanged. Existing human-Apply authorization is still required. No execution authority is gained from a prepared plan. AUTH-01 remains open.
+39. **SEC.UI.1 delta.** Zero semantic delta. Sanitizer/vendor assets, evidence rendering, help/Dream rendering and browser controls are entry-identical. All 30 frozen SEC.UI.1 tests passed.
+40. **Track-A delta.** Zero semantic delta to the pipeline, single-file executor, candidate verification, targeted validation, intent or authority owners. Exact entry hashes and reversible maintenance prove attribution. The existing recorded T6 frozen lifecycle case and relevant authority/intent/envelope tests ran; this is not a new T6 round or a live provider trial.
+41. **Model/network delta.** Zero live provider calls and zero external network requests. Tests use direct plans, offline HTTP fixtures, locally intercepted browser requests and fault injection. No dependencies were installed.
+42. **Traversal delta.** Preparation/snapshot/recovery add zero repository walks. They inspect only supplied targets and their parent chains. Existing lifecycle replay/brain-stamp behavior, dry-run copying and validation side-effect scans remain unchanged; zero new traversal is not a claim those older flows never traverse.
+43. **Concurrency boundary.** A module-local `RLock` serializes plan snapshot through recovery in one process. An event-controlled concurrency test proves a second plan cannot snapshot while the first holds execution. Durable Undo, single-file Apply, external editors, independent processes and validation child processes do not acquire this plan lock. There is no distributed transaction, cross-process compare-and-swap or crash-durable journal.
+44. **Memory bound.** Snapshot memory is proportional to the sum of unique target bytes; repeated operations/hard links do not duplicate baselines. Existing payloads/diffs and a current edit also consume memory. Full schema parsing completes before any target byte snapshot, including malformed-last plans. Direct executor input and aggregate target bytes had no numeric cap, and no incompatible low cap was invented. The separate strict worker-envelope limits remain 256 operations and 1,000,000 response characters; they are not falsely claimed as a direct HTTP/file-memory cap. Very large valid direct plans remain a documented resource limitation.
+45. **Performance.** The table below reports final warm-local medians for three files, seven samples after two warmups, with fixture resets outside timing. Preparation includes schema/encoding validation and path metadata checks but no target byte reads; snapshot/recovery include byte I/O. Success delta compares the exact entry executor on the same legitimate plan. Measurements ran without competing test runs. No corpus benchmark or external service was used. Rows overlap and must not be summed.
+46. **Focused tests.** All 131 EXEC.PLAN.1 cases passed. The final focused verification invocation also passed 14 relocated-owner envelope boundary checks and three refreshed historical frozen/reversal checks: 148 total, no failures or skips. Exact node-level results are in the completion receipt and `.tmp/exec-plan1/verified.xml`.
+47. **Adjacent/broad tests.** The final broad invocation passed all 725 cases across 25 complete affected test modules plus the existing recorded Track-A lifecycle case. The separate complete DATA.UNDO.1/SEC.UI.1 invocation passed all 80 cases (50 Undo, 30 security). There are 936 unique passing cases across these results, no skips. A pre-final source-inspection expectation was updated to inspect the relocated preparer and then rerun. Full repository tests were not run; no full-repository-green claim is made.
+48. **Registry/checks/frozen attribution.** Registry validation is valid: 183 phases, 179 complete, 12 HARDEN; the picker still recommends DOGFOOD.1B. Compileall for `core patching web tests`, all 54 benchmark metadata checks, and `git diff --check` passed. Original audit and historical fixture files are untouched; nine maintenance deltas reverse exactly to the captured entry. The existing Google SDK deprecation warning is the only observed warning.
+49. **Remaining Track-B findings.** AUTH-01, DATA-02, SEC-02 and UX-01 through UX-06 remain open. DATA.UNDO.1 and SEC.UI.1 remain frozen completed contracts. No UI redesign, response-race fix, Undo `last_action` fix, mode reset, Mermaid, focus/keyboard work or T6 Round 11 was started.
+50. **Closure decision.** EXEC-01 is closed: complete preparation prevents malformed later operations from leaving an earlier mutation, and failures after valid execution begins are contained with baseline recovery, independent verification and truthful JSON transaction results. This does not promise recovery under every OS failure and does not close DATA-02 or AUTH-01.
+
+## Permanent file delta
+
+- `docs/roadmap/phase_registry.json`
+- `patching/patch_plan_executor.py`
+- `tests/_data_undo1_maintenance.py`
+- `tests/test_patch_safety_chokepoint.py`
+- `tests/test_patch_write_byte_fidelity.py`
+- `tests/test_phase_picker.py`
+- `tests/test_phase_registry.py`
+- `tests/test_worker_patch_envelope_boundaries.py`
+- `web/routes/patch_routes.py`
+- `patching/patch_plan_transaction.py`
+- `tests/test_exec_plan1.py`
+- `tests/_exec_plan1_maintenance.py`
+- `tests/fixtures/exec_plan1_frozen_boundaries.json`
+- `tests/fixtures/exec_plan1_reversal.json`
+- `tests/fixtures/exec_plan1_completion.json`
+- `docs/designs/2026-09-14-validate-before-mutate-plan-transactions.md`
+
+## Measured performance
+
+All times are median milliseconds; each plan has three files.
+
+| Bytes/file | Preparation | Snapshot | Prepared success incl. snapshot | Full success | Entry success | Added full-success cost | Verified recovery |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 16,384 | 1.4523 | 1.6673 | 10.5027 | 11.8464 | 5.2981 | 6.5483 | 7.1018 |
+| 262,144 | 1.5223 | 2.2667 | 69.7313 | 72.4220 | 65.0278 | 7.3942 | 8.3770 |
+
+Mutation and restore retain the existing binary `Path.write_bytes` primitive and mode behavior. This executor had no atomic-replace mutation primitive, so no new replace contract was invented; injected partial-write failures are recovered and verified. A process dying during a write can still leave residue. ACLs, ownership and crash recovery are not promised. Ordinary mode bits are captured/restored; Windows exposes its platform-specific mode behavior.
+
+## Explicit answers
+
+| Question | Answer |
+|---|---|
+| Can an invalid operation after a valid operation leave the valid mutation? | Schema/path-invalid operations never start mutation. Runtime precondition/I/O failures after a valid start invoke recovery; if restoration fails, exact unresolved paths are reported. |
+| Is the entire plan validated before the first write/delete/create? | Yes: complete schema, payload types/encoding and every target path are prepared first. Ordered file/snippet preconditions remain runtime checks. |
+| Can malformed field types throw outside the structured result? | No in the tested executor and audited plan API JSON contract; the type matrix rejects before mutation. |
+| Does one unsafe target invalidate the entire plan before mutation? | Yes. |
+| On runtime failure after mutation, is recovery attempted? | Yes, for contained normal execution exceptions. |
+| Is recovery success independently verified? | Yes, against final existence, byte hash and ordinary mode bits. |
+| If recovery is incomplete, are exact changed paths reported? | Yes for observable targets; unverifiable targets are conservatively listed as unresolved. Directory residue is reported separately. |
+| Does this phase claim DATA-02 is closed? | No. Generic rollback receipts remain unchanged. |
+| Were durable Undo semantics changed? | No. |
+| Were Dream Apply semantics changed? | No selection/identity/authority changes; it receives the same contained plan executor behavior as other callers. |
+| Was SEC.UI.1 changed? | No. |
+| Was Track A changed? | No semantic changes. |
+| Were live provider calls added? | No. |
+
+## Reproducible evidence
+
+`.tmp/exec-plan1/entry_manifest.json` and `entry/` retain the original bytes. `receipts.py` verifies every captured file and emits unique contextual reversals. `measure.py` reproduces the small performance fixture. `broad-modules.txt` is the exact adjacent selection. Final JUnit sources are `verified.xml`, `approved-broad.xml` and `final-frozen.xml`; registry/picker JSON and benchmark logs are in the same evidence directory. `tests/fixtures/exec_plan1_completion.json` records every unique final test result, measurements and file hashes.
+
+Validation environment: `DB_ENABLED=false`, all DATABASE_URL variants empty, `INDEX_USE_EMBEDDINGS=false`, `ROUTER_USE_EMBEDDINGS=false`, `RETRIEVER_USE_DB=false`, `EMBEDDING_PROVIDER=off`, and test-scoped web tokens. The offline HTTP/browser fixtures isolate infrastructure and deny or intercept network access. Test worktrees and files are synthetic and contained in `.tmp/exec-plan1/`.

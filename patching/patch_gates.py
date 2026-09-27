@@ -1,11 +1,21 @@
 from __future__ import annotations
 
+import ast
 import json
 import re
+import textwrap
 from pathlib import Path
 
 from agents.gemini_client import run_gemini_request
 from core.agent_state import AgentState
+from core.authoritative_binding_context import (
+    AuthoritativeBindingContext,
+    resolve_authoritative_candidate_bindings,
+)
+from core.local_binding_novelty import (
+    classify_candidate_novelty,
+    describe_candidate_novelty,
+)
 from core.validator import validate_patch_plan_grounding
 from database.memory import save_engineering_memory
 from patching.patch_grounding import enforce_patch_candidate_grounding
@@ -1226,15 +1236,10 @@ def reject_ungrounded_candidate_quotes(state: AgentState) -> None:
     result = enforce_patch_candidate_grounding(block, sources)
 
     if not result.is_grounded:
-        # Lower CONTROL's own confidence too, so consumers that read
-        # control_result (not just json_block) see the lowered control value.
-        control = state.control_result
-        if isinstance(control, dict):
-            if isinstance(control.get("confidence"), (int, float)):
-                control["confidence"] = 0.0
-            top = control.get("top_hypothesis")
-            if isinstance(top, dict) and isinstance(top.get("confidence"), (int, float)):
-                top["confidence"] = 0.0
+        # CONTROL.SAFETY.LIVE.1: patch quote failure demotes the model patch,
+        # not localization.  The ranked candidate may remain the best place to
+        # inspect even though this particular patch was ungrounded.
+        return
 
 
 _IDENT_RE = re.compile(r"\b[A-Za-z_][A-Za-z_0-9]*\b")
@@ -1322,7 +1327,30 @@ _LANGUAGE_FAMILY_ALIASES = {
 }
 
 
-def _identifiers_in(snippet: str) -> set[str]:
+def _identifiers_in(snippet: str, *, language: str = "") -> set[str]:
+    if language == "python":
+        try:
+            tree = ast.parse(textwrap.dedent(snippet or ""))
+        except (SyntaxError, ValueError):
+            # Unsupported fragments retain the conservative lexical check.
+            pass
+        else:
+            identifiers: set[str] = set()
+            for node in ast.walk(tree):
+                # These AST fields are identifier-bearing syntax, including
+                # expressions inside formatted strings. Literal text and string
+                # prefixes never become identifiers or hide a callable.
+                for field in ("id", "attr", "arg", "name", "rest"):
+                    value = getattr(node, field, None)
+                    if isinstance(value, str):
+                        identifiers.update(value.split("."))
+                if isinstance(node, ast.ImportFrom) and node.module:
+                    identifiers.update(node.module.split("."))
+                if isinstance(node, ast.alias) and node.asname:
+                    identifiers.add(node.asname)
+                if isinstance(node, (ast.Global, ast.Nonlocal)):
+                    identifiers.update(node.names)
+            return identifiers
     cleaned = _STRING_OR_COMMENT_RE.sub(" ", snippet or "")
     return set(_IDENT_RE.findall(cleaned))
 
@@ -1383,7 +1411,12 @@ def reject_schema_drift(state: AgentState) -> None:
         state.human_answer = state.final_answer
 
 
-def _enforce_safe_minimal(state: AgentState) -> None:
+def _enforce_safe_minimal(
+    state: AgentState,
+    *,
+    authoritative_binding_context: AuthoritativeBindingContext | None = None,
+    authoritative_source: str = "",
+) -> None:
     """For safe_minimal style, reject patches that introduce identifiers not
     present in the source. Replaces patch_candidate with null + needs_escalation
     instead of letting the user see an invented-API patch.
@@ -1436,11 +1469,101 @@ def _enforce_safe_minimal(state: AgentState) -> None:
     family = _LANGUAGE_FAMILY_ALIASES.get(lang, lang)
     builtins = _LANGUAGE_BUILTINS.get(family, set())
 
-    allowed = _identifiers_in(target) | _LANGUAGE_KEYWORDS | builtins
-    used = _identifiers_in(patched)
-    new_idents = sorted(used - allowed)
+    # PATCH.MINIMAL.LIVE.3 — the candidate cannot create its own baseline.
+    # Only a context built from the authoritative pre-candidate file and still
+    # matching that whole-file identity, target path, target symbol and target
+    # snippet participates.  Missing or stale context is exactly the legacy
+    # conservative environment.
+    context_current = False
+    if authoritative_binding_context is not None:
+        context_current = authoritative_binding_context.is_current_for(
+            authoritative_source=authoritative_source,
+            source_path=(
+                candidate.get("relative_path") or candidate.get("file") or ""
+            ),
+            target_symbol=(
+                candidate.get("target_node_name")
+                or candidate.get("target_symbol")
+                or ""
+            ),
+            target_snippet=target,
+        )
+        block.update(
+            authoritative_binding_context.as_telemetry(current=context_current)
+        )
+    effective_binding_context = (
+        authoritative_binding_context if context_current else None
+    )
+
+    allowed = _identifiers_in(target, language=family) | _LANGUAGE_KEYWORDS | builtins
+    used = _identifiers_in(patched, language=family)
+    lexical_delta = used - allowed
+    authoritative_names = frozenset(
+        resolve_authoritative_candidate_bindings(
+            effective_binding_context, patched_snippet=patched
+        )
+        if effective_binding_context is not None
+        else frozenset()
+    ) & lexical_delta
+    if effective_binding_context is not None:
+        block["authoritative_binding_context_reused_names"] = sorted(
+            authoritative_names
+        )
+    new_idents = sorted(lexical_delta - authoritative_names)
+
+    # PATCH.MINIMAL.LIVE.2 — a lexically new identifier is not by itself
+    # evidence that the candidate expanded what the program can reach.  Before
+    # rejecting the delta, classify it structurally: a name the same candidate
+    # binds as a local of the one existing function it edits is bounded local
+    # implementation novelty, and everything else — imports, definitions,
+    # parameters, globals, attribute stores, novel members and callables —
+    # keeps the previous conservative treatment.  Classification decides
+    # eligibility for candidate verification only.  It is not a correctness
+    # verdict, and it grants no review, approval or execution authority.
+    novelty = None
     if new_idents:
-        print(f"🛡️ safe_minimal gate: rejecting patch — invented identifiers: {new_idents}")
+        # Local import: the fingerprint primitive lives next to the sandbox and
+        # is only needed on the path that actually classifies something.
+        from core.candidate_sandbox_validation import (
+            candidate_fingerprint_from_payload,
+        )
+
+        novelty = classify_candidate_novelty(
+            target_snippet=target,
+            patched_snippet=patched,
+            language=family,
+            allowed_identifiers=allowed | authoritative_names,
+            target_node_kind=str(candidate.get("target_node_kind") or ""),
+            target_node_name=str(candidate.get("target_node_name") or ""),
+            authoritative_binding_context=effective_binding_context,
+        )
+        block.update(
+            novelty.as_telemetry(
+                candidate_fingerprint=candidate_fingerprint_from_payload(block),
+                novel_identifiers=new_idents,
+            )
+        )
+
+    if new_idents and novelty is not None and novelty.admits(new_idents):
+        # Admitted, and nothing more: the candidate survives this gate and goes
+        # on to the same verification it always faced.
+        print(
+            f"🛡️ safe_minimal gate: {novelty.primary_reason} — "
+            f"{sorted(novelty.local_binding_names)} bound inside "
+            f"{list(novelty.containing_functions)}"
+        )
+        print(f"🧭 {describe_candidate_novelty(novelty)}")
+    elif new_idents:
+        reason_code = novelty.rejection_reason(new_idents) if novelty else ""
+        unexplained = (
+            list(novelty.unexplained_identifiers(new_idents))
+            if novelty
+            else list(new_idents)
+        ) or list(new_idents)
+        print(
+            f"🛡️ safe_minimal gate: rejecting patch — {reason_code}: "
+            f"{unexplained}"
+        )
         block["patch_candidate"] = None
         block["confidence"] = min(float(block.get("confidence", 0.0) or 0.0), 0.2)
         block["needs_escalation"] = True
@@ -1451,9 +1574,13 @@ def _enforce_safe_minimal(state: AgentState) -> None:
             "type": "policy",
             "file": candidate.get("file") or candidate.get("relative_path") or "",
             "symbol": candidate.get("target_node_name") or "",
+            "novelty_reason": reason_code,
             "reason": (
-                f"safe_minimal mode rejected the AI's patch because it introduced identifiers "
-                f"not present in the source: {new_idents}."
+                f"safe_minimal mode rejected the AI's patch as {reason_code}: "
+                f"{unexplained} "
+                f"{'is' if len(unexplained) == 1 else 'are'} not present in the "
+                "source and not a bounded local binding of the existing "
+                "function being edited."
             ),
             "fix": "Provide more context or use balanced/vibe mode.",
         })

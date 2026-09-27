@@ -160,7 +160,7 @@ def test_template_has_no_new_privileged_or_external_script_behavior():
     t = _template()
     for token in ("os.system", "child_process", "eval(", "new Function(", "document.write("):
         assert token not in t, f"unexpected privileged token in template: {token!r}"
-    assert t.count("<script src=") == 2
+    assert t.count("<script src=") == 6  # two local SEC.UI.1 security assets, the AUTH.WEB.1 request-integrity owner and the UX.STATE.1 workflow-state owner
     assert t.count('src="http') == 1
 
 

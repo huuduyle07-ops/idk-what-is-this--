@@ -333,21 +333,25 @@ def test_no_benchmark_runner_model_client_or_patch_executor_is_called(tmp_path, 
     repo.mkdir()
     item_dir = _proposal_dir(proposals_root)
     _write_proposal(item_dir, repo_path=str(repo))
-    for name in (
+    guarded = (
         "benchmarks.run_benchmarks",
         "agents.gemini_client",
         "agents.ollama_client",
         "agents.deepseek_client",
         "core.run_lifecycle",
         "patching.patch_plan_executor",
-    ):
-        sys.modules.pop(name, None)
+    )
+    # Use monkeypatch.delitem so the removal is auto-restored on teardown — a
+    # raw sys.modules.pop would leak the absence to later test files. A later
+    # module-level `import agents.gemini_client as x` holds the ORIGINAL module
+    # object while production code doing a function-local
+    # `from agents.gemini_client import ...` re-imports and gets a NEW one, so a
+    # patch applied to the first is invisible to the code under test — a failure
+    # that only ever appears in a full-suite run.
+    for name in guarded:
+        monkeypatch.delitem(sys.modules, name, raising=False)
 
     seeder.seed_lessons_from_proposals(proposal_refs=[item_dir])
 
-    assert "benchmarks.run_benchmarks" not in sys.modules
-    assert "agents.gemini_client" not in sys.modules
-    assert "agents.ollama_client" not in sys.modules
-    assert "agents.deepseek_client" not in sys.modules
-    assert "core.run_lifecycle" not in sys.modules
-    assert "patching.patch_plan_executor" not in sys.modules
+    for name in guarded:
+        assert name not in sys.modules, f"forbidden module imported: {name}"

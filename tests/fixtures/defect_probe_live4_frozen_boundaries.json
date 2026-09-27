@@ -1,0 +1,40 @@
+{
+  "schema_version": "defect_probe_live_4_frozen_boundaries_v1",
+  "phase_id": "DEFECT.PROBE.LIVE.4",
+  "notes": [
+    "DEFECT.PROBE.LIVE.4 widens one oracle and nothing else.  Every file pinned here is a whole-file sha256 taken after the phase and asserted unchanged by tests/test_defect_probe_matrix_live.py.",
+    "core/defect_probe.py, core/defect_probe_worker.py and core/candidate_defect_probe.py carry probe construction and execution: the matrix changes which bounded inputs are probed, never how a probe runs or how a candidate sandbox is made.",
+    "core/paired_defect_probe.py is byte-identical: DEFECT.PROBE.LIVE.3's paired semantics are reused for the legacy half of every matrix receipt and remain the whole story for any subject without a matrix.",
+    "core/code_dna.py is pinned because this phase measures _classify_indent and must not repair it; core/candidate_mutation_effect.py because PATCH.MINIMAL.LIVE.1's cheap-first no-op rejection still runs ahead of the matrix; patching/patch_gates.py because safe_minimal is frozen.",
+    "core/targeted_repository_validation.py, core/execution_eligibility_policy.py, core/live_execution_authorization.py and core/human_apply_authorization.py pin the targeted-validation budgets and the authority boundaries the matrix may not move.",
+    "PATCH.MINIMAL.LIVE.2 re-pinned patching/patch_gates.py from 816101991102f593cd037ec2009ddbfb3936b6ceb004dd839a1584e01434425e to cec73583c9d416e3b4f883090b02f2b48e0b012c44d2962f5e40819a5c070cf7. safe_minimal was frozen for LIVE.4 and is the declared subject of LIVE.2, which widens its identifier rule for bounded local binding novelty only. The matrix semantics this fixture exists to protect are untouched: the widened gate decides eligibility for verification, never a behavioral verdict, and tests/test_patch_minimal_novelty_live.py reconstructs the pre-LIVE.2 file, asserts it hashes to 816101991102f593cd037ec2009ddbfb3936b6ceb004dd839a1584e01434425e, and shows that 1 of the file's 35 top-level definitions changed."
+  ],
+  "files": {
+    "core/answer_entity_grounding.py": "a1d3a6542a4cb1dd133b484c77e7f6c6def7df9edd4ce0dd16125f40ecc62987",
+    "core/behavioral_expectation.py": "2411f412c1b4ec43cf0fac2ad46c895d01b3631819a91a08791c1d3405a290a6",
+    "core/candidate_defect_probe.py": "9794d3ef412f564e95497c580181c35598e43853234419613cb79842b6d8a7bc",
+    "core/candidate_mutation_effect.py": "82690b47ef875eaaf7091ce4b81efe595e397075f392a79462046afe1ff6ffd1",
+    "core/candidate_sandbox_validation.py": "73d7a3d3de4b2e666b5ac486f693883ff247c99da4e0dd577e051e2a203bf626",
+    "core/check_oracle_assessment.py": "cb4cf70e0fa37fca10f5a5b17d6a2b291d42a9b9d956618d4e3fb67b2a5a2f56",
+    "core/code_dna.py": "8725b73cea83d010c6d84b896bda524e32b249021d3fada8197d9f27e6d1efc5",
+    "core/control_engine.py": "8d0b55141f24d2e5ac244774452d3a9434d455b8a0f424968f4f6824b9e63ee6",
+    "core/defect_probe.py": "4f5c8cb1b4a98558215d5d7b3cd20cee256c89e11e2ac4e13ed71b6ebb42913c",
+    "core/defect_probe_worker.py": "7a7118e88938341f5f406605d2cc1e23d1ba57c0543f4f308ae28124d4b74138",
+    "core/execution_eligibility_policy.py": "54721c5f9bcab07b74eabb1e6bcc5cafb8af404717aab09ce9af8f935963c2b5",
+    "core/human_apply_authorization.py": "7f65a55cf237193ead702f0a99f3668f649e7efabe7c2618e244cd9518c94e89",
+    "core/identifier_recall.py": "0fb5b00effe02847c06a28e186d7ba8c8cefb83f0df89eba21961ebef6e68c88",
+    "core/live_execution_authorization.py": "72785ea65de0bf88e18c32ce3617170451c666ad7a03162183c921789ab8c784",
+    "core/localization_candidate.py": "90c49b7ae2447eb0f9f1715b1db06119ee92757499f2b0a1e99c2b11a1b27783",
+    "core/localization_relevance.py": "4dbe61eee856be4c0239c9a13d4a8779b14d42c600deb5050aaf21c63ee37b0e",
+    "core/paired_defect_probe.py": "be426bf7576e21beff41772a3f4a605bfcbc933185183414f84e92cb785f800f",
+    "core/patch_basis.py": "c3031916020d71e6ee8471dfb43330b5329247cd202004f48dbe707d8670bb6c",
+    "core/patch_safety.py": "a5e4e3766422d4b7cd185ae478584fe6c8e49f69cac4b245ff85cd44c5de95c9",
+    "core/sandbox_self_evolution_runner.py": "127211ffad23bd79c2ba76506eb75eb8bf31591adb73f0d6c913a704bc7ddf6b",
+    "core/targeted_repository_validation.py": "116cded9cf6f07bf9b53d2e20f45beef2a6643a23898f7a4ea5e8ea16ee7e1e5",
+    "core/validation_execution.py": "c1776d1e917e9b90634ab55333c2dceed812b7e494f57693cecaa6e512b3194d",
+    "patching/patch_gates.py": "cec73583c9d416e3b4f883090b02f2b48e0b012c44d2962f5e40819a5c070cf7",
+    "patching/patch_plan_executor.py": "b1a874c1de5818c80981bd2eb27f996e4d252f7728421d6d38a84427b0b75222"
+  },
+  "control_engine_pre_live2_sha256": "60a9452f7e356333c9157b5d64c0131382e8408d67d761ede53cea4d2ffea23a",
+  "patch_author_live2_repin_note": "PATCH.AUTHOR.LIVE.2 (2026-09-10) is the phase authorised to move the patch-authoring contract: the candidate wire shape, the exact field names, the output-only rules and the safe_minimal identifier constraints now live in core/patch_authoring_contract.py, and the initial draft and the single verification-guided revision both render from there. core/control_engine.py moved for that reason and for no other. The initial-draft prompt is byte-identical across 82 configurations, and tests/fixtures/patch_author_live2_contract_reversal.json stores the hunks that reverse the change, so a test reconstructs the pre-LIVE.2 bytes from the shipped file and asserts the digest this note replaced."
+}

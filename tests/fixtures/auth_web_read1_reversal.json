@@ -1,0 +1,222 @@
+{
+  "phase": "AUTH.WEB.READ.1",
+  "purpose": "Test-only exact reversal before older immutable phase receipts.",
+  "files": {
+    "web/app.py": {
+      "entry_sha256": "fc2195c2c26f4dd46ca05b163855ddb047ce6041705f400bf62f6b011519f864",
+      "post_sha256": "a1f9565c0c0805485f2bfa8794469ded24702ee9d03f44dfe90fab1e44584778",
+      "hunks": [
+        {
+          "before": "    if decision.allowed:\r\n        return None\r\n    return _request_integrity_rejection(decision)\r\n\r\n\r\ndef _set_browser_session_cookie(response, value: str) -> None:\r\n",
+          "after": "    if decision.allowed:\r\n        return None\r\n    return _request_integrity_rejection(decision)\r\n\r\n\r\n# AUTH.WEB.READ.1: GET, HEAD and OPTIONS need a trusted Host before Flask routes\r\n# them; the gate above keeps deciding every mutation.\r\nfrom web.read_host import ReadHostBoundary as _ReadHostBoundary\r\napp.wsgi_app = _ReadHostBoundary(app.wsgi_app)\r\n\r\n\r\ndef _set_browser_session_cookie(response, value: str) -> None:\r\n"
+        }
+      ]
+    },
+    "README.md": {
+      "entry_sha256": "87ba6540e68057b39290988f9079e32696094d9588d3bdae3b9ea436f6ef3438",
+      "post_sha256": "bc0ad7d379f679e4625585dd766c2e59a403312418d0176e80aa0ef28dd7a729",
+      "hunks": [
+        {
+          "before": "\r\n## Web App Security\r\n\r\nEvery state-changing request (POST, PUT, PATCH, DELETE) passes one gate, `web/auth_gate.py`, before any route runs. Browser requests and API clients follow separate contracts (AUTH.WEB.1).\r\n\r\n### Browser requests: exact origin, CSRF token, authentication\r\n\r\n",
+          "after": "\r\n## Web App Security\r\n\r\nEvery state-changing request (POST, PUT, PATCH, DELETE) passes one gate, `web/auth_gate.py`, before any route runs. Browser requests and API clients follow separate contracts (AUTH.WEB.1). Every other request (GET, HEAD, OPTIONS) is served only under a trusted `Host` (AUTH.WEB.READ.1, see [Trusted host for reads](#trusted-host-for-reads)).\r\n\r\n### Browser requests: exact origin, CSRF token, authentication\r\n\r\n"
+        },
+        {
+          "before": "\r\nEach entry is `scheme://host[:port]` with `http` or `https`. Scheme and host are case-insensitive, and a missing port means 80 or 443. Paths, wildcards and user info make an entry invalid; invalid entries are skipped with a printed warning, never widened into a pattern, and at most 16 entries are read. For the Docker Compose service (port `5056:5000`), set `WEB_ALLOWED_ORIGINS=http://localhost:5056` together with `WEB_AUTH_TOKEN`.\r\n\r\n### `WEB_SECRET_KEY` (optional)\r\n\r\nFlask secret key. If not set, a dev-only insecure placeholder is used. This is safe for local development but **must** be set to a strong random value for any network-exposed deployment.\r\n\r\n### Local Development\r\n\r\nWith default settings (no `WEB_AUTH_TOKEN`), open the app at the address it prints (`http://127.0.0.1:5000`); mutating requests are accepted from that page on this machine only.\r\n\r\n## Short Summary\r\n\r\n",
+          "after": "\r\nEach entry is `scheme://host[:port]` with `http` or `https`. Scheme and host are case-insensitive, and a missing port means 80 or 443. Paths, wildcards and user info make an entry invalid; invalid entries are skipped with a printed warning, never widened into a pattern, and at most 16 entries are read. For the Docker Compose service (port `5056:5000`), set `WEB_ALLOWED_ORIGINS=http://localhost:5056` together with `WEB_AUTH_TOKEN`.\r\n\r\n### Trusted host for reads\r\n\r\nPages, static files and every read route are served only when the request's `Host` header names this server: the host and port of an allowed origin (the listening address, or the `WEB_ALLOWED_ORIGINS` entries above). A DNS-rebinding page, for example `http://evil.example:5000` resolved to 127.0.0.1, therefore receives no repository source, evidence, reports, sessions, Dream artifacts or browser session. The check runs in one WSGI boundary (`web/read_host.py`) before any route, redirect, static file or session, and `Host`, `Origin`, `Referer` and `X-Forwarded-*` never add a trusted host.\r\n\r\n- `localhost`, `127.0.0.1` and `::1` are different hosts, and the port always counts. With the default `http://127.0.0.1:5000`, the addresses `http://localhost:5000` and `http://127.0.0.1:7999` are refused.\r\n- A `Host` without a port matches only an origin on its scheme's default port: `https://cattus.example` accepts `Host: cattus.example` and `Host: cattus.example:443`.\r\n- A well-formed host this server is not configured for gets `421 Misdirected Request`; a missing, repeated or malformed `Host` gets `400 Bad Request`. The refusal is JSON (plain text for page navigations) with `error_code` `host_not_allowed`, `host_missing`, `host_ambiguous` or `host_malformed`, and carries no data, cookie or redirect.\r\n- A server listening on `0.0.0.0` or `::` without `WEB_ALLOWED_ORIGINS` refuses every page and read.\r\n- API and CLI read clients need no token, CSRF token or `Origin`; they only have to use a configured address, for example `curl http://127.0.0.1:5000/health`.\r\n- `WEB_AUTH_TOKEN` authenticates mutations only. Reads are not authenticated in either mode, so any client that can reach the server and send a configured `Host` can read. The host check stops browsers on other sites, not other clients on the network.\r\n\r\nDeployment notes:\r\n\r\n- `python main.py --web`: nothing to configure; open `http://127.0.0.1:5000`.\r\n- `WEB_HOST=localhost`: the server binds the resolved loopback address (`127.0.0.1`), so the `http://localhost:5000` address it opens is refused until you set `WEB_ALLOWED_ORIGINS=http://localhost:5000` (list `http://127.0.0.1:5000` too to keep both).\r\n- Docker Compose (`5056:5000`, `WEB_HOST=0.0.0.0`): set `WEB_ALLOWED_ORIGINS=http://localhost:5056`. Without it the published UI returns 421. A probe inside the container must send that host, for example `curl -H \"Host: localhost:5056\" http://127.0.0.1:5000/health`.\r\n- Reverse proxy or TLS termination: list the public origin (`https://cattus.example`) and forward the public `Host` (nginx: `proxy_set_header Host $host;`). `X-Forwarded-Host` and `X-Forwarded-Proto` are ignored, because the app has no trusted-proxy configuration.\r\n\r\n### `WEB_SECRET_KEY` (optional)\r\n\r\nFlask secret key. If not set, a dev-only insecure placeholder is used. This is safe for local development but **must** be set to a strong random value for any network-exposed deployment.\r\n\r\n### Local Development\r\n\r\nWith default settings (no `WEB_AUTH_TOKEN`), open the app at the address it prints (`http://127.0.0.1:5000`); mutating requests are accepted from that page on this machine only. Other addresses for the same server, such as `http://localhost:5000`, are refused unless they are listed in `WEB_ALLOWED_ORIGINS`.\r\n\r\n## Short Summary\r\n\r\n"
+        }
+      ]
+    },
+    "docs/roadmap/phase_registry.json": {
+      "entry_sha256": "164f1024a0b202d48c4417cb91e0937a16c85e2a7cdf3dde073d458b2b5c995d",
+      "post_sha256": "9e52e262804154e4a61e8afa365fa82bcc72f420fe84e223dfd3ebb5f7b44846",
+      "hunks": [
+        {
+          "before": "        \"WEB_AUTH_TOKEN is posted once to /auth/login and exchanged for an HMAC-signed HttpOnly SameSite=Lax session under a per-process secret; restart, token rotation and 12-hour expiry invalidate it. CSRF is a separate session-bound token, and auth-off browser mutations still need the exact origin and CSRF.\",\n        \"Header-token and loopback API clients without browser metadata keep their contract. SEC.UI.1, DATA.UNDO.1, EXEC.PLAN.1, AUTH.DREAM.1, DATA.ROLLBACK.1 and Track A remain frozen; UX-02 through UX-06, PREFLIGHT.REQUEST.1 and T6 Round 11 remain out of scope. No live model or external network calls.\"\n      ]\n    }\n  ]\n}\n",
+          "after": "        \"WEB_AUTH_TOKEN is posted once to /auth/login and exchanged for an HMAC-signed HttpOnly SameSite=Lax session under a per-process secret; restart, token rotation and 12-hour expiry invalidate it. CSRF is a separate session-bound token, and auth-off browser mutations still need the exact origin and CSRF.\",\n        \"Header-token and loopback API clients without browser metadata keep their contract. SEC.UI.1, DATA.UNDO.1, EXEC.PLAN.1, AUTH.DREAM.1, DATA.ROLLBACK.1 and Track A remain frozen; UX-02 through UX-06, PREFLIGHT.REQUEST.1 and T6 Round 11 remain out of scope. No live model or external network calls.\"\n      ]\n    },\n    {\n      \"phase_id\": \"AUTH.WEB.READ.1\",\n      \"title\": \"Trusted Host & Sensitive Read Boundary\",\n      \"track\": \"HARDEN\",\n      \"status\": \"complete\",\n      \"summary\": \"Close the read-side gap AUTH.WEB.1 recorded: every GET, HEAD and OPTIONS request needs a Host projected from the AUTH.WEB.1 allowed origins (exact host and effective port) before Flask routes it, so a DNS-rebound or unconfigured alias hostname receives no repository, evidence, session, Dream or bootstrap data, while mutations keep the frozen AUTH.WEB.1 gate.\",\n      \"automation_level\": \"LOCAL_1_PREPARE\",\n      \"budget_tier\": \"local_only\",\n      \"risk_level\": \"medium\",\n      \"allowed_files\": [\n        \"web/read_host.py\",\n        \"web/app.py\",\n        \"README.md\",\n        \"tests/test_auth_web_read1.py\",\n        \"tests/test_auth_web_read1_browser.py\",\n        \"tests/_auth_web_read1_maintenance.py\",\n        \"tests/_auth_web1_maintenance.py\",\n        \"tests/test_auth_web1.py\",\n        \"tests/test_auth_web1_browser.py\",\n        \"tests/fixtures/auth_web_read1_*.json\",\n        \"docs/roadmap/phase_registry.json\",\n        \"tests/test_phase_registry.py\",\n        \"tests/test_phase_picker.py\",\n        \"docs/designs/2026-09-17-trusted-host-sensitive-read-boundary.md\"\n      ],\n      \"forbidden_files\": [\n        \".env\",\n        \".git\",\n        \".agent/private\",\n        \"agents/\",\n        \"core/\",\n        \"patching/\",\n        \"web/auth_gate.py\",\n        \"web/request_origin.py\",\n        \"web/browser_session.py\",\n        \"web/routes/\",\n        \"web/runner.py\",\n        \"web/session_store.py\",\n        \"web/templates/\",\n        \"web/static/\",\n        \"docker-compose.yml\",\n        \"docs/audits/\"\n      ],\n      \"validation\": [\n        \"python -m pytest tests/test_auth_web_read1.py tests/test_auth_web_read1_browser.py -q\",\n        \"python -m pytest tests/test_auth_web1.py tests/test_auth_web1_browser.py tests/test_web_mutation_auth_gate.py tests/test_web_mutation_surface_audit.py -q\",\n        \"python -m pytest tests/test_sec_ui1.py tests/test_data_undo1.py tests/test_exec_plan1.py tests/test_auth_dream1.py tests/test_data_rollback1.py -q\",\n        \"python -m pytest tests/test_phase_registry.py tests/test_phase_picker.py -q\",\n        \"python -m compileall -q core patching web scripts tests\",\n        \"python benchmarks/run_benchmarks.py --check\",\n        \"git diff --check\"\n      ],\n      \"human_approval_required\": true,\n      \"merge_allowed\": false,\n      \"network_allowed\": false,\n      \"model_calls_allowed\": false,\n      \"writes_real_repo\": true,\n      \"requires_sandbox\": false,\n      \"prerequisites\": [\n        \"AUTH.WEB.1\"\n      ],\n      \"expected_artifacts\": [\n        \"docs/designs/2026-09-17-trusted-host-sensitive-read-boundary.md\",\n        \"web/read_host.py\",\n        \"tests/test_auth_web_read1.py\",\n        \"tests/test_auth_web_read1_browser.py\",\n        \"tests/fixtures/auth_web_read1_completion.json\",\n        \"tests/fixtures/auth_web_read1_frozen_boundaries.json\",\n        \"tests/fixtures/auth_web_read1_reversal.json\"\n      ],\n      \"notes\": [\n        \"Trusted Host identities are projected from request_origin.allowed_origins_for (the listening socket, or WEB_ALLOWED_ORIGINS); Host, Origin, Referer and X-Forwarded-* never add one. host:port is exact, a bare host matches only a default-port origin, localhost, 127.0.0.1 and ::1 stay distinct, and a wildcard bind without WEB_ALLOWED_ORIGINS trusts none.\",\n        \"One WSGI boundary in front of Flask refuses before routing, redirects, sessions, handlers and static files: 400 for a missing, repeated or malformed Host, 421 for a Host this server is not configured for. Reads stay unauthenticated in both WEB_AUTH_TOKEN modes (documented contract); read authentication for network exposure remains Track-B work.\",\n        \"AUTH.WEB.1 mutation Origin, CSRF and authentication semantics, SEC.UI.1, DATA.UNDO.1, EXEC.PLAN.1, AUTH.DREAM.1, DATA.ROLLBACK.1 and Track A remain frozen; UX-02 through UX-06, PREFLIGHT.REQUEST.1 and T6 Round 11 remain out of scope. No live model or external network calls.\"\n      ]\n    }\n  ]\n}\n"
+        }
+      ]
+    },
+    "tests/test_phase_registry.py": {
+      "entry_sha256": "cf085037511a3aa8feca5e332fe742a1eef0ea887faa3a154eb36290b938a882",
+      "post_sha256": "f23abb0595a8655342b71d92ece6795213f2f08b9450abe4acd730fc2bab7285",
+      "hunks": [
+        {
+          "before": "    assert \"EXEC.APPROVAL.LIVE.1\" in ids\r\n    assert \"ANSWER.GROUND.LIVE.2\" in ids\r\n    assert \"CONTROL.LOCALIZE.LIVE.2\" in ids\r\n    assert len(data[\"phases\"]) == 186\r\n\r\n\r\ndef test_input_understanding_phase_is_registered_and_inert():\r\n",
+          "after": "    assert \"EXEC.APPROVAL.LIVE.1\" in ids\r\n    assert \"ANSWER.GROUND.LIVE.2\" in ids\r\n    assert \"CONTROL.LOCALIZE.LIVE.2\" in ids\r\n    assert len(data[\"phases\"]) == 187\r\n\r\n\r\ndef test_input_understanding_phase_is_registered_and_inert():\r\n"
+        },
+        {
+          "before": "        \"DOGFOOD\": 2,\r\n        \"VERIFY\": 1,\r\n        \"EVAL\": 11,\r\n        \"HARDEN\": 15,\n        \"HUMAN\": 5,\r\n        # RETRIEVE.LIVE.* is an ID namespace inside INDEX, not a new track.\r\n        \"INDEX\": 12,\r\n",
+          "after": "        \"DOGFOOD\": 2,\r\n        \"VERIFY\": 1,\r\n        \"EVAL\": 11,\r\n        \"HARDEN\": 16,\n        \"HUMAN\": 5,\r\n        # RETRIEVE.LIVE.* is an ID namespace inside INDEX, not a new track.\r\n        \"INDEX\": 12,\r\n"
+        }
+      ]
+    },
+    "tests/test_phase_picker.py": {
+      "entry_sha256": "4cd202a6ddcccd22907e4178288a48e6c4a2f371ef797d5314cf985edc58bc38",
+      "post_sha256": "1d647bdb65a0579bafeeb7e3ec38b6c78e3bf7d1c62ace4fc06975952d508c81",
+      "hunks": [
+        {
+          "before": "        \"human_approval_required\": 0,\r\n        \"blocked\": 0,\r\n        \"deferred_or_parked\": 0,\r\n        \"complete_or_history\": 182,\r\n    }\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n    assert report[\"top_recommendation\"][\"recommended_next_step\"] == \"prepare_worker_assignment\"\r\n",
+          "after": "        \"human_approval_required\": 0,\r\n        \"blocked\": 0,\r\n        \"deferred_or_parked\": 0,\r\n        \"complete_or_history\": 183,\r\n    }\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n    assert report[\"top_recommendation\"][\"recommended_next_step\"] == \"prepare_worker_assignment\"\r\n"
+        },
+        {
+          "before": "    assert \"CTX.SELECT.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"CTX.SELECT.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"ACQUIRE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"ACQUIRE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"EVIDENCE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"EVIDENCE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"EVIDENCE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"EVIDENCE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert phase[\"prerequisites\"] == [\"EVIDENCE.2\"]\r\n    assert \"CLAIM.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CLAIM.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert phase[\"prerequisites\"] == [\"EVIDENCE.2\"]\r\n    assert \"CLAIM.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CLAIM.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"SYNTHESIS.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"SYNTHESIS.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert phase[\"prerequisites\"] == [\"CTX.APPLY.0\"]\r\n    assert \"CHECK.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert phase[\"prerequisites\"] == [\"CTX.APPLY.0\"]\r\n    assert \"CHECK.1\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.1\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert phase[\"prerequisites\"] == [\"CHECK.1\", \"CLAIM.1\"]\r\n    assert \"CHECK.2\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.2\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert phase[\"prerequisites\"] == [\"CHECK.1\", \"CLAIM.1\"]\r\n    assert \"CHECK.2\" in {item[\"phase_id\"] for item in report[\"complete_or_history\"]}\r\n    assert \"CHECK.2\" not in {item[\"phase_id\"] for item in report[\"safe_to_prepare\"]}\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"CHECK.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"CHECK.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"CHECK.LIVE.1B\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"CHECK.LIVE.1B\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.2A\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.2A\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.2A.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.2A.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "    assert \"WORKER.DECL.2A.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n",
+          "after": "    assert \"WORKER.DECL.2A.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n    assert report[\"bucket_counts\"][\"safe_to_prepare\"] == 3\r\n    assert report[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\r\n\r\n"
+        },
+        {
+          "before": "        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"sandbox_required\"] == 1\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_candidate_sandbox_validation_phase_is_complete_history():\r\n",
+          "after": "        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"sandbox_required\"] == 1\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_candidate_sandbox_validation_phase_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"OPS.PATCH.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_typed_patch_basis_phase_is_complete_history():\r\n",
+          "after": "    assert \"OPS.PATCH.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_typed_patch_basis_phase_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"PATCH.BASIS.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_query_symbol_entry_recall_phase_is_complete_history():\r\n",
+          "after": "    assert \"PATCH.BASIS.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_query_symbol_entry_recall_phase_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"RETRIEVE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_production_query_recall_unification_is_complete_history():\r\n",
+          "after": "    assert \"RETRIEVE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_production_query_recall_unification_is_complete_history():\r\n"
+        },
+        {
+          "before": "    assert \"RETRIEVE.LIVE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_answer_entity_grounding_is_complete_check_history():\r\n",
+          "after": "    assert \"RETRIEVE.LIVE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_answer_entity_grounding_is_complete_check_history():\r\n"
+        },
+        {
+          "before": "    assert \"ANSWER.GROUND.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_answer_symbol_grounding_is_complete_check_history():\r\n",
+          "after": "    assert \"ANSWER.GROUND.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_answer_symbol_grounding_is_complete_check_history():\r\n"
+        },
+        {
+          "before": "    assert \"ANSWER.GROUND.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_bounded_defect_probe_is_complete_ops_history():\r\n",
+          "after": "    assert \"ANSWER.GROUND.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_bounded_defect_probe_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"DEFECT.PROBE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_bounded_targeted_validation_is_complete_ops_history():\r\n",
+          "after": "    assert \"DEFECT.PROBE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_bounded_targeted_validation_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"OPS.VALIDATE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_immutable_candidate_defect_closure_is_complete_ops_history():\r\n",
+          "after": "    assert \"OPS.VALIDATE.3\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_immutable_candidate_defect_closure_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"DEFECT.PROBE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_existing_check_oracle_role_is_complete_ops_history():\r\n",
+          "after": "    assert \"DEFECT.PROBE.LIVE.2\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_existing_check_oracle_role_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"VALIDATE.ORACLE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_execution_eligibility_policy_is_complete_ops_history():\r\n",
+          "after": "    assert \"VALIDATE.ORACLE.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_execution_eligibility_policy_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"EXEC.POLICY.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_human_apply_binding_is_complete_ops_history():\r\n",
+          "after": "    assert \"EXEC.POLICY.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_human_apply_binding_is_complete_ops_history():\r\n"
+        },
+        {
+          "before": "    assert \"EXEC.APPROVAL.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n\r\n\r\ndef test_seed_repository_specificity_entry_ordering_is_complete_index_history():\r\n",
+          "after": "    assert \"EXEC.APPROVAL.LIVE.1\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n\r\n\r\ndef test_seed_repository_specificity_entry_ordering_is_complete_index_history():\r\n"
+        },
+        {
+          "before": "    assert \"RETRIEVE.LIVE.4\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 182\r\n",
+          "after": "    assert \"RETRIEVE.LIVE.4\" not in {\r\n        item[\"phase_id\"] for item in report[\"safe_to_prepare\"]\r\n    }\r\n    assert report[\"bucket_counts\"][\"complete_or_history\"] == 183\r\n"
+        }
+      ]
+    },
+    "tests/_auth_web1_maintenance.py": {
+      "entry_sha256": "ed5bff14ab86b149d7279d233410f21029b9be4d6a18596b2f613ef2ec272541",
+      "post_sha256": "b8b439ba8928aca558263ae05bcffd6f40893ec758afebe968ab1cb6cf9699b4",
+      "hunks": [
+        {
+          "before": "\ndef before_auth_web1(relative: str, content: bytes | None = None) -> bytes:\n    current = (ROOT / relative).read_bytes() if content is None else content\n    receipt = json.loads(\n        (ROOT / \"tests/fixtures/auth_web1_reversal.json\").read_text(encoding=\"utf-8\")\n    )\n",
+          "after": "\ndef before_auth_web1(relative: str, content: bytes | None = None) -> bytes:\n    current = (ROOT / relative).read_bytes() if content is None else content\n    # Later AUTH.WEB.READ.1 is reversed first so AUTH.WEB.1's immutable\n    # post-state remains the input to this historical reversal.\n    from tests._auth_web_read1_maintenance import before_auth_web_read1\n\n    current = before_auth_web_read1(relative, current)\n    receipt = json.loads(\n        (ROOT / \"tests/fixtures/auth_web1_reversal.json\").read_text(encoding=\"utf-8\")\n    )\n"
+        }
+      ]
+    },
+    "tests/test_auth_web1.py": {
+      "entry_sha256": "6eacfba65a1e6e59982153f2ac31c877fe2a1dc7739dd86b7172dff2cdd3116c",
+      "post_sha256": "234eb8f8ca40c7777ba558cd9e09b397218e3456e8a2c900ff661643230fc754",
+      "hunks": [
+        {
+          "before": "\n\ndef test_explicit_allowlist_replaces_the_default_with_exact_origins(web, monkeypatch):\n    monkeypatch.setenv(\"WEB_ALLOWED_ORIGINS\", \" http://localhost:7999 , http://localhost:5000/bad \")\n    client = web.app.test_client()\n    csrf, _, _ = _page(client)\n    assert _import_reference(client, web, origin=\"http://localhost:7999\", csrf=csrf).status_code == 200\n    for origin in (TARGET, \"http://127.0.0.1:7999\", \"https://localhost:7999\"):\n        _assert_rejected(_import_reference(client, web, origin=origin, csrf=csrf), 403, \"origin_not_allowed\")\n",
+          "after": "\n\ndef test_explicit_allowlist_replaces_the_default_with_exact_origins(web, monkeypatch):\n    client = web.app.test_client()\n    # AUTH.WEB.READ.1: read the page while its host is still trusted; the\n    # allowlist below no longer names that host.\n    csrf, _, _ = _page(client)\n    monkeypatch.setenv(\"WEB_ALLOWED_ORIGINS\", \" http://localhost:7999 , http://localhost:5000/bad \")\n    assert _import_reference(client, web, origin=\"http://localhost:7999\", csrf=csrf).status_code == 200\n    for origin in (TARGET, \"http://127.0.0.1:7999\", \"https://localhost:7999\"):\n        _assert_rejected(_import_reference(client, web, origin=origin, csrf=csrf), 403, \"origin_not_allowed\")\n"
+        },
+        {
+          "before": "\ndef test_existing_web_app_definitions_and_page_body_are_unchanged():\n    from tests._auth_web1_maintenance import before_auth_web1\n\n    old, old_statements = _definitions(before_auth_web1(\"web/app.py\"))\n    new, new_statements = _definitions((ROOT / \"web/app.py\").read_bytes())\n    assert {name for name in old.keys() & new.keys() if old[name] != new[name]} == {\"_web_mutation_gate\"}\n    assert set(old) - set(new) == set()\n    assert set(new) - set(old) == APP_DEFINITIONS_ADDED\n",
+          "after": "\ndef test_existing_web_app_definitions_and_page_body_are_unchanged():\n    from tests._auth_web1_maintenance import before_auth_web1\n    from tests._auth_web_read1_maintenance import before_auth_web_read1\n\n    old, old_statements = _definitions(before_auth_web1(\"web/app.py\"))\n    new, new_statements = _definitions(before_auth_web_read1(\"web/app.py\"))\n    assert {name for name in old.keys() & new.keys() if old[name] != new[name]} == {\"_web_mutation_gate\"}\n    assert set(old) - set(new) == set()\n    assert set(new) - set(old) == APP_DEFINITIONS_ADDED\n"
+        },
+        {
+          "before": "    assert phase[\"prerequisites\"] == [\"DATA.ROLLBACK.1\"]\n    assert phase[\"network_allowed\"] is False and phase[\"model_calls_allowed\"] is False\n    assert phase[\"human_approval_required\"] is True and phase[\"merge_allowed\"] is False\n    assert registry[\"phases\"][-1][\"phase_id\"] == \"AUTH.WEB.1\"\n    assert pick_phase_candidates(registry)[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\n\n\ndef test_completion_receipt_pins_every_phase_source():\n    receipt = json.loads((FIXTURES / \"auth_web1_completion.json\").read_text(encoding=\"utf-8\"))\n    assert receipt[\"phase\"] == \"AUTH.WEB.1\"\n    assert receipt[\"closed_findings\"] == [\"SEC-02\", \"UX-01\"]\n",
+          "after": "    assert phase[\"prerequisites\"] == [\"DATA.ROLLBACK.1\"]\n    assert phase[\"network_allowed\"] is False and phase[\"model_calls_allowed\"] is False\n    assert phase[\"human_approval_required\"] is True and phase[\"merge_allowed\"] is False\n    ids = [entry[\"phase_id\"] for entry in registry[\"phases\"]]\n    assert ids.index(\"AUTH.WEB.1\") == ids.index(\"DATA.ROLLBACK.1\") + 1\n    assert pick_phase_candidates(registry)[\"top_recommendation\"][\"phase_id\"] == \"DOGFOOD.1B\"\n\n\ndef test_completion_receipt_pins_every_phase_source():\n    from tests._auth_web_read1_maintenance import before_auth_web_read1\n\n    receipt = json.loads((FIXTURES / \"auth_web1_completion.json\").read_text(encoding=\"utf-8\"))\n    assert receipt[\"phase\"] == \"AUTH.WEB.1\"\n    assert receipt[\"closed_findings\"] == [\"SEC-02\", \"UX-01\"]\n"
+        },
+        {
+          "before": "    expected.remove(\"tests/fixtures/auth_web1_completion.json\")\n    assert set(receipt[\"source_sha256\"]) == expected\n    for relative, digest in receipt[\"source_sha256\"].items():\n        assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == digest, relative\n\n\n# -- performance ----------------------------------------------------------------\n",
+          "after": "    expected.remove(\"tests/fixtures/auth_web1_completion.json\")\n    assert set(receipt[\"source_sha256\"]) == expected\n    for relative, digest in receipt[\"source_sha256\"].items():\n        assert hashlib.sha256(before_auth_web_read1(relative)).hexdigest() == digest, relative\n\n\n# -- performance ----------------------------------------------------------------\n"
+        }
+      ]
+    },
+    "tests/test_auth_web1_browser.py": {
+      "entry_sha256": "8bb83c215f180d3fd0b85209f8bae6c3eea475399f38f30ff6ee49d75cc46f40",
+      "post_sha256": "fdc3e6618f795e34165700cbe3e908865c79100c42667122501bf71a759944b9",
+      "hunks": [
+        {
+          "before": "    return [d for d in live.decisions if d.path == IMPORT_PATH and d.origin == origin]\n\n\ndef _run_cross_origin_page(live, csrf):\n    action = live.base + IMPORT_PATH\n    live.attacker_pages[\"/\"] = ATTACKER_PAGE.format(\n",
+          "after": "    return [d for d in live.decisions if d.path == IMPORT_PATH and d.origin == origin]\n\n\ndef _read_alias_page_from_base(live, route):\n    if route.request.method != \"GET\":\n        route.continue_()\n        return\n    route.fulfill(response=live.context.request.get(live.base + route.request.url[len(live.alias_base):]))\n\n\ndef _run_cross_origin_page(live, csrf):\n    action = live.base + IMPORT_PATH\n    live.attacker_pages[\"/\"] = ATTACKER_PAGE.format(\n"
+        },
+        {
+          "before": "    alias = live.context.new_page()\n    alias.on(\"pageerror\", lambda error: live.errors.append(str(error)))\n    alias.on(\"dialog\", lambda dialog: dialog.dismiss())\n    assert alias.goto(live.alias_base + \"/\").status == 200\n    _prepare_reference(alias, live.repo, \"localhost_alias\")\n    response = _import_via_ui(alias)\n",
+          "after": "    alias = live.context.new_page()\n    alias.on(\"pageerror\", lambda error: live.errors.append(str(error)))\n    alias.on(\"dialog\", lambda dialog: dialog.dismiss())\n    # AUTH.WEB.READ.1: the unconfigured alias host no longer serves the page.\n    assert alias.goto(live.alias_base + \"/\").status == 421\n    # The same page executing at the alias origin still cannot mutate: its reads\n    # come from the configured address, and its POST goes to the alias host.\n    alias.route(live.alias_base + \"/**\", lambda route: _read_alias_page_from_base(live, route))\n    assert alias.goto(live.alias_base + \"/\").status == 200\n    _prepare_reference(alias, live.repo, \"localhost_alias\")\n    response = _import_via_ui(alias)\n"
+        }
+      ]
+    }
+  }
+}

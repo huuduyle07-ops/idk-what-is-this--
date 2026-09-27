@@ -31,6 +31,7 @@ def _patch(relative_path: str, target: str = "old\n", patched: str = "new\n") ->
 def test_safe_single_file_source_patch_still_applies(monkeypatch, tmp_path):
     import config
     import core.executor as executor_mod
+    from core.validator import ValidationRun
     from core.executor import Executor
 
     repo = tmp_path / "repo"
@@ -48,10 +49,10 @@ def test_safe_single_file_source_patch_still_applies(monkeypatch, tmp_path):
 
     def fake_run(command, cwd, timeout=30):
         validation_calls.append((command, cwd))
-        return True, "ok"
+        return ValidationRun(ok=True, output="ok", exit_code=0)
 
     monkeypatch.setattr(config, "MUTATION_ORACLE_ENABLED", False, raising=False)
-    monkeypatch.setattr(executor_mod, "run_validation_command", fake_run)
+    monkeypatch.setattr(executor_mod, "run_validation_command_detailed", fake_run)
 
     result = Executor(str(repo)).run(
         patch,
@@ -82,6 +83,7 @@ def test_single_file_patch_safety_blocks_sensitive_targets_before_apply(
     monkeypatch, tmp_path, relative_path, category
 ):
     import core.executor as executor_mod
+    from core.validator import ValidationRun
     from core.executor import Executor
 
     repo = tmp_path / "repo"
@@ -118,6 +120,7 @@ def test_validation_and_rollback_are_not_run_after_patch_safety_block(
     monkeypatch, tmp_path
 ):
     import core.executor as executor_mod
+    from core.validator import ValidationRun
     from core.executor import Executor
 
     repo = tmp_path / "repo"
@@ -138,7 +141,9 @@ def test_validation_and_rollback_are_not_run_after_patch_safety_block(
         raise AssertionError("rollback must not run when no write happened")
 
     monkeypatch.setattr(executor_mod, "apply_patch_from_json", apply_must_not_run)
-    monkeypatch.setattr(executor_mod, "run_validation_command", validation_must_not_run)
+    monkeypatch.setattr(
+        executor_mod, "run_validation_command_detailed", validation_must_not_run
+    )
     monkeypatch.setattr(executor_mod, "restore_backup", rollback_must_not_run)
 
     result = Executor(str(repo)).run(
@@ -155,6 +160,7 @@ def test_validation_and_rollback_are_not_run_after_patch_safety_block(
 
 def test_path_traversal_remains_blocked_before_apply(monkeypatch, tmp_path):
     import core.executor as executor_mod
+    from core.validator import ValidationRun
     from core.executor import Executor
 
     repo = tmp_path / "repo"

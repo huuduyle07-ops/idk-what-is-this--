@@ -3,16 +3,90 @@ from pathlib import Path
 import re
 import os
 import json
+import hashlib
 from typing import Any
 
 from graph.builder import build_graph_from_repo
 from graph.project_map import load_project_map
 from graph.query import explain_symbol, impact_analysis
 from graph.weights import NodeWeight, compute_node_weights, get_node_weight
-from reasoning.deep_project_understand import deep_project_understand
+from reasoning.deep_project_understand import (
+    deep_project_understand,
+)
 from reasoning.reasoning_engine import analyze_symbol_risk
 from core.retriever import trace_execution_flow
+from core.treesitter_parse import structural_definitions
+from core.localization_candidate import (
+    LocalizationVerdict,
+    iter_graph_verdicts,
+    localization_population_metrics,
+)
+from core.identifier_recall import (
+    IdentifierEntryMatch,
+    resolve_identifier_candidates,
+    resolve_identifier_recall,
+)
+from core.localization_relevance import (
+    describe_relevance,
+    mark_localization_order,
+    verify_entry_paths,
+)
+from core.localization_handoff import current_target_receipt
+from core.authoritative_binding_context import load_authoritative_binding_context
+from core.candidate_authoring_context import CandidateAuthoringContext
+from core.authoring_repair_scope import (
+    AuthoringScopeError, consume_repair_scope, enforce_authoring_scope,
+)
+from core.repair_scope import (
+    REPAIR_SCOPE_COMPLETE,
+    REPAIR_SCOPE_NOT_APPLICABLE,
+    build_repair_scope,
+    render_repair_scope_prompt,
+)
+from core.patch_authoring_contract import (
+    PatchAuthoringContract,
+    patch_output_format_block,
+    render_patch_authoring_contract,
+    safe_minimal_forbidden_block,
+)
 from core.repo_librarian import load_phantom_limb_report
+from core.validation_outcome import is_executed_failure_evidence
+from core.defect_probe import (
+    attach_control_probe_telemetry,
+    attach_defect_probe_receipt,
+    build_control_probe_telemetry,
+    carried_behavior_facts,
+    execute_resolved_control_defect_probe,
+    resolve_control_defect_probe,
+    reproduced_probe_target,
+)
+from core.patch_basis import (
+    FAILURE_BINDING_AMBIGUOUS,
+    FAILURE_BINDING_BOUNDED_REPRODUCTION,
+    FAILURE_BINDING_EXPLICIT_CHANGE_REQUEST,
+    FAILURE_BINDING_UNAVAILABLE,
+    PATCH_BASIS_EXPLICIT_CHANGE_REQUEST,
+    PATCH_BASIS_GROUNDED_DEFECT,
+    PATCH_BASIS_NONE,
+    PATCH_BASIS_SOURCE_BOUNDED_REPRODUCTION,
+    PATCH_BASIS_SOURCE_EXECUTED_FAILURE,
+    PATCH_BASIS_SOURCE_EXPLICIT_REQUEST,
+    PATCH_BASIS_SOURCE_UNAVAILABLE,
+    PATCH_BASIS_UNRESOLVED,
+    FailureRelevanceBinding,
+    LocalizedCandidate,
+    bind_executed_failure_to_candidates,
+    explicit_change_scope_tokens,
+    explicit_change_targets_match_scope,
+    has_legitimate_patch_basis,
+    normalize_patch_basis,
+)
+from core.live_task_routing import (
+    CHANGE_NEED_GROUNDED_DEFECT,
+    route_change_need_source,
+    route_is_explicit_change,
+    route_is_read_only,
+)
 from core.context_profiles import (
     identity_answer_framing,
     identity_prompt_hint,
@@ -23,6 +97,39 @@ from config import LANGUAGE_MAP
 from policy.decision_helper import build_patch_policy, policy_to_prompt_block
 
 _graph_cache: dict[str, Any] = {}
+
+LOCALIZATION_CONFIDENCE_KIND = "localization_rank_legacy"
+LOCALIZATION_SCORE_SEMANTICS = (
+    "relative navigation heuristic; non-probabilistic and non-authoritative"
+)
+
+
+def localization_strength(value: float) -> str:
+    """Human-friendly navigation strength, never defect likelihood."""
+    if value >= 0.75:
+        return "strong"
+    if value >= 0.4:
+        return "moderate"
+    return "weak"
+
+
+def localization_value(hypothesis: dict | None) -> float:
+    """Read new and historical CONTROL localization artifacts safely.
+
+    Historical artifacts exposed only ``confidence``.  That field is retained
+    as a deprecated localization-rank alias; this reader must never be used as
+    defect certainty or patch authority.
+    """
+    if not isinstance(hypothesis, dict):
+        return 0.0
+    for key in ("localization_strength_value", "confidence"):
+        try:
+            return max(0.0, min(1.0, float(hypothesis.get(key, 0.0) or 0.0)))
+        except (TypeError, ValueError):
+            continue
+    return 0.0
+
+
 def infer_language_from_file(rel_file: str | None) -> str:
     if not rel_file:
         return "unknown"
@@ -250,7 +357,8 @@ def select_entry_nodes(
     *,
     graph=None,
     inventory=None,
-) -> list[str]:
+    return_details: bool = False,
+) -> list[str] | dict[str, Any]:
     graph = graph or get_cached_graph(
         repo_path,
         inventory=inventory,
@@ -258,42 +366,138 @@ def select_entry_nodes(
     print("🐛 DEBUG graph node count:", len(graph.nodes))
     print("🐛 DEBUG first graph nodes:", list(graph.nodes.keys())[:20])
     print("🐛 DEBUG query words:", query_words(query))
-
-    project_map = load_project_map(repo_path)
-    map_nodes = extract_hotspots_from_project_map(project_map, limit=limit)
-
-    understanding = deep_project_understand(
-        query,
-        repo_path,
-        graph=graph,
-        inventory=inventory,
+    print(
+        "🐛 DEBUG candidate population:",
+        localization_population_metrics(graph),
     )
-    graph_nodes = [
-        f["symbol"]
-        for f in understanding.get("findings", [])
-        if f.get("symbol")
-    ]
 
-    result: list[str] = []
+    eligible = eligible_localization_nodes(graph)
+
+    # RETRIEVE.LIVE.3.  Production passes the raw query directly to the one
+    # canonical identifier-recall primitive.  Extraction, normalization,
+    # bounded morphology, matching, ordering and the cap therefore cannot drift
+    # between focused fixtures and CONTROL.
+    query_recall = resolve_identifier_recall(
+        query,
+        eligible,
+        entry_limit=limit,
+    )
+    query_matches = list(query_recall.matches)
+    result: list[str] = [match.node_id for match in query_matches]
+    deep_entry_nodes: list[str] = []
+    project_map_entry_nodes: list[str] = []
+
+    # Preserve the established deep/project-map sources as bounded supplements
+    # (or fallback when lexical resolution found nothing).  A full query-derived
+    # set needs neither, avoiding query-independent hotspot work on that path.
+    graph_nodes: list[str] = []
+    map_nodes: list[str] = []
+    if len(result) < limit:
+        understanding = deep_project_understand(
+            query,
+            repo_path,
+            graph=graph,
+            inventory=inventory,
+        )
+        graph_nodes = [
+            f["symbol"]
+            for f in understanding.get("findings", [])
+            if f.get("symbol")
+        ]
+        project_map = load_project_map(repo_path)
+        map_nodes = extract_hotspots_from_project_map(project_map, limit=limit)
 
     for raw in graph_nodes + map_nodes:
+        if len(result) >= limit:
+            break
         resolved_nodes = resolve_symbol_to_graph_nodes(graph, raw, query=query, limit=3)
 
-        if not resolved_nodes and raw in graph.nodes:
+        # The direct-hit shortcut goes through the same boundary: a project-map
+        # hotspot naming a bookkeeping node is still not a candidate.
+        if not resolved_nodes and raw in eligible:
             resolved_nodes = [raw]
 
         for node in resolved_nodes:
             if node not in result:
                 result.append(node)
+                if raw in graph_nodes:
+                    deep_entry_nodes.append(node)
+                else:
+                    project_map_entry_nodes.append(node)
+                if len(result) >= limit:
+                    break
 
+    graph_fallback_nodes: list[str] = []
     if not result:
         for node in fallback_entry_nodes_from_graph(graph, query, limit=limit):
             if node not in result:
                 result.append(node)
+                graph_fallback_nodes.append(node)
 
     print("🐛 DEBUG entry_nodes:", result)
 
-    return result[:limit]
+    entry_nodes = result[:limit]
+    if not return_details:
+        return entry_nodes
+
+    query_entry_nodes = [match.node_id for match in query_matches]
+    project_map_fallback_used = not query_entry_nodes and bool(project_map_entry_nodes)
+    fallback_used = not query_entry_nodes and bool(entry_nodes)
+    details = {
+        "entry_nodes": entry_nodes,
+        **query_recall.as_debug_dict(),
+        # RETRIEVE.LIVE.2 compatibility aliases.
+        "query_candidates": list(query_recall.raw_query_terms),
+        "query_derived_entry_nodes": query_entry_nodes,
+        "query_matches": [match.as_dict() for match in query_matches],
+        "deep_graph_entry_nodes": deep_entry_nodes,
+        "project_map_entry_nodes": project_map_entry_nodes,
+        "graph_fallback_entry_nodes": graph_fallback_nodes,
+        "project_map_fallback_used": project_map_fallback_used,
+        "project_map_supplemented": bool(query_entry_nodes and project_map_entry_nodes),
+        "graph_fallback_used": bool(graph_fallback_nodes),
+        "fallback_used": fallback_used,
+        "hotspot_only": bool(entry_nodes) and not bool(query_entry_nodes),
+        "entry_candidate_count": len(entry_nodes),
+        "entry_candidate_limit": limit,
+    }
+    return details
+
+#: Attribute the eligible-node view is memoised under, so one CONTROL
+#: operation classifies a graph once instead of once per resolved symbol.
+_ELIGIBILITY_CACHE_ATTR = "_localization_eligibility_view"
+
+
+def eligible_localization_nodes(graph) -> dict[str, LocalizationVerdict]:
+    """The subset of ``graph`` allowed to enter localization competition.
+
+    RETRIEVE.LIVE.1.  This replaces the ad-hoc ``call::`` / ``::expr::`` /
+    "must contain ``::``" string sniffing that used to guard these two
+    enumerators.  Same intent, but the decision now comes from node kind and
+    source binding rather than from a prefix, so a malformed parser fragment
+    or a bookkeeping node cannot slip in by having a plausible-looking id.
+
+    Nothing is deleted: ``graph.nodes`` and ``graph.edges`` are untouched and
+    every rejected node keeps its edges and its place in dependency analysis.
+    The returned mapping preserves graph insertion order.
+    """
+    nodes = getattr(graph, "nodes", None) or {}
+    cached = getattr(graph, _ELIGIBILITY_CACHE_ATTR, None)
+    if isinstance(cached, tuple) and len(cached) == 2 and cached[0] == len(nodes):
+        return cached[1]
+
+    view = {
+        verdict.node_id: verdict
+        for verdict in iter_graph_verdicts(graph)
+        if verdict.eligible
+    }
+    try:
+        setattr(graph, _ELIGIBILITY_CACHE_ATTR, (len(nodes), view))
+    except Exception:
+        # A graph stand-in that rejects attributes still works, just uncached.
+        pass
+    return view
+
 
 def query_words(query: str) -> set[str]:
     return {
@@ -352,33 +556,51 @@ def control_dfs_v2(
         if node_metrics is not None
         else compute_node_weights(graph, repo_path=repo_path)
     )
+    # RETRIEVE.LIVE.1.  Entry nodes already came through the eligibility
+    # boundary, but neighbour expansion reaches whatever the graph connects -
+    # including bookkeeping aggregates such as ``app.py::<top-level>``.  A
+    # node that is not a localization candidate must not become one by being
+    # adjacent to one.
+    eligible = eligible_localization_nodes(graph)
 
-    def dfs(symbol: str, depth: int):
+    def dfs(symbol: str, depth: int, origin: str, trail: list[dict]):
         if depth > max_depth:
             return
         if symbol in visited:
             return
         if len(evidence) >= max_nodes:
             return
+        # Preserve space for the bounded entries even when an early hub fills
+        # the expansion budget. Neither the entry cap nor DFS bounds change.
+        pending_entries = sum(node not in visited for node in entry_nodes)
+        if symbol not in entry_nodes and len(evidence) >= max_nodes - pending_entries:
+            return
 
         visited.add(symbol)
 
         info = explain_symbol(graph, symbol)
-        impact = impact_analysis(graph, symbol)
-        risk = analyze_symbol_risk(graph, symbol)
 
-        item = {
-            "symbol": symbol,
-            "depth": depth,
-            "called_by": info.get("called_by", []),
-            "calls": info.get("calls", []),
-            "impact": impact,
-            "risk": risk,
-            "query_bonus": relevance_bonus(symbol, words),
-            "graph_weight": get_node_weight(metrics, symbol),
-        }
-        item["score"] = score_control_node(item)
-        evidence.append(item)
+        # Traversal continues through an ineligible node either way: the
+        # relation it carries is still real, so connectivity is preserved and
+        # only its own candidacy is refused.
+        if symbol in eligible or symbol not in graph.nodes:
+            impact = impact_analysis(graph, symbol)
+            risk = analyze_symbol_risk(graph, symbol)
+
+            item = {
+                "symbol": symbol,
+                "depth": depth,
+                "called_by": info.get("called_by", []),
+                "calls": info.get("calls", []),
+                "impact": impact,
+                "risk": risk,
+                "query_bonus": relevance_bonus(symbol, words),
+                "graph_weight": get_node_weight(metrics, symbol),
+                "originating_entry": origin,
+                "entry_path": trail,
+            }
+            item["score"] = score_control_node(item)
+            evidence.append(item)
 
         neighbors = []
         neighbors.extend(info.get("called_by", []))
@@ -393,11 +615,17 @@ def control_dfs_v2(
         )[:neighbor_limit]
 
         for n in ranked_neighbors:
-            dfs(n, depth + 1)
+            dfs(n, depth + 1, origin, trail + [{
+                "from": symbol,
+                "to": n,
+                "edge_kind": "resolved_call",
+                "direction": "upstream" if n in info.get("called_by", []) else "downstream",
+            }])
 
     for node in entry_nodes:
-        dfs(node, 0)
+        dfs(node, 0, node, [])
 
+    verify_entry_paths(graph, evidence)
     evidence.sort(key=lambda x: x.get("score", 0), reverse=True)
     return evidence[:max_nodes]
 
@@ -424,11 +652,17 @@ def caller_query_bonus(query: str, symbol: str, item: dict) -> float:
 
     return bonus
 
-def infer_hypotheses(query: str, evidence: list[dict], execution_trace: str) -> list[dict]:
+def infer_hypotheses(
+    query: str, evidence: list[dict], execution_trace: str,
+    *, entry_resolution: dict | None = None,
+    failure_binding: FailureRelevanceBinding | None = None,
+) -> list[dict]:
     hypotheses = []
     trace_lower = execution_trace.lower()
 
-    for item in evidence[:8]:
+    # Gate the whole existing bounded candidate set before truncation. Taking
+    # the eight largest graph scores first discarded query-derived evidence.
+    for item in evidence[:20]:
         symbol = item["symbol"]
         risk = item.get("risk", {})
         score = item.get("score", 0)
@@ -464,24 +698,56 @@ def infer_hypotheses(query: str, evidence: list[dict], execution_trace: str) -> 
             reasons.append("trace contains stale-state signal")
             score += 3
 
-        confidence = min(0.95, max(0.1, score / 25))
+        # Compatibility-only presentation value.  This normalization was
+        # historically called confidence, but it is derived entirely from
+        # navigation heuristics and therefore is not a defect probability.
+        legacy_localization_value = min(0.95, max(0.1, score / 25))
         if not reasons:
-            confidence *= 0.5
+            legacy_localization_value *= 0.5
 
         if item.get("depth", 0) > 1:
-            confidence *= 0.9
+            legacy_localization_value *= 0.9
 
+        raw_localization_score = round(score, 2)
+        normalized_localization_value = round(legacy_localization_value, 2)
+
+        relevance = describe_relevance(
+            query, item, entry_resolution or {}, failure_binding=failure_binding,
+        )
+        reasons.insert(0, relevance["anchor_relation"])
         hypotheses.append({
             "symbol": symbol,
-            "score": round(score, 2),
-            "confidence": round(confidence, 2),
+            **relevance,
+            # ``score`` and ``confidence`` remain readable for historical
+            # artifacts.  The explicit fields below define their new contract.
+            "score": raw_localization_score,
+            "localization_score": raw_localization_score,
+            "localization_strength_value": normalized_localization_value,
+            "localization_strength": localization_strength(
+                normalized_localization_value
+            ),
+            "localization_score_semantics": LOCALIZATION_SCORE_SEMANTICS,
+            "confidence": normalized_localization_value,
+            "confidence_kind": LOCALIZATION_CONFIDENCE_KIND,
+            "legacy_control_confidence_deprecated": True,
             "likely_issue": guess_issue_type(query, execution_trace),
             "reasons": reasons,
-            "recommended_action": recommend_action(confidence, risk),
+            "localization_reasons": list(reasons),
+            "evidence_classification": {
+                "navigation": list(reasons),
+                "defect_grounding": [],
+            },
+            "defect_established": False,
+            "defect_grounding": [],
+            "recommended_action": "inspect_candidate",
+            "needs_escalation": True,
             "language": infer_language_from_file(infer_file_from_symbol(symbol)),
         })
 
-    hypotheses.sort(key=lambda x: x["score"], reverse=True)
+    mark_localization_order(hypotheses)
+    by_symbol = {item["symbol"]: item for item in hypotheses}
+    for item in evidence[:20]:
+        item["localization"] = by_symbol[item["symbol"]]
     return hypotheses[:5]
 
 
@@ -503,30 +769,18 @@ def guess_issue_type(query: str, execution_trace: str) -> str:
     return "unknown_logic_issue"
 
 
-def recommend_action(confidence: float, risk: dict) -> str:
-    risk_level = risk.get("risk_level", "low")
-
-    if confidence >= 0.75 and risk_level == "low":
-        return "auto_patch_candidate_allowed"
-
-    if confidence >= 0.65 and risk_level in {"low", "medium"}:
-        return "safe_patch_with_validation"
-
-    if risk_level == "high":
-        return "require_review_before_patch"
-
-    return "collect_more_evidence"
-
-
 def build_control_result(
     query: str,
     repo_path: str,
     entry_nodes: list[str],
     evidence: list[dict],
     execution_trace: str,
+    entry_resolution: dict[str, Any] | None = None,
 ) -> dict:
     context_profile = infer_context_profile(query)
-    hypotheses = infer_hypotheses(query, evidence, execution_trace)
+    hypotheses = infer_hypotheses(
+        query, evidence, execution_trace, entry_resolution=entry_resolution,
+    )
     top = hypotheses[0] if hypotheses else None
     phantom_limb = load_phantom_limb_report(repo_path)
     print("🐛 DEBUG top hypothesis:", top)
@@ -543,11 +797,15 @@ def build_control_result(
         control_rules.insert(1, identity_answer_framing(profile=context_profile))
 
     result = {
-        "version": "control_v4",
+        "version": "control_v5",
         "query": query,
         "repo_path": repo_path,
         "context_profile": context_profile,
         "entry_nodes": entry_nodes,
+        "entry_resolution": entry_resolution or {},
+        "localization_candidates": [
+            item["localization"] for item in evidence[:20] if "localization" in item
+        ],
         "top_hypothesis": top,
         "hypotheses": hypotheses,
         "evidence": evidence[:12],
@@ -562,10 +820,824 @@ def build_control_result(
 
     result["patch_intent"] = build_patch_intent(result)
     result["related_snippets"] = []
+    refresh_control_safety(result)
+    result["localization_handoff"] = current_target_receipt(result)
     return result
 
 
+def _normalized_control_path(value: str | None) -> str:
+    return str(value or "").strip().replace("\\", "/").lstrip("./").lower()
+
+
+def _validation_binding(preflight: dict, relative_file: str) -> dict | None:
+    """Bind an executed validation failure to one already-ranked file.
+
+    This performs no search or traversal.  Typed preflight locations win; the
+    bounded fallback accepts an exact candidate path already printed by the
+    executed validation output (needed for Python tracebacks, whose legacy
+    location extractor does not currently project frames into ``locations``).
+    """
+    wanted = _normalized_control_path(relative_file)
+    if not wanted:
+        return None
+
+    for location in preflight.get("locations") or []:
+        if not isinstance(location, dict):
+            continue
+        if _normalized_control_path(location.get("file")) == wanted:
+            return {
+                "binding": "preflight_location",
+                "priority": 0,
+                "file": relative_file,
+                "line": location.get("line"),
+                "col": location.get("col"),
+                "location_kind": location.get("kind"),
+            }
+
+    normalized_output = str(preflight.get("output") or "").replace("\\", "/").lower()
+    path_pattern = rf"(?<![a-z0-9_.-]){re.escape(wanted)}(?=[:\s\"'()])"
+    if re.search(path_pattern, normalized_output):
+        return {
+            "binding": "executed_failure_output_path",
+            "priority": 1,
+            "file": relative_file,
+            "line": None,
+            "col": None,
+            "location_kind": "validation_output_path",
+        }
+    return None
+
+
+def _source_is_exactly_grounded(control_result: dict, patch_intent: dict) -> bool:
+    repo_path = control_result.get("repo_path")
+    rel = (
+        patch_intent.get("relative_path")
+        or patch_intent.get("file")
+        or patch_intent.get("target_file")
+    )
+    source = patch_intent.get("source_snippet")
+    if not repo_path or not rel or not isinstance(source, str) or not source:
+        return False
+    try:
+        repo = Path(repo_path).resolve()
+        target = (repo / rel).resolve()
+        target.relative_to(repo)
+        return target.is_file() and source in target.read_text(
+            encoding="utf-8", errors="replace"
+        )
+    except (OSError, ValueError):
+        return False
+
+
+def _ensure_localization_metadata(hypothesis: dict, rank: int) -> None:
+    previous_action = hypothesis.get("recommended_action")
+    if (
+        previous_action
+        and previous_action
+        not in {
+            "inspect_candidate",
+            "acquire_source_context",
+            "grounded_defect_candidate",
+            "needs_grounding",
+            "insufficient_patch_evidence",
+        }
+        and "legacy_recommended_action" not in hypothesis
+    ):
+        hypothesis["legacy_recommended_action"] = previous_action
+
+    raw_score = hypothesis.get("localization_score", hypothesis.get("score", 0.0))
+    try:
+        raw_score = float(raw_score or 0.0)
+    except (TypeError, ValueError):
+        raw_score = 0.0
+    normalized = localization_value(hypothesis)
+    reasons = hypothesis.get("localization_reasons", hypothesis.get("reasons", []))
+    reasons = list(reasons) if isinstance(reasons, list) else [str(reasons)]
+
+    hypothesis.update(
+        {
+            "localization_score": round(raw_score, 2),
+            "localization_rank": rank,
+            "localization_strength_value": normalized,
+            "localization_strength": localization_strength(normalized),
+            "localization_score_semantics": LOCALIZATION_SCORE_SEMANTICS,
+            "localization_reasons": reasons,
+            "confidence_kind": LOCALIZATION_CONFIDENCE_KIND,
+            "legacy_control_confidence_deprecated": True,
+            "defect_established": False,
+            "defect_grounding": [],
+            "evidence_classification": {
+                "navigation": reasons,
+                "defect_grounding": [],
+            },
+            "recommended_action": "inspect_candidate",
+            "needs_escalation": True,
+        }
+    )
+
+
+def refresh_control_safety(control_result: dict) -> dict:
+    """Separate localization, typed patch basis, target grounding and authority.
+
+    Ranking remains unchanged and grants nothing.  A defect basis requires a
+    genuine executed failure with a deterministic direct-location or bounded
+    executed-reference binding, or a provenance-valid bounded reproduced
+    probe, and acquired exact candidate source.  An
+    explicit-change basis comes only from WAITER.LIVE.1's preserved route
+    receipt and never fabricates a defect.  Neither basis grants write/apply
+    authority; target grounding and the existing safety/authorization stack
+    remain separate downstream questions.
+    """
+    if not isinstance(control_result, dict):
+        return control_result
+
+    previous_candidate_state = control_result.get("patch_candidate_state")
+    previous_candidate_state = (
+        dict(previous_candidate_state)
+        if isinstance(previous_candidate_state, dict)
+        else {}
+    )
+
+    hypotheses = control_result.get("hypotheses")
+    if not isinstance(hypotheses, list):
+        hypotheses = []
+        control_result["hypotheses"] = hypotheses
+    top = control_result.get("top_hypothesis")
+    top_symbol = top.get("symbol") if isinstance(top, dict) else None
+    top_is_represented = any(
+        item is top
+        or (
+            isinstance(item, dict)
+            and top_symbol
+            and item.get("symbol") == top_symbol
+        )
+        for item in hypotheses
+    )
+    if isinstance(top, dict) and not top_is_represented:
+        hypotheses.insert(0, top)
+
+    for rank, hypothesis in enumerate(hypotheses, start=1):
+        if isinstance(hypothesis, dict):
+            _ensure_localization_metadata(hypothesis, rank)
+
+    top = hypotheses[0] if hypotheses else (top if isinstance(top, dict) else None)
+    control_result["top_hypothesis"] = top
+
+    preflight = control_result.get("preflight_validation") or {}
+    route = control_result.get("live_route")
+    explicit_change_requested = route_is_explicit_change(route)
+    genuine_failure = bool(
+        isinstance(preflight, dict)
+        and preflight.get("ran")
+        and preflight.get("ok") is False
+        and is_executed_failure_evidence(preflight.get("category"))
+    )
+
+    grounded_hypothesis = None
+    defect_evidence: list[dict] = []
+    exact_source_grounded = False
+    probe_target = (
+        None
+        if explicit_change_requested
+        else reproduced_probe_target(control_result.get("defect_probe"))
+    )
+    grounding_source = ""
+    patch_intent = control_result.get("patch_intent")
+    if not isinstance(patch_intent, dict):
+        patch_intent = build_patch_intent(control_result)
+
+    binding = FailureRelevanceBinding()
+    candidate_descriptors: list[LocalizedCandidate] = []
+    if genuine_failure and not explicit_change_requested:
+        for rank, hypothesis in enumerate(hypotheses, start=1):
+            if not isinstance(hypothesis, dict):
+                continue
+            symbol = str(hypothesis.get("symbol") or "")
+            rel_file = infer_file_from_symbol(symbol) or ""
+            symbol_name = infer_name_from_symbol(symbol) or ""
+            if rel_file and symbol_name:
+                candidate_descriptors.append(
+                    LocalizedCandidate(
+                        file=rel_file,
+                        symbol=symbol_name,
+                        rank=rank,
+                    )
+                )
+        binding = bind_executed_failure_to_candidates(
+            repo_path=control_result.get("repo_path") or "",
+            preflight=preflight,
+            candidates=candidate_descriptors,
+        )
+
+    if probe_target is not None and not genuine_failure:
+        wanted_file = _normalized_control_path(probe_target.get("file"))
+        wanted_symbol = str(probe_target.get("symbol") or "")
+        for hypothesis in hypotheses:
+            if not isinstance(hypothesis, dict):
+                continue
+            symbol = str(hypothesis.get("symbol") or "")
+            if (
+                _normalized_control_path(infer_file_from_symbol(symbol)) == wanted_file
+                and infer_name_from_symbol(symbol) == wanted_symbol
+            ):
+                grounded_hypothesis = hypothesis
+                grounding_source = "bounded_reproduction"
+                break
+
+    if binding.bound:
+        wanted_file = _normalized_control_path(binding.candidate_file)
+        wanted_symbol = binding.candidate_symbol
+        for hypothesis in hypotheses:
+            if not isinstance(hypothesis, dict):
+                continue
+            symbol = str(hypothesis.get("symbol") or "")
+            if (
+                _normalized_control_path(infer_file_from_symbol(symbol)) == wanted_file
+                and infer_name_from_symbol(symbol) == wanted_symbol
+            ):
+                grounded_hypothesis = hypothesis
+                grounding_source = "executed_validation_failure"
+                break
+
+    if grounded_hypothesis is not None:
+        patch_intent = build_patch_intent(
+            control_result,
+            hypothesis=grounded_hypothesis,
+            defect_location=(
+                binding.location.as_dict() if binding.location is not None else None
+            ),
+        )
+        exact_source_grounded = _source_is_exactly_grounded(control_result, patch_intent)
+        if grounding_source == "bounded_reproduction":
+            probe = control_result.get("defect_probe") or {}
+            defect_evidence = [
+                {
+                    "kind": "bounded_defect_reproduction",
+                    "probe_basis": probe.get("probe_basis"),
+                    "input_basis": probe.get("input_basis"),
+                    "expected_behavior_basis": probe.get(
+                        "expected_behavior_basis"
+                    ),
+                    "probe_result": probe.get("probe_result"),
+                    "observed": probe.get("probe_observed"),
+                    "expected": probe.get("probe_expected"),
+                    "execution_kind": probe.get("execution_kind"),
+                    "freshness": probe.get("probe_freshness"),
+                    "file": probe_target.get("file") if probe_target else "",
+                    "symbol": probe_target.get("symbol") if probe_target else "",
+                    "semantics": (
+                        "bounded behavior reproduced; not repository validation, "
+                        "patch correctness, or sole-cause certainty"
+                    ),
+                }
+            ]
+        else:
+            defect_evidence = [
+                {
+                    "kind": "executed_validation_failure",
+                    "category": preflight.get("category"),
+                    "outcome": preflight.get("outcome", "failed"),
+                    "command": preflight.get("command", ""),
+                    "binding": binding.kind,
+                    "file": binding.candidate_file,
+                    "symbol": binding.candidate_symbol,
+                    "failure_location": (
+                        binding.location.as_dict() if binding.location is not None else None
+                    ),
+                    "semantics": "failure_relevant; not sole-cause certainty",
+                }
+            ]
+        grounded_hypothesis["defect_established"] = True
+        grounded_hypothesis["defect_grounding"] = defect_evidence
+        grounded_hypothesis["evidence_classification"]["defect_grounding"] = (
+            defect_evidence
+        )
+        grounded_hypothesis["recommended_action"] = (
+            "grounded_defect_candidate"
+            if exact_source_grounded
+            else "acquire_source_context"
+        )
+        grounded_hypothesis["needs_escalation"] = not exact_source_grounded
+
+    defect_established = bool(
+        grounded_hypothesis is not None and not explicit_change_requested
+    )
+
+    # A historical projection is accepted only when the old artifact itself
+    # retained executed-failure evidence and exact-source grounding.  A legacy
+    # localization confidence or a naked ``defect_grounded=true`` is never
+    # reinterpreted as proof.
+    historical_evidence = previous_candidate_state.get("defect_grounding") or []
+    historical_grounded = bool(
+        not genuine_failure
+        and probe_target is None
+        and previous_candidate_state.get("defect_grounded") is True
+        and previous_candidate_state.get("exact_source_grounded") is True
+        and any(
+            isinstance(item, dict)
+            and item.get("kind") == "executed_validation_failure"
+            for item in historical_evidence
+        )
+    )
+
+    if explicit_change_requested:
+        patch_basis = PATCH_BASIS_EXPLICIT_CHANGE_REQUEST
+        patch_basis_source = PATCH_BASIS_SOURCE_EXPLICIT_REQUEST
+        basis_binding_kind = FAILURE_BINDING_EXPLICIT_CHANGE_REQUEST
+        basis_binding_location = None
+        candidate_binding = None
+    elif defect_established and exact_source_grounded:
+        patch_basis = PATCH_BASIS_GROUNDED_DEFECT
+        if grounding_source == "bounded_reproduction":
+            patch_basis_source = PATCH_BASIS_SOURCE_BOUNDED_REPRODUCTION
+            basis_binding_kind = FAILURE_BINDING_BOUNDED_REPRODUCTION
+            basis_binding_location = None
+            candidate_binding = dict(probe_target or {}) or None
+        else:
+            patch_basis_source = PATCH_BASIS_SOURCE_EXECUTED_FAILURE
+            basis_binding_kind = binding.kind
+            basis_binding_location = (
+                binding.location.as_dict() if binding.location is not None else None
+            )
+            candidate_binding = binding.candidate_binding
+    elif historical_grounded:
+        patch_basis = PATCH_BASIS_GROUNDED_DEFECT
+        patch_basis_source = PATCH_BASIS_SOURCE_EXECUTED_FAILURE
+        basis_binding_kind = str(
+            previous_candidate_state.get("failure_binding_kind")
+            or FAILURE_BINDING_UNAVAILABLE
+        )
+        basis_binding_location = previous_candidate_state.get(
+            "failure_binding_location"
+        )
+        candidate_binding = previous_candidate_state.get("candidate_binding")
+        defect_established = True
+        exact_source_grounded = True
+        defect_evidence = list(historical_evidence)
+    elif isinstance(route, dict) and route.get("defect_claim_present") is True:
+        patch_basis = PATCH_BASIS_UNRESOLVED
+        patch_basis_source = PATCH_BASIS_SOURCE_UNAVAILABLE
+        basis_binding_kind = binding.kind
+        basis_binding_location = None
+        candidate_binding = None
+    else:
+        patch_basis = PATCH_BASIS_NONE
+        patch_basis_source = PATCH_BASIS_SOURCE_UNAVAILABLE
+        basis_binding_kind = binding.kind
+        basis_binding_location = None
+        candidate_binding = None
+
+    handoff_ready = bool(
+        patch_basis == PATCH_BASIS_GROUNDED_DEFECT and exact_source_grounded
+    )
+    current_action = (
+        "grounded_defect_candidate"
+        if handoff_ready
+        else "change_request_candidate"
+        if patch_basis == PATCH_BASIS_EXPLICIT_CHANGE_REQUEST
+        else "acquire_source_context"
+        if defect_established
+        else "resolve_failure_reference"
+        if binding.kind == FAILURE_BINDING_AMBIGUOUS
+        else "needs_grounding"
+    )
+    # WAITER.LIVE.1 — why a change is needed, kept separate from whether a
+    # defect exists.  A grounded defect outranks everything, because executed
+    # failure evidence is the strongest reason there is; an explicit user
+    # request is a real reason too, and it is *not* defect evidence.  Neither
+    # grants any authority, and an unrouted run stays exactly where
+    # CONTROL.SAFETY.LIVE.1 left it.
+    #
+    # A defect established while an explicit change was requested does not
+    # relabel *why* the user wants the change.  Baseline health is not a task
+    # shape: a repository that already fails its own tests does not turn "add
+    # task priority support" into a bug report.  ``defect_established`` stays
+    # an independent fact either way.
+    change_need_source = route_change_need_source(route)
+    if defect_established and not explicit_change_requested:
+        change_need_source = CHANGE_NEED_GROUNDED_DEFECT
+    patch_intent.update(
+        {
+            "intent_kind": "grounded_defect_candidate"
+            if defect_established
+            else "change_request_candidate"
+            if explicit_change_requested
+            else "source_acquisition_candidate",
+            "change_need_source": change_need_source,
+            "patch_basis": patch_basis,
+            "patch_basis_source": patch_basis_source,
+            "failure_binding_kind": basis_binding_kind,
+            "failure_binding_location": basis_binding_location,
+            "candidate_binding": candidate_binding,
+            "localization_score": (
+                grounded_hypothesis or top or {}
+            ).get("localization_score"),
+            "confidence_kind": LOCALIZATION_CONFIDENCE_KIND,
+            "defect_established": defect_established,
+            "defect_grounding": defect_evidence,
+            "exact_source_grounded": exact_source_grounded,
+            "target_source_grounded": exact_source_grounded,
+            "eligible_for_patch_safety_handoff": handoff_ready,
+            "recommended_action": current_action,
+            "auto_patch_candidate_allowed": False,
+        }
+    )
+    control_result["patch_intent"] = patch_intent
+    control_result["grounded_hypothesis"] = grounded_hypothesis
+    control_result["localization_assessment"] = {
+        "candidate": top.get("symbol") if top else None,
+        "raw_rank": top.get("localization_rank") if top else None,
+        "localization_score": top.get("localization_score") if top else None,
+        "localization_strength": top.get("localization_strength") if top else None,
+        "localization_reasons": top.get("localization_reasons", []) if top else [],
+        "semantics": LOCALIZATION_SCORE_SEMANTICS,
+        "authoritative_for_defect": False,
+        "authoritative_for_patch": False,
+    }
+    control_result["patch_candidate_state"] = {
+        "localization_candidate_present": top is not None,
+        "defect_established": defect_established,
+        "defect_grounded": patch_basis == PATCH_BASIS_GROUNDED_DEFECT,
+        "defect_grounding": defect_evidence,
+        "patch_basis": patch_basis,
+        "patch_basis_source": patch_basis_source,
+        "failure_binding_kind": basis_binding_kind,
+        "failure_binding_location": basis_binding_location,
+        "candidate_binding": candidate_binding,
+        "exact_source_grounded": exact_source_grounded,
+        "target_source_grounded": exact_source_grounded,
+        "eligible_for_patch_safety_handoff": handoff_ready,
+        "recommended_action": current_action,
+        "change_need_source": change_need_source,
+        "explicit_change_requested": explicit_change_requested,
+        "patch_eligibility_granted": False,
+        "auto_patch_candidate_allowed": False,
+        "write_authority": False,
+        "patch_application_authority": False,
+        "authority_source": (
+            "existing patch safety, CTX.PATCH/CTX.APPLY, runtime authorization, "
+            "and human approval where required"
+        ),
+    }
+    control_result["patch_basis"] = patch_basis
+    control_result["patch_basis_source"] = patch_basis_source
+    control_result["failure_binding_kind"] = basis_binding_kind
+    control_result["failure_binding_location"] = basis_binding_location
+    control_result["candidate_binding"] = candidate_binding
+    control_result["target_source_grounded"] = exact_source_grounded
+    decision = control_result.setdefault("decision", {})
+    decision["symbol"] = top.get("symbol") if top else None
+    decision["action"] = top.get("recommended_action") if top else None
+    decision["grounded_symbol"] = (
+        grounded_hypothesis.get("symbol") if grounded_hypothesis else None
+    )
+    decision["patch_candidate_action"] = current_action
+    decision["auto_patch_candidate_allowed"] = False
+    control_result["legacy_control_confidence_deprecated"] = True
+    return control_result
+
+
+def attach_carried_behavior_facts(control_result: dict) -> dict:
+    """DEFECT.FACT.LIVE.1 — carry the route's typed behavior facts, unchanged.
+
+    CONTROL transports what INPUT typed.  It records the facts beside the
+    localized target so *where* and *what behavior* travel together while
+    staying separate fields, and it neither authors, edits, reorders nor
+    resolves one: the values written here are exactly the values the route
+    carried, and a contradicted claim stays contradicted.
+    """
+    facts, typed_transport = carried_behavior_facts(control_result)
+    control_result["behavior_facts"] = [fact.as_dict() for fact in facts]
+    control_result["behavior_fact_transport"] = (
+        "typed_preserved_contract" if typed_transport else "legacy_untyped_transport"
+    )
+    return control_result
+
+
+def attach_preflight_validation(control_result: dict, preflight: dict) -> dict:
+    """Attach validation, then try one eligible bounded reproduction.
+
+    DEFECT.PROBE.LIVE.1 is self-selecting and returns ``None`` for analysis,
+    explicit-change, passing baseline and genuine executed-failure routes.  It
+    therefore does not force the existing fast defect flows through a probe.
+
+    DEFECT.FACT.LIVE.1 adds two things and changes neither the selection nor the
+    execution: the typed behavior facts are carried onto the result, and the one
+    resolution pass that ran is described in a read-only telemetry block so a
+    later black-box run does not have to reconstruct why a probe was
+    unavailable.
+    """
+    control_result["preflight_validation"] = preflight
+    refresh_control_safety(control_result)
+    attach_carried_behavior_facts(control_result)
+    if "defect_probe" not in control_result:
+        resolution = resolve_control_defect_probe(control_result)
+        receipt = execute_resolved_control_defect_probe(control_result, resolution)
+        if receipt is not None:
+            attach_defect_probe_receipt(control_result, receipt)
+        attach_control_probe_telemetry(
+            control_result,
+            build_control_probe_telemetry(resolution, receipt),
+        )
+    refresh_control_safety(control_result)
+    control_result["localization_handoff"] = current_target_receipt(control_result)
+    return control_result
+
+
+def control_has_grounded_patch_candidate(control_result: dict | None) -> bool:
+    if not isinstance(control_result, dict):
+        return False
+    state = refresh_control_safety(control_result).get("patch_candidate_state") or {}
+    return bool(state.get("eligible_for_patch_safety_handoff"))
+
+
+def control_has_legitimate_patch_basis(control_result: dict | None) -> bool:
+    """Whether CONTROL carries either legitimate *reason* to consider a patch.
+
+    This deliberately says nothing about target grounding or write authority.
+    Consumers that operate on a concrete payload must also require that
+    payload's ``eligible_for_patch_safety_handoff`` fact.
+    """
+
+    if not isinstance(control_result, dict):
+        return False
+    state = refresh_control_safety(control_result).get("patch_candidate_state") or {}
+    return has_legitimate_patch_basis(state.get("patch_basis"))
+
+
+def payload_is_eligible_for_patch_safety_handoff(block: dict | None) -> bool:
+    return bool(
+        isinstance(block, dict)
+        and has_legitimate_patch_basis(block.get("patch_basis"))
+        and block.get("target_source_grounded") is True
+        and block.get("eligible_for_patch_safety_handoff") is True
+    )
+
+
+def acquired_source_files(control_result: dict | None) -> set[str]:
+    """Repository files whose source this run actually read.
+
+    The change-request path patches what it has read, not what it has ranked.
+    Membership is drawn only from context that really carries source text: a
+    related snippet with content, and CONTROL's own target when it has an exact
+    source snippet.  A file that was merely *named* — by a rank, or by a Scout
+    pick that never resolved to a real file — is deliberately absent, so naming
+    a file cannot become permission to edit it.
+    """
+    if not isinstance(control_result, dict):
+        return set()
+
+    repo_path = control_result.get("repo_path")
+    files: set[str] = set()
+
+    def quote_is_exact(relative: Any, quote: Any) -> bool:
+        if not repo_path or not isinstance(quote, str) or not quote:
+            return False
+        normalized = _normalized_control_path(relative)
+        if not normalized:
+            return False
+        try:
+            repo = Path(repo_path).resolve()
+            target = (repo / str(relative)).resolve()
+            target.relative_to(repo)
+            return target.is_file() and quote in target.read_text(
+                encoding="utf-8", errors="replace"
+            )
+        except (OSError, ValueError):
+            return False
+
+    for snippet in control_result.get("related_snippets") or []:
+        if not isinstance(snippet, dict):
+            continue
+        text = snippet.get("snippet")
+        if not isinstance(text, str) or not text.strip():
+            continue
+        normalized = _normalized_control_path(snippet.get("file"))
+        if normalized and quote_is_exact(snippet.get("file"), text):
+            files.add(normalized)
+
+    intent = control_result.get("patch_intent")
+    if isinstance(intent, dict) and str(intent.get("source_snippet") or "").strip():
+        normalized = _normalized_control_path(
+            intent.get("relative_path")
+            or intent.get("file")
+            or intent.get("target_file")
+        )
+        if normalized and quote_is_exact(
+            intent.get("relative_path")
+            or intent.get("file")
+            or intent.get("target_file"),
+            intent.get("source_snippet"),
+        ):
+            files.add(normalized)
+    return files
+
+
+def enforce_control_grounding_on_payload(
+    control_result: dict,
+    block: dict,
+) -> dict:
+    """Fail closed when model output outruns CONTROL's grounded-candidate facts.
+
+    This gate grants nothing.  A passing result merely hands the candidate to
+    the pre-existing quote grounding, patch safety, policy and apply gates.
+
+    There are exactly two legitimate reasons a payload may pass, and they are
+    not interchangeable:
+
+    *defect grounding* — an executed OPS.VALIDATE.1 failure bound to a ranked
+    file, whose exact source CONTROL supplied.  Unchanged by WAITER.LIVE.1.
+
+    *change-request grounding* — the user explicitly asked for the change, and
+    every proposed operation targets a file whose source this run really
+    acquired.  This supplies a different reason **why** a change is needed; it
+    weakens nothing about **how** one may be executed, and every quote is still
+    checked against the file by the gates downstream.
+
+    A read-only route passes under neither.  Localization rank alone still
+    passes under neither, which is CONTROL.SAFETY.LIVE.1's whole point.
+    """
+    if not isinstance(control_result, dict) or not isinstance(block, dict):
+        return block
+    candidate = block.get("patch_candidate")
+    plan = block.get("patch_plan")
+    if not isinstance(candidate, dict) and not (isinstance(plan, list) and plan):
+        return block
+
+    # Authoring containment precedes acceptance; the CONTROL basis below is
+    # unchanged. This also covers the direct Generate Patch endpoint.
+    if control_result.get("repair_scope"):
+        try:
+            authoring = authoring_context_for_control_result(
+                control_result, repo_path=control_result.get("repo_path"),
+            )
+            if not enforce_authoring_scope(authoring, block):
+                return block
+        except AuthoringScopeError as exc:
+            block.update(patch_candidate=None, patch_plan=None, needs_escalation=True,
+                         authoring_scope_status=exc.reason)
+            return block
+
+    control = refresh_control_safety(control_result)
+    candidate_state = control.get("patch_candidate_state") or {}
+    grounded_intent = control.get("patch_intent") or {}
+    route = control.get("live_route")
+    patch_basis = normalize_patch_basis(candidate_state.get("patch_basis"))
+    grounded_file = _normalized_control_path(
+        grounded_intent.get("relative_path")
+        or grounded_intent.get("file")
+        or grounded_intent.get("target_file")
+    )
+    handoff_ready = bool(
+        candidate_state.get("eligible_for_patch_safety_handoff")
+        and grounded_file
+    )
+
+    target_records: list[tuple[str, str]] = []
+    if isinstance(candidate, dict):
+        target_records.append(
+            (
+                _normalized_control_path(
+                    candidate.get("relative_path") or candidate.get("file")
+                ),
+                str(candidate.get("op") or "replace_snippet"),
+            )
+        )
+    if isinstance(plan, list):
+        target_records.extend(
+            (
+                _normalized_control_path(
+                    operation.get("relative_path") or operation.get("file")
+                ),
+                str(operation.get("op") or "replace_snippet"),
+            )
+            for operation in plan
+            if isinstance(operation, dict)
+        )
+    named_targets = {target for target, _ in target_records if target}
+    create_targets = {
+        target for target, operation in target_records if operation == "create_file"
+    }
+    replacement_targets = named_targets - create_targets
+    target_is_bound = grounded_file in named_targets
+
+    read_only_route = route_is_read_only(route)
+    acquired = acquired_source_files(control)
+    requested_paths = {
+        _normalized_control_path(path)
+        for path in ((route or {}).get("requested_paths") or [])
+        if _normalized_control_path(path)
+    }
+    replacements_grounded = bool(named_targets) and replacement_targets <= acquired
+    creates_grounded = create_targets <= requested_paths
+    target_source_grounded = bool(
+        named_targets and replacements_grounded and creates_grounded
+    )
+    scope_tokens = explicit_change_scope_tokens(route)
+    scope_grounded = explicit_change_targets_match_scope(route, named_targets)
+
+    defect_payload_ready = bool(
+        patch_basis == PATCH_BASIS_GROUNDED_DEFECT
+        and handoff_ready
+        and target_is_bound
+        and target_source_grounded
+    )
+    explicit_payload_ready = bool(
+        patch_basis == PATCH_BASIS_EXPLICIT_CHANGE_REQUEST
+        and route_is_explicit_change(route)
+        and not read_only_route
+        and target_source_grounded
+        and scope_grounded
+    )
+
+    block.update(
+        {
+            "patch_basis": patch_basis,
+            "patch_basis_source": candidate_state.get("patch_basis_source"),
+            "failure_binding_kind": candidate_state.get("failure_binding_kind"),
+            "failure_binding_location": candidate_state.get(
+                "failure_binding_location"
+            ),
+            "candidate_binding": candidate_state.get("candidate_binding"),
+            "target_source_grounded": target_source_grounded,
+            "change_scope_grounded": scope_grounded,
+            "explicit_scope_tokens": list(scope_tokens),
+            "eligible_for_patch_safety_handoff": bool(
+                defect_payload_ready or explicit_payload_ready
+            ),
+            "write_authority": False,
+            "patch_application_authority": False,
+            "human_approval_required": True,
+        }
+    )
+    if defect_payload_ready or explicit_payload_ready:
+        return block
+
+    block["patch_candidate"] = None
+    block["patch_plan"] = None
+    block["confidence"] = 0.0
+    block["needs_escalation"] = True
+    block["control_patch_candidate_rejected"] = True
+    if read_only_route:
+        block["control_patch_candidate_reject_reason"] = (
+            "No repository change was requested; this route is read-only."
+        )
+    elif patch_basis == PATCH_BASIS_EXPLICIT_CHANGE_REQUEST and not target_source_grounded:
+        block["control_patch_candidate_reject_reason"] = (
+            "The requested change targets a file whose exact source this run did "
+            "not acquire, or creates a path the preserved request did not name."
+        )
+    elif patch_basis == PATCH_BASIS_EXPLICIT_CHANGE_REQUEST and not scope_grounded:
+        block["control_patch_candidate_reject_reason"] = (
+            "The proposed targets do not preserve the explicit multi-surface scope "
+            "recorded in the user request."
+        )
+    elif route_is_explicit_change(route):
+        block["control_patch_candidate_reject_reason"] = (
+            "The change was explicitly requested, but no source context was acquired "
+            "to ground it."
+        )
+    else:
+        block["control_patch_candidate_reject_reason"] = (
+            "CONTROL has no exact-source candidate bound to genuine executed failure evidence."
+            if not handoff_ready
+            else "The proposed patch has an ungrounded target or does not include CONTROL's grounded target file."
+        )
+    issues = block.get("issues")
+    if not isinstance(issues, list):
+        issues = []
+    if not any(
+        isinstance(issue, dict)
+        and issue.get("type") == "control_grounding"
+        for issue in issues
+    ):
+        issues.insert(
+            0,
+            {
+                "severity": "high",
+                "type": "control_grounding",
+                "file": grounded_file,
+                "symbol": grounded_intent.get("target_symbol") or "",
+                "reason": block["control_patch_candidate_reject_reason"],
+                "fix": "Inspect the candidate or collect genuine target-bound failure evidence before patching.",
+            },
+        )
+    block["issues"] = issues
+    return block
+
+
+def reject_ungrounded_control_patch(state: Any) -> None:
+    """AgentState adapter for the shared CONTROL payload boundary."""
+    if not getattr(state, "is_project_input", False):
+        return
+    control_result = getattr(state, "control_result", None)
+    block = getattr(state, "json_block", None)
+    if isinstance(control_result, dict) and isinstance(block, dict):
+        enforce_control_grounding_on_payload(control_result, block)
+
+
 def format_control_context(result: dict) -> str:
+    result = refresh_control_safety(result)
     lines = []
 
     lines.append("=== CONTROL ENGINE CONTEXT ===")
@@ -574,14 +1646,47 @@ def format_control_context(result: dict) -> str:
     lines.append(f"Repo: {result['repo_path']}")
     lines.append("")
 
-    lines.append("## Top Hypothesis")
+    entry_resolution = result.get("entry_resolution") or {}
+    lines.append("## Query Recall Facts")
+    lines.append(
+        f"- raw_query_terms: {entry_resolution.get('raw_query_terms', [])}"
+    )
+    lines.append(
+        "- normalized_query_terms: "
+        f"{entry_resolution.get('normalized_query_terms', [])}"
+    )
+    lines.append(
+        f"- resolved_entry_nodes: {entry_resolution.get('resolved_entry_nodes', [])}"
+    )
+    lines.append(
+        f"- entry_match_kind: {entry_resolution.get('entry_match_kind', {})}"
+    )
+    lines.append(f"- fallback_used: {entry_resolution.get('fallback_used', False)}")
+    lines.append(
+        "- query_resolution_seconds: "
+        f"{entry_resolution.get('query_resolution_seconds', 0.0)}"
+    )
+    lines.append("")
+
+    lines.append("## Top Localization Candidate")
     top = result.get("top_hypothesis")
     if top:
         lines.append(f"- symbol: {top['symbol']}")
-        lines.append(f"- likely_issue: {top['likely_issue']}")
-        lines.append(f"- confidence: {top['confidence']}")
+        lines.append(f"- likely_issue_hint: {top['likely_issue']}")
+        lines.append(f"- localization_score: {top['localization_score']}")
+        lines.append(f"- localization_strength: {top['localization_strength']}")
+        lines.append(
+            f"- legacy confidence ({top['confidence_kind']}): {top.get('confidence')}"
+        )
+        lines.append(f"- defect_established: {top['defect_established']}")
         lines.append(f"- recommended_action: {top['recommended_action']}")
-        lines.append(f"- reasons: {top['reasons']}")
+        lines.append(f"- localization_reasons: {top['localization_reasons']}")
+        for key in (
+            "anchor_relation", "originating_entry", "entry_rank",
+            "query_relevance_support", "source_support", "graph_support",
+            "centrality_support", "final_localization_class", "selected_reason",
+        ):
+            lines.append(f"- {key}: {top.get(key)}")
         lines.append(f"- language: {top.get('language', 'unknown')}")
     else:
         lines.append("- none")
@@ -594,13 +1699,16 @@ def format_control_context(result: dict) -> str:
         lines.append("- none")
     lines.append("")
 
-    lines.append("## Ranked Hypotheses")
+    lines.append("## Ranked Localization Candidates")
     for h in result.get("hypotheses", []):
         lines.append(
-            f"- {h['symbol']} | issue={h['likely_issue']} | "
-            f"score={h['score']} | confidence={h['confidence']} | "
+            f"- {h['symbol']} | issue_hint={h['likely_issue']} | "
+            f"localization_score={h['localization_score']} | "
+            f"strength={h['localization_strength']} | "
+            f"defect_established={h['defect_established']} | "
             f"action={h['recommended_action']}"
         )
+        lines.append(f"  anchor={h.get('anchor_relation')} | class={h.get('final_localization_class')} | reason={h.get('selected_reason')}")
     if not result.get("hypotheses"):
         lines.append("- none")
     lines.append("")
@@ -613,6 +1721,7 @@ def format_control_context(result: dict) -> str:
         lines.append(f"- score: {item.get('score', 0):.2f}")
         lines.append(f"- graph_weight: {item.get('graph_weight', 0):.2f}")
         lines.append(f"- risk: {risk.get('risk_level')} ({risk.get('risk_score')})")
+        lines.append(f"- score_semantics: {LOCALIZATION_SCORE_SEMANTICS}")
         lines.append(f"- called_by: {item.get('called_by', [])[:5]}")
         lines.append(f"- calls: {item.get('calls', [])[:5]}")
         lines.append(f"- impact: {item.get('impact', [])[:5]}")
@@ -641,6 +1750,7 @@ def format_control_context(result: dict) -> str:
     lines.append("## Structured Control JSON")
     lines.append("```json")
     lines.append(json.dumps({
+        "entry_resolution": result.get("entry_resolution"),
         "top_hypothesis": result.get("top_hypothesis"),
         "hypotheses": result.get("hypotheses"),
         "phantom_limb": {
@@ -676,13 +1786,21 @@ def run_control_structured(
         inventory=inventory,
     )
 
-    entry_nodes = select_entry_nodes(
+    entry_selection = select_entry_nodes(
         query=query,
         repo_path=repo_path,
         limit=6,
         graph=graph,
         inventory=inventory,
+        return_details=True,
     )
+    if isinstance(entry_selection, dict):
+        entry_nodes = list(entry_selection.get("entry_nodes") or [])
+        entry_resolution = entry_selection
+    else:
+        # Compatibility for existing embedders/tests that replace the selector.
+        entry_nodes = list(entry_selection)
+        entry_resolution = {}
 
     evidence = control_dfs_v2(
         graph=graph,
@@ -708,6 +1826,7 @@ def run_control_structured(
         entry_nodes=entry_nodes,
         evidence=evidence,
         execution_trace=execution_trace,
+        entry_resolution=entry_resolution,
     )
 
 def run_control(
@@ -725,55 +1844,52 @@ def run_control(
     )
     return format_control_context(result)
 
-def resolve_symbol_to_graph_nodes(graph, symbol: str, query: str = "", limit: int = 3) -> list[str]:
-    if not symbol:
-        return []
+def resolve_query_to_graph_nodes(
+    graph,
+    query_candidates: list[str] | tuple[str, ...],
+    *,
+    limit: int = 6,
+) -> list[IdentifierEntryMatch]:
+    """Resolve bounded query concepts against eligible source identifiers.
 
-    # Already a real graph node id.
-    if symbol in graph.nodes:
-        return [symbol]
+    Eligibility is evaluated first, so structural call nodes and malformed
+    historical nodes never reach decomposition.  The scan is linear in the
+    already-loaded eligible population; ordering uses lexical entry facts only,
+    never centrality, caller count, hotspot score, or CONTROL rank.
+    """
+    return list(
+        resolve_identifier_candidates(
+            eligible_localization_nodes(graph),
+            query_candidates,
+            limit=limit,
+        ).matches
+    )
 
-    words = query_words(query)
-    name = symbol.split("::")[-1]
 
-    matches = []
-    for node_id, node in graph.nodes.items():
-        if node_id.startswith("call::"):
-            continue
-        if "::expr::" in node_id:
-            continue
-        if "::" not in node_id:
-            continue
-
-        tail = node_id.split("::")[-1]
-        if tail == name:
-            score = relevance_bonus(node_id, words)
-
-            # Prefer functions/methods over classes when query asks about calls/bugs.
-            if getattr(node, "type", "") == "function":
-                score += 2
-
-            # Prefer entry-like names for game projects.
-            if tail.lower() in {"update", "start", "main", "run"}:
-                score += 2
-
-            matches.append((score, node_id))
-
-    matches.sort(key=lambda x: (-x[0], x[1]))
-    return [node_id for _, node_id in matches[:limit]]
+def resolve_symbol_to_graph_nodes(
+    graph,
+    symbol: str,
+    query: str = "",
+    limit: int = 3,
+) -> list[str]:
+    """Compatibility resolver for one canonical symbol or lexical concept."""
+    del query  # Ranking relevance remains downstream and unchanged.
+    return [
+        match.node_id
+        for match in resolve_identifier_candidates(
+            eligible_localization_nodes(graph),
+            [symbol] if symbol else [],
+            limit=limit,
+        ).matches
+    ]
 
 def fallback_entry_nodes_from_graph(graph, query: str, limit: int = 6) -> list[str]:
     words = query_words(query)
     profile = infer_context_profile(query)
     candidates = []
 
-    for node_id, node in graph.nodes.items():
-        if node_id.startswith("call::"):
-            continue
-        if "::expr::" in node_id:
-            continue
-        if "::" not in node_id:
-            continue
+    for node_id in eligible_localization_nodes(graph):
+        node = graph.nodes[node_id]
 
         score = relevance_bonus(node_id, words)
 
@@ -802,106 +1918,110 @@ def fallback_entry_nodes_from_graph(graph, query: str, limit: int = 6) -> list[s
     return [node_id for _, node_id in candidates[:limit]]
 
 def _safe_minimal_forbidden_block(source_snippet: str) -> str:
-    """Build a stark 'FORBIDDEN' block for safe_minimal mode.
+    """Compatibility shim over the shared contract (PATCH.AUTHOR.LIVE.2).
 
-    Lists the only identifiers the AI is allowed to use (those literally
-    present in the source snippet) and reminds it that anything else is a
-    hallucination. Reduces 'invented field' patches like `player.position`
-    when only `player.speed` exists in the source.
+    The derivation is unchanged and still bounded by the source snippet the
+    author was already handed — no repository is rescanned.  It moved to
+    ``core.patch_authoring_contract`` so the revision author receives the
+    identical identifier constraints rather than none at all.
     """
-    if not source_snippet:
-        return ""
-    # Extract identifiers actually present so we can reflect them back at the AI.
-    # This is a heuristic — strings/comments are filtered out crudely.
-    cleaned = re.sub(r"//.*?$|/\*.*?\*/|\".*?\"|'.*?'", " ", source_snippet, flags=re.S | re.M)
-    seen = sorted(set(re.findall(r"\b[A-Za-z_][A-Za-z_0-9]*\b", cleaned)))
-    return f"""
-SAFE_MINIMAL — HARD CONSTRAINTS:
-You may ONLY reference identifiers that appear in the source_snippet below.
-Identifiers visible in source: {seen}
+    return safe_minimal_forbidden_block(source_snippet)
 
-FORBIDDEN in patched_snippet:
-- Any field/method/class name not in the list above (e.g. `player.position` if only `player.speed` exists).
-- New imports, new helper functions, new type declarations.
-- Behavioural redesign — only fix the literal bug.
 
-If a correct fix would require any of the above:
-  set patch_candidate=null, confidence<=0.3, needs_escalation=true,
-  and explain in `summary` what is missing from context.
-""".strip()
+def authoring_contract_for_control_result(
+    control_result: dict,
+) -> PatchAuthoringContract:
+    """PATCH.AUTHOR.LIVE.2 §1 — the contract this result's patch author gets.
+
+    Resolved from exactly the two inputs :func:`build_control_prompt` resolves
+    it from: the patch policy's normalized style, and the bounded source
+    snippet already on ``patch_intent``.  Every authoring call for this
+    CONTROL result — the initial draft and the single verification-guided
+    revision — reads the contract here instead of describing the protocol
+    again, which is what makes the two one contract rather than two.
+
+    Pure prompt construction: no retrieval, no graph work, no repository
+    traversal, no indexing and no model call.
+    """
+
+    patch_intent = control_result.get("patch_intent") or {}
+    top = control_result.get("top_hypothesis") or {}
+    candidate_state = control_result.get("patch_candidate_state") or {}
+    policy = build_patch_policy(
+        control_result.get("patch_style"),
+        language=(patch_intent.get("language") or top.get("language") or "unknown"),
+        defect_grounded=bool(candidate_state.get("defect_grounded")),
+        patch_basis=candidate_state.get("patch_basis"),
+        patch_confidence=0.0,
+    )
+    return render_patch_authoring_contract(
+        style=policy.style,
+        source_snippet=patch_intent.get("source_snippet", "") or "",
+    )
 
 
 def _patch_output_format_block(style: str) -> str:
-    """Tell the AI when to use patch_candidate vs patch_plan.
+    """Compatibility shim over the shared contract (PATCH.AUTHOR.LIVE.2).
 
-    - safe_minimal: patch_candidate only — single-file edit, never create files.
-    - balanced:     patch_candidate by default; patch_plan ALLOWED for feature work.
-    - vibe:         patch_plan freely, but every path must stay inside the repo.
-
-    Mirrors the split between the executor's snippet-replace path and the
-    multi-file plan path. Putting this in the prompt prevents the AI from
-    quietly cramming a multi-file change into a single patch_candidate.
+    The wire shapes, the exact field names and the per-style output rules now
+    live in ``core.patch_authoring_contract`` so the verification-guided
+    revision author is held to the same contract as the initial author.  The
+    rendered text is byte-identical to what this function returned before;
+    there is simply one definition of it.
     """
-    common_shapes = """\
-patch_candidate (single-file existing-code fix):
-{
-  "patch_candidate": {
-    "file": "...",
-    "relative_path": "...",
-    "target_node_name": "...",
-    "target_node_kind": "function|class",
-    "target_snippet": "...",
-    "patched_snippet": "..."
-  }
-}
+    return patch_output_format_block(style)
 
-patch_plan (multi-file or new-file work):
-{
-  "patch_plan": [
-    {"op": "create_file",     "relative_path": "src/aml.rs", "content": "..."},
-    {"op": "replace_snippet", "relative_path": "src/main.rs",
-     "target_snippet": "mod agent;",
-     "patched_snippet": "mod agent;\\nmod aml;"}
-  ]
-}
 
-Rules:
-- Output EITHER patch_candidate OR patch_plan, never both.
-- Use patch_candidate only when editing one existing file.
-- Use patch_plan when creating files, editing multiple files, or changing APIs across files.
-- Every relative_path MUST stay inside the repo (no absolute paths, no '..').
-- Every patch_candidate.target_snippet must be an exact quote from the target file.
-- If it is not found, reject/demote the candidate before final result.
-"""
+def authoring_context_for_control_result(
+    control_result: dict, *, repo_path: str | None = None,
+) -> CandidateAuthoringContext:
+    """Use PATCH.MINIMAL's named-target loader, never a separate lexical scan."""
 
-    if style == "safe_minimal":
-        return (
-            "[PATCH OUTPUT FORMAT — safe_minimal]\n"
-            "Use patch_candidate ONLY. Do NOT emit patch_plan. Do NOT create files.\n"
-            "If the fix would require new files or multi-file changes, set\n"
-            "patch_candidate=null and needs_escalation=true.\n\n"
-            + common_shapes
-            + "\nsafe_minimal-specific: patch_plan is FORBIDDEN. Single existing file or escalate."
+    intent = control_result.get("patch_intent") or {}
+    path = str(intent.get("relative_path") or intent.get("file")
+               or intent.get("target_file") or "").replace("\\", "/")
+    symbol = str(intent.get("target_symbol")
+                 or str(intent.get("target_symbol_full") or "").rsplit("::", 1)[-1]
+                 or "").strip()
+    context, source, source_raw = (None, "", b"")
+    if repo_path and path and symbol:
+        if path.lower().endswith(".java"):
+            from core.candidate_authoring_context import load_java_authoring_source
+            source, source_raw = load_java_authoring_source(repo_path, path)
+        else:
+            context, source = load_authoritative_binding_context(
+                repo_root=repo_path, source_path=path, target_symbol=symbol,
+            )
+    repair = None
+    measured = control_result.get("repair_scope")
+    if measured and measured.get("status") != REPAIR_SCOPE_NOT_APPLICABLE:
+        repair = consume_repair_scope(
+            measured, repo_path=repo_path or control_result.get("repo_path") or "",
+            primary_file=path, primary_symbol=symbol,
+            primary_source=str(intent.get("source_snippet") or ""),
+            preflight=control_result.get("preflight_validation") or {},
+            language=str(intent.get("language") or ""),
         )
-
-    if style == "balanced":
-        return (
-            "[PATCH OUTPUT FORMAT — balanced]\n"
-            "Prefer patch_candidate. Use patch_plan ONLY when feature work genuinely\n"
-            "requires touching multiple files or creating a new file. Justify in `summary`.\n\n"
-            + common_shapes
-            + "\nbalanced-specific: patch_plan allowed but every op must reference an existing\n"
-              "module/API or be clearly justified. Bias toward smaller patch_candidate when possible."
+    contract = authoring_contract_for_control_result(control_result)
+    if repair is not None and len(repair.measured.members) > 1:
+        from core.patch_authoring_contract import for_measured_repair_scope
+        contract = for_measured_repair_scope(contract)
+    oop_projection = oop_target = None
+    if path.lower().endswith(".java") and source:
+        from core.oop_reasoning_context import project_oop_author_source
+        oop_projection, oop_target = project_oop_author_source(
+            source=source, file=path, symbol=symbol,
+            source_snippet=str(intent.get("source_snippet") or ""),
+            raw=source_raw,
         )
-
-    # vibe
-    return (
-        "[PATCH OUTPUT FORMAT — vibe]\n"
-        "Use whichever shape best fits the change. patch_plan is encouraged for feature work,\n"
-        "refactors across files, or anything that needs new helpers. List every assumption in `summary`.\n\n"
-        + common_shapes
-        + "\nvibe-specific: patch_plan freely usable, but every relative_path MUST stay inside\n"
-          "the repo. Auto-apply is disabled — the user will review your plan."
+    return CandidateAuthoringContext(
+        contract=contract,
+        source_path=path, target_symbol=symbol,
+        source_snippet=str(intent.get("source_snippet") or ""),
+        binding_context=context, authoritative_source=source,
+        authoring_repair_scope=repair,
+        oop_projection=oop_projection, oop_target=oop_target,
+        oop_source_bytes=source_raw,
     )
 
 
@@ -1036,7 +2156,18 @@ def build_control_prompt(
     repo_path: str | None = None,
     anti_lesson_control_requested: bool = False,
     anti_lesson_control_max_items: int = 3,
+    authoring_context: CandidateAuthoringContext | None = None,
 ) -> str:
+    # The receipt's CONTROL binding predates the preflight handoff and all
+    # later CONTROL bookkeeping.  Capture it before ``refresh_control_safety``
+    # mutates the in-memory projection; this is a verification input, never a
+    # new source of target selection.
+    receipt_control = dict(control_result) if isinstance(control_result, dict) else {}
+    receipt_control.pop("preflight_validation", None)
+    receipt_control_fingerprint = hashlib.sha256(json.dumps(
+        receipt_control, sort_keys=True, separators=(",", ":"), ensure_ascii=False,
+    ).encode("utf-8")).hexdigest()
+    control_result = refresh_control_safety(control_result)
     context_profile = (
         control_result.get("context_profile")
         or infer_context_profile(control_result.get("query") or user_query)
@@ -1048,8 +2179,42 @@ def build_control_prompt(
     top = control_result.get("top_hypothesis") or {}
     patch_intent = control_result.get("patch_intent") or {}
     preflight = control_result.get("preflight_validation") or {}
+    candidate_state = control_result.get("patch_candidate_state") or {}
+    # Re-rendering/revision consumes the BASIS receipt already produced by this
+    # run. It must not select membership again from enriched CONTROL state.
+    existing_authoring = None
+    if (control_result.get("repair_scope") or {}).get("status") == REPAIR_SCOPE_COMPLETE:
+        existing_authoring = authoring_context_for_control_result(control_result, repo_path=repo_path)
+    if existing_authoring is not None:
+        repair_scope = existing_authoring.authoring_repair_scope.measured
+    else:
+        repair_scope = build_repair_scope(
+            repo_path=control_result.get("repo_path"),
+            primary_file=(patch_intent.get("relative_path") or patch_intent.get("file")
+                          or patch_intent.get("target_file")),
+            primary_symbol=(patch_intent.get("target_symbol")
+                            or patch_intent.get("target_node_name")),
+            primary_kind=patch_intent.get("target_node_kind") or "function",
+            language=patch_intent.get("language"),
+            preflight=preflight,
+            receipt_control_fingerprint=receipt_control_fingerprint,
+        )
+    # Scope is additive evidence on the grounded basis.  ``target_file`` and
+    # ``target_symbol`` continue to name only the existing primary target.
+    if repair_scope.status != REPAIR_SCOPE_NOT_APPLICABLE:
+        repair_scope_data = repair_scope.as_dict()
+        control_result["repair_scope"] = repair_scope_data
+        patch_intent["repair_scope"] = repair_scope_data
+        candidate_state["repair_scope_status"] = repair_scope.status
+    repair_scope_prompt = render_repair_scope_prompt(repair_scope)
     related_snippets = control_result.get("related_snippets") or []
     scout = control_result.get("scout") or {}
+    # WAITER.LIVE.1 — what kind of order this is.  An unrouted call (Dream, the
+    # proposal queue, a direct CONTROL inspection) reads as neither, and every
+    # branch below then behaves exactly as it did before this phase.
+    live_route = control_result.get("live_route")
+    explicit_change_route = route_is_explicit_change(live_route)
+    read_only_route = route_is_read_only(live_route)
     code_dna_block = _resolve_code_dna_block(control_result)
     lessons_block = _lessons_prompt_block(repo_path, user_query)
     # Phase 11.7c: default-off, two-key-gated. "" unless the server flag AND the
@@ -1074,12 +2239,55 @@ def build_control_prompt(
     policy = build_patch_policy(
         control_result.get("patch_style"),
         language=language,
-        control_confidence=float(top.get("confidence", 0.0) or 0.0),
+        defect_grounded=bool(candidate_state.get("defect_grounded")),
+        patch_basis=candidate_state.get("patch_basis"),
+        patch_confidence=0.0,
     )
 
     policy_block = policy_to_prompt_block(policy)
     style = policy.style
-    output_format_block = _patch_output_format_block(style)
+    # PATCH.AUTHOR.LIVE.2 — one rendering of the authoritative patch-authoring
+    # contract.  A later authoring call for the same artifact asks the same
+    # accessor rather than restating the protocol, so the two cannot drift.
+    contract = authoring_contract_for_control_result(control_result)
+    authoring_context = authoring_context or authoring_context_for_control_result(
+        control_result, repo_path=repo_path,
+    )
+    # Consume the just-built BASIS result, never a model-proposed member list.
+    # A context supplied before BASIS ran must gain this same measured boundary.
+    if repair_scope.is_complete and authoring_context.authoring_repair_scope is None:
+        authoring_context = authoring_context_for_control_result(control_result, repo_path=repo_path)
+    if authoring_context.authoring_repair_scope is not None:
+        authoring_context.authoring_repair_scope.assert_current(preflight)
+        if authoring_context.authoring_repair_scope.measured.as_dict()["members"] != repair_scope.as_dict()["members"]:
+            raise AuthoringScopeError("author_scope_receipt_mismatch")
+    contract = authoring_context.contract
+    if authoring_context.authoring_repair_scope is not None and len(repair_scope.members) > 1:
+        repair_scope_prompt = (
+            "[MEASURED REPAIR SCOPE — authoritative compiler evidence]\n"
+            "Receipt-bound sources and member diagnostics are projected without alteration "
+            "in AUTHORITATIVE AUTHORING SCOPE above."
+        )
+    current_binding, current_source, current_raw = authoring_context.source_inputs(repo_path)
+    expected_path = str(patch_intent.get("relative_path") or patch_intent.get("file")
+                        or patch_intent.get("target_file") or "").replace("\\", "/")
+    expected_symbol = str(patch_intent.get("target_symbol")
+                          or str(patch_intent.get("target_symbol_full") or "").rsplit("::", 1)[-1]
+                          or "").strip()
+    if (authoring_context.source_path != expected_path
+            or authoring_context.target_symbol != expected_symbol
+            or authoring_context.source_snippet != str(patch_intent.get("source_snippet") or "")):
+        current_binding, current_source, current_raw = None, "", b""
+    # Rendering from a stale scope can only omit the expansion, never refresh
+    # it silently into capabilities the first author did not see.
+    from dataclasses import replace
+    scope_text = replace(
+        authoring_context, binding_context=current_binding,
+        authoritative_source=current_source,
+    ).scope_text
+    oop_attachment = replace(authoring_context, authoritative_source=current_source,
+                             oop_source_bytes=current_raw).oop_attachment
+    output_format_block = contract.output_format_block
 
     # Render related snippets. For feature tasks, this becomes patchable source.
     related_block = "No related snippets."
@@ -1139,6 +2347,30 @@ symbol={item.get("symbol", "")}
 
     is_feature_extension = scout.get("request_type") == "feature_extension"
 
+    # A read-only order must never reach a patch prompt.  Production routes it
+    # away from CONTROL entirely, so arriving here means something upstream
+    # forgot; answer the question rather than ask for a snippet nobody needs.
+    if read_only_route:
+        return f"""\
+You are inspecting a repository to answer a question. No code change was requested.
+
+[CONTROL CONTEXT — INSPECTION ONLY]
+highest_ranked_candidate={top.get("symbol")}
+score_semantics={LOCALIZATION_SCORE_SEMANTICS}
+
+[RELATED CONTEXT]
+{related_block}
+{lessons_block}{anti_lessons_block}
+[USER]
+{user_query}
+
+[RULES]
+- Answer in plain natural language, not JSON.
+- No repository change was requested: do not propose or emit a patch or a diff.
+- Ground every claim in the context above and name the file it came from.
+- If the context is insufficient, say what is missing rather than guessing.
+""".strip()
+
     if identity_framing:
         source_excerpt = patch_intent.get("source_snippet") or "No source excerpt."
         return f"""\
@@ -1146,7 +2378,9 @@ symbol={item.get("symbol", "")}
 
 [CONTROL CONTEXT]
 top_symbol={top.get("symbol")}
-confidence={top.get("confidence")}
+localization_score={top.get("localization_score")}
+localization_strength={top.get("localization_strength")}
+defect_established={candidate_state.get("defect_established", False)}
 language={language}
 
 [SOURCE EXCERPT]
@@ -1166,6 +2400,79 @@ language={language}
 - Explain the product/workspace identity before subsystem details.
 - Include repair, patching, and benchmarks as parts of the system when supported by context.
 - Do not invent features that are not present in provided context.
+""".strip()
+
+    # Localization can identify useful code without establishing any defect or
+    # requested change.  Until independently grounded failure evidence binds to
+    # exact source, the existing model call is inspection-only and may not mint
+    # a patch candidate.
+    #
+    # WAITER.LIVE.1 adds the one case this gate could not previously express: an
+    # explicit change request is grounded in the user's own words rather than in
+    # a failing test, so it is not "ungrounded" and must not be told to return
+    # nothing.  It falls through to the change-oriented branch below, where the
+    # target must still be quoted verbatim from acquired source and every patch
+    # safety, CTX and authorization gate still applies.
+    if not candidate_state.get("eligible_for_patch_safety_handoff") and (
+        not explicit_change_route
+    ):
+        return f"""\
+You are inspecting a repository candidate selected by CONTROL navigation.
+
+[CONTROL LOCALIZATION — NON-AUTHORITATIVE]
+highest_ranked_candidate={top.get("symbol")}
+localization_score={top.get("localization_score")}
+localization_strength={top.get("localization_strength")}
+score_semantics={LOCALIZATION_SCORE_SEMANTICS}
+localization_reasons={top.get("localization_reasons", [])}
+
+[DEFECT GROUNDING]
+defect_established={candidate_state.get("defect_established", False)}
+patch_basis={candidate_state.get("patch_basis", "none")}
+failure_binding_kind={candidate_state.get("failure_binding_kind", "unavailable")}
+exact_source_grounded={candidate_state.get("exact_source_grounded", False)}
+recommended_action={candidate_state.get("recommended_action", "needs_grounding")}
+auto_patch_candidate_allowed=false
+
+[RELATED CONTEXT — INSPECTION ONLY]
+{related_block}
+
+[PHANTOM LIMB SUGGESTIONS - structural hints, not proof]
+{phantom_block}
+{linter_hints_block}{lessons_block}{anti_lessons_block}
+[USER]
+{user_query}
+
+[RULES]
+- Localization rank is useful for inspection only; it is not defect probability.
+- Do not infer a defect from lexical overlap, callers, topology, trace proximity, or score magnitude.
+- A validation command, a passing validation, or an inconclusive validation establishes no defect.
+- Return no patch candidate and request grounding; do not claim write or apply authority.
+- Return ONLY valid JSON matching this schema:
+{PATCH_RESPONSE_SCHEMA}
+- Set patch_candidate=null, patch_plan=null, confidence=0.0, and needs_escalation=true.
+""".strip()
+
+    # A receipt that proved same-file compiler errors but cannot safely bind
+    # every one of them may not be presented as a complete repair problem.
+    # This does not alter PATCH.BASIS, PATCH.AUTHOR or PATCH.MINIMAL; it stops
+    # before the existing authoring call with an explicit typed scope result.
+    if (
+        repair_scope.status != REPAIR_SCOPE_NOT_APPLICABLE
+        and repair_scope.status != REPAIR_SCOPE_COMPLETE
+    ):
+        return f"""\
+Measured compiler evidence cannot be safely represented as a bounded repair scope.
+
+[MEASURED REPAIR SCOPE]
+{json.dumps(repair_scope.as_dict(), ensure_ascii=False, indent=2)}
+
+[RULES]
+- Do not infer additional definitions from nearby source, sibling methods, model suggestions, or graph context.
+- Return no patch candidate because the authoritative compiler receipt is incomplete for repair-scope purposes.
+- Return ONLY valid JSON matching this schema:
+{PATCH_RESPONSE_SCHEMA}
+- Set patch_candidate=null, patch_plan=null, confidence=0.0, and needs_escalation=true.
 """.strip()
 
     # ============================================================
@@ -1201,7 +2508,22 @@ Return ONLY valid JSON:
 }}
 """.strip()
 
-    if is_feature_extension:
+    if is_feature_extension or explicit_change_route:
+        request_type = "explicit_change_request" if explicit_change_route else "feature_extension"
+        obligations = (live_route or {}).get("obligations") or []
+        change_need_block = f"""\
+[CHANGE NEED — WAITER.LIVE.1]
+change_need_source={candidate_state.get("change_need_source", "unresolved")}
+defect_established={candidate_state.get("defect_established", False)}
+patch_basis={candidate_state.get("patch_basis", "none")}
+The user explicitly asked for this change. That establishes why a change is
+needed. It does not establish a defect, a target, a correct patch, write
+authority or apply authority — those remain with patch safety, CTX and the
+existing authorization gates.
+
+[REQUESTED OBLIGATIONS — preserved in the order the user wrote them]
+{chr(10).join(f"{index}. {item}" for index, item in enumerate(obligations, start=1)) or "1. " + user_query[:240]}
+""" if explicit_change_route else ""
         return f"""\
 You are a verifier/patch writer inside an agentic coding system.
 
@@ -1218,14 +2540,14 @@ You are a verifier/patch writer inside an agentic coding system.
 - Correctness > grounding > validation > style.
 
 [REQUEST TYPE]
-feature_extension
-
+{request_type}
+{change_need_block}
 [SCOUT RESULT — navigation hint]
 {json.dumps(scout, ensure_ascii=False, indent=2)}
 
 [CONTROL WARNING]
-The CONTROL top hypothesis may be unrelated because this is a feature-extension task, not a localized bug fix.
-Do not use the top hypothesis as the patch target unless it is directly relevant to the requested feature.
+The CONTROL top hypothesis may be unrelated because this is a requested change, not a localized bug fix.
+Do not use the top hypothesis as the patch target unless it is directly relevant to the requested change.
 
 [RELATED SOURCE CONTEXT — patchable source]
 {related_block}
@@ -1237,7 +2559,9 @@ Do not use the top hypothesis as the patch target unless it is directly relevant
 {user_query}
 
 [RULES]
-- This is a feature-extension task.
+- This is a requested change, not a defect repair. Do not claim a defect exists.
+- The patch basis is explicit_change_request; it grants no write/apply authority.
+- Deliver the change the user asked for; do not reduce it to one suspicious symbol.
 - Use Scout and RELATED SOURCE CONTEXT as the primary source of truth.
 - You may patch files shown in RELATED SOURCE CONTEXT.
 - For every replace_snippet operation, target_snippet must be copied verbatim from RELATED SOURCE CONTEXT.
@@ -1300,22 +2624,11 @@ Language is unknown. Infer likely language only for analysis.
 Do not invent syntax or APIs. Do not propose a patch unless source_snippet is exact and sufficient.
 """.strip()
 
-    style_constraints = ""
-    if style == "safe_minimal":
-        style_constraints = _safe_minimal_forbidden_block(
-            patch_intent.get("source_snippet", "")
-        )
-    elif style == "balanced":
-        style_constraints = (
-            "BALANCED: design-level fixes allowed, but every identifier in patched_snippet "
-            "must be either in source_snippet OR a clearly-existing API shown in RELATED CONTEXT. "
-            "If you need a new field/method on a user-defined type, set needs_escalation=true."
-        )
-    else:
-        style_constraints = (
-            "VIBE: creative fixes allowed. You MAY introduce new helpers/fields, but mark each "
-            "assumption explicitly in summary. auto_apply will be disabled — produce a reviewable patch."
-        )
+    # PATCH.AUTHOR.LIVE.2 — the candidate-language constraints, from the one
+    # producer that also renders them for the verification-guided revision
+    # author.  The safe_minimal/balanced/vibe dispatch that used to sit inline
+    # here is unchanged; it simply has a single definition now.
+    style_constraints = contract.candidate_language_block
 
     reasons_raw = top.get("reasons") or []
     if isinstance(reasons_raw, list):
@@ -1332,6 +2645,12 @@ Do not invent syntax or APIs. Do not propose a patch unless source_snippet is ex
     target_kind = patch_intent.get("target_node_kind") or "function"
     source_snippet = patch_intent.get("source_snippet") or ""
 
+    target_quote_rule = "Use source_snippet as target_snippet verbatim."
+    primary_scope_rule = "PATCH TARGET remains the primary grounded target and must remain included."
+    if authoring_context.authoring_repair_scope is not None and len(repair_scope.members) > 1:
+        target_quote_rule = "For multi-member edits, quote replacement_envelope.original_snippet verbatim as target_snippet and replace that same envelope."
+        primary_scope_rule = "PATCH TARGET remains the primary grounded target; editing every member is not required."
+
     return f"""\
 You are a verifier/patch writer inside an agentic coding system.
 
@@ -1339,6 +2658,8 @@ You are a verifier/patch writer inside an agentic coding system.
 {policy_block}
 
 {style_constraints}
+
+{scope_text}
 
 [REPO STYLE HINT — lower priority than correctness]
 {code_dna_block}
@@ -1351,11 +2672,14 @@ You are a verifier/patch writer inside an agentic coding system.
 
 [CONTROL]
 symbol={top.get("symbol")}
-issue={top.get("likely_issue")}
-confidence={top.get("confidence")}
+issue_hint={top.get("likely_issue")}
+localization_score={top.get("localization_score")}
+localization_strength={top.get("localization_strength")}
+confidence_kind={top.get("confidence_kind")}
+defect_established={candidate_state.get("defect_established", False)}
 action={top.get("recommended_action")}
 language={language}
-reasons={reasons}
+localization_reasons={reasons}
 {unknown_language_rule}
 
 [PATCH TARGET]
@@ -1367,6 +2691,10 @@ source_snippet:
 ```{language}
 {source_snippet}
 ```
+
+{repair_scope_prompt}
+
+{oop_attachment.prompt}
 
 [RELATED CONTEXT — evidence only, do not patch directly unless PATCH TARGET changes]
 {related_block}
@@ -1380,11 +2708,16 @@ source_snippet:
 [RULES]
 
 Style block above is authoritative.
-Use source_snippet as target_snippet verbatim.
+{target_quote_rule}
 Make the smallest edit that satisfies constraints.
+{primary_scope_rule}
+When [MEASURED REPAIR SCOPE] is present, its exact members are the only
+additional same-file definitions the compiler receipt grounds for this repair.
+Do not add a file or definition because it is adjacent, a sibling, or otherwise
+appears related.  The source and diagnostics in that section are authoritative.
 Do not invent identifiers unless style explicitly permits it.
 If source does not support a safe fix, return patch_candidate=null and needs_escalation=true.
-If preflight_validation ran and failed, treat it as the strongest evidence.
+Only a genuine executed preflight failure may ground a defect; inconclusive or passing validation may not.
 Fix compile/build errors before guessing runtime/gameplay logic.
 Do not speculate about architecture or behavior until compiler/runtime errors are resolved.
 If preflight stack trace points to a callee and the current source_snippet is the caller, infer the smallest caller-side fix first.
@@ -1403,6 +2736,7 @@ def allow_create_file(patch_style: str) -> bool:
     return patch_style in {"balanced", "vibe"}
 
 def build_control_prompt_human(control_result: dict, user_query: str) -> str:
+    control_result = refresh_control_safety(control_result)
     context_profile = (
         control_result.get("context_profile")
         or infer_context_profile(control_result.get("query") or user_query)
@@ -1418,6 +2752,7 @@ def build_control_prompt_human(control_result: dict, user_query: str) -> str:
     )
     patch_intent = control_result.get("patch_intent") or {}
     snippet = patch_intent.get("source_snippet") or ""
+    candidate_state = control_result.get("patch_candidate_state") or {}
     if identity_framing:
         entry_nodes = "\n".join(
             f"- {node}" for node in control_result.get("entry_nodes", [])[:8]
@@ -1430,8 +2765,10 @@ def build_control_prompt_human(control_result: dict, user_query: str) -> str:
 
 [CONTROL]
 top_symbol={top.get("symbol")}
-confidence={top.get("confidence")}
-reasons: {reasons}
+localization_score={top.get("localization_score")}
+localization_strength={top.get("localization_strength")}
+defect_established={(control_result.get("patch_candidate_state") or {}).get("defect_established", False)}
+localization_reasons: {reasons}
 
 [AUTHORITATIVE / SUPPORTING CONTEXT]
 entry_nodes:
@@ -1455,11 +2792,24 @@ Your job:
 Plain natural language. No JSON.
 """
 
+    human_task = (
+        """1. Explain what the grounded failure evidence establishes and why the bug occurs.
+2. Walk through the execution flow briefly.
+3. Suggest a fix (with code if helpful).
+4. Highlight the exact grounded problematic line."""
+        if candidate_state.get("defect_established")
+        else """1. Explain why this is the highest-ranked localization candidate.
+2. State clearly that no defect has been established at this candidate.
+3. Describe what evidence or source inspection would be needed next.
+4. Do not claim an exact problematic line or warranted patch from rank alone."""
+    )
+
     return f"""\
 You are explaining a bug to a human learner.
 
-[CONTROL] symbol={top.get("symbol")} | issue={top.get("likely_issue")} | conf={top.get("confidence")}
-reasons: {reasons}
+[CONTROL LOCALIZATION] symbol={top.get("symbol")} | issue_hint={top.get("likely_issue")} | localization_score={top.get("localization_score")}
+defect_established={(control_result.get("patch_candidate_state") or {}).get("defect_established", False)}
+localization_reasons: {reasons}
 
 [CODE]
 {snippet}
@@ -1468,10 +2818,7 @@ reasons: {reasons}
 {user_query}
 
 Your job:
-1. Explain what is happening and why the bug occurs.
-2. Walk through the execution flow briefly.
-3. Suggest a fix (with code if helpful).
-4. Highlight the exact problematic line.
+{human_task}
 
 Plain natural language. No JSON.
 """
@@ -1743,9 +3090,151 @@ def extract_symbol_snippet(repo_path: str, rel_file: str, symbol_name: str) -> s
     return "\n".join(snippet).strip()
 
 
-def build_patch_intent(control_result: dict) -> dict:
-    top = control_result.get("top_hypothesis") or {}
-    symbol = top.get("symbol")
+# --- PATCH.BASIS.TARGET.1: structural target-source grounding --------------
+#
+# Identifier length is not evidence.  A short spelling such as ``m1`` is a
+# legitimate patch target when the repository's existing language-aware
+# extractor structurally resolves exactly one definition for it inside the
+# exact file already grounded, and the measured defect location - when one
+# exists - belongs to that definition.  A short spelling that merely occurs in
+# a comment, a string literal or another identifier still grounds nothing, and
+# two plausible definitions are refused rather than guessed.
+
+TARGET_GROUNDING_RESOLVED = "structurally_resolved"
+TARGET_GROUNDING_NOT_FOUND = "not_found"
+TARGET_GROUNDING_AMBIGUOUS = "ambiguous"
+TARGET_GROUNDING_LOCATION_MISMATCH = "location_mismatch"
+TARGET_GROUNDING_UNAVAILABLE = "structure_unavailable"
+TARGET_GROUNDING_FILE_TARGET = "file_target"
+
+#: Statuses where the structural extractor positively contradicts the target.
+#: Every other status either proves the target or says nothing about it, and
+#: saying nothing must leave the pre-existing behaviour exactly as it was.
+TARGET_GROUNDING_REFUSES_TARGET = frozenset({
+    TARGET_GROUNDING_NOT_FOUND,
+    TARGET_GROUNDING_AMBIGUOUS,
+    TARGET_GROUNDING_LOCATION_MISMATCH,
+})
+
+#: An unqualified single-token spelling, i.e. the shape the structural
+#: extractor is able to name.  This is a *shape* test, never a length test:
+#: ``f``, ``m1`` and ``calculate_total`` all pass it equally.
+_SIMPLE_IDENTIFIER = re.compile(r"[^\W\d]\w*\Z", re.UNICODE)
+
+
+def _structural_target_definition(
+    definitions: list[dict],
+    symbol_name: str,
+    defect_line: int | None,
+) -> tuple[str, dict | None, int]:
+    """Pick at most one definition for ``symbol_name``, or refuse.
+
+    Never "first match in file order wins": more than one plausible definition
+    is ambiguous unless the measured defect location singles one out.
+    """
+    matches = [item for item in definitions if item.get("name") == symbol_name]
+    if not matches:
+        return TARGET_GROUNDING_NOT_FOUND, None, 0
+
+    def owns(item: dict) -> bool:
+        return item["start_line"] <= defect_line <= item["end_line"]
+
+    if defect_line is not None:
+        owning = [item for item in matches if owns(item)]
+        if len(owning) == 1:
+            return TARGET_GROUNDING_RESOLVED, owning[0], len(matches)
+        if owning:
+            # Nested or overlapping definitions share the line, so the location
+            # does not single one out either.
+            return TARGET_GROUNDING_AMBIGUOUS, None, len(matches)
+        if any(owns(item) for item in definitions):
+            # The spelling resolves, but the measured defect belongs to another
+            # definition, so this source must not be bound to that defect.
+            return TARGET_GROUNDING_LOCATION_MISMATCH, None, len(matches)
+        # Otherwise the line lies outside every definition in the file - module
+        # level, an import, a blank line, or past the end - so it discriminates
+        # nothing and the structural result stands on its own.
+
+    if len(matches) == 1:
+        return TARGET_GROUNDING_RESOLVED, matches[0], 1
+    return TARGET_GROUNDING_AMBIGUOUS, None, len(matches)
+
+
+def ground_target_symbol(
+    repo_path: str | None,
+    rel_file: str | None,
+    symbol_name: str | None,
+    *,
+    defect_location: dict | None = None,
+) -> dict:
+    """Structurally resolve an already-localized target inside its own file.
+
+    Reads exactly the one named file - no walk, index, graph or retrieval - and
+    asks the existing tree-sitter extractor which definitions it declares.  The
+    returned ``status`` is one of the ``TARGET_GROUNDING_*`` constants;
+    ``definition`` is populated only for ``structurally_resolved``.  This
+    acquires no authority and decides no patch basis.
+    """
+    unavailable = {
+        "status": TARGET_GROUNDING_UNAVAILABLE,
+        "definition": None,
+        "matches": 0,
+    }
+    if not symbol_name or not rel_file or not repo_path:
+        return unavailable
+
+    # A file node carries no symbol target.  File-only and no-symbol behaviour
+    # is out of scope for this phase and passes straight through.
+    if symbol_name == rel_file or symbol_name == Path(rel_file).stem:
+        return {
+            "status": TARGET_GROUNDING_FILE_TARGET,
+            "definition": None,
+            "matches": 0,
+        }
+
+    # A qualified or otherwise non-simple spelling (``Class::method``,
+    # ``Outer.inner``) is a legacy target form the structural extractor never
+    # names, so it yields no structural proof either way.
+    if not _SIMPLE_IDENTIFIER.match(symbol_name):
+        return unavailable
+
+    try:
+        path = Path(repo_path) / rel_file
+        if not path.is_file():
+            return unavailable
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except (OSError, ValueError):
+        return unavailable
+
+    parsed = structural_definitions(text, infer_language_from_file(rel_file))
+    if not parsed["available"]:
+        # No structural extractor for this language: nothing is proven and
+        # nothing is contradicted, so the pre-existing path is preserved.
+        return unavailable
+
+    defect_line = None
+    if isinstance(defect_location, dict):
+        line = defect_location.get("line")
+        same_file = _normalized_control_path(
+            defect_location.get("file")
+        ) == _normalized_control_path(rel_file)
+        if same_file and isinstance(line, int) and line > 0:
+            defect_line = line
+
+    status, definition, matches = _structural_target_definition(
+        parsed["definitions"], symbol_name, defect_line
+    )
+    return {"status": status, "definition": definition, "matches": matches}
+
+
+def build_patch_intent(
+    control_result: dict,
+    *,
+    hypothesis: dict | None = None,
+    defect_location: dict | None = None,
+) -> dict:
+    candidate = hypothesis or control_result.get("top_hypothesis") or {}
+    symbol = candidate.get("symbol")
     repo_path = control_result.get("repo_path")
 
     rel_file = infer_file_from_symbol(symbol)
@@ -1762,14 +3251,23 @@ def build_patch_intent(control_result: dict) -> dict:
             symbol_name = guessed
             symbol = f"{rel_file}::{guessed}"
 
-    if not symbol_name or len(symbol_name) < 3:
+    target_grounding = ground_target_symbol(
+        repo_path,
+        rel_file,
+        symbol_name,
+        defect_location=defect_location,
+    )
+
+    if not symbol_name or target_grounding["status"] in TARGET_GROUNDING_REFUSES_TARGET:
         return {
             "target_file": None,
             "target_symbol": None,
             "target_symbol_full": symbol,
-            "issue_type": top.get("likely_issue"),
-            "confidence": top.get("confidence"),
-            "recommended_action": "collect_more_evidence",
+            "issue_type": candidate.get("likely_issue"),
+            "confidence": candidate.get("confidence"),
+            "confidence_kind": LOCALIZATION_CONFIDENCE_KIND,
+            "localization_score": candidate.get("localization_score"),
+            "recommended_action": "acquire_source_context",
             "source_snippet": "",
             "patch_rules": [],
             "language": infer_language_from_file(rel_file),
@@ -1783,7 +3281,9 @@ def build_patch_intent(control_result: dict) -> dict:
     # the parser returns "unknown"), leaving symbol_name pointing at a
     # filename. If we have a real file but no snippet, regex-scan the file
     # for query-relevant function definitions.
-    if not source_snippet and repo_path and rel_file:
+    if not source_snippet and repo_path and rel_file and (
+        not symbol_name or symbol_name == Path(rel_file).stem
+    ):
         query = control_result.get("query") or ""
         fallback_name = infer_symbol_from_query_in_file(repo_path, rel_file, query)
         if fallback_name:
@@ -1793,6 +3293,7 @@ def build_patch_intent(control_result: dict) -> dict:
                 source_snippet = fallback_snippet
                 print(f"🐛 DEBUG fallback symbol resolved: {fallback_name}")
 
+    print("🐛 DEBUG target grounding:", target_grounding["status"])
     print("🐛 DEBUG symbol:", symbol)
     print("🐛 DEBUG file:", rel_file)
     print("🐛 DEBUG name:", symbol_name)
@@ -1807,9 +3308,11 @@ def build_patch_intent(control_result: dict) -> dict:
         "target_file": rel_file,
         "target_symbol": symbol_name,
         "target_symbol_full": symbol,
-        "issue_type": top.get("likely_issue"),
-        "confidence": top.get("confidence"),
-        "recommended_action": top.get("recommended_action"),
+        "issue_type": candidate.get("likely_issue"),
+        "confidence": candidate.get("confidence"),
+        "confidence_kind": LOCALIZATION_CONFIDENCE_KIND,
+        "localization_score": candidate.get("localization_score"),
+        "recommended_action": candidate.get("recommended_action"),
         "source_snippet": source_snippet,
         "patch_rules": [
             "Patch only the target symbol unless evidence proves otherwise.",

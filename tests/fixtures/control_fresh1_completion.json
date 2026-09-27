@@ -1,0 +1,298 @@
+{
+  "phase": "CONTROL.FRESH.1",
+  "completed_on": "2026-09-18",
+  "closed_residuals": [
+    "UX.CONTEXT.1: without an eligible run, Generate Patch and Generate Candidates sent an empty control value that the backend answered as malformed (Invalid control JSON)"
+  ],
+  "fresh_generate_executable": false,
+  "bootstrap_boundary": "A fresh Generate now reaches the bootstrap boundary, but CONTROL.BOOTSTRAP.1 is required before a fresh task can proceed into CONTROL-dependent analysis/provider stages.",
+  "required_follow_up": [
+    "CONTROL.BOOTSTRAP.1"
+  ],
+  "remaining_findings": [
+    "UX-05",
+    "UX-06"
+  ],
+  "out_of_scope": [
+    "CONTROL.BOOTSTRAP.1",
+    "UX.RESILIENCE.1",
+    "PREFLIGHT.REQUEST.1",
+    "T6 Round 11",
+    "UX-05",
+    "UX-06"
+  ],
+  "existing_files_changed": [
+    "web/app.py",
+    "web/templates/index.html",
+    "docs/roadmap/phase_registry.json",
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py",
+    "tests/_ux_context1_maintenance.py",
+    "tests/test_ux_context1.py",
+    "tests/test_ux_context1_browser.py",
+    "tests/test_ux_state1.py",
+    "tests/test_auth_web1.py",
+    "tests/test_auth_web_read1.py"
+  ],
+  "new_files": [
+    "web/control_context.py",
+    "tests/test_control_fresh1.py",
+    "tests/test_control_fresh1_browser.py",
+    "tests/_control_fresh1_maintenance.py",
+    "tests/fixtures/control_fresh1_reversal.json",
+    "tests/fixtures/control_fresh1_frozen_boundaries.json",
+    "tests/fixtures/control_fresh1_completion.json",
+    "docs/designs/2026-09-18-explicit-no-prior-run-control-context.md"
+  ],
+  "owners": {
+    "control_field_normalization": "web/control_context.py: normalize_control_values, control_context_from_form",
+    "request_run_eligibility": "web/static/workbench_state.js (UX.CONTEXT.1, byte-identical)",
+    "request_serialization": "web/templates/index.html: generatePatch and generateCandidates"
+  },
+  "wire_contract": {
+    "field": "control",
+    "prior_control": "the eligible run's frozen context text, a CONTROL object",
+    "fresh": "null, exactly (JSON.stringify(null) in both handlers)",
+    "ux_context1_fresh_form": "",
+    "http_status": "200 JSON for every answer, as the entry routes answered"
+  },
+  "states": {
+    "prior_control": "continuation input for the unchanged harness, prompt, provider and grounding tail",
+    "fresh_bootstrap_required": "answered fresh_control_required at the bootstrap boundary; no stage reached",
+    "rejected": "invalid_control_json or invalid_control_request with a reason; no stage reached"
+  },
+  "normalization_matrix": [
+    {
+      "control": "a CONTROL object",
+      "state": "prior_control"
+    },
+    {
+      "control": "null",
+      "state": "fresh_bootstrap_required",
+      "code": "fresh_control_required"
+    },
+    {
+      "control": "omitted",
+      "state": "rejected",
+      "code": "invalid_control_request",
+      "reason": "missing"
+    },
+    {
+      "control": "repeated",
+      "state": "rejected",
+      "code": "invalid_control_request",
+      "reason": "repeated"
+    },
+    {
+      "control": "null spelled otherwise",
+      "state": "rejected",
+      "code": "invalid_control_request",
+      "reason": "non_canonical_null"
+    },
+    {
+      "control": "empty",
+      "state": "rejected",
+      "code": "invalid_control_json",
+      "reason": "empty"
+    },
+    {
+      "control": "whitespace only",
+      "state": "rejected",
+      "code": "invalid_control_json",
+      "reason": "whitespace_only"
+    },
+    {
+      "control": "not JSON, NaN or Infinity",
+      "state": "rejected",
+      "code": "invalid_control_json",
+      "reason": "malformed_json"
+    },
+    {
+      "control": "array, string, number or boolean",
+      "state": "rejected",
+      "code": "invalid_control_json",
+      "reason": "wrong_top_level_type"
+    },
+    {
+      "control": "recognized field with a shape CONTROL never produces",
+      "state": "rejected",
+      "code": "invalid_control_json",
+      "reason": "invalid_field_type",
+      "field": "<field name>"
+    },
+    {
+      "control": "object without a non-null anchor",
+      "state": "rejected",
+      "code": "invalid_control_json",
+      "reason": "missing_required_fields"
+    }
+  ],
+  "control_shape": {
+    "anchors": [
+      "top_hypothesis",
+      "hypotheses",
+      "patch_intent",
+      "related_snippets"
+    ],
+    "strings": [
+      "query",
+      "repo_path",
+      "patch_style"
+    ],
+    "objects": [
+      "top_hypothesis",
+      "patch_intent",
+      "scout",
+      "patch_candidate_state",
+      "preflight_validation",
+      "live_route",
+      "phantom_limb"
+    ],
+    "arrays_of_objects": [
+      "hypotheses",
+      "related_snippets"
+    ],
+    "calibration": "build_control_result output and the partial CONTROL tests/test_harness_modes_web.py posts stay prior CONTROL; all 4 JSON-object CONTROL contexts in the local session store conform, and the only anchorless recorded context there is {} from a harness-blocked full run"
+  },
+  "audit": {
+    "control_needed_from": "the first stage after the parse: _patch_generation_harness_block",
+    "stages": {
+      "decide_harness_mode": "target path and source text; without CONTROL it refuses with source_missing",
+      "build_control_prompt": "localization, patch intent, defect grounding, route and snippets; None raises",
+      "providers": "the prompt only",
+      "enforce_control_grounding_on_payload": "a non-dict CONTROL returns the payload unchanged, so absence must never reach it"
+    },
+    "control_creation_stages_outside_generate": [
+      "WAITER.LIVE.1 routing and the INPUT.1 Task Contract",
+      "indexing",
+      "preflight",
+      "run_control_structured"
+    ]
+  },
+  "entry_behavior": {
+    "new_session": "control empty -> {\"error\": \"Invalid control JSON\"}; no stage reached, no model call",
+    "repository_a_to_b": "control empty -> Invalid control JSON",
+    "mismatched_history": "control empty -> Invalid control JSON",
+    "switch_back_without_reselect": "control empty -> Invalid control JSON",
+    "java_two_file_fresh_repository": "control empty -> Invalid control JSON",
+    "null_array_empty_object_non_control_object": "parsed, then refused by the harness gate (source_missing)",
+    "generate_candidates_without_control_field": "unstructured HTML 400",
+    "non_standard_json": "NaN and Infinity parsed"
+  },
+  "post_behavior": {
+    "new_session": "control null -> fresh_control_required; no harness, prompt, provider, graph, retrieval, preflight, mutation or session",
+    "repository_a_to_b": "control null -> fresh_control_required; run A displayed, never sent",
+    "same_repository_continuation": "request bodies byte-identical to UX.CONTEXT.1; the real parser hands run A's CONTROL to the harness, prompt and deterministic provider adapter; entry and post routes return the same answer, stages and prompts",
+    "mismatched_history": "control null -> fresh_control_required",
+    "switch_back_without_reselect": "control null -> fresh_control_required; reselecting the run restores continuation",
+    "java_two_file_fresh_repository": "control null -> fresh_control_required; files untouched, no analysis",
+    "malformed": "invalid_control_json with reason (and field), error text unchanged",
+    "transport_level": "invalid_control_request (missing, repeated, non_canonical_null)"
+  },
+  "fresh_path_stages_reached": [],
+  "fake_run_artifacts_created": [],
+  "model_calls": 0,
+  "external_network_requests": 0,
+  "frozen_production_deltas": {
+    "web/static/workbench_state.js": 0,
+    "UX.CONTEXT.1 run and repository provenance": 0,
+    "UX-02 stale responses": 0,
+    "UX-03 actions and Undo": 0,
+    "UX-04 modes": 0,
+    "generate route pipeline tail": 0,
+    "Task Contract and user intent": 0,
+    "Local Critique": 0,
+    "Track A": 0,
+    "execution authority and human Apply": 0,
+    "AUTH.DREAM.1": 0,
+    "AUTH.WEB.1": 0,
+    "AUTH.WEB.READ.1": 0,
+    "SEC.UI.1": 0,
+    "DATA.UNDO.1": 0,
+    "EXEC.PLAN.1": 0,
+    "DATA.ROLLBACK.1": 0
+  },
+  "limitations": [
+    "A fresh Generate is not executable: it stops at the bootstrap boundary until CONTROL.BOOTSTRAP.1 adds CONTROL creation for a fresh task, which also needs request text a Generate request does not carry today.",
+    "A run whose recorded context is not a CONTROL object still cannot be continued; retrieve text, empty full or deep contexts and a harness-blocked {} answer invalid_control_json (for {} the entry answer was the harness's source_missing; neither calls a model).",
+    "A run whose recorded context is exactly the text null would be read as the fresh form; no producer records it."
+  ],
+  "performance": {
+    "normalization_us": {
+      "fresh": 0.67,
+      "malformed": 3.83,
+      "prior_64kb_control": 142.58,
+      "json_loads_same_64kb": 131.9
+    },
+    "note": "microseconds per call, median of 7 batches; the owner adds about 11 us of shape checks to the JSON parse the entry routes already did, and no I/O"
+  },
+  "red_green_toggle": {
+    "reverted": "web/app.py and web/templates/index.html to entry bytes, web/control_context.py moved aside",
+    "suites": [
+      "tests/test_control_fresh1.py",
+      "tests/test_control_fresh1_browser.py",
+      "tests/test_ux_context1_browser.py"
+    ],
+    "reverted_result": "120 failed, 9 errors, 18 passed",
+    "restored_result": "146 passed, 1 failed (this receipt, not yet written); digests verified",
+    "passing_on_both_sides": "the 18 preservation guards: continuation, state-owner contracts, registry, frozen manifest and workbench_state.js identity"
+  },
+  "test_runs": {
+    "red_backend": "tests/test_control_fresh1.py before any production code: 94 failed, 2 passed (the continuation preservation guards); failures were the missing owner, answers without code, null reaching the harness (source_missing) and an unstructured 400",
+    "red_browser": "tests/test_control_fresh1_browser.py before the template change: 9 failed on ('control', '') != ('control', 'null'); 7 passed (continuation guards and PRE on the UX.CONTEXT.1 post-state)",
+    "final_focused": {
+      "command": "pytest test_control_fresh1 test_control_fresh1_browser test_ux_context1 test_ux_context1_browser test_ux_state1 test_ux_state1_browser test_phase_registry test_phase_picker",
+      "result": "478 passed",
+      "per_suite": {
+        "test_control_fresh1": 105,
+        "test_control_fresh1_browser": 16,
+        "test_ux_context1": 10,
+        "test_ux_context1_browser": 26,
+        "test_ux_state1": 15,
+        "test_ux_state1_browser": 39,
+        "test_phase_registry": 167,
+        "test_phase_picker": 100
+      }
+    },
+    "validation_group": {
+      "command": "pytest harness_modes_web anti_lesson_control_injection runtime_environment_web unified_workbench_behavior_preservation web_ui_history_controls history_management current_run_snapshot_association data_undo1 auth_dream1 sec_ui1 exec_plan1 data_rollback1 auth_web1 auth_web1_browser auth_web_read1 auth_web_read1_browser phase_registry phase_picker",
+      "result": "964 passed"
+    },
+    "broad": {
+      "files": 273,
+      "composition": "UX.CONTEXT.1's 235-file set, 36 more files that reference the Generate routes or web.app, and the two CONTROL.FRESH.1 suites",
+      "result": "6965 passed, 50 failed, 26 skipped in 24m40s",
+      "known_failures": "49, identical to UX.CONTEXT.1's broad run by node id and first-line message",
+      "other_failure": "tests/test_data_rollback1_consumers.py::test_lifecycle_events_and_shadow_input_follow_the_measured_rollback[no_mutation] KeyError replay_dir: create_replay_bundle raised OSError creating a tmp replay directory under load; that module, run_lifecycle and the test are byte-identical and import nothing this phase changed; it passed 6 of 6 alone, its file 16 of 16 and the DATA.ROLLBACK.1 family 159 of 159",
+      "added_files": "all 36 route-referencing files and both new suites passed"
+    },
+    "flakes_observed": [
+      "tests/test_data_undo1.py::test_exact_bytes_post_hash_and_one_shot_consumption (two parameters) failed once inside a 12-file combined run; it passed alone (6 of 6) and in an identical immediate re-run of the combined files"
+    ]
+  },
+  "checks": {
+    "compileall": "python -m compileall -q core patching web scripts tests: exit 0",
+    "benchmarks_check": "python benchmarks/run_benchmarks.py --check: 54 checked, 0 errors",
+    "git_diff_check": "exit 0; 36 line-ending notices, the same count UX.CONTEXT.1 recorded"
+  },
+  "source_sha256": {
+    "web/app.py": "f2b3f3fa555712345104db16cd1d494da69a01af509bdfc18eca298894e2701c",
+    "web/templates/index.html": "a7e54cf535de7477de4d8aee1303b42c0fecc0c8c984dcb1af8ac0257ba9de11",
+    "docs/roadmap/phase_registry.json": "633a946e99838e38999ea021baae7fe334eb80e3f8ff85b279688f88fb8c7823",
+    "tests/test_phase_registry.py": "0379dcd23a5a765623b3ce3d373dba2c96b63e10ef51a9866c990e0ab34b8e6c",
+    "tests/test_phase_picker.py": "2648ddf1e8ea081c3d059877aabb7855c7aac0cf41f5e26544fd44a23d95477c",
+    "tests/_ux_context1_maintenance.py": "32edc9088b016e33332ba0f86a4aa8fc33c0581069696b1f74484148a44aae99",
+    "tests/test_ux_context1.py": "ed86ea5234984ceaacc61f8ee7eb9ac0d5e55210dbd0ed4987b162c2896443ad",
+    "tests/test_ux_context1_browser.py": "24b24cb517151957402cd0f48e7a4081c2f0fd07b73af7d3cb3cef9db6e0a722",
+    "tests/test_ux_state1.py": "7380b09ebf5703449eeac358f941dd7e3cf00d04cdeb52fd5d66e846a5bbe398",
+    "tests/test_auth_web1.py": "562a5fad1ddc4ffefbec39c1a5e934da8aa1e7661828573054810c65975da306",
+    "tests/test_auth_web_read1.py": "2c38ba911dd8745ae5cd14dc3a87e8b6b3783a7b2b02b5ed969fc9aeec96a3bb",
+    "web/control_context.py": "8d36ef26dac6c2f9af4130663fa158d5cfd8d6083bc3a8ad61cb3a453eba970f",
+    "tests/test_control_fresh1.py": "a61345be57234792463892f4783d0927e74ee8d906ddc64e051223fbc7d8487a",
+    "tests/test_control_fresh1_browser.py": "f33276516b90472328220a6c1dba824820475afb6c8fdad50968f79e6145b4d4",
+    "tests/_control_fresh1_maintenance.py": "57a57e0f4ebe64eb31044e607feed6bc0ea7bd4a43d85cfd1d8fcd23b9ca7ad9",
+    "tests/fixtures/control_fresh1_reversal.json": "2e1b1814a51cdb28756685383a2a7ac89971b161c3a43d1b211734ef132e9870",
+    "tests/fixtures/control_fresh1_frozen_boundaries.json": "fe52dbaca241f6f2995593d6bdd63c2a44b11c4de5eaef1ae9b53b70f7cc9914",
+    "docs/designs/2026-09-18-explicit-no-prior-run-control-context.md": "e469ebf4d537080578ca4f4880f4e1cc80c9ce716739f5dd5914fad9d3626e72"
+  }
+}

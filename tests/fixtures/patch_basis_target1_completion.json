@@ -1,0 +1,187 @@
+{
+  "phase": "PATCH.BASIS.TARGET.1",
+  "completed_on": "2026-09-20",
+  "closed_residual": "DOGFOOD.JAVA.1's single measured blocker: build_patch_intent discarded the grounded Java target MainApp.java::m1 because len(\"m1\") < 3.",
+  "old_rule": "if not symbol_name or len(symbol_name) < 3: return <no target>",
+  "new_rule": "The existing language-aware extractor must structurally resolve exactly one definition of the spelling inside the exact file already grounded, and a measured defect location for that file must not belong to another definition. Identifier length is consulted nowhere.",
+  "structural_authority": "core/treesitter_parse.py::structural_definitions (additive)",
+  "grounding_statuses": [
+    "structurally_resolved",
+    "not_found",
+    "ambiguous",
+    "location_mismatch",
+    "file_target",
+    "structure_unavailable"
+  ],
+  "statuses_that_refuse_a_target": [
+    "not_found",
+    "ambiguous",
+    "location_mismatch"
+  ],
+  "identifier_length_used_as_criterion": false,
+  "model_calls_added": 0,
+  "network_calls_added": 0,
+  "repository_traversals_added": 0,
+  "authority_delta": "none",
+  "patch_basis_hardcoded": false,
+  "containment": {
+    "core/control_engine.py": {
+      "top_level_definitions": "56 -> 58",
+      "changed": [
+        "build_patch_intent",
+        "refresh_control_safety"
+      ],
+      "added": [
+        "ground_target_symbol",
+        "_structural_target_definition"
+      ],
+      "removed": [],
+      "note": "refresh_control_safety changed for one reason only: the grounded build_patch_intent call site now forwards the measured defect location. CONTROL.LOCALIZE.LIVE.2's other 8 pinned CONTROL functions are byte-identical."
+    },
+    "core/treesitter_parse.py": {
+      "top_level_definitions": "unchanged + 1",
+      "changed": [],
+      "added": [
+        "structural_definitions"
+      ],
+      "removed": [],
+      "note": "Purely additive; no existing parsing definition moved."
+    }
+  },
+  "java_dogfood": {
+    "repository": "C:\\Users\\Admin\\Documents\\Code\\Side quest\\java",
+    "task": "Help me check if the code in twosum.java and MainApp.java is ok, then fix them",
+    "session": "fresh",
+    "applied": false,
+    "java_repository_byte_identical": true,
+    "model_calls": 2,
+    "javac_subprocesses": 2,
+    "graph_index_retrieval_sentinels_fired": 0,
+    "javac_error_lines": [
+      12,
+      20,
+      26,
+      28,
+      28
+    ],
+    "pre": {
+      "source": "DOGFOOD.JAVA.1 audit, re-measured against the entry bytes of core/control_engine.py",
+      "grounded_symbol": "MainApp.java::m1",
+      "failure_binding_kind": "direct_location",
+      "target_file": null,
+      "target_symbol": null,
+      "source_snippet_chars": 0,
+      "exact_source_grounded": false,
+      "patch_basis": "unresolved",
+      "patch_basis_source": "unavailable",
+      "eligible_for_patch_safety_handoff": false,
+      "authoring_branch": "inspection_only",
+      "write_authority": false,
+      "patch_application_authority": false
+    },
+    "post": {
+      "source": "live Workbench replay through the unchanged production web app",
+      "grounded_symbol": "MainApp.java::m1",
+      "failure_binding_kind": "direct_location",
+      "defect_location": {
+        "file": "MainApp.java",
+        "line": 12,
+        "col": 49,
+        "kind": "compiler_error"
+      },
+      "target_grounding_status": "structurally_resolved",
+      "target_grounding_matches": 1,
+      "target_definition": {
+        "name": "m1",
+        "kind": "function",
+        "start_line": 7,
+        "end_line": 13
+      },
+      "symbol_length": 2,
+      "target_file": "MainApp.java",
+      "target_symbol": "m1",
+      "source_snippet_chars": 231,
+      "exact_source_grounded": true,
+      "patch_basis": "grounded_defect",
+      "patch_basis_source": "executed_validation_failure",
+      "eligible_for_patch_safety_handoff": true,
+      "authoring_branch": "localized_bug_fix",
+      "write_authority": false,
+      "patch_application_authority": false,
+      "auto_patch_candidate_allowed": false,
+      "patch_eligibility_granted": false
+    },
+    "regression_observations": {
+      "compiler_diagnostics_in_author_input": "present - the localized branch carries [PREFLIGHT VALIDATION] with typed compiler_error locations. No prompt code was changed to achieve this.",
+      "task_text_transport": "unchanged - web/app.py still passes the literal 'Generate patch' as the prompt's [USER] section; the original task text is not transported. Recorded, not fixed.",
+      "twosum": "unchanged - inside the authorized evidence scope, not compiled, no defect.",
+      "crlf": "not reached as a blocker; extract_symbol_snippet and _source_is_exactly_grounded both read through universal newlines, so the CRLF source matched exactly."
+    },
+    "candidate_outcome": {
+      "patch_candidate": null,
+      "needs_escalation": true,
+      "confidence": 0.2,
+      "model_issues": [
+        "Variable 'no2' is undefined in m1()",
+        "Variable 'no1' is undefined in m2()",
+        "Non-static variable 'no' accessed in static method m3()",
+        "Variables 'no1' and 'no2' are undefined in m3()"
+      ],
+      "next_measured_blocker": "multi-method repair scope: the authoring model located every defect but declined a single-method patch because the compilation errors span m1, m2 and m3 while the grounded patch target is m1 alone. This is the limitation PATCH.BASIS.TARGET.1 was explicitly forbidden to widen."
+    }
+  },
+  "results": {
+    "focused_patch_basis_target1": "35 passed",
+    "patch_basis_defect_fact_control_safety_localization": "232 passed",
+    "preflight_request1_control_bootstrap1_control_fresh1": "316 passed, 1 skipped",
+    "security_and_ux_frozen": "505 passed",
+    "mutation_frozen_auth_dream1_data_rollback1": "109 passed",
+    "patch_minimal_author_candidate_answer": "612 passed, 24 skipped, 1 pre-existing failure (test_patch_minimal_novelty_live live-revision provider call; reproduces identically on entry bytes)",
+    "registry_and_picker": "267 passed",
+    "affected_broad_suite_78_files": "2375 passed, 27 skipped, 1 pre-existing failure (test_analysis_multiroot_evidence; reproduces identically on entry bytes)",
+    "compileall": "exit 0",
+    "benchmarks_check": "54 checked, 0 errors",
+    "git_diff_check": "clean",
+    "red_green_toggle": "restoring len(symbol_name) < 3 turns 9 of the phase's tests red; 20 stay green",
+    "performance_median_ms": {
+      "ground_target_symbol_resolved": 1.067,
+      "ground_target_symbol_refused": 1.092,
+      "build_patch_intent_end_to_end": 1.348,
+      "files_read_per_call": 1,
+      "repository_traversals": 0
+    }
+  },
+  "existing_files_changed": [
+    "core/control_engine.py",
+    "core/treesitter_parse.py",
+    "docs/roadmap/phase_registry.json",
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py",
+    "tests/_preflight_request1_maintenance.py",
+    "tests/test_preflight_request1.py",
+    "tests/fixtures/control_localize_live2_boundaries.json"
+  ],
+  "new_files": [
+    "tests/test_patch_basis_target1.py",
+    "tests/_patch_basis_target1_maintenance.py",
+    "tests/fixtures/patch_basis_target1_reversal.json",
+    "tests/fixtures/patch_basis_target1_frozen_boundaries.json",
+    "tests/fixtures/patch_basis_target1_completion.json",
+    "docs/designs/2026-09-20-structural-short-identifier-target-source-grounding.md"
+  ],
+  "source_sha256": {
+    "core/control_engine.py": "afe75eabcc8940a599c402940a7592e189ff45361e90e8608507fd4e24b222b8",
+    "core/treesitter_parse.py": "077318f84f7d20167bafe52b8c4162d4657341f6f1643052045737d28d153108",
+    "docs/designs/2026-09-20-structural-short-identifier-target-source-grounding.md": "52ffe1b8e55fb74d045778de391d404e90d0983055a08ef4c862b44333cedd21",
+    "docs/roadmap/phase_registry.json": "ba868ce42af92daa10f9635ef056645c700a308fcd098b40d17f39cf44225c07",
+    "tests/_patch_basis_target1_maintenance.py": "88c487fcac5669de2e156468695eca85481511025fcf8d0748ba7908509840d6",
+    "tests/_preflight_request1_maintenance.py": "f9fb8e748b1012ca26e5054a454fcf3fe7bc54b079a2bcd5c90e8626b1bd8afa",
+    "tests/fixtures/control_localize_live2_boundaries.json": "df2e70db5209fbe5309e62b29f0c9bbbac5c618233ab40fce639c11315cfd3a2",
+    "tests/fixtures/patch_basis_target1_frozen_boundaries.json": "158c9241028615ae4b3219809e2dfb38d0befd4320a69099952e298e111c3db1",
+    "tests/fixtures/patch_basis_target1_reversal.json": "92194b1df64a19bfc44324d47fec460e8f6d3549e3cc25d9c49319734539c2c6",
+    "tests/test_patch_basis_target1.py": "e6f68f111f0dd38d035d85f5743e3e8555e18f3568c4bf079d3c3bcea1d8696a",
+    "tests/test_phase_picker.py": "1dcebdaed32896a7514e7e2aa16df1ead07411a660963b72fa9277646f843862",
+    "tests/test_phase_registry.py": "f50ac242f7bf050cb452968dcbc92138471f14417ca31773ce6ed8a2162a5fe3",
+    "tests/test_preflight_request1.py": "47a77707f37613048f550db78df6900eb06f7999e1bf52639fdad116115987cc"
+  }
+}

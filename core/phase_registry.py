@@ -88,6 +88,69 @@ PHASE_ID_PREFIXES: tuple[str, ...] = (
     "UX",
     "INDEX",
     "CTX",
+    "INPUT",
+    "WAITER",
+    "ACQUIRE",
+    "EVIDENCE",
+    "CLAIM",
+    "SYNTHESIS",
+    "CHECK",
+    "WORKER",
+    "CONTROL",
+    # PATCH.* names implementation slices inside the existing CONTROL track;
+    # this is an ID namespace only, not a separate registry track.
+    "PATCH",
+    "REPAIR",
+    "OOP",
+    # EXEC.* likewise names execution-truthfulness slices inside the existing
+    # OPS track.  Also an ID namespace only: no track was added, and nothing
+    # in the schema, the counts or the report grew a new dimension.
+    "EXEC",
+    # RETRIEVE.* names retrieval-quality slices inside the existing INDEX
+    # track, following the same rule as PATCH and EXEC above.  A "RETRIEVE"
+    # *track* would have added a dimension to the schema, the counts and the
+    # report; the phases live under INDEX instead, which is the nearest
+    # existing retrieval/index track.
+    "RETRIEVE",
+    # ANSWER.* names deterministic user-visible answer truthfulness slices in
+    # the existing CHECK track.  It is an ID namespace only, not full semantic
+    # verification and not a new registry track.
+    "ANSWER",
+    # DEFECT.* names bounded defect-evidence execution slices in the existing
+    # OPS track.  It is an ID namespace only, not a new track and not patch or
+    # write authority.
+    "DEFECT",
+    # VALIDATE.* names evidence-role classification slices inside the existing
+    # OPS track.  It is an ID namespace only; no registry field or track is
+    # added.
+    "VALIDATE",
+    # ANALYSIS.* names analysis-route evidence-acquisition slices inside the
+    # existing WAITER track, which already owns the read-only route these
+    # phases allocate evidence for.  An ID namespace only, following PATCH,
+    # EXEC, RETRIEVE, ANSWER, DEFECT and VALIDATE above: no track was added and
+    # nothing in the schema, the counts or the report grew a new dimension.
+    "ANALYSIS",
+    # CANDIDATE.* names candidate-verification lifecycle slices inside the
+    # existing OPS track, which already owns the patch/validate/execute
+    # lifecycle these phases sit in.  An ID namespace only, exactly like PATCH,
+    # EXEC, DEFECT and VALIDATE above: no registry track was added and nothing
+    # in the schema, the counts or the report grew a new dimension.
+    "CANDIDATE",
+    # INDENT.* names indentation-subject semantic-contract slices inside the
+    # existing OPS track, which already owns the behavioral matrix whose
+    # reference reading these phases define.  An ID namespace only, exactly
+    # like DEFECT and CANDIDATE above: no registry track was added and nothing
+    # in the schema, the counts or the report grew a new dimension.
+    "INDENT",
+    # SEC.* names UI security remediation in the existing HARDEN track.
+    "SEC",
+    "DATA",
+    "AUTH",
+    # PREFLIGHT.* names typed diagnostic-evidence request slices inside the
+    # existing CONTROL track, whose evidence_gaps they measure.  It is an
+    # ID namespace only, like PATCH above: no registry track was added and
+    # nothing in the schema, the counts or the report grew a new dimension.
+    "PREFLIGHT",
 )
 
 #: Registry-root fields that must be present.

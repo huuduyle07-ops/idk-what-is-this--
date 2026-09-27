@@ -1,0 +1,170 @@
+{
+  "schema_version": "patch_author_live2_contract_reversal_v1",
+  "phase_id": "PATCH.AUTHOR.LIVE.2",
+  "notes": "PATCH.AUTHOR.LIVE.2 moves the patch-authoring contract into core/patch_authoring_contract.py so the initial draft and the single verification-guided revision render it from one place. For every file it changed, the hunks below reverse the change: a test reconstructs the pre-phase bytes from the shipped file and asserts pre_sha256, so the earlier phases' pins move as a proof rather than as a bump. The files map holds what this phase must not touch.",
+  "new_module": "core/patch_authoring_contract.py",
+  "files": {
+    "core/answer_entity_grounding.py": "a1d3a6542a4cb1dd133b484c77e7f6c6def7df9edd4ce0dd16125f40ecc62987",
+    "core/behavioral_expectation.py": "2411f412c1b4ec43cf0fac2ad46c895d01b3631819a91a08791c1d3405a290a6",
+    "core/behavioral_matrix.py": "bc56a56212f92ff84dc5b1f52c442421d22c2d6804dccb2341ea0d19660ea0d4",
+    "core/candidate_defect_probe.py": "9794d3ef412f564e95497c580181c35598e43853234419613cb79842b6d8a7bc",
+    "core/candidate_mutation_effect.py": "82690b47ef875eaaf7091ce4b81efe595e397075f392a79462046afe1ff6ffd1",
+    "core/candidate_sandbox_validation.py": "73d7a3d3de4b2e666b5ac486f693883ff247c99da4e0dd577e051e2a203bf626",
+    "core/candidate_verification.py": "c259837a1680c6aed15e8fb09ed7f0d0b85a5c7179351be562a5e817797be1a8",
+    "core/check_oracle_assessment.py": "cb4cf70e0fa37fca10f5a5b17d6a2b291d42a9b9d956618d4e3fb67b2a5a2f56",
+    "core/code_dna.py": "8725b73cea83d010c6d84b896bda524e32b249021d3fada8197d9f27e6d1efc5",
+    "core/defect_probe.py": "4f5c8cb1b4a98558215d5d7b3cd20cee256c89e11e2ac4e13ed71b6ebb42913c",
+    "core/defect_probe_worker.py": "7a7118e88938341f5f406605d2cc1e23d1ba57c0543f4f308ae28124d4b74138",
+    "core/execution_eligibility_policy.py": "54721c5f9bcab07b74eabb1e6bcc5cafb8af404717aab09ce9af8f935963c2b5",
+    "core/execution_outcome_telemetry.py": "29f22090a31ef137a06280475fe5183b224ca691639f39a0ae4b42063c6270ce",
+    "core/human_apply_authorization.py": "7f65a55cf237193ead702f0a99f3668f649e7efabe7c2618e244cd9518c94e89",
+    "core/live_execution_authorization.py": "72785ea65de0bf88e18c32ce3617170451c666ad7a03162183c921789ab8c784",
+    "core/local_binding_novelty.py": "e77959dff4c82cfa344ba271ee25074edb7171591617c8796cca35f34f055a2b",
+    "core/localization_candidate.py": "90c49b7ae2447eb0f9f1715b1db06119ee92757499f2b0a1e99c2b11a1b27783",
+    "core/localization_relevance.py": "4dbe61eee856be4c0239c9a13d4a8779b14d42c600deb5050aaf21c63ee37b0e",
+    "core/paired_defect_probe.py": "be426bf7576e21beff41772a3f4a605bfcbc933185183414f84e92cb785f800f",
+    "core/patch_basis.py": "c3031916020d71e6ee8471dfb43330b5329247cd202004f48dbe707d8670bb6c",
+    "core/patch_safety.py": "a5e4e3766422d4b7cd185ae478584fe6c8e49f69cac4b245ff85cd44c5de95c9",
+    "core/targeted_repository_validation.py": "116cded9cf6f07bf9b53d2e20f45beef2a6643a23898f7a4ea5e8ea16ee7e1e5",
+    "core/validation_command.py": "585f9af510d9f357c36e8e134f25578c7d162c6b70088d22378274eec7223c96",
+    "core/validation_execution.py": "c1776d1e917e9b90634ab55333c2dceed812b7e494f57693cecaa6e512b3194d",
+    "graph/builder.py": "cfcd6f1844b43b76e7ec5e790b3a9777da85a359445367759480acee51965365",
+    "graph/query.py": "ec503af99878f9f7fbd59f91f9c6d618387a765a8e2ff53ed717fd1344c32e20",
+    "graph/weights.py": "8156eb6bcd2a31f21c125dce10a0172d6f46c07c06727eb106f6c54f94c3411c",
+    "patching/patch_gates.py": "cec73583c9d416e3b4f883090b02f2b48e0b012c44d2962f5e40819a5c070cf7",
+    "patching/patch_plan_executor.py": "b1a874c1de5818c80981bd2eb27f996e4d252f7728421d6d38a84427b0b75222",
+    "policy/decision_helper.py": "c512a43b53b47babc48c6016eef83e105e64ac8ff5c1f388f1937978d0bd5930"
+  },
+  "reversals": [
+    {
+      "path": "core/candidate_revision.py",
+      "pre_sha256": "ac594f8cbe2f80d0f32fec65277f17044d9e55993ea4fc7dc9e308b37a04b695",
+      "post_sha256": "61a93256028e9a0494c7b2c92fcbf9f657df9960cc253bebf7a0785ec9ca4d4e",
+      "top_level_definitions_pre": 25,
+      "top_level_definitions_post": 25,
+      "added_definitions": [],
+      "removed_definitions": [],
+      "changed_definitions": [
+        "CandidateRevisionReceipt",
+        "build_revision_prompt",
+        "candidate_revision_guardrails"
+      ],
+      "hunks": [
+        {
+          "post": "from typing import Any, Mapping, Sequence\r\n\r\nfrom core.json_utils import extract_json_block\r\nfrom core.patch_authoring_contract import PatchAuthoringContract\r\n\r\n\r\nPHASE_ID = \"PATCH.AUTHOR.LIVE.1\"",
+          "pre": "from typing import Any, Mapping, Sequence\r\n\r\nfrom core.json_utils import extract_json_block\r\n\r\n\r\nPHASE_ID = \"PATCH.AUTHOR.LIVE.1\""
+        },
+        {
+          "post": ")\r\n_TASK_HEADING = \"ORIGINAL TASK (verbatim, unchanged):\"\r\n_TARGET_HEADING = \"TARGET:\"\r\n#: §14 — the revision request is stateless, so the contract travels with it.\r\n#: This heading is this call's framing; the contract text beneath it is the\r\n#: shared material and is byte-identical to the initial author's.\r\n_CONTRACT_HEADING = (\r\n    \"PATCH CANDIDATE CONTRACT - authoritative, and identical to the contract \"\r\n    \"the first draft was given. It is repeated in full because this request \"\r\n    \"is stateless: nothing you were told in an earlier call is available to \"\r\n    \"you now. Every field name in it is protocol, and a synonym is not read.\"\r\n)\r\n_SOURCE_HEADING = (\r\n    \"AUTHORITATIVE ORIGINAL SOURCE. This is the current content of the target \"\r\n    \"and the base your candidate must replace:\"",
+          "pre": ")\r\n_TASK_HEADING = \"ORIGINAL TASK (verbatim, unchanged):\"\r\n_TARGET_HEADING = \"TARGET:\"\r\n_SOURCE_HEADING = (\r\n    \"AUTHORITATIVE ORIGINAL SOURCE. This is the current content of the target \"\r\n    \"and the base your candidate must replace:\""
+        },
+        {
+          "post": "    \"original task while satisfying every case listed above. Author it against \"\r\n    \"the authoritative original source shown above; do not build on the \"\r\n    \"rejected candidate and do not assume it was correct. Your target_snippet \"\r\n    \"must come from the authoritative original source. Return exactly the JSON \"\r\n    \"object the PATCH CANDIDATE CONTRACT above specifies: a top-level \"\r\n    \"patch_candidate object, whose target_snippet field holds the bytes you \"\r\n    \"are replacing and whose patched_snippet field holds the bytes that \"\r\n    \"replace them. Those field names are the protocol and no other spelling \"\r\n    \"is read. Return that JSON object and nothing else.\"\r\n)\r\n\r\n#: Every fixed sentence the request can contain.  The hint test reads exactly",
+          "pre": "    \"original task while satisfying every case listed above. Author it against \"\r\n    \"the authoritative original source shown above; do not build on the \"\r\n    \"rejected candidate and do not assume it was correct. Your target_snippet \"\r\n    \"must come from the authoritative original source. Return the normal \"\r\n    \"patch-candidate JSON schema and nothing else.\"\r\n)\r\n\r\n#: Every fixed sentence the request can contain.  The hint test reads exactly"
+        },
+        {
+          "post": "    _EVIDENCE_HEADING,\r\n    _FAILED_HEADING,\r\n    _PRESERVED_HEADING,\r\n    _CONTRACT_HEADING,\r\n    _INSTRUCTION,\r\n)\r\n",
+          "pre": "    _EVIDENCE_HEADING,\r\n    _FAILED_HEADING,\r\n    _PRESERVED_HEADING,\r\n    _INSTRUCTION,\r\n)\r\n"
+        },
+        {
+          "post": "    )\r\n\r\n\r\ndef build_revision_prompt(\r\n    receipt: CandidateRevisionEvidence, contract: PatchAuthoringContract\r\n) -> str:\r\n    \"\"\"§12 — the request, assembled by concatenation and nothing cleverer.\r\n\r\n    ``contract`` is PATCH.AUTHOR.LIVE.2's correction, and it is a required\r\n    argument rather than an optional one: this call is stateless, so a\r\n    revision request that does not carry the authoring contract is a request\r\n    the model cannot answer in the required shape.  Round 9 proved that\r\n    empirically - asked to \"return the normal patch-candidate JSON schema\",\r\n    a schema it had never been shown, it returned a bare\r\n    ``target_snippet``/``replacement_snippet`` pair and its work was thrown\r\n    away at the parser.\r\n\r\n    The contract is rendered by ``core.patch_authoring_contract`` from the\r\n    same accessor the initial draft uses, so the two are the same bytes.\r\n    Everything around it - the task, the target, the source, the rejected\r\n    bytes and the measured cases - is this call's own evidence and is\r\n    deliberately not the initial draft's framing.\r\n    \"\"\"\r\n\r\n    parts: list[str] = [\r\n        _HEADER,",
+          "pre": "    )\r\n\r\n\r\ndef build_revision_prompt(receipt: CandidateRevisionEvidence) -> str:\r\n    \"\"\"§12 — the request, assembled by concatenation and nothing cleverer.\"\"\"\r\n\r\n    parts: list[str] = [\r\n        _HEADER,"
+        },
+        {
+          "post": "        \"\",\r\n        _TARGET_HEADING,\r\n        f\"{receipt.target_file}::{receipt.target_symbol}\",\r\n        \"\",\r\n        _CONTRACT_HEADING,\r\n        contract.text,\r\n        \"\",\r\n        _SOURCE_HEADING,\r\n        receipt.original_source,",
+          "pre": "        \"\",\r\n        _TARGET_HEADING,\r\n        f\"{receipt.target_file}::{receipt.target_symbol}\",\r\n        \"\",\r\n        _SOURCE_HEADING,\r\n        receipt.original_source,"
+        },
+        {
+          "post": "    input_chars: int = 0\r\n    output_chars: int = 0\r\n    revised_candidate_present: bool = False\r\n    #: §33 — the contract the revision author was actually handed.  Empty on\r\n    #: every receipt that spent no call, because none was rendered.\r\n    authoring_contract_version: str = \"\"\r\n    authoring_contract_fingerprint: str = \"\"\r\n    revision_contract_present: bool = False\r\n    phase_id: str = PHASE_ID\r\n    schema_version: str = SCHEMA_VERSION\r\n",
+          "pre": "    input_chars: int = 0\r\n    output_chars: int = 0\r\n    revised_candidate_present: bool = False\r\n    phase_id: str = PHASE_ID\r\n    schema_version: str = SCHEMA_VERSION\r\n"
+        },
+        {
+          "post": "            \"authority_effect\": \"none\",\r\n            \"execution_authorized\": self.execution_authorized,\r\n            \"final_repository_changed\": self.final_repository_changed,\r\n            # PATCH.AUTHOR.LIVE.2 §33 — which contract the author was held\r\n            # to, by identity rather than by repeating its text.  Deliberately\r\n            # not flattened alongside: §34 records that this receipt is\r\n            # already duplicated into the payload, and three more duplicated\r\n            # keys would make that worse.\r\n            \"authoring_contract_version\": self.authoring_contract_version,\r\n            \"authoring_contract_fingerprint\": self.authoring_contract_fingerprint,\r\n            \"revision_contract_present\": self.revision_contract_present,\r\n        }\r\n\r\n    def as_telemetry(self) -> dict[str, Any]:",
+          "pre": "            \"authority_effect\": \"none\",\r\n            \"execution_authorized\": self.execution_authorized,\r\n            \"final_repository_changed\": self.final_repository_changed,\r\n        }\r\n\r\n    def as_telemetry(self) -> dict[str, Any]:"
+        },
+        {
+          "post": "        \"revision_grants_execution_authority\": False,\r\n        \"revision_widens_auto_apply\": False,\r\n        \"revision_mutates_the_repository\": False,\r\n        # PATCH.AUTHOR.LIVE.2 — the authoring-contract asymmetry, closed.\r\n        \"revision_receives_the_initial_authoring_contract\": True,\r\n        \"revision_and_initial_draft_share_one_contract\": True,\r\n        \"revision_prompt_is_self_contained_about_the_wire_contract\": True,\r\n        \"revision_contract_supplies_implementation_hints\": False,\r\n        \"revision_output_parser_accepts_field_aliases\": False,\r\n        \"malformed_revision_output_is_repaired\": False,\r\n        \"prompt_compliance_can_substitute_for_a_deterministic_gate\": False,\r\n    }\r\n",
+          "pre": "        \"revision_grants_execution_authority\": False,\r\n        \"revision_widens_auto_apply\": False,\r\n        \"revision_mutates_the_repository\": False,\r\n    }\r\n"
+        }
+      ]
+    },
+    {
+      "path": "core/control_engine.py",
+      "pre_sha256": "60a9452f7e356333c9157b5d64c0131382e8408d67d761ede53cea4d2ffea23a",
+      "post_sha256": "8d0b55141f24d2e5ac244774452d3a9434d455b8a0f424968f4f6824b9e63ee6",
+      "top_level_definitions_pre": 54,
+      "top_level_definitions_post": 55,
+      "added_definitions": [
+        "authoring_contract_for_control_result"
+      ],
+      "removed_definitions": [],
+      "changed_definitions": [
+        "_patch_output_format_block",
+        "_safe_minimal_forbidden_block",
+        "build_control_prompt"
+      ],
+      "hunks": [
+        {
+          "post": "    verify_entry_paths,\r\n)\r\nfrom core.localization_handoff import current_target_receipt\r\nfrom core.patch_authoring_contract import (\r\n    PatchAuthoringContract,\r\n    patch_output_format_block,\r\n    render_patch_authoring_contract,\r\n    safe_minimal_forbidden_block,\r\n)\r\nfrom core.repo_librarian import load_phantom_limb_report\r\nfrom core.validation_outcome import is_executed_failure_evidence\r\nfrom core.defect_probe import (",
+          "pre": "    verify_entry_paths,\r\n)\r\nfrom core.localization_handoff import current_target_receipt\r\nfrom core.repo_librarian import load_phantom_limb_report\r\nfrom core.validation_outcome import is_executed_failure_evidence\r\nfrom core.defect_probe import ("
+        },
+        {
+          "post": "    return [node_id for _, node_id in candidates[:limit]]\r\n\r\ndef _safe_minimal_forbidden_block(source_snippet: str) -> str:\r\n    \"\"\"Compatibility shim over the shared contract (PATCH.AUTHOR.LIVE.2).\r\n\r\n    The derivation is unchanged and still bounded by the source snippet the\r\n    author was already handed — no repository is rescanned.  It moved to\r\n    ``core.patch_authoring_contract`` so the revision author receives the\r\n    identical identifier constraints rather than none at all.\r\n    \"\"\"\r\n    return safe_minimal_forbidden_block(source_snippet)\r\n\r\n\r\ndef authoring_contract_for_control_result(\r\n    control_result: dict,\r\n) -> PatchAuthoringContract:\r\n    \"\"\"PATCH.AUTHOR.LIVE.2 §1 — the contract this result's patch author gets.\r\n\r\n    Resolved from exactly the two inputs :func:`build_control_prompt` resolves\r\n    it from: the patch policy's normalized style, and the bounded source\r\n    snippet already on ``patch_intent``.  Every authoring call for this\r\n    CONTROL result — the initial draft and the single verification-guided\r\n    revision — reads the contract here instead of describing the protocol\r\n    again, which is what makes the two one contract rather than two.\r\n\r\n    Pure prompt construction: no retrieval, no graph work, no repository\r\n    traversal, no indexing and no model call.\r\n    \"\"\"\r\n\r\n    patch_intent = control_result.get(\"patch_intent\") or {}\r\n    top = control_result.get(\"top_hypothesis\") or {}\r\n    candidate_state = control_result.get(\"patch_candidate_state\") or {}\r\n    policy = build_patch_policy(\r\n        control_result.get(\"patch_style\"),\r\n        language=(patch_intent.get(\"language\") or top.get(\"language\") or \"unknown\"),\r\n        defect_grounded=bool(candidate_state.get(\"defect_grounded\")),\r\n        patch_basis=candidate_state.get(\"patch_basis\"),\r\n        patch_confidence=0.0,\r\n    )\r\n    return render_patch_authoring_contract(\r\n        style=policy.style,\r\n        source_snippet=patch_intent.get(\"source_snippet\", \"\") or \"\",\r\n    )\r\n\r\n\r\ndef _patch_output_format_block(style: str) -> str:\r\n    \"\"\"Compatibility shim over the shared contract (PATCH.AUTHOR.LIVE.2).\r\n\r\n    The wire shapes, the exact field names and the per-style output rules now\r\n    live in ``core.patch_authoring_contract`` so the verification-guided\r\n    revision author is held to the same contract as the initial author.  The\r\n    rendered text is byte-identical to what this function returned before;\r\n    there is simply one definition of it.\r\n    \"\"\"\r\n    return patch_output_format_block(style)\r\n\r\n\r\ndef _resolve_code_dna_block(control_result: dict) -> str:",
+          "pre": "    return [node_id for _, node_id in candidates[:limit]]\r\n\r\ndef _safe_minimal_forbidden_block(source_snippet: str) -> str:\r\n    \"\"\"Build a stark 'FORBIDDEN' block for safe_minimal mode.\r\n\r\n    Lists the only identifiers the AI is allowed to use (those literally\r\n    present in the source snippet) and reminds it that anything else is a\r\n    hallucination. Reduces 'invented field' patches like `player.position`\r\n    when only `player.speed` exists in the source.\r\n    \"\"\"\r\n    if not source_snippet:\r\n        return \"\"\r\n    # Extract identifiers actually present so we can reflect them back at the AI.\r\n    # This is a heuristic — strings/comments are filtered out crudely.\r\n    cleaned = re.sub(r\"//.*?$|/\\*.*?\\*/|\\\".*?\\\"|'.*?'\", \" \", source_snippet, flags=re.S | re.M)\r\n    seen = sorted(set(re.findall(r\"\\b[A-Za-z_][A-Za-z_0-9]*\\b\", cleaned)))\r\n    return f\"\"\"\r\nSAFE_MINIMAL — HARD CONSTRAINTS:\r\nYou may ONLY reference identifiers that appear in the source_snippet below.\r\nIdentifiers visible in source: {seen}\r\n\r\nFORBIDDEN in patched_snippet:\r\n- Any field/method/class name not in the list above (e.g. `player.position` if only `player.speed` exists).\r\n- New imports, new helper functions, new type declarations.\r\n- Behavioural redesign — only fix the literal bug.\r\n\r\nIf a correct fix would require any of the above:\r\n  set patch_candidate=null, confidence<=0.3, needs_escalation=true,\r\n  and explain in `summary` what is missing from context.\r\n\"\"\".strip()\r\n\r\n\r\ndef _patch_output_format_block(style: str) -> str:\r\n    \"\"\"Tell the AI when to use patch_candidate vs patch_plan.\r\n\r\n    - safe_minimal: patch_candidate only — single-file edit, never create files.\r\n    - balanced:     patch_candidate by default; patch_plan ALLOWED for feature work.\r\n    - vibe:         patch_plan freely, but every path must stay inside the repo.\r\n\r\n    Mirrors the split between the executor's snippet-replace path and the\r\n    multi-file plan path. Putting this in the prompt prevents the AI from\r\n    quietly cramming a multi-file change into a single patch_candidate.\r\n    \"\"\"\r\n    common_shapes = \"\"\"\\\r\npatch_candidate (single-file existing-code fix):\r\n{\r\n  \"patch_candidate\": {\r\n    \"file\": \"...\",\r\n    \"relative_path\": \"...\",\r\n    \"target_node_name\": \"...\",\r\n    \"target_node_kind\": \"function|class\",\r\n    \"target_snippet\": \"...\",\r\n    \"patched_snippet\": \"...\"\r\n  }\r\n}\r\n\r\npatch_plan (multi-file or new-file work):\r\n{\r\n  \"patch_plan\": [\r\n    {\"op\": \"create_file\",     \"relative_path\": \"src/aml.rs\", \"content\": \"...\"},\r\n    {\"op\": \"replace_snippet\", \"relative_path\": \"src/main.rs\",\r\n     \"target_snippet\": \"mod agent;\",\r\n     \"patched_snippet\": \"mod agent;\\\\nmod aml;\"}\r\n  ]\r\n}\r\n\r\nRules:\r\n- Output EITHER patch_candidate OR patch_plan, never both.\r\n- Use patch_candidate only when editing one existing file.\r\n- Use patch_plan when creating files, editing multiple files, or changing APIs across files.\r\n- Every relative_path MUST stay inside the repo (no absolute paths, no '..').\r\n- Every patch_candidate.target_snippet must be an exact quote from the target file.\r\n- If it is not found, reject/demote the candidate before final result.\r\n\"\"\"\r\n\r\n    if style == \"safe_minimal\":\r\n        return (\r\n            \"[PATCH OUTPUT FORMAT — safe_minimal]\\n\"\r\n            \"Use patch_candidate ONLY. Do NOT emit patch_plan. Do NOT create files.\\n\"\r\n            \"If the fix would require new files or multi-file changes, set\\n\"\r\n            \"patch_candidate=null and needs_escalation=true.\\n\\n\"\r\n            + common_shapes\r\n            + \"\\nsafe_minimal-specific: patch_plan is FORBIDDEN. Single existing file or escalate.\"\r\n        )\r\n\r\n    if style == \"balanced\":\r\n        return (\r\n            \"[PATCH OUTPUT FORMAT — balanced]\\n\"\r\n            \"Prefer patch_candidate. Use patch_plan ONLY when feature work genuinely\\n\"\r\n            \"requires touching multiple files or creating a new file. Justify in `summary`.\\n\\n\"\r\n            + common_shapes\r\n            + \"\\nbalanced-specific: patch_plan allowed but every op must reference an existing\\n\"\r\n              \"module/API or be clearly justified. Bias toward smaller patch_candidate when possible.\"\r\n        )\r\n\r\n    # vibe\r\n    return (\r\n        \"[PATCH OUTPUT FORMAT — vibe]\\n\"\r\n        \"Use whichever shape best fits the change. patch_plan is encouraged for feature work,\\n\"\r\n        \"refactors across files, or anything that needs new helpers. List every assumption in `summary`.\\n\\n\"\r\n        + common_shapes\r\n        + \"\\nvibe-specific: patch_plan freely usable, but every relative_path MUST stay inside\\n\"\r\n          \"the repo. Auto-apply is disabled — the user will review your plan.\"\r\n    )\r\n\r\n\r\ndef _resolve_code_dna_block(control_result: dict) -> str:"
+        },
+        {
+          "post": "\r\n    policy_block = policy_to_prompt_block(policy)\r\n    style = policy.style\r\n    # PATCH.AUTHOR.LIVE.2 — one rendering of the authoritative patch-authoring\r\n    # contract.  A later authoring call for the same artifact asks the same\r\n    # accessor rather than restating the protocol, so the two cannot drift.\r\n    contract = authoring_contract_for_control_result(control_result)\r\n    output_format_block = contract.output_format_block\r\n\r\n    # Render related snippets. For feature tasks, this becomes patchable source.\r\n    related_block = \"No related snippets.\"",
+          "pre": "\r\n    policy_block = policy_to_prompt_block(policy)\r\n    style = policy.style\r\n    output_format_block = _patch_output_format_block(style)\r\n\r\n    # Render related snippets. For feature tasks, this becomes patchable source.\r\n    related_block = \"No related snippets.\""
+        },
+        {
+          "post": "Do not invent syntax or APIs. Do not propose a patch unless source_snippet is exact and sufficient.\r\n\"\"\".strip()\r\n\r\n    # PATCH.AUTHOR.LIVE.2 — the candidate-language constraints, from the one\r\n    # producer that also renders them for the verification-guided revision\r\n    # author.  The safe_minimal/balanced/vibe dispatch that used to sit inline\r\n    # here is unchanged; it simply has a single definition now.\r\n    style_constraints = contract.candidate_language_block\r\n\r\n    reasons_raw = top.get(\"reasons\") or []\r\n    if isinstance(reasons_raw, list):",
+          "pre": "Do not invent syntax or APIs. Do not propose a patch unless source_snippet is exact and sufficient.\r\n\"\"\".strip()\r\n\r\n    style_constraints = \"\"\r\n    if style == \"safe_minimal\":\r\n        style_constraints = _safe_minimal_forbidden_block(\r\n            patch_intent.get(\"source_snippet\", \"\")\r\n        )\r\n    elif style == \"balanced\":\r\n        style_constraints = (\r\n            \"BALANCED: design-level fixes allowed, but every identifier in patched_snippet \"\r\n            \"must be either in source_snippet OR a clearly-existing API shown in RELATED CONTEXT. \"\r\n            \"If you need a new field/method on a user-defined type, set needs_escalation=true.\"\r\n        )\r\n    else:\r\n        style_constraints = (\r\n            \"VIBE: creative fixes allowed. You MAY introduce new helpers/fields, but mark each \"\r\n            \"assumption explicitly in summary. auto_apply will be disabled — produce a reviewable patch.\"\r\n        )\r\n\r\n    reasons_raw = top.get(\"reasons\") or []\r\n    if isinstance(reasons_raw, list):"
+        }
+      ]
+    },
+    {
+      "path": "core/pipeline.py",
+      "pre_sha256": "67c83a2e9d3f1d141849352defbf928c2f489f51645dc9b647c8a4fee72d4f7b",
+      "post_sha256": "d135ecda9de9ed6c22f55dba6b599e545c68132faade268bc8ca0bbcb2bdf10d",
+      "top_level_definitions_pre": 42,
+      "top_level_definitions_post": 42,
+      "added_definitions": [],
+      "removed_definitions": [],
+      "changed_definitions": [
+        "_maybe_revise_rejected_candidate"
+      ],
+      "hunks": [
+        {
+          "post": "    route_is_read_only,\r\n)\r\nfrom core.control_engine import (\r\n    authoring_contract_for_control_result,\r\n    build_control_prompt,\r\n    build_control_prompt_human,\r\n    control_has_grounded_patch_candidate,",
+          "pre": "    route_is_read_only,\r\n)\r\nfrom core.control_engine import (\r\n    build_control_prompt,\r\n    build_control_prompt_human,\r\n    control_has_grounded_patch_candidate,"
+        },
+        {
+          "post": "        )\r\n        return verification\r\n\r\n    # PATCH.AUTHOR.LIVE.2 — the same authoring contract the initial draft was\r\n    # given, from the same accessor, because the provider call is stateless and\r\n    # a contract it was shown in an earlier call is a contract it does not have.\r\n    contract = authoring_contract_for_control_result(control)\r\n    prompt = build_revision_prompt(evidence, contract)\r\n    provider, model = _revision_author_configuration()\r\n    print(\r\n        \"✍️ PATCH.AUTHOR.LIVE.1 requesting one verification-guided revision on \"",
+          "pre": "        )\r\n        return verification\r\n\r\n    prompt = build_revision_prompt(evidence)\r\n    provider, model = _revision_author_configuration()\r\n    print(\r\n        \"✍️ PATCH.AUTHOR.LIVE.1 requesting one verification-guided revision on \""
+        },
+        {
+          "post": "        evidence_seconds=evidence_seconds,\r\n        input_chars=len(prompt),\r\n        output_chars=len(response if isinstance(response, str) else \"\"),\r\n        # PATCH.AUTHOR.LIVE.2 §33 — which authoring contract this call was\r\n        # held to, by identity.  The contract text itself is not recorded.\r\n        authoring_contract_version=contract.version,\r\n        authoring_contract_fingerprint=contract.fingerprint,\r\n        revision_contract_present=True,\r\n    )\r\n\r\n    if not revised.accepted:",
+          "pre": "        evidence_seconds=evidence_seconds,\r\n        input_chars=len(prompt),\r\n        output_chars=len(response if isinstance(response, str) else \"\"),\r\n    )\r\n\r\n    if not revised.accepted:"
+        }
+      ],
+      "evaluated_after": "tests/fixtures/2026-09-10-harness-remediation-reversal.json"
+    },
+    {
+      "path": "core/prompter.py",
+      "pre_sha256": "ed21e589ec1b2746766a1f7c456be155db3c5010d1edee84676002ba4d67bd38",
+      "post_sha256": "dee45048a7bee3c92d29766ff2924939159a1a65ddd8a22ecff3e07aae192279",
+      "top_level_definitions_pre": 16,
+      "top_level_definitions_post": 16,
+      "added_definitions": [],
+      "removed_definitions": [],
+      "changed_definitions": [],
+      "hunks": [
+        {
+          "post": "  \"missing_context\": [\"...\"],\r\n  \"confidence\": 0.0\r\n}\"\"\"\r\n#: PATCH.AUTHOR.LIVE.2 — the response envelope moved to the shared authoring\r\n#: contract, which the initial draft and the verification-guided revision both\r\n#: render from.  Re-exported here so this module's public name is unchanged.\r\nfrom core.patch_authoring_contract import PATCH_RESPONSE_SCHEMA\r\n# Hard cap on retrieved context to keep prompts bounded.\r\nMAX_CONTEXT_CHARS = 12000\r\n",
+          "pre": "  \"missing_context\": [\"...\"],\r\n  \"confidence\": 0.0\r\n}\"\"\"\r\nPATCH_RESPONSE_SCHEMA = \"\"\"\r\nReturn JSON:\r\n{\r\n  \"summary\": \"...\",\r\n  \"issues\": [...],\r\n  \"patch_candidate\": null | {...},\r\n  \"patch_plan\": null | [\r\n    {\"op\": \"create_file\", \"relative_path\": \"...\", \"content\": \"...\"},\r\n    {\"op\": \"replace_snippet\", \"relative_path\": \"...\", \"target_snippet\": \"...\", \"patched_snippet\": \"...\"}\r\n  ],\r\n  \"confidence\": 0.0,\r\n  \"needs_escalation\": false\r\n}\r\n\"\"\"\r\n# Hard cap on retrieved context to keep prompts bounded.\r\nMAX_CONTEXT_CHARS = 12000\r\n"
+        }
+      ]
+    }
+  ],
+  "harness_remediation_note": "While this phase was being verified, a separate, explicitly requested harness remediation edited core/pipeline.py, core/defect_probe.py, patching/patch_gates.py and core/targeted_repository_validation.py. That work is recorded, with exact reversible hunks, in tests/fixtures/2026-09-10-harness-remediation-reversal.json and undone by tests/_harness_maintenance.py::before_harness_remediation. Its core/pipeline.py preimage is exactly this phase's post, so every entry here is evaluated after that helper: the pipeline reversal runs LIVE.2 post -> LIVE.1 post, and every frozen pin is the byte-identical history this phase shipped against - the same digests CANDIDATE.VERIFY.LIVE.1 and DEFECT.PROBE.LIVE.5 pin. No value here describes the remediation's own bytes; that is its receipt's job, not this one's."
+}

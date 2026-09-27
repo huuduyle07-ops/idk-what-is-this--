@@ -1,0 +1,367 @@
+{
+  "phase": "AUTH.WEB.READ.1",
+  "completed_on": "2026-09-17",
+  "closed_gaps": [
+    "AUTH.WEB.1 recorded read-side gap: GET routes served repository, evidence, session, Dream and bootstrap data under any Host, so a DNS-rebound page could read them"
+  ],
+  "remaining_findings": [
+    "UX-02",
+    "UX-03",
+    "UX-04",
+    "UX-05",
+    "UX-06"
+  ],
+  "remaining_track_b": [
+    "Read authentication for network-exposed deployments (auth-on sensitive reads plus a UI that re-fetches after sign-in)",
+    "Sign-out control and server-side browser-session revocation"
+  ],
+  "out_of_scope": [
+    "UX-02",
+    "UX-03",
+    "UX-04",
+    "UX-05",
+    "UX-06",
+    "UI redesign",
+    "UX.STATE.1",
+    "PREFLIGHT.REQUEST.1",
+    "T6 Round 11"
+  ],
+  "existing_files_changed": [
+    "web/app.py",
+    "README.md",
+    "docs/roadmap/phase_registry.json",
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py",
+    "tests/_auth_web1_maintenance.py",
+    "tests/test_auth_web1.py",
+    "tests/test_auth_web1_browser.py"
+  ],
+  "new_files": [
+    "web/read_host.py",
+    "tests/_auth_web_read1_maintenance.py",
+    "tests/test_auth_web_read1.py",
+    "tests/test_auth_web_read1_browser.py",
+    "tests/fixtures/auth_web_read1_reversal.json",
+    "tests/fixtures/auth_web_read1_frozen_boundaries.json",
+    "tests/fixtures/auth_web_read1_completion.json",
+    "docs/designs/2026-09-17-trusted-host-sensitive-read-boundary.md"
+  ],
+  "owners": {
+    "read_host_decision": "web/read_host.py::should_allow_read_host",
+    "host_parsing": "web/read_host.py::parse_host (via web/request_origin.py::parse_origin)",
+    "trusted_host_source": "web/request_origin.py::allowed_origins_for (unchanged)",
+    "choke_point": "web/read_host.py::ReadHostBoundary wrapping web/app.py app.wsgi_app",
+    "mutation_gate": "web/auth_gate.py::should_allow_mutation via web/app.py::_web_mutation_gate (unchanged)"
+  },
+  "host_model": {
+    "representation": "HostIdentity(host, port or None); host normalized by request_origin.parse_origin",
+    "trusted_source": "allowed_origins_for(environ, WEB_ALLOWED_ORIGINS): listening socket, or the explicit list which replaces it",
+    "projection": "origin (scheme, host, port) -> host:port, plus bare host when port is the scheme default",
+    "port_compared": true,
+    "loopback_aliases_equivalent": false,
+    "wildcard_bind_without_setting": "no trusted host; every safe-method request refused",
+    "ignored_headers": [
+      "Origin",
+      "Referer",
+      "X-Forwarded-Host",
+      "X-Forwarded-Proto",
+      "X-Forwarded-Port",
+      "Forwarded",
+      "X-Original-Host",
+      "X-Host"
+    ],
+    "methods": "GET, HEAD, OPTIONS and every other non-mutating method; POST/PUT/PATCH/DELETE left to AUTH.WEB.1",
+    "refusals": {
+      "host_not_allowed": 421,
+      "host_missing": 400,
+      "host_ambiguous": 400,
+      "host_malformed": 400
+    }
+  },
+  "route_inventory": {
+    "classification": {
+      "/": "public_shell_static",
+      "/new": "public_shell_static",
+      "/static/<path:filename>": "public_shell_static",
+      "/help": "public_shell_static",
+      "/health": "health_operational",
+      "/tools/registry": "health_operational",
+      "/dream/taxonomy": "health_operational",
+      "/auth/session": "auth_bootstrap",
+      "/benchmarks/cases": "project_repository_data",
+      "/benchmarks/case-defaults": "project_repository_data",
+      "/graph/evidence_spread": "project_repository_data",
+      "/graph/explainability/view": "project_repository_data",
+      "/lessons/list": "project_repository_data",
+      "/lessons/duplicates": "project_repository_data",
+      "/lessons/anti/report": "project_repository_data",
+      "/lessons/anti/reverse-dream-plan": "project_repository_data",
+      "/lessons/anti/shadow-retrieval": "project_repository_data",
+      "/lessons/anti/control-preview": "project_repository_data",
+      "/lessons/anti/control-preview-report": "project_repository_data",
+      "/project-evolution/approval-panel": "project_repository_data",
+      "/handoffs/list": "project_repository_data",
+      "/presentation/evidence/list": "source_evidence_report_history",
+      "/presentation/evidence/file": "source_evidence_report_history",
+      "/eval/evidence-quality/report/<path:report_id>": "source_evidence_report_history",
+      "/mirror-tunnel/preview/<path:preview_id>": "source_evidence_report_history",
+      "/benchmarks/list": "source_evidence_report_history",
+      "/benchmarks/report": "source_evidence_report_history",
+      "/benchmarks/prompt-cost": "source_evidence_report_history",
+      "/proposals/list": "source_evidence_report_history",
+      "/proposals/view": "source_evidence_report_history",
+      "/lessons/proposal": "source_evidence_report_history",
+      "/dream/queue": "dream_reports_artifacts",
+      "/dream/list": "dream_reports_artifacts",
+      "/dream/reports": "dream_reports_artifacts",
+      "/dream/report": "dream_reports_artifacts",
+      "/dream/plan/latest": "dream_reports_artifacts",
+      "/dream/references/list": "dream_reports_artifacts",
+      "/dream/references/file": "dream_reports_artifacts",
+      "/dream/trials/list": "dream_reports_artifacts",
+      "/dream/trials/file": "dream_reports_artifacts",
+      "/history/sessions": "session_run_debug_internal",
+      "/session/<session_id>": "session_run_debug_internal",
+      "/replays": "session_run_debug_internal",
+      "/replays/<replay_id>": "session_run_debug_internal",
+      "/replays/<replay_id>/compare": "session_run_debug_internal",
+      "/replays/<replay_id>/artifact/<artifact_name>": "session_run_debug_internal",
+      "/replays/janitor": "session_run_debug_internal",
+      "/ux/run-progress/snapshot/<path:snapshot_id>": "session_run_debug_internal",
+      "/worker-runs/list": "session_run_debug_internal",
+      "/worker-runs/view": "session_run_debug_internal",
+      "/dream/status": "session_run_debug_internal",
+      "/dream/proposals/status": "session_run_debug_internal",
+      "/benchmarks/status": "session_run_debug_internal",
+      "/mcp/audit": "session_run_debug_internal",
+      "/harness/controls": "session_run_debug_internal"
+    },
+    "counts": {
+      "public_shell_static": 4,
+      "health_operational": 3,
+      "auth_bootstrap": 1,
+      "project_repository_data": 13,
+      "source_evidence_report_history": 10,
+      "dream_reports_artifacts": 9,
+      "session_run_debug_internal": 15
+    },
+    "non_sensitive": [
+      "/",
+      "/dream/taxonomy",
+      "/health",
+      "/help",
+      "/new",
+      "/static/<path:filename>",
+      "/tools/registry"
+    ],
+    "sensitive": [
+      "/auth/session",
+      "/benchmarks/case-defaults",
+      "/benchmarks/cases",
+      "/benchmarks/list",
+      "/benchmarks/prompt-cost",
+      "/benchmarks/report",
+      "/benchmarks/status",
+      "/dream/list",
+      "/dream/plan/latest",
+      "/dream/proposals/status",
+      "/dream/queue",
+      "/dream/references/file",
+      "/dream/references/list",
+      "/dream/report",
+      "/dream/reports",
+      "/dream/status",
+      "/dream/trials/file",
+      "/dream/trials/list",
+      "/eval/evidence-quality/report/<path:report_id>",
+      "/graph/evidence_spread",
+      "/graph/explainability/view",
+      "/handoffs/list",
+      "/harness/controls",
+      "/history/sessions",
+      "/lessons/anti/control-preview",
+      "/lessons/anti/control-preview-report",
+      "/lessons/anti/report",
+      "/lessons/anti/reverse-dream-plan",
+      "/lessons/anti/shadow-retrieval",
+      "/lessons/duplicates",
+      "/lessons/list",
+      "/lessons/proposal",
+      "/mcp/audit",
+      "/mirror-tunnel/preview/<path:preview_id>",
+      "/presentation/evidence/file",
+      "/presentation/evidence/list",
+      "/project-evolution/approval-panel",
+      "/proposals/list",
+      "/proposals/view",
+      "/replays",
+      "/replays/<replay_id>",
+      "/replays/<replay_id>/artifact/<artifact_name>",
+      "/replays/<replay_id>/compare",
+      "/replays/janitor",
+      "/session/<session_id>",
+      "/ux/run-progress/snapshot/<path:snapshot_id>",
+      "/worker-runs/list",
+      "/worker-runs/view"
+    ],
+    "auth_dependent": [
+      "/",
+      "/auth/session",
+      "/session/<session_id>"
+    ],
+    "trusted_host_required": "all",
+    "authentication_required": []
+  },
+  "read_policy": {
+    "auth_off": "trusted Host required; reads unauthenticated",
+    "auth_on": "trusted Host required; reads unauthenticated (documented contract); token header, session cookie, CSRF or Origin never make an untrusted Host acceptable",
+    "api_clients": "configured Host only; no CSRF, Origin or token for reads",
+    "rationale": "WEB_AUTH_TOKEN documents mutation-only authentication, and the shell's load-time reads are not re-fetched after in-page sign-in; read authentication needs UI state work outside this phase"
+  },
+  "entry_behavior": {
+    "configuration": "socket 127.0.0.1:5000, WEB_AUTH_TOKEN unset, synthetic marker files",
+    "untrusted_hosts": [
+      "evil.example:5000",
+      "localhost:5000",
+      "127.0.0.1:7999"
+    ],
+    "sensitive_reads": [
+      "/history/sessions",
+      "/session/<id>",
+      "/presentation/evidence/file",
+      "/dream/report",
+      "/graph/evidence_spread"
+    ],
+    "pre": "200 with marker for every untrusted host; / and /auth/session served and minted a session; //new redirected to http://evil.example:5000/",
+    "post": "421 host_not_allowed before routing, handlers and data access; no marker, cookie or redirect",
+    "chromium_pre": "rebound page at http://evil.example:<port> read the marker via same-origin fetch without Origin or Fetch Metadata",
+    "chromium_post": "every rebound read 421, no handler or data access, no cookie for evil.example"
+  },
+  "model_calls": 0,
+  "external_network_requests": 0,
+  "performance": {
+    "python": {
+      "host_parse_us": 5.944,
+      "host_parse_and_check_us": 5.562,
+      "trusted_host_derivation_us": 9.867,
+      "full_read_host_decision_us": 16.445,
+      "refused_request_wsgi_us": 46.901
+    },
+    "method": "median per-operation microseconds; median of 3 runs of 15 batches (400 operations, 100 for WSGI refusals)"
+  },
+  "test_runs": [
+    {
+      "scope": "red_before_implementation",
+      "suite": "tests/test_auth_web_read1.py before web/read_host.py existed",
+      "passed": 4,
+      "failed": 133,
+      "note": "the 4 passes are trusted-host positive controls and the frozen mutation-composition guard"
+    },
+    {
+      "scope": "red_green_toggle",
+      "selection": "tests/test_auth_web_read1.py and tests/test_auth_web_read1_browser.py on entry web/app.py (only the two boundary statements removed)",
+      "entry": {
+        "passed": 68,
+        "failed": 73,
+        "failed_test_functions": 27,
+        "chromium_failed": 4
+      },
+      "restored_web_app_sha256": "a1f9565c0c0805485f2bfa8794469ded24702ee9d03f44dfe90fab1e44584778"
+    },
+    {
+      "scope": "focused_auth_web_read1",
+      "passed": 141,
+      "failed": 0,
+      "skipped": 0,
+      "modules": {
+        "test_auth_web_read1": {
+          "passed": 137,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_auth_web_read1_browser": {
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "scope": "auth_web1_frozen_mutation_suites",
+      "passed": 176,
+      "failed": 0,
+      "skipped": 0,
+      "selection": "test_auth_web1, test_auth_web1_browser, test_web_mutation_auth_gate, test_web_mutation_surface_audit"
+    },
+    {
+      "scope": "frozen_phase_suites",
+      "passed": 457,
+      "failed": 0,
+      "skipped": 0,
+      "selection": "test_sec_ui1, test_data_undo1, test_exec_plan1, test_auth_dream1, test_data_rollback1 and its consumers/executor/store/telemetry edge suites"
+    },
+    {
+      "scope": "registry_picker",
+      "passed": 267,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "scope": "affected_broad",
+      "files": 230,
+      "selection": "the 228-file AUTH.WEB.1 affected set (every test importing web or reading index.html, every reversal-chain user, DATA.ROLLBACK.1 edge suites, AUTH.WEB.1 suites, registry/picker and phase-advance checks) plus both AUTH.WEB.READ.1 suites",
+      "passed": 5674,
+      "failed": 49,
+      "skipped": 26,
+      "duration_seconds": 1424.89,
+      "failures_vs_auth_web1_recorded_set": "identical 49 node ids; none new, none resolved",
+      "failures_ab": "the 24 failing files give identical node ids and first-line messages on entry bytes (all 8 changed files reverted, all 8 new files moved aside) and on post bytes"
+    }
+  ],
+  "checks": {
+    "compileall": "passed",
+    "benchmark_cases_check": "54 checked, 0 errors",
+    "git_diff_check": "passed",
+    "phase_picker_top_recommendation": "DOGFOOD.1B",
+    "registry_phases": 187,
+    "complete_or_history": 183,
+    "chromium": "Playwright 1.62.0 Chromium with --host-resolver-rules=MAP evil.example 127.0.0.1; no system DNS or hosts-file change"
+  },
+  "frozen_production_deltas": {
+    "AUTH.WEB.1_mutation_origin_csrf_auth": 0,
+    "SEC.UI.1": 0,
+    "DATA.UNDO.1": 0,
+    "EXEC.PLAN.1": 0,
+    "AUTH.DREAM.1": 0,
+    "DATA.ROLLBACK.1": 0,
+    "Track_A": 0,
+    "UX-02_and_later": 0,
+    "route_handlers_and_templates": 0,
+    "web_app_definitions": 0
+  },
+  "limitations": [
+    "Host validation is not authentication: any client that reaches the socket can send a configured Host, and reads stay unauthenticated in both WEB_AUTH_TOKEN modes.",
+    "Mutating-method responses rely on AUTH.WEB.1's Origin proof; engines that send neither Origin nor Fetch Metadata on POST remain treated as non-browser clients.",
+    "The browser session cookie is host-scoped, not port-scoped; another port on the same host can still overwrite it (sign-out nuisance).",
+    "WEB_HOST=localhost, Docker and reverse proxies need WEB_ALLOWED_ORIGINS (and a proxy must forward the public Host); without it pages return 421.",
+    "WSGI servers that derive SERVER_NAME/SERVER_PORT from Host make the default projection follow the request and must set WEB_ALLOWED_ORIGINS.",
+    "A trailing-dot hostname (localhost.) is refused as malformed."
+  ],
+  "source_sha256": {
+    "web/app.py": "a1f9565c0c0805485f2bfa8794469ded24702ee9d03f44dfe90fab1e44584778",
+    "README.md": "bc0ad7d379f679e4625585dd766c2e59a403312418d0176e80aa0ef28dd7a729",
+    "docs/roadmap/phase_registry.json": "9e52e262804154e4a61e8afa365fa82bcc72f420fe84e223dfd3ebb5f7b44846",
+    "tests/test_phase_registry.py": "f23abb0595a8655342b71d92ece6795213f2f08b9450abe4acd730fc2bab7285",
+    "tests/test_phase_picker.py": "1d647bdb65a0579bafeeb7e3ec38b6c78e3bf7d1c62ace4fc06975952d508c81",
+    "tests/_auth_web1_maintenance.py": "b8b439ba8928aca558263ae05bcffd6f40893ec758afebe968ab1cb6cf9699b4",
+    "tests/test_auth_web1.py": "234eb8f8ca40c7777ba558cd9e09b397218e3456e8a2c900ff661643230fc754",
+    "tests/test_auth_web1_browser.py": "fdc3e6618f795e34165700cbe3e908865c79100c42667122501bf71a759944b9",
+    "web/read_host.py": "d7b25d45719c21e32197eab6e8546d415f51df06cfc1f011b4e1e6d13b949f59",
+    "tests/_auth_web_read1_maintenance.py": "e8fc28898ada4413b02bf7e47cffd36fcce1c249bdec082f05966cd7a0648678",
+    "tests/test_auth_web_read1.py": "e20020cbb84bfacb4ffe8e5bdd446934048f1918a0e7e71fde1b991d40520665",
+    "tests/test_auth_web_read1_browser.py": "7f7f86dac8e498d544521b8f78dc5cb311bb18f2d2ea0f04ce20d364dab1762d",
+    "tests/fixtures/auth_web_read1_reversal.json": "b767cb5cb294a32721474d0eb79a233b0307bc7c7f49359a77e746922e5825a2",
+    "tests/fixtures/auth_web_read1_frozen_boundaries.json": "fa220d79faa05a9e0a0bc9fbd9e392e6a76f507499ecc6b5a0fcdc164da17042",
+    "docs/designs/2026-09-17-trusted-host-sensitive-read-boundary.md": "f1e93c64108a5a96a1a7ba63a4b22143ead166e9da659a9535e25066642db521"
+  }
+}

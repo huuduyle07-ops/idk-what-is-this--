@@ -1,6 +1,6 @@
 # CHECK.LIVE.1B — Independent Typed Worker Declaration Wiring
 
-**Status:** proposed, shadow-only, default off
+**Status:** complete, shadow-only, default off
 **Date:** 2026-08-28
 **Depends on:** CHECK.LIVE.1 (complete). Not CHECK.2. Not CHECK.LIVE.2's semantic slice.
 
@@ -420,6 +420,7 @@ New entry `CHECK.LIVE.1B` in `docs/roadmap/phase_registry.json`:
   `core/run_lifecycle.py`, `tests/test_live_worker_declaration.py`,
   `tests/test_post_run_reconciliation_shadow.py`,
   `tests/test_post_run_reconciliation_shadow_boundaries.py`,
+  `tests/test_post_run_reconciliation_boundaries.py`,
   `tests/test_phase_registry.py`, `tests/test_phase_picker.py`, this design
   doc, `docs/roadmap/phase_registry.json`.
 - `forbidden_files`: everything CHECK.LIVE.1 already forbids (frozen CHECK.1,

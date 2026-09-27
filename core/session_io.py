@@ -7,6 +7,7 @@ from agents.gemini_client import run_gemini_request
 from config import OUTPUT_FILE
 from core.agent_memory import persist_ai_memory_notes
 from core.agent_state import AgentState
+from core.localization_handoff import ground_answer_for_display
 from core.json_utils import extract_json_block
 from core.prompter import build_followup_prompt
 from database.memory import save_artifact, save_message
@@ -96,19 +97,23 @@ def handle_followups(state: AgentState) -> None:
             continue
 
         inner_json = extract_json_block(followup_answer)
-        inner_human = strip_json_from_text(followup_answer)
+        safe_answer, inner_human, inner_json, _ = ground_answer_for_display(
+            state,
+            followup_answer,
+            inner_json,
+        )
 
         if inner_human:
             print("\n🤖 Mentor:")
             print(inner_human)
         else:
             print("\n🤖 Mentor (Data):")
-            print(followup_answer)
+            print(safe_answer)
 
-        history.append({"role": "assistant", "content": followup_answer})
-        save_message(state.session_id, "assistant", followup_answer)
+        history.append({"role": "assistant", "content": safe_answer})
+        save_message(state.session_id, "assistant", safe_answer)
         append_to_log("--- USER FOLLOW-UP ---", user_reply)
-        append_to_log("--- MENTOR FOLLOW-UP ---", followup_answer)
+        append_to_log("--- MENTOR FOLLOW-UP ---", safe_answer)
 
         if inner_json:
             save_artifact(

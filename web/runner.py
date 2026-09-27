@@ -7,12 +7,26 @@ from pathlib import Path
 from typing import Any
 
 from core.agent_state import AgentState
+from core.json_utils import extract_json_block
+from core.author_escalation_admission import admit_author_escalation
+from core.repair_intent_evidence_refs import EvidenceRefError
+from core.repair_intent import admit_gap, render_question
+from core.repair_intent_ambiguity import detect_repair_intent_ambiguity
+from web.session_store import create_repair_intent_wait
 from core.code_dna import dna_to_prompt_block, get_or_compute_dna
 from core.credential_redaction import redact_credentials
 from core.control_engine import (
+    attach_preflight_validation,
+    build_control_prompt,
     build_related_snippets,
     clear_graph_cache,
     run_control_structured,
+)
+from core.execution_outcome_telemetry import (
+    DENIED_HARNESS_MODE_BLOCKED,
+    DENIED_NO_CHANGE_REQUESTED,
+    attach_execution_telemetry,
+    no_execution,
 )
 from core.feature_context import maybe_enrich_with_scout
 from core.indexer import index_repository
@@ -33,6 +47,9 @@ from core.project_tag import build_project_tag
 from core.repo_librarian import (
     load_phantom_limb_report,
 )
+from core.analysis_evidence import collect_analysis_evidence
+from core.localization_handoff import ground_state_answer
+from core.live_task_routing import safe_route_live_task
 from core.repository_inventory import create_repository_inventory
 from core.runtime_environment import (
     build_runtime_environment_state,
@@ -162,6 +179,8 @@ def _context_is_degraded(control_result: dict | None) -> bool:
 def _grounding_failed(json_block: dict | None) -> bool:
     if not isinstance(json_block, dict):
         return False
+    if json_block.get("control_patch_candidate_rejected"):
+        return True
     if json_block.get("patch_plan_rejected"):
         return True
     candidate = json_block.get("patch_candidate")
@@ -403,6 +422,20 @@ def run_agent_web(
     is_project_input = bool(repo_path) and os.path.isdir(repo_path)
     interface = "agent"
     mode = agent_mode if agent_mode in {"reviewer", "planner"} else "reviewer"
+    # WAITER.LIVE.1 — decide what kind of order this is *first*, before the
+    # repository is indexed, before validation is executed and before CONTROL
+    # localizes anything.  Deterministic, and free: no model call, no network
+    # call, no file read, no graph.  Doing it here is the fix for an
+    # architecture question that used to pay twenty-six minutes of indexing on
+    # its way to being told it was missing a patch snippet.
+    live_route = safe_route_live_task(query, repository_available=is_project_input)
+    live_route_payload = live_route.as_dict()
+    print(
+        "🧭 WAITER route: "
+        f"{live_route.task_shape} -> {live_route.selected_workflow} "
+        f"(change_need_source={live_route.change_need_source}, "
+        f"patch_localization_allowed={live_route.patch_localization_allowed})"
+    )
     runtime_state = build_runtime_environment_state(
         runtime_environment,
         custom_name=runtime_environment_custom_name,
@@ -428,6 +461,7 @@ def run_agent_web(
             "patch": "",
             "validation": "",
             "project_tag": project_tag or "",
+            "live_route": live_route_payload,
             "patch_loop_attempts": 0,
             "patch_loop_stop_reason": None,
             **runtime_state,
@@ -475,6 +509,7 @@ def run_agent_web(
             "patch": "",
             "validation": "",
             "project_tag": project_tag or "",
+            "live_route": live_route_payload,
             **(
                 {"delta_shadow": empty_delta_shadow}
                 if isinstance(empty_delta_shadow, dict)
@@ -500,13 +535,46 @@ def run_agent_web(
     task_info["ignore_repo_dna"] = bool(ignore_repo_dna)
     task_info.update(runtime_state)
     task_info["runtime_environment_description"] = runtime_description
+    task_info["live_route"] = live_route_payload
 
     final_tag = build_project_tag(repo_path, project_tag)
     print(f"Runtime environment: {runtime_description}")
 
     control_result = None
+    analysis_evidence = None
     delta_shadow = None
-    if is_project_input:
+
+    # WAITER.LIVE.1 — a read-only order reads documents, not a call graph.  No
+    # index is built, no validation is executed and CONTROL is never entered.
+    if is_project_input and not live_route.patch_localization_allowed:
+        analysis_evidence = collect_analysis_evidence(
+            repo_path,
+            inventory=operation_inventory,
+            requested_paths=live_route.requested_paths,
+            subjects=live_route.subjects,
+            # ANALYSIS.EVIDENCE.LIVE.1 — the obligations INPUT.1 preserved are
+            # what decide the evidence profile.  No extra model call: these are
+            # the user's own words, already split before this line.
+            obligations=live_route.obligations,
+            # ANALYSIS.MULTIROOT.LIVE.1 — the analysis workflow, and only it,
+            # may also read a repository the user explicitly named.
+            analysis_only=live_route.analysis_only,
+        )
+        print(
+            "🧭 WAITER: analysis evidence acquired from "
+            f"{len(analysis_evidence.items)} bounded file(s) "
+            f"[profile={analysis_evidence.profile}, "
+            f"roles={analysis_evidence.files_by_role()}]"
+        )
+        from web.oop_intent_adapter import admit_oop_review_wait
+        oop_wait = admit_oop_review_wait(
+            evidence=analysis_evidence, repo_path=repo_path, task_text=query,
+            task_mode="review")
+        if oop_wait is not None:
+            return {**oop_wait, "project_tag": final_tag,
+                    "live_route": live_route_payload, **runtime_state,
+                    "runtime_environment_description": runtime_description}
+    elif is_project_input:
         try:
             clear_graph_cache(repo_path)
             index_result = index_repository(
@@ -541,6 +609,9 @@ def run_agent_web(
                 graph=program_graph,
             )
             if control_result:
+                # Attach the route before any CONTROL safety refresh reads it,
+                # so change-need separation is established from the first pass.
+                control_result["live_route"] = live_route_payload
                 control_result["phantom_limb"] = (
                     index_result.get("phantom_limb")
                     or load_phantom_limb_report(repo_path)
@@ -552,7 +623,9 @@ def run_agent_web(
                     control_result["delta_shadow"] = (
                         index_result["delta_shadow"]
                     )
-                control_result["preflight_validation"] = preflight
+                control_result = attach_preflight_validation(
+                    control_result, preflight
+                )
                 control_result["related_snippets"] = build_related_snippets(
                     control_result,
                     repo_path,
@@ -604,6 +677,7 @@ def run_agent_web(
                 "patch": "",
                 "validation": "",
                 "project_tag": final_tag,
+                "live_route": live_route_payload,
                 **(
                     {"delta_shadow": delta_shadow}
                     if isinstance(delta_shadow, dict)
@@ -634,6 +708,14 @@ def run_agent_web(
         runtime_environment_notes=runtime_state["runtime_environment_notes"],
         harness_mode=base_harness_decision.mode,
         harness_mode_decision=base_harness_decision.to_dict(),
+        live_route=live_route_payload,
+        analysis_evidence=analysis_evidence,
+        repository_inventory=operation_inventory,
+        repository_graph=(
+            program_graph
+            if "program_graph" in locals()
+            else None
+        ),
     )
 
     shadow_run_id = ""
@@ -669,14 +751,23 @@ def run_agent_web(
             if patch_intent.get("source_snippet"):
                 print("✅ CONTROL source_snippet recovered from Scout fallback")
 
-        pre_generation_decision = decide_harness_mode(
-            repo_root=state.repo_path or repo_path or ".",
-            runtime_environment=state.runtime_environment,
-            request_path=_request_path_hint_or_repo(query, repo_path),
-            target_path=_control_target_path(state.control_result),
-            source_text=_control_source_text(state.control_result),
-            index_degraded=_context_is_degraded(state.control_result),
-            patch_gates_passed=True,
+        # The harness gate decides whether a *patch* may be generated: without
+        # source text it answers "source context is missing".  On a read-only
+        # route there is no patch to generate and no source snippet to be
+        # missing, so it is not consulted — refusing to write a patch is not an
+        # answer to a question nobody asked one for.
+        pre_generation_decision = (
+            base_harness_decision
+            if live_route.read_only
+            else decide_harness_mode(
+                repo_root=state.repo_path or repo_path or ".",
+                runtime_environment=state.runtime_environment,
+                request_path=_request_path_hint_or_repo(query, repo_path),
+                target_path=_control_target_path(state.control_result),
+                source_text=_control_source_text(state.control_result),
+                index_degraded=_context_is_degraded(state.control_result),
+                patch_gates_passed=True,
+            )
         )
         state.harness_mode = pre_generation_decision.mode
         state.harness_mode_decision = pre_generation_decision.to_dict()
@@ -695,6 +786,7 @@ def run_agent_web(
                 "patch": "",
                 "validation": "",
                 "project_tag": final_tag,
+                "live_route": live_route_payload,
                 **(
                     {"delta_shadow": delta_shadow}
                     if isinstance(delta_shadow, dict)
@@ -743,7 +835,113 @@ def run_agent_web(
                     )
                 except Exception as e:
                     print(f"⚠️ DB memory save skipped: {e}")
+        # CONTROL's existing prompt preparation projects RepairScope without
+        # invoking the patch author; the detector consumes that measured scope.
+        if state.interface == "agent" and not live_route.read_only and state.control_result:
+            build_control_prompt(
+                control_result=state.control_result, user_query=query,
+                repo_path=state.repo_path,
+            )
+        # A compiler-bound ownership ambiguity is admitted by the harness
+        # before the patch author is sampled.  The existing model escalation
+        # path below remains available for unsupported ambiguity classes.
+        detection = detect_repair_intent_ambiguity(
+            task_text=query, control=state.control_result or {},
+            repo_path=state.repo_path or "", language=state.language or language,
+        ) if state.interface == "agent" and not live_route.read_only else None
+        if detection is not None and detection.gap is not None:
+            gap = detection.gap
+            wait_id = create_repair_intent_wait(
+                repo_path=state.repo_path, task_text=query,
+                control=state.control_result, gap=gap.as_dict(),
+            )
+            question = render_question(gap)
+            try:
+                save_message(session_id, "user", query)
+                save_message(session_id, "assistant", question)
+            except Exception:
+                pass
+            return {
+                "answer": question, "context": "", "graph": "", "state": "",
+                "patch": "", "validation": "", "project_tag": final_tag,
+                "patch_candidate": None, "patch_plan": None,
+                "write_authority": False, "execution_authorized": False,
+                "auto_apply": False, "status": "waiting_for_clarification",
+                "code": "needs_clarification", "clarification_session_id": wait_id,
+                "repair_intent_gap": gap.as_dict(),
+                "ambiguity_detection": detection.as_dict(),
+                "patch_author_calls": 0, "live_route": live_route_payload,
+                **runtime_state,
+                "runtime_environment_description": runtime_description,
+                **_harness_payload(base_harness_decision),
+            }
+        if state.interface == "agent" and not live_route.read_only and state.control_result:
+            from web.oop_intent_adapter import admit_oop_patch_wait
+            oop_wait = admit_oop_patch_wait(
+                control=state.control_result, repo_path=state.repo_path or "",
+                task_text=query)
+            if oop_wait is not None:
+                return {**oop_wait, "project_tag": final_tag,
+                        "live_route": live_route_payload, **runtime_state,
+                        "runtime_environment_description": runtime_description}
         draft = run_draft_pipeline(state)
+        scope = (state.control_result or {}).get("repair_scope") or {}
+        draft_block = extract_json_block(draft)
+        if isinstance(draft_block, dict):
+            admission = admit_author_escalation(draft_block, raw_response=draft)
+            if not admission.admitted:
+                quarantine = admission.quarantine_receipt()
+                common = {
+                    "context": "", "graph": "", "state": "", "patch": "",
+                    "validation": "", "project_tag": final_tag,
+                    "patch_candidate": None, "patch_plan": None,
+                    "author_escalation_receipt": quarantine,
+                    "write_authority": False, "execution_authorized": False,
+                    "live_route": live_route_payload,
+                    **runtime_state,
+                    "runtime_environment_description": runtime_description,
+                    **_harness_payload(base_harness_decision),
+                }
+                if admission.semantic:
+                    author_for_gap = dict(draft_block, patch_candidate=None,
+                                          patch_plan=None)
+                    try:
+                        gap = admit_gap(
+                            author=author_for_gap, task_text=query,
+                            control=state.control_result or {}, scope=scope,
+                            repo_path=state.repo_path or "",
+                        ) if scope else None
+                    except EvidenceRefError:
+                        return {**common,
+                                "answer": "The semantic evidence reference did not resolve.",
+                                "status": "needs_clarification",
+                                "code": "semantic_gap_evidence_unresolved"}
+                    if gap is not None:
+                        wait_id = create_repair_intent_wait(
+                            repo_path=state.repo_path, task_text=query,
+                            control=state.control_result, gap=gap.as_dict(),
+                            author_escalation_receipt=quarantine,
+                        )
+                        question = render_question(gap)
+                        try:
+                            save_message(session_id, "user", query)
+                            save_message(session_id, "assistant", question)
+                        except Exception:
+                            pass
+                        return {**common, "answer": question,
+                                "status": "waiting_for_clarification",
+                                "code": "needs_clarification",
+                                "clarification_session_id": wait_id,
+                                "repair_intent_gap": gap.as_dict()}
+                    return {**common,
+                            "answer": "The intended behavior is unclear. Please describe the expected behavior and retry.",
+                            "status": "needs_clarification",
+                            "code": "unbounded_semantic_gap"}
+                return {**common,
+                        "answer": "The author requested escalation; its candidate was quarantined.",
+                        "status": admission.status,
+                        "code": admission.reason if admission.status == "author_escalation_required"
+                                else admission.status}
         _maybe_update_run_progress_snapshot_shadow(
             run_id=shadow_run_id,
             mode=mode,
@@ -760,32 +958,48 @@ def run_agent_web(
             mode_label="web",
         )
         grounding_failed = _grounding_failed(state.json_block)
-        post_gate_decision = decide_harness_mode(
-            repo_root=state.repo_path or repo_path or ".",
-            runtime_environment=state.runtime_environment,
-            request_path=_request_path_hint_or_repo(query, repo_path),
-            target_path=_control_target_path(state.control_result),
-            source_text=_control_source_text(state.control_result),
-            grounding_failed=grounding_failed,
-            index_degraded=_context_is_degraded(state.control_result),
-            patch_gates_passed=not grounding_failed,
+        post_gate_decision = (
+            base_harness_decision
+            if live_route.read_only
+            else decide_harness_mode(
+                repo_root=state.repo_path or repo_path or ".",
+                runtime_environment=state.runtime_environment,
+                request_path=_request_path_hint_or_repo(query, repo_path),
+                target_path=_control_target_path(state.control_result),
+                source_text=_control_source_text(state.control_result),
+                grounding_failed=grounding_failed,
+                index_degraded=_context_is_degraded(state.control_result),
+                patch_gates_passed=not grounding_failed,
+            )
         )
         state.harness_mode = post_gate_decision.mode
         state.harness_mode_decision = post_gate_decision.to_dict()
-        if state.json_block:
-            state.final_answer = json.dumps(state.json_block, indent=2, ensure_ascii=False)
-            state.human_answer = state.final_answer
+        if live_route.read_only:
+            # No repository change was requested; nothing may be applied.
+            print("🧭 WAITER: read-only route — no patch application attempted.")
+            # EXEC.AUTH.LIVE.1 §9/§10 — an analysis or clarification answer
+            # states the absence of execution as a fact, so nothing downstream
+            # has to infer it from a missing patch field.
+            attach_execution_telemetry(
+                state.json_block, no_execution(DENIED_NO_CHANGE_REQUESTED)
+            )
+        elif post_gate_decision.can_apply_patch:
+            maybe_run_auto_patch(state, interactive=False)
+        else:
+            print(f"Harness mode blocks apply: {post_gate_decision.mode}")
+            attach_execution_telemetry(
+                state.json_block, no_execution(DENIED_HARNESS_MODE_BLOCKED)
+            )
+        # ANSWER.GROUND.LIVE.1 — execution/authority is terminal above.  Only
+        # now may the display/persistence copy be downgraded, so entity
+        # truthfulness can neither grant nor disturb patch authority.
+        grounding_receipt = ground_state_answer(state)
 
         print("💾 PATCH RESULT:")
         if state.json_block:
             print(json.dumps(state.json_block, indent=2, ensure_ascii=False))
         else:
             print("No structured patch JSON.")
-
-        if post_gate_decision.can_apply_patch:
-            maybe_run_auto_patch(state, interactive=False)
-        else:
-            print(f"Harness mode blocks apply: {post_gate_decision.mode}")
         state.session_id = session_id
         try:
             save_message(session_id, "user", query)
@@ -799,7 +1013,9 @@ def run_agent_web(
             "state": _harness_debug(post_gate_decision) + "\n\n" + (state.memory_block or ""),
             "patch": json.dumps(state.json_block, indent=2) if state.json_block else "",
             "validation": state.validation_output or "",
+            "answer_entity_grounding": grounding_receipt,
             "project_tag": final_tag,
+                "live_route": live_route_payload,
             **(
                 {"delta_shadow": delta_shadow}
                 if isinstance(delta_shadow, dict)
@@ -843,6 +1059,7 @@ def run_agent_web(
             "patch": "",
             "validation": "",
             "project_tag": final_tag,
+                "live_route": live_route_payload,
             **(
                 {"delta_shadow": delta_shadow}
                 if isinstance(delta_shadow, dict)

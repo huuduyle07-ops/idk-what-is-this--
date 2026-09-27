@@ -1,0 +1,15 @@
+{
+  "phase": "DATA.ROLLBACK.1",
+  "sha256": {
+    "core/mutation_oracle.py": "dcd114153c0111903364d1234e6e66b7ddd66e227154f564bdc1ec076de80bd2",
+    "patching/patch_plan_transaction.py": "7b29f583da2a649290958b3e58009413c9389f0f41522430d86edf2f555496fe",
+    "core/undo_backup.py": "1c5c6cd16f00dd08c56232e30fc4d378c178a996dd8820dedf19c3b4e9b17050",
+    "core/dream_review_binding.py": "06bab93181813d25ae3490b9d7aebed9a0d352f23cd577fc4421e8ed6e62f825",
+    "core/human_apply_authorization.py": "7f65a55cf237193ead702f0a99f3668f649e7efabe7c2618e244cd9518c94e89",
+    "web/app.py": "b6f34009812f7efe0ab4681b007dda01798539622c1e0bac6c46ef8bff6dba6f",
+    "web/templates/index.html": "3f9dd3cc54ca149320f6d9c467281b3262cf76d6c4ca547542ef60b5694fc7d7",
+    "web/static/safe_content.js": "f60cc819d554958b69f1897178111931ad7770726d9306dc3fd0637afb251745",
+    "docs/audits/2026-09-11-security-and-ui-ux-review-vi.md": "cae6d7375eb0aa87c607edd2f3336321c10c70edc6194a1cb9a27fb68efdbee1",
+    "docs/audits/2026-09-11-security-and-ui-ux-results.json": "001399d888c239607b043b2a2abdf0ffdfbaa9ffe98a0b367eabe667d4ae0c93"
+  }
+}

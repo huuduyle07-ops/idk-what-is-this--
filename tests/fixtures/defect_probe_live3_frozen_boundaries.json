@@ -1,0 +1,38 @@
+{
+  "schema_version": "defect_probe_live_3_frozen_boundaries_v1",
+  "phase_id": "DEFECT.PROBE.LIVE.3",
+  "notes": [
+    "Whole-file digests for everything DEFECT.PROBE.LIVE.3 was forbidden to change: the probe execution engine and its worker, the typed-fact extractor, the production _classify_indent it measures, every authority and eligibility surface, OPS.VALIDATE.3, patch basis and safety, CONTROL ranking and RETRIEVE recall, and the sandbox/apply primitives it reuses.",
+    "AST digests for the DEFECT.PROBE.LIVE.2 comparison-integrity rules. This phase added a companion-probe parameter and one closure status to core/candidate_defect_probe.py; what makes a comparison valid, what makes it stale, and how the managed sandbox is disposed of are pinned here so the addition cannot quietly relax any of them.",
+    "CONTROL.LOCALIZE.LIVE.2 pinned core/candidate_defect_probe.py by whole-file digest. That digest was re-pinned for this phase, and this fixture is the finer-grained invariant it used to carry."
+  ],
+  "files": {
+    "core/defect_probe.py": "4f5c8cb1b4a98558215d5d7b3cd20cee256c89e11e2ac4e13ed71b6ebb42913c",
+    "core/defect_probe_worker.py": "7a7118e88938341f5f406605d2cc1e23d1ba57c0543f4f308ae28124d4b74138",
+    "core/code_dna.py": "8725b73cea83d010c6d84b896bda524e32b249021d3fada8197d9f27e6d1efc5",
+    "core/behavioral_expectation.py": "2411f412c1b4ec43cf0fac2ad46c895d01b3631819a91a08791c1d3405a290a6",
+    "core/execution_eligibility_policy.py": "54721c5f9bcab07b74eabb1e6bcc5cafb8af404717aab09ce9af8f935963c2b5",
+    "core/live_execution_authorization.py": "72785ea65de0bf88e18c32ce3617170451c666ad7a03162183c921789ab8c784",
+    "core/human_apply_authorization.py": "7f65a55cf237193ead702f0a99f3668f649e7efabe7c2618e244cd9518c94e89",
+    "core/targeted_repository_validation.py": "116cded9cf6f07bf9b53d2e20f45beef2a6643a23898f7a4ea5e8ea16ee7e1e5",
+    "core/patch_basis.py": "c3031916020d71e6ee8471dfb43330b5329247cd202004f48dbe707d8670bb6c",
+    "core/patch_safety.py": "a5e4e3766422d4b7cd185ae478584fe6c8e49f69cac4b245ff85cd44c5de95c9",
+    "core/control_engine.py": "8d0b55141f24d2e5ac244774452d3a9434d455b8a0f424968f4f6824b9e63ee6",
+    "core/localization_relevance.py": "4dbe61eee856be4c0239c9a13d4a8779b14d42c600deb5050aaf21c63ee37b0e",
+    "core/identifier_recall.py": "0fb5b00effe02847c06a28e186d7ba8c8cefb83f0df89eba21961ebef6e68c88",
+    "patching/patch_plan_executor.py": "b1a874c1de5818c80981bd2eb27f996e4d252f7728421d6d38a84427b0b75222",
+    "core/sandbox_self_evolution_runner.py": "127211ffad23bd79c2ba76506eb75eb8bf31591adb73f0d6c913a704bc7ddf6b",
+    "core/validation_execution.py": "c1776d1e917e9b90634ab55333c2dceed812b7e494f57693cecaa6e512b3194d"
+  },
+  "candidate_closure_functions": {
+    "_oracle_integrity_error": "a298a14920aaa5ffe3dc88350cb22c10894ab1c13b2222210a63843fa3e9dc87",
+    "_candidate_paths": "64ad61b0b973537628465d68c089c9729ac8abe2a95eb34e51b6051638f5ebd6",
+    "_receipt_payload": "8b37cf82ce9b1324723be8052ef588b8b3c97de6c8158123954e3656d70e9249",
+    "_receipt_observed": "aee699a26718184be6992493ff87e1823a1e21da2f8c1dd1bdf1daede48b6166",
+    "_normalized_path": "be0616b606801d03af6cfd4ff3be5b557793aab92f0a3ce5a6012c7656babaff",
+    "candidate_defect_closure_is_current": "146f9607b1b9dff9e295b192b3e0c7d84de3d47ee39d5fa3de198b1ac3d9c4b9",
+    "_cleanup": "587614af704989bcd7048ef36cb88a978374eba91496802fbd5bd72b93ca3566"
+  },
+  "control_engine_pre_live2_sha256": "60a9452f7e356333c9157b5d64c0131382e8408d67d761ede53cea4d2ffea23a",
+  "patch_author_live2_repin_note": "PATCH.AUTHOR.LIVE.2 (2026-09-10) is the phase authorised to move the patch-authoring contract: the candidate wire shape, the exact field names, the output-only rules and the safe_minimal identifier constraints now live in core/patch_authoring_contract.py, and the initial draft and the single verification-guided revision both render from there. core/control_engine.py moved for that reason and for no other. The initial-draft prompt is byte-identical across 82 configurations, and tests/fixtures/patch_author_live2_contract_reversal.json stores the hunks that reverse the change, so a test reconstructs the pre-LIVE.2 bytes from the shipped file and asserts the digest this note replaced."
+}

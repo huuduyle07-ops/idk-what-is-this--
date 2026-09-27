@@ -160,8 +160,8 @@ def test_no_new_backend_tokens_in_template():
     for token in forbidden:
         assert token not in t, f"unexpected privileged token in template: {token!r}"
 
-    # UI.1 fixed the external-script count; UI.2 must not add new ones.
-    assert t.count("<script src=") == 2
+    # SEC.UI.1 adds two local security assets; external-script count stays one.
+    assert t.count("<script src=") == 6  # two local SEC.UI.1 security assets, the AUTH.WEB.1 request-integrity owner and the UX.STATE.1 workflow-state owner
     assert t.count('src="http') == 1  # mermaid CDN only
 
 

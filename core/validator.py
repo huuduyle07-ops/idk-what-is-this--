@@ -8,6 +8,18 @@ from typing import Tuple, Dict, Optional
 from dataclasses import dataclass
 
 from core.validation_command import validation_command_safety_issue
+from core.validation_bytecode_cache import (
+    apply_validation_bytecode_cache_env,
+    validation_bytecode_cache,
+)
+from core.validation_execution import VALIDATION_BUDGET_EXHAUSTED_MARKER
+from core.validation_outcome import (
+    CATEGORY_NO_TESTS_COLLECTED,
+    CATEGORY_VALIDATION_BUDGET_EXHAUSTED,
+    CATEGORY_VALIDATION_TOOL_UNAVAILABLE,
+    budget_exhausted_info,
+    outcome_reason,
+)
 # Compilers whose runtime DLLs frequently collide with Anaconda's bundled
 # mingw-w64 stubs (or other parallel installs) on Windows. When we see one of
 # these on PATH, we prepend its install dir to PATH for the child process so
@@ -149,11 +161,23 @@ def _looks_like_go_validation_command(command: str) -> bool:
     return re.match(r"^\s*(?:go|go\.exe)\b", command or "", flags=re.IGNORECASE) is not None
 
 
-def _validation_command_env(command: str, cwd: str) -> Optional[dict]:
+def _validation_command_env(
+    command: str,
+    cwd: str,
+    *,
+    pycache_prefix: str = "",
+) -> Optional[dict]:
     env = _native_toolchain_env()
 
     if sys.platform != "win32" or not _looks_like_go_validation_command(command):
-        return env
+        # OPS.VALIDATE.2 - a fresh bytecode cache is worth materialising the
+        # environment for even when no toolchain fix is needed, because
+        # ``env=None`` means "inherit", and the inherited PYTHONPYCACHEPREFIX is
+        # exactly the stale state this defends against.
+        if not pycache_prefix:
+            return env
+        env = dict(env) if env is not None else os.environ.copy()
+        return apply_validation_bytecode_cache_env(env, pycache_prefix)
 
     env = dict(env) if env is not None else os.environ.copy()
     try:
@@ -166,57 +190,187 @@ def _validation_command_env(command: str, cwd: str) -> Optional[dict]:
         env["GOCACHE"] = str(cache_dir)
     except OSError:
         pass
-    return env
+    return apply_validation_bytecode_cache_env(env, pycache_prefix)
 
 
-def run_validation_command(command: str, cwd: str, timeout: int = 30) -> tuple[bool, str]:
-    """Run a legacy/manual shell validation command.
+@dataclass(frozen=True)
+class ValidationRun:
+    """One legacy validation execution, including the runner's exit code.
+
+    The exit code is the fact the classifier could never see before: pytest
+    reserves ``5`` for "no tests were collected", which is the only completely
+    unambiguous way to distinguish a suite that ran nothing from one that ran
+    and failed.  ``exit_code`` is ``None`` when no process was started at all
+    (empty command, safety refusal) or when it did not finish (timeout, OS
+    error).
+    """
+
+    ok: bool
+    output: str
+    exit_code: Optional[int] = None
+    timed_out: bool = False
+    # OPS.VALIDATE.2 - the budget this attempt was given, so a timed-out run can
+    # name what ran out instead of leaving a reader to infer it, and the bounded
+    # fact that the attempt did not consult repository bytecode.  No temp path
+    # is carried anywhere.
+    timeout_seconds: Optional[int] = None
+    python_bytecode_cache_isolated: bool = False
+
+
+# A leading *bare* python launcher token - not a path, not an argument.
+_BARE_PYTHON_LAUNCHER_RE = re.compile(
+    r"^\s*(?:python3?|py)(?:\.exe)?(?=\s|$)", re.IGNORECASE
+)
+
+# Anything that needs a shell to mean what it says.
+_SHELL_META_RE = re.compile(r"&&|\|\||\$\(|[`&;|<>]")
+
+
+def _current_interpreter_argv(command: str) -> Optional[list]:
+    """Argv for a bare-``python`` command, bound to *this* interpreter.
+
+    ``python`` on PATH is not necessarily the interpreter C.A.T.T.U.S runs
+    under.  On Windows that gap is the norm: the active virtualenv owns pytest
+    and the project's dependencies while the PATH ``python`` - if there is one -
+    owns neither.  When the command is a plain python invocation with no shell
+    syntax in it, it is therefore executed directly as argv with
+    ``sys.executable`` in front, which also sidesteps quoting an interpreter
+    path through ``cmd.exe``, where a quoted executable beside a quoted argument
+    is mangled.
+
+    Returns ``None`` for every other command, which then runs through the shell
+    exactly as before.  This is one deterministic representation choice, not a
+    fallback chain: nothing is retried under a second interpreter.
+    """
+    if not sys.executable:
+        return None
+    if not _BARE_PYTHON_LAUNCHER_RE.match(command or ""):
+        return None
+    if _SHELL_META_RE.search(command or ""):
+        return None
+    # POSIX splitting is what removes the quotes around an argument such as
+    # `python -c "import app"`, but it also eats backslashes, which on Windows
+    # are path separators.  A command containing one is left to the shell that
+    # has always handled it rather than being silently re-spelt.
+    if "\\" in (command or ""):
+        return None
+    try:
+        argv = shlex.split(command, posix=True)
+    except ValueError:
+        return None
+    if not argv:
+        return None
+    return [sys.executable, *argv[1:]]
+
+
+def run_validation_command_detailed(
+    command: str,
+    cwd: str,
+    timeout: int = 30,
+) -> ValidationRun:
+    """Run a legacy/manual shell validation command and report how it ended.
 
     This is retained for backwards-compatible human/manual validation flows.
     Automation and self-evolution callers must use
     core.validation_execution.SafeValidationCommand instead.
     """
     if not command:
-        return True, ""
+        return ValidationRun(ok=True, output="")
 
-    # Phase 13.6 — shared shell chokepoint. Every validation command (user text,
+    # Phase 13.6 - shared shell chokepoint. Every validation command (user text,
     # hardcoded default, or DB/profile-derived) flows through here before the
     # shell sees it, so this is the one place to screen for destructive ops. With
-    # shell=True below, an unscreened command would run verbatim — so refuse here
+    # shell=True below, an unscreened command would run verbatim - so refuse here
     # and never execute it.
     issue = validation_command_safety_issue(command)
     if issue:
-        return False, f"❌ Validation command blocked for safety: {issue}"
-
-    try:
-        is_windows = sys.platform == "win32"
-
-        shell_executable = None
-        if not is_windows:
-            shell_executable = "/bin/bash" if Path("/bin/bash").exists() else "/bin/sh"
-
-        result = subprocess.run(
-            command,
-            cwd=cwd,
-            shell=True,
-            executable=shell_executable,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            encoding="utf-8",
-            errors="replace",
-            env=_validation_command_env(command, cwd),
+        return ValidationRun(
+            ok=False,
+            output=f"\u274c Validation command blocked for safety: {issue}",
+            timeout_seconds=timeout,
         )
 
-        output = (result.stdout or "") + (result.stderr or "")
-        return result.returncode == 0, output.strip()
+    # Interpreter resolution happens strictly after the safety screen, so the
+    # text that was screened is the text that runs.
+    argv = _current_interpreter_argv(command)
 
-    except subprocess.TimeoutExpired as e:
-        output = ((e.stdout or "") + (e.stderr or "")) if hasattr(e, "stdout") else ""
-        return False, f"❌ Validation Timeout after {timeout}s\n{output}"
+    # OPS.VALIDATE.2 - one fresh bytecode cache per execution, removed on every
+    # exit path including the timeout branch.
+    with validation_bytecode_cache() as pycache_prefix:
+        isolated = bool(pycache_prefix)
+        try:
+            is_windows = sys.platform == "win32"
 
-    except Exception as e:
-        return False, f"❌ Execution Error: {e}"
+            shell_executable = None
+            if argv is None and not is_windows:
+                shell_executable = (
+                    "/bin/bash" if Path("/bin/bash").exists() else "/bin/sh"
+                )
+
+            result = subprocess.run(
+                argv if argv is not None else command,
+                cwd=cwd,
+                shell=argv is None,
+                executable=shell_executable,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                encoding="utf-8",
+                errors="replace",
+                env=_validation_command_env(
+                    command, cwd, pycache_prefix=pycache_prefix
+                ),
+            )
+
+            output = (result.stdout or "") + (result.stderr or "")
+            return ValidationRun(
+                ok=result.returncode == 0,
+                output=output.strip(),
+                exit_code=result.returncode,
+                timeout_seconds=timeout,
+                python_bytecode_cache_isolated=isolated,
+            )
+
+        except subprocess.TimeoutExpired as e:
+            # ``subprocess.run`` has already killed and reaped the child, so no
+            # validation process survives this call.  The budget marker goes
+            # into the output so even a caller that drops ``timed_out`` cannot
+            # launder this into a test failure.
+            output = (
+                ((e.stdout or "") + (e.stderr or "")) if hasattr(e, "stdout") else ""
+            )
+            return ValidationRun(
+                ok=False,
+                output=(
+                    f"\u23f1\ufe0f Validation "
+                    f"{VALIDATION_BUDGET_EXHAUSTED_MARKER} after {timeout}s"
+                    f"\n{output}"
+                ),
+                timed_out=True,
+                timeout_seconds=timeout,
+                python_bytecode_cache_isolated=isolated,
+            )
+
+        except Exception as e:
+            return ValidationRun(
+                ok=False,
+                output=f"\u274c Execution Error: {e}",
+                timeout_seconds=timeout,
+                python_bytecode_cache_isolated=isolated,
+            )
+
+
+def run_validation_command(command: str, cwd: str, timeout: int = 30) -> tuple[bool, str]:
+    """Backwards-compatible ``(ok, output)`` view of the legacy/manual shell runner.
+
+    Retained for human/manual validation flows and for callers that predate the
+    exit code.  It adds no second execution path: every command still goes
+    through ``run_validation_command_detailed``, which is where the safety
+    screen lives.  Automation and self-evolution callers must use
+    ``core.validation_execution.SafeValidationCommand`` instead.
+    """
+    run = run_validation_command_detailed(command, cwd=cwd, timeout=timeout)
+    return run.ok, run.output
 
 
 run_legacy_validation_command = run_validation_command
@@ -609,8 +763,131 @@ def validate_patch_plan_grounding(repo_path: str, plan: list[dict]) -> list[str]
 
     return errors
 
-def classify_validation_output(output: str) -> Dict[str, str]:
+# -- OPS.VALIDATE.1 - "did anything actually get checked?" --------------------
+
+#: Runners whose *own* absence means the validation tool is missing, as opposed
+#: to a module the repository under test needs.  ``No module named requests`` is
+#: a fact about the repository; ``No module named pytest`` is a fact about this
+#: environment, and only the first is evidence about the code.
+_RUNNER_MODULE_MISSING_RE = re.compile(
+    r"""no module named ['"]?(?:pytest|unittest|nose2|nose)\b"""
+)
+
+#: The command itself never started, or the shell could not find it.
+_EXECUTABLE_MISSING_RE = re.compile(
+    r"is not recognized as an internal or external command"
+    r"|: command not found"
+    r"|safe validation execution error"
+    r"|missing script:"
+)
+
+_PYTEST_INVOCATION_RE = re.compile(
+    r"(?:^|[^\w.-])(?:pytest|py[.]test)\b", re.IGNORECASE
+)
+
+#: pytest's documented exit status for "no tests were collected".
+PYTEST_EXIT_NO_TESTS_COLLECTED = 5
+
+_ZERO_TESTS_MARKERS: tuple = (
+    "no tests ran",
+    "no tests collected",
+    "no tests were collected",
+)
+
+_ZERO_TESTS_RE = re.compile(r"\bran 0 tests?\b|\bcollected 0 items?\b")
+
+
+def _looks_like_pytest_command(command: str) -> bool:
+    return bool(_PYTEST_INVOCATION_RE.search(command or ""))
+
+
+def detect_no_tests_collected(
+    output: str,
+    *,
+    exit_code: Optional[int] = None,
+    command: str = "",
+) -> bool:
+    """True when the runner finished having executed no check at all.
+
+    Zero collected tests is neither a pass nor a failure: a suite that ran
+    nothing has said nothing about the patch.  Before this existed, pytest's
+    "no tests ran" was funnelled into ``test_failure`` while unittest's ``Ran 0
+    tests`` came back with exit code 0 and was read as success - the same
+    non-event reported as both a defect and a proof.
+
+    The exit code is authoritative where the runner defines one; output markers
+    are consulted only when the exit code does not already say the run failed
+    for some other reason, so a collection *error* (pytest exit 2, which also
+    prints ``collected 0 items``) stays the import or syntax error it really is.
+    """
+    if (
+        _looks_like_pytest_command(command)
+        and exit_code == PYTEST_EXIT_NO_TESTS_COLLECTED
+    ):
+        return True
+    if exit_code is not None and exit_code not in (
+        0,
+        PYTEST_EXIT_NO_TESTS_COLLECTED,
+    ):
+        return False
     text = (output or "").lower()
+    if not text:
+        return False
+    if any(marker in text for marker in _ZERO_TESTS_MARKERS):
+        return True
+    return bool(_ZERO_TESTS_RE.search(text))
+
+
+def detect_validation_tool_unavailable(
+    output: str,
+    *,
+    command: str = "",
+) -> bool:
+    """True when the validation tool, not the repository, is what is missing."""
+    del command  # reserved: classification is decided by the runner's own words
+    text = (output or "").lower()
+    if not text:
+        return False
+    if _RUNNER_MODULE_MISSING_RE.search(text):
+        return True
+    return bool(_EXECUTABLE_MISSING_RE.search(text))
+
+
+def detect_validation_budget_exhausted(output: str) -> bool:
+    """True when the output carries the marker a stopped-at-budget run writes.
+
+    Structural notification is the primary channel: every runner returns
+    ``timed_out`` and every caller passes it on.  This reads the marker the two
+    runners also write into the output, so a caller that forgets the flag still
+    cannot let the failure taxonomy see partial pytest output and call it a
+    test failure.  The marker is a fixed phrase this project emits, not a
+    guess at what a runner might print.
+    """
+    return VALIDATION_BUDGET_EXHAUSTED_MARKER in (output or "").lower()
+
+
+def classify_validation_output(
+    output: str,
+    *,
+    exit_code: Optional[int] = None,
+    command: str = "",
+    timed_out: bool = False,
+    timeout_seconds: Optional[int] = None,
+) -> Dict[str, str]:
+    text = (output or "").lower()
+
+    # OPS.VALIDATE.2 - first, before every branch below.
+    #
+    # A command stopped at its own budget produced *partial* output, and
+    # partial pytest output contains "collected N items" and often a "FAILED"
+    # line or two.  Every taxonomy branch below is a claim about the
+    # repository, and each of them would happily read that partial text: on the
+    # C.A.T.T.U.S self-repository run (~8,944 tests, 30 s budget) the generic
+    # test_patterns branch matched and production reported ``test_failure`` for
+    # a suite that had proved nothing.  The budget is a fact about the
+    # validator, so it is settled here where no later branch can overwrite it.
+    if timed_out or detect_validation_budget_exhausted(output):
+        return budget_exhausted_info(timeout_seconds)
 
     if (
         "no .net sdks were found" in text
@@ -633,6 +910,32 @@ def classify_validation_output(output: str) -> Dict[str, str]:
             "category": "missing_toolchain",
             "reason": "The validation command could not run because the required CLI tool is missing from PATH.",
             "hint": "Restart the terminal/Flask app after installing the tool, or add the tool to PATH.",
+        }
+
+    # OPS.VALIDATE.1 — infrastructure facts are settled before the code
+    # taxonomy runs, because every category below this point is a claim about
+    # the repository, and a runner that never reached the repository has not
+    # earned one.  Order matters: the two toolchain branches above already own
+    # their vocabulary, so they keep it.
+    if detect_no_tests_collected(output, exit_code=exit_code, command=command):
+        return {
+            "category": CATEGORY_NO_TESTS_COLLECTED,
+            "reason": outcome_reason(CATEGORY_NO_TESTS_COLLECTED),
+            "hint": (
+                "Nothing was executed, so this run is not evidence about the "
+                "patch. Point the validation command at tests that exist."
+            ),
+        }
+
+    if detect_validation_tool_unavailable(output, command=command):
+        return {
+            "category": CATEGORY_VALIDATION_TOOL_UNAVAILABLE,
+            "reason": outcome_reason(CATEGORY_VALIDATION_TOOL_UNAVAILABLE),
+            "hint": (
+                "Install or configure the validation tool in this environment, "
+                "or supply a validation command that uses what is available. "
+                "Nothing is installed automatically."
+            ),
         }
 
     if not text:

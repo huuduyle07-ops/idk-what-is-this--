@@ -1,0 +1,467 @@
+{
+  "phase_id": "PATCH.MINIMAL.LIVE.3",
+  "schema_version": "patch_minimal_live_3_completion_v1",
+  "status": "complete",
+  "completed_date": "2026-09-13",
+  "live3a_status": "carried_forward",
+  "live3b_status": "complete",
+  "pre": {
+    "candidate_novelty_reason": "novel_external_reference",
+    "unexplained_identifiers": [
+      "value"
+    ],
+    "live3b_proof_disabled_only": true
+  },
+  "post": {
+    "candidate_effect_status": "mutating",
+    "candidate_effect_candidate_fingerprint": "dff855b8d02b0439fbed62927f0c19f868c7233b819e9efb8636adcfb4a1b055",
+    "candidate_probe_apply_status": "applied",
+    "behavioral_matrix_status": "fixed_and_preserved",
+    "behavioral_matrix_case_count": 8,
+    "candidate_verification_status": "verified",
+    "candidate_verification_components": [
+      {
+        "component": "patch_safety",
+        "verdict": "supporting",
+        "reason": "",
+        "detail": ""
+      },
+      {
+        "component": "exact_candidate_sandbox",
+        "verdict": "supporting",
+        "reason": "",
+        "detail": ""
+      },
+      {
+        "component": "paired_defect_probe",
+        "verdict": "supporting",
+        "reason": "",
+        "detail": ""
+      },
+      {
+        "component": "targeted_validation",
+        "verdict": "not_applicable",
+        "reason": "",
+        "detail": "no existing check is structurally related to the target"
+      },
+      {
+        "component": "oracle_assessment",
+        "verdict": "supporting",
+        "reason": "",
+        "detail": ""
+      }
+    ],
+    "execution_authorized": false,
+    "final_repository_changed": false,
+    "target_sha256": "58944200dc3fba429634e791791c8373ba91db64b86fa6a55c5ae1daf05c2637",
+    "candidate_novelty_reason": "proven_immutable_result_field_read",
+    "auto_apply_allowed": false,
+    "write_authority": false
+  },
+  "performance": {
+    "return_type_proof_median_ms": 15.058399992994964,
+    "field_lookup_median_ms": 0.03339999238960445,
+    "safe_minimal_pre_median_ms": 1.3591000024462119,
+    "safe_minimal_post_median_ms": 2.0904999983031303,
+    "safe_minimal_gate_delta_ms": 0.7313999958569184,
+    "safe_minimal_total_incremental_median_ms": 15.789799988851883,
+    "total_delta_method": "Sum of incremental proof-construction median and POST-minus-PRE gate medians; 31 samples, no source traversal."
+  },
+  "candidate_body": "    return assess_indentation_observation(\n        observe_source_indentation(\n            text,\n            language=language,\n        )\n    ).value",
+  "candidate_body_sha256": "8e3af8a350dea9bdaabdba7935b572a57581cde7b5aeabf43dd01fd131daacf4",
+  "authoritative_context": {
+    "phase_id": "PATCH.MINIMAL.LIVE.3",
+    "schema_version": "patch_minimal_live_3_v1",
+    "source_path": "core/code_dna.py",
+    "source_sha256": "8c9f36646c5d991167c509559417697c4d8aebc939870830da5b1ce0fd4fabb8",
+    "target_symbol": "_classify_indent",
+    "target_source_sha256": "1791a0594def14f0efa90e6150a4689cae2b8667b944f51fbb87ab39b0adcfbf",
+    "target_start_line": 101,
+    "target_end_line": 118,
+    "parameter_names": [
+      "language",
+      "text"
+    ],
+    "existing_local_names": [
+      "counts",
+      "line"
+    ],
+    "repository_local_direct_imports": [
+      {
+        "bound_name": "assess_indentation_observation",
+        "imported_name": "assess_indentation_observation",
+        "module": "core.indentation_observation",
+        "resolved_module_path": "core/indentation_observation.py"
+      },
+      {
+        "bound_name": "observe_source_indentation",
+        "imported_name": "observe_source_indentation",
+        "module": "core.indentation_observation",
+        "resolved_module_path": "core/indentation_observation.py"
+      },
+      {
+        "bound_name": "redact_credentials",
+        "imported_name": "redact_credentials",
+        "module": "core.credential_redaction",
+        "resolved_module_path": "core/credential_redaction.py"
+      }
+    ],
+    "immutable_result_callable_proofs": [
+      {
+        "bound_name": "assess_indentation_observation",
+        "type_name": "SourceIndentationAssessment",
+        "type_source_path": "core/indentation_observation.py",
+        "field_names": [
+          "basis",
+          "observation",
+          "space_unit",
+          "value"
+        ]
+      },
+      {
+        "bound_name": "observe_source_indentation",
+        "type_name": "SourceIndentationObservation",
+        "type_source_path": "core/indentation_observation.py",
+        "field_names": [
+          "claim_strength",
+          "fallback_reason",
+          "language",
+          "observation_tier",
+          "physical_tab_lines",
+          "structural_mixed_steps",
+          "tokenizer_status"
+        ]
+      }
+    ],
+    "immutable_result_source_identities": [
+      [
+        "core/credential_redaction.py",
+        "1d4a369296b9ec18547403f6dd73041d64504f8dc8a967687d89f827bba5d6f6"
+      ],
+      [
+        "core/indentation_observation.py",
+        "c66712090e49fb91eac7c5bd30d271887c42a9c808ece5ca6ccb1e2838d6cacc"
+      ]
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "indentation_style.primary.2space",
+      "role": "primary_defect",
+      "provenance": "explicit_user_fact",
+      "subject_kind": "indentation_style",
+      "expected": "2space",
+      "baseline_observed": "4space",
+      "baseline_result": "reproduced",
+      "baseline_status": "reproduced",
+      "candidate_observed": "2space",
+      "candidate_result": "not_reproduced",
+      "candidate_status": "fixed",
+      "reason": "",
+      "input_language": "python",
+      "observation_tier": "python_structural",
+      "claim_strength": "structural",
+      "fallback_reason": "",
+      "reference_assessment": "2space"
+    },
+    {
+      "case_id": "indentation_style.generalize.2space.deep",
+      "role": "defect_generalization",
+      "provenance": "system_derived_subject_invariant",
+      "subject_kind": "indentation_style",
+      "expected": "2space",
+      "baseline_observed": "4space",
+      "baseline_result": "reproduced",
+      "baseline_status": "reproduced",
+      "candidate_observed": "2space",
+      "candidate_result": "not_reproduced",
+      "candidate_status": "fixed",
+      "reason": "",
+      "input_language": "python",
+      "observation_tier": "python_structural",
+      "claim_strength": "structural",
+      "fallback_reason": "",
+      "reference_assessment": "2space"
+    },
+    {
+      "case_id": "indentation_style.preserve.4space",
+      "role": "preservation",
+      "provenance": "system_derived_behavior_preservation",
+      "subject_kind": "indentation_style",
+      "expected": "4space",
+      "baseline_observed": "4space",
+      "baseline_result": "not_reproduced",
+      "baseline_status": "satisfied",
+      "candidate_observed": "4space",
+      "candidate_result": "not_reproduced",
+      "candidate_status": "preserved",
+      "reason": "",
+      "input_language": "python",
+      "observation_tier": "python_structural",
+      "claim_strength": "structural",
+      "fallback_reason": "",
+      "reference_assessment": "4space"
+    },
+    {
+      "case_id": "indentation_style.preserve.4space.deep",
+      "role": "preservation_generalization",
+      "provenance": "system_derived_subject_invariant",
+      "subject_kind": "indentation_style",
+      "expected": "4space",
+      "baseline_observed": "4space",
+      "baseline_result": "not_reproduced",
+      "baseline_status": "satisfied",
+      "candidate_observed": "4space",
+      "candidate_result": "not_reproduced",
+      "candidate_status": "preserved",
+      "reason": "",
+      "input_language": "python",
+      "observation_tier": "python_structural",
+      "claim_strength": "structural",
+      "fallback_reason": "",
+      "reference_assessment": "4space"
+    },
+    {
+      "case_id": "indentation_style.generalize.2space.skew",
+      "role": "defect_generalization",
+      "provenance": "system_derived_subject_invariant",
+      "subject_kind": "indentation_style",
+      "expected": "2space",
+      "baseline_observed": "4space",
+      "baseline_result": "reproduced",
+      "baseline_status": "reproduced",
+      "candidate_observed": "2space",
+      "candidate_result": "not_reproduced",
+      "candidate_status": "fixed",
+      "reason": "",
+      "input_language": "python",
+      "observation_tier": "python_structural",
+      "claim_strength": "structural",
+      "fallback_reason": "",
+      "reference_assessment": "2space"
+    },
+    {
+      "case_id": "indentation_style.preserve.4space.continuation",
+      "role": "preservation_generalization",
+      "provenance": "system_derived_subject_invariant",
+      "subject_kind": "indentation_style",
+      "expected": "4space",
+      "baseline_observed": "4space",
+      "baseline_result": "not_reproduced",
+      "baseline_status": "satisfied",
+      "candidate_observed": "4space",
+      "candidate_result": "not_reproduced",
+      "candidate_status": "preserved",
+      "reason": "",
+      "input_language": "python",
+      "observation_tier": "python_structural",
+      "claim_strength": "structural",
+      "fallback_reason": "",
+      "reference_assessment": "4space"
+    },
+    {
+      "case_id": "indentation_style.preserve.4space.multiline_string",
+      "role": "preservation_generalization",
+      "provenance": "system_derived_subject_invariant",
+      "subject_kind": "indentation_style",
+      "expected": "4space",
+      "baseline_observed": "4space",
+      "baseline_result": "not_reproduced",
+      "baseline_status": "satisfied",
+      "candidate_observed": "4space",
+      "candidate_result": "not_reproduced",
+      "candidate_status": "preserved",
+      "reason": "",
+      "input_language": "python",
+      "observation_tier": "python_structural",
+      "claim_strength": "structural",
+      "fallback_reason": "",
+      "reference_assessment": "4space"
+    },
+    {
+      "case_id": "indentation_style.preserve.tab.go",
+      "role": "preservation_generalization",
+      "provenance": "system_derived_behavior_preservation",
+      "subject_kind": "indentation_style",
+      "expected": "tab",
+      "baseline_observed": "tab",
+      "baseline_result": "not_reproduced",
+      "baseline_status": "satisfied",
+      "candidate_observed": "tab",
+      "candidate_result": "not_reproduced",
+      "candidate_status": "preserved",
+      "reason": "",
+      "input_language": "go",
+      "observation_tier": "heuristic_physical",
+      "claim_strength": "heuristic_physical",
+      "fallback_reason": "language_not_python",
+      "reference_assessment": "tab"
+    }
+  ],
+  "limits": {
+    "proof_files": 16,
+    "single_source_bytes": 262144,
+    "total_source_bytes": 1048576,
+    "type_import_hops": 1,
+    "attribute_hops": 1,
+    "novel_locals": 3,
+    "touched_functions": 1,
+    "changed_lines": 24
+  },
+  "unchanged": [
+    "candidate fingerprint primitive",
+    "sandbox/probes",
+    "eight-case oracle",
+    "targeted validation",
+    "candidate verification",
+    "execution authority",
+    "authoring prompts",
+    "retrieval/localization",
+    "_classify_indent",
+    "UI/security"
+  ],
+  "frozen_production_file_count": 375,
+  "frozen_production_hashes_match": true,
+  "lifecycle_log_sha256": "e72d6fb2f0b01eed9f97fe7725a0dc8447e7a7a83aab053129d6538cd13bb1b2",
+  "false_authority_flags_evidence": "test_exact_t6_real_frozen_lifecycle asserts execution_authorized, auto_apply_allowed, write_authority and final_repository_changed are each False.",
+  "validation_results": {
+    "focused": {
+      "passed": 132
+    },
+    "adjacent": {
+      "passed": 309,
+      "skipped": 1
+    },
+    "governance_and_retrieval": {
+      "passed": 310
+    },
+    "benchmark_structure": {
+      "checked": 54,
+      "errors": 0
+    },
+    "broad_initial": {
+      "passed": 9953,
+      "skipped": 39,
+      "failed": 50,
+      "excluded_already_tested_files": 10
+    },
+    "entry_registry_failure_replay": {
+      "failed": 49,
+      "passed": 1,
+      "method": "Replay exactly the 50 broad failures with Path.read_text intercepted only for the phase registry, returning the LIVE.3B entry-state registry; product code is otherwise unchanged. Not a full checkout rollback."
+    },
+    "final_registration_frozen_recheck": {
+      "passed": 170
+    },
+    "broad_rerun_after_registration_guard_fix": false,
+    "remaining_failures": 49,
+    "reproduced_failure_node_ids": [
+      "tests/test_approval_enforcement_attachment_plan.py::test_cli_writes_summary_json",
+      "tests/test_approval_enforcement_attachment_plan.py::test_default_plan_is_ready_with_warnings_and_report_only",
+      "tests/test_approval_enforcement_attachment_plan.py::test_json_and_markdown_attachment_plan_artifacts_are_written",
+      "tests/test_approval_enforcement_attachment_plan.py::test_plan_references_harden_n1_human_n2_and_human_close_artifacts",
+      "tests/test_approval_enforcement_attachment_plan.py::test_real_registry_marks_harden_n2_complete_adds_n3_and_picker_recommends_harden_n4",
+      "tests/test_approval_enforcement_dry_run_gate_simulator.py::test_cli_writes_summary_json",
+      "tests/test_approval_enforcement_dry_run_gate_simulator.py::test_custom_request_and_token_can_be_simulated_without_enforcement",
+      "tests/test_approval_enforcement_dry_run_gate_simulator.py::test_default_sample_scenarios_produce_required_decisions",
+      "tests/test_approval_enforcement_dry_run_gate_simulator.py::test_default_simulator_is_ready_with_warnings_and_report_only",
+      "tests/test_approval_enforcement_dry_run_gate_simulator.py::test_json_and_markdown_simulator_artifacts_are_written",
+      "tests/test_approval_enforcement_dry_run_gate_simulator.py::test_missing_or_mismatched_custom_inputs_return_simulated_denials",
+      "tests/test_approval_enforcement_dry_run_gate_simulator.py::test_real_registry_marks_harden_n3_complete_adds_n4_and_picker_recommends_harden_n4",
+      "tests/test_approval_enforcement_dry_run_gate_simulator.py::test_simulated_allow_never_authorizes_or_applies_enforcement",
+      "tests/test_approval_enforcement_operator_report.py::test_cli_writes_summary_json",
+      "tests/test_approval_enforcement_operator_report.py::test_decision_summary_counts_every_known_decision_value",
+      "tests/test_approval_enforcement_operator_report.py::test_default_report_is_ready_with_warnings_and_report_only",
+      "tests/test_approval_enforcement_operator_report.py::test_json_and_markdown_operator_artifacts_are_written",
+      "tests/test_approval_enforcement_operator_report.py::test_operator_review_items_map_simulator_results_for_human_review",
+      "tests/test_approval_enforcement_operator_report.py::test_real_registry_marks_harden_n4_and_harden_close_complete_then_picker_recommends_ops_test_1",
+      "tests/test_approval_enforcement_operator_report.py::test_report_buckets_allow_deny_block_warning_and_incomplete_items",
+      "tests/test_approval_enforcement_operator_report.py::test_token_denial_scenarios_are_caution_or_high_risk",
+      "tests/test_approval_enforcement_planning_branch_checkpoint.py::test_real_registry_marks_harden_close_complete_adds_ops_test_1_and_picker_recommends_ops_test_1",
+      "tests/test_approval_enforcement_readiness_audit.py::test_audit_references_human_and_model_adoption_source_artifacts",
+      "tests/test_approval_enforcement_readiness_audit.py::test_cli_writes_summary_json",
+      "tests/test_approval_enforcement_readiness_audit.py::test_default_audit_is_ready_with_warnings_and_report_only",
+      "tests/test_approval_enforcement_readiness_audit.py::test_json_and_markdown_audit_artifacts_are_written",
+      "tests/test_approval_enforcement_readiness_audit.py::test_real_registry_marks_harden_n1_complete_and_picker_recommends_harden_n2",
+      "tests/test_context_selection_contract.py::test_production_python_does_not_activate_selector_runtime",
+      "tests/test_hardening_branch_checkpoint.py::test_cli_writes_real_repo_artifacts",
+      "tests/test_hardening_branch_checkpoint.py::test_real_registry_registers_harden_close_complete",
+      "tests/test_human_approval_token_contract.py::test_real_registry_marks_human_n2_complete_and_picker_recommends_adopt_model_1",
+      "tests/test_human_approval_token_dry_run_validator.py::test_real_registry_marks_human_n3_complete_and_picker_recommends_adopt_model_1",
+      "tests/test_human_approval_token_sample_catalog.py::test_real_registry_marks_human_n4_complete_and_picker_recommends_adopt_model_1",
+      "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1",
+      "tests/test_human_review_boundary_map.py::test_real_registry_marks_human_n1_complete_and_picker_recommends_adopt_model_1",
+      "tests/test_mirror_tunnel_branch_checkpoint.py::test_cli_exit_codes_for_warning_and_blocked",
+      "tests/test_mirror_tunnel_branch_checkpoint.py::test_gather_real_inputs_and_cli_current_status",
+      "tests/test_model_role_catalog_adoption.py::test_phase_registry_marks_adoption_complete_and_picker_recommends_model_2",
+      "tests/test_model_role_catalog_adoption_checkpoint.py::test_real_registry_marks_close_complete_adds_harden_n2_and_picker_recommends_harden_n2",
+      "tests/test_model_role_catalog_adoption_plan.py::test_registry_and_picker_recommend_model_n7",
+      "tests/test_model_role_catalog_adoption_readiness.py::test_registry_and_picker_recommend_model_close",
+      "tests/test_model_role_post_adoption_coverage.py::test_phase_registry_marks_adopt_model_2_complete_and_picker_recommends_close",
+      "tests/test_model_role_registry.py::test_registry_and_picker_recommend_model_n3_after_model_n2",
+      "tests/test_run_progress_instrumentation_plan.py::test_real_registry_marks_live_1_through_live_3_complete_and_recommends_live_4",
+      "tests/test_slow_test_timing_collector.py::test_real_registry_marks_ops_test_2_complete_and_recommends_ops_test_3",
+      "tests/test_test_runtime_operations_branch_checkpoint.py::test_phase_picker_recommends_ux_run_1_after_ops_test_close",
+      "tests/test_test_runtime_operations_branch_checkpoint.py::test_real_registry_marks_ops_test_close_complete_and_adds_ux_run_1",
+      "tests/test_test_suite_runtime_profile_audit.py::test_real_registry_marks_ops_test_1_complete_and_preserves_ops_test_chain",
+      "tests/test_test_suite_split_manifest_plan.py::test_real_registry_marks_ops_test_3_complete_and_recommends_ops_test_close"
+    ],
+    "fixed_registration_guard_node_ids": [
+      "tests/test_defect_probe_matrix_live.py::test_the_phase_is_registered_with_its_measured_claim"
+    ]
+  },
+  "live3b_files_changed": [
+    "core/authoritative_binding_context.py",
+    "core/immutable_result_fields.py",
+    "core/local_binding_novelty.py",
+    "core/pipeline.py",
+    "docs/designs/2026-09-12-authoritative-bindings-and-immutable-result-fields.md",
+    "docs/roadmap/phase_registry.json",
+    "patching/patch_gates.py",
+    "tests/fixtures/patch_minimal_live3_completion.json",
+    "tests/fixtures/patch_minimal_live3_frozen_boundaries.json",
+    "tests/fixtures/patch_minimal_live3_reversal.json",
+    "tests/test_defect_probe_matrix_live.py",
+    "tests/test_patch_minimal_binding_context_live3.py",
+    "tests/test_patch_minimal_novelty_live.py",
+    "tests/test_patch_minimal_result_fields_live3.py",
+    "tests/test_phase_picker.py",
+    "tests/test_phase_registry.py"
+  ],
+  "authoring_mismatch_remains": true,
+  "next_phase_input": "PATCH.AUTHOR.LIVE.3 must communicate authoritative available bindings and narrow immutable field capabilities without dumping arbitrary repository identifiers. No authoring work began here.",
+  "validation_logs": {
+    "focused-3.log": {
+      "sha256": "21f231fdc37a3995925045181389e083ec3c68843123899802e7be035eedf66d",
+      "last_line": "126 passed, 2 warnings in 14.49s"
+    },
+    "focused-adjacent-final.log": {
+      "sha256": "b372a658a3a29b648e3ab8a8c93b26b024aa4337b522d1e826074ff9fb53732d",
+      "last_line": "10 failed, 648 passed, 1 skipped, 3 warnings in 204.88s (0:03:24)"
+    },
+    "governance-2.log": {
+      "sha256": "9b1b9e57b7f955e5f7bc663111009c2821f8972af594591e01def8a459cd14b4",
+      "last_line": "442 passed, 282 warnings in 60.37s (0:01:00)"
+    },
+    "broad-complete.log": {
+      "sha256": "c5942a2b36ffdb5a3926b6e0e3f304e6573217cc01cfe0db1216535356b65801",
+      "last_line": "50 failed, 9953 passed, 39 skipped, 6206 warnings in 1496.84s (0:24:56)"
+    },
+    "baseline-diagnostic.log": {
+      "sha256": "f20514bcdd9d6c304685d82d084dd252cd1c29bc664781e9c91aed1e2119c986",
+      "last_line": "21 failed, 24 passed, 2 warnings in 0.81s"
+    },
+    "all-baseline-diagnostic.log": {
+      "sha256": "f66efdc725aa026bece9f4b02db585aed0c20cc4dcfff5402105ff596007cbb6",
+      "last_line": "49 failed, 1 passed, 3 warnings in 9.84s"
+    },
+    "completion-final.log": {
+      "sha256": "d6e2dec29368d2ee1cd6bac72edc3985a037f4587e03c4a6dea0224f82db3f71",
+      "last_line": "170 passed, 2 warnings in 4.25s"
+    },
+    "benchmark-check.log": {
+      "sha256": "fb2104e31f97f3233e247de1bc7683dd0eb8bbac50114df0c6bf617e673cf4c7",
+      "last_line": "Errors: 0"
+    }
+  }
+}

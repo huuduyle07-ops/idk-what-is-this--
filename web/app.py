@@ -5,7 +5,7 @@ from math import isfinite
 import markdown as _markdown_lib
 from datetime import datetime
 from pathlib import Path
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, abort, render_template, request, redirect, url_for
 from collections import Counter 
 # Resolve project root from this file's location (avoids hardcoded user paths).
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -13,14 +13,46 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 from core.retriever import retrieve_context
 from reasoning.deep_project_understand import deep_project_understand
-from core.control_engine import run_control_structured, run_control, build_control_prompt
+from core.control_engine import (
+    build_control_prompt,
+    enforce_control_grounding_on_payload,
+    run_control,
+    run_control_structured,
+)
 from agents.gemini_client import run_gemini_request
 from agents.model_stats import ModelStatsScope, format_usage_report
+from core.analysis_evidence import (
+    collect_analysis_evidence,
+    render_analysis_evidence_block,
+)
+from core.live_task_routing import safe_route_live_task
+from core.execution_outcome_telemetry import (
+    AUTHORITY_SOURCE_MANUAL_APPLY,
+    DENIED_PATCH_SAFETY_BLOCKED,
+    authorized_execution,
+    final_state_observation,
+    no_execution,
+    observe_named_paths,
+    plan_execution_receipt,
+)
+from core.dream_review_binding import (
+    DreamReviewError, attach_review_candidates, resolve_reviewed_candidate,
+    resolve_reviewed_selection,
+)
 from core.credential_redaction import redact_credentials
 from core.json_utils import extract_json_block
+from core.author_escalation_admission import admit_author_escalation
+from core.repair_intent_evidence_refs import EvidenceRefError
+from core.repair_intent import (
+    ClarificationAnswer, RepairIntentGap, admit_gap, author_escalation_directive,
+    bind_answer, preserved_task_text, render_human_clarification, render_question, validate_resume,
+)
 from core.validation_command import get_default_validation_command
 from web.runner import run_agent_web
 from web.dream_report_markdown import render_dream_report_markdown
+from web.control_context import control_context_from_form
+from web.control_bootstrap import bootstrap_fresh_control_from_form
+from web.preflight_request import preflight_bootstrapped_control
 from agents.deepseek_client import run_deepseek_review
 from config import get_agent_dir, FOLDER_BLACKLIST
 from core.project_tag import build_project_tag, fingerprint_repo  # re-exported for legacy callers
@@ -152,24 +184,189 @@ def _run_progress_polling_template_context() -> dict[str, dict[str, int | bool]]
     """Keep the optional polling experiment explicitly configured per page render."""
     return {"run_progress_polling_config": _run_progress_polling_config()}
 
+from flask import g as _request_state, jsonify as _jsonify
+from web import browser_session as _browser_session
+from web import request_origin as _request_origin
+from web.auth_gate import is_browser_request as _is_browser_request
+from web.auth_gate import is_mutating_method as _is_mutating_method
 from web.auth_gate import should_allow_mutation as _should_allow_mutation
+
+
+def _configured_web_auth_token() -> str:
+    return (_os_gate.environ.get("WEB_AUTH_TOKEN", "") or "").strip()
+
+
+def _submitted_csrf_tokens() -> tuple[str, ...]:
+    """AUTH.WEB.1: one X-CSRF-Token header, or one csrf_token field of a native form."""
+    header_values = request.headers.getlist(_browser_session.CSRF_HEADER)
+    if header_values:
+        return tuple(header_values)
+    if request.mimetype in {"application/x-www-form-urlencoded", "multipart/form-data"}:
+        return tuple(request.form.getlist(_browser_session.CSRF_FORM_FIELD))
+    return ()
+
+
+def _request_integrity_rejection(decision):
+    """A structured refusal naming the failed proof; it never echoes secrets."""
+    if request.headers.get("Sec-Fetch-Mode") == "navigate":
+        response = app.response_class(
+            decision.reason + "\n", status=decision.status_code, mimetype="text/plain"
+        )
+    else:
+        response = _jsonify({
+            "ok": False,
+            "success": False,
+            "error": decision.reason,
+            "error_code": decision.code,
+            "auth_required": bool(_configured_web_auth_token()),
+        })
+        response.status_code = decision.status_code
+    response.headers["X-CATTUS-Request-Integrity"] = decision.code
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
 
 @app.before_request
 def _web_mutation_gate():
-    from flask import abort as _abort
-    configured_token = _os_gate.environ.get("WEB_AUTH_TOKEN", "")
+    # AUTH.WEB.1: exact origin, CSRF and authentication are separate proofs,
+    # all decided here before any route's own mutation authority runs.
+    if not _is_mutating_method(request.method):
+        return None
+    configured_token = _configured_web_auth_token()
     decision = _should_allow_mutation(
         method=request.method,
         remote_addr=(request.remote_addr or ""),
         headers=request.headers,
-        host=(request.host or ""),
         configured_token=configured_token,
+        path=request.path,
+        allowed_origins=_request_origin.allowed_origins_for(
+            request.environ, _os_gate.environ.get(_request_origin.ALLOWED_ORIGINS_ENV)
+        ),
+        browser_session=_browser_session.read_session(
+            request.cookies.getlist(_browser_session.COOKIE_NAME),
+            configured_token=configured_token,
+        ),
+        csrf_submissions=_submitted_csrf_tokens() if _is_browser_request(request.headers) else (),
     )
-    if not decision.allowed:
-        _abort(decision.status_code, decision.reason)
+    if decision.allowed:
+        return None
+    return _request_integrity_rejection(decision)
+
+
+# AUTH.WEB.READ.1: GET, HEAD and OPTIONS need a trusted Host before Flask routes
+# them; the gate above keeps deciding every mutation.
+from web.read_host import ReadHostBoundary as _ReadHostBoundary
+app.wsgi_app = _ReadHostBoundary(app.wsgi_app)
+
+
+def _set_browser_session_cookie(response, value: str) -> None:
+    # HttpOnly: page scripts never need the session. SameSite=Lax is only
+    # defense in depth (other ports on this host are same-site). Secure only
+    # over HTTPS, so http://127.0.0.1 stays usable.
+    response.set_cookie(
+        _browser_session.COOKIE_NAME,
+        value,
+        path="/",
+        httponly=True,
+        samesite="Lax",
+        secure=request.is_secure,
+    )
+
+
+def _browser_session_for_page():
+    """This browser's valid session, or a new anonymous one for CSRF."""
+    session = _request_state.get("cattus_browser_session")
+    if session is not None:
+        return session
+    configured_token = _configured_web_auth_token()
+    session = _browser_session.read_session(
+        request.cookies.getlist(_browser_session.COOKIE_NAME),
+        configured_token=configured_token,
+    ).session
+    if session is None:
+        session, cookie = _browser_session.mint_session(
+            authenticated=False, configured_token=configured_token
+        )
+        _request_state.cattus_browser_session_cookie = cookie
+    _request_state.cattus_browser_session = session
+    return session
+
+
+def _browser_auth_state(session) -> str:
+    if not _configured_web_auth_token():
+        return "not_required"
+    return "signed_in" if session.authenticated else "signed_out"
+
+
+@app.context_processor
+def _browser_request_integrity_template_context():
+    return {
+        "cattus_csrf_token": lambda: _browser_session.csrf_token_for(_browser_session_for_page()),
+        "cattus_auth_state": lambda: _browser_auth_state(_browser_session_for_page()),
+    }
+
+
+@app.after_request
+def _browser_session_response_headers(response):
+    if _request_state.get("cattus_browser_session") is not None:
+        response.headers["Cache-Control"] = "no-store"
+    cookie = _request_state.pop("cattus_browser_session_cookie", None)
+    if cookie:
+        _set_browser_session_cookie(response, cookie)
+    return response
+
+
+@app.route("/auth/session", methods=["GET"])
+def auth_session_route():
+    session = _browser_session_for_page()
+    return {
+        "ok": True,
+        "auth_required": bool(_configured_web_auth_token()),
+        "authenticated": session.authenticated,
+        "auth_state": _browser_auth_state(session),
+        "csrf_token": _browser_session.csrf_token_for(session),
+    }
+
+
+@app.route("/auth/login", methods=["POST"])
+def auth_login_route():
+    """Exchange WEB_AUTH_TOKEN, sent once in the POST body, for a derived session."""
+    configured_token = _configured_web_auth_token()
+    no_store = {"Cache-Control": "no-store"}
+    if not configured_token:
+        return {
+            "ok": False,
+            "authenticated": False,
+            "error_code": "web_auth_not_enabled",
+            "error": "WEB_AUTH_TOKEN is not configured; browser sign-in is not needed.",
+        }, 409, no_store
+    supplied = request.form.get(_browser_session.LOGIN_TOKEN_FIELD, "")
+    if not _browser_session.web_auth_token_matches(supplied, configured_token):
+        return {
+            "ok": False,
+            "authenticated": False,
+            "error_code": "web_auth_token_invalid",
+            "error": "Sign-in failed: the token was not accepted.",
+        }, 401, no_store
+    session, cookie = _browser_session.mint_session(
+        authenticated=True, configured_token=configured_token
+    )
+    _request_state.cattus_browser_session = session
+    _request_state.cattus_browser_session_cookie = cookie
+    return {
+        "ok": True,
+        "authenticated": True,
+        "auth_state": "signed_in",
+        "csrf_token": _browser_session.csrf_token_for(session),
+    }
 
 WEB_DIR = Path(__file__).parent
-from web.session_store import load_sessions, save_sessions, find_session
+from web.session_store import (
+    load_sessions, save_sessions, find_session, create_repair_intent_wait,
+    update_repair_intent_wait,
+)
+from web.session_presentation import CorruptWaitingSession, project_session
 from scripts.run_patch_proposal_queue import PROPOSAL_ROOT as _DREAM_PROPOSAL_ROOT
 BACKUP_DIR = WEB_DIR / "backups"
 BACKUP_DIR.mkdir(exist_ok=True)
@@ -403,15 +600,46 @@ def _run_mode(
         return result, (result.get("project_tag") or project_tag)
 
     # default: retrieve
+    #
+    # WAITER.LIVE.1 — this shell answers in prose, but it used to reach CONTROL
+    # patch localization to do it.  A read-only order must not: the hard
+    # invariant is that a question never becomes a patch-target search.
+    live_route = safe_route_live_task(query, repository_available=bool(repo_path))
     retrieved = retrieve_context(query, repo_path=repo_path, project_tag=project_tag)
-    deep = deep_project_understand(query, repo_path)
-    structured = run_control_structured(query, repo_path)
+    if live_route.patch_localization_allowed:
+        deep = deep_project_understand(query, repo_path)
+        structured = run_control_structured(query, repo_path)
+        structured["live_route"] = live_route.as_dict()
+        evidence_block = (
+            f"Deep analysis:\n{json.dumps(deep, indent=2)}\n\n"
+            f"Control reasoning:\n{json.dumps(structured, indent=2)}\n\n"
+        )
+    else:
+        evidence = collect_analysis_evidence(
+            repo_path,
+            requested_paths=live_route.requested_paths,
+            subjects=live_route.subjects,
+            # ANALYSIS.EVIDENCE.LIVE.1 — profile from the preserved obligations.
+            obligations=live_route.obligations,
+            # ANALYSIS.MULTIROOT.LIVE.1 — only the analysis workflow may read a
+            # second, explicitly requested repository.
+            analysis_only=live_route.analysis_only,
+        )
+        from web.oop_intent_adapter import admit_oop_review_wait
+        oop_wait = admit_oop_review_wait(
+            evidence=evidence, repo_path=repo_path, task_text=query,
+            task_mode="review")
+        if oop_wait is not None:
+            return {**oop_wait, "live_route": live_route.as_dict()}, project_tag
+        evidence_block = (
+            "Repository evidence (bounded documents actually read):\n"
+            f"{render_analysis_evidence_block(evidence)}\n\n"
+        )
     prompt = (
         "You are the AI Coding Agent.\n\n"
         f"User question:\n{query}\n\n"
         f"Retrieved context:\n{retrieved}\n\n"
-        f"Deep analysis:\n{json.dumps(deep, indent=2)}\n\n"
-        f"Control reasoning:\n{json.dumps(structured, indent=2)}\n\n"
+        f"{evidence_block}"
         "Explain clearly: what is happening, what is disconnected, what should be connected."
     )
     answer = run_gemini_request(prompt)
@@ -422,6 +650,7 @@ def _run_mode(
         "state": "",
         "patch": "",
         "validation": "",
+        "live_route": live_route.as_dict(),
     }, project_tag
 
 
@@ -497,7 +726,10 @@ def index():
                 _attach_runtime_environment(result, runtime_state)
                 _attach_model_usage(result, model_calls)
 
-            current = save_session(
+            existing_oop_wait = (
+                find_session(result.get("clarification_session_id", ""))
+                if result.get("clarification_kind") == "oop_intent" else None)
+            current = existing_oop_wait or save_session(
                 query,
                 repo_path,
                 mode,
@@ -512,25 +744,52 @@ def index():
             )
             sessions = load_sessions()
 
+    presentation = project_session(current) if current else None
+
     return render_template(
         "index.html",
         sessions=sessions,
         current=current,
         result=result,
+        presentation=presentation,
         error=error,
         active_web_mode=active_web_mode,
     )
 
+def _bootstrap_fresh_control(control_context, repo_path):
+    """CONTROL.BOOTSTRAP.1: a fresh request's first CONTROL, or None when it carries no task."""
+    with ModelStatsScope() as model_calls:
+        bootstrap = bootstrap_fresh_control_from_form(
+            request.form, control_context, repo_path, provider=run_gemini_request,
+        )
+    return None if bootstrap is None else bootstrap.with_usage(format_usage_report(model_calls))
+
+
 @app.route("/generate_patch", methods=["POST"])
 def generate_patch():
     repo_path = request.form.get("repo_path", "")
-    control_json = request.form.get("control", "")
+    # CONTROL.FRESH.1: only prior CONTROL continues.  A fresh start stops at the
+    # bootstrap boundary and malformed CONTROL is rejected, both as typed answers.
+    control_context = control_context_from_form(request.form)
+    if control_context.control is None:
+        # CONTROL.BOOTSTRAP.1: a fresh start that transports its task may author
+        # its first CONTROL from the files it names; everything else keeps its answer.
+        bootstrap = _bootstrap_fresh_control(control_context, repo_path)
+        if bootstrap is None:
+            return control_context.response()
+        if bootstrap.control is None:
+            return bootstrap.response()
+        # PREFLIGHT.REQUEST.1: at most one bounded, harness-owned diagnostic cycle for the
+        # CONTROL's typed evidence gaps; a CONTROL without gaps continues exactly as before.
+        preflight = preflight_bootstrapped_control(bootstrap)
+        if preflight.control is None:
+            return bootstrap.attach(preflight.response())
+        return bootstrap.attach(preflight.attach(_generate_patch_from_control(repo_path, preflight.control)))
+    return _generate_patch_from_control(repo_path, control_context.control)
 
-    try:
-        control = json.loads(control_json)
-    except Exception:
-        return {"error": "Invalid control JSON"}
 
+def _generate_patch_from_control(repo_path, control):
+    """The unchanged CONTROL-dependent Generate Patch pipeline, for prior or bootstrapped CONTROL."""
     harness_block = _patch_generation_harness_block(repo_path, control)
     if harness_block:
         return harness_block
@@ -550,6 +809,34 @@ def generate_patch():
         repo_path=repo_path or None,
         anti_lesson_control_requested=anti_lesson_control_requested,
     )
+    # CONTROL has now projected the measured RepairScope. Admit an exact
+    # compiler-bound ambiguity before the patch-author provider call.
+    from core.repair_intent_ambiguity import detect_repair_intent_ambiguity
+    task_text = preserved_task_text(control)
+    detection = detect_repair_intent_ambiguity(
+        task_text=task_text, control=control, repo_path=repo_path or "",
+    ) if task_text else None
+    if detection is not None and detection.gap is not None:
+        gap = detection.gap
+        session_id = create_repair_intent_wait(
+            repo_path=repo_path, task_text=task_text, control=control,
+            gap=gap.as_dict(),
+        )
+        return {"patch": "", "patch_candidate": None, "patch_plan": None,
+                "write_authority": False, "execution_authorized": False,
+                "auto_apply": False, "status": "waiting_for_clarification",
+                "code": "needs_clarification", "question": render_question(gap),
+                "clarification_session_id": session_id,
+                "repair_intent_gap": gap.as_dict(),
+                "ambiguity_detection": detection.as_dict(),
+                "usage": {"patch_author_calls": 0}}
+    from web.oop_intent_adapter import admit_oop_patch_wait
+    oop_wait = admit_oop_patch_wait(
+        control=control, repo_path=repo_path or "", task_text=task_text)
+    if oop_wait is not None:
+        return {**oop_wait, "usage": {"patch_author_calls": 0}}
+    if (control.get("repair_scope") or {}).get("status") == "complete":
+        prompt += "\n\n" + author_escalation_directive(control["repair_scope"])
 
     from core.anti_lesson_control_injection import (
         summarize_anti_lesson_control_injection,
@@ -567,12 +854,57 @@ def generate_patch():
         response = run_gemini_request(prompt)
     patch = extract_json_block(response)
 
-    if not patch:
+    if not isinstance(patch, dict) or not patch:
         return {
             "error": "Failed to generate patch",
             "usage": format_usage_report(model_calls),
             "anti_lesson_control": anti_lesson_control,
         }
+
+    # REPAIR.INTENT.ADMIT.1: a candidate accompanying author uncertainty is
+    # evidence only.  Classify the structured escalation before any candidate
+    # grounding, span/scope gate or patch handoff.
+    admission = admit_author_escalation(patch, raw_response=response)
+    if not admission.admitted:
+        quarantine = admission.quarantine_receipt()
+        common = {
+            "patch": "", "patch_candidate": None, "patch_plan": None,
+            "author_escalation_receipt": quarantine,
+            "write_authority": False, "execution_authorized": False,
+            "usage": format_usage_report(model_calls),
+        }
+        if admission.semantic:
+            scope = control.get("repair_scope") or {}
+            # REPAIR.INTENT.1 owns gap validation unchanged.  Present only the
+            # quarantined candidate-free view to its existing admission gate.
+            author_for_gap = dict(patch, patch_candidate=None, patch_plan=None)
+            try:
+                gap = admit_gap(
+                    author=author_for_gap, task_text=task_text, control=control,
+                    scope=scope, repo_path=repo_path or "",
+                ) if task_text and scope else None
+            except EvidenceRefError:
+                return {**common, "status": "needs_clarification",
+                        "code": "semantic_gap_evidence_unresolved",
+                        "error": "The semantic evidence reference did not resolve."}
+            if gap is not None:
+                session_id = create_repair_intent_wait(
+                    repo_path=repo_path, task_text=task_text, control=control,
+                    gap=gap.as_dict(), author_escalation_receipt=quarantine,
+                )
+                return {**common, "status": "waiting_for_clarification",
+                        "code": "needs_clarification", "question": render_question(gap),
+                        "clarification_session_id": session_id,
+                        "repair_intent_gap": gap.as_dict()}
+            return {**common, "status": "needs_clarification",
+                    "code": "unbounded_semantic_gap",
+                    "error": "The intended behavior is unclear. Please describe the expected behavior and retry."}
+        return {**common, "status": admission.status,
+                "code": admission.reason if admission.status == "author_escalation_required"
+                        else admission.status,
+                "error": "The author requested escalation; its candidate was quarantined."}
+
+    enforce_control_grounding_on_payload(control, patch)
 
     return {
         "patch": json.dumps(patch, indent=2, ensure_ascii=False),
@@ -580,42 +912,209 @@ def generate_patch():
         "anti_lesson_control": anti_lesson_control,
     }
 
+
+@app.route("/repair_intent/answer", methods=["POST"])
+def answer_repair_intent():
+    """Continue one stored Generate task after a human semantic answer."""
+    session_id = (request.form.get("session_id") or "").strip()
+    session = find_session(session_id)
+    if not session or session.get("mode") != "repair_intent":
+        return {"status": "rejected", "code": "wrong_run"}, 404
+    submitted_repo = (request.form.get("repo_path") or "").strip()
+    if not submitted_repo or Path(submitted_repo).resolve() != Path(session["repo_path"]).resolve():
+        return {"status": "rejected", "code": "wrong_repository"}, 409
+    try:
+        gap = RepairIntentGap.from_dict(session["repair_intent_gap"])
+    except (KeyError, TypeError, ValueError):
+        return {"status": "rejected", "code": "malformed_semantic_gap"}, 400
+    if request.form.get("decline") == "true":
+        if session.get("status") == "clarification_declined":
+            return session.get("result") or {"status": "clarification_declined", "patch": ""}
+        if session.get("clarification_answer") is not None:
+            return {"status": "rejected", "code": "clarification_conflict"}, 409
+        update_repair_intent_wait(session_id, status="clarification_declined",
+                                  result={"status": "clarification_declined", "patch": ""})
+        return {"status": "clarification_declined", "patch": "",
+                "write_authority": False, "execution_authorized": False}
+    text = request.form.get("answer") or ""
+    previous_data = session.get("clarification_answer")
+    previous = ClarificationAnswer(**previous_data) if previous_data else None
+    try:
+        answer = bind_answer(gap, text, previous)
+    except ValueError as exc:
+        code = str(exc)
+        return {"status": "rejected", "code": code}, (409 if code == "clarification_conflict" else 400)
+    if previous is not None:
+        return session.get("result") or {"status": session.get("status"), "patch": ""}
+    control = session["control"]
+    repo_path = session["repo_path"]
+    task_text = session["query"]
+    freshness = validate_resume(gap, answer, task_text=task_text,
+                                control=control, repo_path=repo_path)
+    if freshness != "current":
+        update_repair_intent_wait(session_id, status="reacquisition_required",
+                                  answer=answer.as_dict(),
+                                  result={"status": "reacquisition_required", "code": freshness,
+                                          "patch": ""})
+        return {"status": "reacquisition_required", "code": freshness,
+                "patch": "", "write_authority": False,
+                "execution_authorized": False}, 409
+    update_repair_intent_wait(session_id, status="clarification_supplied",
+                              answer=answer.as_dict(),
+                              result={"status": "clarification_supplied", "patch": ""})
+    # Reuse the same CONTROL, preflight receipt, RepairScope and canonical envelope.
+    # The answer is data in its own trusted section and does not change scope.
+    prompt = build_control_prompt(control, task_text, repo_path=repo_path)
+    prompt += "\n\n" + render_human_clarification(answer)
+    prompt += "\nEcho the exact clarification text in human_clarification_ack. " \
+              "Respect it as an explicit task commitment. Do not widen the measured scope."
+    try:
+        with ModelStatsScope() as model_calls:
+            response = run_gemini_request(prompt)
+    except Exception:
+        result = {"status": "authoring_failed", "patch": "",
+                  "write_authority": False, "execution_authorized": False}
+        update_repair_intent_wait(session_id, status="authoring_failed", result=result)
+        return result
+    patch = extract_json_block(response)
+    if not isinstance(patch, dict) or patch.get("human_clarification_ack") != answer.text:
+        result = {"status": "intent_preservation_failed", "patch": "",
+                  "write_authority": False, "execution_authorized": False,
+                  "usage": format_usage_report(model_calls)}
+    else:
+        enforce_control_grounding_on_payload(control, patch)
+        result = {"status": "resumed", "patch": json.dumps(patch, indent=2, ensure_ascii=False)
+                  if patch.get("patch_candidate") or patch.get("patch_plan") else "",
+                  "clarification_answer": answer.as_dict(),
+                  "write_authority": False, "execution_authorized": False,
+                  "usage": format_usage_report(model_calls)}
+    update_repair_intent_wait(session_id, status=result["status"],
+                              answer=answer.as_dict(), result=result)
+    return result
+
+
+@app.route("/oop_intent/answer", methods=["POST"])
+def answer_oop_intent():
+    """Bind human intent to one exact OOP review without patch execution."""
+    from core.oop_intent_session import (
+        bind_human_answer, source_freshness, validate_stored_gap,
+    )
+    from web.session_store import update_oop_intent_wait
+
+    session_id = (request.form.get("session_id") or "").strip()
+    session = find_session(session_id)
+    if not session or session.get("clarification_kind") != "oop_intent":
+        return {"status": "rejected", "code": "wrong_run"}, 404
+    repo_path = (request.form.get("repo_path") or "").strip()
+    if not repo_path or Path(repo_path).resolve() != Path(session["repo_path"]).resolve():
+        return {"status": "rejected", "code": "wrong_repository"}, 409
+    try:
+        gap = validate_stored_gap(
+            session["oop_intent_gap"], task_text=session["query"],
+            repo_path=session["repo_path"])
+    except (KeyError, TypeError, ValueError):
+        return {"status": "rejected", "code": "malformed_oop_gap"}, 400
+    if request.form.get("gap_id") != gap["gap_id"]:
+        return {"status": "rejected", "code": "wrong_gap"}, 409
+    if request.form.get("decline") == "true":
+        if session.get("status") == "clarification_declined":
+            return session["result"]
+        if session.get("clarification_answer") is not None:
+            return {"status": "rejected", "code": "clarification_conflict"}, 409
+        result = {"status": "clarification_declined", "answer": "Clarification declined; intent remains unresolved.",
+                  "patch": "", "write_authority": False, "execution_authorized": False,
+                  "auto_apply": False}
+        update_oop_intent_wait(session_id, status="clarification_declined", result=result)
+        return result
+    previous = session.get("clarification_answer")
+    try:
+        answer = bind_human_answer(gap, request.form.get("answer") or "", previous)
+    except ValueError as exc:
+        code = str(exc)
+        return {"status": "rejected", "code": code}, (409 if code == "clarification_conflict" else 400)
+    if previous is not None:
+        return session.get("result") or {"status": session["status"], "patch": ""}
+    if session.get("status") != "waiting_for_clarification":
+        return {"status": "rejected", "code": "clarification_not_waiting"}, 409
+    freshness = source_freshness(gap, repo_path=session["repo_path"])
+    if freshness != "current":
+        result = {"status": "reacquisition_required", "code": freshness, "patch": "",
+                  "write_authority": False, "execution_authorized": False, "auto_apply": False}
+        update_oop_intent_wait(session_id, status="reacquisition_required", result=result)
+        return result, 409
+    review_only = session.get("task_mode") == "review"
+    if not review_only:
+        control = session.get("control")
+        if not isinstance(control, dict) or not control:
+            return {"status": "rejected", "code": "missing_original_control"}, 409
+        update_oop_intent_wait(session_id, status="clarification_supplied",
+                               answer=answer.as_dict(),
+                               result={"status": "clarification_supplied", "patch": "",
+                                       "write_authority": False, "execution_authorized": False,
+                                       "auto_apply": False})
+        prompt = build_control_prompt(control, session["query"], repo_path=session["repo_path"])
+        prompt += "\n\n" + render_human_clarification(answer)
+        prompt += ("\nEcho the exact clarification text in human_clarification_ack. "
+                   "Treat it as an explicit task commitment. Do not widen RepairScope.")
+        try:
+            with ModelStatsScope() as model_calls:
+                response = run_gemini_request(prompt)
+            patch = extract_json_block(response)
+            if not isinstance(patch, dict) or patch.get("human_clarification_ack") != answer.text:
+                raise ValueError("intent_preservation_failed")
+            admission = admit_author_escalation(patch, raw_response=response)
+            if not admission.admitted:
+                raise ValueError("author_escalation_required")
+            enforce_control_grounding_on_payload(control, patch)
+            if source_freshness(gap, repo_path=session["repo_path"]) != "current":
+                raise ValueError("stale_source")
+        except ValueError as exc:
+            code = str(exc)
+            status = "reacquisition_required" if code == "stale_source" else code
+            result = {"status": status, "code": code, "patch": "",
+                      "write_authority": False, "execution_authorized": False,
+                      "auto_apply": False}
+            update_oop_intent_wait(session_id, status=status, result=result)
+            return result
+        except Exception:
+            result = {"status": "authoring_failed", "patch": "",
+                      "write_authority": False, "execution_authorized": False,
+                      "auto_apply": False}
+            update_oop_intent_wait(session_id, status="authoring_failed", result=result)
+            return result
+        result = {"status": "resumed",
+                  "answer": "Intent preserved in a candidate for review. No code was changed.",
+                  "patch": json.dumps(patch, indent=2, ensure_ascii=False)
+                  if patch.get("patch_candidate") or patch.get("patch_plan") else "",
+                  "clarification_answer": answer.as_dict(),
+                  "write_authority": False, "execution_authorized": False,
+                  "auto_apply": False, "usage": format_usage_report(model_calls)}
+        update_oop_intent_wait(session_id, status="resumed", result=result)
+        return result
+    facts = "\n".join("- " + x["description"] for x in gap["current_facts"])
+    observations = "\n".join("- " + x["description"] for x in gap["interpretations"])
+    summary = ("Current code:\n" + facts + "\n\nWhy this may matter (not a proven defect):\n"
+               + observations + "\n\nYour stated intent:\n" + answer.text)
+    result = {"status": "resumed" if review_only else "clarification_supplied",
+              "answer": summary if review_only else "Intent recorded for this task. No code was changed.",
+              "semantic_review_status": "informational" if review_only else "awaiting_authoring",
+              "clarification_answer": answer.as_dict(), "patch": "",
+              "write_authority": False, "execution_authorized": False,
+              "auto_apply": False}
+    update_oop_intent_wait(session_id, status=result["status"],
+                           answer=answer.as_dict(), result=result)
+    return result
+
 @app.route("/undo_patch", methods=["POST"])
 def undo_patch():
-    repo_path = request.form.get("repo_path", "")
-    target_file = request.form["file"]
+    from core.undo_backup import UndoBackupStore
 
-    repo_root = Path(repo_path).resolve()
-    file_path = (repo_root / target_file).resolve()
-    try:
-        file_path.relative_to(repo_root)
-    except ValueError:
-        return {
-            "success": False,
-            "message": "Unsafe undo target: file is outside repo.",
-        }, 400
-
-    # 🔥 FIX: dùng safe_path
-    safe_path = target_file.replace("/", "_").replace("\\", "_")
-
-    backups = sorted(BACKUP_DIR.glob(f"{safe_path}_*.bak"), reverse=True)
-
-    if not backups:
-        return {
-            "success": False,
-            "message": "No backup found",
-        }
-
-    latest = backups[0]
-
-    file_path.write_text(latest.read_text(encoding="utf-8"), encoding="utf-8")
-
-    latest.unlink()
-
-    return {
-        "success": True,
-        "message": "Undo successful",
-    }
+    return UndoBackupStore(BACKUP_DIR).undo(
+        request.form.get("repo_path", ""),
+        request.form.get("backup_id", ""),
+        relative=request.form.get("file"),
+        transaction_id=request.form.get("transaction_id"),
+    )
 
 @app.route("/dream/queue", methods=["GET", "POST"])
 def dream_queue_route():
@@ -790,7 +1289,7 @@ def dream_list_route():
         return {"error": "No dream report found yet."}
 
     try:
-        data = dream_artifacts.read_report(latest)
+        data = attach_review_candidates(repo_path, latest, dream_artifacts.read_report(latest))
     except Exception as e:
         return {"error": f"failed to read list.json: {e}"}
 
@@ -854,68 +1353,36 @@ def dream_report_route():
 
     if not report_dir.is_dir():
         return {"error": f"no report for date={date}{(' run=' + run) if run else ' (legacy)'}"}
-    report = dream_artifacts.read_report(report_dir)
+    report = attach_review_candidates(repo_path, report_dir, dream_artifacts.read_report(report_dir))
     # Phase 5P.1: render the morning report Markdown to safe HTML for the
     # viewer modal. The raw `morning_report` text is left in place as a
     # fallback; this only adds a rendered companion field.
     report["morning_report_html"] = render_dream_report_markdown(
         report.get("morning_report", "")
     )
-    _list_json_path = report_dir / "list.json"
-    try:
-        report["list_json_raw"] = (
-            _list_json_path.read_text(encoding="utf-8") if _list_json_path.is_file() else ""
-        )
-    except Exception:
-        report["list_json_raw"] = ""
     return report
 
 
 @app.route("/dream/apply", methods=["POST"])
 def dream_apply_route():
-    """Apply selected dream items to the real repo. One commit per item.
-
-    `selection`: '1', '1,2', or 'all'.
-    """
+    """Apply only the exact stored candidates selected in the review dialog."""
     import subprocess
 
     repo_path = request.form.get("repo_path", "").strip()
     selection = request.form.get("selection", "").strip().lower()
-
-    if not repo_path or not Path(repo_path).is_dir():
-        return {"error": f"repo_path is not a directory: {repo_path}"}
-    if not selection:
-        return {"error": "selection is required (e.g., '1', '1,2', 'all')"}
-
-    latest = dream_artifacts.latest_report_dir(repo_path)
-    if not latest:
-        return {"error": "No dream report found to apply."}
-
     try:
-        data = json.loads((latest / "list.json").read_text(encoding="utf-8"))
-    except Exception as e:
-        return {"error": f"failed to read list.json: {e}"}
-
-    items = data.get("items", [])
-
-    if selection == "all":
-        chosen_idxs: list[int] = [it.get("idx") for it in items if isinstance(it.get("idx"), int)]
-    else:
-        try:
-            chosen_idxs = [int(x.strip()) for x in selection.split(",") if x.strip()]
-        except Exception:
-            return {"error": f"invalid selection: {selection}"}
-
-    chosen = [it for it in items if it.get("idx") in chosen_idxs]
-    if not chosen:
-        return {"error": "no matching items in selection"}
+        chosen = resolve_reviewed_selection(
+            repo_path, selection, request.form.get("review_bindings", ""),
+        )
+    except DreamReviewError as error:
+        return error.as_payload()
 
     results = []
-    for it in chosen:
+    for candidate in chosen:
+        it = candidate.item
         idx = it.get("idx")
         title = it.get("title", "untitled")
         kind = (it.get("kind") or "").lower()
-        item_dir_path = latest / it.get("item_dir_name", "")
 
         if kind in {"idea", "research"}:
             results.append({
@@ -946,7 +1413,6 @@ def dream_apply_route():
             })
             continue
 
-        plan_path = item_dir_path / "patch_plan.json"
         if it.get("status") != "ready_to_apply":
             results.append({
                 "idx": idx,
@@ -955,23 +1421,17 @@ def dream_apply_route():
                 "message": f"Item status is {it.get('status')}, not ready_to_apply.",
             })
             continue
-        if not plan_path.exists():
+        if candidate.plan_bytes is None:
             results.append({
                 "idx": idx, "title": title,
                 "status": "skipped_no_plan",
-                "message": f"patch_plan.json not found at {plan_path}",
+                "message": "patch_plan.json not found in the reviewed item.",
             })
             continue
 
-        try:
-            plan = json.loads(plan_path.read_text(encoding="utf-8"))
-        except Exception as e:
-            results.append({
-                "idx": idx, "title": title,
-                "status": "error",
-                "message": f"failed to read patch_plan: {e}",
-            })
-            continue
+        # Execute this verified snapshot; never reload a different representation.
+        plan = candidate.plan
+        repo_path = candidate.canonical_root
 
         touched = patch_plan_files(plan)
         patch_safety = evaluate_patch_safety(
@@ -988,6 +1448,13 @@ def dream_apply_route():
                     + "; ".join(patch_safety["reasons"])
                 ),
                 "patch_safety": patch_safety,
+                # EXEC.AUTH.LIVE.1 §24 — the human apply action is a real
+                # execution authority source, and patch safety refusing the
+                # plan is a real denial of it.
+                **no_execution(
+                    DENIED_PATCH_SAFETY_BLOCKED,
+                    human_approval_required_for_execution=False,
+                ).as_payload_fields(),
             })
             continue
 
@@ -995,19 +1462,41 @@ def dream_apply_route():
         language = inspect_repo_inventory(repo_path).get("primary_language", "unknown")
         validation_command = get_default_validation_command(language, Path(repo_path))
 
+        # Revalidate after inventory/validation selection, immediately before the
+        # existing mutation path. Later disk edits cannot retarget this payload.
+        try:
+            candidate = resolve_reviewed_candidate(repo_path, candidate.binding.as_dict())
+        except DreamReviewError as error:
+            results.append({"idx": idx, "title": title, **error.as_payload()})
+            continue
+        plan = candidate.plan
+
+        # EXEC.AUTH.LIVE.1 — the manual execution authorization point: a human
+        # selected these items and pressed Apply.  Observation covers exactly
+        # the paths this plan names, taken either side of the apply.
+        manual_before = observe_named_paths(repo_path, touched)
         result = run_patch_plan_with_artifacts(
             repo_path,
             plan,
             validation_command=validation_command or None,
             user_query=title,
-            control_result={"route": "dream_apply", "idx": idx, "title": title},
+            control_result={"route": "dream_apply", "idx": idx, "title": title,
+                            "dream_review_receipt": candidate.receipt()},
             source="web_dream_apply",
         )
+        manual_telemetry = authorized_execution(
+            authority_source=AUTHORITY_SOURCE_MANUAL_APPLY,
+            receipt=plan_execution_receipt(result),
+            observation=final_state_observation(
+                manual_before, observe_named_paths(repo_path, touched)
+            ),
+        ).as_payload_fields()
         if not result.get("success"):
             results.append({
                 "idx": idx, "title": title,
                 "status": "apply_failed",
                 "message": (result.get("message") or "")[:200],
+                **manual_telemetry,
             })
             continue
 
@@ -1035,8 +1524,14 @@ def dream_apply_route():
             "idx": idx, "title": title,
             "status": "applied",
             "message": commit_status,
+            **manual_telemetry,
         })
 
+    for item_result, candidate in zip(results, chosen):
+        if not item_result.get("review_required"):
+            item_result["dream_review_receipt"] = candidate.receipt(
+                executed=bool(item_result.get("execution_attempted")),
+            )
     return {"results": results}
 
 
@@ -2374,26 +2869,46 @@ def dream_create_proposal_route():
 def load_session(session_id):
     sessions = load_sessions()
     current = find_session(session_id)
-    active_web_mode = _normalize_web_mode((current or {}).get("web_mode"))
+    if current is None:
+        abort(404)
+    try:
+        presentation = project_session(current)
+    except CorruptWaitingSession as exc:
+        abort(422, description=str(exc))
+    active_web_mode = _normalize_web_mode(current.get("web_mode"))
 
     return render_template(
         "index.html",
         sessions=sessions,
         current=current,
-        result=current.get("result", {}) if current else {},
+        result=current.get("result") if isinstance(current.get("result"), dict) else {},
+        presentation=presentation,
         active_web_mode=active_web_mode,
     )
 
 @app.route("/generate_candidates", methods=["POST"])
 def generate_candidates():
-    control_json = request.form["control"]
+    # CONTROL.FRESH.1: the same owner and typed answers as /generate_patch.
+    control_context = control_context_from_form(request.form)
     repo_path = (request.form.get("repo_path") or "").strip() or None
 
-    try:
-        control = json.loads(control_json)
-    except Exception:
-        return {"error": "Invalid control JSON"}
+    if control_context.control is None:
+        # CONTROL.BOOTSTRAP.1: the same fresh bootstrap as /generate_patch.
+        bootstrap = _bootstrap_fresh_control(control_context, repo_path)
+        if bootstrap is None:
+            return control_context.response()
+        if bootstrap.control is None:
+            return bootstrap.response()
+        # PREFLIGHT.REQUEST.1: the same bounded diagnostic cycle as /generate_patch.
+        preflight = preflight_bootstrapped_control(bootstrap)
+        if preflight.control is None:
+            return bootstrap.attach(preflight.response())
+        return bootstrap.attach(preflight.attach(_generate_candidates_from_control(repo_path, preflight.control)))
+    return _generate_candidates_from_control(repo_path, control_context.control)
 
+
+def _generate_candidates_from_control(repo_path, control):
+    """The unchanged CONTROL-dependent Generate Candidates pipeline, for prior or bootstrapped CONTROL."""
     harness_block = _patch_generation_harness_block(repo_path, control)
     if harness_block:
         return harness_block
@@ -2415,6 +2930,7 @@ def generate_candidates():
 
             patch = extract_json_block(raw)
             if patch:
+                enforce_control_grounding_on_payload(control, patch)
                 candidates.append({
                     "name": name,
                     "patch": patch,
@@ -3985,7 +4501,7 @@ def help_route():
             )
         else:
             _help_cache[cache_key] = '<p>README.md not found.</p>'
-    return _help_cache[cache_key], 200, {'Content-Type': 'text/html; charset=utf-8'}
+    return _help_cache[cache_key], 200, {'Content-Type': 'text/plain; charset=utf-8', 'X-Content-Type-Options': 'nosniff'}
 
 # === Phase 12.13f: explain-only graph explainability debug view ===
 @app.route("/graph/explainability/view", methods=["GET"])

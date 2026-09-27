@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any
 
+from core.identifier_recall import extract_query_symbol_candidates
 from graph.builder import build_graph_from_repo
 from graph.query import explain_symbol, impact_analysis, trace_path
 
@@ -44,25 +45,8 @@ def clear_graph_cache(repo_path: str | None = None) -> None:
 
 
 def extract_symbol_candidates(query: str) -> list[str]:
-    import re
-
-    stop_words = {
-        "the", "a", "an", "and", "or", "to", "from", "in", "on", "for", "with",
-        "is", "are", "was", "were", "why", "how", "what", "where", "when",
-        "this", "that", "it", "of", "not", "bug", "fix",
-    }
-
-    result = []
-    seen = set()
-
-    for c in re.findall(r"\b[A-Za-z_][A-Za-z0-9_]*\b", query):
-        low = c.lower()
-        if len(c) < 2 or low in stop_words or low in seen:
-            continue
-        seen.add(low)
-        result.append(c)
-
-    return result[:12]
+    """Compatibility entrypoint for bounded, Unicode-aware query concepts."""
+    return extract_query_symbol_candidates(query, limit=12)
 
 
 def expand_candidates(words: list[str]) -> list[str]:

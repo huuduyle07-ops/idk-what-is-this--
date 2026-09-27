@@ -25,6 +25,14 @@ import json
 import re
 
 from core.credential_redaction import redact_credentials
+# INDENT.RUNTIME.1 repair seam: the one semantic authority a future patch to
+# `_classify_indent` may use instead of inventing a parser. Not called by the
+# current (deliberately unfixed) body below — see
+# docs/designs/2026-09-12-language-context-transport-and-repair-boundary.md.
+from core.indentation_observation import (
+    assess_indentation_observation,
+    observe_source_indentation,
+)
 
 if TYPE_CHECKING:
     from core.repository_inventory import RepositoryInventory
@@ -68,6 +76,17 @@ _FUNC_RES = [
 ]
 
 
+def _language_for_suffix(suffix: str) -> Optional[str]:
+    """The same authoritative extension->language label compute_dna's own
+    lang_mix already keys on suffix for (INDENT.RUNTIME.1) — never a second
+    suffix->language map. None for an unmapped or unresolvable extension."""
+    try:
+        from config import LANGUAGE_MAP
+    except Exception:
+        return None
+    return LANGUAGE_MAP.get(suffix.lower())
+
+
 def _classify_name(name: str) -> str:
     """snake_case / camelCase / PascalCase. Falls back to 'mixed' otherwise."""
     if "_" in name and name.lower() == name:
@@ -79,10 +98,13 @@ def _classify_name(name: str) -> str:
     return "mixed"
 
 
-def _classify_indent(text: str) -> Optional[str]:
+def _classify_indent(text: str, *, language: str | None = None) -> Optional[str]:
     """Return one of '2space', '4space', 'tab', or None when no leading
     indent on any line. We bias toward the ratio of indented lines so a single
-    tab in a Python file doesn't outvote a thousand 4-space lines."""
+    tab in a Python file doesn't outvote a thousand 4-space lines.
+
+    ``language`` describes the language of ``text`` (INDENT.RUNTIME.1) and is
+    currently ignored by this body; the classification below is unchanged."""
     counts = Counter()
     for line in text.splitlines():
         if not line or line[0] not in " \t":
@@ -191,8 +213,9 @@ def compute_dna(
         for line in text.splitlines():
             line_lengths.append(len(line))
 
-        # Indent detection (per-file, vote across files)
-        ind = _classify_indent(text)
+        # Indent detection (per-file, vote across files). INDENT.RUNTIME.1:
+        # language describes this walked file, never core/code_dna.py itself.
+        ind = _classify_indent(text, language=_language_for_suffix(p.suffix))
         if ind:
             indents[ind] += 1
 

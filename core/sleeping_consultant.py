@@ -7,14 +7,35 @@ import threading
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
-from core.control_engine import run_control_structured, build_control_prompt
+from core.control_engine import (
+    build_control_prompt,
+    enforce_control_grounding_on_payload,
+    run_control_structured,
+)
 from core.feature_context import maybe_enrich_with_scout
 from core.json_utils import extract_json_block
 from core.lesson_quality import evaluate_lesson_candidate
 from core.repo_librarian import inspect_repo_inventory
+from core.rollback_outcome import (
+    disposable_clone_rollback_fields,
+    rollback_disqualifies_success_evidence,
+)
 from core.run_lifecycle import run_patch_plan_with_artifacts
 from core.source_snippet_fallback import hydrate_control_source_from_scout
+from core.strict_envelope_emission import (
+    PROVIDER_GOOGLE,
+    apply_strict_emission_to_prompt,
+    is_strict_envelope_emission_enabled,
+    safe_observe_strict_envelope_emission,
+    strict_emission_client_kwargs,
+    strict_emission_directive,
+)
+from core.worker_patch_envelope import (
+    is_strict_worker_patch_envelope_shadow_enabled,
+    safe_compare_strict_and_legacy,
+)
 from agents.gemini_client import run_gemini_request_2
 from core import dream_artifacts
 
@@ -184,10 +205,37 @@ def _attach_patch_blockers(
     return dream_artifacts.attach_patch_blockers(item_result, plan_context)
 
 
+def _require_provider_text(raw: Any) -> str:
+    """Turn transport error strings into the same failure path as exceptions."""
+    if not isinstance(raw, str) or not raw.strip():
+        raise ValueError("Dream provider returned an empty or non-text response.")
+    if raw.lstrip().startswith("AGENT_ERROR:"):
+        raise RuntimeError(raw.strip())
+    return raw
+
+
+def _require_plan_payload(parsed: Any) -> dict:
+    """A completed plan needs usable content, not merely parseable JSON."""
+    if not isinstance(parsed, dict):
+        raise ValueError("Dream planner did not return a JSON object.")
+    summary = parsed.get("problem_summary")
+    steps = parsed.get("recommended_steps")
+    if not isinstance(summary, str) or not summary.strip():
+        raise ValueError("Dream plan is missing a non-empty problem_summary.")
+    if not isinstance(steps, list) or not steps or not all(
+        isinstance(step, str) and step.strip() for step in steps
+    ):
+        raise ValueError("Dream plan is missing non-empty recommended_steps.")
+    if "safe_to_patch_now" in parsed and type(parsed["safe_to_patch_now"]) is not bool:
+        raise ValueError("Dream plan safe_to_patch_now must be a JSON boolean.")
+    return parsed
+
+
 def _generate_patch_plan(
     repo_path: str,
     item: dict,
     feedback: str | None = None,
+    emission: Any = None,
 ) -> tuple[dict | None, str]:
     """Run Control + Scout + Gemini once. Returns (parsed_dict, raw_response)."""
     query = _build_patch_query(item)
@@ -216,8 +264,21 @@ def _generate_patch_plan(
         f"Generate patch_plan for: {query}",
         repo_path=repo_path,
     )
-    raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path)
+    # WORKER.DECL.2A.1: the same single call, optionally asked for the strict
+    # one-object envelope.  `emission` requests nothing unless the experiment is
+    # on *and* the control result's patch style already declares a patch_plan as
+    # the shape wanted; off, the prompt object and the client kwargs below are
+    # exactly the ones this site has always used.
+    prompt = apply_strict_emission_to_prompt(prompt, emission)
+    raw = run_gemini_request_2(
+        prompt=prompt,
+        repo_path=repo_path,
+        **strict_emission_client_kwargs(emission),
+    )
+    raw = _require_provider_text(raw)
     parsed = extract_json_block(raw)
+    if isinstance(parsed, dict):
+        enforce_control_grounding_on_payload(control, parsed)
     return parsed, (raw or "")
 
 
@@ -263,8 +324,8 @@ Rules:
 - Otherwise leave `safe_to_patch_now=false` and explain via `recommended_steps` and `risks`.
 - Do NOT skip the item. Always return the JSON object above.
 """
-    raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path)
-    parsed = extract_json_block(raw)
+    raw = _require_provider_text(run_gemini_request_2(prompt=prompt, repo_path=repo_path))
+    parsed = _require_plan_payload(extract_json_block(raw))
     return parsed, (raw or "")
 
 
@@ -452,8 +513,10 @@ Rules:
 - Prefer small, generic bug patterns over project-specific feature requests.
 - If the notes do not contain enough signal, return an empty case_ideas list.
 """
-    raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path) or ""
+    raw = _require_provider_text(run_gemini_request_2(prompt=prompt, repo_path=repo_path))
     parsed = extract_json_block(raw)
+    if not isinstance(parsed, (dict, list)):
+        raise ValueError("Dream case-idea provider did not return valid JSON.")
     raw_ideas, lesson_notes = _extract_case_idea_payload(parsed)
     ideas = [
         _normalize_case_idea(raw_idea, item=item, item_idx=int(item.get("idx") or 0), idea_idx=i)
@@ -552,6 +615,30 @@ def _normalize_dream_mode(value: str | None) -> str:
     return aliases.get(v, "plan_only")
 
 
+def _effective_item_mode(run_mode: str, item: dict) -> str:
+    """Item permissions may restrict a run, but cannot enable run-level patching."""
+    if run_mode != "patch_if_safe":
+        return run_mode
+    if "action_level" in item:
+        # Unlike legacy mode aliases, action_level is a canonical permission.
+        # An unknown/malformed value must never inherit patch permission.
+        level = item["action_level"]
+        if not isinstance(level, str):
+            return "plan_only"
+        return {
+            "patch_if_safe": "patch_if_safe",
+            "plan_only": "plan_only",
+            "proposal_draft": "plan_only",
+            "report_only": "research",
+            "case_idea_research": "case_idea_research",
+        }.get(level, "plan_only")
+    if "mode" in item:
+        legacy_mode = item["mode"]
+        return _normalize_dream_mode(legacy_mode if isinstance(legacy_mode, str) else None)
+    # Historical queues without per-item permissions follow the run setting.
+    return run_mode
+
+
 def _run_patch_item(
     repo_path: str,
     item: dict,
@@ -563,10 +650,40 @@ def _run_patch_item(
     item_dir_path.mkdir(parents=True, exist_ok=True)
     feedback: str | None = None
 
+    # WORKER.DECL.2A.1: this site is deliberately NOT enrolled in the strict
+    # emission experiment.  `run_control_structured` sets no `patch_style`, so
+    # `build_control_prompt` resolves this prompt to `safe_minimal`, under which
+    # a patch_plan is forbidden outright — appending an envelope block asking
+    # for one would override a safety instruction, which S4 keeps fixed.  The
+    # directive below therefore requests nothing, and the run is recorded
+    # honestly as `legacy_prompt`: the experiment's control arm, not a gap.
+    emission_enabled = is_strict_envelope_emission_enabled()
+    emission = strict_emission_directive(
+        PROVIDER_GOOGLE,
+        patch_plan_is_declared_shape=False,
+    )
+
     for attempt in range(1 + max(0, retry_per_item)):
-        patch, raw = _generate_patch_plan(repo_path, item, feedback=feedback)
+        patch, raw = _generate_patch_plan(
+            repo_path, item, feedback=feedback, emission=emission
+        )
         (item_dir_path / f"raw_model_attempt{attempt + 1}.txt").write_text(
             raw, encoding="utf-8",
+        )
+        # WORKER.DECL.2A: one response, two parsers.  `patch` above stays the
+        # authoritative payload; this only records what a strict one-object
+        # envelope parser would have made of the same text.  Default off.
+        worker_patch_response = (
+            safe_compare_strict_and_legacy(raw, patch)
+            if (is_strict_worker_patch_envelope_shadow_enabled() or emission_enabled)
+            else None
+        )
+        # WORKER.DECL.2A.1: label that measurement with the transport actually
+        # used for this call.  Adoption telemetry — it selects nothing.
+        strict_envelope_emission = (
+            safe_observe_strict_envelope_emission(emission, worker_patch_response)
+            if emission_enabled
+            else None
         )
 
         if not isinstance(patch, dict):
@@ -617,6 +734,8 @@ def _run_patch_item(
                 user_query=str(item.get("title") or item.get("hint") or ""),
                 control_result={"dream_item": item, "patch": patch},
                 source="dream_patch_if_safe",
+                worker_patch_response=worker_patch_response,
+                strict_envelope_emission=strict_envelope_emission,
             )
 
         # Persist artifacts regardless of success
@@ -678,7 +797,7 @@ def _run_idea_item(
         f"Be specific. Reference real symbols/paths when you can. No code patches."
     )
 
-    raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path) or ""
+    raw = _require_provider_text(run_gemini_request_2(prompt=prompt, repo_path=repo_path))
     (item_dir_path / "design.md").write_text(raw, encoding="utf-8")
 
     return _attach_patch_blockers({
@@ -747,7 +866,7 @@ def _run_research_item(
         "Be specific. Reference real symbols/paths when you can. No code patches."
     )
 
-    raw = run_gemini_request_2(prompt=prompt, repo_path=repo_path) or ""
+    raw = _require_provider_text(run_gemini_request_2(prompt=prompt, repo_path=repo_path))
     (item_dir_path / "proposal.md").write_text(raw, encoding="utf-8")
 
     # Also save a small plan_analysis.json for consistency with other modes.
@@ -794,7 +913,7 @@ def _run_patch_if_safe_item(
     safe = False
     if isinstance(plan_data, dict):
         summary = plan_data.get("problem_summary", "") or ""
-        safe = bool(plan_data.get("safe_to_patch_now"))
+        safe = plan_data.get("safe_to_patch_now") is True
 
     if not safe:
         return _attach_patch_blockers({
@@ -882,7 +1001,7 @@ def _lesson_candidate_from_revalidation(
         "touched_forbidden_files": _touched_forbidden_files(changed_files),
         "missing_expected_files": [],
         "patch_kind": "patch_plan",
-        "rollback_happened": bool(result.get("rollback_performed")),
+        "rollback_happened": rollback_disqualifies_success_evidence(result),
         "changed_files": changed_files,
         "diff": diff_text,
         "diffs": result.get("diffs", []),
@@ -928,9 +1047,12 @@ def _refine_plan_only_item(
         f"PREVIOUS PLAN (pass {pass_num - 1} or original):\n{old_text[:4000]}"
     )
     raw = run_gemini_request_2(prompt=refine_prompt, repo_path=repo_path) or ""
+    if raw.strip():
+        _require_provider_text(raw)
     parsed = extract_json_block(raw)
 
     if isinstance(parsed, dict):
+        _require_plan_payload(parsed)
         refined_name = f"plan_analysis.refined_pass{pass_num}.json"
         (item_dir_path / refined_name).write_text(
             json.dumps(parsed, indent=2, ensure_ascii=False),
@@ -984,6 +1106,7 @@ def _refine_research_item(
     raw = run_gemini_request_2(prompt=refine_prompt, repo_path=repo_path) or ""
 
     if raw.strip():
+        _require_provider_text(raw)
         refined_name = f"proposal.refined_pass{pass_num}.md"
         (item_dir_path / refined_name).write_text(raw, encoding="utf-8")
         after_summary = raw[:200].replace("\n", " ")
@@ -1038,17 +1161,22 @@ def _revalidate_ready_to_apply_item(
     item["lesson_evaluation"] = lesson_evaluation
 
     artifact_name = f"patch_revalidation_pass{pass_num}.json"
+    clone_fields = disposable_clone_rollback_fields(result)
+    clone_message = str(result.get("message") or "").split(
+        " Emergency recovery material", 1
+    )[0].rstrip()
+    clone_message += " " + clone_fields["recovery_material_note"]
     success = bool(result.get("success"))
     artifact = {
         "ok": success,
         "success": success,
-        "message": result.get("message") or "",
+        "message": clone_message,
         "error": result.get("error"),
         "validation_command": validation or "",
         "validation_ok": result.get("validation_ok"),
         "validation_output": result.get("validation_output") or "",
         "changed_files": changed_files,
-        "rollback_performed": bool(result.get("rollback_performed")),
+        **clone_fields,
         "diff": diff_text,
         "diffs": diffs,
         "failed_op_index": result.get("failed_op_index"),
@@ -1063,7 +1191,7 @@ def _revalidate_ready_to_apply_item(
 
     promotion = lesson_evaluation.get("promotion", "unknown")
     score = lesson_evaluation.get("score", "unknown")
-    result_summary = result.get("message") or result.get("error") or "Revalidation completed."
+    result_summary = clone_message or result.get("error") or "Revalidation completed."
     after_summary = (
         f"{result_summary} lesson_quality={promotion} score={score}"
     )[:220]
@@ -1296,6 +1424,8 @@ def run_overnight(
             _record_item_done(skipped)
             continue
 
+        item_mode = _effective_item_mode(mode, item)
+        item = {**item, "effective_dream_mode": item_mode}
         kind = (item.get("kind") or "").lower()
         title = item.get("title", "")
         item_path = dream_artifacts.item_dir(report_dir, idx, title)
@@ -1309,7 +1439,7 @@ def run_overnight(
         item_started = time.time()
 
         try:
-            if mode == "case_idea_research" or kind in _REFERENCE_STUDY_KINDS:
+            if item_mode == "case_idea_research" or kind in _REFERENCE_STUDY_KINDS:
                 print(
                     f"DREAM: [{idx}/{len(queue)}] case_idea_research -> {kind}",
                     flush=True,
@@ -1317,15 +1447,15 @@ def run_overnight(
                 results.append(_run_case_idea_research_item(
                     repo_path, item, idx, item_path,
                 ))
-            elif mode == "plan_only":
+            elif item_mode == "plan_only":
                 print(
                     f"💤 DREAM: [{idx}/{len(queue)}] plan_only → {kind}",
                     flush=True,
                 )
                 results.append(_run_plan_only_item(
-                    repo_path, item, idx, item_path, dream_mode=mode,
+                    repo_path, item, idx, item_path, dream_mode=item_mode,
                 ))
-            elif mode == "research":
+            elif item_mode == "research":
                 print(
                     f"💤 DREAM: [{idx}/{len(queue)}] research → {kind}",
                     flush=True,

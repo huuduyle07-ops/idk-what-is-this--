@@ -1,0 +1,274 @@
+{
+  "phase": "CONTROL.BOOTSTRAP.1",
+  "completed_on": "2026-09-18",
+  "closed_residuals": [
+    "CONTROL.FRESH.1: a fresh Generate reached the bootstrap boundary but was not executable; CONTROL.BOOTSTRAP.1 was required before a fresh task could proceed into CONTROL-dependent analysis and provider stages"
+  ],
+  "fresh_generate_executable_with_explicit_targets": true,
+  "bootstrap_transition": "fresh_control_required + the transported task -> WAITER.LIVE.1 / INPUT.1 Task Contract -> exact grounding -> CTX.READ.1 exact reads -> one CONTROL-authoring call -> CONTROL.FRESH.1 validator and closed admission -> first CONTROL -> unchanged CONTROL-dependent pipeline",
+  "required_follow_up": [
+    "PREFLIGHT.REQUEST.1"
+  ],
+  "remaining_findings": [
+    "UX-05",
+    "UX-06"
+  ],
+  "out_of_scope": [
+    "repository-wide graph bootstrap",
+    "canonical indexing",
+    "embeddings",
+    "vector retrieval",
+    "arbitrary repository discovery",
+    "compiler/test/linter preflight",
+    "model-generated shell commands",
+    "PREFLIGHT.REQUEST.1",
+    "UX-05",
+    "UX-06",
+    "T6 Round 11"
+  ],
+  "existing_files_changed": [
+    "web/app.py",
+    "web/templates/index.html",
+    "web/static/workbench_state.js",
+    "docs/roadmap/phase_registry.json",
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py",
+    "tests/_control_fresh1_maintenance.py",
+    "tests/test_control_fresh1.py",
+    "tests/test_ux_context1_browser.py"
+  ],
+  "new_files": [
+    "web/control_bootstrap.py",
+    "tests/test_control_bootstrap1.py",
+    "tests/test_control_bootstrap1_browser.py",
+    "tests/_control_bootstrap1_maintenance.py",
+    "tests/fixtures/control_bootstrap1_reversal.json",
+    "tests/fixtures/control_bootstrap1_frozen_boundaries.json",
+    "tests/fixtures/control_bootstrap1_completion.json",
+    "docs/designs/2026-09-18-explicit-target-direct-context-bootstrap.md"
+  ],
+  "owners": {
+    "fresh_bootstrap": "web/control_bootstrap.py: bootstrap_fresh_control, bootstrap_fresh_control_from_form",
+    "intent_and_explicit_targets": "core/live_task_routing.py safe_route_live_task over the INPUT.1 Task Contract (explicit_evidence.file_paths), unchanged",
+    "direct_reads": "core/direct_context_runtime.py execute_direct_context (CTX.READ.1), unchanged",
+    "control_validation": "web/control_context.py normalize_control_values (CONTROL.FRESH.1), unchanged",
+    "task_snapshot": "web/static/workbench_state.js begin(kind, inputs): ticket.task",
+    "task_serialization": "web/templates/index.html: _mainIntentText, _withFreshTask, generatePatch, generateCandidates",
+    "generate_seam": "web/app.py: _bootstrap_fresh_control, _generate_patch_from_control, _generate_candidates_from_control"
+  },
+  "wire_contract": {
+    "fresh_form": "control=null (CONTROL.FRESH.1) plus query=<Main Intent text as typed>, appended last",
+    "continuation_form": "unchanged: the eligible run's context, no query field",
+    "fresh_without_task": "fresh_control_required, unchanged",
+    "answer_on_success": "the unchanged pipeline answer plus control_bootstrap (the receipt)",
+    "answer_on_stop": "error, code, reason (field), control_context=fresh_bootstrap_required, control_bootstrap; HTTP 200 JSON"
+  },
+  "codes": {
+    "control_bootstrapped": "first CONTROL composed, validated and handed to the pipeline",
+    "bootstrap_discovery_required": "empty_task | no_explicit_target",
+    "bootstrap_target_unresolved": "task_contract_not_preserved | repository_unavailable | not_found | not_a_file | unsafe_path",
+    "bootstrap_target_unsupported": "ignored_by_repository_policy | sensitive_file_blocked | binary_or_opaque | encoding_unsupported | read_failed | ...",
+    "bootstrap_target_budget_exceeded": "file_count | file_bytes | aggregate_bytes | file_lines",
+    "bootstrap_source_changed": "changed_during_read | changed | deleted | replaced | unverifiable",
+    "bootstrap_provider_failed": "provider_exception | provider_error | empty_response | non_text_response",
+    "bootstrap_control_invalid": "the CONTROL.FRESH.1 validator's reason, or unadmitted_field | ungrounded_hypothesis | invalid_hypothesis | invalid_evidence_gap",
+    "bootstrap_request_invalid": "repeated_task"
+  },
+  "target_sets": {
+    "requested_targets": "Task Contract explicit file commitments, literal, in order",
+    "evidence_targets": "grounded canonical paths read by CTX.READ.1, in order",
+    "localized_patch_targets": "null: not decided by bootstrap"
+  },
+  "bounds": {
+    "max_files": 8,
+    "max_total_bytes": 1048576,
+    "max_bytes_per_file": 262144,
+    "max_lines_per_file": 4000,
+    "source": "CTX.READ.1 defaults"
+  },
+  "authoring": {
+    "provider": "the route's run_gemini_request, response_mime_type=application/json",
+    "calls_per_fresh_request": "at most 1, no retry",
+    "author_writes": [
+      "hypotheses",
+      "evidence_gaps"
+    ],
+    "evidence_needs": [
+      "compile_evidence",
+      "test_evidence",
+      "runtime_evidence",
+      "additional_source",
+      "user_clarification"
+    ]
+  },
+  "entry_behavior": "control=null (with or without a named-file task) -> fresh_control_required; the page never sent the task",
+  "post_behavior": "control=null + a task naming bounded, grounded files -> exact reads -> one author call -> validated CONTROL -> harness, prompt, provider, grounding; typed stops otherwise",
+  "fake_run_artifacts_created": 0,
+  "model_calls_in_tests": 0,
+  "external_network_requests": 0,
+  "production_bootstrap_model_calls_per_fresh_request": 1,
+  "graph_index_embedding_traversal_delta": {
+    "canonical_graph_operations": 0,
+    "activation_graph_operations": 0,
+    "indexing_operations": 0,
+    "embedding_operations": 0,
+    "repository_membership_traversals": 0
+  },
+  "frozen_production_deltas": {
+    "web/control_context.py": 0,
+    "core/": 0,
+    "agents/": 0,
+    "patching/": 0,
+    "web/routes/": 0,
+    "web/runner.py": 0,
+    "web/session_store.py": 0,
+    "web/static/request_integrity.js": 0,
+    "web/static/safe_content.js": 0,
+    "generate_pipeline_tails": 0,
+    "execution_and_human_apply_authority": 0,
+    "track_a": 0
+  },
+  "limitations": [
+    "targets must be named at their exact repository path; discovery stays out of scope",
+    "only file names the INPUT.1 extractor recognizes become commitments",
+    "a bootstrap is not persisted as a run: another fresh Generate bootstraps again",
+    "exact CRLF source meets downstream text-mode quote grounding, which fails closed on CRLF files",
+    "freshness uses CTX.READ.1's stat identity rule",
+    "static reading only suspects compiler defects; compile evidence is a recorded gap"
+  ],
+  "performance": {
+    "fixture": "Java dogfood: Twosum.java (473 bytes) + MainApp.java (234 bytes), median of 7 batches x 20 calls",
+    "task_contract_transport_us": 243.1,
+    "target_grounding_us": 489.4,
+    "named_file_reads_us": 6532.5,
+    "prompt_rendering_us": 4.1,
+    "control_validation_us": 73.5,
+    "end_to_end_without_model_us": 8019.9,
+    "bytes_read": 707,
+    "prompt_bytes": 3908,
+    "model_latency_included": false
+  },
+  "red_green_toggle": {
+    "reverted_to_entry": [
+      "web/app.py",
+      "web/templates/index.html",
+      "web/static/workbench_state.js"
+    ],
+    "moved_aside": [
+      "web/control_bootstrap.py"
+    ],
+    "suites": [
+      "tests/test_control_bootstrap1.py",
+      "tests/test_control_bootstrap1_browser.py"
+    ],
+    "without_production_change": {
+      "tests": 133,
+      "failed": 117,
+      "passed": 15,
+      "skipped": 1
+    },
+    "with_production_change": {
+      "tests": 133,
+      "failed": 1,
+      "passed": 131,
+      "skipped": 1,
+      "only_failure": "the completion receipt pin of tests/test_control_bootstrap1.py, stale by design until this receipt was rebuilt"
+    },
+    "passing_both_ways": "the frozen CONTROL.FRESH.1 answer without a task, malformed CONTROL rejection, registry and frozen-boundary governance, and continuation tickets carrying no task",
+    "restored_byte_exact": true
+  },
+  "test_runs": {
+    "medium_adjacent": {
+      "files": 27,
+      "result": "1048 passed, 3 skipped, 0 failed in 306 s",
+      "skips": "symlink creation needs a privilege this Windows account lacks (1 here, 2 pre-existing CTX.READ.1)"
+    },
+    "broad": {
+      "files": 321,
+      "list": ".tmp/control-bootstrap1/broad_files.txt",
+      "junit": ".tmp/control-bootstrap1/broad.xml",
+      "result": "8724 passed, 50 failed, 38 skipped in 1892 s",
+      "failures": "49 identical node ids and first-line messages to CONTROL.FRESH.1's final broad run, plus tests/test_context_selection_contract.py::test_production_python_does_not_activate_selector_runtime, which is on the known pre-existing list, was not in CONTROL.FRESH.1's broad set, and fails at entry on a .tmp SyntaxError; web/control_bootstrap.py imports no selector module",
+      "control_fresh1_load_flake": "test_data_rollback1_consumers[no_mutation] passed this time"
+    },
+    "final_focused": {
+      "junit": ".tmp/control-bootstrap1/final_focused.xml",
+      "result": "610 passed, 1 skipped, 0 failed in 302 s",
+      "per_suite": {
+        "test_control_bootstrap1": {
+          "tests": 115,
+          "failed": 0,
+          "skipped": 1
+        },
+        "test_control_bootstrap1_browser": {
+          "tests": 18,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_control_fresh1": {
+          "tests": 105,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_control_fresh1_browser": {
+          "tests": 16,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_phase_picker": {
+          "tests": 100,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_phase_registry": {
+          "tests": 167,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_ux_context1": {
+          "tests": 10,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_ux_context1_browser": {
+          "tests": 26,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_ux_state1": {
+          "tests": 15,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_ux_state1_browser": {
+          "tests": 39,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    }
+  },
+  "checks": {
+    "compileall": "python -m compileall -q core patching web scripts tests: exit 0",
+    "benchmarks_check": "python benchmarks/run_benchmarks.py --check: 54 checked, 0 errors",
+    "git_diff_check": "clean on every tracked changed file; new files checked for trailing whitespace separately"
+  },
+  "source_sha256": {
+    "web/app.py": "c5b73619811ceb6339207154f3b8863e37445afcb636b73151b4d1a6a2e241ae",
+    "web/templates/index.html": "3bdb72c51028b1317cd5ce82c5859a4b34f7f1cc0de2218ac26340ef649fc80c",
+    "web/static/workbench_state.js": "843be0a0bbfbfc9c22eb23f5e5ae04695d4daf3d32ac77eef9ca2772a0f76f39",
+    "docs/roadmap/phase_registry.json": "156abc272fa7f18da67b1089e11a8cacb61d19d82e8ef009f0a7c68194981ede",
+    "tests/test_phase_registry.py": "5e8e35bb3f3907dcc42c951c473b7d342efbd33163f59bd868ef287a84b98ece",
+    "tests/test_phase_picker.py": "c1ba7b58531280f8aec659d438e2020c3625a3faf16109899ebd4b58c5d6ba49",
+    "tests/_control_fresh1_maintenance.py": "cf96df7b7485f6d875f5a09ce9ee65dd9283f4369e53f6830f9f15f5cf1d7126",
+    "tests/test_control_fresh1.py": "05f8479e2564e8e072f87da3cf042247ee0a96b5552f0b48af131cfda5cea326",
+    "tests/test_ux_context1_browser.py": "2dd9e15b13333ca8fd2201ebd7ef7aa1c26c9a22d5cd4d3241944573b3bcfdf9",
+    "web/control_bootstrap.py": "76a6d59f654b2f76d7933a7a134fd9796382973fbb56b8f9b50141172e3f090b",
+    "tests/test_control_bootstrap1.py": "83393c5faee3ca7669ed29ba54fd0ae5a8704ea0689fa7885b34389403583815",
+    "tests/test_control_bootstrap1_browser.py": "c009ddbe3f58309c5a64ea642393494f1e41ec3ebff52be92cc290e7c4aa2579",
+    "tests/_control_bootstrap1_maintenance.py": "06fc01313f8d8b70b4891f82264ee41c8aab319c32e501d51877f95622c77548",
+    "tests/fixtures/control_bootstrap1_reversal.json": "de6056655057546e7965763c607ff526ea6c4adf01ffead501633320ada86bcb",
+    "tests/fixtures/control_bootstrap1_frozen_boundaries.json": "35eca0c35879a2b06b847a00d2527b06b956b5d710e0ff8fcfce7c1d6a7fa2a4",
+    "docs/designs/2026-09-18-explicit-target-direct-context-bootstrap.md": "dd4d43033a6594a3d846ce9291aa9b9e459e8b79c32f3e9d731d9e53b0f4596f"
+  }
+}

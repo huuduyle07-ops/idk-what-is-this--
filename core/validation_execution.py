@@ -8,6 +8,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Mapping
 
+from core.validation_bytecode_cache import (
+    apply_validation_bytecode_cache_env,
+    validation_bytecode_cache,
+)
+
 
 DEFAULT_ALLOWED_TOOLS: tuple[str, ...] = (
     "python",
@@ -16,6 +21,11 @@ DEFAULT_ALLOWED_TOOLS: tuple[str, ...] = (
     "pytest",
     "node",
     "npm",
+    # OPS.VALIDATE.1 - the package managers a repository's own lockfile can
+    # name. They are allowed for the same reason npm is, and for nothing more:
+    # only `<manager> run <script>` is ever emitted, never an install.
+    "pnpm",
+    "yarn",
     "npx",
     "go",
     "cargo",
@@ -66,6 +76,13 @@ SECRET_NAME_FRAGMENTS: tuple[str, ...] = (
     "CREDENTIAL",
 )
 
+#: OPS.VALIDATE.2 - the one phrase both runners write into the output of a
+#: command they stopped at the budget.  The classifier is told structurally
+#: that a run timed out; this marker is the defence in depth for a caller
+#: that forgets to say so, which is why the wording is a named constant
+#: rather than prose to be reworded casually.
+VALIDATION_BUDGET_EXHAUSTED_MARKER = "validation budget exhausted"
+
 SHELL_META_TOKENS: tuple[str, ...] = ("&&", "||", "$(", "`")
 SHELL_META_CHARS: tuple[str, ...] = ("&", ";", "|", ">", "<")
 MAX_TIMEOUT_SEC = 600
@@ -98,6 +115,12 @@ class SafeValidationResult:
     timed_out: bool
     command: list[str]
     cwd: str
+    # OPS.VALIDATE.2 - the budget the command was given, so a reader of a
+    # timed-out result can say what ran out without guessing, and the bounded
+    # fact that this execution did not trust repository bytecode.  No path is
+    # carried: the temp cache directory is an implementation detail.
+    timeout_sec: int | None = None
+    python_bytecode_cache_isolated: bool = False
 
     @property
     def output(self) -> str:
@@ -118,6 +141,12 @@ def _blocked_result(
         timed_out=False,
         command=list(command.command or []),
         cwd=str(command.cwd or ""),
+        timeout_sec=(
+            command.timeout_sec
+            if isinstance(command.timeout_sec, int)
+            and not isinstance(command.timeout_sec, bool)
+            else None
+        ),
     )
 
 
@@ -143,7 +172,11 @@ def _env_is_secret(name: str) -> bool:
     return any(fragment in upper for fragment in SECRET_NAME_FRAGMENTS)
 
 
-def _build_scrubbed_env(command: SafeValidationCommand) -> dict[str, str]:
+def _build_scrubbed_env(
+    command: SafeValidationCommand,
+    *,
+    pycache_prefix: str = "",
+) -> dict[str, str]:
     allow = {
         name.strip()
         for name in (command.env_allowlist or ())
@@ -158,7 +191,12 @@ def _build_scrubbed_env(command: SafeValidationCommand) -> dict[str, str]:
     env.setdefault("PYTHONUTF8", "1")
     env.setdefault("PYTHONIOENCODING", "utf-8")
     env.setdefault("PYTHONUNBUFFERED", "1")
-    return env
+    # OPS.VALIDATE.2 - last, deliberately: a PYTHONPYCACHEPREFIX inherited from
+    # the parent environment or supplied by a caller would point at a cache
+    # built for some earlier source state, which is the defect.  Setting it is
+    # a no-op for non-Python validation, which is why the freshness mechanism
+    # needs no per-language branch.
+    return apply_validation_bytecode_cache_env(env, pycache_prefix)
 
 
 def validate_safe_validation_command(command: SafeValidationCommand) -> str:
@@ -259,52 +297,70 @@ def run_safe_validation_command(command: SafeValidationCommand) -> SafeValidatio
     if _tool_basename(argv[0]) in {"python", "python3", "py"}:
         argv[0] = sys.executable
 
-    try:
-        completed = subprocess.run(
-            argv,
-            cwd=str(cwd),
-            shell=False,
-            capture_output=True,
-            text=True,
-            timeout=command.timeout_sec,
-            encoding="utf-8",
-            errors="replace",
-            env=_build_scrubbed_env(command),
-        )
-        return SafeValidationResult(
-            ok=completed.returncode == 0,
-            blocked=False,
-            block_reason="",
-            exit_code=completed.returncode,
-            stdout=completed.stdout or "",
-            stderr=completed.stderr or "",
-            timed_out=False,
-            command=argv,
-            cwd=str(cwd),
-        )
-    except subprocess.TimeoutExpired as exc:
-        stdout = exc.stdout if isinstance(exc.stdout, str) else ""
-        stderr = exc.stderr if isinstance(exc.stderr, str) else ""
-        return SafeValidationResult(
-            ok=False,
-            blocked=False,
-            block_reason="",
-            exit_code=None,
-            stdout=stdout,
-            stderr=f"validation timeout after {command.timeout_sec}s\n{stderr}",
-            timed_out=True,
-            command=argv,
-            cwd=str(cwd),
-        )
-    except OSError as exc:
-        return SafeValidationResult(
-            ok=False,
-            blocked=False,
-            block_reason="",
-            exit_code=None,
-            stdout="",
-            stderr=f"safe validation execution error: {exc}",
-            timed_out=False,
-            command=argv,
-            cwd=str(cwd),
-        )
+    # OPS.VALIDATE.2 - the bytecode cache directory lives exactly as long as
+    # this one execution.  ``validation_bytecode_cache`` removes it on every
+    # exit path, the timeout branch below included, so a run that exhausts its
+    # budget leaves no more behind than one that finished.
+    with validation_bytecode_cache() as pycache_prefix:
+        isolated = bool(pycache_prefix)
+        env = _build_scrubbed_env(command, pycache_prefix=pycache_prefix)
+        try:
+            completed = subprocess.run(
+                argv,
+                cwd=str(cwd),
+                shell=False,
+                capture_output=True,
+                text=True,
+                timeout=command.timeout_sec,
+                encoding="utf-8",
+                errors="replace",
+                env=env,
+            )
+            return SafeValidationResult(
+                ok=completed.returncode == 0,
+                blocked=False,
+                block_reason="",
+                exit_code=completed.returncode,
+                stdout=completed.stdout or "",
+                stderr=completed.stderr or "",
+                timed_out=False,
+                command=argv,
+                cwd=str(cwd),
+                timeout_sec=command.timeout_sec,
+                python_bytecode_cache_isolated=isolated,
+            )
+        except subprocess.TimeoutExpired as exc:
+            # ``subprocess.run`` kills and reaps the child before re-raising, so
+            # no validation process outlives this call.
+            stdout = exc.stdout if isinstance(exc.stdout, str) else ""
+            stderr = exc.stderr if isinstance(exc.stderr, str) else ""
+            return SafeValidationResult(
+                ok=False,
+                blocked=False,
+                block_reason="",
+                exit_code=None,
+                stdout=stdout,
+                stderr=(
+                    f"{VALIDATION_BUDGET_EXHAUSTED_MARKER} after "
+                    f"{command.timeout_sec}s\n{stderr}"
+                ),
+                timed_out=True,
+                command=argv,
+                cwd=str(cwd),
+                timeout_sec=command.timeout_sec,
+                python_bytecode_cache_isolated=isolated,
+            )
+        except OSError as exc:
+            return SafeValidationResult(
+                ok=False,
+                blocked=False,
+                block_reason="",
+                exit_code=None,
+                stdout="",
+                stderr=f"safe validation execution error: {exc}",
+                timed_out=False,
+                command=argv,
+                cwd=str(cwd),
+                timeout_sec=command.timeout_sec,
+                python_bytecode_cache_isolated=isolated,
+            )

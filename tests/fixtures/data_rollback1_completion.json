@@ -1,0 +1,343 @@
+{
+  "phase": "DATA.ROLLBACK.1",
+  "completed_on": "2026-09-16",
+  "closed_finding": "DATA-02",
+  "remaining_findings": [
+    "SEC-02",
+    "UX-01",
+    "UX-02",
+    "UX-03",
+    "UX-04",
+    "UX-05",
+    "UX-06"
+  ],
+  "out_of_scope": [
+    "UI redesign",
+    "T6 Round 11"
+  ],
+  "existing_files_changed": [
+    "core/execution_outcome_telemetry.py",
+    "core/executor.py",
+    "core/lesson_auto_candidates.py",
+    "core/pipeline.py",
+    "core/run_lifecycle.py",
+    "core/self_correct_loop.py",
+    "core/sleeping_consultant.py",
+    "core/validation_side_effects.py",
+    "docs/roadmap/phase_registry.json",
+    "patching/patch_plan_executor.py",
+    "scripts/create_lesson_from_proposal.py",
+    "scripts/seed_lessons_from_proposals.py",
+    "tests/_auth_dream1_maintenance.py",
+    "tests/_harness_maintenance.py",
+    "tests/test_data_undo1.py",
+    "tests/test_exec_plan1.py",
+    "tests/test_execution_outcome_telemetry.py",
+    "tests/test_executor_single_file_path.py",
+    "tests/test_indent_semantics1.py",
+    "tests/test_patch_minimal_result_fields_live3.py",
+    "tests/test_phase_picker.py",
+    "tests/test_phase_registry.py",
+    "web/routes/patch_routes.py",
+    "web/session_store.py"
+  ],
+  "new_files": [
+    "core/failed_rollback_recovery.py",
+    "core/rollback_outcome.py",
+    "docs/designs/2026-09-14-verified-rollback-truthfulness.md",
+    "tests/_data_rollback1_maintenance.py",
+    "tests/fixtures/data_rollback1_frozen_boundaries.json",
+    "tests/fixtures/data_rollback1_reversal.json",
+    "tests/test_data_rollback1.py",
+    "tests/test_data_rollback1_telemetry_edges.py",
+    "tests/test_data_rollback1_store_edges.py",
+    "tests/test_data_rollback1_executor_edges.py",
+    "tests/test_data_rollback1_consumers.py",
+    "tests/fixtures/data_rollback1_completion.json"
+  ],
+  "production_rollback_owners": [
+    "patching/patch_plan_executor.py",
+    "core/executor.py"
+  ],
+  "frozen_nested_rollback_mechanism": "core/mutation_oracle.py; verified and guarded by core/executor.py without changing oracle source",
+  "authoritative_outcome_owner": "core/rollback_outcome.py",
+  "emergency_recovery_owner": "core/failed_rollback_recovery.py",
+  "rollback_statuses": [
+    "not_required",
+    "not_attempted",
+    "completed_verified",
+    "incomplete",
+    "unverifiable"
+  ],
+  "patch_ops_rollback_protected_semantics": "capability_only",
+  "execution_telemetry_schema": "exec_auth_live_1_execution_telemetry_v2",
+  "rollback_outcome_schema": "data_rollback_1_outcome_v1",
+  "recovery_artifact_schema": 1,
+  "recovery_artifact_namespace": "failed_rollback_recovery",
+  "model_calls": 0,
+  "external_network_requests": 0,
+  "performance": {
+    "generic_outcome_construct_and_serialize_median_us": 7.5,
+    "one_4k_target_final_verification_median_us": 2216.55,
+    "one_4k_emergency_artifact_persist_and_verify_median_us": 26424.8,
+    "normal_success_artifact_writes": 0,
+    "samples": {
+      "outcome": 20000,
+      "verification": 2000,
+      "persistence": 100
+    }
+  },
+  "test_runs": [
+    {
+      "scope": "focused",
+      "passed": 123,
+      "failed": 0,
+      "skipped": 0,
+      "module_results": {
+        "tests.test_data_rollback1": {
+          "passed": 22,
+          "failed": 0,
+          "skipped": 0
+        },
+        "tests.test_data_rollback1_telemetry_edges": {
+          "passed": 35,
+          "failed": 0,
+          "skipped": 0
+        },
+        "tests.test_data_rollback1_store_edges": {
+          "passed": 38,
+          "failed": 0,
+          "skipped": 0
+        },
+        "tests.test_data_rollback1_executor_edges": {
+          "passed": 17,
+          "failed": 0,
+          "skipped": 0
+        },
+        "tests.test_data_rollback1_consumers": {
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        }
+      },
+      "junit_report": ".tmp/data_rollback1_final_focused.xml"
+    }
+  ],
+  "verification_sequence": "Affected broad started before the final conservative legacy-transaction parser tightening. Focused and post_parser_compatibility rerun the final parser, all affected production adapters/consumers, and frozen boundaries; source hashes identify the final delivered files.",
+  "checks": {
+    "compileall": "passed",
+    "benchmark_cases_check": "54 passed, 0 errors",
+    "registry_and_receipt_json": "valid",
+    "git_diff_check": "passed",
+    "phase_picker_top_recommendation": "DOGFOOD.1B"
+  },
+  "frozen_production_deltas": {
+    "AUTH.DREAM.1": 0,
+    "EXEC.PLAN.1_transaction_mechanics": 0,
+    "DATA.UNDO.1": 0,
+    "SEC.UI.1": 0,
+    "Track_A": 0,
+    "authority_semantics": 0
+  },
+  "limitations": [
+    "Existing process-local mutation locks are preserved; there is no cross-process CAS.",
+    "Power-loss and process-kill crash recovery are not claimed.",
+    "Emergency artifacts are bounded manual-recovery locators and grant no restore authority.",
+    "A later external writer causes incomplete or unverifiable truth when observed; it is not silently overwritten."
+  ],
+  "source_sha256": {
+    "core/execution_outcome_telemetry.py": "4da1232c2022df114ccc7fbfa77d49fb38ff26d059dd5e323005e904795926a5",
+    "core/executor.py": "4ec3c7861a4c17cf2629db5715b1c01fde6a59ffead4b2be45950dfa2a7f88a8",
+    "core/lesson_auto_candidates.py": "6fc676a7d01c8707780c67f9d71b768b966723e2757d468ac1528053718af762",
+    "core/pipeline.py": "be8036f02a5c554a0e191d9b03fcab52a0d76df21fd818b7857ccc11afdd133b",
+    "core/run_lifecycle.py": "39e9f8ca575b90cb751f6db8b4eb0f4e5a7e45579e5469e3116c7459230040a7",
+    "core/self_correct_loop.py": "8f056cbb6d3f55c38cc7e3eb9405da2834a176f9b13c08d1f2c9efa5c1654d86",
+    "core/sleeping_consultant.py": "3feab9601463ec0b0d6ad6d79b479c6197014b337ddd8ab824abfa843e081e87",
+    "core/validation_side_effects.py": "16e702f9258b13e6399ce0bc94ecc9e15dfbe0d0bbbfae62220e52f400186ed3",
+    "docs/roadmap/phase_registry.json": "f1d4205e35eba2bf0b7f26c80e5cae7428e292fdb639032384e4048d76909f52",
+    "patching/patch_plan_executor.py": "111ee91975b484579e5dbd0fc3c18de862fad7bc2f179b7af88082c7572776e8",
+    "scripts/create_lesson_from_proposal.py": "92197410fc682f1d21836c911b0b3d602371605697113fbf16741326929ff0bb",
+    "scripts/seed_lessons_from_proposals.py": "d70992d163238e7fbfc3f6d13725b716f09cbf1ac70b21849787a3d11e024e49",
+    "tests/_auth_dream1_maintenance.py": "5322f9886e644074c98e8fae2eeb1c92c152de3568127538124cd33cb08b7d20",
+    "tests/_harness_maintenance.py": "114adb336b001383c1c1e6afb5bb731003ab3dbadc71b512a3226195712d77c4",
+    "tests/test_data_undo1.py": "e08d10e6a3380b6f338046c819877c10097c26733f4a8f1af40505cb3f3e3bd6",
+    "tests/test_exec_plan1.py": "a45c41640eec2b267e7cbcd21f2a7304419931872c4668488237693507829146",
+    "tests/test_execution_outcome_telemetry.py": "bd670b2104bc7441f3e32b7d3bfd86f91aafbca9fe7cf2d2fe972334c415b452",
+    "tests/test_executor_single_file_path.py": "80a0182e4a05dcb76ca482bfbba0de3807f599c516a6ccde99090483c93ccdb9",
+    "tests/test_indent_semantics1.py": "414039b14c8548bfa9a457d6bfa7aa4e1da22629edd68799c93c9bd0f39d21c5",
+    "tests/test_patch_minimal_result_fields_live3.py": "12bd693695d449cf89fa9c7ffa496b04e4677a3e485d503d5844f61ef1342716",
+    "tests/test_phase_picker.py": "c4c3d03622a9e43bbf65ba1be7bda069269531602c0765118a7e801940fc8e3d",
+    "tests/test_phase_registry.py": "5926e62fdab312a2d898800794a911a0159fa524556153a4a6b8ae45aded2e92",
+    "web/routes/patch_routes.py": "19fc0272e812ec4394c774b1940ade3ef0e2843ef447cdc54e51dcdd938c8a55",
+    "web/session_store.py": "d89322a78a49ac9ba8beef2086eff32190fe6a16dd9810bd73ebe906b9488214",
+    "core/failed_rollback_recovery.py": "7ff20ce943df6d4f45e625530b82da32e15ee027237a5bb3213e80b1f9ebcf19",
+    "core/rollback_outcome.py": "35eac0d075bf5b7cf5050470f3a94015f103d807b4536399772eceec57b88e7d",
+    "docs/designs/2026-09-14-verified-rollback-truthfulness.md": "c89873d97f5b5e16b0126452f0e80a64832682cb98a83d3ad82f9b574b50b573",
+    "tests/_data_rollback1_maintenance.py": "72b5dbf2da1ec701df6a32a4bac638f0d8b295bbf43e3852a1b51b2dcda66d14",
+    "tests/fixtures/data_rollback1_frozen_boundaries.json": "b304843a1bbac3743594360ca1d258a2d16869023c4eac9475750d4e8f28bed7",
+    "tests/fixtures/data_rollback1_reversal.json": "5e3fba30858a2ca1da0d8ca479e3b547c691454ddcdc4b03a161fd79b6e6513b",
+    "tests/test_data_rollback1.py": "addd01c678bb4eced6010567ecf2048d0afb14cd9aa308fd5c7cba7ddf21ce40",
+    "tests/test_data_rollback1_telemetry_edges.py": "919c8773f8ba5ab5d349a54a5c950b68dc842620e096779af22ad6fd2fb54e53",
+    "tests/test_data_rollback1_store_edges.py": "d53f98d9ef2fd89fa1cabed507cd4da6f31668294cf401a806f723716d9179d4",
+    "tests/test_data_rollback1_executor_edges.py": "5b6263d020b2bfc8c1694389d639ba33a5a25f83bc89483f11727e6095bfd3c2",
+    "tests/test_data_rollback1_consumers.py": "bef5593fe606bf8fbeaa15359dccd9414e9f1e8dc5aaee14c32eaf93590e5177"
+  },
+  "audit_followup": {
+    "date": "2026-09-17",
+    "trigger": "Line-by-line re-audit of the DATA.ROLLBACK.1 specification against delivered code.",
+    "gaps_closed": [
+      {
+        "id": "lifecycle_shadow_input",
+        "finding": "core/run_lifecycle.py fed the narrowed rollback_performed into the frozen post-run shadow, so an incomplete rollback stopped marking observed_change_identity_incomplete.",
+        "resolution": "The shadow input receives the typed attempted fact; failure before mutation still does not mark it."
+      },
+      {
+        "id": "lifecycle_rollback_event",
+        "finding": "Replay events.jsonl logged rollback_performed on verified success but nothing when recovery was incomplete.",
+        "resolution": "A rollback_incomplete event carries status, unresolved paths/directories, artifact IDs and material error."
+      },
+      {
+        "id": "partial_material_wording",
+        "finding": "Executor, plan executor, telemetry and web messages said emergency material 'is available' when only some unresolved targets were persisted.",
+        "resolution": "One presenter over the outcome distinguishes available, partially available, not fully persisted and not recorded; not_attempted no longer reads as failed."
+      },
+      {
+        "id": "typed_success_precedence",
+        "finding": "rollback_outcome_from_mapping accepted a typed completed_verified beside measured recovery_complete=false or non-empty remaining sets.",
+        "resolution": "Such conflicting evidence loads as unverifiable (conflicting_rollback_evidence)."
+      },
+      {
+        "id": "absent_receipt_final_state",
+        "finding": "A non-mapping receipt loaded with final_state_verified=true.",
+        "resolution": "It loads as not_required with final_state_verified=false."
+      },
+      {
+        "id": "static_ownership_breadth",
+        "finding": "The static guard covered only literal rollback_performed=True in seven files.",
+        "resolution": "Literal rollback_completed/rollback_verified/rollback_status=completed_verified writes are guarded across producers and translators, and verified-success construction is pinned to its two measuring owners."
+      },
+      {
+        "id": "undo_separation_test",
+        "finding": "No test proved DATA.UNDO.1 refuses emergency artifact IDs, although both use 64-hex IDs.",
+        "resolution": "Undo refuses the ID and even the copied manifest/bytes; the emergency store exposes no restore/consume API."
+      },
+      {
+        "id": "apply_failure_info_single_outcome",
+        "finding": "/apply_patch merged executor failure_info.rollback_code/rollback_reason with telemetry's final rollback_failure, so a final observation refuting a verified restore left two rollback accounts in one payload.",
+        "resolution": "failure_info keeps its validation cause while its rollback code and reason are rendered from the final outcome."
+      }
+    ],
+    "recorded_not_changed": [
+      "graph.penalty counts rollback_performed IS TRUE; post_apply_blocked or oracle_recovery_failed attempts with measured incomplete rollback are no longer counted through that column. Penalty scoring and the database schema are outside this phase.",
+      "Plan-path restore exception classes are not surfaced because frozen EXEC.PLAN.1 recovery swallows them; the typed outcome carries recovery_incomplete plus exact unresolved paths."
+    ],
+    "red_green": {
+      "new_tests_on_pre_fix_production_bytes": {
+        "failed": 15,
+        "passed": 7
+      },
+      "passing_controls_on_pre_fix_bytes": [
+        "restored and no-mutation lifecycle scenarios",
+        "consistent typed success still loads",
+        "complete-material wording",
+        "two static current-producer guards",
+        "Undo separation (structural property that lacked a test)"
+      ],
+      "restore": "fixed production bytes restored and sha256-verified",
+      "apply_failure_info_on_pre_alignment_route": {
+        "failed": 1,
+        "passed": 1
+      }
+    },
+    "adjacent_flake_attribution": {
+      "test": "tests/test_auth_dream1.py::test_browser_review_transition_failures_and_reload[explicit_new_review]",
+      "observed": "Failed once in the broad run and intermittently in isolated reruns on the remediated tree.",
+      "mechanism": "open_review() calls applyDream(), which does not return its fetch promise; wait_for() can resolve on the previous render, so the binding read races the asynchronous re-render. The /dream/list handler path contains no file changed by this phase.",
+      "interleaved_ab_explicit_new_review": {
+        "pre_fix": {
+          "runs": 24,
+          "fail": 0
+        },
+        "remediated": {
+          "runs": 24,
+          "fail": 1
+        }
+      },
+      "attribution": "pre-existing load-dependent AUTH.DREAM.1 browser-test race; frozen UI, handler and binding files are byte-identical to their pins"
+    },
+    "test_runs": [
+      {
+        "scope": "pre_edit_baseline_registered_validation_groups",
+        "passed": 859,
+        "failed": 0,
+        "skipped": 0,
+        "junit_report": ".tmp/data_rollback1_audit_baseline.xml"
+      },
+      {
+        "scope": "final_bytes_broad_affected",
+        "groups": {
+          "focused_data_rollback1": {
+            "passed": 159,
+            "failed": 0,
+            "skipped": 0
+          },
+          "validation_side_effects_lifecycle_telemetry": {
+            "passed": 250,
+            "failed": 0,
+            "skipped": 0
+          },
+          "web_api": {
+            "passed": 79,
+            "failed": 0,
+            "skipped": 0
+          },
+          "frozen_auth_dream1_exec_plan1_data_undo1_sec_ui1": {
+            "passed": 299,
+            "failed": 0,
+            "skipped": 0
+          },
+          "track_a_frozen_pins": {
+            "passed": 284,
+            "failed": 0,
+            "skipped": 1
+          },
+          "registry_picker": {
+            "passed": 267,
+            "failed": 0,
+            "skipped": 0
+          },
+          "broad_affected_total": {
+            "passed": 4029,
+            "failed": 0,
+            "skipped": 26,
+            "test_files": 163,
+            "seconds": 1570.49
+          }
+        },
+        "junit_report": ".tmp/data_rollback1_final_broad.xml"
+      }
+    ],
+    "checks": {
+      "compileall_core_patching_web_scripts_tests": "passed",
+      "benchmark_cases_check": "54 checked, 0 errors",
+      "git_diff_check": "exit 0",
+      "trailing_whitespace_introduced": 0,
+      "registry_changed": false,
+      "phase_picker_top_recommendation": "DOGFOOD.1B",
+      "frozen_chain_pins_auth_dream1_exec_plan1_data_undo1": "1465/1439/1432 reconstructed, 0 mismatches",
+      "concurrent_session_edits_detected": false,
+      "model_calls": 0,
+      "external_network_requests": 0
+    },
+    "performance": {
+      "typed_load_with_conflict_check_median_us": 14.95,
+      "typed_load_failed_receipt_median_us": 13.79,
+      "lifecycle_extra_typed_loads_per_plan_run": 2,
+      "failure_notice_render_median_us": 0.8,
+      "samples": {
+        "rounds": 25,
+        "calls_per_round": 2000
+      }
+    }
+  }
+}

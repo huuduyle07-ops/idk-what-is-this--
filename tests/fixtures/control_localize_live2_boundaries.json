@@ -1,0 +1,29 @@
+{
+  "files": {
+    "core/identifier_recall.py": "0fb5b00effe02847c06a28e186d7ba8c8cefb83f0df89eba21961ebef6e68c88",
+    "core/localization_candidate.py": "90c49b7ae2447eb0f9f1715b1db06119ee92757499f2b0a1e99c2b11a1b27783",
+    "graph/builder.py": "cfcd6f1844b43b76e7ec5e790b3a9777da85a359445367759480acee51965365",
+    "graph/query.py": "ec503af99878f9f7fbd59f91f9c6d618387a765a8e2ff53ed717fd1344c32e20",
+    "graph/weights.py": "8156eb6bcd2a31f21c125dce10a0172d6f46c07c06727eb106f6c54f94c3411c",
+    "core/code_dna.py": "8725b73cea83d010c6d84b896bda524e32b249021d3fada8197d9f27e6d1efc5",
+    "core/patch_basis.py": "c3031916020d71e6ee8471dfb43330b5329247cd202004f48dbe707d8670bb6c",
+    "core/defect_probe.py": "4f5c8cb1b4a98558215d5d7b3cd20cee256c89e11e2ac4e13ed71b6ebb42913c",
+    "core/candidate_defect_probe.py": "9794d3ef412f564e95497c580181c35598e43853234419613cb79842b6d8a7bc",
+    "core/targeted_repository_validation.py": "116cded9cf6f07bf9b53d2e20f45beef2a6643a23898f7a4ea5e8ea16ee7e1e5",
+    "core/answer_entity_grounding.py": "a1d3a6542a4cb1dd133b484c77e7f6c6def7df9edd4ce0dd16125f40ecc62987",
+    "core/live_execution_authorization.py": "72785ea65de0bf88e18c32ce3617170451c666ad7a03162183c921789ab8c784",
+    "core/execution_eligibility_policy.py": "54721c5f9bcab07b74eabb1e6bcc5cafb8af404717aab09ce9af8f935963c2b5",
+    "core/human_apply_authorization.py": "7f65a55cf237193ead702f0a99f3668f649e7efabe7c2618e244cd9518c94e89"
+  },
+  "control_functions": {
+    "select_entry_nodes": "0fc4b06c231df70bac44b19a1e20d8006ca7da3231d521e3ca9f07a64dccbade",
+    "query_words": "cff65a0f7b70e6c6063a666307810848ff6da0f98ce3e5c20afae7fb239579dd",
+    "relevance_bonus": "389375056589b00ef1a77f8e2bf89de0a194399e6132349635e1df851e3373ea",
+    "score_control_node": "c7586c61de51774cdc106fc86f89205c3f0875d275c84837c192734ac8a4ac1b",
+    "_validation_binding": "a2124a3bed53e8c6f0d4c2c95650c4f4576cccd4915a2e7f0afc679d6f7359f3",
+    "_source_is_exactly_grounded": "4328528a490f3ab6da276d4720fd0a0dd41f7005178f41ce0b345b4ffcbe0500",
+    "_ensure_localization_metadata": "ac3c0b4e170bae1a1ffddbfe4adcf44651e18ca466600aef06aa1c2272199576",
+    "refresh_control_safety": "c72af9054069e510df9010da18ef8732a7067a88f3d0df91146ee880532a536d",
+    "enforce_control_grounding_on_payload": "bbaf901ecddead0551afe0f814be6ae54e114d6336d842c834bf8de0c50af3df"
+  }
+}

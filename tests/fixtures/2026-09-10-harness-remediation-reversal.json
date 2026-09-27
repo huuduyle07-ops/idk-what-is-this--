@@ -1,0 +1,163 @@
+{
+  "schema_version": "harness_remediation_reversal_v1",
+  "reason": "Explicit user request to resolve black-box findings after audit. Earlier phase boundaries remain historical evidence; reverse this maintenance before evaluating them.",
+  "scope": {
+    "core/defect_probe.py": "Allow independent typed reproduction with conclusive baseline validation.",
+    "patching/patch_gates.py": "Use Python AST identifiers including f-string expressions, without treating string prefixes as names. Preserve from-import module novelty, even when aliases stay unchanged.",
+    "core/targeted_repository_validation.py": "Recognize assertion red-to-green only with identical concrete cases and unchanged check/config bytes. Reject absolute/parent/escaping oracle paths and consume invalid user selectors without looping.",
+    "core/pipeline.py": "Enforce planner mutation refusals before execution, preserve blocked proposals, and remove timeout-only evidence triggers."
+  },
+  "reversals": [
+    {
+      "path": "core/defect_probe.py",
+      "pre_sha256": "4f5c8cb1b4a98558215d5d7b3cd20cee256c89e11e2ac4e13ed71b6ebb42913c",
+      "post_sha256": "813dda87bdf7ff0241e5f7475db56666a8f1f0e6e8faa3f422ce902f8768c2c1",
+      "pre_newline": "CRLF",
+      "hunks": [
+        {
+          "pre": "The production path is intentionally narrow:\n\n* the task must already be routed as defect repair;\n* baseline validation must be inconclusive;\n* CONTROL must already have recalled an eligible exact source target;\n* input and expectation must have an allowed non-model provenance; and\n* execution uses a static worker under the existing safe argv runner and\n",
+          "post": "The production path is intentionally narrow:\n\n* the task must already be routed as defect repair;\n* baseline validation remains a separate fact, whether passed, failed or inconclusive;\n* CONTROL must already have recalled an eligible exact source target;\n* input and expectation must have an allowed non-model provenance; and\n* execution uses a static worker under the existing safe argv runner and\n"
+        },
+        {
+          "pre": "            reason_code=REASON_ROUTE_NOT_ELIGIBLE,\n            reason=\"task preservation did not pass\",\n        )\n    if preflight.get(\"outcome\") != \"inconclusive\":\n        return ControlProbeResolution(\n            in_scope=False,\n            reason_code=REASON_ROUTE_NOT_ELIGIBLE,\n            reason=\"whole-repository validation is already conclusive\",\n        )\n\n    facts, _typed_transport = carried_behavior_facts(control_result)\n",
+          "post": "            reason_code=REASON_ROUTE_NOT_ELIGIBLE,\n            reason=\"task preservation did not pass\",\n        )\n    if preflight.get(\"outcome\") not in {\"passed\", \"failed\", \"inconclusive\"}:\n        return ControlProbeResolution(\n            in_scope=False,\n            reason_code=REASON_ROUTE_NOT_ELIGIBLE,\n            reason=\"whole-repository validation outcome is unavailable\",\n        )\n\n    facts, _typed_transport = carried_behavior_facts(control_result)\n"
+        }
+      ]
+    },
+    {
+      "path": "patching/patch_gates.py",
+      "pre_sha256": "cec73583c9d416e3b4f883090b02f2b48e0b012c44d2962f5e40819a5c070cf7",
+      "post_sha256": "f9751b47f3abd63af8585ca0424413232b33023de8ede0a788b652429a0b6cc7",
+      "pre_newline": "CRLF",
+      "hunks": [
+        {
+          "pre": "from __future__ import annotations\n\nimport json\nimport re\nfrom pathlib import Path\n\nfrom agents.gemini_client import run_gemini_request\n",
+          "post": "from __future__ import annotations\n\nimport ast\nimport json\nimport re\nimport textwrap\nfrom pathlib import Path\n\nfrom agents.gemini_client import run_gemini_request\n"
+        },
+        {
+          "pre": "}\n\n\ndef _identifiers_in(snippet: str) -> set[str]:\n    cleaned = _STRING_OR_COMMENT_RE.sub(\" \", snippet or \"\")\n    return set(_IDENT_RE.findall(cleaned))\n\n",
+          "post": "}\n\n\ndef _identifiers_in(snippet: str, *, language: str = \"\") -> set[str]:\n    if language == \"python\":\n        try:\n            tree = ast.parse(textwrap.dedent(snippet or \"\"))\n        except (SyntaxError, ValueError):\n            # Unsupported fragments retain the conservative lexical check.\n            pass\n        else:\n            identifiers: set[str] = set()\n            for node in ast.walk(tree):\n                # These AST fields are identifier-bearing syntax, including\n                # expressions inside formatted strings. Literal text and string\n                # prefixes never become identifiers or hide a callable.\n                for field in (\"id\", \"attr\", \"arg\", \"name\", \"rest\"):\n                    value = getattr(node, field, None)\n                    if isinstance(value, str):\n                        identifiers.update(value.split(\".\"))\n                if isinstance(node, ast.ImportFrom) and node.module:\n                    identifiers.update(node.module.split(\".\"))\n                if isinstance(node, ast.alias) and node.asname:\n                    identifiers.add(node.asname)\n                if isinstance(node, (ast.Global, ast.Nonlocal)):\n                    identifiers.update(node.names)\n            return identifiers\n    cleaned = _STRING_OR_COMMENT_RE.sub(\" \", snippet or \"\")\n    return set(_IDENT_RE.findall(cleaned))\n\n"
+        },
+        {
+          "pre": "    family = _LANGUAGE_FAMILY_ALIASES.get(lang, lang)\n    builtins = _LANGUAGE_BUILTINS.get(family, set())\n\n    allowed = _identifiers_in(target) | _LANGUAGE_KEYWORDS | builtins\n    used = _identifiers_in(patched)\n    new_idents = sorted(used - allowed)\n\n    # PATCH.MINIMAL.LIVE.2 — a lexically new identifier is not by itself\n",
+          "post": "    family = _LANGUAGE_FAMILY_ALIASES.get(lang, lang)\n    builtins = _LANGUAGE_BUILTINS.get(family, set())\n\n    allowed = _identifiers_in(target, language=family) | _LANGUAGE_KEYWORDS | builtins\n    used = _identifiers_in(patched, language=family)\n    new_idents = sorted(used - allowed)\n\n    # PATCH.MINIMAL.LIVE.2 — a lexically new identifier is not by itself\n"
+        }
+      ]
+    },
+    {
+      "path": "core/targeted_repository_validation.py",
+      "pre_sha256": "116cded9cf6f07bf9b53d2e20f45beef2a6643a23898f7a4ea5e8ea16ee7e1e5",
+      "post_sha256": "eb8897c866c7bf8198270077494a9df055fc375b884397e8fcf999b00e68e9d9",
+      "pre_newline": "LF",
+      "hunks": [
+        {
+          "pre": "import shutil\nimport tempfile\nimport time\nfrom dataclasses import dataclass, field\nfrom pathlib import Path\nfrom typing import Any, Mapping, Sequence\n",
+          "post": "import shutil\nimport tempfile\nimport time\nimport xml.etree.ElementTree as ET\nfrom dataclasses import dataclass, field\nfrom pathlib import Path\nfrom typing import Any, Mapping, Sequence\n"
+        },
+        {
+          "pre": "SELECTION_MODULE_DEPENDENCY = \"test_module_imports_changed_module\"\n\nCATEGORY_TARGETED_CHECKS_PASSED = \"targeted_checks_passed\"\nCATEGORY_CHECKS_SELECTED = \"checks_selected\"\nCATEGORY_NO_RELEVANT_EXISTING_CHECKS = \"no_relevant_existing_checks\"\nCATEGORY_SELECTION_BUDGET_EXCEEDED = \"selection_budget_exceeded\"\n",
+          "post": "SELECTION_MODULE_DEPENDENCY = \"test_module_imports_changed_module\"\n\nCATEGORY_TARGETED_CHECKS_PASSED = \"targeted_checks_passed\"\nCATEGORY_TARGETED_DEFECT_REPAIRED = \"targeted_defect_repaired\"\nCATEGORY_CHECKS_SELECTED = \"checks_selected\"\nCATEGORY_NO_RELEVANT_EXISTING_CHECKS = \"no_relevant_existing_checks\"\nCATEGORY_SELECTION_BUDGET_EXCEEDED = \"selection_budget_exceeded\"\n"
+        },
+        {
+          "pre": "    checks_executed: tuple[str, ...]\n    output_excerpt: str = \"\"\n    python_bytecode_cache_isolated: bool = False\n\n\n@dataclass(frozen=True, slots=True)\n",
+          "post": "    checks_executed: tuple[str, ...]\n    output_excerpt: str = \"\"\n    python_bytecode_cache_isolated: bool = False\n    concrete_cases: tuple[tuple[str, str], ...] = ()\n    oracle_source_fingerprint: str = \"\"\n    oracle_unchanged: bool = False\n\n\n@dataclass(frozen=True, slots=True)\n"
+        },
+        {
+          "pre": "    sandbox_cleanup_ok: bool = True\n    baseline_python_bytecode_cache_isolated: bool = False\n    candidate_python_bytecode_cache_isolated: bool = False\n\n    @property\n    def checks_executed(self) -> tuple[str, ...]:\n",
+          "post": "    sandbox_cleanup_ok: bool = True\n    baseline_python_bytecode_cache_isolated: bool = False\n    candidate_python_bytecode_cache_isolated: bool = False\n    baseline_concrete_cases: tuple[tuple[str, str], ...] = ()\n    candidate_concrete_cases: tuple[tuple[str, str], ...] = ()\n    oracle_source_unchanged: bool = False\n\n    @property\n    def checks_executed(self) -> tuple[str, ...]:\n"
+        },
+        {
+          "pre": "            \"selection_provenance\": list(self.request.selection_provenance),\n            \"baseline_targeted_outcome\": self.baseline_outcome,\n            \"baseline_targeted_category\": self.baseline_category,\n            \"baseline_checks_executed\": list(self.baseline_checks_executed),\n            \"candidate_targeted_outcome\": self.candidate_outcome,\n            \"candidate_targeted_category\": self.candidate_category,\n",
+          "post": "            \"selection_provenance\": list(self.request.selection_provenance),\n            \"baseline_targeted_outcome\": self.baseline_outcome,\n            \"baseline_targeted_category\": self.baseline_category,\n            \"baseline_concrete_cases\": [list(case) for case in self.baseline_concrete_cases],\n            \"candidate_concrete_cases\": [list(case) for case in self.candidate_concrete_cases],\n            \"targeted_oracle_source_unchanged\": self.oracle_source_unchanged,\n            \"baseline_checks_executed\": list(self.baseline_checks_executed),\n            \"candidate_targeted_outcome\": self.candidate_outcome,\n            \"candidate_targeted_category\": self.candidate_category,\n"
+        },
+        {
+          "pre": "            continue\n        if token.startswith(\"-\"):\n            return []\n        path, separator, test_name = token.partition(\"::\")\n        selector = _safe_selector(path, test_name if separator else \"\")\n        if not selector:\n",
+          "post": "            continue\n        if token.startswith(\"-\"):\n            return []\n        # Consume every selector before any rejection can continue the loop.\n        index += 1\n        path, separator, test_name = token.partition(\"::\")\n        selector = _safe_selector(path, test_name if separator else \"\")\n        if not selector:\n"
+        },
+        {
+          "pre": "                relation_target=\"preserved_user_command\",\n            )\n        )\n        index += 1\n    return checks\n\n\n",
+          "post": "                relation_target=\"preserved_user_command\",\n            )\n        )\n    return checks\n\n\n"
+        },
+        {
+          "pre": "    return text if len(text) <= MAX_OUTPUT_EXCERPT_CHARS else text[-MAX_OUTPUT_EXCERPT_CHARS:]\n\n\ndef _run_check_set(\n    root: Path,\n    request: TargetedValidationRequest,\n",
+          "post": "    return text if len(text) <= MAX_OUTPUT_EXCERPT_CHARS else text[-MAX_OUTPUT_EXCERPT_CHARS:]\n\n\ndef _oracle_source_fingerprint(root: Path, request: TargetedValidationRequest) -> str:\n    \"\"\"Bind checks to bytes, including pytest configuration affecting collection.\"\"\"\n    for check in request.selected_checks:\n        path = Path(check.path)\n        if path.is_absolute() or path.anchor or \"..\" in path.parts:\n            return \"\"\n    paths = {check.path for check in request.selected_checks}\n    for check in request.selected_checks:\n        parent = Path(check.path).parent\n        while True:\n            for name in (\"conftest.py\", \"pytest.ini\", \"pyproject.toml\", \"setup.cfg\", \"tox.ini\"):\n                paths.add((parent / name).as_posix())\n            if parent == Path(\".\"):\n                break\n            parent = parent.parent\n    try:\n        resolved_root = root.resolve()\n        if any(not (root / path).resolve().is_relative_to(resolved_root) for path in paths):\n            return \"\"\n        return _fingerprint({path: hashlib.sha256((root / path).read_bytes()).hexdigest()\n                             if (root / path).is_file() else None for path in sorted(paths)})\n    except OSError:\n        return \"\"\n\n\ndef _concrete_case_results(report: Path) -> tuple[tuple[str, str], ...]:\n    \"\"\"Read machine-reported executed cases; missing/duplicate reports prove nothing.\"\"\"\n    try:\n        if report.stat().st_size > 2_000_000:\n            return ()\n        tree = ET.parse(report)\n        cases: dict[str, str] = {}\n        for node in tree.iter(\"testcase\"):\n            identity = str(node.get(\"classname\") or \"\") + \"::\" + str(node.get(\"name\") or \"\")\n            if identity == \"::\" or identity in cases:\n                return ()\n            status = \"passed\"\n            if node.find(\"error\") is not None:\n                status = \"error\"\n            elif node.find(\"skipped\") is not None:\n                status = \"skipped\"\n            elif node.find(\"failure\") is not None:\n                failure = node.find(\"failure\")\n                content = (failure.text or \"\") + str(failure.get(\"message\") or \"\")\n                status = \"assertion_failed\" if \"AssertionError\" in content or \"assert \" in content else \"failed\"\n            cases[identity] = status\n        return tuple(sorted(cases.items()))\n    except (OSError, ET.ParseError, ValueError):\n        return ()\n\n\ndef _reproduced_checks_repaired(baseline: TargetedCheckRun, candidate: TargetedCheckRun,\n                               pre_patch_probe_result: str) -> bool:\n    before, after = dict(baseline.concrete_cases), dict(candidate.concrete_cases)\n    return bool(\n        pre_patch_probe_result == \"reproduced\"\n        and baseline.completed and candidate.completed\n        and baseline.outcome == VALIDATION_FAILED and candidate.outcome == VALIDATION_PASSED\n        and baseline.category in {\"test_failure\", \"assertion_failure\"}\n        and before and before.keys() == after.keys()\n        and \"assertion_failed\" in before.values()\n        and set(before.values()) <= {\"passed\", \"assertion_failed\"}\n        and set(after.values()) == {\"passed\"}\n        and baseline.oracle_unchanged and candidate.oracle_unchanged\n        and baseline.oracle_source_fingerprint\n        and baseline.oracle_source_fingerprint == candidate.oracle_source_fingerprint\n    )\n\n\ndef _run_check_set(\n    root: Path,\n    request: TargetedValidationRequest,\n"
+        },
+        {
+          "pre": "    timeout_seconds: int,\n) -> TargetedCheckRun:\n    identifiers = tuple(check.identifier for check in request.selected_checks)\n    command = SafeValidationCommand(\n        command=[\n            \"python\",\n",
+          "post": "    timeout_seconds: int,\n) -> TargetedCheckRun:\n    identifiers = tuple(check.identifier for check in request.selected_checks)\n    report = root / \".cattus-targeted-results.xml\"\n    report.unlink(missing_ok=True)\n    oracle_before = _oracle_source_fingerprint(root, request)\n    command = SafeValidationCommand(\n        command=[\n            \"python\",\n"
+        },
+        {
+          "pre": "            \"-q\",\n            \"-p\",\n            \"no:cacheprovider\",\n        ],\n        cwd=root,\n        timeout_sec=timeout_seconds,\n",
+          "post": "            \"-q\",\n            \"-p\",\n            \"no:cacheprovider\",\n            \"--junitxml=\" + str(report),\n        ],\n        cwd=root,\n        timeout_sec=timeout_seconds,\n"
+        },
+        {
+          "pre": "        checks_executed=executed,\n        output_excerpt=_output_excerpt(output),\n        python_bytecode_cache_isolated=run.python_bytecode_cache_isolated,\n    )\n\n\n",
+          "post": "        checks_executed=executed,\n        output_excerpt=_output_excerpt(output),\n        python_bytecode_cache_isolated=run.python_bytecode_cache_isolated,\n        concrete_cases=_concrete_case_results(report),\n        oracle_source_fingerprint=oracle_before,\n        oracle_unchanged=bool(oracle_before and oracle_before == _oracle_source_fingerprint(root, request)),\n    )\n\n\n"
+        },
+        {
+          "pre": "        status = VALIDATION_INCONCLUSIVE\n        category = CATEGORY_VALIDATION_BUDGET_EXHAUSTED\n        reason = budget_exhausted_info(request.budget_seconds)[\"reason\"]\n    elif baseline.outcome == VALIDATION_FAILED:\n        status = VALIDATION_INCONCLUSIVE\n        category = CATEGORY_BASELINE_TARGETED_FAILED\n",
+          "post": "        status = VALIDATION_INCONCLUSIVE\n        category = CATEGORY_VALIDATION_BUDGET_EXHAUSTED\n        reason = budget_exhausted_info(request.budget_seconds)[\"reason\"]\n    elif _reproduced_checks_repaired(baseline, candidate, pre_patch_probe_result):\n        status = VALIDATION_PASSED\n        category = CATEGORY_TARGETED_DEFECT_REPAIRED\n        reason = (\"the same unchanged existing assertions changed from failure to pass; \"\n                  \"every baseline passing case also passed, with an independently reproduced defect\")\n    elif baseline.outcome == VALIDATION_FAILED:\n        status = VALIDATION_INCONCLUSIVE\n        category = CATEGORY_BASELINE_TARGETED_FAILED\n"
+        },
+        {
+          "pre": "        candidate_category=candidate.category,\n        baseline_checks_executed=baseline.checks_executed,\n        candidate_checks_executed=candidate.checks_executed,\n        pre_patch_probe_result=pre_patch_probe_result,\n        reason=reason,\n        output_excerpt=(candidate.output_excerpt or baseline.output_excerpt),\n",
+          "post": "        candidate_category=candidate.category,\n        baseline_checks_executed=baseline.checks_executed,\n        candidate_checks_executed=candidate.checks_executed,\n        baseline_concrete_cases=baseline.concrete_cases,\n        candidate_concrete_cases=candidate.concrete_cases,\n        oracle_source_unchanged=bool(baseline.oracle_unchanged and candidate.oracle_unchanged\n                                     and baseline.oracle_source_fingerprint == candidate.oracle_source_fingerprint),\n        pre_patch_probe_result=pre_patch_probe_result,\n        reason=reason,\n        output_excerpt=(candidate.output_excerpt or baseline.output_excerpt),\n"
+        }
+      ]
+    },
+    {
+      "path": "core/pipeline.py",
+      "pre_sha256": "d135ecda9de9ed6c22f55dba6b599e545c68132faade268bc8ca0bbcb2bdf10d",
+      "post_sha256": "6b9efb3f44a1d9d7e86634fa7451e85ad3c8697493bc9e62fe09bc506bdb948e",
+      "pre_newline": "CRLF",
+      "hunks": [
+        {
+          "pre": "        return {\"status\": \"failed\", \"summary\": \"AI returned invalid JSON\"}\n    res_json[\"id\"] = subtask.get(\"id\")\n\n    if subtask.get(\"action\") == \"edit\" and res_json.get(\"patch_candidate\"):\n        print(f\"🛠️ Applying patch for {res_json['patch_candidate'].get('file')}...\")\n        project_root = Path(state.repo_path) if state.repo_path else Path.cwd()\n        executor = Executor(\n",
+          "post": "        return {\"status\": \"failed\", \"summary\": \"AI returned invalid JSON\"}\n    res_json[\"id\"] = subtask.get(\"id\")\n\n    if res_json.get(\"blocked\") is True or res_json.get(\"status\") == \"blocked\":\n        res_json[\"status\"] = \"blocked\"\n        res_json[\"summary\"] = str(\n            res_json.get(\"blocker_reason\") or \"The author reported a blocked subtask.\"\n        )\n        return attach_execution_telemetry(res_json, no_execution(DENIED_NEEDS_ESCALATION))\n\n    if subtask.get(\"action\") == \"edit\" and res_json.get(\"patch_candidate\"):\n        # Planner steps run before maybe_run_auto_patch. Enforce the same\n        # mutation switch and read-only route at this actual write boundary;\n        # a generated plan or candidate does not override either restriction.\n        denied_reason = \"\"\n        if not AUTO_PATCH_ENABLED:\n            denied_reason = DENIED_AUTO_PATCH_DISABLED\n            refusal = \"Automatic patching is disabled (AUTO_PATCH_ENABLED=false).\"\n        elif not state.live_route or route_is_read_only(state.live_route):\n            denied_reason = DENIED_NO_CHANGE_REQUESTED\n            refusal = \"The task has no change-authorizing route.\"\n        elif res_json.get(\"needs_escalation\") is True:\n            denied_reason = DENIED_NEEDS_ESCALATION\n            refusal = \"The author requested escalation.\"\n        if denied_reason:\n            res_json.update(\n                status=\"blocked\", blocked=True, blocker_reason=denied_reason,\n                summary=f\"{refusal} The proposed edit was not applied; dependent steps are paused.\",\n                approval_ready=False, needs_escalation=True,\n            )\n            return attach_execution_telemetry(res_json, no_execution(denied_reason))\n\n        print(f\"🛠️ Applying patch for {res_json['patch_candidate'].get('file')}...\")\n        project_root = Path(state.repo_path) if state.repo_path else Path.cwd()\n        executor = Executor(\n"
+        },
+        {
+          "pre": "            json.dumps(result, ensure_ascii=False)\n        )\n\n        if result.get(\"status\") != \"failed\":\n            continue\n\n",
+          "post": "            json.dumps(result, ensure_ascii=False)\n        )\n\n        if result.get(\"status\") == \"blocked\":\n            print(f\"⏸️ Plan paused: {result.get('summary')}\")\n            break\n\n        if result.get(\"status\") != \"failed\":\n            continue\n\n"
+        },
+        {
+          "pre": "    for s in state.completed_subtasks:\n        status = (s.get(\"status\") or \"unknown\").upper()\n        summary_lines.append(f\"[{s.get('id')}] {status}: {s.get('summary')}\")\n\n    return \"\\n\".join(summary_lines)\n\n",
+          "post": "    for s in state.completed_subtasks:\n        status = (s.get(\"status\") or \"unknown\").upper()\n        summary_lines.append(f\"[{s.get('id')}] {status}: {s.get('summary')}\")\n\n    if any(s.get(\"status\") == \"blocked\" for s in state.completed_subtasks):\n        # Preserve the proposal even without DB persistence. Keep it scoped to\n        # its subtask; it is not a top-level executable/approved patch payload.\n        return json.dumps({\n            \"goal\": state.mission_goal,\n            \"status\": \"blocked\",\n            \"summary\": \"\\n\".join(summary_lines),\n            \"subtasks\": state.completed_subtasks,\n            \"remaining_subtasks\": remaining_plan,\n            \"confidence\": 0.0,\n            \"needs_escalation\": True,\n        }, ensure_ascii=False, indent=2)\n\n    return \"\\n\".join(summary_lines)\n\n"
+        },
+        {
+          "pre": "    \"selection_provenance\",\n    \"baseline_targeted_outcome\",\n    \"baseline_targeted_category\",\n    \"baseline_checks_executed\",\n    \"candidate_targeted_outcome\",\n    \"candidate_targeted_category\",\n",
+          "post": "    \"selection_provenance\",\n    \"baseline_targeted_outcome\",\n    \"baseline_targeted_category\",\n    \"baseline_concrete_cases\",\n    \"candidate_concrete_cases\",\n    \"targeted_oracle_source_unchanged\",\n    \"baseline_checks_executed\",\n    \"candidate_targeted_outcome\",\n    \"candidate_targeted_category\",\n"
+        },
+        {
+          "pre": "    This records the exact-candidate paired probe fact and nothing else.  No\n    execution-policy branch reads the result.\n\n    DEFECT.PROBE.LIVE.3 changed what is recorded, not when.  The same route,\n    preflight and reproduction preconditions gate the same single sandbox; what\n    runs inside it is now the defect case together with whatever deterministic\n    preservation counter-cases the typed behavior fact supports.  A task whose\n    subject has no preservation adapter records exactly what it recorded before.\n",
+          "post": "    This records the exact-candidate paired probe fact and nothing else.  No\n    execution-policy branch reads the result.\n\n    The route, exact source and reproduced independent probe gate the sandbox.\n    Whole-suite pass/fail/timeout does not replace this behavioral question. What\n    runs inside it is now the defect case together with whatever deterministic\n    preservation counter-cases the typed behavior fact supports.  A task whose\n    subject has no preservation adapter records exactly what it recorded before.\n"
+        },
+        {
+          "pre": "    preflight = control.get(\"preflight_validation\") or {}\n    pre_probe = control.get(\"defect_probe\") or {}\n    if route.get(\"selected_workflow\") != \"defect_repair_patch\":\n        return None\n    if not (\n        preflight.get(\"outcome\") == \"inconclusive\"\n        and preflight.get(\"category\") == \"validation_budget_exhausted\"\n    ):\n        return None\n    if reproduced_probe_target(pre_probe) is None:\n        return None\n",
+          "post": "    preflight = control.get(\"preflight_validation\") or {}\n    pre_probe = control.get(\"defect_probe\") or {}\n    if route.get(\"selected_workflow\") != \"defect_repair_patch\":\n        return None\n    if reproduced_probe_target(pre_probe) is None:\n        return None\n"
+        },
+        {
+          "pre": ") -> Any | None:\n    \"\"\"OPS.VALIDATE.3 production trigger and telemetry adapter.\n\n    The trigger is intentionally narrow: defect repair, full validation\n    inconclusive specifically because its budget expired, a reproduced\n    independently-oracled probe, an exact localized target, a safe exact\n    candidate, and the already-loaded operation graph.  The result is recorded\n    but never read to grant or widen execution authority in this phase.\n",
+          "post": ") -> Any | None:\n    \"\"\"OPS.VALIDATE.3 production trigger and telemetry adapter.\n\n    The trigger is intentionally narrow: defect repair, a reproduced\n    independently-oracled probe, an exact localized target, a safe exact\n    candidate, and the already-loaded operation graph.  The result is recorded\n    but never read to grant or widen execution authority in this phase.\n"
+        },
+        {
+          "pre": "    probe = control.get(\"defect_probe\") or {}\n    target = reproduced_probe_target(probe)\n    if route.get(\"selected_workflow\") != \"defect_repair_patch\":\n        return None\n    if not (\n        preflight.get(\"outcome\") == \"inconclusive\"\n        and preflight.get(\"category\") == \"validation_budget_exhausted\"\n    ):\n        return None\n    if target is None:\n        return None\n",
+          "post": "    probe = control.get(\"defect_probe\") or {}\n    target = reproduced_probe_target(probe)\n    if route.get(\"selected_workflow\") != \"defect_repair_patch\":\n        return None\n    if target is None:\n        return None\n"
+        }
+      ]
+    }
+  ],
+  "finalized_date": "2026-09-11",
+  "preimage_evidence": {
+    "audit": "docs/audits/2026-09-10-harness-blackbox-results.json",
+    "audit_field": "source_sha256_after_runs",
+    "audit_matched_files": {
+      "core/pipeline.py": "d135ecda9de9ed6c22f55dba6b599e545c68132faade268bc8ca0bbcb2bdf10d",
+      "core/targeted_repository_validation.py": "116cded9cf6f07bf9b53d2e20f45beef2a6643a23898f7a4ea5e8ea16ee7e1e5"
+    },
+    "other_historical_reference": "tests/fixtures/candidate_verify_live1_frozen_boundaries.json",
+    "other_historical_matched_files": [
+      "core/defect_probe.py",
+      "patching/patch_gates.py"
+    ],
+    "concurrent_snapshot_note": "PATCH.AUTHOR.LIVE.2 recorded concurrent maintenance in its full-file hash. After undoing this maintenance, its three authoring hunks reconstruct the exact earlier PATCH.AUTHOR.LIVE.1 post hash. The full LIVE.2 snapshot itself remains untouched; this receipt does not claim it was the immediate audit preimage."
+  }
+}

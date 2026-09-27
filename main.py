@@ -5,8 +5,10 @@ import sys
 
 from cli.interactive import ask_entrypoint, create_agent_state
 from config import WELCOME
+from core.localization_handoff import ground_state_answer
 from core.credential_redaction import redact_credentials
 from core.json_utils import extract_json_block
+from core.live_task_routing import route_is_read_only
 from core.pipeline import (
     finalize_answer,
     maybe_run_auto_patch,
@@ -85,7 +87,10 @@ def main() -> None:
 
     reviewed = run_review_pipeline(state, draft)
 
-    if state.mode == "planner":
+    # WAITER.LIVE.1 — mode is not task identity.  "planner" plus an architecture
+    # question is still an architecture question, and a read-only route never
+    # enters the plan-execution pipeline.
+    if state.mode == "planner" and not route_is_read_only(state.live_route):
         plan_json = extract_json_block(reviewed)
         if plan_json:
             reviewed = run_planner_pipeline(state, plan_json)
@@ -98,9 +103,10 @@ def main() -> None:
         finalize_answer_fn=finalize_answer,
         mode_label="cli",
     )
-    if state.json_block:
-        state.final_answer = json.dumps(state.json_block, indent=2, ensure_ascii=False)
-        state.human_answer = state.final_answer
+    maybe_run_auto_patch(state)
+    # ANSWER.GROUND.LIVE.1 runs only after the authority/execution path has
+    # terminated. It changes the display/persistence copy, never the decision.
+    ground_state_answer(state)
 
     print("💾 PATCH RESULT:")
     if state.json_block:
@@ -108,13 +114,19 @@ def main() -> None:
     else:
         print("No structured patch JSON.")
 
-    maybe_run_auto_patch(state)
-
     confidence, needs_escalation = get_confidence_and_escalation(state.json_block)
+
+    run_status = "succeeded"
+    if state.mode == "planner" and state.completed_subtasks:
+        # The last completed step describes why the plan stopped. Earlier
+        # failed attempts may have been recovered by a successful replan.
+        last_status = state.completed_subtasks[-1].get("status")
+        if last_status in {"blocked", "failed"}:
+            run_status = last_status
 
     finish_task_run(
         task_run_id=state.task_run_id,
-        status="succeeded",
+        status=run_status,
         confidence=confidence,
         needs_escalation=needs_escalation,
     )

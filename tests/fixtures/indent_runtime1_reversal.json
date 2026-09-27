@@ -1,0 +1,162 @@
+{
+  "schema_version": "indent_runtime1_reversal_v1",
+  "phase_id": "INDENT.RUNTIME.1",
+  "reason": "INDENT.RUNTIME.1 gives core/code_dna.py::_classify_indent a keyword-only language parameter (default None, ignored by the current body), adds an unused-by-production repair-seam import of core.indentation_observation's public API, transports each walked file's language from compute_dna via config.LANGUAGE_MAP (no second suffix->language map), and threads that same language into every T6 indentation matrix case's candidate probe contract as a generic kwargs entry (build_python_function_probe gained an optional kwargs parameter; omitting it reproduces the exact prior wire shape). behavioral_matrix_guardrails()['candidate_receives_input_language'] flips from False to True, honestly. core/defect_probe_worker.py's _run_python_function now checks inspect.signature(function).bind(*args, **kwargs) before calling, falling back to a plain function(*args) call when the real target does not accept the extra keyword -- required because build_probe_contract_from_behavior_fact and _indentation_preservation_cases are shared, generic adapters also used against arbitrary indentation classifiers CONTROL localizes in a real user's own repository, not only against core/code_dna.py::_classify_indent. It changes no fixture byte, expectation, role or provenance of the 8-case matrix, and the known T6 defect still reproduces under every declared language, including 'python'.",
+  "chain": {
+    "core/code_dna.py": "this receipt's pre_sha256 is indent_semantics1_frozen_boundaries.json's files entry for this path; no later receipt touched this file",
+    "core/defect_probe.py": "this receipt's pre_sha256 is indent_semantics1_frozen_boundaries.json's files entry for this path; no later receipt touched this file",
+    "core/paired_defect_probe.py": "this receipt's pre_sha256 is indent_semantics1_frozen_boundaries.json's files entry for this path; no later receipt touched this file",
+    "core/behavioral_matrix.py": "this receipt's pre_sha256 is indent_semantics1_reversal.json's own post_sha256 for this path -- INDENT.SEMANTICS.1's shipped state; evaluate through before_later_receipts(..., newer_than=this fixture's own path) so an even later phase's edits are undone before comparison",
+    "core/defect_probe_worker.py": "this receipt's pre_sha256 is indent_semantics1_frozen_boundaries.json's files entry for this path (no pre_image snapshot existed since this file was not expected to be touched; reconstructed by reversing the two known edits and verified against that existing pin before this receipt was built); no later receipt touched this file"
+  },
+  "new_module": null,
+  "reversals": [
+    {
+      "path": "core/code_dna.py",
+      "pre_sha256": "8725b73cea83d010c6d84b896bda524e32b249021d3fada8197d9f27e6d1efc5",
+      "post_sha256": "58944200dc3fba429634e791791c8373ba91db64b86fa6a55c5ae1daf05c2637",
+      "hunks": [
+        {
+          "pre": "import re\n\nfrom core.credential_redaction import redact_credentials\n\nif TYPE_CHECKING:\n    from core.repository_inventory import RepositoryInventory\n",
+          "post": "import re\n\nfrom core.credential_redaction import redact_credentials\n# INDENT.RUNTIME.1 repair seam: the one semantic authority a future patch to\r\n# `_classify_indent` may use instead of inventing a parser. Not called by the\r\n# current (deliberately unfixed) body below — see\r\n# docs/designs/2026-09-12-language-context-transport-and-repair-boundary.md.\r\nfrom core.indentation_observation import (\r\n    assess_indentation_observation,\r\n    observe_source_indentation,\r\n)\r\n\nif TYPE_CHECKING:\n    from core.repository_inventory import RepositoryInventory\n"
+        },
+        {
+          "pre": "]\r\n\r\n\r\ndef _classify_name(name: str) -> str:\r\n    \"\"\"snake_case / camelCase / PascalCase. Falls back to 'mixed' otherwise.\"\"\"\r\n    if \"_\" in name and name.lower() == name:\r\n",
+          "post": "]\r\n\r\n\r\ndef _language_for_suffix(suffix: str) -> Optional[str]:\r\n    \"\"\"The same authoritative extension->language label compute_dna's own\r\n    lang_mix already keys on suffix for (INDENT.RUNTIME.1) — never a second\r\n    suffix->language map. None for an unmapped or unresolvable extension.\"\"\"\r\n    try:\r\n        from config import LANGUAGE_MAP\r\n    except Exception:\r\n        return None\r\n    return LANGUAGE_MAP.get(suffix.lower())\r\n\r\n\r\ndef _classify_name(name: str) -> str:\r\n    \"\"\"snake_case / camelCase / PascalCase. Falls back to 'mixed' otherwise.\"\"\"\r\n    if \"_\" in name and name.lower() == name:\r\n"
+        },
+        {
+          "pre": "    return \"mixed\"\r\n\r\n\r\ndef _classify_indent(text: str) -> Optional[str]:\r\n    \"\"\"Return one of '2space', '4space', 'tab', or None when no leading\r\n    indent on any line. We bias toward the ratio of indented lines so a single\r\n    tab in a Python file doesn't outvote a thousand 4-space lines.\"\"\"\r\n    counts = Counter()\r\n    for line in text.splitlines():\r\n        if not line or line[0] not in \" \\t\":\r\n",
+          "post": "    return \"mixed\"\r\n\r\n\r\ndef _classify_indent(text: str, *, language: str | None = None) -> Optional[str]:\r\n    \"\"\"Return one of '2space', '4space', 'tab', or None when no leading\r\n    indent on any line. We bias toward the ratio of indented lines so a single\r\n    tab in a Python file doesn't outvote a thousand 4-space lines.\r\n\r\n    ``language`` describes the language of ``text`` (INDENT.RUNTIME.1) and is\r\n    currently ignored by this body; the classification below is unchanged.\"\"\"\r\n    counts = Counter()\r\n    for line in text.splitlines():\r\n        if not line or line[0] not in \" \\t\":\r\n"
+        },
+        {
+          "pre": "        for line in text.splitlines():\r\n            line_lengths.append(len(line))\r\n\r\n        # Indent detection (per-file, vote across files)\r\n        ind = _classify_indent(text)\r\n        if ind:\r\n            indents[ind] += 1\r\n\r\n",
+          "post": "        for line in text.splitlines():\r\n            line_lengths.append(len(line))\r\n\r\n        # Indent detection (per-file, vote across files). INDENT.RUNTIME.1:\r\n        # language describes this walked file, never core/code_dna.py itself.\r\n        ind = _classify_indent(text, language=_language_for_suffix(p.suffix))\r\n        if ind:\r\n            indents[ind] += 1\r\n\r\n"
+        }
+      ],
+      "top_level_definitions_pre": 11,
+      "top_level_definitions_post": 12,
+      "added_definitions": [
+        "_language_for_suffix"
+      ],
+      "removed_definitions": [],
+      "changed_definitions": [
+        "_classify_indent",
+        "compute_dna"
+      ],
+      "added_assignments": [],
+      "changed_assignments": []
+    },
+    {
+      "path": "core/defect_probe.py",
+      "pre_sha256": "813dda87bdf7ff0241e5f7475db56666a8f1f0e6e8faa3f422ce902f8768c2c1",
+      "post_sha256": "d1e0ec1b6e8d7b3026c4efc66a82ec04129827dba1b700e0e6a4658f709f8c74",
+      "hunks": [
+        {
+          "pre": "    SafeValidationCommand,\r\n    run_safe_validation_command,\r\n)\r\n\r\n\r\nPHASE_ID = \"DEFECT.PROBE.LIVE.1\"\r\n",
+          "post": "    SafeValidationCommand,\r\n    run_safe_validation_command,\r\n)\r\n# INDENT.RUNTIME.1 — the one language label this file's indentation-style\r\n# fixtures declare; reused rather than a second \"python\" spelling.\r\nfrom core.indentation_observation import LANGUAGE_PYTHON\r\n\r\n\r\nPHASE_ID = \"DEFECT.PROBE.LIVE.1\"\r\n"
+        },
+        {
+          "pre": "    provenance_reference: str,\r\n    expectation_source_paths: Sequence[str] = (),\r\n    timeout_seconds: int = DEFAULT_PROBE_TIMEOUT_SECONDS,\r\n) -> DefectProbeContract:\r\n    \"\"\"Build a data-only invocation; no code or command text is accepted.\"\"\"\r\n\r\n    return DefectProbeContract(\r\n        target=target,\r\n        invocation_kind=INVOCATION_PYTHON_PURE_FUNCTION,\r\n        structured_input_json=_canonical_json({\"args\": list(args), \"kwargs\": {}}),\r\n        expected_relation=RELATION_EQUALS,\r\n        expected_json=_canonical_json(expected),\r\n        probe_basis=probe_basis,\r\n",
+          "post": "    provenance_reference: str,\r\n    expectation_source_paths: Sequence[str] = (),\r\n    timeout_seconds: int = DEFAULT_PROBE_TIMEOUT_SECONDS,\r\n    kwargs: Mapping[str, Any] | None = None,\r\n) -> DefectProbeContract:\r\n    \"\"\"Build a data-only invocation; no code or command text is accepted.\r\n\r\n    ``kwargs`` (INDENT.RUNTIME.1) is generic bounded transport for any\r\n    JSON-typed keyword the target function's real signature accepts — never\r\n    interpreted here, never special-cased by target symbol name. Omitting it\r\n    reproduces the exact prior wire shape (``\"kwargs\": {}``).\r\n    \"\"\"\r\n\r\n    return DefectProbeContract(\r\n        target=target,\r\n        invocation_kind=INVOCATION_PYTHON_PURE_FUNCTION,\r\n        structured_input_json=_canonical_json(\r\n            {\"args\": list(args), \"kwargs\": dict(kwargs) if kwargs else {}}\r\n        ),\r\n        expected_relation=RELATION_EQUALS,\r\n        expected_json=_canonical_json(expected),\r\n        probe_basis=probe_basis,\r\n"
+        },
+        {
+          "pre": "            f\"{expected_width} spaces per depth; the user reported \"\r\n            f\"{behavior_fact.observed_value}\"\r\n        ),\r\n    )\r\n\r\n\r\n",
+          "post": "            f\"{expected_width} spaces per depth; the user reported \"\r\n            f\"{behavior_fact.observed_value}\"\r\n        ),\r\n        # INDENT.RUNTIME.1 §17 — _nested_indentation_fixture is always a\r\n        # Python-shaped sample; this adapter is only ever reached for\r\n        # SUBJECT_INDENTATION_STYLE (guarded above).\r\n        kwargs={\"language\": LANGUAGE_PYTHON},\r\n    )\r\n\r\n\r\n"
+        }
+      ],
+      "top_level_definitions_pre": 31,
+      "top_level_definitions_post": 31,
+      "added_definitions": [],
+      "removed_definitions": [],
+      "changed_definitions": [
+        "build_probe_contract_from_behavior_fact",
+        "build_python_function_probe"
+      ],
+      "added_assignments": [],
+      "changed_assignments": []
+    },
+    {
+      "path": "core/paired_defect_probe.py",
+      "pre_sha256": "be426bf7576e21beff41772a3f4a605bfcbc933185183414f84e92cb785f800f",
+      "post_sha256": "25e9d898efa91f9b55bb9d18018362c52355aed24625667f53aa7ed45f9fb681",
+      "hunks": [
+        {
+          "pre": "    build_python_function_probe,\r\n    execute_defect_probe,\r\n)\r\n\r\n\r\nPHASE_ID = \"DEFECT.PROBE.LIVE.3\"\r\n",
+          "post": "    build_python_function_probe,\r\n    execute_defect_probe,\r\n)\r\n# INDENT.RUNTIME.1 — the one language label this file's indentation-style\r\n# fixtures declare; reused rather than a second \"python\" spelling.\r\nfrom core.indentation_observation import LANGUAGE_PYTHON\r\n\r\n\r\nPHASE_ID = \"DEFECT.PROBE.LIVE.3\"\r\n"
+        },
+        {
+          "pre": "            f\"user's requirement is {behavior_fact.expected_value} and it \"\r\n            \"belongs to the primary case\"\r\n        ),\r\n    )\r\n    return (\r\n        PreservationCase(\r\n",
+          "post": "            f\"user's requirement is {behavior_fact.expected_value} and it \"\r\n            \"belongs to the primary case\"\r\n        ),\r\n        # INDENT.RUNTIME.1 §17 — _nested_indentation_fixture is always a\r\n        # Python-shaped sample; this adapter is only ever reached for\r\n        # SUBJECT_INDENTATION_STYLE (guarded above).\r\n        kwargs={\"language\": LANGUAGE_PYTHON},\r\n    )\r\n    return (\r\n        PreservationCase(\r\n"
+        }
+      ],
+      "top_level_definitions_pre": 15,
+      "top_level_definitions_post": 15,
+      "added_definitions": [],
+      "removed_definitions": [],
+      "changed_definitions": [
+        "_indentation_preservation_cases"
+      ],
+      "added_assignments": [],
+      "changed_assignments": []
+    },
+    {
+      "path": "core/behavioral_matrix.py",
+      "pre_sha256": "3d2c62cd4283e1cd347a04d55b5ce77923c7f85d8278cb03a72e4c84a2dc6dce",
+      "post_sha256": "25f7174ea9fbb397f1f2c34ebfffebff608544762ea3425a7c9de2c00718a25e",
+      "hunks": [
+        {
+          "pre": "                        f\"for the {subject} subject; {fixture_note}; its \"\n                        f\"expected result {expected} is {requirement}\"\n                    ),\n                ),\n                derivation=derivation,\n            ),\n",
+          "post": "                        f\"for the {subject} subject; {fixture_note}; its \"\n                        f\"expected result {expected} is {requirement}\"\n                    ),\n                    # INDENT.RUNTIME.1 §17 — the same `language` this\n                    # comprehension already passes to _declared() below, so\n                    # the two can never drift apart.\n                    kwargs={\"language\": language},\n                ),\n                derivation=derivation,\n            ),\n"
+        },
+        {
+          "pre": "            f\"user's requirement is {behavior_fact.expected_value} and it \"\n            \"belongs to the primary case\"\n        ),\n    )\n\n\n",
+          "post": "            f\"user's requirement is {behavior_fact.expected_value} and it \"\n            \"belongs to the primary case\"\n        ),\n        # INDENT.RUNTIME.1 §17 — indentation_depth_fixture is always a\n        # Python-shaped sample; _declared() below wraps every case built here\n        # with the same INPUT_LANGUAGE_PYTHON.\n        kwargs={\"language\": INPUT_LANGUAGE_PYTHON},\n    )\n\n\n"
+        },
+        {
+          "pre": "            f\"requirement: the user's requirement is \"\n            f\"{behavior_fact.expected_value} and it belongs to the primary case\"\n        ),\n    )\n\n\n",
+          "post": "            f\"requirement: the user's requirement is \"\n            f\"{behavior_fact.expected_value} and it belongs to the primary case\"\n        ),\n        # INDENT.RUNTIME.1 §17 — indentation_skew_fixture is always a\n        # Python-shaped sample; _declared() below wraps this case with the\n        # same INPUT_LANGUAGE_PYTHON.\n        kwargs={\"language\": INPUT_LANGUAGE_PYTHON},\n    )\n\n\n"
+        },
+        {
+          "pre": "        \"continuation_and_multiline_string_cases_are_fixed\": True,\n        \"non_python_compatibility_case_is_fixed\": True,\n        \"input_language_inferred_from_target_path\": False,\n        \"candidate_receives_input_language\": False,\n        \"heuristic_reference_labelled_structural\": False,\n        \"preservation_baseline_precondition_required\": True,\n        \"one_candidate_sandbox_for_every_case\": True,\n",
+          "post": "        \"continuation_and_multiline_string_cases_are_fixed\": True,\n        \"non_python_compatibility_case_is_fixed\": True,\n        \"input_language_inferred_from_target_path\": False,\n        # INDENT.RUNTIME.1 — every case's candidate probe contract now carries\n        # kwargs={\"language\": case.input_language}; see\n        # test_every_case_contract_kwargs_language_matches_the_cases_declared_language.\n        \"candidate_receives_input_language\": True,\n        \"heuristic_reference_labelled_structural\": False,\n        \"preservation_baseline_precondition_required\": True,\n        \"one_candidate_sandbox_for_every_case\": True,\n"
+        }
+      ],
+      "top_level_definitions_pre": 24,
+      "top_level_definitions_post": 24,
+      "added_definitions": [],
+      "removed_definitions": [],
+      "changed_definitions": [
+        "_declared_input_cases",
+        "_depth_only_contract",
+        "_skew_contract",
+        "behavioral_matrix_guardrails"
+      ],
+      "added_assignments": [],
+      "changed_assignments": []
+    },
+    {
+      "path": "core/defect_probe_worker.py",
+      "pre_sha256": "7a7118e88938341f5f406605d2cc1e23d1ba57c0543f4f308ae28124d4b74138",
+      "post_sha256": "adc5613ddb54018e452753e326372e4e523f6de713c791bc8d3251236abbbe2d",
+      "hunks": [
+        {
+          "pre": "from contextlib import redirect_stderr, redirect_stdout\nimport hashlib\nimport importlib.util\nimport io\nimport json\nimport os\n",
+          "post": "from contextlib import redirect_stderr, redirect_stdout\nimport hashlib\nimport importlib.util\nimport inspect\nimport io\nimport json\nimport os\n"
+        },
+        {
+          "pre": "    if not isinstance(args, list) or not isinstance(kwargs, dict):\n        raise ValueError(\"structured input must contain JSON args and kwargs\")\n    function = _load_function(repo, target, str(target_binding.get(\"symbol\") or \"\"))\n    observed = function(*args, **kwargs)\n    # The parent accepts only JSON-structured observations.\n    json.dumps(observed, ensure_ascii=False)\n",
+          "post": "    if not isinstance(args, list) or not isinstance(kwargs, dict):\n        raise ValueError(\"structured input must contain JSON args and kwargs\")\n    function = _load_function(repo, target, str(target_binding.get(\"symbol\") or \"\"))\n    # INDENT.RUNTIME.1 — kwargs is generic transport a target's real signature\n    # may or may not accept: the same indentation-style contract can be built\n    # against core/code_dna.py::_classify_indent (language-aware) or against\n    # an arbitrary target CONTROL localized in a real user's own repository\n    # (not language-aware). Checked via signature binding, never a bare\n    # call-and-catch, so a TypeError the target's own logic raises is never\n    # mistaken for an unsupported keyword and silently retried.\n    if kwargs:\n        try:\n            inspect.signature(function).bind(*args, **kwargs)\n        except TypeError:\n            kwargs = {}\n    observed = function(*args, **kwargs)\n    # The parent accepts only JSON-structured observations.\n    json.dumps(observed, ensure_ascii=False)\n"
+        }
+      ],
+      "top_level_definitions_pre": 11,
+      "top_level_definitions_post": 11,
+      "added_definitions": [],
+      "removed_definitions": [],
+      "changed_definitions": [
+        "_run_python_function"
+      ],
+      "added_assignments": [],
+      "changed_assignments": []
+    }
+  ]
+}

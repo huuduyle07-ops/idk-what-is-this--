@@ -37,7 +37,21 @@ class OllamaClient:
         self.model = model or os.getenv("LOCAL_REVIEWER_MODEL") or "deepseek-r1:1.5b"
         self.timeout = timeout
 
-    def generate(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+    def generate(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        options: Optional[Dict[str, Any]] = None,
+    ) -> str:
+        """Run one completion.
+
+        ``options`` merges over the defaults below. Reasoning models bill their
+        hidden ``thinking`` block against the same context window as the prompt
+        and the answer, so a caller may need to widen ``num_ctx``; at the stock
+        window such a request is cut off mid-thought (``done_reason=length``)
+        and returns an empty ``response``, which is indistinguishable from an
+        unreachable model.
+        """
         url = f"{self.base_url}/api/generate"
 
         payload: Dict[str, Any] = {
@@ -47,6 +61,7 @@ class OllamaClient:
             "options": {
                 "temperature": 0.2,
                 "top_p": 0.9,
+                **(options or {}),
             },
         }
 

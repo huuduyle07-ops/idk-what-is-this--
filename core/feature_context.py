@@ -6,6 +6,8 @@ from core.prompter import SCOUT_PROMPT
 from core.json_utils import extract_json_block
 from pathlib import Path
 
+from core.control_engine import localization_value
+
 def extract_scout_snippets(repo_path: str, scout: dict) -> list[dict]:
     repo = Path(repo_path).resolve()
     snippets = []
@@ -125,7 +127,9 @@ def query_words(query: str) -> set[str]:
 def should_call_scout(query: str, control_result: dict) -> bool:
     q = query.lower()
     top = control_result.get("top_hypothesis") or {}
-    confidence = float(top.get("confidence", 0.0) or 0.0)
+    # Navigation-only trigger: this value decides whether to acquire more
+    # context.  It is not defect confidence and grants no patch authority.
+    localization = localization_value(top)
     related = control_result.get("related_snippets") or []
 
     feature_words = [
@@ -139,7 +143,7 @@ def should_call_scout(query: str, control_result: dict) -> bool:
 
     is_feature = any(w in q for w in feature_words)
 
-    if is_feature and confidence < 0.65:
+    if is_feature and localization < 0.65:
         return True
 
     if is_feature and len(related) < 2:

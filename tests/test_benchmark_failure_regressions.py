@@ -68,6 +68,7 @@ def test_executor_allows_validated_literal_mapping_patch_tagged_as_class(
 ):
     import config
     import core.executor as executor_mod
+    from core.validator import ValidationRun
     from core.executor import Executor
 
     repo = tmp_path / "repo"
@@ -98,8 +99,10 @@ def test_executor_allows_validated_literal_mapping_patch_tagged_as_class(
     monkeypatch.setattr(config, "MUTATION_ORACLE_ENABLED", False, raising=False)
     monkeypatch.setattr(
         executor_mod,
-        "run_validation_command",
-        lambda command, cwd, timeout=30: (True, "ok"),
+        "run_validation_command_detailed",
+        lambda command, cwd, timeout=30: ValidationRun(
+            ok=True, output="ok", exit_code=0
+        ),
     )
 
     result = Executor(str(repo)).run(
@@ -120,6 +123,7 @@ def test_typescript_ast_patch_expands_export_modifier_before_replacement(
 ):
     import config
     import core.executor as executor_mod
+    from core.validator import ValidationRun
     import patching.patch_engine as patch_engine
     from core.executor import Executor
 
@@ -169,8 +173,10 @@ def test_typescript_ast_patch_expands_export_modifier_before_replacement(
     monkeypatch.setattr(patch_engine, "parse_code_with_treesitter", fake_parse)
     monkeypatch.setattr(
         executor_mod,
-        "run_validation_command",
-        lambda command, cwd, timeout=30: (True, "ok"),
+        "run_validation_command_detailed",
+        lambda command, cwd, timeout=30: ValidationRun(
+            ok=True, output="ok", exit_code=0
+        ),
     )
 
     result = Executor(str(repo)).run(

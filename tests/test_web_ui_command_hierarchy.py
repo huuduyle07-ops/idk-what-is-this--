@@ -226,7 +226,7 @@ def test_no_backend_change_in_memory_segmentation():
     t = _template()
     for token in ("os.system", "child_process", "eval(", "new Function(", "document.write("):
         assert token not in t, f"unexpected privileged token: {token!r}"
-    assert t.count("<script src=") == 2  # mermaid CDN + keybindings.js only
+    assert t.count("<script src=") == 6  # two local SEC.UI.1 security assets, the AUTH.WEB.1 request-integrity owner and the UX.STATE.1 workflow-state owner
 
 
 # ---------------------------------------------------------------------------
@@ -350,7 +350,7 @@ def test_no_backend_change_in_run_inspector():
     t = _template()
     for token in ("os.system", "child_process", "eval(", "new Function(", "document.write("):
         assert token not in t, f"unexpected privileged token: {token!r}"
-    assert t.count("<script src=") == 2  # mermaid CDN + keybindings.js only
+    assert t.count("<script src=") == 6  # two local SEC.UI.1 security assets, the AUTH.WEB.1 request-integrity owner and the UX.STATE.1 workflow-state owner
 
 
 # ===========================================================================
@@ -516,7 +516,7 @@ def test_no_backend_change_in_inspector_drawer():
     t = _template()
     for token in ("os.system", "child_process", "eval(", "new Function(", "document.write("):
         assert token not in t, f"unexpected privileged token: {token!r}"
-    assert t.count("<script src=") == 2  # mermaid CDN + keybindings.js only
+    assert t.count("<script src=") == 6  # two local SEC.UI.1 security assets, the AUTH.WEB.1 request-integrity owner and the UX.STATE.1 workflow-state owner
 
 
 # ===========================================================================
@@ -673,4 +673,4 @@ def test_no_backend_change_in_top_nav_cleanup():
     t = _template()
     for token in ("os.system", "child_process", "eval(", "new Function(", "document.write("):
         assert token not in t, f"unexpected privileged token: {token!r}"
-    assert t.count("<script src=") == 2  # mermaid CDN + keybindings.js only
+    assert t.count("<script src=") == 6  # two local SEC.UI.1 security assets, the AUTH.WEB.1 request-integrity owner and the UX.STATE.1 workflow-state owner

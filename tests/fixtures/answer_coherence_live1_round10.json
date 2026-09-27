@@ -1,0 +1,76 @@
+{
+  "schema_version": "answer_coherence_live1_round10_v1",
+  "phase_id": "ANSWER.COHERENCE.LIVE.1",
+  "source": "Round-10 live T6 run, 2026-09-11 (tracer t6k). candidate0_response is the draft provider response and candidate1_response the single verification-guided revision response, both verbatim; task, control_source_snippet and behavioral_expectation are CONTROL's recorded values; observed_final_payload is what the run displayed and persisted.",
+  "task": "When I point the agent at a repository that uses 2-space indentation, the patches it writes come back using 4-space indentation instead. Something looks wrong with the way repo style gets detected. Please find the root cause and fix it.",
+  "target_file": "core/code_dna.py",
+  "target_symbol": "_classify_indent",
+  "control_source_snippet": "def _classify_indent(text: str) -> Optional[str]:\n    \"\"\"Return one of '2space', '4space', 'tab', or None when no leading\n    indent on any line. We bias toward the ratio of indented lines so a single\n    tab in a Python file doesn't outvote a thousand 4-space lines.\"\"\"\n    counts = Counter()\n    for line in text.splitlines():\n        if not line or line[0] not in \" \\t\":\n            continue\n        if line.startswith(\"\\t\"):\n            counts[\"tab\"] += 1\n        elif line.startswith(\"    \"):\n            counts[\"4space\"] += 1\n        elif line.startswith(\"  \"):\n            counts[\"2space\"] += 1\n    return counts.most_common(1)[0][0] if counts else None",
+  "behavioral_expectation": {
+    "schema_version": "defect_fact_live_1_behavioral_expectation_v1",
+    "subject_kind": "indentation_style",
+    "expected_value": "2space",
+    "observed_value": "4space",
+    "relation": "instead_of",
+    "provenance": "explicit_user_fact",
+    "source_text": "2-space indentation, the patches it writes come back using 4-space indentation instead",
+    "source_start": 49,
+    "source_end": 135,
+    "obligation_ordinal": 0,
+    "authoritative": true,
+    "semantics": "explicit user claim about behavior; not defect evidence, not a probe observation, and not patch or write authority"
+  },
+  "probe_fingerprint": "15335911d7f3c23f2a517a9d83585f60a049ebb303d42c8adfa92f5e34045988",
+  "candidate0_response": "{\n  \"summary\": \"The `_classify_indent` function checks for '4space' before '2space'. Because `startswith('    ')` is also true for `startswith('  ')`, the 4-space check incorrectly consumes 2-space indented lines, causing the classifier to favor 4-space indentation even when 2-space is used. Reordering the checks to prioritize the more specific (longer) prefix or checking 2-space only if it doesn't start with 4-space is required. Since I must use existing identifiers, I will reorder the `if/elif` blocks to check for '4space' first, but ensure the logic is sound by checking the 4-space condition before the 2-space condition, which is already the case—the issue is that `startswith('  ')` is too broad. However, since I cannot add new logic, I will reorder the checks to ensure 4-space is evaluated correctly, and note that the current implementation is actually logically sound for 4-space vs 2-space if the order is correct. Wait, the current order IS 4-space then 2-space. The issue is that `startswith('  ')` matches 4-space lines. I will swap the order to check 4-space first, which it already does. Actually, the fix is to ensure we don't misclassify 4-space as 2-space. The current code checks 4-space first, which is correct. The bug is likely that it should check for 4-space, then 2-space, but the `startswith` logic is overlapping. I will reorder to check 4-space first (which it does) but ensure the logic is robust.\",\n  \"issues\": [\n    \"Indentation classification logic incorrectly prioritizes or overlaps 4-space and 2-space detection due to startswith behavior.\"\n  ],\n  \"patch_candidate\": {\n    \"file\": \"core/code_dna.py\",\n    \"relative_path\": \"core/code_dna.py\",\n    \"target_node_name\": \"_classify_indent\",\n    \"target_node_kind\": \"function\",\n    \"target_snippet\": \"        if line.startswith(\\\"\\\\t\\\"):\\n            counts[\\\"tab\\\"] += 1\\n        elif line.startswith(\\\"    \\\"):\\n            counts[\\\"4space\\\"] += 1\\n        elif line.startswith(\\\"  \\\"):\\n            counts[\\\"2space\\\"] += 1\",\n    \"patched_snippet\": \"        if line.startswith(\\\"\\\\t\\\"):\\n            counts[\\\"tab\\\"] += 1\\n        elif line.startswith(\\\"    \\\"):\\n            counts[\\\"4space\\\"] += 1\\n        elif line.startswith(\\\"  \\\") and not line.startswith(\\\"    \\\"):\\n            counts[\\\"2space\\\"] += 1\"\n  },\n  \"confidence\": 0.9,\n  \"needs_escalation\": false\n}",
+  "candidate1_response": "{\n  \"summary\": \"The original implementation checked for 4-space indentation before 2-space indentation, causing lines with 4 spaces to be misclassified as '4space' even when the file uses 2-space indentation. By checking for 2-space indentation first, we correctly identify the base unit of indentation.\",\n  \"issues\": [\n    \"Incorrect priority in indentation detection logic.\"\n  ],\n  \"patch_candidate\": {\n    \"file\": \"core/code_dna.py\",\n    \"relative_path\": \"core/code_dna.py\",\n    \"target_node_name\": \"_classify_indent\",\n    \"target_node_kind\": \"function\",\n    \"target_snippet\": \"        if line.startswith(\\\"\\\\t\\\"):\\n            counts[\\\"tab\\\"] += 1\\n        elif line.startswith(\\\"    \\\"):\\n            counts[\\\"4space\\\"] += 1\\n        elif line.startswith(\\\"  \\\"):\\n            counts[\\\"2space\\\"] += 1\",\n    \"patched_snippet\": \"        if line.startswith(\\\"\\\\t\\\"):\\n            counts[\\\"tab\\\"] += 1\\n        elif line.startswith(\\\"  \\\"):\\n            counts[\\\"2space\\\"] += 1\\n        elif line.startswith(\\\"    \\\"):\\n            counts[\\\"4space\\\"] += 1\"\n  },\n  \"confidence\": 1.0,\n  \"needs_escalation\": false\n}",
+  "candidate1_request_sha256": "8f2c4080453437bf8341545684606be434ad4f3f8e6bc3f3d55fe3e221e0375f",
+  "candidate1_request_chars": 6347,
+  "candidate0_fingerprint": "9e6924f6024e92c5b09846b7a99d8ee772da55663cfb7ab11de146f45b7514cf",
+  "candidate1_fingerprint": "368fc1588fd1f6b7c0c135dfc926c9940fb11c546c48c52e101f7e5b33647f95",
+  "candidate0_verification": {
+    "status": "rejected",
+    "rejection_reasons": [
+      "primary_defect_not_closed"
+    ]
+  },
+  "candidate1_verification": {
+    "status": "rejected",
+    "rejection_reasons": [
+      "behavior_preservation_regressed"
+    ]
+  },
+  "observed_final_payload": {
+    "summary": "The `_classify_indent` function checks (context reference; not the localized target) for '4space' before '2space'. Because `startswith('    ')` is also true for `startswith('  ')`, the 4-space check incorrectly consumes 2-space indented lines, causing the classifier to favor 4-space indentation even when 2-space is used. Reordering the checks to prioritize the more specific (longer) prefix or checking 2-space only if it doesn't start with 4-space is required. Since I must use existing identifiers, I will reorder the `if/elif` blocks to check for '4space' first, but ensure the logic is sound by checking the 4-space condition before the 2-space condition, which is already the case—the issue is that `startswith('  ')` is too broad. However, since I cannot add new logic, I will reorder the checks to ensure 4-space is evaluated correctly, and note that the current implementation is actually logically sound for 4-space vs 2-space if the order is correct. Wait, the current order IS 4-space then 2-space. The issue is that `startswith('  ')` matches 4-space lines. I will swap the order to check 4-space first, which it already does. Actually, the fix is to ensure we don't misclassify 4-space as 2-space. The current code checks 4-space first, which is correct. The bug is likely that it should check for 4-space, then 2-space, but the `startswith` (context reference; not the localized target) (not established in the current evidence) logic is overlapping. I will reorder to check 4-space first (which it does) but ensure the logic is robust.\n\nRepository evidence gap: the model named \"startswith\", but the reference is not established in the current evidence for C.A.T.T.U.S, so I am not treating it as a real source location. This check reads only the evidence this run acquired, so that is an evidence limit and not a finding about whether C.A.T.T.U.S contains it.",
+    "issues": [
+      {
+        "severity": "high",
+        "type": "candidate_verification",
+        "file": "",
+        "symbol": "",
+        "reason": "The candidate fixed the reported case but broke a behavior the unpatched code already produced correctly.",
+        "fix": "Author a candidate that resolves the defect without trading away the behavior the preservation counter-case measures.",
+        "code": "behavior_preservation_regressed"
+      },
+      "Indentation classification logic incorrectly prioritizes or overlaps 4-space and 2-space detection due to startswith behavior."
+    ],
+    "confidence": 1.0,
+    "needs_escalation": true,
+    "human_review_eligible": false,
+    "approval_ready": false,
+    "execution_authorized": false,
+    "candidate_verification_status": "rejected",
+    "candidate_verification_rejection_reasons": [
+      "behavior_preservation_regressed"
+    ],
+    "candidate_verification_candidate_fingerprint": "368fc1588fd1f6b7c0c135dfc926c9940fb11c546c48c52e101f7e5b33647f95",
+    "candidate_revision_outcome": "revised_candidate_rejected",
+    "candidate_revision_previous_candidate": {
+      "candidate_fingerprint": "9e6924f6024e92c5b09846b7a99d8ee772da55663cfb7ab11de146f45b7514cf",
+      "relative_path": "core/code_dna.py",
+      "target_node_name": "_classify_indent",
+      "patched_snippet": "        if line.startswith(\"\\t\"):\n            counts[\"tab\"] += 1\n        elif line.startswith(\"    \"):\n            counts[\"4space\"] += 1\n        elif line.startswith(\"  \") and not line.startswith(\"    \"):\n            counts[\"2space\"] += 1",
+      "status": "rejected_evidence_only"
+    }
+  },
+  "observed_final_payload_sha256": "13b2d7894d47927911c7e41585e7012081556ae9771e237a07642f1fc1b0acc3"
+}

@@ -241,9 +241,9 @@ def test_template_introduces_no_privileged_tokens():
     for token in forbidden:
         assert token not in t, f"unexpected privileged token in template: {token!r}"
 
-    # Only the two known <script src=...> remain (mermaid CDN + keybindings) -
+    # Four known scripts: Mermaid, keybindings and two local SEC.UI.1 assets;
     # the reorg added no new external script.
-    assert t.count("<script src=") == 2
+    assert t.count("<script src=") == 6  # two local SEC.UI.1 security assets, the AUTH.WEB.1 request-integrity owner and the UX.STATE.1 workflow-state owner
     assert t.count('src="http') == 1  # solely the mermaid CDN
 
 

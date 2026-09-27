@@ -1,0 +1,865 @@
+{
+  "query": "When I point the agent at a repository that uses 2-space indentation, the patches it writes come back using 4-space indentation instead. Something looks wrong with the way repo style gets detected. Please find the root cause and fix it.",
+  "entry_resolution": {
+    "entry_nodes": [
+      "core/check_oracle_assessment.py::_indentation_signature",
+      "core/code_dna.py::_classify_indent",
+      "core/harness_controls.py::_indent_of",
+      "core/pipeline.py::_indent_of",
+      "patching/patch_engine.py::_indent_of",
+      "core/answer_entity_grounding.py::_annotation_point"
+    ],
+    "raw_query_terms": [
+      "point",
+      "agent",
+      "at",
+      "repository",
+      "uses",
+      "space",
+      "indentation",
+      "patches",
+      "writes",
+      "come",
+      "back",
+      "using"
+    ],
+    "normalized_query_terms": [
+      "point",
+      "agent",
+      "at",
+      "repository",
+      "uses",
+      "space",
+      "indentation",
+      "patches",
+      "writes",
+      "come",
+      "back",
+      "using",
+      "indent"
+    ],
+    "resolved_entry_nodes": [
+      "core/check_oracle_assessment.py::_indentation_signature",
+      "core/code_dna.py::_classify_indent",
+      "core/harness_controls.py::_indent_of",
+      "core/pipeline.py::_indent_of",
+      "patching/patch_engine.py::_indent_of",
+      "core/answer_entity_grounding.py::_annotation_point"
+    ],
+    "entry_match_kind": {
+      "core/check_oracle_assessment.py::_indentation_signature": "identifier_token",
+      "core/code_dna.py::_classify_indent": "bounded_morphology",
+      "core/harness_controls.py::_indent_of": "bounded_morphology",
+      "core/pipeline.py::_indent_of": "bounded_morphology",
+      "patching/patch_engine.py::_indent_of": "bounded_morphology",
+      "core/answer_entity_grounding.py::_annotation_point": "identifier_token"
+    },
+    "morphology_relations": [
+      "indentation->indent"
+    ],
+    "candidate_population_count": 19655,
+    "query_resolution_seconds": 0.30125709995627403,
+    "query_token_document_frequency": {
+      "agent": 43,
+      "repository": 259,
+      "point": 12,
+      "at": 122,
+      "indentation": 4,
+      "indent": 13,
+      "uses": 86,
+      "writes": 210,
+      "back": 44,
+      "come": 7,
+      "space": 1,
+      "patches": 1,
+      "using": 2
+    },
+    "specificity_candidate_count": 19655,
+    "entry_ordering": [
+      {
+        "node_id": "core/check_oracle_assessment.py::_indentation_signature",
+        "rank": 1,
+        "entry_match_kind": "identifier_token",
+        "matched_query_tokens": [
+          "indentation"
+        ],
+        "strongest_match_token": "indentation",
+        "strongest_match_token_df": 4,
+        "max_match_specificity": 8.27664912542186,
+        "identifier_precision": 0.5,
+        "lexical_specificity_score": 4.13832456271093
+      },
+      {
+        "node_id": "core/code_dna.py::_classify_indent",
+        "rank": 2,
+        "entry_match_kind": "bounded_morphology",
+        "matched_query_tokens": [
+          "indentation"
+        ],
+        "strongest_match_token": "indentation",
+        "strongest_match_token_df": 4,
+        "max_match_specificity": 8.27664912542186,
+        "identifier_precision": 0.5,
+        "lexical_specificity_score": 4.13832456271093
+      },
+      {
+        "node_id": "core/harness_controls.py::_indent_of",
+        "rank": 3,
+        "entry_match_kind": "bounded_morphology",
+        "matched_query_tokens": [
+          "indentation"
+        ],
+        "strongest_match_token": "indentation",
+        "strongest_match_token_df": 4,
+        "max_match_specificity": 8.27664912542186,
+        "identifier_precision": 0.5,
+        "lexical_specificity_score": 4.13832456271093
+      },
+      {
+        "node_id": "core/pipeline.py::_indent_of",
+        "rank": 4,
+        "entry_match_kind": "bounded_morphology",
+        "matched_query_tokens": [
+          "indentation"
+        ],
+        "strongest_match_token": "indentation",
+        "strongest_match_token_df": 4,
+        "max_match_specificity": 8.27664912542186,
+        "identifier_precision": 0.5,
+        "lexical_specificity_score": 4.13832456271093
+      },
+      {
+        "node_id": "patching/patch_engine.py::_indent_of",
+        "rank": 5,
+        "entry_match_kind": "bounded_morphology",
+        "matched_query_tokens": [
+          "indentation"
+        ],
+        "strongest_match_token": "indentation",
+        "strongest_match_token_df": 4,
+        "max_match_specificity": 8.27664912542186,
+        "identifier_precision": 0.5,
+        "lexical_specificity_score": 4.13832456271093
+      },
+      {
+        "node_id": "core/answer_entity_grounding.py::_annotation_point",
+        "rank": 6,
+        "entry_match_kind": "identifier_token",
+        "matched_query_tokens": [
+          "point"
+        ],
+        "strongest_match_token": "point",
+        "strongest_match_token_df": 12,
+        "max_match_specificity": 7.321137680394424,
+        "identifier_precision": 0.5,
+        "lexical_specificity_score": 3.660568840197212
+      }
+    ],
+    "query_candidates": [
+      "point",
+      "agent",
+      "at",
+      "repository",
+      "uses",
+      "space",
+      "indentation",
+      "patches",
+      "writes",
+      "come",
+      "back",
+      "using"
+    ],
+    "query_derived_entry_nodes": [
+      "core/check_oracle_assessment.py::_indentation_signature",
+      "core/code_dna.py::_classify_indent",
+      "core/harness_controls.py::_indent_of",
+      "core/pipeline.py::_indent_of",
+      "patching/patch_engine.py::_indent_of",
+      "core/answer_entity_grounding.py::_annotation_point"
+    ],
+    "query_matches": [
+      {
+        "node_id": "core/check_oracle_assessment.py::_indentation_signature",
+        "entry_match_kind": "identifier_token",
+        "identifier_tokens": [
+          "indentation",
+          "signature"
+        ],
+        "matched_query_tokens": [
+          "indentation"
+        ],
+        "matched_identifier_tokens": [
+          "indentation"
+        ],
+        "morphology_relations": [],
+        "exact_query": null
+      },
+      {
+        "node_id": "core/code_dna.py::_classify_indent",
+        "entry_match_kind": "bounded_morphology",
+        "identifier_tokens": [
+          "classify",
+          "indent"
+        ],
+        "matched_query_tokens": [
+          "indentation"
+        ],
+        "matched_identifier_tokens": [
+          "indent"
+        ],
+        "morphology_relations": [
+          "indentation->indent"
+        ],
+        "exact_query": null
+      },
+      {
+        "node_id": "core/harness_controls.py::_indent_of",
+        "entry_match_kind": "bounded_morphology",
+        "identifier_tokens": [
+          "indent",
+          "of"
+        ],
+        "matched_query_tokens": [
+          "indentation"
+        ],
+        "matched_identifier_tokens": [
+          "indent"
+        ],
+        "morphology_relations": [
+          "indentation->indent"
+        ],
+        "exact_query": null
+      },
+      {
+        "node_id": "core/pipeline.py::_indent_of",
+        "entry_match_kind": "bounded_morphology",
+        "identifier_tokens": [
+          "indent",
+          "of"
+        ],
+        "matched_query_tokens": [
+          "indentation"
+        ],
+        "matched_identifier_tokens": [
+          "indent"
+        ],
+        "morphology_relations": [
+          "indentation->indent"
+        ],
+        "exact_query": null
+      },
+      {
+        "node_id": "patching/patch_engine.py::_indent_of",
+        "entry_match_kind": "bounded_morphology",
+        "identifier_tokens": [
+          "indent",
+          "of"
+        ],
+        "matched_query_tokens": [
+          "indentation"
+        ],
+        "matched_identifier_tokens": [
+          "indent"
+        ],
+        "morphology_relations": [
+          "indentation->indent"
+        ],
+        "exact_query": null
+      },
+      {
+        "node_id": "core/answer_entity_grounding.py::_annotation_point",
+        "entry_match_kind": "identifier_token",
+        "identifier_tokens": [
+          "annotation",
+          "point"
+        ],
+        "matched_query_tokens": [
+          "point"
+        ],
+        "matched_identifier_tokens": [
+          "point"
+        ],
+        "morphology_relations": [],
+        "exact_query": null
+      }
+    ],
+    "deep_graph_entry_nodes": [],
+    "project_map_entry_nodes": [],
+    "graph_fallback_entry_nodes": [],
+    "project_map_fallback_used": false,
+    "project_map_supplemented": false,
+    "graph_fallback_used": false,
+    "fallback_used": false,
+    "hotspot_only": false,
+    "entry_candidate_count": 6,
+    "entry_candidate_limit": 6
+  },
+  "evidence": [
+    {
+      "symbol": "core/executor.py::run",
+      "score": 223.2558,
+      "depth": 2,
+      "called_by": [
+        "benchmarks/cases/cpp/cpp_account_interest/buggy_repo/validate.py::run_and_forward",
+        "benchmarks/cases/cpp/cpp_account_interest/buggy_repo/validate.py::<top-level>",
+        "benchmarks/cases/cpp/cpp_boundary_check/buggy_repo/validate.py::run_and_forward",
+        "benchmarks/cases/cpp/cpp_boundary_check/buggy_repo/validate.py::<top-level>",
+        "benchmarks/cases/cpp/cpp_iterator_invalidation_trap/buggy_repo/validate.py::run_and_forward",
+        "benchmarks/cases/cpp/cpp_iterator_invalidation_trap/buggy_repo/validate.py::<top-level>",
+        "benchmarks/cases/cpp/cpp_string_view_lifetime_trap/buggy_repo/validate.py::run_and_forward",
+        "benchmarks/cases/cpp/cpp_string_view_lifetime_trap/buggy_repo/validate.py::<top-level>",
+        "core/benchmark_web.py::_git_lines",
+        "core/benchmark_web.py::<top-level>",
+        "core/brain_stamp.py::_run_git",
+        "core/brain_stamp.py::<top-level>",
+        "core/health.py::_docker_image_pulled",
+        "core/health.py::check_docker_sandbox",
+        "core/health.py::<top-level>",
+        "core/pipeline.py::execute_subtask",
+        "core/sandbox_runner.py::_kill_process_tree",
+        "core/sandbox_runner.py::_docker_kill_container",
+        "core/sandbox_runner.py::<top-level>",
+        "core/self_correct_loop.py::run_self_correct_loop",
+        "core/self_correct_loop.py::<top-level>",
+        "core/validation_execution.py::run_safe_validation_command",
+        "core/validation_execution.py::<top-level>",
+        "core/validator.py::run_validation_command_detailed",
+        "core/validator.py::run_tests",
+        "core/validator.py::<top-level>",
+        "mcp_server/artifact_write.py::main",
+        "mcp_server/artifact_write.py::<top-level>",
+        "mcp_server/read_only.py::main",
+        "mcp_server/read_only.py::<top-level>",
+        "scripts/run_background_reporter.py::run_cmd",
+        "scripts/run_background_reporter.py::<top-level>",
+        "scripts/run_patch_proposal_queue.py::_run_validation_segments",
+        "scripts/run_patch_proposal_queue.py::<top-level>",
+        "scripts/run_subagent_handoff.py::run_handoff",
+        "scripts/run_subagent_handoff.py::<top-level>",
+        "tests/test_artifact_dataset_builder.py::test_jsonl_output_is_deterministic",
+        "tests/test_benchmark_failure_regressions.py::test_executor_allows_validated_literal_mapping_patch_tagged_as_class",
+        "tests/test_benchmark_failure_regressions.py::test_typescript_ast_patch_expands_export_modifier_before_replacement",
+        "tests/test_benchmark_web.py::_write_dirty_git_repo",
+        "tests/test_checkpoint_audit.py::test_report_bytes_are_deterministic",
+        "tests/test_checkpoint_audit.py::<top-level>",
+        "tests/test_cockpit_usability_checkpoint.py::test_cli_writes_json_and_markdown",
+        "tests/test_cockpit_usability_checkpoint.py::test_demo_mode_uses_static_local_observations_only",
+        "tests/test_cockpit_usability_checkpoint.py::<top-level>",
+        "tests/test_continue_from_frame_contract.py::test_demo_mode_uses_static_local_data",
+        "tests/test_continue_from_frame_contract.py::test_cli_writes_json_and_markdown",
+        "tests/test_continue_from_frame_contract.py::<top-level>",
+        "tests/test_dream_patch_blockers.py::test_ui_renderer_includes_patch_blocker_badge_and_text",
+        "tests/test_dream_patch_blockers.py::<top-level>",
+        "tests/test_driver_classifier_baseline.py::test_predictions_jsonl_is_deterministic",
+        "tests/test_evidence_card_layout.py::test_required_card_types_present_in_demo_layout",
+        "tests/test_evidence_card_layout.py::test_cli_writes_json_and_markdown",
+        "tests/test_evidence_card_layout.py::test_demo_mode_uses_static_local_data",
+        "tests/test_evidence_card_layout.py::test_demo_mode_includes_all_main_card_types",
+        "tests/test_evidence_card_layout.py::<top-level>",
+        "tests/test_executor_single_file_patch_safety.py::test_safe_single_file_source_patch_still_applies",
+        "tests/test_executor_single_file_patch_safety.py::test_single_file_patch_safety_blocks_sensitive_targets_before_apply",
+        "tests/test_executor_single_file_patch_safety.py::test_validation_and_rollback_are_not_run_after_patch_safety_block",
+        "tests/test_executor_single_file_patch_safety.py::test_path_traversal_remains_blocked_before_apply",
+        "tests/test_executor_single_file_patch_safety.py::<top-level>",
+        "tests/test_executor_single_file_path.py::test_missing_target_is_conflict_not_exception_in_single_file_executor",
+        "tests/test_executor_single_file_path.py::test_validation_routed_through_run_validation_command_in_single_file_executor",
+        "tests/test_executor_single_file_path.py::<top-level>",
+        "tests/test_flaky_case_review.py::test_deterministic_review_id_and_created_at",
+        "tests/test_github_pr_safety_contract.py::test_cli_deterministic_output",
+        "tests/test_goal_brief_4w1h.py::test_cli_writes_json_and_markdown",
+        "tests/test_goal_brief_4w1h.py::test_cli_field_flags_build_a_brief",
+        "tests/test_goal_brief_4w1h.py::test_cli_partial_fields_produce_clarify_hint",
+        "tests/test_goal_brief_4w1h.py::test_demo_mode_uses_static_local_data",
+        "tests/test_goal_brief_4w1h.py::test_demo_mode_includes_all_four_example_types",
+        "tests/test_goal_brief_4w1h.py::<top-level>",
+        "tests/test_lesson_activation_dataset.py::test_jsonl_output_is_deterministic_with_fixed_metadata",
+        "tests/test_mixed_mode_intent_router.py::test_cli_writes_json_and_markdown",
+        "tests/test_mixed_mode_intent_router.py::test_demo_mode_uses_static_local_data",
+        "tests/test_mixed_mode_intent_router.py::test_demo_mode_produces_at_least_four_different_modes",
+        "tests/test_mixed_mode_intent_router.py::<top-level>",
+        "tests/test_n8n_orchestration_dry_run.py::test_cli_deterministic_output",
+        "tests/test_patch_plan_atomicity_boundary.py::test_executor_result_exposes_same_atomicity_boundary",
+        "tests/test_patch_plan_atomicity_boundary.py::<top-level>",
+        "tests/test_phase_picker.py::test_report_bytes_are_deterministic",
+        "tests/test_phase_registry.py::test_cli_deterministic_report",
+        "tests/test_post_eval_cmd_checkpoint_audit.py::test_report_bytes_are_deterministic",
+        "tests/test_sandbox_patch_candidate_evaluation.py::test_deterministic_trial_id_and_created_at",
+        "tests/test_sandbox_patch_candidate_evaluation.py::<top-level>",
+        "tests/test_sandbox_patch_graduation_review.py::test_deterministic_review_id_and_created_at",
+        "tests/test_sandbox_self_evolution_runner.py::test_deterministic_trial_id_and_created_at",
+        "tests/test_sandbox_self_evolution_trial.py::test_deterministic_trial_id_and_created_at",
+        "tests/test_self_evolution_evidence_pack.py::test_deterministic_pack_id_and_created_at",
+        "tests/test_telegram_evidence_contract.py::test_cli_deterministic_output",
+        "tests/test_unified_workbench_input_plan.py::test_cli_writes_json_and_markdown",
+        "tests/test_unified_workbench_input_plan.py::test_demo_mode_uses_static_local_data_only",
+        "tests/test_unified_workbench_input_plan.py::<top-level>",
+        "tests/test_ux_branch_freeze_checkpoint.py::test_report_bytes_are_deterministic",
+        "tests/test_ux_branch_freeze_checkpoint.py::<top-level>",
+        "tests/test_validation_timeout_and_bytecode_freshness.py::test_executor_post_patch_timeout_is_environment_failure_and_rolls_back",
+        "tests/test_validation_timeout_and_bytecode_freshness.py::_stale_pyc_repo",
+        "tests/test_validation_timeout_and_bytecode_freshness.py::test_fixture_really_reproduces_the_stale_pyc_defect",
+        "tests/test_validation_timeout_and_bytecode_freshness.py::test_dont_write_bytecode_does_not_fix_stale_reads",
+        "tests/test_validation_timeout_and_bytecode_freshness.py::test_sandbox_candidate_validation_uses_the_freshness_guarantee",
+        "tests/test_validation_timeout_and_bytecode_freshness.py::<top-level>",
+        "web/app.py::dream_apply_route",
+        "web/app.py::<top-level>",
+        "web/mcp_inspector_processes.py::_run_snapshot_command",
+        "web/mcp_inspector_processes.py::_terminate_process_tree",
+        "web/mcp_inspector_processes.py::<top-level>",
+        "web/routes/patch_routes.py::apply_patch",
+        "web/routes/patch_routes.py::test_patch",
+        "web/routes/patch_routes.py::<top-level>",
+        "web/runner.py::run_web_app",
+        "web/runner.py::<top-level>"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.2558,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [
+        {
+          "from": "core/harness_controls.py::_indent_of",
+          "to": "patching/patch_engine.py::apply_patch_from_json",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        },
+        {
+          "from": "patching/patch_engine.py::apply_patch_from_json",
+          "to": "core/executor.py::run",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        }
+      ],
+      "originating_entry": "core/harness_controls.py::_indent_of"
+    },
+    {
+      "symbol": "core/answer_entity_grounding.py::ground_answer_text",
+      "score": 123.1752,
+      "depth": 2,
+      "called_by": [
+        "core/answer_entity_grounding.py::_ground_payload_value",
+        "core/answer_entity_grounding.py::ground_answer_for_display",
+        "core/answer_entity_grounding.py::<top-level>",
+        "tests/test_analysis_multiroot_evidence.py::test_a_symbol_only_root_a_defines_cannot_ground_a_claim_about_root_b",
+        "tests/test_analysis_multiroot_evidence.py::test_a_comparative_claim_needs_evidence_from_both_sides",
+        "tests/test_analysis_multiroot_evidence.py::<top-level>",
+        "tests/test_answer_entity_grounding.py::test_nonexistent_file_assertions_are_downgraded_and_reported_as_an_evidence_gap",
+        "tests/test_answer_entity_grounding.py::test_real_file_does_not_ground_a_fabricated_symbol",
+        "tests/test_answer_entity_grounding.py::test_real_source_backed_file_and_symbol_remain_precise",
+        "tests/test_answer_entity_grounding.py::test_t1_t2_t3_legacy_repository_symbols_remain_unchanged",
+        "tests/test_answer_entity_grounding.py::test_analysis_evidence_path_is_grounded_without_code_index_membership",
+        "tests/test_answer_entity_grounding.py::test_traceback_path_is_execution_observed_but_does_not_ground_a_symbol",
+        "tests/test_answer_entity_grounding.py::test_well_known_external_product_name_is_not_a_repository_file_claim",
+        "tests/test_answer_entity_grounding.py::test_missing_source_files_are_still_downgraded_beside_a_product_name",
+        "tests/test_answer_entity_grounding.py::test_repository_evidence_wins_over_the_external_product_name_guard",
+        "tests/test_answer_entity_grounding.py::test_a_file_signal_takes_a_product_name_back_out_of_the_guard",
+        "tests/test_answer_entity_grounding.py::test_user_supplied_missing_path_is_retained_only_as_unverified",
+        "tests/test_answer_entity_grounding.py::test_clearly_hypothetical_path_is_not_reported_as_fabricated",
+        "tests/test_answer_entity_grounding.py::test_paths_in_fenced_examples_are_not_treated_as_repository_claims",
+        "tests/test_answer_entity_grounding.py::test_multi_repository_same_relative_path_requires_subject_binding",
+        "tests/test_answer_entity_grounding.py::test_stale_or_mismatched_evidence_fails_conservatively",
+        "tests/test_answer_entity_grounding.py::test_grounding_never_silently_substitutes_a_real_ranked_file",
+        "tests/test_answer_grounding_nondestructive.py::test_one_unsupported_symbol_never_deletes_its_sentence",
+        "tests/test_answer_grounding_nondestructive.py::test_round6_t5_abbreviation_clause_is_not_cut_in_half",
+        "tests/test_answer_grounding_nondestructive.py::test_eg_and_ie_abbreviations_do_not_control_remediation",
+        "tests/test_answer_grounding_nondestructive.py::test_surrounding_clause_survives_at_start_middle_and_end_positions",
+        "tests/test_answer_grounding_nondestructive.py::test_several_unsupported_entities_stay_position_stable",
+        "tests/test_answer_grounding_nondestructive.py::test_markdown_bullets_headings_and_inline_code_stay_well_formed",
+        "tests/test_answer_grounding_nondestructive.py::test_neighbouring_citations_and_grounded_paths_survive_a_downgrade",
+        "tests/test_answer_grounding_nondestructive.py::test_unverified_never_reads_as_proven_nonexistent",
+        "tests/test_answer_grounding_nondestructive.py::test_true_but_unacquired_symbol_is_an_evidence_gap_not_a_denial",
+        "tests/test_answer_grounding_nondestructive.py::test_fabricated_qualified_symbol_is_still_downgraded",
+        "tests/test_answer_grounding_nondestructive.py::test_grounded_symbols_and_paths_are_byte_identical",
+        "tests/test_answer_grounding_nondestructive.py::test_ambiguous_hypothetical_and_proposed_behaviour_is_unchanged",
+        "tests/test_answer_grounding_nondestructive.py::test_multi_root_separation_is_unchanged_by_local_remediation",
+        "tests/test_answer_grounding_nondestructive.py::test_user_supplied_referent_is_retained_and_still_only_unverified",
+        "tests/test_answer_grounding_nondestructive.py::test_node_js_external_product_guard_is_unchanged",
+        "tests/test_answer_grounding_nondestructive.py::test_a_dotted_identifier_beside_a_real_path_downgrades_only_the_symbol",
+        "tests/test_answer_symbol_grounding.py::test_round5_prose_class_method_with_no_path_is_no_longer_established_fact",
+        "tests/test_answer_symbol_grounding.py::test_no_substitute_symbol_is_invented_for_a_rejected_claim",
+        "tests/test_answer_symbol_grounding.py::test_real_unique_bare_function_may_stay_precise_without_a_path",
+        "tests/test_answer_symbol_grounding.py::test_real_qualified_member_is_grounded_from_recorded_spans",
+        "tests/test_answer_symbol_grounding.py::test_module_qualified_symbol_binds_through_the_module_relation",
+        "tests/test_answer_symbol_grounding.py::test_execution_observed_frame_grounds_the_symbol_it_actually_ran",
+        "tests/test_answer_symbol_grounding.py::test_real_file_never_grounds_an_invented_member",
+        "tests/test_answer_symbol_grounding.py::test_real_class_never_grounds_a_method_it_does_not_own",
+        "tests/test_answer_symbol_grounding.py::test_real_method_in_the_wrong_class_is_not_grounded",
+        "tests/test_answer_symbol_grounding.py::test_ambiguous_bare_symbol_is_never_guessed_at",
+        "tests/test_answer_symbol_grounding.py::test_ambiguity_resolves_when_the_same_sentence_names_a_grounded_file",
+        "tests/test_answer_symbol_grounding.py::test_ambiguity_resolves_from_a_sibling_structured_path_field",
+        "tests/test_answer_symbol_grounding.py::test_symbol_tail_collision_permanent_regression",
+        "tests/test_answer_symbol_grounding.py::test_stale_symbol_evidence_fails_conservatively",
+        "tests/test_answer_symbol_grounding.py::test_one_repository_symbol_never_grounds_another_repository_claim",
+        "tests/test_answer_symbol_grounding.py::test_user_supplied_missing_symbol_is_discussable_as_unverified",
+        "tests/test_answer_symbol_grounding.py::test_proposed_new_method_needs_an_existing_owner_and_stays_unapplied",
+        "tests/test_answer_symbol_grounding.py::test_hypothetical_symbol_example_is_not_reported_as_fabricated",
+        "tests/test_answer_symbol_grounding.py::test_identifiers_inside_a_generated_code_block_are_not_repository_claims",
+        "tests/test_answer_symbol_grounding.py::test_external_library_symbols_are_not_forced_to_exist_in_the_repository",
+        "tests/test_answer_symbol_grounding.py::test_ordinary_prose_words_are_not_turned_into_repository_entities",
+        "tests/test_answer_symbol_grounding.py::test_t1_t2_t3_style_answers_keep_both_path_and_symbol_precision",
+        "tests/test_answer_symbol_grounding.py::test_path_grounding_behaviour_from_live_1_is_unchanged_by_symbol_grounding"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.1752,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [
+        {
+          "from": "core/answer_entity_grounding.py::_annotation_point",
+          "to": "core/answer_entity_grounding.py::_annotate_unsupported_spans",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        },
+        {
+          "from": "core/answer_entity_grounding.py::_annotate_unsupported_spans",
+          "to": "core/answer_entity_grounding.py::ground_answer_text",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        }
+      ],
+      "originating_entry": "core/answer_entity_grounding.py::_annotation_point"
+    },
+    {
+      "symbol": "core/code_dna.py::_classify_indent",
+      "score": 22.0185,
+      "depth": 0,
+      "called_by": [
+        "core/code_dna.py::compute_dna",
+        "core/code_dna.py::<top-level>",
+        "tests/test_defect_probe_live.py::test_t6_sandbox_closure_and_defect_preservation_failure_coexist",
+        "tests/test_defect_probe_live.py::<top-level>",
+        "tests/test_localization_candidate_population.py::test_classify_indent_defect_remains_reproducible",
+        "tests/test_localization_candidate_population.py::<top-level>",
+        "tests/test_query_symbol_entry_recall.py::test_classify_indent_remains_intentionally_broken_and_untouched",
+        "tests/test_query_symbol_entry_recall.py::<top-level>",
+        "tests/test_repository_specificity_entry_ordering.py::test_classify_indent_remains_intentionally_unfixed",
+        "tests/test_repository_specificity_entry_ordering.py::<top-level>"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0185,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [],
+      "originating_entry": "core/code_dna.py::_classify_indent"
+    },
+    {
+      "symbol": "core/harness_controls.py::_indent_of",
+      "score": 12.0093,
+      "depth": 0,
+      "called_by": [
+        "core/harness_controls.py::_service_block_range",
+        "core/harness_controls.py::_env_block_range",
+        "core/harness_controls.py::<top-level>",
+        "core/pipeline.py::_graft_statement_level_patch_into_function",
+        "patching/patch_engine.py::apply_patch_from_json"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0093,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [],
+      "originating_entry": "core/harness_controls.py::_indent_of"
+    },
+    {
+      "symbol": "core/pipeline.py::_indent_of",
+      "score": 12.0093,
+      "depth": 0,
+      "called_by": [
+        "core/harness_controls.py::_service_block_range",
+        "core/harness_controls.py::_env_block_range",
+        "core/harness_controls.py::<top-level>",
+        "core/pipeline.py::_graft_statement_level_patch_into_function",
+        "patching/patch_engine.py::apply_patch_from_json"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0093,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [],
+      "originating_entry": "core/pipeline.py::_indent_of"
+    },
+    {
+      "symbol": "patching/patch_engine.py::_indent_of",
+      "score": 12.0093,
+      "depth": 0,
+      "called_by": [
+        "core/harness_controls.py::_service_block_range",
+        "core/harness_controls.py::_env_block_range",
+        "core/harness_controls.py::<top-level>",
+        "core/pipeline.py::_graft_statement_level_patch_into_function",
+        "patching/patch_engine.py::apply_patch_from_json"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0093,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [],
+      "originating_entry": "patching/patch_engine.py::_indent_of"
+    },
+    {
+      "symbol": "patching/patch_engine.py::apply_patch_from_json",
+      "score": 11.5595,
+      "depth": 1,
+      "called_by": [
+        "core/executor.py::run",
+        "core/executor.py::<top-level>",
+        "core/mutation_oracle.py::run_mutation_oracle",
+        "tests/test_patch_write_byte_fidelity.py::test_patch_engine_single_file_newline_behaviour_still_holds",
+        "tests/test_patch_write_byte_fidelity.py::<top-level>"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0595,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [
+        {
+          "from": "core/harness_controls.py::_indent_of",
+          "to": "patching/patch_engine.py::apply_patch_from_json",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        }
+      ],
+      "originating_entry": "core/harness_controls.py::_indent_of"
+    },
+    {
+      "symbol": "core/check_oracle_assessment.py::_input_relation",
+      "score": 7.509600000000001,
+      "depth": 1,
+      "called_by": [
+        "core/check_oracle_assessment.py::_direct_relation",
+        "core/check_oracle_assessment.py::_extract_relations",
+        "core/check_oracle_assessment.py::<top-level>"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0096,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [
+        {
+          "from": "core/check_oracle_assessment.py::_indentation_signature",
+          "to": "core/check_oracle_assessment.py::_input_relation",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        }
+      ],
+      "originating_entry": "core/check_oracle_assessment.py::_indentation_signature"
+    },
+    {
+      "symbol": "core/check_oracle_assessment.py::_indentation_signature",
+      "score": 6.0037,
+      "depth": 0,
+      "called_by": [
+        "core/check_oracle_assessment.py::_input_relation",
+        "core/check_oracle_assessment.py::<top-level>"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0037,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [],
+      "originating_entry": "core/check_oracle_assessment.py::_indentation_signature"
+    },
+    {
+      "symbol": "core/answer_entity_grounding.py::_annotation_point",
+      "score": 6.0037,
+      "depth": 0,
+      "called_by": [
+        "core/answer_entity_grounding.py::_annotate_unsupported_spans",
+        "core/answer_entity_grounding.py::<top-level>"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0037,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [],
+      "originating_entry": "core/answer_entity_grounding.py::_annotation_point"
+    },
+    {
+      "symbol": "core/answer_entity_grounding.py::_annotate_unsupported_spans",
+      "score": 5.5077,
+      "depth": 1,
+      "called_by": [
+        "core/answer_entity_grounding.py::ground_answer_text",
+        "core/answer_entity_grounding.py::<top-level>"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0077,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [
+        {
+          "from": "core/answer_entity_grounding.py::_annotation_point",
+          "to": "core/answer_entity_grounding.py::_annotate_unsupported_spans",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        }
+      ],
+      "originating_entry": "core/answer_entity_grounding.py::_annotation_point"
+    },
+    {
+      "symbol": "core/check_oracle_assessment.py::_direct_relation",
+      "score": 5.0258,
+      "depth": 2,
+      "called_by": [
+        "core/check_oracle_assessment.py::_extract_relations",
+        "core/check_oracle_assessment.py::<top-level>"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0258,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [
+        {
+          "from": "core/check_oracle_assessment.py::_indentation_signature",
+          "to": "core/check_oracle_assessment.py::_input_relation",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        },
+        {
+          "from": "core/check_oracle_assessment.py::_input_relation",
+          "to": "core/check_oracle_assessment.py::_direct_relation",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        }
+      ],
+      "originating_entry": "core/check_oracle_assessment.py::_indentation_signature"
+    },
+    {
+      "symbol": "core/check_oracle_assessment.py::_extract_relations",
+      "score": 5.0258,
+      "depth": 2,
+      "called_by": [
+        "core/check_oracle_assessment.py::assess_selected_check_oracles",
+        "core/check_oracle_assessment.py::<top-level>"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0258,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [
+        {
+          "from": "core/check_oracle_assessment.py::_indentation_signature",
+          "to": "core/check_oracle_assessment.py::_input_relation",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        },
+        {
+          "from": "core/check_oracle_assessment.py::_input_relation",
+          "to": "core/check_oracle_assessment.py::_extract_relations",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        }
+      ],
+      "originating_entry": "core/check_oracle_assessment.py::_indentation_signature"
+    },
+    {
+      "symbol": "core/pipeline.py::normalize_patch_candidate_with_control_source",
+      "score": 5.0077,
+      "depth": 2,
+      "called_by": [
+        "core/pipeline.py::maybe_run_auto_patch",
+        "tests/test_benchmark_failure_regressions.py::test_normalizes_statement_level_cpp_patch_for_whole_function_target"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0077,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [
+        {
+          "from": "core/harness_controls.py::_indent_of",
+          "to": "core/pipeline.py::_graft_statement_level_patch_into_function",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        },
+        {
+          "from": "core/pipeline.py::_graft_statement_level_patch_into_function",
+          "to": "core/pipeline.py::normalize_patch_candidate_with_control_source",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        }
+      ],
+      "originating_entry": "core/harness_controls.py::_indent_of"
+    },
+    {
+      "symbol": "core/pipeline.py::_graft_statement_level_patch_into_function",
+      "score": 3.5119,
+      "depth": 1,
+      "called_by": [
+        "core/pipeline.py::normalize_patch_candidate_with_control_source"
+      ],
+      "calls": [],
+      "impact": [],
+      "query_bonus": 0,
+      "graph_weight": 0.0119,
+      "risk": {
+        "risk_level": "low",
+        "risk_score": 1
+      },
+      "entry_path": [
+        {
+          "from": "core/harness_controls.py::_indent_of",
+          "to": "core/pipeline.py::_graft_statement_level_patch_into_function",
+          "edge_kind": "resolved_call",
+          "direction": "upstream"
+        }
+      ],
+      "originating_entry": "core/harness_controls.py::_indent_of"
+    }
+  ]
+}

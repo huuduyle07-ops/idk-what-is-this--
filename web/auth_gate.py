@@ -1,12 +1,60 @@
 from __future__ import annotations
 
-import hmac
+from collections.abc import Collection, Sequence
 from dataclasses import dataclass
-from urllib.parse import urlparse
+
+from web.browser_session import (
+    SESSION_MISSING,
+    SessionRead,
+    evaluate_csrf,
+    web_auth_token_matches,
+)
+from web.request_origin import Origin, evaluate_origin
 
 
 _LOOPBACK_HOSTS = {"127.0.0.1", "::1", "localhost"}
 _MUTATING_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
+# Metadata a browser attaches by itself. User-Agent is not a signal, and a
+# session cookie alone never selects the browser path: it is no credential.
+_BROWSER_CONTEXT_HEADERS = ("Origin", "Sec-Fetch-Site", "Sec-Fetch-Mode", "Sec-Fetch-Dest", "Referer")
+LOGIN_PATH = "/auth/login"
+
+_REASONS = {
+    "safe_method": "safe method",
+    "origin_missing": "Browser mutation rejected: the request carries no Origin header.",
+    "origin_null": "Browser mutation rejected: an opaque (privacy-masked) origin is never an allowed application origin.",
+    "origin_malformed": "Browser mutation rejected: the Origin header is not a valid scheme://host[:port] origin.",
+    "origin_ambiguous": "Browser mutation rejected: the request carries more than one Origin value.",
+    "origin_not_allowed": (
+        "Browser mutation rejected: this page's origin is not allowed for this server "
+        "(scheme, host and port must match exactly; see WEB_ALLOWED_ORIGINS)."
+    ),
+    "browser_session_missing": "Browser mutation rejected: no browser session. Reload the page and retry.",
+    "browser_session_invalid": (
+        "Browser mutation rejected: the browser session is no longer valid (server restart, "
+        "token change or expiry). Reload the page, sign in again if required, and retry."
+    ),
+    "csrf_missing": "Browser mutation rejected: the CSRF token is missing.",
+    "csrf_ambiguous": "Browser mutation rejected: more than one CSRF token was supplied.",
+    "csrf_invalid": "Browser mutation rejected: the CSRF token is invalid or stale. Reload the page and retry.",
+    "auth_required": (
+        "Authentication required: sign in with WEB_AUTH_TOKEN in the browser, "
+        "or send it as a bearer token from an API client."
+    ),
+    "web_auth_token_mismatch": "Authentication failed: the supplied WEB_AUTH_TOKEN was not accepted.",
+    "non_loopback_rejected": (
+        "mutation from non-loopback address rejected; "
+        "set WEB_AUTH_TOKEN to allow network-exposed mutations"
+    ),
+    "browser_context_required": (
+        "Browser sign-in requires a same-origin browser request; "
+        "API clients send WEB_AUTH_TOKEN as a bearer token instead."
+    ),
+    "browser_session_authenticated": "browser session authenticated",
+    "token_authenticated": "token authenticated",
+    "login_bootstrap": "sign-in request; the route verifies WEB_AUTH_TOKEN",
+    "loopback_allowed": "loopback client allowed (no WEB_AUTH_TOKEN configured)",
+}
 
 
 @dataclass
@@ -14,6 +62,11 @@ class GateDecision:
     allowed: bool
     status_code: int
     reason: str
+    code: str = ""
+
+
+def _decision(allowed: bool, status_code: int, code: str) -> GateDecision:
+    return GateDecision(allowed=allowed, status_code=status_code, reason=_REASONS[code], code=code)
 
 
 def is_loopback_host(value: str) -> bool:
@@ -37,91 +90,97 @@ def extract_web_auth_token(headers) -> str:
     return ""
 
 
-def origin_matches_request(origin: str, host: str) -> bool:
-    """Return True when origin host equals request host (allows same-origin)."""
-    if not origin or not host:
-        return True
-    try:
-        origin_host = urlparse(origin).hostname or ""
-    except Exception:
-        return False
-    request_host = host.split(":")[0].strip().lower()
-    if not request_host:
-        request_host = host.strip().lower()
-    origin_host = origin_host.strip().lower()
-    if not origin_host:
-        return True
-    if origin_host == request_host:
-        return True
-    if origin_host in _LOOPBACK_HOSTS and request_host in _LOOPBACK_HOSTS:
-        return True
-    return False
+def is_mutating_method(method: str) -> bool:
+    return (method or "").upper() in _MUTATING_METHODS
+
+
+def is_browser_request(headers) -> bool:
+    """True when the request carries origin or Fetch Metadata a browser attaches."""
+    return any(headers.get(name) is not None for name in _BROWSER_CONTEXT_HEADERS)
+
+
+def _header_values(headers, name: str) -> list[str]:
+    getlist = getattr(headers, "getlist", None)
+    if getlist is not None:
+        return list(getlist(name))
+    value = headers.get(name)
+    return [] if value is None else [value]
+
+
+def _authenticate(
+    token: str, provided: str, remote_addr: str, *, browser_authenticated: bool
+) -> GateDecision:
+    if token:
+        if browser_authenticated:
+            return _decision(True, 200, "browser_session_authenticated")
+        if not provided:
+            return _decision(False, 401, "auth_required")
+        if not web_auth_token_matches(provided, token):
+            return _decision(False, 403, "web_auth_token_mismatch")
+        return _decision(True, 200, "token_authenticated")
+    # No token configured: only loopback clients may mutate.
+    if is_loopback_host(remote_addr):
+        return _decision(True, 200, "loopback_allowed")
+    return _decision(False, 403, "non_loopback_rejected")
 
 
 def should_allow_mutation(
     method: str,
     remote_addr: str,
     headers,
-    host: str,
     configured_token: str | None,
+    *,
+    path: str = "",
+    allowed_origins: Collection[Origin] = frozenset(),
+    browser_session: SessionRead | None = None,
+    csrf_submissions: Sequence[str] = (),
 ) -> GateDecision:
-    """Decide whether a request should be allowed through the mutation gate.
+    """Decide whether a request may reach a state-changing route.
+
+    AUTH.WEB.1: a browser request (Origin or Fetch Metadata present) must pass
+    three independent proofs, in this order: exact origin (scheme, host and
+    effective port in ``allowed_origins``), a CSRF token bound to a valid
+    browser session, then authentication -- an authenticated browser session
+    or a valid WEB_AUTH_TOKEN header, or with no WEB_AUTH_TOKEN configured a
+    loopback client. Neither proof substitutes for another.
+
+    A request without browser metadata keeps the API contract: a valid
+    WEB_AUTH_TOKEN header (X-CATTUS-Web-Token or Authorization: Bearer), or a
+    loopback client when no token is configured. A session cookie
+    authenticates nothing on that path, and /auth/login is browser-only.
 
     Args:
         method: HTTP method string (e.g. "POST").
         remote_addr: Client IP address string.
         headers: Mapping-like object with HTTP headers (e.g. flask.request.headers).
-        host: Request Host header value (e.g. "localhost:5000").
         configured_token: Value of WEB_AUTH_TOKEN env var, or None/empty if unset.
+        path: Request path (only /auth/login is special).
+        allowed_origins: Exact origins allowed to send browser mutations.
+        browser_session: The verified browser session cookie read.
+        csrf_submissions: CSRF token values carried by the request.
 
     Returns:
-        GateDecision with allowed, status_code, reason.
+        GateDecision with allowed, status_code, reason and a stable code.
     """
-    if method.upper() not in _MUTATING_METHODS:
-        return GateDecision(allowed=True, status_code=200, reason="safe method")
-
-    # CSRF / Origin check — runs before auth so cross-origin is always rejected.
-    origin = (headers.get("Origin") or "").strip()
-    referer = (headers.get("Referer") or "").strip()
-    check_origin = origin or referer
-    if check_origin and not origin_matches_request(check_origin, host):
-        return GateDecision(
-            allowed=False,
-            status_code=403,
-            reason=f"cross-origin mutation rejected: origin={check_origin!r} host={host!r}",
-        )
-
+    if not is_mutating_method(method):
+        return _decision(True, 200, "safe_method")
     token = configured_token.strip() if configured_token else ""
+    provided = extract_web_auth_token(headers)
+    login = path == LOGIN_PATH
 
-    if token:
-        # Token is configured — require a matching bearer on all mutating requests.
-        provided = extract_web_auth_token(headers)
-        if not provided:
-            return GateDecision(
-                allowed=False,
-                status_code=401,
-                reason="mutation requires WEB_AUTH_TOKEN; no token provided",
-            )
-        if not hmac.compare_digest(provided, token):
-            return GateDecision(
-                allowed=False,
-                status_code=403,
-                reason="mutation token mismatch",
-            )
-        return GateDecision(allowed=True, status_code=200, reason="token authenticated")
-    else:
-        # No token configured — allow only loopback clients.
-        if is_loopback_host(remote_addr):
-            return GateDecision(
-                allowed=True,
-                status_code=200,
-                reason="loopback client allowed (no WEB_AUTH_TOKEN configured)",
-            )
-        return GateDecision(
-            allowed=False,
-            status_code=403,
-            reason=(
-                "mutation from non-loopback address rejected; "
-                "set WEB_AUTH_TOKEN to allow network-exposed mutations"
-            ),
-        )
+    if not is_browser_request(headers):
+        if login:
+            return _decision(False, 403, "browser_context_required")
+        return _authenticate(token, provided, remote_addr, browser_authenticated=False)
+
+    origin = evaluate_origin(_header_values(headers, "Origin"), allowed_origins)
+    if not origin.allowed:
+        return _decision(False, 403, origin.code)
+    session = browser_session if browser_session is not None else SessionRead(SESSION_MISSING)
+    csrf = evaluate_csrf(session, csrf_submissions)
+    if not csrf.allowed:
+        return _decision(False, 403, csrf.code)
+    authenticated = session.session.authenticated
+    if token and login and not provided and not authenticated:
+        return _decision(True, 200, "login_bootstrap")
+    return _authenticate(token, provided, remote_addr, browser_authenticated=authenticated)

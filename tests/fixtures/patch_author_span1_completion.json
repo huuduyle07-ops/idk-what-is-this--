@@ -1,0 +1,1798 @@
+{
+  "phase_id": "PATCH.AUTHOR.SPAN.1",
+  "completed_on": "2026-09-22",
+  "deterministic_phase_complete": true,
+  "previous_phase_evidence_preserved": "tests/fixtures/patch_author_scope1_completion.json",
+  "existing_files_changed": [
+    "docs/roadmap/phase_registry.json",
+    "core/control_engine.py",
+    "core/candidate_revision.py",
+    "core/candidate_authoring_context.py",
+    "core/authoring_repair_scope.py",
+    "core/patch_authoring_contract.py",
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py",
+    "tests/_patch_author_scope1_maintenance.py"
+  ],
+  "new_files": [
+    "core/candidate_replacement_span.py",
+    "tests/test_patch_author_span1.py",
+    "tests/_patch_author_span1_maintenance.py",
+    "tests/fixtures/patch_author_span1_reversal.json",
+    "tests/fixtures/patch_author_span1_frozen.json",
+    "tests/fixtures/patch_author_span1_completion.json",
+    "docs/designs/2026-09-22-repair-envelope-target-replacement-alignment.md"
+  ],
+  "canonical_owner": "AuthoringRepairScope.replacement_source + member_ranges, projected by canonical_replacement_envelope",
+  "primary_target": "MainApp.java::m1",
+  "editable_members": [
+    "MainApp.java::m1",
+    "MainApp.java::m2",
+    "MainApp.java::m3"
+  ],
+  "single_member_unchanged": true,
+  "initial_revision_contract_parity": true,
+  "validated_pair_never_expanded": true,
+  "typed_author_output_status": [
+    "valid_replacement_span",
+    "target_not_unique",
+    "outside_authoring_envelope",
+    "replacement_span_mismatch",
+    "readonly_gap_modified",
+    "duplicate_definition_risk",
+    "missing_definition_risk"
+  ],
+  "scope_status_compatibility": "author_output_status carries span validity; authoring_scope_status retains the containment classification",
+  "no_new_wire_format": true,
+  "fingerprint_primitive_unchanged": true,
+  "frozen_semantics": [
+    "measured RepairScope membership",
+    "primary localization",
+    "CONTROL",
+    "PREFLIGHT",
+    "BASIS",
+    "PATCH.MINIMAL",
+    "CRLF application",
+    "Java candidate validation",
+    "Twosum compile policy",
+    "task transport",
+    "UI receipts and null-candidate status",
+    "UX/security/mutation",
+    "T6 Round 11"
+  ],
+  "write_authority": false,
+  "execution_authorized": false,
+  "auto_apply": false,
+  "human_approval_required": true,
+  "focused_provider_calls": 0,
+  "focused_external_network_calls": 0,
+  "additional_span_selection_calls": 0,
+  "performance": {
+    "canonical_envelope_ms": {
+      "median": 2.4858000106178224,
+      "max": 5.320199998095632
+    },
+    "span_alignment_ms": {
+      "median": 1.375199994072318,
+      "max": 2.430399996228516
+    },
+    "full_containment_ms": {
+      "median": 9.615200047846884,
+      "max": 18.730699957814068
+    }
+  },
+  "definition_attribution": [
+    {
+      "file": "core/authoring_repair_scope.py",
+      "definition": "consume_repair_scope",
+      "ast_sha256": "c03002214ed4f620e11bda0f0977667d4472cd4264ca837ece901a0690f1c87e",
+      "unchanged": true
+    },
+    {
+      "file": "core/authoring_repair_scope.py",
+      "definition": "AuthoringRepairScope.assert_current",
+      "ast_sha256": "71a2303eac24b20b076d235751d44ec90732b133fefb582be8de63585e3be1f5",
+      "unchanged": true
+    },
+    {
+      "file": "core/authoring_repair_scope.py",
+      "definition": "AuthoringRepairScope.replacement_source",
+      "ast_sha256": "cda4ce14483c0f78e341c685962b197e65bca20a7b30de438b159ab3ebe1bd78",
+      "unchanged": true
+    },
+    {
+      "file": "core/authoring_repair_scope.py",
+      "definition": "AuthoringRepairScope.as_dict",
+      "ast_sha256": "72c77ddb761d193d73495de1fb8e615e1d374762b3358b3b9090e816b8cf4d79",
+      "unchanged": true
+    },
+    {
+      "file": "core/candidate_authoring_context.py",
+      "definition": "CandidateAuthoringContext.binding_inputs",
+      "ast_sha256": "0225a491b48b46f48b7e27d6bd2f20da974b78c4d8623f135df70cd1a1e48f62",
+      "unchanged": true
+    },
+    {
+      "file": "core/candidate_authoring_context.py",
+      "definition": "CandidateAuthoringContext.revision_prompt",
+      "ast_sha256": "0a4c327d0c340f4cf48bbce717f8ebf7bda08dc0c15c3ceddddebaedd22bc158",
+      "unchanged": true
+    },
+    {
+      "file": "core/control_engine.py",
+      "definition": "enforce_control_grounding_on_payload",
+      "ast_sha256": "82b9abb192c62c4811f8751107f10d3f1f0acab27bfae4594d943124d4dd567e",
+      "unchanged": true
+    },
+    {
+      "file": "core/control_engine.py",
+      "definition": "authoring_context_for_control_result",
+      "ast_sha256": "31375589b2c80799b2a57adab9ac04358bdb0af1238f6148d41727d440a23e85",
+      "unchanged": true
+    },
+    {
+      "file": "core/candidate_revision.py",
+      "definition": "build_revision_prompt",
+      "ast_sha256": "05fabb226c08389fb0f92583977dda59df3d01ccaccb16b00929fd4b6f101bf6",
+      "unchanged": true
+    },
+    {
+      "file": "core/candidate_revision.py",
+      "definition": "rebase_onto_original_source",
+      "ast_sha256": "3ed0dcd5161398ffec8ad56a264b7ea74e8067e7b12c9f022e8d167bb698cf0e",
+      "unchanged": true
+    }
+  ],
+  "frozen_file_count": 1143,
+  "validation": {
+    "Phase-entry baseline": {
+      "passed": 354,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "354 passed, 1 warning in 77.67s (0:01:17)",
+      "log": ".tmp/patch-author-span1/baseline.log",
+      "failures": []
+    },
+    "Focused SPAN.1 final": {
+      "passed": 37,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "37 passed, 1 warning in 11.16s",
+      "log": ".tmp/patch-author-span1/focused-final.log",
+      "failures": []
+    },
+    "Combined SPAN / SCOPE / LIVE.3 / BASIS.SCOPE / registry / picker": {
+      "passed": 389,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "389 passed, 1 warning in 49.60s",
+      "log": ".tmp/patch-author-span1/combined.log",
+      "failures": []
+    },
+    "Security / mutation / Undo / rollback / AUTH.DREAM": {
+      "passed": 764,
+      "failed": 13,
+      "skipped": 0,
+      "summary": "13 failed, 764 passed, 1 warning in 488.96s (0:08:08)",
+      "log": ".tmp/patch-author-span1/security.log",
+      "failures": [
+        "tests/test_sec_ui1.py::test_frozen_entry_bytes_and_original_audit_preserved",
+        "tests/test_sec_ui1.py::test_reversal_reconstructs_entry_without_repinning_history",
+        "tests/test_auth_web1.py::test_reversal_receipt_reconstructs_every_entry_file",
+        "tests/test_auth_web1.py::test_frozen_phase_and_track_a_boundaries_are_byte_exact",
+        "tests/test_auth_web1.py::test_completion_receipt_pins_every_phase_source",
+        "tests/test_auth_web_read1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_auth_web1_post_state",
+        "tests/test_auth_web_read1.py::test_frozen_phase_boundaries_are_byte_exact",
+        "tests/test_auth_web_read1.py::test_completion_receipt_pins_every_phase_source",
+        "tests/test_auth_dream1.py::test_exact_frozen_entry_reversal",
+        "tests/test_data_undo1.py::test_frozen_entry_hashes_and_reviewable_reversal",
+        "tests/test_data_rollback1.py::test_reversal_receipt_reconstructs_every_entry_file",
+        "tests/test_data_rollback1.py::test_completion_receipt_pins_every_phase_source",
+        "tests/test_exec_plan1.py::test_exact_entry_reversal_and_frozen_surfaces"
+      ]
+    },
+    "Affected pipeline / envelope / byte fidelity / plan routes": {
+      "passed": 129,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "129 passed, 1 warning in 30.17s",
+      "log": ".tmp/patch-author-span1/broad-final.log",
+      "failures": []
+    },
+    "tests/test_patch_authoring_contract_live2.py": {
+      "passed": 42,
+      "failed": 2,
+      "skipped": 0,
+      "summary": "2 failed, 42 passed, 1 warning in 332.76s (0:05:32)",
+      "log": ".tmp/patch-author-span1/adjacent-test_patch_authoring_contract_live2.log",
+      "failures": [
+        "tests/test_patch_authoring_contract_live2.py::test_the_change_is_a_reversible_containment_proof",
+        "tests/test_patch_authoring_contract_live2.py::test_the_containment_is_one_new_accessor_and_four_touched_definitions"
+      ]
+    },
+    "tests/test_candidate_revision_live.py": {
+      "passed": 97,
+      "failed": 1,
+      "skipped": 0,
+      "summary": "1 failed, 97 passed, 1 warning in 278.88s (0:04:38)",
+      "log": ".tmp/patch-author-span1/revision-isolated.log",
+      "failures": [
+        "tests/test_candidate_revision_live.py::test_every_frozen_file_is_byte_identical"
+      ]
+    },
+    "tests/test_patch_basis_target1.py": {
+      "passed": 35,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "35 passed in 3.47s",
+      "log": ".tmp/patch-author-span1/adjacent-test_patch_basis_target1.log",
+      "failures": []
+    },
+    "tests/test_preflight_request1.py": {
+      "passed": 94,
+      "failed": 3,
+      "skipped": 0,
+      "summary": "3 failed, 94 passed, 1 warning in 166.46s (0:02:46)",
+      "log": ".tmp/patch-author-span1/adjacent-test_preflight_request1.log",
+      "failures": [
+        "tests/test_preflight_request1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_control_bootstrap1_post_state",
+        "tests/test_preflight_request1.py::test_frozen_phase_boundaries_are_byte_exact",
+        "tests/test_preflight_request1.py::test_completion_receipt_pins_every_phase_source_and_records_the_measurement"
+      ]
+    },
+    "tests/test_control_fresh1.py": {
+      "passed": 102,
+      "failed": 3,
+      "skipped": 0,
+      "summary": "3 failed, 102 passed, 1 warning in 11.41s",
+      "log": ".tmp/patch-author-span1/adjacent-test_control_fresh1.log",
+      "failures": [
+        "tests/test_control_fresh1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_ux_context1_post_state",
+        "tests/test_control_fresh1.py::test_frozen_phase_boundaries_are_byte_exact",
+        "tests/test_control_fresh1.py::test_completion_receipt_pins_every_phase_source_and_records_the_bootstrap_boundary"
+      ]
+    },
+    "tests/test_control_bootstrap1.py": {
+      "passed": 111,
+      "failed": 3,
+      "skipped": 1,
+      "summary": "3 failed, 111 passed, 1 skipped, 3 warnings in 21.31s",
+      "log": ".tmp/patch-author-span1/adjacent-test_control_bootstrap1.log",
+      "failures": [
+        "tests/test_control_bootstrap1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_control_fresh1_post_state",
+        "tests/test_control_bootstrap1.py::test_frozen_phase_boundaries_are_byte_exact",
+        "tests/test_control_bootstrap1.py::test_completion_receipt_pins_every_phase_source_and_records_the_bootstrap"
+      ]
+    },
+    "tests/test_indent_runtime1.py": {
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "27 passed, 1 warning in 3.25s",
+      "log": ".tmp/patch-author-span1/adjacent-test_indent_runtime1.log",
+      "failures": []
+    },
+    "tests/test_indent_semantics1.py": {
+      "passed": 147,
+      "failed": 1,
+      "skipped": 1,
+      "summary": "1 failed, 147 passed, 1 skipped, 1 warning in 234.99s (0:03:54)",
+      "log": ".tmp/patch-author-span1/adjacent-test_indent_semantics1.log",
+      "failures": [
+        "tests/test_indent_semantics1.py::test_every_frozen_boundary_is_byte_identical"
+      ]
+    },
+    "tests/test_answer_coherence_live1.py": {
+      "passed": 34,
+      "failed": 1,
+      "skipped": 24,
+      "summary": "1 failed, 34 passed, 24 skipped, 1 warning in 2.78s",
+      "log": ".tmp/patch-author-span1/adjacent-test_answer_coherence_live1.log",
+      "failures": [
+        "tests/test_answer_coherence_live1.py::test_every_frozen_boundary_is_byte_identical"
+      ]
+    },
+    "tests/test_patch_minimal_live.py": {
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "48 passed, 1 warning in 99.35s (0:01:39)",
+      "log": ".tmp/patch-author-span1/gates-test_patch_minimal_live.log",
+      "failures": []
+    },
+    "tests/test_patch_minimal_novelty_live.py": {
+      "passed": 79,
+      "failed": 2,
+      "skipped": 0,
+      "summary": "2 failed, 79 passed, 1 warning in 195.74s (0:03:15)",
+      "log": ".tmp/patch-author-span1/gates-test_patch_minimal_novelty_live.log",
+      "failures": [
+        "tests/test_patch_minimal_novelty_live.py::test_every_other_frozen_boundary_file_is_byte_identical[defect_probe_live4_frozen_boundaries.json]",
+        "tests/test_patch_minimal_novelty_live.py::test_every_other_frozen_boundary_file_is_byte_identical[candidate_verify_live1_frozen_boundaries.json]"
+      ]
+    },
+    "tests/test_patch_minimal_binding_context_live3.py": {
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "24 passed, 1 warning in 5.29s",
+      "log": ".tmp/patch-author-span1/gates-test_patch_minimal_binding_context_live3.log",
+      "failures": []
+    },
+    "tests/test_patch_minimal_result_fields_live3.py": {
+      "passed": 107,
+      "failed": 1,
+      "skipped": 0,
+      "summary": "1 failed, 107 passed, 1 warning in 56.75s",
+      "log": ".tmp/patch-author-span1/gates-test_patch_minimal_result_fields_live3.log",
+      "failures": [
+        "tests/test_patch_minimal_result_fields_live3.py::test_combined_phase_frozen_bytes_and_reversal_receipt"
+      ]
+    },
+    "tests/test_candidate_verification.py": {
+      "passed": 57,
+      "failed": 1,
+      "skipped": 0,
+      "summary": "1 failed, 57 passed, 1 warning in 262.59s (0:04:22)",
+      "log": ".tmp/patch-author-span1/gates-test_candidate_verification.log",
+      "failures": [
+        "tests/test_candidate_verification.py::test_frozen_prerequisite_files_are_untouched"
+      ]
+    },
+    "tests/test_candidate_sandbox_validation.py": {
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "40 passed, 1 warning in 155.15s (0:02:35)",
+      "log": ".tmp/patch-author-span1/gates-test_candidate_sandbox_validation.log",
+      "failures": []
+    },
+    "tests/test_execution_eligibility_policy.py": {
+      "passed": 36,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "36 passed, 1 warning in 4.54s",
+      "log": ".tmp/patch-author-span1/gates-test_execution_eligibility_policy.log",
+      "failures": []
+    },
+    "tests/test_human_apply_authorization.py": {
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "22 passed in 22.36s",
+      "log": ".tmp/patch-author-span1/gates-test_human_apply_authorization.log",
+      "failures": []
+    },
+    "tests/test_control_safety_live.py": {
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "15 passed, 1 warning in 7.83s",
+      "log": ".tmp/patch-author-span1/gates-test_control_safety_live.log",
+      "failures": []
+    },
+    "tests/test_patch_safety_chokepoint.py": {
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "22 passed, 1 warning in 12.75s",
+      "log": ".tmp/patch-author-span1/gates-test_patch_safety_chokepoint.log",
+      "failures": []
+    },
+    "tests/test_dream_apply_safety.py": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "summary": "1 passed, 1 warning in 6.20s",
+      "log": ".tmp/patch-author-span1/gates-test_dream_apply_safety.log",
+      "failures": []
+    }
+  },
+  "historical_failure_count": 31,
+  "historical_failure_attribution": [
+    {
+      "nodeid": "tests/test_answer_coherence_live1.py::test_every_frozen_boundary_is_byte_identical",
+      "outcome": "failed",
+      "details": "def test_every_frozen_boundary_is_byte_identical():\n        \"\"\"Probes, verification, safe_minimal, validation, authority, routing, display.\n    \n        Evaluated through the maintenance chain, so a later receipt that edits one\n        of these files is undone before comparison rather than silently re-pinned.\n        \"\"\"\n    \n        pins = json.loads(\n            (FIXTURES / \"answer_coherence_live1_frozen_boundaries.json\").read_text(\n                encoding=\"utf-8\"\n            )\n        )\n        assert tuple(pins[\"files\"]) == FROZEN_FILES\n        drifted = [\n            rel\n            for rel, digest in pins[\"files\"].items()\n            if hashlib.sha256(\n>               before_later_receipts(rel, (ROOT / rel).read_bytes())\n            ).hexdigest()\n            != digest\n        ]\n\ntests\\test_answer_coherence_live1.py:1647: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'core/control_engine.py'\ncontent = b'from __future__ import annotations\\r\\nfrom pathlib import Path\\nimport re\\nimport os\\nimport json\\nfrom typing impor...ctions, or APIs.\",\\r\\n            \"If source_snippet is empty, set needs_escalation=true.\",\\r\\n        ],\\r\\n    }\\r\\n'\nnewer_than = None\n\n    def before_later_receipts(\n        relative: str, content: bytes, *, newer_than: Path | None = None\n    ) -> bytes:\n        # Hunks apply to the raw decoded text: these receipts keep each file's own\n        # line endings, and core/agent_state.py mixes CRLF with LF.\n        # ``newer_than`` stops at that receipt: a phase that pins *current* bytes\n        # undoes only the receipts recorded after its own, never its own or older.\n        # The newer governance phases have their own exact test-only chain.  Undo\n        # them before entering this older receipt format and chronology.\n        from tests._data_undo1_maintenance import before_data_undo1\n    \n        content = before_data_undo1(relative, content)\n        sec_receipt = json.loads(\n            (ROOT / \"tests/fixtures/sec_ui1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        sec_record = sec_receipt[\"files\"].get(relative)\n        if sec_record is not None:\n            text = content.decode(\"utf-8\")\n            for hunk in reversed(sec_record[\"hunks\"]):\n                assert text.count(hunk[\"after\"]) == 1, (\n                    relative,\n                    \"sec_ui1_reversal.json\",\n                    \"non-unique hunk\",\n                )\n                text = text.replace(hunk[\"after\"], hunk[\"before\"], 1)\n            content = text.encode(\"utf-8\")\n            assert hashlib.sha256(content).hexdigest() == sec_record[\"entry_sha256\"], (\n                relative,\n                \"sec_ui1_reversal.json\",\n            )\n        for path in LATER_RECEIPTS:\n            if newer_than is not None and path == newer_than:\n                break\n            receipt = json.loads(path.read_text(encoding=\"utf-8\"))\n            reversal = next((item for item in receipt[\"reversals\"] if item[\"path\"] == relative), None)\n            if reversal is None:\n                continue\n>           assert hashlib.sha256(content).hexdigest() == reversal[\"post_sha256\"], (relative, path.name)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: ('core/control_engine.py', 'patch_author_live3_reversal.json')\n\ntests\\_harness_maintenance.py:69: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_auth_dream1.py::test_exact_frozen_entry_reversal",
+      "outcome": "failed",
+      "details": "def test_exact_frozen_entry_reversal():\n        from tests._auth_dream1_maintenance import before_auth_dream1\n        manifest = json.loads((ROOT / \"tests/fixtures/auth_dream1_frozen_boundaries.json\").read_text())\n        for name, digest in manifest[\"sha256\"].items():\n>           assert hashlib.sha256(before_auth_dream1(name)).hexdigest() == digest, name\nE           AssertionError: core/control_engine.py\nE           assert '369b33a83e8e...e55d2d9da74fd' == 'a29d8db26371...669a9421fa8e7'\nE             \nE             - a29d8db26371fa9c92a08d9127929f7bacf776765526ed2bf17669a9421fa8e7\nE             + 369b33a83e8ead1e9ec64287f693fd86507f7b89273b11b256de55d2d9da74fd\n\ntests\\test_auth_dream1.py:503: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_auth_web1.py::test_completion_receipt_pins_every_phase_source",
+      "outcome": "failed",
+      "details": "def test_completion_receipt_pins_every_phase_source():\n        from tests._auth_web_read1_maintenance import before_auth_web_read1\n    \n        receipt = json.loads((FIXTURES / \"auth_web1_completion.json\").read_text(encoding=\"utf-8\"))\n        assert receipt[\"phase\"] == \"AUTH.WEB.1\"\n        assert receipt[\"closed_findings\"] == [\"SEC-02\", \"UX-01\"]\n        assert receipt[\"remaining_findings\"] == [\"UX-02\", \"UX-03\", \"UX-04\", \"UX-05\", \"UX-06\"]\n        assert receipt[\"model_calls\"] == 0 and receipt[\"external_network_requests\"] == 0\n        expected = set(receipt[\"existing_files_changed\"] + receipt[\"new_files\"])\n        expected.remove(\"tests/fixtures/auth_web1_completion.json\")\n        assert set(receipt[\"source_sha256\"]) == expected\n        for relative, digest in receipt[\"source_sha256\"].items():\n>           assert hashlib.sha256(before_auth_web_read1(relative)).hexdigest() == digest, relative\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_auth_web1.py:1105: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_auth_web_read1_maintenance.py:18: in before_auth_web_read1\n    current = before_ux_state1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_state1_maintenance.py:18: in before_ux_state1\n    current = before_ux_context1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_context1_maintenance.py:18: in before_ux_context1\n    current = before_control_fresh1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_fresh1_maintenance.py:18: in before_control_fresh1\n    current = before_control_bootstrap1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_bootstrap1_maintenance.py:18: in before_control_bootstrap1\n    current = before_preflight_request1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_auth_web1.py::test_frozen_phase_and_track_a_boundaries_are_byte_exact",
+      "outcome": "failed",
+      "details": "def test_frozen_phase_and_track_a_boundaries_are_byte_exact():\n        manifest = json.loads((FIXTURES / \"auth_web1_frozen_boundaries.json\").read_text(encoding=\"utf-8\"))\n        assert manifest[\"phase\"] == \"AUTH.WEB.1\"\n        # AUTH.WEB.1's post-state bytes: later phases' receipts are undone first (PREFLIGHT.REQUEST.1\n        # added an ID prefix to core/phase_registry.py).\n        post_state = __import__(\"tests._auth_web_read1_maintenance\", fromlist=[\"x\"]).before_auth_web_read1\n        for relative, digest in manifest[\"sha256\"].items():\n>           assert hashlib.sha256(post_state(relative)).hexdigest() == digest, relative\nE           AssertionError: core/control_engine.py\nE           assert '369b33a83e8e...e55d2d9da74fd' == 'a29d8db26371...669a9421fa8e7'\nE             \nE             - a29d8db26371fa9c92a08d9127929f7bacf776765526ed2bf17669a9421fa8e7\nE             + 369b33a83e8ead1e9ec64287f693fd86507f7b89273b11b256de55d2d9da74fd\n\ntests\\test_auth_web1.py:1063: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_auth_web1.py::test_reversal_receipt_reconstructs_every_entry_file",
+      "outcome": "failed",
+      "details": "def test_reversal_receipt_reconstructs_every_entry_file():\n        from tests._auth_web1_maintenance import before_auth_web1\n    \n        receipt = json.loads((FIXTURES / \"auth_web1_reversal.json\").read_text(encoding=\"utf-8\"))\n        assert receipt[\"phase\"] == \"AUTH.WEB.1\"\n        assert {\"web/auth_gate.py\", \"web/app.py\", \"web/templates/index.html\"} <= set(receipt[\"files\"])\n        for relative, record in receipt[\"files\"].items():\n>           restored = before_auth_web1(relative)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_auth_web1.py:1049: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_auth_web1_maintenance.py:18: in before_auth_web1\n    current = before_auth_web_read1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_auth_web_read1_maintenance.py:18: in before_auth_web_read1\n    current = before_ux_state1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_state1_maintenance.py:18: in before_ux_state1\n    current = before_ux_context1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_context1_maintenance.py:18: in before_ux_context1\n    current = before_control_fresh1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_fresh1_maintenance.py:18: in before_control_fresh1\n    current = before_control_bootstrap1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_bootstrap1_maintenance.py:18: in before_control_bootstrap1\n    current = before_preflight_request1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_auth_web_read1.py::test_completion_receipt_pins_every_phase_source",
+      "outcome": "failed",
+      "details": "def test_completion_receipt_pins_every_phase_source():\n        receipt = json.loads((FIXTURES / \"auth_web_read1_completion.json\").read_text(encoding=\"utf-8\"))\n        assert receipt[\"phase\"] == \"AUTH.WEB.READ.1\"\n        assert receipt[\"remaining_findings\"] == [\"UX-02\", \"UX-03\", \"UX-04\", \"UX-05\", \"UX-06\"]\n        assert receipt[\"model_calls\"] == 0 and receipt[\"external_network_requests\"] == 0\n        assert set(receipt[\"frozen_production_deltas\"].values()) == {0}\n        expected = set(receipt[\"existing_files_changed\"] + receipt[\"new_files\"])\n        expected.remove(\"tests/fixtures/auth_web_read1_completion.json\")\n        assert set(receipt[\"source_sha256\"]) == expected\n        for relative, digest in receipt[\"source_sha256\"].items():\n>           assert hashlib.sha256(_before_ux_state1(relative)).hexdigest() == digest, relative\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_auth_web_read1.py:1006: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\test_auth_web_read1.py:142: in _before_ux_state1\n    return before_ux_state1(relative)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_state1_maintenance.py:18: in before_ux_state1\n    current = before_ux_context1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_context1_maintenance.py:18: in before_ux_context1\n    current = before_control_fresh1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_fresh1_maintenance.py:18: in before_control_fresh1\n    current = before_control_bootstrap1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_bootstrap1_maintenance.py:18: in before_control_bootstrap1\n    current = before_preflight_request1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_auth_web_read1.py::test_frozen_phase_boundaries_are_byte_exact",
+      "outcome": "failed",
+      "details": "def test_frozen_phase_boundaries_are_byte_exact():\n        manifest = json.loads((FIXTURES / \"auth_web_read1_frozen_boundaries.json\").read_text(encoding=\"utf-8\"))\n        assert manifest[\"phase\"] == \"AUTH.WEB.READ.1\"\n        for relative, digest in manifest[\"sha256\"].items():\n>           assert hashlib.sha256(_before_ux_state1(relative)).hexdigest() == digest, relative\nE           AssertionError: core/control_engine.py\nE           assert '369b33a83e8e...e55d2d9da74fd' == 'a29d8db26371...669a9421fa8e7'\nE             \nE             - a29d8db26371fa9c92a08d9127929f7bacf776765526ed2bf17669a9421fa8e7\nE             + 369b33a83e8ead1e9ec64287f693fd86507f7b89273b11b256de55d2d9da74fd\n\ntests\\test_auth_web_read1.py:965: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_auth_web_read1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_auth_web1_post_state",
+      "outcome": "failed",
+      "details": "def test_reversal_receipt_reconstructs_every_entry_file_on_the_auth_web1_post_state():\n        receipt = json.loads((FIXTURES / \"auth_web_read1_reversal.json\").read_text(encoding=\"utf-8\"))\n        assert receipt[\"phase\"] == \"AUTH.WEB.READ.1\"\n        assert {\"web/app.py\", \"tests/_auth_web1_maintenance.py\", \"tests/test_auth_web1.py\",\n                \"tests/test_auth_web1_browser.py\", \"docs/roadmap/phase_registry.json\"} <= set(receipt[\"files\"])\n        auth_web1_post = {\n            relative: record[\"post_sha256\"]\n            for relative, record in json.loads(\n                (FIXTURES / \"auth_web1_reversal.json\").read_text(encoding=\"utf-8\")\n            )[\"files\"].items()\n        }\n        auth_web1_sources = json.loads(\n            (FIXTURES / \"auth_web1_completion.json\").read_text(encoding=\"utf-8\")\n        )[\"source_sha256\"]\n        for relative, record in receipt[\"files\"].items():\n>           restored = _before_auth_web_read1(relative)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_auth_web_read1.py:953: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\test_auth_web_read1.py:135: in _before_auth_web_read1\n    return before_auth_web_read1(relative)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_auth_web_read1_maintenance.py:18: in before_auth_web_read1\n    current = before_ux_state1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_state1_maintenance.py:18: in before_ux_state1\n    current = before_ux_context1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_context1_maintenance.py:18: in before_ux_context1\n    current = before_control_fresh1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_fresh1_maintenance.py:18: in before_control_fresh1\n    current = before_control_bootstrap1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_bootstrap1_maintenance.py:18: in before_control_bootstrap1\n    current = before_preflight_request1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_candidate_revision_live.py::test_every_frozen_file_is_byte_identical",
+      "outcome": "failed",
+      "details": "def test_every_frozen_file_is_byte_identical():\n        \"\"\"Historical §49 boundaries reconstruct after authorized maintenance.\"\"\"\n    \n        for rel, digest in _fixture()[\"files\"].items():\n>           actual = hashlib.sha256(before_harness_remediation(rel)).hexdigest()\n                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_candidate_revision_live.py:1806: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_harness_maintenance.py:83: in before_harness_remediation\n    current = before_later_receipts(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'core/control_engine.py'\ncontent = b'from __future__ import annotations\\r\\nfrom pathlib import Path\\nimport re\\nimport os\\nimport json\\nfrom typing impor...ctions, or APIs.\",\\r\\n            \"If source_snippet is empty, set needs_escalation=true.\",\\r\\n        ],\\r\\n    }\\r\\n'\nnewer_than = None\n\n    def before_later_receipts(\n        relative: str, content: bytes, *, newer_than: Path | None = None\n    ) -> bytes:\n        # Hunks apply to the raw decoded text: these receipts keep each file's own\n        # line endings, and core/agent_state.py mixes CRLF with LF.\n        # ``newer_than`` stops at that receipt: a phase that pins *current* bytes\n        # undoes only the receipts recorded after its own, never its own or older.\n        # The newer governance phases have their own exact test-only chain.  Undo\n        # them before entering this older receipt format and chronology.\n        from tests._data_undo1_maintenance import before_data_undo1\n    \n        content = before_data_undo1(relative, content)\n        sec_receipt = json.loads(\n            (ROOT / \"tests/fixtures/sec_ui1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        sec_record = sec_receipt[\"files\"].get(relative)\n        if sec_record is not None:\n            text = content.decode(\"utf-8\")\n            for hunk in reversed(sec_record[\"hunks\"]):\n                assert text.count(hunk[\"after\"]) == 1, (\n                    relative,\n                    \"sec_ui1_reversal.json\",\n                    \"non-unique hunk\",\n                )\n                text = text.replace(hunk[\"after\"], hunk[\"before\"], 1)\n            content = text.encode(\"utf-8\")\n            assert hashlib.sha256(content).hexdigest() == sec_record[\"entry_sha256\"], (\n                relative,\n                \"sec_ui1_reversal.json\",\n            )\n        for path in LATER_RECEIPTS:\n            if newer_than is not None and path == newer_than:\n                break\n            receipt = json.loads(path.read_text(encoding=\"utf-8\"))\n            reversal = next((item for item in receipt[\"reversals\"] if item[\"path\"] == relative), None)\n            if reversal is None:\n                continue\n>           assert hashlib.sha256(content).hexdigest() == reversal[\"post_sha256\"], (relative, path.name)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: ('core/control_engine.py', 'patch_author_live3_reversal.json')\n\ntests\\_harness_maintenance.py:69: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_candidate_verification.py::test_frozen_prerequisite_files_are_untouched",
+      "outcome": "failed",
+      "details": "def test_frozen_prerequisite_files_are_untouched():\n        \"\"\"Historical §30 bytes reconstruct after the explicit harness remediation.\"\"\"\n    \n        pinned = json.loads(\n            (ROOT / \"tests\" / \"fixtures\" / \"candidate_verify_live1_frozen_boundaries.json\")\n            .read_text(encoding=\"utf-8\")\n        )\n        import hashlib\n    \n        for relative, digest in sorted(pinned[\"files\"].items()):\n>           actual = hashlib.sha256(before_harness_remediation(relative)).hexdigest()\n                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_candidate_verification.py:1601: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_harness_maintenance.py:83: in before_harness_remediation\n    current = before_later_receipts(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'core/control_engine.py'\ncontent = b'from __future__ import annotations\\r\\nfrom pathlib import Path\\nimport re\\nimport os\\nimport json\\nfrom typing impor...ctions, or APIs.\",\\r\\n            \"If source_snippet is empty, set needs_escalation=true.\",\\r\\n        ],\\r\\n    }\\r\\n'\nnewer_than = None\n\n    def before_later_receipts(\n        relative: str, content: bytes, *, newer_than: Path | None = None\n    ) -> bytes:\n        # Hunks apply to the raw decoded text: these receipts keep each file's own\n        # line endings, and core/agent_state.py mixes CRLF with LF.\n        # ``newer_than`` stops at that receipt: a phase that pins *current* bytes\n        # undoes only the receipts recorded after its own, never its own or older.\n        # The newer governance phases have their own exact test-only chain.  Undo\n        # them before entering this older receipt format and chronology.\n        from tests._data_undo1_maintenance import before_data_undo1\n    \n        content = before_data_undo1(relative, content)\n        sec_receipt = json.loads(\n            (ROOT / \"tests/fixtures/sec_ui1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        sec_record = sec_receipt[\"files\"].get(relative)\n        if sec_record is not None:\n            text = content.decode(\"utf-8\")\n            for hunk in reversed(sec_record[\"hunks\"]):\n                assert text.count(hunk[\"after\"]) == 1, (\n                    relative,\n                    \"sec_ui1_reversal.json\",\n                    \"non-unique hunk\",\n                )\n                text = text.replace(hunk[\"after\"], hunk[\"before\"], 1)\n            content = text.encode(\"utf-8\")\n            assert hashlib.sha256(content).hexdigest() == sec_record[\"entry_sha256\"], (\n                relative,\n                \"sec_ui1_reversal.json\",\n            )\n        for path in LATER_RECEIPTS:\n            if newer_than is not None and path == newer_than:\n                break\n            receipt = json.loads(path.read_text(encoding=\"utf-8\"))\n            reversal = next((item for item in receipt[\"reversals\"] if item[\"path\"] == relative), None)\n            if reversal is None:\n                continue\n>           assert hashlib.sha256(content).hexdigest() == reversal[\"post_sha256\"], (relative, path.name)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: ('core/control_engine.py', 'patch_author_live3_reversal.json')\n\ntests\\_harness_maintenance.py:69: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_control_bootstrap1.py::test_completion_receipt_pins_every_phase_source_and_records_the_bootstrap",
+      "outcome": "failed",
+      "details": "def test_completion_receipt_pins_every_phase_source_and_records_the_bootstrap():\n        receipt = json.loads((FIXTURES / \"control_bootstrap1_completion.json\").read_text(encoding=\"utf-8\"))\n        assert receipt[\"phase\"] == \"CONTROL.BOOTSTRAP.1\"\n        assert receipt[\"fresh_generate_executable_with_explicit_targets\"] is True\n        assert receipt[\"required_follow_up\"] == [\"PREFLIGHT.REQUEST.1\"]\n        assert receipt[\"model_calls_in_tests\"] == 0 and receipt[\"external_network_requests\"] == 0\n        assert receipt[\"production_bootstrap_model_calls_per_fresh_request\"] == 1\n        assert set(receipt[\"frozen_production_deltas\"].values()) == {0}\n        assert receipt[\"graph_index_embedding_traversal_delta\"] == {\n            \"canonical_graph_operations\": 0, \"activation_graph_operations\": 0, \"indexing_operations\": 0,\n            \"embedding_operations\": 0, \"repository_membership_traversals\": 0}\n        assert set(receipt[\"existing_files_changed\"]) == set(EXISTING_FILES_CHANGED)\n        assert set(receipt[\"new_files\"]) == set(NEW_FILES)\n        expected = set(EXISTING_FILES_CHANGED + NEW_FILES)\n        expected.remove(\"tests/fixtures/control_bootstrap1_completion.json\")\n        assert set(receipt[\"source_sha256\"]) == expected\n        for relative, digest in receipt[\"source_sha256\"].items():\n>           assert _sha(_post_state(relative)) == digest, relative\n                        ^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_control_bootstrap1.py:1336: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\test_control_bootstrap1.py:1103: in _post_state\n    return before_preflight_request1(relative)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_control_bootstrap1.py::test_frozen_phase_boundaries_are_byte_exact",
+      "outcome": "failed",
+      "details": "def test_frozen_phase_boundaries_are_byte_exact():\n        manifest = json.loads((FIXTURES / \"control_bootstrap1_frozen_boundaries.json\").read_text(encoding=\"utf-8\"))\n        assert manifest[\"phase\"] == \"CONTROL.BOOTSTRAP.1\"\n        for relative, digest in manifest[\"sha256\"].items():\n>           assert _sha(_post_state(relative)) == digest, relative\nE           AssertionError: core/control_engine.py\nE           assert '369b33a83e8e...e55d2d9da74fd' == 'a29d8db26371...669a9421fa8e7'\nE             \nE             - a29d8db26371fa9c92a08d9127929f7bacf776765526ed2bf17669a9421fa8e7\nE             + 369b33a83e8ead1e9ec64287f693fd86507f7b89273b11b256de55d2d9da74fd\n\ntests\\test_control_bootstrap1.py:1299: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_control_bootstrap1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_control_fresh1_post_state",
+      "outcome": "failed",
+      "details": "def test_reversal_receipt_reconstructs_every_entry_file_on_the_control_fresh1_post_state():\n        receipt = json.loads((FIXTURES / \"control_bootstrap1_reversal.json\").read_text(encoding=\"utf-8\"))\n        assert receipt[\"phase\"] == \"CONTROL.BOOTSTRAP.1\"\n        assert set(receipt[\"files\"]) == set(EXISTING_FILES_CHANGED)\n        anchors: dict[str, str] = {}\n        for name, key in ((\"control_fresh1_frozen_boundaries.json\", \"sha256\"),\n                          (\"control_fresh1_completion.json\", \"source_sha256\")):\n            anchors.update(json.loads((FIXTURES / name).read_text(encoding=\"utf-8\"))[key])  # newest pin wins\n        for relative, record in receipt[\"files\"].items():\n>           restored = _control_fresh1_bytes(relative)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_control_bootstrap1.py:1289: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\test_control_bootstrap1.py:1096: in _control_fresh1_bytes\n    return before_control_bootstrap1(relative)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_bootstrap1_maintenance.py:18: in before_control_bootstrap1\n    current = before_preflight_request1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_control_fresh1.py::test_completion_receipt_pins_every_phase_source_and_records_the_bootstrap_boundary",
+      "outcome": "failed",
+      "details": "def test_completion_receipt_pins_every_phase_source_and_records_the_bootstrap_boundary():\n        receipt = json.loads((FIXTURES / \"control_fresh1_completion.json\").read_text(encoding=\"utf-8\"))\n        assert receipt[\"phase\"] == \"CONTROL.FRESH.1\"\n        assert receipt[\"fresh_generate_executable\"] is False\n        assert receipt[\"required_follow_up\"] == [\"CONTROL.BOOTSTRAP.1\"]\n        assert receipt[\"model_calls\"] == 0 and receipt[\"external_network_requests\"] == 0\n        assert set(receipt[\"frozen_production_deltas\"].values()) == {0}\n        assert set(receipt[\"existing_files_changed\"]) == set(EXISTING_FILES_CHANGED)\n        assert set(receipt[\"new_files\"]) == set(NEW_FILES)\n        expected = set(EXISTING_FILES_CHANGED + NEW_FILES)\n        expected.remove(\"tests/fixtures/control_fresh1_completion.json\")\n        assert set(receipt[\"source_sha256\"]) == expected\n        for relative, digest in receipt[\"source_sha256\"].items():\n>           assert _sha(_post_state(relative)) == digest, relative\n                        ^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_control_fresh1.py:682: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\test_control_fresh1.py:497: in _post_state\n    return before_control_bootstrap1(relative)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_bootstrap1_maintenance.py:18: in before_control_bootstrap1\n    current = before_preflight_request1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_control_fresh1.py::test_frozen_phase_boundaries_are_byte_exact",
+      "outcome": "failed",
+      "details": "def test_frozen_phase_boundaries_are_byte_exact():\n        manifest = json.loads((FIXTURES / \"control_fresh1_frozen_boundaries.json\").read_text(encoding=\"utf-8\"))\n        assert manifest[\"phase\"] == \"CONTROL.FRESH.1\"\n        for relative, digest in manifest[\"sha256\"].items():\n>           assert _sha(_post_state(relative)) == digest, relative\nE           AssertionError: core/control_engine.py\nE           assert '369b33a83e8e...e55d2d9da74fd' == 'a29d8db26371...669a9421fa8e7'\nE             \nE             - a29d8db26371fa9c92a08d9127929f7bacf776765526ed2bf17669a9421fa8e7\nE             + 369b33a83e8ead1e9ec64287f693fd86507f7b89273b11b256de55d2d9da74fd\n\ntests\\test_control_fresh1.py:650: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_control_fresh1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_ux_context1_post_state",
+      "outcome": "failed",
+      "details": "def test_reversal_receipt_reconstructs_every_entry_file_on_the_ux_context1_post_state():\n        receipt = json.loads((FIXTURES / \"control_fresh1_reversal.json\").read_text(encoding=\"utf-8\"))\n        assert receipt[\"phase\"] == \"CONTROL.FRESH.1\"\n        assert set(receipt[\"files\"]) == set(EXISTING_FILES_CHANGED)\n        anchors: dict[str, str] = {}\n        for name, key in ((\"ux_state1_completion.json\", \"source_sha256\"),\n                          (\"ux_context1_frozen_boundaries.json\", \"sha256\"),\n                          (\"ux_context1_completion.json\", \"source_sha256\")):\n            anchors.update(json.loads((FIXTURES / name).read_text(encoding=\"utf-8\"))[key])  # newest pin wins\n        for relative, record in receipt[\"files\"].items():\n>           restored = _entry_bytes(relative)\n                       ^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_control_fresh1.py:640: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\test_control_fresh1.py:490: in _entry_bytes\n    return before_control_fresh1(relative)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_fresh1_maintenance.py:18: in before_control_fresh1\n    current = before_control_bootstrap1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_bootstrap1_maintenance.py:18: in before_control_bootstrap1\n    current = before_preflight_request1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_data_rollback1.py::test_completion_receipt_pins_every_phase_source",
+      "outcome": "failed",
+      "details": "def test_completion_receipt_pins_every_phase_source():\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/data_rollback1_completion.json\").read_text(\n                encoding=\"utf-8\"\n            )\n        )\n        assert receipt[\"phase\"] == \"DATA.ROLLBACK.1\"\n        assert receipt[\"closed_finding\"] == \"DATA-02\"\n        assert receipt[\"model_calls\"] == 0\n        assert receipt[\"external_network_requests\"] == 0\n        expected = set(receipt[\"existing_files_changed\"] + receipt[\"new_files\"])\n        expected.remove(\"tests/fixtures/data_rollback1_completion.json\")\n        assert set(receipt[\"source_sha256\"]) == expected\n        for relative, digest in receipt[\"source_sha256\"].items():\n>           assert hashlib.sha256(before_auth_web1(relative)).hexdigest() == digest\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_data_rollback1.py:560: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_auth_web1_maintenance.py:18: in before_auth_web1\n    current = before_auth_web_read1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_auth_web_read1_maintenance.py:18: in before_auth_web_read1\n    current = before_ux_state1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_state1_maintenance.py:18: in before_ux_state1\n    current = before_ux_context1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_context1_maintenance.py:18: in before_ux_context1\n    current = before_control_fresh1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_fresh1_maintenance.py:18: in before_control_fresh1\n    current = before_control_bootstrap1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_bootstrap1_maintenance.py:18: in before_control_bootstrap1\n    current = before_preflight_request1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_data_rollback1.py::test_reversal_receipt_reconstructs_every_entry_file",
+      "outcome": "failed",
+      "details": "def test_reversal_receipt_reconstructs_every_entry_file():\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/data_rollback1_reversal.json\").read_text(\n                encoding=\"utf-8\"\n            )\n        )\n        for relative, record in receipt[\"files\"].items():\n>           restored = before_data_rollback1(relative)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_data_rollback1.py:521: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_data_rollback1_maintenance.py:20: in before_data_rollback1\n    current = before_auth_web1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_auth_web1_maintenance.py:18: in before_auth_web1\n    current = before_auth_web_read1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_auth_web_read1_maintenance.py:18: in before_auth_web_read1\n    current = before_ux_state1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_state1_maintenance.py:18: in before_ux_state1\n    current = before_ux_context1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_context1_maintenance.py:18: in before_ux_context1\n    current = before_control_fresh1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_fresh1_maintenance.py:18: in before_control_fresh1\n    current = before_control_bootstrap1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_bootstrap1_maintenance.py:18: in before_control_bootstrap1\n    current = before_preflight_request1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_data_undo1.py::test_frozen_entry_hashes_and_reviewable_reversal",
+      "outcome": "failed",
+      "details": "def test_frozen_entry_hashes_and_reviewable_reversal():\n        from tests._data_undo1_maintenance import before_data_undo1\n        fixture = json.loads((ROOT / \"tests/fixtures/data_undo1_frozen_boundaries.json\").read_text(encoding=\"utf-8\"))\n        for name, digest in fixture[\"sha256\"].items():\n>           assert hashlib.sha256(before_data_undo1(name)).hexdigest() == digest, name\n                                  ^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_data_undo1.py:462: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_data_undo1_maintenance.py:12: in before_data_undo1\n    current = before_exec_plan1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_exec_plan1_maintenance.py:12: in before_exec_plan1\n    current = before_auth_dream1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_auth_dream1_maintenance.py:14: in before_auth_dream1\n    current = before_data_rollback1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_data_rollback1_maintenance.py:20: in before_data_rollback1\n    current = before_auth_web1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_auth_web1_maintenance.py:18: in before_auth_web1\n    current = before_auth_web_read1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_auth_web_read1_maintenance.py:18: in before_auth_web_read1\n    current = before_ux_state1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_state1_maintenance.py:18: in before_ux_state1\n    current = before_ux_context1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_context1_maintenance.py:18: in before_ux_context1\n    current = before_control_fresh1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_fresh1_maintenance.py:18: in before_control_fresh1\n    current = before_control_bootstrap1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_bootstrap1_maintenance.py:18: in before_control_bootstrap1\n    current = before_preflight_request1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_exec_plan1.py::test_exact_entry_reversal_and_frozen_surfaces",
+      "outcome": "failed",
+      "details": "def test_exact_entry_reversal_and_frozen_surfaces():\n        from tests._exec_plan1_maintenance import before_exec_plan1\n        fixture = json.loads((ROOT / 'tests/fixtures/exec_plan1_frozen_boundaries.json').read_text())\n        for name, digest in fixture['sha256'].items():\n>           assert hashlib.sha256(before_exec_plan1(name)).hexdigest() == digest, name\nE           AssertionError: core/control_engine.py\nE           assert '369b33a83e8e...e55d2d9da74fd' == 'a29d8db26371...669a9421fa8e7'\nE             \nE             - a29d8db26371fa9c92a08d9127929f7bacf776765526ed2bf17669a9421fa8e7\nE             + 369b33a83e8ead1e9ec64287f693fd86507f7b89273b11b256de55d2d9da74fd\n\ntests\\test_exec_plan1.py:519: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_indent_semantics1.py::test_every_frozen_boundary_is_byte_identical",
+      "outcome": "failed",
+      "details": "def test_every_frozen_boundary_is_byte_identical():\n        \"\"\"§60 — evaluated through the receipt chain, never re-pinned.\"\"\"\n    \n        from _harness_maintenance import before_later_receipts\n    \n        frozen = json.loads(FROZEN_FIXTURE.read_text(encoding=\"utf-8\"))\n        assert frozen[\"phase_id\"] == \"INDENT.SEMANTICS.1\"\n        drifted = [\n            relative\n            for relative, pinned in frozen[\"files\"].items()\n            if hashlib.sha256(\n>               before_later_receipts(\n                    relative,\n                    (ROOT / relative).read_bytes(),\n                    newer_than=REVERSAL_FIXTURE,\n                )\n            ).hexdigest()\n            != pinned\n        ]\n\ntests\\test_indent_semantics1.py:2484: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'core/control_engine.py'\ncontent = b'from __future__ import annotations\\r\\nfrom pathlib import Path\\nimport re\\nimport os\\nimport json\\nfrom typing impor...ctions, or APIs.\",\\r\\n            \"If source_snippet is empty, set needs_escalation=true.\",\\r\\n        ],\\r\\n    }\\r\\n'\nnewer_than = WindowsPath('C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/indent_semantics1_reversal.json')\n\n    def before_later_receipts(\n        relative: str, content: bytes, *, newer_than: Path | None = None\n    ) -> bytes:\n        # Hunks apply to the raw decoded text: these receipts keep each file's own\n        # line endings, and core/agent_state.py mixes CRLF with LF.\n        # ``newer_than`` stops at that receipt: a phase that pins *current* bytes\n        # undoes only the receipts recorded after its own, never its own or older.\n        # The newer governance phases have their own exact test-only chain.  Undo\n        # them before entering this older receipt format and chronology.\n        from tests._data_undo1_maintenance import before_data_undo1\n    \n        content = before_data_undo1(relative, content)\n        sec_receipt = json.loads(\n            (ROOT / \"tests/fixtures/sec_ui1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        sec_record = sec_receipt[\"files\"].get(relative)\n        if sec_record is not None:\n            text = content.decode(\"utf-8\")\n            for hunk in reversed(sec_record[\"hunks\"]):\n                assert text.count(hunk[\"after\"]) == 1, (\n                    relative,\n                    \"sec_ui1_reversal.json\",\n                    \"non-unique hunk\",\n                )\n                text = text.replace(hunk[\"after\"], hunk[\"before\"], 1)\n            content = text.encode(\"utf-8\")\n            assert hashlib.sha256(content).hexdigest() == sec_record[\"entry_sha256\"], (\n                relative,\n                \"sec_ui1_reversal.json\",\n            )\n        for path in LATER_RECEIPTS:\n            if newer_than is not None and path == newer_than:\n                break\n            receipt = json.loads(path.read_text(encoding=\"utf-8\"))\n            reversal = next((item for item in receipt[\"reversals\"] if item[\"path\"] == relative), None)\n            if reversal is None:\n                continue\n>           assert hashlib.sha256(content).hexdigest() == reversal[\"post_sha256\"], (relative, path.name)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: ('core/control_engine.py', 'patch_author_live3_reversal.json')\n\ntests\\_harness_maintenance.py:69: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_patch_authoring_contract_live2.py::test_the_change_is_a_reversible_containment_proof",
+      "outcome": "failed",
+      "details": "def test_the_change_is_a_reversible_containment_proof():\n        \"\"\"Every changed file's pre-phase bytes are reproducible from the shipped one.\n    \n        The remediation is undone first.  Its core/pipeline.py preimage is exactly\n        this phase's post, so the pipeline chain is shipped -> LIVE.2 post ->\n        LIVE.2 pre, and LIVE.2's pre is PATCH.AUTHOR.LIVE.1's post byte for byte.\n        Every digest asserted here is this fixture's own.\n        \"\"\"\n    \n        fixture = _fixture()\n        for reversal in fixture[\"reversals\"]:\n            path = reversal[\"path\"]\n>           post = before_harness_remediation(path).decode(\"utf-8\")\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_patch_authoring_contract_live2.py:1077: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_harness_maintenance.py:83: in before_harness_remediation\n    current = before_later_receipts(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'core/control_engine.py'\ncontent = b'from __future__ import annotations\\r\\nfrom pathlib import Path\\nimport re\\nimport os\\nimport json\\nfrom typing impor...ctions, or APIs.\",\\r\\n            \"If source_snippet is empty, set needs_escalation=true.\",\\r\\n        ],\\r\\n    }\\r\\n'\nnewer_than = None\n\n    def before_later_receipts(\n        relative: str, content: bytes, *, newer_than: Path | None = None\n    ) -> bytes:\n        # Hunks apply to the raw decoded text: these receipts keep each file's own\n        # line endings, and core/agent_state.py mixes CRLF with LF.\n        # ``newer_than`` stops at that receipt: a phase that pins *current* bytes\n        # undoes only the receipts recorded after its own, never its own or older.\n        # The newer governance phases have their own exact test-only chain.  Undo\n        # them before entering this older receipt format and chronology.\n        from tests._data_undo1_maintenance import before_data_undo1\n    \n        content = before_data_undo1(relative, content)\n        sec_receipt = json.loads(\n            (ROOT / \"tests/fixtures/sec_ui1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        sec_record = sec_receipt[\"files\"].get(relative)\n        if sec_record is not None:\n            text = content.decode(\"utf-8\")\n            for hunk in reversed(sec_record[\"hunks\"]):\n                assert text.count(hunk[\"after\"]) == 1, (\n                    relative,\n                    \"sec_ui1_reversal.json\",\n                    \"non-unique hunk\",\n                )\n                text = text.replace(hunk[\"after\"], hunk[\"before\"], 1)\n            content = text.encode(\"utf-8\")\n            assert hashlib.sha256(content).hexdigest() == sec_record[\"entry_sha256\"], (\n                relative,\n                \"sec_ui1_reversal.json\",\n            )\n        for path in LATER_RECEIPTS:\n            if newer_than is not None and path == newer_than:\n                break\n            receipt = json.loads(path.read_text(encoding=\"utf-8\"))\n            reversal = next((item for item in receipt[\"reversals\"] if item[\"path\"] == relative), None)\n            if reversal is None:\n                continue\n>           assert hashlib.sha256(content).hexdigest() == reversal[\"post_sha256\"], (relative, path.name)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: ('core/control_engine.py', 'patch_author_live3_reversal.json')\n\ntests\\_harness_maintenance.py:69: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_patch_authoring_contract_live2.py::test_the_containment_is_one_new_accessor_and_four_touched_definitions",
+      "outcome": "failed",
+      "details": "def test_the_containment_is_one_new_accessor_and_four_touched_definitions():\n        \"\"\"Nothing was removed, and nothing outside the contract path was rewritten.\"\"\"\n    \n        def definitions(source: str) -> dict[str, str]:\n            return {\n                node.name: hashlib.sha256(ast.dump(node).encode(\"utf-8\")).hexdigest()\n                for node in ast.parse(source).body\n                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))\n            }\n    \n        expected = {\n            \"core/candidate_revision.py\": (\n                [],\n                [\"CandidateRevisionReceipt\", \"build_revision_prompt\", \"candidate_revision_guardrails\"],\n            ),\n            \"core/control_engine.py\": (\n                [\"authoring_contract_for_control_result\"],\n                [\"_patch_output_format_block\", \"_safe_minimal_forbidden_block\", \"build_control_prompt\"],\n            ),\n            \"core/pipeline.py\": ([], [\"_maybe_revise_rejected_candidate\"]),\n            \"core/prompter.py\": ([], []),\n        }\n        seen = {}\n        for reversal in _fixture()[\"reversals\"]:\n            # Compare LIVE.2's own post with LIVE.2's own pre: the remediation that\n            # came later is undone first, so it cannot appear as this phase's diff.\n>           post_text = before_harness_remediation(reversal[\"path\"]).decode(\"utf-8\")\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_patch_authoring_contract_live2.py:1120: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_harness_maintenance.py:83: in before_harness_remediation\n    current = before_later_receipts(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'core/control_engine.py'\ncontent = b'from __future__ import annotations\\r\\nfrom pathlib import Path\\nimport re\\nimport os\\nimport json\\nfrom typing impor...ctions, or APIs.\",\\r\\n            \"If source_snippet is empty, set needs_escalation=true.\",\\r\\n        ],\\r\\n    }\\r\\n'\nnewer_than = None\n\n    def before_later_receipts(\n        relative: str, content: bytes, *, newer_than: Path | None = None\n    ) -> bytes:\n        # Hunks apply to the raw decoded text: these receipts keep each file's own\n        # line endings, and core/agent_state.py mixes CRLF with LF.\n        # ``newer_than`` stops at that receipt: a phase that pins *current* bytes\n        # undoes only the receipts recorded after its own, never its own or older.\n        # The newer governance phases have their own exact test-only chain.  Undo\n        # them before entering this older receipt format and chronology.\n        from tests._data_undo1_maintenance import before_data_undo1\n    \n        content = before_data_undo1(relative, content)\n        sec_receipt = json.loads(\n            (ROOT / \"tests/fixtures/sec_ui1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        sec_record = sec_receipt[\"files\"].get(relative)\n        if sec_record is not None:\n            text = content.decode(\"utf-8\")\n            for hunk in reversed(sec_record[\"hunks\"]):\n                assert text.count(hunk[\"after\"]) == 1, (\n                    relative,\n                    \"sec_ui1_reversal.json\",\n                    \"non-unique hunk\",\n                )\n                text = text.replace(hunk[\"after\"], hunk[\"before\"], 1)\n            content = text.encode(\"utf-8\")\n            assert hashlib.sha256(content).hexdigest() == sec_record[\"entry_sha256\"], (\n                relative,\n                \"sec_ui1_reversal.json\",\n            )\n        for path in LATER_RECEIPTS:\n            if newer_than is not None and path == newer_than:\n                break\n            receipt = json.loads(path.read_text(encoding=\"utf-8\"))\n            reversal = next((item for item in receipt[\"reversals\"] if item[\"path\"] == relative), None)\n            if reversal is None:\n                continue\n>           assert hashlib.sha256(content).hexdigest() == reversal[\"post_sha256\"], (relative, path.name)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: ('core/control_engine.py', 'patch_author_live3_reversal.json')\n\ntests\\_harness_maintenance.py:69: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_patch_minimal_novelty_live.py::test_every_other_frozen_boundary_file_is_byte_identical[candidate_verify_live1_frozen_boundaries.json]",
+      "outcome": "failed",
+      "details": "fixture_name = 'candidate_verify_live1_frozen_boundaries.json'\n\n    @pytest.mark.parametrize(\n        \"fixture_name\",\n        [\n            \"defect_probe_live4_frozen_boundaries.json\",\n            \"candidate_verify_live1_frozen_boundaries.json\",\n        ],\n    )\n    def test_every_other_frozen_boundary_file_is_byte_identical(fixture_name):\n        \"\"\"Historical §33 boundaries still reconstruct after authorized maintenance.\"\"\"\n    \n        fixture = json.loads(\n            (ROOT / \"tests\" / \"fixtures\" / fixture_name).read_text(encoding=\"utf-8\")\n        )\n        for rel, digest in fixture[\"files\"].items():\n>           actual = hashlib.sha256(before_harness_remediation(rel)).hexdigest()\n                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_patch_minimal_novelty_live.py:1486: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_harness_maintenance.py:83: in before_harness_remediation\n    current = before_later_receipts(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'core/control_engine.py'\ncontent = b'from __future__ import annotations\\r\\nfrom pathlib import Path\\nimport re\\nimport os\\nimport json\\nfrom typing impor...ctions, or APIs.\",\\r\\n            \"If source_snippet is empty, set needs_escalation=true.\",\\r\\n        ],\\r\\n    }\\r\\n'\nnewer_than = None\n\n    def before_later_receipts(\n        relative: str, content: bytes, *, newer_than: Path | None = None\n    ) -> bytes:\n        # Hunks apply to the raw decoded text: these receipts keep each file's own\n        # line endings, and core/agent_state.py mixes CRLF with LF.\n        # ``newer_than`` stops at that receipt: a phase that pins *current* bytes\n        # undoes only the receipts recorded after its own, never its own or older.\n        # The newer governance phases have their own exact test-only chain.  Undo\n        # them before entering this older receipt format and chronology.\n        from tests._data_undo1_maintenance import before_data_undo1\n    \n        content = before_data_undo1(relative, content)\n        sec_receipt = json.loads(\n            (ROOT / \"tests/fixtures/sec_ui1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        sec_record = sec_receipt[\"files\"].get(relative)\n        if sec_record is not None:\n            text = content.decode(\"utf-8\")\n            for hunk in reversed(sec_record[\"hunks\"]):\n                assert text.count(hunk[\"after\"]) == 1, (\n                    relative,\n                    \"sec_ui1_reversal.json\",\n                    \"non-unique hunk\",\n                )\n                text = text.replace(hunk[\"after\"], hunk[\"before\"], 1)\n            content = text.encode(\"utf-8\")\n            assert hashlib.sha256(content).hexdigest() == sec_record[\"entry_sha256\"], (\n                relative,\n                \"sec_ui1_reversal.json\",\n            )\n        for path in LATER_RECEIPTS:\n            if newer_than is not None and path == newer_than:\n                break\n            receipt = json.loads(path.read_text(encoding=\"utf-8\"))\n            reversal = next((item for item in receipt[\"reversals\"] if item[\"path\"] == relative), None)\n            if reversal is None:\n                continue\n>           assert hashlib.sha256(content).hexdigest() == reversal[\"post_sha256\"], (relative, path.name)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: ('core/control_engine.py', 'patch_author_live3_reversal.json')\n\ntests\\_harness_maintenance.py:69: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_patch_minimal_novelty_live.py::test_every_other_frozen_boundary_file_is_byte_identical[defect_probe_live4_frozen_boundaries.json]",
+      "outcome": "failed",
+      "details": "fixture_name = 'defect_probe_live4_frozen_boundaries.json'\n\n    @pytest.mark.parametrize(\n        \"fixture_name\",\n        [\n            \"defect_probe_live4_frozen_boundaries.json\",\n            \"candidate_verify_live1_frozen_boundaries.json\",\n        ],\n    )\n    def test_every_other_frozen_boundary_file_is_byte_identical(fixture_name):\n        \"\"\"Historical §33 boundaries still reconstruct after authorized maintenance.\"\"\"\n    \n        fixture = json.loads(\n            (ROOT / \"tests\" / \"fixtures\" / fixture_name).read_text(encoding=\"utf-8\")\n        )\n        for rel, digest in fixture[\"files\"].items():\n>           actual = hashlib.sha256(before_harness_remediation(rel)).hexdigest()\n                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_patch_minimal_novelty_live.py:1486: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_harness_maintenance.py:83: in before_harness_remediation\n    current = before_later_receipts(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'core/control_engine.py'\ncontent = b'from __future__ import annotations\\r\\nfrom pathlib import Path\\nimport re\\nimport os\\nimport json\\nfrom typing impor...ctions, or APIs.\",\\r\\n            \"If source_snippet is empty, set needs_escalation=true.\",\\r\\n        ],\\r\\n    }\\r\\n'\nnewer_than = None\n\n    def before_later_receipts(\n        relative: str, content: bytes, *, newer_than: Path | None = None\n    ) -> bytes:\n        # Hunks apply to the raw decoded text: these receipts keep each file's own\n        # line endings, and core/agent_state.py mixes CRLF with LF.\n        # ``newer_than`` stops at that receipt: a phase that pins *current* bytes\n        # undoes only the receipts recorded after its own, never its own or older.\n        # The newer governance phases have their own exact test-only chain.  Undo\n        # them before entering this older receipt format and chronology.\n        from tests._data_undo1_maintenance import before_data_undo1\n    \n        content = before_data_undo1(relative, content)\n        sec_receipt = json.loads(\n            (ROOT / \"tests/fixtures/sec_ui1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        sec_record = sec_receipt[\"files\"].get(relative)\n        if sec_record is not None:\n            text = content.decode(\"utf-8\")\n            for hunk in reversed(sec_record[\"hunks\"]):\n                assert text.count(hunk[\"after\"]) == 1, (\n                    relative,\n                    \"sec_ui1_reversal.json\",\n                    \"non-unique hunk\",\n                )\n                text = text.replace(hunk[\"after\"], hunk[\"before\"], 1)\n            content = text.encode(\"utf-8\")\n            assert hashlib.sha256(content).hexdigest() == sec_record[\"entry_sha256\"], (\n                relative,\n                \"sec_ui1_reversal.json\",\n            )\n        for path in LATER_RECEIPTS:\n            if newer_than is not None and path == newer_than:\n                break\n            receipt = json.loads(path.read_text(encoding=\"utf-8\"))\n            reversal = next((item for item in receipt[\"reversals\"] if item[\"path\"] == relative), None)\n            if reversal is None:\n                continue\n>           assert hashlib.sha256(content).hexdigest() == reversal[\"post_sha256\"], (relative, path.name)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: ('core/control_engine.py', 'patch_author_live3_reversal.json')\n\ntests\\_harness_maintenance.py:69: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_patch_minimal_result_fields_live3.py::test_combined_phase_frozen_bytes_and_reversal_receipt",
+      "outcome": "failed",
+      "details": "def test_combined_phase_frozen_bytes_and_reversal_receipt():\n        from _harness_maintenance import before_later_receipts\n        receipt = ROOT / \"tests/fixtures/patch_minimal_live3_reversal.json\"\n        for item in json.loads(receipt.read_text())[\"reversals\"]:\n            restored = before_later_receipts(item[\"path\"], (ROOT / item[\"path\"]).read_bytes(),\n                                             newer_than=ROOT / \"tests/fixtures/indent_runtime1_reversal.json\")\n            assert hashlib.sha256(restored).hexdigest() == item[\"pre_sha256\"]\n        frozen = json.loads((ROOT / \"tests/fixtures/patch_minimal_live3_frozen_boundaries.json\").read_text())\n        for relative, digest in frozen[\"files\"].items():\n            if relative == \"web/sessions.json\":\n                # Runtime session data is intentionally mutable and earlier tests in\n                # the same process write it; it is not a frozen production source.\n                continue\n>           assert hashlib.sha256(before_later_receipts(relative, (ROOT / relative).read_bytes(), newer_than=receipt)).hexdigest() == digest, relative\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_patch_minimal_result_fields_live3.py:409: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'core/control_engine.py'\ncontent = b'from __future__ import annotations\\r\\nfrom pathlib import Path\\nimport re\\nimport os\\nimport json\\nfrom typing impor...ctions, or APIs.\",\\r\\n            \"If source_snippet is empty, set needs_escalation=true.\",\\r\\n        ],\\r\\n    }\\r\\n'\nnewer_than = WindowsPath('C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_minimal_live3_reversal.json')\n\n    def before_later_receipts(\n        relative: str, content: bytes, *, newer_than: Path | None = None\n    ) -> bytes:\n        # Hunks apply to the raw decoded text: these receipts keep each file's own\n        # line endings, and core/agent_state.py mixes CRLF with LF.\n        # ``newer_than`` stops at that receipt: a phase that pins *current* bytes\n        # undoes only the receipts recorded after its own, never its own or older.\n        # The newer governance phases have their own exact test-only chain.  Undo\n        # them before entering this older receipt format and chronology.\n        from tests._data_undo1_maintenance import before_data_undo1\n    \n        content = before_data_undo1(relative, content)\n        sec_receipt = json.loads(\n            (ROOT / \"tests/fixtures/sec_ui1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        sec_record = sec_receipt[\"files\"].get(relative)\n        if sec_record is not None:\n            text = content.decode(\"utf-8\")\n            for hunk in reversed(sec_record[\"hunks\"]):\n                assert text.count(hunk[\"after\"]) == 1, (\n                    relative,\n                    \"sec_ui1_reversal.json\",\n                    \"non-unique hunk\",\n                )\n                text = text.replace(hunk[\"after\"], hunk[\"before\"], 1)\n            content = text.encode(\"utf-8\")\n            assert hashlib.sha256(content).hexdigest() == sec_record[\"entry_sha256\"], (\n                relative,\n                \"sec_ui1_reversal.json\",\n            )\n        for path in LATER_RECEIPTS:\n            if newer_than is not None and path == newer_than:\n                break\n            receipt = json.loads(path.read_text(encoding=\"utf-8\"))\n            reversal = next((item for item in receipt[\"reversals\"] if item[\"path\"] == relative), None)\n            if reversal is None:\n                continue\n>           assert hashlib.sha256(content).hexdigest() == reversal[\"post_sha256\"], (relative, path.name)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: ('core/control_engine.py', 'patch_author_live3_reversal.json')\n\ntests\\_harness_maintenance.py:69: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_preflight_request1.py::test_completion_receipt_pins_every_phase_source_and_records_the_measurement",
+      "outcome": "failed",
+      "details": "def test_completion_receipt_pins_every_phase_source_and_records_the_measurement():\n        receipt = json.loads((FIXTURES / \"preflight_request1_completion.json\").read_text(encoding=\"utf-8\"))\n        assert receipt[\"phase\"] == PHASE\n        assert receipt[\"executable_evidence_kinds\"] == [\"compile_evidence\"]\n        assert receipt[\"model_calls_in_tests\"] == 0 and receipt[\"external_network_requests\"] == 0\n        assert receipt[\"diagnostic_model_calls_per_request\"] == 0 and receipt[\"max_diagnostic_cycles_per_request\"] == 1\n        assert set(receipt[\"frozen_production_deltas\"].values()) == {0}\n        assert receipt[\"graph_index_embedding_traversal_delta\"] == {\n            \"canonical_graph_operations\": 0, \"activation_graph_operations\": 0, \"indexing_operations\": 0,\n            \"embedding_operations\": 0, \"repository_membership_traversals\": 0}\n        assert receipt[\"deferred\"] == [\"CAPABILITY.BROKER.1\", \"CRLF remediation\"]\n        assert set(receipt[\"existing_files_changed\"]) == set(EXISTING_FILES_CHANGED)\n        assert set(receipt[\"new_files\"]) == set(NEW_FILES)\n        expected = set(EXISTING_FILES_CHANGED + NEW_FILES)\n        expected.remove(\"tests/fixtures/preflight_request1_completion.json\")\n        assert set(receipt[\"source_sha256\"]) == expected\n        for relative, digest in receipt[\"source_sha256\"].items():\n>           assert _sha(_post_state(relative)) == digest, relative\n                        ^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_preflight_request1.py:1499: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\test_preflight_request1.py:1361: in _post_state\n    return before_patch_basis_target1(relative)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py', content = None\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_preflight_request1.py::test_frozen_phase_boundaries_are_byte_exact",
+      "outcome": "failed",
+      "details": "def test_frozen_phase_boundaries_are_byte_exact():\n        manifest = json.loads((FIXTURES / \"preflight_request1_frozen_boundaries.json\").read_text(encoding=\"utf-8\"))\n        assert manifest[\"phase\"] == PHASE\n        for relative, digest in manifest[\"sha256\"].items():\n>           assert _sha(_post_state(relative)) == digest, relative\nE           AssertionError: core/control_engine.py\nE           assert '369b33a83e8e...e55d2d9da74fd' == 'a29d8db26371...669a9421fa8e7'\nE             \nE             - a29d8db26371fa9c92a08d9127929f7bacf776765526ed2bf17669a9421fa8e7\nE             + 369b33a83e8ead1e9ec64287f693fd86507f7b89273b11b256de55d2d9da74fd\n\ntests\\test_preflight_request1.py:1464: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_preflight_request1.py::test_reversal_receipt_reconstructs_every_entry_file_on_the_control_bootstrap1_post_state",
+      "outcome": "failed",
+      "details": "def test_reversal_receipt_reconstructs_every_entry_file_on_the_control_bootstrap1_post_state():\n        receipt = json.loads((FIXTURES / \"preflight_request1_reversal.json\").read_text(encoding=\"utf-8\"))\n        assert receipt[\"phase\"] == PHASE and set(receipt[\"files\"]) == set(EXISTING_FILES_CHANGED)\n        anchors: dict[str, str] = {}\n        for name, key in ((\"control_bootstrap1_frozen_boundaries.json\", \"sha256\"),\n                          (\"control_bootstrap1_completion.json\", \"source_sha256\")):\n            anchors.update(json.loads((FIXTURES / name).read_text(encoding=\"utf-8\"))[key])  # newest pin wins\n        for relative, record in receipt[\"files\"].items():\n>           restored = _entry(relative)\n                       ^^^^^^^^^^^^^^^^\n\ntests\\test_preflight_request1.py:1454: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\test_preflight_request1.py:1354: in _entry\n    return before_preflight_request1(relative)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_sec_ui1.py::test_frozen_entry_bytes_and_original_audit_preserved",
+      "outcome": "failed",
+      "details": "def test_frozen_entry_bytes_and_original_audit_preserved():\n        from tests._data_undo1_maintenance import before_data_undo1\n        manifest = json.loads((FIXTURES / 'sec_ui1_frozen_boundaries.json').read_text())\n        changed = [name for name, digest in manifest['sha256'].items() if hashlib.sha256(before_data_undo1(name)).hexdigest() != digest]\n>       assert changed == []\nE       AssertionError: assert ['core/control_engine.py'] == []\nE         \nE         Left contains one more item: 'core/control_engine.py'\nE         Use -v to get more diff\n\ntests\\test_sec_ui1.py:127: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_sec_ui1.py::test_reversal_reconstructs_entry_without_repinning_history",
+      "outcome": "failed",
+      "details": "def test_reversal_reconstructs_entry_without_repinning_history():\n        from tests._data_undo1_maintenance import before_data_undo1\n        manifest = json.loads((FIXTURES / 'sec_ui1_reversal.json').read_text(encoding='utf-8'))\n        for name, record in manifest['files'].items():\n>           text = before_data_undo1(name).decode('utf-8')\n                   ^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_sec_ui1.py:134: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_data_undo1_maintenance.py:12: in before_data_undo1\n    current = before_exec_plan1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_exec_plan1_maintenance.py:12: in before_exec_plan1\n    current = before_auth_dream1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_auth_dream1_maintenance.py:14: in before_auth_dream1\n    current = before_data_rollback1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_data_rollback1_maintenance.py:20: in before_data_rollback1\n    current = before_auth_web1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_auth_web1_maintenance.py:18: in before_auth_web1\n    current = before_auth_web_read1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_auth_web_read1_maintenance.py:18: in before_auth_web_read1\n    current = before_ux_state1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_state1_maintenance.py:18: in before_ux_state1\n    current = before_ux_context1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_ux_context1_maintenance.py:18: in before_ux_context1\n    current = before_control_fresh1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_fresh1_maintenance.py:18: in before_control_fresh1\n    current = before_control_bootstrap1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_control_bootstrap1_maintenance.py:18: in before_control_bootstrap1\n    current = before_preflight_request1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\_preflight_request1_maintenance.py:18: in before_preflight_request1\n    current = before_patch_basis_target1(relative, current)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'tests/test_phase_registry.py'\ncontent = b'\"\"\"Tests for ROAD.1 \\xc3\\xa2\\xe2\\x82\\xac\\xe2\\x80\\x9d Machine-Readable Phase Registry (report-only).\\r\\n\\r\\nROAD.1 de...IEVE.LIVE.4.READINESS\",\\r\\n        \"RETRIEVE.LIVE.4.CLOSE\",\\r\\n    ):\\r\\n        assert forbidden_phase not in ids\\r\\n'\n\n    def before_patch_basis_target1(relative: str, content: bytes | None = None) -> bytes:\n        current = (ROOT / relative).read_bytes() if content is None else content\n        from tests._patch_basis_scope1_maintenance import before_patch_basis_scope1\n    \n        current = before_patch_basis_scope1(relative, current)\n        receipt = json.loads(\n            (ROOT / \"tests/fixtures/patch_basis_target1_reversal.json\").read_text(encoding=\"utf-8\")\n        )\n        record = receipt[\"files\"].get(relative)\n        if record is None:\n            return current\n        # PATCH.BASIS.SCOPE.1 adds an authoring-only prompt seam in this file.\n        # Its maintenance reversal restores the prior syntax before this target\n        # phase's hunk reversal; mixed historical newline provenance is not a\n        # semantic change to TARGET.1's own structural-grounding definitions.\n        if relative != \"core/control_engine.py\":\n>           assert hashlib.sha256(current).hexdigest() == record[\"post_sha256\"], relative\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           AssertionError: tests/test_phase_registry.py\n\ntests\\_patch_basis_target1_maintenance.py:28: AssertionError"
+    }
+  ],
+  "revision_first_attempt": "Timed out at 600s under concurrent validation; complete isolated rerun recorded above.",
+  "quality_checks": {
+    "registry": "valid; exactly one new phase",
+    "benchmarks_check": {
+      "checked": 54,
+      "errors": 0
+    },
+    "compileall": "passed",
+    "git_diff_check": "passed",
+    "full_suite_run": false
+  },
+  "live_java": {
+    "phase_id": "PATCH.AUTHOR.SPAN.1",
+    "task": "Help me check if the code in twosum.java and MainApp.java is ok, then fix them",
+    "target": "C:\\Users\\Admin\\Documents\\Code\\Side quest\\java",
+    "fresh_control": null,
+    "write_authority": false,
+    "execution_authorized": false,
+    "auto_apply": false,
+    "apply_invoked": false,
+    "human_approval_required": true,
+    "scope_selection_model_calls": 0,
+    "span_selection_model_calls": 0,
+    "provider_calls": [
+      {
+        "kind": "bootstrap",
+        "prompt_sha256": "51c64cfc6625bf89549b325b0f60d87bfc8ec3b28464fa079636894c88ac1ce1",
+        "seconds": 6.074489799968433
+      },
+      {
+        "kind": "author",
+        "prompt_sha256": "fafbd6e3e8e9d8309b64c12f034ce9e9e270969f964ae9faf0c05e753e314665",
+        "seconds": 12.66848300001584
+      }
+    ],
+    "candidate_produced": false,
+    "task_text_remains_generate_patch": true,
+    "repair_scope": {
+      "phase_id": "PATCH.BASIS.SCOPE.1",
+      "status": "complete",
+      "reason": "source_definition_order",
+      "primary_target": {
+        "file": "MainApp.java",
+        "symbol": "m1"
+      },
+      "members": [
+        {
+          "file": "MainApp.java",
+          "symbol": "m1",
+          "kind": "function",
+          "span": {
+            "start_line": 7,
+            "end_line": 13
+          },
+          "source_snippet": "void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }",
+          "diagnostics": [
+            {
+              "file": "MainApp.java",
+              "line": 12,
+              "col": 49,
+              "severity": "error",
+              "kind": "compiler_error",
+              "message": "cannot find symbol"
+            }
+          ]
+        },
+        {
+          "file": "MainApp.java",
+          "symbol": "m2",
+          "kind": "function",
+          "span": {
+            "start_line": 15,
+            "end_line": 21
+          },
+          "source_snippet": "void m2()\n    {\n        int no2 = 20;   //local variable\n        System.out.println(\"Result 4 : \"+(no2 + no));\n        System.out.println(\"Result 5 : \"+(no2 + no + sno));\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n    }",
+          "diagnostics": [
+            {
+              "file": "MainApp.java",
+              "line": 20,
+              "col": 49,
+              "severity": "error",
+              "kind": "compiler_error",
+              "message": "cannot find symbol"
+            }
+          ]
+        },
+        {
+          "file": "MainApp.java",
+          "symbol": "m3",
+          "kind": "function",
+          "span": {
+            "start_line": 23,
+            "end_line": 29
+          },
+          "source_snippet": "static void m3()\n    {\n        int no3 = 30;   //local variable\n        System.out.println(\"Result 7 : \"+(no3 + no));\n        System.out.println(\"Result 8 : \"+(no3 + sno));\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n    }",
+          "diagnostics": [
+            {
+              "file": "MainApp.java",
+              "line": 26,
+              "col": 49,
+              "severity": "error",
+              "kind": "compiler_error",
+              "message": "non-static variable no cannot be referenced from a static context"
+            },
+            {
+              "file": "MainApp.java",
+              "line": 28,
+              "col": 43,
+              "severity": "error",
+              "kind": "compiler_error",
+              "message": "cannot find symbol"
+            },
+            {
+              "file": "MainApp.java",
+              "line": 28,
+              "col": 49,
+              "severity": "error",
+              "kind": "compiler_error",
+              "message": "cannot find symbol"
+            }
+          ]
+        }
+      ],
+      "evidence_fingerprint": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e",
+      "source_fingerprint": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+      "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93",
+      "control_fingerprint": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+      "authority": {
+        "write_authority": false,
+        "execution_authorized": false,
+        "auto_apply": false
+      }
+    },
+    "crlf_result": "not_reached",
+    "java_candidate_validation": "not_reached",
+    "patch_minimal_result": "not_reached",
+    "first_remaining_blocker": "AUTHOR_MODEL_OUTPUT",
+    "author_result": {
+      "summary": "The compilation errors are caused by accessing local variables across method boundaries and attempting to access a non-static instance variable 'no' from a static method 'm3'. Since the constraints forbid adding new fields or changing the class structure, and the variables 'no1', 'no2', and 'no' are not available in the required scopes, the requested logic cannot be implemented as written. The errors are fundamental to the provided code structure.",
+      "patch_candidate": null,
+      "needs_escalation": true,
+      "confidence": 0.2
+    },
+    "elapsed_seconds": 31.77538629999617,
+    "all_target_files_unchanged": true
+  },
+  "live_repair_scope": {
+    "phase_id": "PATCH.BASIS.SCOPE.1",
+    "status": "complete",
+    "reason": "source_definition_order",
+    "primary_target": {
+      "file": "MainApp.java",
+      "symbol": "m1"
+    },
+    "members": [
+      {
+        "file": "MainApp.java",
+        "symbol": "m1",
+        "kind": "function",
+        "span": {
+          "start_line": 7,
+          "end_line": 13
+        },
+        "source_snippet": "void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }",
+        "diagnostics": [
+          {
+            "file": "MainApp.java",
+            "line": 12,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          }
+        ]
+      },
+      {
+        "file": "MainApp.java",
+        "symbol": "m2",
+        "kind": "function",
+        "span": {
+          "start_line": 15,
+          "end_line": 21
+        },
+        "source_snippet": "void m2()\n    {\n        int no2 = 20;   //local variable\n        System.out.println(\"Result 4 : \"+(no2 + no));\n        System.out.println(\"Result 5 : \"+(no2 + no + sno));\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n    }",
+        "diagnostics": [
+          {
+            "file": "MainApp.java",
+            "line": 20,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          }
+        ]
+      },
+      {
+        "file": "MainApp.java",
+        "symbol": "m3",
+        "kind": "function",
+        "span": {
+          "start_line": 23,
+          "end_line": 29
+        },
+        "source_snippet": "static void m3()\n    {\n        int no3 = 30;   //local variable\n        System.out.println(\"Result 7 : \"+(no3 + no));\n        System.out.println(\"Result 8 : \"+(no3 + sno));\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n    }",
+        "diagnostics": [
+          {
+            "file": "MainApp.java",
+            "line": 26,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "non-static variable no cannot be referenced from a static context"
+          },
+          {
+            "file": "MainApp.java",
+            "line": 28,
+            "col": 43,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          },
+          {
+            "file": "MainApp.java",
+            "line": 28,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          }
+        ]
+      }
+    ],
+    "evidence_fingerprint": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e",
+    "source_fingerprint": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+    "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93",
+    "control_fingerprint": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+    "authority": {
+      "write_authority": false,
+      "execution_authorized": false,
+      "auto_apply": false
+    }
+  },
+  "live_authoring_scope": {
+    "phase_id": "PATCH.AUTHOR.SCOPE.1",
+    "file": "MainApp.java",
+    "primary_symbol": "m1",
+    "members": [
+      {
+        "file": "MainApp.java",
+        "symbol": "m1",
+        "kind": "function",
+        "span": {
+          "start_line": 7,
+          "end_line": 13
+        },
+        "source_snippet": "void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }",
+        "diagnostics": [
+          {
+            "file": "MainApp.java",
+            "line": 12,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          }
+        ],
+        "bindings": {
+          "available_baseline_bindings": [],
+          "proof_source_identities": [],
+          "source_path": "MainApp.java",
+          "source_sha256": "",
+          "target_source_sha256": "",
+          "target_symbol": "m1",
+          "version": "candidate_authoring_scope_v1"
+        }
+      },
+      {
+        "file": "MainApp.java",
+        "symbol": "m2",
+        "kind": "function",
+        "span": {
+          "start_line": 15,
+          "end_line": 21
+        },
+        "source_snippet": "void m2()\n    {\n        int no2 = 20;   //local variable\n        System.out.println(\"Result 4 : \"+(no2 + no));\n        System.out.println(\"Result 5 : \"+(no2 + no + sno));\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n    }",
+        "diagnostics": [
+          {
+            "file": "MainApp.java",
+            "line": 20,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          }
+        ],
+        "bindings": {
+          "available_baseline_bindings": [],
+          "proof_source_identities": [],
+          "source_path": "MainApp.java",
+          "source_sha256": "",
+          "target_source_sha256": "",
+          "target_symbol": "m2",
+          "version": "candidate_authoring_scope_v1"
+        }
+      },
+      {
+        "file": "MainApp.java",
+        "symbol": "m3",
+        "kind": "function",
+        "span": {
+          "start_line": 23,
+          "end_line": 29
+        },
+        "source_snippet": "static void m3()\n    {\n        int no3 = 30;   //local variable\n        System.out.println(\"Result 7 : \"+(no3 + no));\n        System.out.println(\"Result 8 : \"+(no3 + sno));\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n    }",
+        "diagnostics": [
+          {
+            "file": "MainApp.java",
+            "line": 26,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "non-static variable no cannot be referenced from a static context"
+          },
+          {
+            "file": "MainApp.java",
+            "line": 28,
+            "col": 43,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          },
+          {
+            "file": "MainApp.java",
+            "line": 28,
+            "col": 49,
+            "severity": "error",
+            "kind": "compiler_error",
+            "message": "cannot find symbol"
+          }
+        ],
+        "bindings": {
+          "available_baseline_bindings": [],
+          "proof_source_identities": [],
+          "source_path": "MainApp.java",
+          "source_sha256": "",
+          "target_source_sha256": "",
+          "target_symbol": "m3",
+          "version": "candidate_authoring_scope_v1"
+        }
+      }
+    ],
+    "evidence_source": "PATCH.BASIS.SCOPE.1",
+    "evidence_fingerprint": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e",
+    "source_fingerprint": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+    "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93",
+    "control_fingerprint": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+    "replacement_source": "void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }\n\n    void m2()\n    {\n        int no2 = 20;   //local variable\n        System.out.println(\"Result 4 : \"+(no2 + no));\n        System.out.println(\"Result 5 : \"+(no2 + no + sno));\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n    }\n\n    static void m3()\n    {\n        int no3 = 30;   //local variable\n        System.out.println(\"Result 7 : \"+(no3 + no));\n        System.out.println(\"Result 8 : \"+(no3 + sno));\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n    }",
+    "write_authority": false,
+    "execution_authorized": false,
+    "auto_apply": false,
+    "human_approval_required": true
+  },
+  "live_replacement_envelope": {
+    "phase_id": "PATCH.AUTHOR.SPAN.1",
+    "file": "MainApp.java",
+    "source_representation": "authoring_normalized_utf8",
+    "span": {
+      "start": 115,
+      "end": 828,
+      "unit": "unicode_codepoints",
+      "end_exclusive": true
+    },
+    "utf8_span": {
+      "start": 115,
+      "end": 828,
+      "end_exclusive": true
+    },
+    "source_fingerprint": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+    "evidence_fingerprint": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e",
+    "original_snippet": "void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }\n\n    void m2()\n    {\n        int no2 = 20;   //local variable\n        System.out.println(\"Result 4 : \"+(no2 + no));\n        System.out.println(\"Result 5 : \"+(no2 + no + sno));\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n    }\n\n    static void m3()\n    {\n        int no3 = 30;   //local variable\n        System.out.println(\"Result 7 : \"+(no3 + no));\n        System.out.println(\"Result 8 : \"+(no3 + sno));\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n    }",
+    "original_sha256": "ee6f58cff81fa3e62064a722b7581ae05fc980c1cd2367cbf7d1f6fb09ede26f",
+    "editable_members": [
+      "m1",
+      "m2",
+      "m3"
+    ],
+    "intervening_source_readonly": true
+  },
+  "live_authoring_prompt": "You are a verifier/patch writer inside an agentic coding system.\n\n[STYLE & CONSTRAINTS — authoritative, overrides later rules]\nPATCH STYLE: safe_minimal\n- allow_new_api: False\n- allow_multifile_patch: False\n- patch_basis: grounded_defect\n- patch_basis_accepted: True\n- auto_apply_allowed: False\n- human_approval_required: True\n\nPatch style rules:\n- Use only APIs, fields, functions, and classes already present in the provided context.\n- Do not introduce new fields, methods, classes, imports, or framework assumptions.\n- Prefer the smallest single-file edit.\n- If a safe patch requires missing context, set needs_escalation=true.\n\nSAFE_MINIMAL — HARD CONSTRAINTS:\nCandidate references must come from authoritative baseline bindings shown in\nAUTHORITATIVE AUTHORING SCOPE, permitted bounded candidate-local bindings, or\nthe gate's existing source-snippet, language-keyword and supported-builtin classes.\nBaseline locals remain subject to initialization and lexical shadowing; their\npresence does not prove a value at an arbitrary point in the function.\nA proven repository-local immutable result may expose its declared read-only\ndata fields. This permission is limited to proven reads in bounded straight-line\nreturn expressions, directly or through a single unaliased local assignment\nbefore use. It grants no new method, property, chained member, field call, write,\ndelete, module-namespace or dynamic access permission.\nCandidate-local novelty remains bounded by PATCH.MINIMAL; it does not permit\nnew external capabilities. Deterministic PATCH.MINIMAL remains final authority.\n\nFORBIDDEN in patched_snippet:\n- Unproven new external references or member capabilities.\n- New imports, new helper functions, new type declarations.\n- Behavioural redesign — only fix the literal bug.\n\nIf a correct fix would require any of the above:\n  set patch_candidate=null, confidence<=0.3, needs_escalation=true,\n  and explain in `summary` what is missing from context.\n\n[MEASURED REPAIR-SET AUTHORING CONTRACT]\nYou may draft changes inside exactly the measured repair members in\nAUTHORITATIVE AUTHORING SCOPE. The primary target remains separate and unchanged.\nAccount for all associated compiler diagnostics; you need not edit every member.\nMember-local bindings belong only to their named member. Proven file imports\nretain their existing read capabilities; no import modification is authorized.\nVisible context and the source between members are read-only.\nUse the existing single-file patch_candidate shape. Keep target_node_name equal\nto the primary symbol; it identifies the semantic target, not the replacement span.\nCANONICAL REPLACEMENT ENVELOPE: replacement_envelope.original_snippet is the exact\nprovided baseline interval, separate from primary_target.source_snippet, member\nsnippets and whole-file read-only context. For edits spanning multiple measured\nmembers, copy that entire original_snippet verbatim into target_snippet and put\nits replacement in patched_snippet. Both fields must describe the SAME interval.\nNever quote only the primary member while supplying other members in the\nreplacement: their original definitions would remain outside the replaced span.\nAn existing exact unique sub-envelope is allowed only when the replacement is\nself-consistent for precisely that interval; do not insert copies of members\noutside it. The canonical envelope is the maximum allowed original interval.\nPreserve every byte outside the measured members in patched_snippet, including\nintervening definitions, comments, annotations, blank lines and whitespace.\nMembers inside the envelope may remain unchanged; not every member must differ.\nMalformed spans are rejected, never silently expanded or rewritten.\nNo new definitions, files, imports or extra targets may be proposed.\nThe measured set is permitted for drafting even when it contains several methods.\nDraft permission does not certify safety, minimality or completeness.\nExisting PATCH.MINIMAL (including its one-function limit), verification and human\napproval remain downstream authorities and may reject this draft.\nwrite_authority=false; execution_authorized=false; auto_apply=false.\n\nAUTHORITATIVE AUTHORING SCOPE:\n{\n  \"authoring_repair_scope\": {\n    \"auto_apply\": false,\n    \"control_fingerprint\": \"8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a\",\n    \"evidence_fingerprint\": \"0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e\",\n    \"evidence_source\": \"PATCH.BASIS.SCOPE.1\",\n    \"execution_authorized\": false,\n    \"file\": \"MainApp.java\",\n    \"human_approval_required\": true,\n    \"members\": [\n      {\n        \"bindings\": {\n          \"available_baseline_bindings\": [],\n          \"proof_source_identities\": [],\n          \"source_path\": \"MainApp.java\",\n          \"source_sha256\": \"\",\n          \"target_source_sha256\": \"\",\n          \"target_symbol\": \"m1\",\n          \"version\": \"candidate_authoring_scope_v1\"\n        },\n        \"diagnostics\": [\n          {\n            \"col\": 49,\n            \"file\": \"MainApp.java\",\n            \"kind\": \"compiler_error\",\n            \"line\": 12,\n            \"message\": \"cannot find symbol\",\n            \"severity\": \"error\"\n          }\n        ],\n        \"file\": \"MainApp.java\",\n        \"kind\": \"function\",\n        \"source_snippet\": \"void m1()\\n    {\\n        int no1 = 10;   //local variable\\n        System.out.println(\\\"Result 1 : \\\"+(no1 + no));\\n        System.out.println(\\\"Result 2 : \\\"+(no1 + no + sno));\\n        System.out.println(\\\"Result 3 : \\\"+(no1 + no2));\\n    }\",\n        \"span\": {\n          \"end_line\": 13,\n          \"start_line\": 7\n        },\n        \"symbol\": \"m1\"\n      },\n      {\n        \"bindings\": {\n          \"available_baseline_bindings\": [],\n          \"proof_source_identities\": [],\n          \"source_path\": \"MainApp.java\",\n          \"source_sha256\": \"\",\n          \"target_source_sha256\": \"\",\n          \"target_symbol\": \"m2\",\n          \"version\": \"candidate_authoring_scope_v1\"\n        },\n        \"diagnostics\": [\n          {\n            \"col\": 49,\n            \"file\": \"MainApp.java\",\n            \"kind\": \"compiler_error\",\n            \"line\": 20,\n            \"message\": \"cannot find symbol\",\n            \"severity\": \"error\"\n          }\n        ],\n        \"file\": \"MainApp.java\",\n        \"kind\": \"function\",\n        \"source_snippet\": \"void m2()\\n    {\\n        int no2 = 20;   //local variable\\n        System.out.println(\\\"Result 4 : \\\"+(no2 + no));\\n        System.out.println(\\\"Result 5 : \\\"+(no2 + no + sno));\\n        System.out.println(\\\"Result 6 : \\\"+(no2 + no1));\\n    }\",\n        \"span\": {\n          \"end_line\": 21,\n          \"start_line\": 15\n        },\n        \"symbol\": \"m2\"\n      },\n      {\n        \"bindings\": {\n          \"available_baseline_bindings\": [],\n          \"proof_source_identities\": [],\n          \"source_path\": \"MainApp.java\",\n          \"source_sha256\": \"\",\n          \"target_source_sha256\": \"\",\n          \"target_symbol\": \"m3\",\n          \"version\": \"candidate_authoring_scope_v1\"\n        },\n        \"diagnostics\": [\n          {\n            \"col\": 49,\n            \"file\": \"MainApp.java\",\n            \"kind\": \"compiler_error\",\n            \"line\": 26,\n            \"message\": \"non-static variable no cannot be referenced from a static context\",\n            \"severity\": \"error\"\n          },\n          {\n            \"col\": 43,\n            \"file\": \"MainApp.java\",\n            \"kind\": \"compiler_error\",\n            \"line\": 28,\n            \"message\": \"cannot find symbol\",\n            \"severity\": \"error\"\n          },\n          {\n            \"col\": 49,\n            \"file\": \"MainApp.java\",\n            \"kind\": \"compiler_error\",\n            \"line\": 28,\n            \"message\": \"cannot find symbol\",\n            \"severity\": \"error\"\n          }\n        ],\n        \"file\": \"MainApp.java\",\n        \"kind\": \"function\",\n        \"source_snippet\": \"static void m3()\\n    {\\n        int no3 = 30;   //local variable\\n        System.out.println(\\\"Result 7 : \\\"+(no3 + no));\\n        System.out.println(\\\"Result 8 : \\\"+(no3 + sno));\\n        System.out.println(\\\"Result 9 : \\\"+(no1 + no2 + no3));\\n    }\",\n        \"span\": {\n          \"end_line\": 29,\n          \"start_line\": 23\n        },\n        \"symbol\": \"m3\"\n      }\n    ],\n    \"phase_id\": \"PATCH.AUTHOR.SCOPE.1\",\n    \"primary_symbol\": \"m1\",\n    \"replacement_source\": \"void m1()\\n    {\\n        int no1 = 10;   //local variable\\n        System.out.println(\\\"Result 1 : \\\"+(no1 + no));\\n        System.out.println(\\\"Result 2 : \\\"+(no1 + no + sno));\\n        System.out.println(\\\"Result 3 : \\\"+(no1 + no2));\\n    }\\n\\n    void m2()\\n    {\\n        int no2 = 20;   //local variable\\n        System.out.println(\\\"Result 4 : \\\"+(no2 + no));\\n        System.out.println(\\\"Result 5 : \\\"+(no2 + no + sno));\\n        System.out.println(\\\"Result 6 : \\\"+(no2 + no1));\\n    }\\n\\n    static void m3()\\n    {\\n        int no3 = 30;   //local variable\\n        System.out.println(\\\"Result 7 : \\\"+(no3 + no));\\n        System.out.println(\\\"Result 8 : \\\"+(no3 + sno));\\n        System.out.println(\\\"Result 9 : \\\"+(no1 + no2 + no3));\\n    }\",\n    \"repository_id\": \"java-f0fc418b6355ebbe9c8fbcb27b899b93\",\n    \"source_fingerprint\": \"6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39\",\n    \"write_authority\": false\n  },\n  \"primary_target\": {\n    \"file\": \"MainApp.java\",\n    \"source_snippet\": \"void m1()\\n    {\\n        int no1 = 10;   //local variable\\n        System.out.println(\\\"Result 1 : \\\"+(no1 + no));\\n        System.out.println(\\\"Result 2 : \\\"+(no1 + no + sno));\\n        System.out.println(\\\"Result 3 : \\\"+(no1 + no2));\\n    }\",\n    \"symbol\": \"m1\"\n  },\n  \"replacement_envelope\": {\n    \"editable_members\": [\n      \"m1\",\n      \"m2\",\n      \"m3\"\n    ],\n    \"evidence_fingerprint\": \"0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e\",\n    \"file\": \"MainApp.java\",\n    \"intervening_source_readonly\": true,\n    \"original_sha256\": \"ee6f58cff81fa3e62064a722b7581ae05fc980c1cd2367cbf7d1f6fb09ede26f\",\n    \"original_snippet\": \"void m1()\\n    {\\n        int no1 = 10;   //local variable\\n        System.out.println(\\\"Result 1 : \\\"+(no1 + no));\\n        System.out.println(\\\"Result 2 : \\\"+(no1 + no + sno));\\n        System.out.println(\\\"Result 3 : \\\"+(no1 + no2));\\n    }\\n\\n    void m2()\\n    {\\n        int no2 = 20;   //local variable\\n        System.out.println(\\\"Result 4 : \\\"+(no2 + no));\\n        System.out.println(\\\"Result 5 : \\\"+(no2 + no + sno));\\n        System.out.println(\\\"Result 6 : \\\"+(no2 + no1));\\n    }\\n\\n    static void m3()\\n    {\\n        int no3 = 30;   //local variable\\n        System.out.println(\\\"Result 7 : \\\"+(no3 + no));\\n        System.out.println(\\\"Result 8 : \\\"+(no3 + sno));\\n        System.out.println(\\\"Result 9 : \\\"+(no1 + no2 + no3));\\n    }\",\n    \"phase_id\": \"PATCH.AUTHOR.SPAN.1\",\n    \"source_fingerprint\": \"6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39\",\n    \"source_representation\": \"authoring_normalized_utf8\",\n    \"span\": {\n      \"end\": 828,\n      \"end_exclusive\": true,\n      \"start\": 115,\n      \"unit\": \"unicode_codepoints\"\n    },\n    \"utf8_span\": {\n      \"end\": 828,\n      \"end_exclusive\": true,\n      \"start\": 115\n    }\n  },\n  \"source_path\": \"MainApp.java\",\n  \"target_symbol\": \"m1\",\n  \"version\": \"candidate_authoring_scope_v3_replacement_envelope\"\n}\n\n[REPO STYLE HINT — lower priority than correctness]\nREPO STYLE: indent=4space, naming=mixed, line~60c, brace=allman, avg_func~13l. Match this in patched_snippet.\n\n[STYLE RULE]\n- Match repo style when writing patched_snippet: indentation, naming convention, brace/comment style.\n- Correctness > grounding > validation > style.\n\n[PATCH OUTPUT FORMAT — safe_minimal]\nUse patch_candidate ONLY. Do NOT emit patch_plan. Do NOT create files.\nIf the fix would require new files or multi-file changes, set\npatch_candidate=null and needs_escalation=true.\n\npatch_candidate (single-file existing-code fix):\n{\n  \"patch_candidate\": {\n    \"file\": \"...\",\n    \"relative_path\": \"...\",\n    \"target_node_name\": \"...\",\n    \"target_node_kind\": \"function|class\",\n    \"target_snippet\": \"...\",\n    \"patched_snippet\": \"...\"\n  }\n}\n\npatch_plan (multi-file or new-file work):\n{\n  \"patch_plan\": [\n    {\"op\": \"create_file\",     \"relative_path\": \"src/aml.rs\", \"content\": \"...\"},\n    {\"op\": \"replace_snippet\", \"relative_path\": \"src/main.rs\",\n     \"target_snippet\": \"mod agent;\",\n     \"patched_snippet\": \"mod agent;\\nmod aml;\"}\n  ]\n}\n\nRules:\n- Output EITHER patch_candidate OR patch_plan, never both.\n- Use patch_candidate only when editing one existing file.\n- Use patch_plan when creating files, editing multiple files, or changing APIs across files.\n- Every relative_path MUST stay inside the repo (no absolute paths, no '..').\n- Every patch_candidate.target_snippet must be an exact quote from the target file.\n- If it is not found, reject/demote the candidate before final result.\n\nsafe_minimal-specific: patch_plan is FORBIDDEN. Single existing file or escalate.\n\n[CONTROL]\nsymbol=MainApp.java::m1\nissue_hint=Compilation error due to undefined variable usage\nlocalization_score=0.0\nlocalization_strength=weak\nconfidence_kind=localization_rank_legacy\ndefect_established=True\naction=grounded_defect_candidate\nlanguage=java\nlocalization_reasons=The variable 'no2' is used in m1() but is not defined in the scope of m1() or as\n\n\n[PATCH TARGET]\nfile=MainApp.java\nsymbol=m1\nkind=function\n\nsource_snippet:\n```java\nvoid m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }\n```\n\n[MEASURED REPAIR SCOPE — authoritative compiler evidence]\nReceipt-bound sources and member diagnostics are projected without alteration in AUTHORITATIVE AUTHORING SCOPE above.\n\n[RELATED CONTEXT — evidence only, do not patch directly unless PATCH TARGET changes]\n--- RELATED SNIPPET [1] ---\nrole=requested_target\nfile=Twosum.java\nsymbol=\n\n```java\nimport java.util.HashMap;\nimport java.util.Map;\n\nclass Solution{\n    public int[] twoSum(int[] nums, int target){\n        Map<Integer, Integer> map = new HashMap<>();\n\n        for (int i = 0; i < nums.length; i++){\n            int complement = target - nums[i];\n            if (map.containsKey(complement)){\n                return new int[] { map.get(complement), i};\n            }\n            map.put(nums[i], i);\n        }\n        return new int[] {};\n    }\n}\n\npublic class Twosum{\n    public static void main(String[] args){\n        Solution solver = new Solution();\n        int[] result = solver.twoSum(new int[]{3, 2, 4}, 6);\n\n        System.out.println(\"Result: [\" + result[0] + \",\" + result[1] + \"]\");\n    }\n}\n```\n\n--- RELATED SNIPPET [2] ---\nrole=requested_target\nfile=MainApp.java\nsymbol=\n\n```java\npublic class MainApp\n{\n    int no = 100;   //instance variable\n\n    static int sno = 200;   //static variable\n\n    void m1()\n    {\n        int no1 = 10;   //local variable\n        System.out.println(\"Result 1 : \"+(no1 + no));\n        System.out.println(\"Result 2 : \"+(no1 + no + sno));\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n    }\n\n    void m2()\n    {\n        int no2 = 20;   //local variable\n        System.out.println(\"Result 4 : \"+(no2 + no));\n        System.out.println(\"Result 5 : \"+(no2 + no + sno));\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n    }\n\n    static void m3()\n    {\n        int no3 = 30;   //local variable\n        System.out.println(\"Result 7 : \"+(no3 + no));\n        System.out.println(\"Result 8 : \"+(no3 + sno));\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n    }\n\n    public static void main(String[] args)\n    {\n        MainApp obj = new MainApp();\n        obj.m1();\n        obj.m2();\n\n        MainApp.m3();  //static method can be directly called by class name\n    }\n}\n\n```\n\n[PHANTOM LIMB SUGGESTIONS - structural hints, not proof]\nNo phantom limb suggestions.\n\n[USER]\nGenerate patch\n\n[RULES]\n\nStyle block above is authoritative.\nFor multi-member edits, quote replacement_envelope.original_snippet verbatim as target_snippet and replace that same envelope.\nMake the smallest edit that satisfies constraints.\nPATCH TARGET remains the primary grounded target; editing every member is not required.\nWhen [MEASURED REPAIR SCOPE] is present, its exact members are the only\nadditional same-file definitions the compiler receipt grounds for this repair.\nDo not add a file or definition because it is adjacent, a sibling, or otherwise\nappears related.  The source and diagnostics in that section are authoritative.\nDo not invent identifiers unless style explicitly permits it.\nIf source does not support a safe fix, return patch_candidate=null and needs_escalation=true.\nOnly a genuine executed preflight failure may ground a defect; inconclusive or passing validation may not.\nFix compile/build errors before guessing runtime/gameplay logic.\nDo not speculate about architecture or behavior until compiler/runtime errors are resolved.\nIf preflight stack trace points to a callee and the current source_snippet is the caller, infer the smallest caller-side fix first.\nFor TypeError caused by primitive/object argument mismatch, prefer reordering existing arguments before changing function bodies.\nIf the patch can be made by reordering identifiers already present in source_snippet, it is allowed in safe_minimal.\nRELATED CONTEXT is evidence only for normal bug-fix tasks.\nUse RELATED CONTEXT to verify callees, signatures, tests, and stack traces.\nReturn ONLY valid JSON matching this schema:\n\nReturn JSON:\n{\n  \"summary\": \"...\",\n  \"issues\": [...],\n  \"patch_candidate\": null | {...},\n  \"patch_plan\": null | [\n    {\"op\": \"create_file\", \"relative_path\": \"...\", \"content\": \"...\"},\n    {\"op\": \"replace_snippet\", \"relative_path\": \"...\", \"target_snippet\": \"...\", \"patched_snippet\": \"...\"}\n  ],\n  \"confidence\": 0.0,\n  \"needs_escalation\": false\n}\n\n\n[PREFLIGHT VALIDATION]\n{\n  \"ran\": true,\n  \"ok\": false,\n  \"outcome\": \"failed\",\n  \"category\": \"build_error\",\n  \"command\": \"javac -J-Duser.language=en -J-Duser.country=US -J-XX:-UsePerfData -J-Dstdout.encoding=UTF-8 -J-Dstderr.encoding=UTF-8 -encoding UTF-8 -proc:none -implicit:none -sourcepath <isolated-empty> -classpath <isolated-empty> -d <isolated-output> -Xmaxerrs 100 -Xmaxwarns 100 MainApp.java\",\n  \"reason\": \"Compilation failed under the recorded javac invocation for: MainApp.java.\",\n  \"hint\": \"Measured by PREFLIGHT.REQUEST.1. A compiler result is not behavioral, test or patch evidence.\",\n  \"output\": \"MainApp.java:12: error: cannot find symbol\\n        System.out.println(\\\"Result 3 : \\\"+(no1 + no2));\\n                                                ^\\n  symbol:   variable no2\\n  location: class MainApp\\nMainApp.java:20: error: cannot find symbol\\n        System.out.println(\\\"Result 6 : \\\"+(no2 + no1));\\n                                                ^\\n  symbol:   variable no1\\n  location: class MainApp\\nMainApp.java:26: error: non-static variable no cannot be referenced from a static context\\n        System.out.println(\\\"Result 7 : \\\"+(no3 + no));\\n                                                ^\\nMainApp.java:28: error: cannot find symbol\\n        System.out.println(\\\"Result 9 : \\\"+(no1 + no2 + no3));\\n                                          ^\\n  symbol:   variable no1\\n  location: class MainApp\\nMainApp.java:28: error: cannot find symbol\\n        System.out.println(\\\"Result 9 : \\\"+(no1 + no2 + no3));\\n                                                ^\\n  symbol:   variable no2\\n  location: class MainApp\\n5 errors\\n\",\n  \"locations\": [\n    {\n      \"kind\": \"compiler_error\",\n      \"language\": \"java\",\n      \"file\": \"MainApp.java\",\n      \"line\": 12,\n      \"col\": 49,\n      \"severity\": \"error\",\n      \"message\": \"cannot find symbol\"\n    },\n    {\n      \"kind\": \"compiler_error\",\n      \"language\": \"java\",\n      \"file\": \"MainApp.java\",\n      \"line\": 20,\n      \"col\": 49,\n      \"severity\": \"error\",\n      \"message\": \"cannot find symbol\"\n    },\n    {\n      \"kind\": \"compiler_error\",\n      \"language\": \"java\",\n      \"file\": \"MainApp.java\",\n      \"line\": 26,\n      \"col\": 49,\n      \"severity\": \"error\",\n      \"message\": \"non-static variable no cannot be referenced from a static context\"\n    },\n    {\n      \"kind\": \"compiler_error\",\n      \"language\": \"java\",\n      \"file\": \"MainApp.java\",\n      \"line\": 28,\n      \"col\": 43,\n      \"severity\": \"error\",\n      \"message\": \"cannot find symbol\"\n    },\n    {\n      \"kind\": \"compiler_error\",\n      \"language\": \"java\",\n      \"file\": \"MainApp.java\",\n      \"line\": 28,\n      \"col\": 49,\n      \"severity\": \"error\",\n      \"message\": \"cannot find symbol\"\n    }\n  ],\n  \"timed_out\": false,\n  \"timeout_seconds\": 60,\n  \"validation_budget_exhausted\": false,\n  \"python_bytecode_cache_isolated\": false,\n  \"evidence_source\": \"PREFLIGHT.REQUEST.1\",\n  \"evidence_kind\": \"compile_evidence\",\n  \"measured\": true,\n  \"adapter\": \"java_compile_diagnostic/1\",\n  \"tool_version\": \"javac 26.0.2.1\",\n  \"receipt_fingerprint\": \"0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e\",\n  \"control_sha256\": \"8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a\",\n  \"repository_id\": \"java-f0fc418b6355ebbe9c8fbcb27b899b93\",\n  \"source_fingerprints\": [\n    {\n      \"path\": \"MainApp.java\",\n      \"sha256\": \"6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39\"\n    }\n  ],\n  \"compile_mode\": \"independent_per_target\",\n  \"targets\": [\n    {\n      \"path\": \"MainApp.java\",\n      \"outcome\": \"compile_failed\",\n      \"reason\": \"\",\n      \"compile_mode\": \"independent\",\n      \"errors\": 5,\n      \"warnings\": 0\n    }\n  ],\n  \"semantics\": \"compile_passed proves only that a target compiled under the recorded javac invocation and environment; it does not establish behavioral correctness, test results or patch correctness. compile_failed proves only that compilation failed under that invocation; it does not decide which change is correct. Neither grants patch, write, execution or approval authority.\",\n  \"authority\": {\n    \"write_authority\": false,\n    \"patch_authority\": false,\n    \"execution_authorized\": false,\n    \"patch_applied\": false,\n    \"human_approval_granted\": false\n  }\n}",
+  "live_raw_author_output": "{\n  \"summary\": \"The compilation errors are caused by accessing local variables across method boundaries and attempting to access a non-static instance variable 'no' from a static method 'm3'. Since the constraints forbid adding new fields or changing the class structure, and the variables 'no1', 'no2', and 'no' are not available in the required scopes, the requested logic cannot be implemented as written. The errors are fundamental to the provided code structure.\",\n  \"issues\": [\n    \"Variable 'no2' is not defined in m1()\",\n    \"Variable 'no1' is not defined in m2()\",\n    \"Non-static variable 'no' accessed in static method m3()\",\n    \"Variables 'no1' and 'no2' are not defined in m3()\"\n  ],\n  \"patch_candidate\": null,\n  \"confidence\": 0.2,\n  \"needs_escalation\": true\n}",
+  "live_raw_candidate": null,
+  "live_original_target_span": null,
+  "live_replacement_span": null,
+  "live_author_output_status": "no_candidate; alignment validation not invoked",
+  "live_candidate_fingerprint": null,
+  "live_post_authoring_result": {
+    "patch": "{\n  \"summary\": \"The compilation errors are caused by accessing local variables across method boundaries and attempting to access a non-static instance variable 'no' from a static method 'm3'. Since the constraints forbid adding new fields or changing the class structure, and the variables 'no1', 'no2', and 'no' are not available in the required scopes, the requested logic cannot be implemented as written. The errors are fundamental to the provided code structure.\",\n  \"issues\": [\n    \"Variable 'no2' is not defined in m1()\",\n    \"Variable 'no1' is not defined in m2()\",\n    \"Non-static variable 'no' accessed in static method m3()\",\n    \"Variables 'no1' and 'no2' are not defined in m3()\"\n  ],\n  \"patch_candidate\": null,\n  \"confidence\": 0.2,\n  \"needs_escalation\": true\n}",
+    "usage": "{\n  \"summary\": {\n    \"attempts\": 1,\n    \"fallback_count\": 0,\n    \"selected_model\": \"gemini-3.1-flash-lite\",\n    \"models_by_role\": {\n      \"draft\": \"gemini-3.1-flash-lite\"\n    },\n    \"input_tokens\": 6915,\n    \"output_tokens\": 204,\n    \"total_tokens\": 7119,\n    \"estimated_cost_usd\": 0.00203475,\n    \"costed_calls\": 1,\n    \"unknown_cost_calls\": 0,\n    \"by_role\": {\n      \"draft\": {\n        \"calls\": 1,\n        \"input_tokens\": 6915,\n        \"output_tokens\": 204,\n        \"total_tokens\": 7119,\n        \"estimated_cost_usd\": 0.00203475\n      }\n    }\n  },\n  \"calls\": [\n    {\n      \"call\": 1,\n      \"model\": \"gemini-3.1-flash-lite\",\n      \"provider\": \"google\",\n      \"role\": \"draft\",\n      \"success\": true,\n      \"input_tokens\": 6915,\n      \"output_tokens\": 204,\n      \"total_tokens\": 7119,\n      \"estimated_cost_usd\": 0.00203475,\n      \"cost_rates_per_1m\": {\n        \"input\": 0.25,\n        \"output\": 1.5\n      },\n      \"cost_source\": \"google_gemini_paid_standard_2026-05-18\"\n    }\n  ]\n}",
+    "anti_lesson_control": {
+      "requested": false,
+      "enabled_by_config": false,
+      "injected": false,
+      "selected_count": 0
+    },
+    "preflight_request": {
+      "phase_id": "PREFLIGHT.REQUEST.1",
+      "schema_version": "preflight_request_v1",
+      "status": "evidence_measured",
+      "reason": "",
+      "repository": {
+        "canonical_root": "C:\\Users\\Admin\\Documents\\Code\\Side quest\\java",
+        "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93"
+      },
+      "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+      "cycles": 1,
+      "requested_evidence": [
+        {
+          "kind": "compile_evidence",
+          "targets": [
+            "MainApp.java"
+          ],
+          "language": "java",
+          "reason": "The code in MainApp.java contains multiple scope and static context errors that prevent compilation.",
+          "provenance": "evidence_gaps[0]",
+          "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+          "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93",
+          "identity": "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc"
+        }
+      ],
+      "rejected_evidence": [],
+      "ignored_item_keys": [],
+      "policy": [
+        {
+          "provenance": "evidence_gaps[0]",
+          "identity": "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc",
+          "kind": "compile_evidence",
+          "decision": "admitted",
+          "reason": "",
+          "adapter": "java_compile_diagnostic"
+        }
+      ],
+      "source_freshness": {
+        "MainApp.java": "fresh"
+      },
+      "diagnostics": [
+        {
+          "schema_version": "preflight_request_v1",
+          "phase_id": "PREFLIGHT.REQUEST.1",
+          "evidence_kind": "compile_evidence",
+          "adapter": {
+            "id": "java_compile_diagnostic",
+            "version": "1"
+          },
+          "tool": "javac",
+          "tool_version": "javac 26.0.2.1",
+          "tool_available": true,
+          "attempted": true,
+          "outcome": "compile_failed",
+          "reason": "",
+          "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93",
+          "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+          "need_identities": [
+            "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc"
+          ],
+          "compile_mode": "independent_per_target",
+          "working_directory": "repository_root",
+          "environment_keys": [
+            "PATH",
+            "SYSTEMDRIVE",
+            "SYSTEMROOT",
+            "TEMP",
+            "TMP",
+            "TMPDIR",
+            "WINDIR"
+          ],
+          "version_probe": {
+            "attempted": true,
+            "exit_status": 0,
+            "timed_out": false,
+            "elapsed_ms": 1814.514
+          },
+          "targets": [
+            {
+              "path": "MainApp.java",
+              "language": "java",
+              "source_sha256": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+              "attempted": true,
+              "outcome": "compile_failed",
+              "reason": "",
+              "compile_mode": "independent",
+              "group": [],
+              "independent_outcome": null,
+              "exit_status": 1,
+              "timed_out": false,
+              "elapsed_ms": 2785.283,
+              "error_count": 5,
+              "warning_count": 0,
+              "diagnostics": [
+                {
+                  "file": "MainApp.java",
+                  "reported_file": "MainApp.java",
+                  "line": 12,
+                  "column": 49,
+                  "severity": "error",
+                  "message": "cannot find symbol",
+                  "text": "MainApp.java:12: error: cannot find symbol\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp"
+                },
+                {
+                  "file": "MainApp.java",
+                  "reported_file": "MainApp.java",
+                  "line": 20,
+                  "column": 49,
+                  "severity": "error",
+                  "message": "cannot find symbol",
+                  "text": "MainApp.java:20: error: cannot find symbol\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n                                                ^\n  symbol:   variable no1\n  location: class MainApp"
+                },
+                {
+                  "file": "MainApp.java",
+                  "reported_file": "MainApp.java",
+                  "line": 26,
+                  "column": 49,
+                  "severity": "error",
+                  "message": "non-static variable no cannot be referenced from a static context",
+                  "text": "MainApp.java:26: error: non-static variable no cannot be referenced from a static context\n        System.out.println(\"Result 7 : \"+(no3 + no));\n                                                ^"
+                },
+                {
+                  "file": "MainApp.java",
+                  "reported_file": "MainApp.java",
+                  "line": 28,
+                  "column": 43,
+                  "severity": "error",
+                  "message": "cannot find symbol",
+                  "text": "MainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                          ^\n  symbol:   variable no1\n  location: class MainApp"
+                },
+                {
+                  "file": "MainApp.java",
+                  "reported_file": "MainApp.java",
+                  "line": 28,
+                  "column": 49,
+                  "severity": "error",
+                  "message": "cannot find symbol",
+                  "text": "MainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp"
+                }
+              ],
+              "stdout": {
+                "bytes_total": 0,
+                "bytes_captured": 0,
+                "truncated": false,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "text": ""
+              },
+              "stderr": {
+                "bytes_total": 1029,
+                "bytes_captured": 1029,
+                "truncated": false,
+                "sha256": "208f28e428d317061a2a76297a2f78ac5ce5bb51e2cf77890f11c3a0875218ca",
+                "text": "MainApp.java:12: error: cannot find symbol\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp\nMainApp.java:20: error: cannot find symbol\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n                                                ^\n  symbol:   variable no1\n  location: class MainApp\nMainApp.java:26: error: non-static variable no cannot be referenced from a static context\n        System.out.println(\"Result 7 : \"+(no3 + no));\n                                                ^\nMainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                          ^\n  symbol:   variable no1\n  location: class MainApp\nMainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp\n5 errors\n"
+              },
+              "invocation": "javac -J-Duser.language=en -J-Duser.country=US -J-XX:-UsePerfData -J-Dstdout.encoding=UTF-8 -J-Dstderr.encoding=UTF-8 -encoding UTF-8 -proc:none -implicit:none -sourcepath <isolated-empty> -classpath <isolated-empty> -d <isolated-output> -Xmaxerrs 100 -Xmaxwarns 100 MainApp.java"
+            }
+          ],
+          "exit_statuses": {
+            "MainApp.java": 1
+          },
+          "process_timeout_seconds": 60.0,
+          "timing_ms": {
+            "adapter_construction": 6.496,
+            "tool_probe": 1814.514,
+            "process_launch": 266.41,
+            "process_wait": 2518.873,
+            "normalization": 1.975,
+            "cleanup": 5.958,
+            "total": 4620.317
+          },
+          "operational_warnings": [],
+          "semantics": "compile_passed proves only that a target compiled under the recorded javac invocation and environment; it does not establish behavioral correctness, test results or patch correctness. compile_failed proves only that compilation failed under that invocation; it does not decide which change is correct. Neither grants patch, write, execution or approval authority.",
+          "authority": {
+            "write_authority": false,
+            "patch_authority": false,
+            "execution_authorized": false,
+            "patch_applied": false,
+            "human_approval_granted": false
+          },
+          "evidence_fingerprint": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e"
+        }
+      ],
+      "need_receipts": {
+        "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e"
+      },
+      "handoff": {
+        "attached": true,
+        "field": "preflight_validation",
+        "outcome": "failed",
+        "category": "build_error"
+      },
+      "timing_ms": {
+        "policy": 5.587,
+        "freshness": 0.428,
+        "total": 4628.037,
+        "harness_overhead": 28.24
+      },
+      "executable_commands_accepted": 0,
+      "model_calls": 0,
+      "network_operations": 0,
+      "repository_traversals": 0,
+      "graph_operations": 0,
+      "index_operations": 0,
+      "embedding_operations": 0,
+      "authority": {
+        "write_authority": false,
+        "patch_authority": false,
+        "execution_authorized": false,
+        "patch_applied": false,
+        "human_approval_granted": false
+      }
+    },
+    "control_bootstrap": {
+      "phase_id": "CONTROL.BOOTSTRAP.1",
+      "provenance": "fresh_bootstrap",
+      "status": "control_bootstrapped",
+      "reason": null,
+      "field": null,
+      "repository": {
+        "canonical_root": "C:\\Users\\Admin\\Documents\\Code\\Side quest\\java",
+        "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93"
+      },
+      "task": {
+        "sha256": "09980b9b525a3d6d322d34c06da46edbdeeeade94d5d7d775a8e37d7c7bd33f2",
+        "char_count": 78,
+        "task_shape": "defect_repair",
+        "selected_workflow": "defect_repair_patch",
+        "preservation_passed": true
+      },
+      "requested_targets": [
+        "twosum.java",
+        "MainApp.java"
+      ],
+      "evidence_targets": [
+        "Twosum.java",
+        "MainApp.java"
+      ],
+      "localized_patch_targets": null,
+      "targets": [
+        {
+          "requested": "twosum.java",
+          "path": "Twosum.java",
+          "status": "read",
+          "reason": "",
+          "size_bytes": 741,
+          "language": "java"
+        },
+        {
+          "requested": "MainApp.java",
+          "path": "MainApp.java",
+          "status": "read",
+          "reason": "",
+          "size_bytes": 1076,
+          "language": "java"
+        }
+      ],
+      "sources": [
+        {
+          "path": "Twosum.java",
+          "requested": "twosum.java",
+          "language": "java",
+          "size_bytes": 741,
+          "lines": 26,
+          "sha256": "b6164c74cd30eeaabf6368346b36e08e23fdf2afb6f36471bcf12e611decfc8c",
+          "freshness": "fresh"
+        },
+        {
+          "path": "MainApp.java",
+          "requested": "MainApp.java",
+          "language": "java",
+          "size_bytes": 1076,
+          "lines": 39,
+          "sha256": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+          "freshness": "fresh"
+        }
+      ],
+      "budget": {
+        "requested_target_count": 2,
+        "requested_target_count_complete": true,
+        "accepted_file_limit": 8,
+        "aggregate_requested_bytes": 1817,
+        "max_total_bytes": 1048576,
+        "max_bytes_per_file": 262144,
+        "max_lines_per_file": 4000
+      },
+      "bytes_read": 1817,
+      "model_calls": 1,
+      "prompt_sha256": "51c64cfc6625bf89549b325b0f60d87bfc8ec3b28464fa079636894c88ac1ce1",
+      "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+      "evidence_gap_needs": [
+        "compile_evidence"
+      ],
+      "discarded_item_keys": [],
+      "executable_commands_accepted": 0,
+      "repository_traversals": 0,
+      "graph_operations": 0,
+      "index_operations": 0,
+      "embedding_operations": 0,
+      "authority": {
+        "defect_established": false,
+        "patch_basis_established": false,
+        "write_authority": false,
+        "patch_authority": false,
+        "human_approval_granted": false,
+        "execution_performed": false
+      },
+      "persisted": false,
+      "usage": "{\n  \"summary\": {\n    \"attempts\": 1,\n    \"fallback_count\": 0,\n    \"selected_model\": \"gemini-3.1-flash-lite\",\n    \"models_by_role\": {\n      \"draft\": \"gemini-3.1-flash-lite\"\n    },\n    \"input_tokens\": 1602,\n    \"output_tokens\": 347,\n    \"total_tokens\": 1949,\n    \"estimated_cost_usd\": 0.000921,\n    \"costed_calls\": 1,\n    \"unknown_cost_calls\": 0,\n    \"by_role\": {\n      \"draft\": {\n        \"calls\": 1,\n        \"input_tokens\": 1602,\n        \"output_tokens\": 347,\n        \"total_tokens\": 1949,\n        \"estimated_cost_usd\": 0.000921\n      }\n    }\n  },\n  \"calls\": [\n    {\n      \"call\": 1,\n      \"model\": \"gemini-3.1-flash-lite\",\n      \"provider\": \"google\",\n      \"role\": \"draft\",\n      \"success\": true,\n      \"input_tokens\": 1602,\n      \"output_tokens\": 347,\n      \"total_tokens\": 1949,\n      \"estimated_cost_usd\": 0.000921,\n      \"cost_rates_per_1m\": {\n        \"input\": 0.25,\n        \"output\": 1.5\n      },\n      \"cost_source\": \"google_gemini_paid_standard_2026-05-18\"\n    }\n  ]\n}"
+    }
+  },
+  "live_bootstrap_receipt": {
+    "phase_id": "CONTROL.BOOTSTRAP.1",
+    "provenance": "fresh_bootstrap",
+    "status": "control_bootstrapped",
+    "reason": null,
+    "field": null,
+    "repository": {
+      "canonical_root": "C:\\Users\\Admin\\Documents\\Code\\Side quest\\java",
+      "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93"
+    },
+    "task": {
+      "sha256": "09980b9b525a3d6d322d34c06da46edbdeeeade94d5d7d775a8e37d7c7bd33f2",
+      "char_count": 78,
+      "task_shape": "defect_repair",
+      "selected_workflow": "defect_repair_patch",
+      "preservation_passed": true
+    },
+    "requested_targets": [
+      "twosum.java",
+      "MainApp.java"
+    ],
+    "evidence_targets": [
+      "Twosum.java",
+      "MainApp.java"
+    ],
+    "localized_patch_targets": null,
+    "targets": [
+      {
+        "requested": "twosum.java",
+        "path": "Twosum.java",
+        "status": "read",
+        "reason": "",
+        "size_bytes": 741,
+        "language": "java"
+      },
+      {
+        "requested": "MainApp.java",
+        "path": "MainApp.java",
+        "status": "read",
+        "reason": "",
+        "size_bytes": 1076,
+        "language": "java"
+      }
+    ],
+    "sources": [
+      {
+        "path": "Twosum.java",
+        "requested": "twosum.java",
+        "language": "java",
+        "size_bytes": 741,
+        "lines": 26,
+        "sha256": "b6164c74cd30eeaabf6368346b36e08e23fdf2afb6f36471bcf12e611decfc8c",
+        "freshness": "fresh"
+      },
+      {
+        "path": "MainApp.java",
+        "requested": "MainApp.java",
+        "language": "java",
+        "size_bytes": 1076,
+        "lines": 39,
+        "sha256": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+        "freshness": "fresh"
+      }
+    ],
+    "budget": {
+      "requested_target_count": 2,
+      "requested_target_count_complete": true,
+      "accepted_file_limit": 8,
+      "aggregate_requested_bytes": 1817,
+      "max_total_bytes": 1048576,
+      "max_bytes_per_file": 262144,
+      "max_lines_per_file": 4000
+    },
+    "bytes_read": 1817,
+    "model_calls": 1,
+    "prompt_sha256": "51c64cfc6625bf89549b325b0f60d87bfc8ec3b28464fa079636894c88ac1ce1",
+    "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+    "evidence_gap_needs": [
+      "compile_evidence"
+    ],
+    "discarded_item_keys": [],
+    "executable_commands_accepted": 0,
+    "repository_traversals": 0,
+    "graph_operations": 0,
+    "index_operations": 0,
+    "embedding_operations": 0,
+    "authority": {
+      "defect_established": false,
+      "patch_basis_established": false,
+      "write_authority": false,
+      "patch_authority": false,
+      "human_approval_granted": false,
+      "execution_performed": false
+    },
+    "persisted": false,
+    "usage": "{\n  \"summary\": {\n    \"attempts\": 1,\n    \"fallback_count\": 0,\n    \"selected_model\": \"gemini-3.1-flash-lite\",\n    \"models_by_role\": {\n      \"draft\": \"gemini-3.1-flash-lite\"\n    },\n    \"input_tokens\": 1602,\n    \"output_tokens\": 347,\n    \"total_tokens\": 1949,\n    \"estimated_cost_usd\": 0.000921,\n    \"costed_calls\": 1,\n    \"unknown_cost_calls\": 0,\n    \"by_role\": {\n      \"draft\": {\n        \"calls\": 1,\n        \"input_tokens\": 1602,\n        \"output_tokens\": 347,\n        \"total_tokens\": 1949,\n        \"estimated_cost_usd\": 0.000921\n      }\n    }\n  },\n  \"calls\": [\n    {\n      \"call\": 1,\n      \"model\": \"gemini-3.1-flash-lite\",\n      \"provider\": \"google\",\n      \"role\": \"draft\",\n      \"success\": true,\n      \"input_tokens\": 1602,\n      \"output_tokens\": 347,\n      \"total_tokens\": 1949,\n      \"estimated_cost_usd\": 0.000921,\n      \"cost_rates_per_1m\": {\n        \"input\": 0.25,\n        \"output\": 1.5\n      },\n      \"cost_source\": \"google_gemini_paid_standard_2026-05-18\"\n    }\n  ]\n}"
+  },
+  "live_preflight_receipt": {
+    "phase_id": "PREFLIGHT.REQUEST.1",
+    "schema_version": "preflight_request_v1",
+    "status": "evidence_measured",
+    "reason": "",
+    "repository": {
+      "canonical_root": "C:\\Users\\Admin\\Documents\\Code\\Side quest\\java",
+      "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93"
+    },
+    "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+    "cycles": 1,
+    "requested_evidence": [
+      {
+        "kind": "compile_evidence",
+        "targets": [
+          "MainApp.java"
+        ],
+        "language": "java",
+        "reason": "The code in MainApp.java contains multiple scope and static context errors that prevent compilation.",
+        "provenance": "evidence_gaps[0]",
+        "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+        "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93",
+        "identity": "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc"
+      }
+    ],
+    "rejected_evidence": [],
+    "ignored_item_keys": [],
+    "policy": [
+      {
+        "provenance": "evidence_gaps[0]",
+        "identity": "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc",
+        "kind": "compile_evidence",
+        "decision": "admitted",
+        "reason": "",
+        "adapter": "java_compile_diagnostic"
+      }
+    ],
+    "source_freshness": {
+      "MainApp.java": "fresh"
+    },
+    "diagnostics": [
+      {
+        "schema_version": "preflight_request_v1",
+        "phase_id": "PREFLIGHT.REQUEST.1",
+        "evidence_kind": "compile_evidence",
+        "adapter": {
+          "id": "java_compile_diagnostic",
+          "version": "1"
+        },
+        "tool": "javac",
+        "tool_version": "javac 26.0.2.1",
+        "tool_available": true,
+        "attempted": true,
+        "outcome": "compile_failed",
+        "reason": "",
+        "repository_id": "java-f0fc418b6355ebbe9c8fbcb27b899b93",
+        "control_sha256": "8b529f7251c4a755cdb640d98cf62ed7a4479424a442373a0b8acf1561b8175a",
+        "need_identities": [
+          "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc"
+        ],
+        "compile_mode": "independent_per_target",
+        "working_directory": "repository_root",
+        "environment_keys": [
+          "PATH",
+          "SYSTEMDRIVE",
+          "SYSTEMROOT",
+          "TEMP",
+          "TMP",
+          "TMPDIR",
+          "WINDIR"
+        ],
+        "version_probe": {
+          "attempted": true,
+          "exit_status": 0,
+          "timed_out": false,
+          "elapsed_ms": 1814.514
+        },
+        "targets": [
+          {
+            "path": "MainApp.java",
+            "language": "java",
+            "source_sha256": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+            "attempted": true,
+            "outcome": "compile_failed",
+            "reason": "",
+            "compile_mode": "independent",
+            "group": [],
+            "independent_outcome": null,
+            "exit_status": 1,
+            "timed_out": false,
+            "elapsed_ms": 2785.283,
+            "error_count": 5,
+            "warning_count": 0,
+            "diagnostics": [
+              {
+                "file": "MainApp.java",
+                "reported_file": "MainApp.java",
+                "line": 12,
+                "column": 49,
+                "severity": "error",
+                "message": "cannot find symbol",
+                "text": "MainApp.java:12: error: cannot find symbol\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp"
+              },
+              {
+                "file": "MainApp.java",
+                "reported_file": "MainApp.java",
+                "line": 20,
+                "column": 49,
+                "severity": "error",
+                "message": "cannot find symbol",
+                "text": "MainApp.java:20: error: cannot find symbol\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n                                                ^\n  symbol:   variable no1\n  location: class MainApp"
+              },
+              {
+                "file": "MainApp.java",
+                "reported_file": "MainApp.java",
+                "line": 26,
+                "column": 49,
+                "severity": "error",
+                "message": "non-static variable no cannot be referenced from a static context",
+                "text": "MainApp.java:26: error: non-static variable no cannot be referenced from a static context\n        System.out.println(\"Result 7 : \"+(no3 + no));\n                                                ^"
+              },
+              {
+                "file": "MainApp.java",
+                "reported_file": "MainApp.java",
+                "line": 28,
+                "column": 43,
+                "severity": "error",
+                "message": "cannot find symbol",
+                "text": "MainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                          ^\n  symbol:   variable no1\n  location: class MainApp"
+              },
+              {
+                "file": "MainApp.java",
+                "reported_file": "MainApp.java",
+                "line": 28,
+                "column": 49,
+                "severity": "error",
+                "message": "cannot find symbol",
+                "text": "MainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp"
+              }
+            ],
+            "stdout": {
+              "bytes_total": 0,
+              "bytes_captured": 0,
+              "truncated": false,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "text": ""
+            },
+            "stderr": {
+              "bytes_total": 1029,
+              "bytes_captured": 1029,
+              "truncated": false,
+              "sha256": "208f28e428d317061a2a76297a2f78ac5ce5bb51e2cf77890f11c3a0875218ca",
+              "text": "MainApp.java:12: error: cannot find symbol\n        System.out.println(\"Result 3 : \"+(no1 + no2));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp\nMainApp.java:20: error: cannot find symbol\n        System.out.println(\"Result 6 : \"+(no2 + no1));\n                                                ^\n  symbol:   variable no1\n  location: class MainApp\nMainApp.java:26: error: non-static variable no cannot be referenced from a static context\n        System.out.println(\"Result 7 : \"+(no3 + no));\n                                                ^\nMainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                          ^\n  symbol:   variable no1\n  location: class MainApp\nMainApp.java:28: error: cannot find symbol\n        System.out.println(\"Result 9 : \"+(no1 + no2 + no3));\n                                                ^\n  symbol:   variable no2\n  location: class MainApp\n5 errors\n"
+            },
+            "invocation": "javac -J-Duser.language=en -J-Duser.country=US -J-XX:-UsePerfData -J-Dstdout.encoding=UTF-8 -J-Dstderr.encoding=UTF-8 -encoding UTF-8 -proc:none -implicit:none -sourcepath <isolated-empty> -classpath <isolated-empty> -d <isolated-output> -Xmaxerrs 100 -Xmaxwarns 100 MainApp.java"
+          }
+        ],
+        "exit_statuses": {
+          "MainApp.java": 1
+        },
+        "process_timeout_seconds": 60.0,
+        "timing_ms": {
+          "adapter_construction": 6.496,
+          "tool_probe": 1814.514,
+          "process_launch": 266.41,
+          "process_wait": 2518.873,
+          "normalization": 1.975,
+          "cleanup": 5.958,
+          "total": 4620.317
+        },
+        "operational_warnings": [],
+        "semantics": "compile_passed proves only that a target compiled under the recorded javac invocation and environment; it does not establish behavioral correctness, test results or patch correctness. compile_failed proves only that compilation failed under that invocation; it does not decide which change is correct. Neither grants patch, write, execution or approval authority.",
+        "authority": {
+          "write_authority": false,
+          "patch_authority": false,
+          "execution_authorized": false,
+          "patch_applied": false,
+          "human_approval_granted": false
+        },
+        "evidence_fingerprint": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e"
+      }
+    ],
+    "need_receipts": {
+      "a089107ac9622caae1bea28f248f58707991840a549066807f1c0fc2be1f49bc": "0c218e5838fe2551597bc51dbf3d0c02f69c32f76791f88cbf86d64361c6119e"
+    },
+    "handoff": {
+      "attached": true,
+      "field": "preflight_validation",
+      "outcome": "failed",
+      "category": "build_error"
+    },
+    "timing_ms": {
+      "policy": 5.587,
+      "freshness": 0.428,
+      "total": 4628.037,
+      "harness_overhead": 28.24
+    },
+    "executable_commands_accepted": 0,
+    "model_calls": 0,
+    "network_operations": 0,
+    "repository_traversals": 0,
+    "graph_operations": 0,
+    "index_operations": 0,
+    "embedding_operations": 0,
+    "authority": {
+      "write_authority": false,
+      "patch_authority": false,
+      "execution_authorized": false,
+      "patch_applied": false,
+      "human_approval_granted": false
+    }
+  },
+  "live_before_files": {
+    "armstrong.java": {
+      "sha256": "c5df23eb11358dcabcc93da39de57b791fb75f63904169f0bb6d9c2b5f6c2422",
+      "bytes": 586,
+      "mtime_ns": 1789367351737754600
+    },
+    "bank.java": {
+      "sha256": "361a600f98447b05876e3d0fbf3a6ea56e4bcf82abf588df6fb09a312fc7d806",
+      "bytes": 1144,
+      "mtime_ns": 1789973144378200400
+    },
+    "BankAccount.class": {
+      "sha256": "d71ced44380a37609f954b1a2f99115c6b526c64ae7543cf9945b1b21f7b85c6",
+      "bytes": 1344,
+      "mtime_ns": 1789971784960277700
+    },
+    "fibonacci.java": {
+      "sha256": "0d462d1bff4a6d8c8db963343030a558b6f98c956e65656d34212e4cd02345db",
+      "bytes": 142,
+      "mtime_ns": 1789367700053684800
+    },
+    "library.java": {
+      "sha256": "96bbbd21f528616adf68674bc2561a679a20618f2a67491fbfc624b5f171f635",
+      "bytes": 624,
+      "mtime_ns": 1789971107105370400
+    },
+    "MainApp.class": {
+      "sha256": "861b89fc437033d1b890a742a9ef834f5cb6e12b4d16a34ee67debebcdf0b88f",
+      "bytes": 1403,
+      "mtime_ns": 1789360058566547000
+    },
+    "MainApp.java": {
+      "sha256": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+      "bytes": 1076,
+      "mtime_ns": 1789363985057404200
+    },
+    "Number.class": {
+      "sha256": "f5aacd34d00a08e742e9c87ca89d3354287cc03d693152d5dc90ad8599885fc1",
+      "bytes": 943,
+      "mtime_ns": 1789366664425430400
+    },
+    "Number.java": {
+      "sha256": "b2c14795b46840946dbd30ac887f1b1e82572356ea58a0f6a7ed5db6abdb3a27",
+      "bytes": 249,
+      "mtime_ns": 1789366835549383800
+    },
+    "Solution.class": {
+      "sha256": "0bc15508dbc170f22092bc80ffafa8945e3fef67b7a5bfab585c4ae6217b136e",
+      "bytes": 731,
+      "mtime_ns": 1788765184807275500
+    },
+    "star.class": {
+      "sha256": "ebf3e39afff1604ec2d8a355885ddc3a03791a03c0a8ed552abe5adb04744f4e",
+      "bytes": 586,
+      "mtime_ns": 1789370262680193400
+    },
+    "star.java": {
+      "sha256": "695b7f8adb414fd62aa6804facfbe8e05401a0415f2389137d3d872837c1268e",
+      "bytes": 476,
+      "mtime_ns": 1789964234233973700
+    },
+    "Student.class": {
+      "sha256": "d4763b44c30f29f654d683a6a00f01c116bcbfc0671def6cdfcaf5cb47498b01",
+      "bytes": 2963,
+      "mtime_ns": 1789968370617959600
+    },
+    "student.java": {
+      "sha256": "f373fbf64bcdec6f8a72b4631455ccb164326605a1cd4cf15d75a311025da4d9",
+      "bytes": 2398,
+      "mtime_ns": 1789971069961752000
+    },
+    "Students.class": {
+      "sha256": "5f1e6f7c9b30c97e243f016cffc7d1c25c6ba54fee3ae7781f7e469dfc2c8071",
+      "bytes": 611,
+      "mtime_ns": 1789968370485071800
+    },
+    "Twosum.class": {
+      "sha256": "0bc62faf57345cf83697c76db4c3b6b8b006f22f068b2aa4b2b07d5870dd2665",
+      "bytes": 938,
+      "mtime_ns": 1788765184877833300
+    },
+    "Twosum.java": {
+      "sha256": "b6164c74cd30eeaabf6368346b36e08e23fdf2afb6f36471bcf12e611decfc8c",
+      "bytes": 741,
+      "mtime_ns": 1788765178157863900
+    }
+  },
+  "live_after_files": {
+    "armstrong.java": {
+      "sha256": "c5df23eb11358dcabcc93da39de57b791fb75f63904169f0bb6d9c2b5f6c2422",
+      "bytes": 586,
+      "mtime_ns": 1789367351737754600
+    },
+    "bank.java": {
+      "sha256": "361a600f98447b05876e3d0fbf3a6ea56e4bcf82abf588df6fb09a312fc7d806",
+      "bytes": 1144,
+      "mtime_ns": 1789973144378200400
+    },
+    "BankAccount.class": {
+      "sha256": "d71ced44380a37609f954b1a2f99115c6b526c64ae7543cf9945b1b21f7b85c6",
+      "bytes": 1344,
+      "mtime_ns": 1789971784960277700
+    },
+    "fibonacci.java": {
+      "sha256": "0d462d1bff4a6d8c8db963343030a558b6f98c956e65656d34212e4cd02345db",
+      "bytes": 142,
+      "mtime_ns": 1789367700053684800
+    },
+    "library.java": {
+      "sha256": "96bbbd21f528616adf68674bc2561a679a20618f2a67491fbfc624b5f171f635",
+      "bytes": 624,
+      "mtime_ns": 1789971107105370400
+    },
+    "MainApp.class": {
+      "sha256": "861b89fc437033d1b890a742a9ef834f5cb6e12b4d16a34ee67debebcdf0b88f",
+      "bytes": 1403,
+      "mtime_ns": 1789360058566547000
+    },
+    "MainApp.java": {
+      "sha256": "6e84dc30157e53e9c10b775bc0da48b2be63f5a33583130527f7cd4edba7ae39",
+      "bytes": 1076,
+      "mtime_ns": 1789363985057404200
+    },
+    "Number.class": {
+      "sha256": "f5aacd34d00a08e742e9c87ca89d3354287cc03d693152d5dc90ad8599885fc1",
+      "bytes": 943,
+      "mtime_ns": 1789366664425430400
+    },
+    "Number.java": {
+      "sha256": "b2c14795b46840946dbd30ac887f1b1e82572356ea58a0f6a7ed5db6abdb3a27",
+      "bytes": 249,
+      "mtime_ns": 1789366835549383800
+    },
+    "Solution.class": {
+      "sha256": "0bc15508dbc170f22092bc80ffafa8945e3fef67b7a5bfab585c4ae6217b136e",
+      "bytes": 731,
+      "mtime_ns": 1788765184807275500
+    },
+    "star.class": {
+      "sha256": "ebf3e39afff1604ec2d8a355885ddc3a03791a03c0a8ed552abe5adb04744f4e",
+      "bytes": 586,
+      "mtime_ns": 1789370262680193400
+    },
+    "star.java": {
+      "sha256": "695b7f8adb414fd62aa6804facfbe8e05401a0415f2389137d3d872837c1268e",
+      "bytes": 476,
+      "mtime_ns": 1789964234233973700
+    },
+    "Student.class": {
+      "sha256": "d4763b44c30f29f654d683a6a00f01c116bcbfc0671def6cdfcaf5cb47498b01",
+      "bytes": 2963,
+      "mtime_ns": 1789968370617959600
+    },
+    "student.java": {
+      "sha256": "f373fbf64bcdec6f8a72b4631455ccb164326605a1cd4cf15d75a311025da4d9",
+      "bytes": 2398,
+      "mtime_ns": 1789971069961752000
+    },
+    "Students.class": {
+      "sha256": "5f1e6f7c9b30c97e243f016cffc7d1c25c6ba54fee3ae7781f7e469dfc2c8071",
+      "bytes": 611,
+      "mtime_ns": 1789968370485071800
+    },
+    "Twosum.class": {
+      "sha256": "0bc62faf57345cf83697c76db4c3b6b8b006f22f068b2aa4b2b07d5870dd2665",
+      "bytes": 938,
+      "mtime_ns": 1788765184877833300
+    },
+    "Twosum.java": {
+      "sha256": "b6164c74cd30eeaabf6368346b36e08e23fdf2afb6f36471bcf12e611decfc8c",
+      "bytes": 741,
+      "mtime_ns": 1788765178157863900
+    }
+  },
+  "final_java_hash_recheck": true,
+  "sandbox_transport_attempt": {
+    "observation": {
+      "phase_id": "PATCH.AUTHOR.SPAN.1",
+      "task": "Help me check if the code in twosum.java and MainApp.java is ok, then fix them",
+      "target": "C:\\Users\\Admin\\Documents\\Code\\Side quest\\java",
+      "fresh_control": null,
+      "write_authority": false,
+      "execution_authorized": false,
+      "auto_apply": false,
+      "apply_invoked": false,
+      "human_approval_required": true,
+      "scope_selection_model_calls": 0,
+      "span_selection_model_calls": 0,
+      "provider_calls": [
+        {
+          "kind": "bootstrap",
+          "prompt_sha256": "51c64cfc6625bf89549b325b0f60d87bfc8ec3b28464fa079636894c88ac1ce1",
+          "seconds": 0.510331799974665
+        }
+      ],
+      "candidate_produced": false,
+      "task_text_remains_generate_patch": null,
+      "repair_scope": null,
+      "crlf_result": "not_reached",
+      "java_candidate_validation": "not_reached",
+      "patch_minimal_result": "not_reached",
+      "first_remaining_blocker": "UPSTREAM_REPLAY_BLOCKER",
+      "elapsed_seconds": 7.265162300027441,
+      "all_target_files_unchanged": true
+    },
+    "reason": "WinError 10013 before any provider response; no author call. Retried the authorized replay with network permission; no second completed live replay."
+  },
+  "first_remaining_blocker": "AUTHOR_MODEL_OUTPUT",
+  "recommended_next_phase": "Investigate author abstention under the existing contract in a separately scoped author-output phase; no measured evidence justifies PATCH.MINIMAL remediation.",
+  "checks_pending": [],
+  "phase_source_sha256": {
+    "docs/roadmap/phase_registry.json": "bb70321d020b7063b0ae42af9c911206899aa9c25ffa832e75d4bb8976cc7141",
+    "core/control_engine.py": "ef3641ccc6b4480954ea0a1aa9404da72ed9404a485729d9e562ed9758093bbe",
+    "core/candidate_revision.py": "55a64a9f6564b1fad33f6547a7904792578d9e98b40b481d968f40c12266a05a",
+    "core/candidate_authoring_context.py": "f41ff481f9f470da49d5cc44ac1dbec708f28277deef9be357575365e93e1281",
+    "core/authoring_repair_scope.py": "e118f8eb4bb22513efb55258833280245c41b0c7d01c5fc1564263dd2e7a01bc",
+    "core/patch_authoring_contract.py": "4040bc851ea611f6c4e7e9852e10e87eb6424e3764c9d7e14cecb99e22e0ee42",
+    "tests/test_phase_registry.py": "583f807e290729abd3bc83f26c8b3b01eb110f04a3413bf6d0ff991624702109",
+    "tests/test_phase_picker.py": "641601bf4b8d91531582b1c0e86a6ca1326a1bbe2bef66bba0f92635581eaf59",
+    "tests/_patch_author_scope1_maintenance.py": "105189d2dcbd56aea02752c7d5a612033fcc7f3152441093cc449d792b1778ef",
+    "core/candidate_replacement_span.py": "9f73f272bf2e81a1b8da36414d9eb43558c6ea7c204f24d8dc59c64d59bbb90a",
+    "tests/test_patch_author_span1.py": "0b6ee92b20c0e5b8ae26b98220707e989ebe652cb4ea30a0d4800e0d1797edfa",
+    "tests/_patch_author_span1_maintenance.py": "e4db96da9fd94e2a84d19110c50fe9f8623f71e269f94535260cedabfd2ce2f9",
+    "tests/fixtures/patch_author_span1_reversal.json": "0e60be49f61a7b03a4ef4a9ce8d5686bd05616b0bdb855ecb813509a1ff4e93b",
+    "tests/fixtures/patch_author_span1_frozen.json": "2a9e263fd24a314b368931ab38c739a20227ffddeb3ce8f94fa72a5c7a73fdf8"
+  }
+}

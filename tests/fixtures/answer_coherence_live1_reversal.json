@@ -1,0 +1,85 @@
+{
+  "schema_version": "answer_coherence_live1_reversal_v1",
+  "phase_id": "ANSWER.COHERENCE.LIVE.1",
+  "reason": "ANSWER.COHERENCE.LIVE.1 binds every candidate-authored field of the final answer to one candidate. It edited core/pipeline.py (the capture at finalize_answer, the one-unit install in _maybe_revise_rejected_candidate, the final binding in _verify_authored_candidate_without_mutation, and one key group) and core/agent_state.py (one run field). Every earlier phase that pins these files is evaluated against history: tests/_harness_maintenance.py undoes these hunks, asserting both digests, before the remediation's own.",
+  "chain": {
+    "core/pipeline.py": "this receipt's pre_sha256 is the 2026-09-10 harness remediation's post_sha256, so shipped -> this pre -> remediation pre -> PATCH.AUTHOR.LIVE.2 post, byte for byte",
+    "core/agent_state.py": "this receipt's pre_sha256 is the digest DEFECT.PROBE.LIVE.5 pins; the remediation never touched this file"
+  },
+  "new_module": "core/candidate_presentation.py",
+  "reversals": [
+    {
+      "path": "core/pipeline.py",
+      "pre_sha256": "6b9efb3f44a1d9d7e86634fa7451e85ad3c8697493bc9e62fe09bc506bdb948e",
+      "post_sha256": "92d2772d1cde074ff7006821f8cc7dd5d60f43254e99ab33729c7a512caad319",
+      "hunks": [
+        {
+          "post": "    not_eligible_receipt,\r\n    parse_revised_candidate,\r\n    revision_evidence_is_current,\r\n)\r\nfrom core.candidate_presentation import (\r\n    GENERATION_INITIAL,\r\n    GENERATION_REVISION,\r\n    CandidateAuthoredFields,\r\n    bind_final_candidate_presentation,\r\n    capture_candidate_authored_fields,\r\n    describe_candidate_presentation,\r\n    install_candidate_presentation,\r\n    superseded_candidate_history,\r\n)\r\nfrom core.candidate_verification import (\r\n    candidate_verification_is_current,\r\n",
+          "pre": "    not_eligible_receipt,\r\n    parse_revised_candidate,\r\n    revision_evidence_is_current,\r\n)\r\nfrom core.candidate_verification import (\r\n    candidate_verification_is_current,\r\n"
+        },
+        {
+          "post": "\r\n    state.final_answer = answer\r\n    state.json_block = extract_json_block(answer)\r\n    # ANSWER.COHERENCE.LIVE.1 — what this authoring response said about its\r\n    # own candidate, recorded before any gate below can narrow the payload.\r\n    # A revision replaces the candidate and this record together.\r\n    state.candidate_presentation = capture_candidate_authored_fields(\r\n        state.json_block, generation=GENERATION_INITIAL\r\n    )\r\n    state.human_answer = strip_json_from_text(answer)\r\n\r\n    # WORKER.DECL.2A: one response, two parsers.  The legacy payload above is\r\n",
+          "pre": "\r\n    state.final_answer = answer\r\n    state.json_block = extract_json_block(answer)\r\n    state.human_answer = strip_json_from_text(answer)\r\n\r\n    # WORKER.DECL.2A: one response, two parsers.  The legacy payload above is\r\n"
+        },
+        {
+          "post": "    \"candidate_revision_previous_candidate\",\r\n)\r\n\r\n#: ANSWER.COHERENCE.LIVE.1 — which candidate the final answer presents, and\r\n#: whether every author-facing field was bound to it.  Written once the\r\n#: candidate lifecycle is terminal; it names one exact candidate and goes\r\n#: stale with it, like every candidate-bound receipt above.\r\n_CANDIDATE_PRESENTATION_KEYS: tuple[str, ...] = (\r\n    \"candidate_presentation_phase_id\",\r\n    \"candidate_presentation_schema_version\",\r\n    \"final_candidate_fingerprint\",\r\n    \"final_candidate_generation\",\r\n    \"candidate_presentation_coherent\",\r\n    \"candidate_presentation_authored_fields\",\r\n    \"candidate_presentation_model_confidence\",\r\n    \"candidate_presentation_model_needs_escalation\",\r\n    \"candidate_presentation_incoherence_reasons\",\r\n)\r\n\r\n\r\ndef _record_candidate_mutation_effect(state: AgentState) -> Any | None:\r\n    \"\"\"PATCH.MINIMAL.LIVE.1 — the exact mutation-effect gate.\r\n",
+          "pre": "    \"candidate_revision_previous_candidate\",\r\n)\r\n\r\n\r\ndef _record_candidate_mutation_effect(state: AgentState) -> Any | None:\r\n    \"\"\"PATCH.MINIMAL.LIVE.1 — the exact mutation-effect gate.\r\n"
+        },
+        {
+          "post": "    verification = _maybe_revise_rejected_candidate(\r\n        state, project_root=project_root, verification=verification\r\n    )\r\n    # ANSWER.COHERENCE.LIVE.1 — the candidate lifecycle is terminal here, so\r\n    # this is where the final answer is bound to exactly one candidate.\r\n    _record_candidate_presentation(state)\r\n\r\n    state.auto_patch_result = _read_only_verification_message(verification)\r\n    revision = getattr(state, \"candidate_revision\", None)\r\n",
+          "pre": "    verification = _maybe_revise_rejected_candidate(\r\n        state, project_root=project_root, verification=verification\r\n    )\r\n\r\n    state.auto_patch_result = _read_only_verification_message(verification)\r\n    revision = getattr(state, \"candidate_revision\", None)\r\n"
+        },
+        {
+          "post": "    _CANDIDATE_VERIFICATION_KEYS,\r\n    _CANDIDATE_EFFECT_KEYS,\r\n    _CANDIDATE_NOVELTY_KEYS,\r\n    _CANDIDATE_PRESENTATION_KEYS,\r\n)\r\n\r\n#: The derived readiness flags those receipts wrote.  They are decisions about\r\n",
+          "pre": "    _CANDIDATE_VERIFICATION_KEYS,\r\n    _CANDIDATE_EFFECT_KEYS,\r\n    _CANDIDATE_NOVELTY_KEYS,\r\n)\r\n\r\n#: The derived readiness flags those receipts wrote.  They are decisions about\r\n"
+        },
+        {
+          "post": "    if isinstance(state.json_block, dict):\r\n        state.json_block.update(telemetry)\r\n    return receipt\r\n\r\n\r\ndef _recorded_candidate_presentation(\r\n    state: AgentState,\r\n) -> CandidateAuthoredFields | None:\r\n    \"\"\"The run's record of who authored the candidate now on the payload.\"\"\"\r\n\r\n    record = getattr(state, \"candidate_presentation\", None)\r\n    return record if isinstance(record, CandidateAuthoredFields) else None\r\n\r\n\r\ndef _record_candidate_presentation(state: AgentState) -> Any | None:\r\n    \"\"\"ANSWER.COHERENCE.LIVE.1 — bind the final answer to one candidate.\r\n\r\n    The generation comes from the revision receipt, the identity from the\r\n    lifecycle receipts, and the author-facing fields from the run's record\r\n    of that candidate's author.  Nothing here writes a readiness flag, an\r\n    authority flag or ``needs_escalation``; a presentation that cannot be\r\n    bound withholds the author's account instead of guessing whose it is.\r\n    \"\"\"\r\n\r\n    block = state.json_block if isinstance(state.json_block, dict) else None\r\n    if block is None:\r\n        return None\r\n    revision = getattr(state, \"candidate_revision\", None)\r\n    revised = bool(\r\n        isinstance(revision, CandidateRevisionReceipt)\r\n        and revision.revised_candidate_present\r\n    )\r\n    presentation = bind_final_candidate_presentation(\r\n        block,\r\n        author=_recorded_candidate_presentation(state),\r\n        revised_candidate_present=revised,\r\n        revised_candidate_fingerprint=(\r\n            revision.revised_candidate_fingerprint if revised else \"\"\r\n        ),\r\n        payload_candidate_fingerprint=(\r\n            candidate_fingerprint_from_payload(block)\r\n            if candidate_plan_from_payload(block)\r\n            else None\r\n        ),\r\n    )\r\n    if presentation is None:\r\n        return None\r\n    block.update(presentation.as_telemetry())\r\n    print(\r\n        (\"🧷 \" if presentation.coherent else \"🛑 \")\r\n        + \"ANSWER.COHERENCE.LIVE.1 final answer: \"\r\n        + describe_candidate_presentation(presentation)\r\n    )\r\n    return presentation\r\n\r\n\r\ndef _revision_attempts_already_made(state: AgentState) -> int:\r\n",
+          "pre": "    if isinstance(state.json_block, dict):\r\n        state.json_block.update(telemetry)\r\n    return receipt\r\n\r\n\r\ndef _revision_attempts_already_made(state: AgentState) -> int:\r\n"
+        },
+        {
+          "post": "\r\n    # §11/§17 — Candidate0 survives only as bounded historical evidence, and\r\n    # every receipt it earned is removed before Candidate1 is measured.\r\n    # ANSWER.COHERENCE.LIVE.1 §3/§27 — that history also keeps what\r\n    # Candidate0's author said and what verification found, labelled as the\r\n    # rejected first generation, because the primary surface below carries\r\n    # Candidate1's account and nobody else's.\r\n    superseded = _recorded_candidate_presentation(state)\r\n    block[\"candidate_revision_previous_candidate\"] = {\r\n        \"candidate_fingerprint\": evidence.rejected_candidate_fingerprint,\r\n        \"relative_path\": evidence.target_file,\r\n        \"target_node_name\": evidence.target_symbol,\r\n        \"patched_snippet\": evidence.rejected_patched_snippet,\r\n        \"status\": \"rejected_evidence_only\",\r\n        **superseded_candidate_history(block, superseded),\r\n    }\r\n    _drop_candidate_bound_receipts(state)\r\n    # ANSWER.COHERENCE.LIVE.1 — Candidate1 and its author's account are one\r\n    # install from one response: the bytes, the §42 confidence (a confidence\r\n    # travels only if this response actually carried one), the summary and\r\n    # the author's own issues.  A field it did not supply stays absent.\r\n    authored = capture_candidate_authored_fields(\r\n        extract_json_block(response),\r\n        generation=GENERATION_REVISION,\r\n        confidence=revised.confidence,\r\n        supersedes=superseded,\r\n    ) or CandidateAuthoredFields(\r\n        generation=GENERATION_REVISION, supersedes=superseded\r\n    )\r\n    install_candidate_presentation(\r\n        block, candidate=revised.candidate, authored=authored\r\n    )\r\n    state.candidate_presentation = authored\r\n\r\n    # A fresh candidate has escalated nothing yet.  Candidate0's flag was a\r\n    # decision about Candidate0, and every gate below can raise this one again\r\n",
+          "pre": "\r\n    # §11/§17 — Candidate0 survives only as bounded historical evidence, and\r\n    # every receipt it earned is removed before Candidate1 is measured.\r\n    block[\"candidate_revision_previous_candidate\"] = {\r\n        \"candidate_fingerprint\": evidence.rejected_candidate_fingerprint,\r\n        \"relative_path\": evidence.target_file,\r\n        \"target_node_name\": evidence.target_symbol,\r\n        \"patched_snippet\": evidence.rejected_patched_snippet,\r\n        \"status\": \"rejected_evidence_only\",\r\n    }\r\n    _drop_candidate_bound_receipts(state)\r\n    block[\"patch_candidate\"] = dict(revised.candidate)\r\n    block[\"patch_plan\"] = None\r\n    # §42 — a confidence travels only if this response actually carried one.\r\n    block.pop(\"confidence\", None)\r\n    if revised.confidence is not None:\r\n        block[\"confidence\"] = revised.confidence\r\n\r\n    # A fresh candidate has escalated nothing yet.  Candidate0's flag was a\r\n    # decision about Candidate0, and every gate below can raise this one again\r\n"
+        }
+      ],
+      "top_level_definitions_pre": 42,
+      "top_level_definitions_post": 44,
+      "added_definitions": [
+        "_record_candidate_presentation",
+        "_recorded_candidate_presentation"
+      ],
+      "removed_definitions": [],
+      "changed_definitions": [
+        "_maybe_revise_rejected_candidate",
+        "_verify_authored_candidate_without_mutation",
+        "finalize_answer"
+      ],
+      "added_assignments": [
+        "_CANDIDATE_PRESENTATION_KEYS"
+      ],
+      "changed_assignments": [
+        "_CANDIDATE_BOUND_RECEIPT_GROUPS"
+      ]
+    },
+    {
+      "path": "core/agent_state.py",
+      "pre_sha256": "02b1db1bb0e57cae11d3a6833b7cd14b13775c9c5f639ebdab4aaf0bd61dc25d",
+      "post_sha256": "800cc9505b149ab6ca443804b6f7486f0bc7d2baf0debf80157dd0d2e6f01909",
+      "hunks": [
+        {
+          "post": "    # candidate is exactly the thing a revision replaces.\r\n    candidate_revision: Optional[Any] = None\r\n\r\n    # ANSWER.COHERENCE.LIVE.1 - the account the author of the candidate now\r\n    # on the payload gave of it, recorded when its response was parsed.  A\r\n    # revision replaces the candidate and this record together, so every\r\n    # author-facing field of the final answer names one candidate.\r\n    candidate_presentation: Optional[Any] = None\r\n\r\n\r\ndef time_budget_exceeded(state: AgentState) -> bool:\r\n    return (time.time() - state.started_at) > state.time_budget_sec\r\n",
+          "pre": "    # candidate is exactly the thing a revision replaces.\r\n    candidate_revision: Optional[Any] = None\r\n\r\n\r\ndef time_budget_exceeded(state: AgentState) -> bool:\r\n    return (time.time() - state.started_at) > state.time_budget_sec\r\n"
+        }
+      ],
+      "top_level_definitions_pre": 2,
+      "top_level_definitions_post": 2,
+      "added_definitions": [],
+      "removed_definitions": [],
+      "changed_definitions": [
+        "AgentState"
+      ],
+      "added_assignments": [],
+      "changed_assignments": []
+    }
+  ]
+}

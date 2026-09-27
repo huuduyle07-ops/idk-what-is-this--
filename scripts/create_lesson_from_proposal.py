@@ -16,9 +16,12 @@ import argparse
 import json
 import sys
 from pathlib import Path
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+
+from core.rollback_outcome import rollback_disqualifies_success_evidence
 _REQUIRED_FILES = (
     "item.json",
     "case.json",
@@ -163,7 +166,7 @@ def _build_candidate(artifacts: dict) -> dict:
     missing_expected = sorted(set(expected) - set(changed_files))
 
     validation_ok = bool(validation.get("validation_ok") or validation.get("ok"))
-    rollback = bool(apply_result.get("rollback_performed"))
+    rollback = rollback_disqualifies_success_evidence(apply_result)
 
     case_name = item.get("case_name") or case.get("name") or ""
     language = item.get("language") or case.get("language") or ""

@@ -28,6 +28,27 @@ JSON_ARTIFACT_NAMES = {
     "final_status.json",
     "patch_parsed.json",
     "patch_plan.json",
+    # EXEC.APPROVAL.LIVE.1 persists the typed human authorization before the
+    # executor is entered. Older bundles simply do not carry this additive file.
+    "human_apply_authorization.json",
+    # CHECK.LIVE.1 attaches its shadow post-run reconciliation receipt to the
+    # bundle the run already produces.  The addition is additive and
+    # migration-safe: a bundle written before this phase simply does not carry
+    # the file, and `files_present` is derived from disk.
+    "post_run_reconciliation_shadow.json",
+    # WORKER.DECL.2A records how the strict one-object patch envelope and the
+    # legacy extractor each read the worker response behind this run.  Same
+    # additive, migration-safe shape: bounded identity metadata only, and an
+    # older bundle simply does not carry the file.
+    "worker_patch_envelope.json",
+    # WORKER.DECL.2A.1 records which output-transport strategy was asked of the
+    # model call behind this run, beside the strict/legacy statuses above.
+    # Additive and migration-safe in the same way: a bundle written before the
+    # phase, or with the experiment off, simply does not carry the file.
+    "strict_envelope_emission.json",
+    # WORKER.DECL.2B freezes bounded pre-execution intent identity/status
+    # telemetry.  It contains no response body, prompt, snippet or file body.
+    "pre_execution_change_intent.json",
     "scout_snippets.json",
     "self_correct_attempts.json",
 }

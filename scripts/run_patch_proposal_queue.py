@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from contextlib import ExitStack
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -167,7 +168,7 @@ def _split_validation_command(command: str) -> tuple[list[list[str]], str | None
     return segments, None
 
 
-def _validation_env() -> dict[str, str]:
+def _validation_env(pycache_prefix: str = "") -> dict[str, str]:
     env = os.environ.copy()
     env["PYTHONUTF8"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
@@ -185,7 +186,18 @@ def _validation_env() -> dict[str, str]:
     except Exception:
         pass
 
-    return env
+    # OPS.VALIDATE.2 - last, over anything inherited.  A worker proposal is
+    # validated in a temp clone that carries the source repository's
+    # __pycache__ with it, so without this a same-size candidate could be
+    # judged against the bytecode of the state before it.
+    try:
+        from core.validation_bytecode_cache import (
+            apply_validation_bytecode_cache_env,
+        )
+
+        return apply_validation_bytecode_cache_env(env, pycache_prefix)
+    except Exception:
+        return env
 
 
 def _run_validation_command(command: str, cwd: Path, timeout_sec: int) -> dict[str, Any]:
@@ -205,7 +217,37 @@ def _run_validation_command(command: str, cwd: Path, timeout_sec: int) -> dict[s
             "output": "",
         }
 
-    env = _validation_env()
+    # OPS.VALIDATE.2 - one fresh bytecode cache for the whole multi-segment
+    # run, removed on every exit path including the timeout returns below.
+    with ExitStack() as stack:
+        try:
+            from core.validation_bytecode_cache import validation_bytecode_cache
+
+            pycache_prefix = stack.enter_context(validation_bytecode_cache())
+        except Exception:
+            pycache_prefix = ""
+        return _run_validation_segments(
+            command,
+            cwd,
+            timeout_sec,
+            segments,
+            started,
+            output_parts,
+            completed_segments,
+            _validation_env(pycache_prefix),
+        )
+
+
+def _run_validation_segments(
+    command: str,
+    cwd: Path,
+    timeout_sec: int,
+    segments: list,
+    started: float,
+    output_parts: list[str],
+    completed_segments: list[dict[str, Any]],
+    env: dict[str, str],
+) -> dict[str, Any]:
     for args in segments:
         elapsed = time.time() - started
         remaining_raw = timeout_sec - elapsed
@@ -429,9 +471,14 @@ def _generate_patch_payload(
     temp_repo: Path,
     item: dict[str, Any],
     case: dict[str, Any],
+    emission: Any = None,
 ) -> tuple[dict[str, Any] | None, str]:
     from agents.gemini_client import run_gemini_request_2
     from core.json_utils import extract_json_block
+    from core.strict_envelope_emission import (
+        apply_strict_emission_to_prompt,
+        strict_emission_client_kwargs,
+    )
 
     prompt = f"""You are generating a patch proposal inside an isolated temporary benchmark repo.
 Do not modify any real repository. Return JSON only.
@@ -476,7 +523,16 @@ Rules:
 - If no safe patch can be proposed, set patch_candidate=null and patch_plan=null.
 - Never include shell commands from your own output.
 """
-    raw = run_gemini_request_2(prompt=prompt, repo_path=str(temp_repo)) or ""
+    # WORKER.DECL.2A.1: the same single call, optionally asked for the strict
+    # one-object envelope instead of free-form text.  With the experiment off
+    # `emission` requests nothing: the prompt is the identical object built
+    # above and `response_mime_type` is None, which is the client's own default.
+    prompt = apply_strict_emission_to_prompt(prompt, emission)
+    raw = run_gemini_request_2(
+        prompt=prompt,
+        repo_path=str(temp_repo),
+        **strict_emission_client_kwargs(emission),
+    ) or ""
     parsed = extract_json_block(raw)
     return (parsed if isinstance(parsed, dict) else None), raw
 
@@ -608,8 +664,65 @@ def _process_item(
         temp_root = Path(temp_dir)
         temp_repo = _copy_case_repo(case_file, temp_root)
 
-        payload, raw = _generate_patch_payload(temp_repo=temp_repo, item=item, case=case)
+        # WORKER.DECL.2A.1: this site's own prompt already fixes
+        # patch_candidate=null and asks for a patch_plan, so requesting the
+        # strict envelope here overrides no patch rule and no safety
+        # instruction — only the transport changes, and only when opted in.
+        from core.strict_envelope_emission import (
+            PROVIDER_GOOGLE,
+            is_strict_envelope_emission_enabled,
+            safe_observe_strict_envelope_emission,
+            strict_emission_directive,
+        )
+
+        emission_enabled = is_strict_envelope_emission_enabled()
+        emission = strict_emission_directive(
+            PROVIDER_GOOGLE,
+            patch_plan_is_declared_shape=True,
+        )
+        from core.pre_execution_change_intent import (
+            INTENT_ARTIFACT_NAME,
+            build_durable_intent_receipt,
+            intent_emission_directive,
+            is_pre_execution_change_intent_enabled,
+            persist_durable_intent_receipt,
+            safe_capture_pre_execution_change_intent,
+        )
+
+        intent_enabled = is_pre_execution_change_intent_enabled()
+        emission = intent_emission_directive(emission)
+
+        payload, raw = _generate_patch_payload(
+            temp_repo=temp_repo, item=item, case=case, emission=emission
+        )
         (item_dir / "raw_model_response.txt").write_text(raw, encoding="utf-8")
+        # WORKER.DECL.2A: one response, two parsers.  `payload` above stays the
+        # authoritative source of the applied plan; this only records what a
+        # strict one-object envelope parser would have made of the same text.
+        from core.worker_patch_envelope import (
+            is_strict_worker_patch_envelope_shadow_enabled,
+            safe_compare_strict_and_legacy,
+        )
+
+        worker_patch_response = (
+            safe_compare_strict_and_legacy(raw, payload)
+            if (is_strict_worker_patch_envelope_shadow_enabled() or emission_enabled)
+            else None
+        )
+        # WORKER.DECL.2A.1: label that measurement with the transport that
+        # produced it.  Adoption telemetry — it selects nothing.
+        strict_envelope_emission = (
+            safe_observe_strict_envelope_emission(emission, worker_patch_response)
+            if emission_enabled
+            else None
+        )
+        # WORKER.DECL.2B: parse the same already-received response once under
+        # v2.  This frozen value is never derived from `payload` or `plan`.
+        pre_execution_intent_capture = (
+            safe_capture_pre_execution_change_intent(raw, emission)
+            if intent_enabled
+            else None
+        )
 
         if not isinstance(payload, dict):
             return {
@@ -636,8 +749,38 @@ def _process_item(
             user_query=str(item.get("title") or case.get("prompt") or case_name),
             control_result={"item": item, "case": case, "proposal": payload},
             source="proposal_queue",
+            worker_patch_response=worker_patch_response,
+            strict_envelope_emission=strict_envelope_emission,
+            pre_execution_intent_capture=pre_execution_intent_capture,
         )
         _write_json(item_dir / "apply_result.json", apply_result)
+        if pre_execution_intent_capture is not None:
+            # The replay bundle is inside the disposable clone.  Export only a
+            # bounded identity/status receipt into this established durable
+            # proposal directory before TemporaryDirectory cleans the clone.
+            from core.post_run_reconciliation_shadow import (
+                load_shadow_post_run_check,
+            )
+
+            replay_dir = apply_result.get("replay_dir")
+            shadow_receipt = (
+                load_shadow_post_run_check(replay_dir)
+                if isinstance(replay_dir, str) and replay_dir
+                else {}
+            )
+            durable_intent_receipt = build_durable_intent_receipt(
+                case_identity=case_name,
+                run_identity=str(apply_result.get("replay_id") or ""),
+                capture=pre_execution_intent_capture,
+                shadow_receipt=shadow_receipt,
+                authoritative_outcome=(
+                    "success" if apply_result.get("success") else "failed"
+                ),
+            )
+            persist_durable_intent_receipt(
+                item_dir / INTENT_ARTIFACT_NAME,
+                durable_intent_receipt,
+            )
         diff_text = "\n\n".join(str(diff) for diff in (apply_result.get("diffs") or []) if diff)
         (item_dir / "diff.patch").write_text(diff_text, encoding="utf-8")
 

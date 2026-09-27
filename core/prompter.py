@@ -37,14 +37,17 @@ REVIEWER_SCHEMA = """\
     {"severity": "low|medium|high", "type": "bug|logic|design|style|architecture|test",
      "file": "...", "symbol": "...", "reason": "...", "fix": "..."}
   ],
-  "patch_candidate": {
+  "patch_candidate": null | {
     "file": "...", "relative_path": "...",
     "target_node_name": "...", "target_node_kind": "function|class",
     "target_snippet": "...", "patched_snippet": "..."
   },
   "confidence": 0.0,
-  "needs_escalation": false
-}"""
+  "needs_escalation": false,
+  "escalation_reason": "none|semantic_intent_required|missing_context|insufficient_evidence|unsupported_scope|author_output_invalid|other_bounded_reason"
+}
+When needs_escalation=true, select a non-none escalation_reason and set
+patch_candidate=null. Otherwise use escalation_reason="none"."""
 
 PLANNER_SCHEMA = """\
 {
@@ -57,20 +60,10 @@ PLANNER_SCHEMA = """\
   "missing_context": ["..."],
   "confidence": 0.0
 }"""
-PATCH_RESPONSE_SCHEMA = """
-Return JSON:
-{
-  "summary": "...",
-  "issues": [...],
-  "patch_candidate": null | {...},
-  "patch_plan": null | [
-    {"op": "create_file", "relative_path": "...", "content": "..."},
-    {"op": "replace_snippet", "relative_path": "...", "target_snippet": "...", "patched_snippet": "..."}
-  ],
-  "confidence": 0.0,
-  "needs_escalation": false
-}
-"""
+#: PATCH.AUTHOR.LIVE.2 — the response envelope moved to the shared authoring
+#: contract, which the initial draft and the verification-guided revision both
+#: render from.  Re-exported here so this module's public name is unchanged.
+from core.patch_authoring_contract import PATCH_RESPONSE_SCHEMA
 # Hard cap on retrieved context to keep prompts bounded.
 MAX_CONTEXT_CHARS = 12000
 

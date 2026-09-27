@@ -18,16 +18,58 @@ Supported ops:
   create_file       — write a new file with `content`. Fails if file exists.
   replace_snippet   — same as patch_candidate's target/patched snippet, but
                       for one of many files.
+
+Write fidelity (OPS.PATCH.1)
+----------------------------
+Every read and write here is byte-oriented. `Path.read_text()` collapses CRLF
+and lone CR to LF, and `Path.write_text()` translates every LF back to
+`os.linesep` — so on Windows this path used to rewrite the line endings of any
+file a patch touched, and rolled back through the same translation, leaving a
+whole-file line-ending diff where it claimed to have restored the original.
+
+The invariant is therefore stated in bytes:
+
+  * an existing file keeps its own newline convention; only the bytes of the
+    requested replacement may differ;
+  * rollback restores the exact original bytes (encoding, BOM and terminators
+    included), or the exact original absence for a created file;
+  * a created file is written with the payload's own newline bytes — the host
+    OS never converts it.
+
+Snippet matching is deliberately unchanged: it still runs against the
+universal-newline view that `read_text()` used to produce, so a `\\n` snippet
+matches a CRLF file exactly as it always did. Only the write side moved.
 """
 from __future__ import annotations
 
 import difflib
+import hashlib
+import stat
+from bisect import bisect_left
 from pathlib import Path
 from typing import Any
+
+from core.failed_rollback_recovery import persist_failed_rollback_material
+from core.rollback_outcome import (
+    ROLLBACK_INCOMPLETE,
+    attach_rollback_outcome,
+    recovery_material_notice,
+    rollback_not_required,
+    rollback_outcome_from_plan,
+)
+from patching.patch_plan_transaction import (
+    PlanError, PreparedPatchPlan, create_parents, plan_mutation_lock,
+    plan_rejection, prepare_patch_plan, recover_transaction, recheck_target,
+    snapshot_targets,
+)
 
 from core.validation_execution import (
     SafeValidationCommand,
     run_safe_validation_command,
+)
+from core.validation_outcome import (
+    VALIDATION_INCONCLUSIVE,
+    VALIDATION_PASSED,
 )
 from core.validation_side_effects import (
     diff_validation_side_effects,
@@ -37,13 +79,13 @@ from core.validation_side_effects import (
 )
 
 
-# Each rollback entry is (path, original_text_or_None).
-# original_text=None means the op was a CREATE → rollback = delete the file.
-# original_text=str  means the op was a REPLACE → rollback = restore the bytes.
-RollbackEntry = tuple[Path, str | None]
+# Byte baseline references used by the existing validation touched-path scope.
+# TargetBaseline in patch_plan_transaction owns the one-per-physical-file
+# transaction snapshot, including exact bytes, absence, hash and mode.
+RollbackEntry = tuple[Path, bytes | None]
 
 
-def _rollback_and_fail(
+def _failed_result(
     rollbacks: list[RollbackEntry],
     op: dict,
     idx: int,
@@ -52,26 +94,16 @@ def _rollback_and_fail(
     applied_ops: list[dict],
     validation_side_effects: dict[str, Any] | None = None,
 ) -> dict:
-    """Reverse every applied patch op in LIFO order and return failure metadata."""
-    for path, original in reversed(rollbacks):
-        try:
-            if original is None:
-                # The op was create_file — delete the file we created.
-                if path.exists():
-                    path.unlink()
-            else:
-                # The op was replace_snippet — restore the original bytes.
-                path.write_text(original, encoding="utf-8")
-        except Exception as e:
-            print(f"⚠️ Rollback warning on {path}: {e}")
-
+    """Keep generic receipt semantics; the outer transaction owns recovery."""
     return with_atomicity_metadata(
         {
             "success": False,
             "failed_op_index": idx,
             "failed_op": op,
             "error": error,
-            "rollback_performed": True,
+            # The outer transaction has not attempted recovery yet.  Its
+            # measured recovery facts are translated after final inspection.
+            "rollback_performed": False,
             "applied_ops": applied_ops,
             "diffs": diffs,
         },
@@ -79,28 +111,63 @@ def _rollback_and_fail(
     )
 
 
-def _is_inside(child: Path, parent: Path) -> bool:
-    try:
-        child.relative_to(parent)
-        return True
-    except ValueError:
-        return False
+def _to_lf(text: str) -> str:
+    """Apply the same translation `Path.read_text()` applies (CRLF/CR → LF)."""
+    return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
-def _resolve_safe_target(root: Path, rel_path: str) -> Path | None:
-    """Return absolute path inside root, or None if rel_path escapes/absolute."""
-    if not rel_path:
-        return None
-    raw = Path(rel_path)
-    if raw.is_absolute():
-        return None
-    try:
-        target = (root / rel_path).resolve()
-    except Exception:
-        return None
-    if not _is_inside(target, root):
-        return None
-    return target
+def _universal_newline_view(raw_text: str) -> tuple[str, list[int]]:
+    """Return the LF view of `raw_text` plus the offsets needed to map back.
+
+    Snippet matching has always run against `Path.read_text()` output, so it
+    must keep running against the identical view or patches that used to apply
+    to CRLF checkouts would start failing. This rebuilds that view without
+    reading the file a second time, and returns the LF positions at which a
+    `\\r\\n` was collapsed into one character.
+
+    Only `\\r\\n` shortens the text; a lone `\\r` is substituted in place. So
+    the raw offset of LF index ``i`` is ``i`` plus the number of collapsed
+    pairs before it — see `_raw_offset`. Storing one int per CRLF line keeps
+    this proportional to the file's line count, not its length.
+    """
+    if "\r" not in raw_text:
+        # The overwhelmingly common case: the view is the text, unchanged.
+        return raw_text, []
+
+    collapsed: list[int] = []
+    raw_index = 0
+    lf_index = 0
+    length = len(raw_text)
+    while raw_index < length:
+        if raw_text.startswith("\r\n", raw_index):
+            collapsed.append(lf_index)
+            raw_index += 2
+        else:
+            raw_index += 1
+        lf_index += 1
+    return _to_lf(raw_text), collapsed
+
+
+def _raw_offset(lf_index: int, collapsed: list[int]) -> int:
+    """Translate an index in the LF view back into the raw text."""
+    if not collapsed:
+        return lf_index
+    return lf_index + bisect_left(collapsed, lf_index)
+
+
+def _newline_for(region: str, fallback: str) -> str:
+    """The newline convention to render an inserted snippet in.
+
+    Preference order is the region being replaced, then the file as a whole —
+    the same heuristic `patch_engine` already uses for the single-file path.
+    A mixed-newline file therefore keeps whatever the untouched parts used,
+    because those bytes are never rewritten at all.
+    """
+    if "\r\n" in region:
+        return "\r\n"
+    if "\n" in region:
+        return "\n"
+    return fallback
 
 
 def _make_diff(original: str, modified: str, label: str) -> str:
@@ -124,6 +191,23 @@ def _validation_failed_message(kind: str) -> str:
     )
 
 
+def _validation_outcome_message(kind: str, outcome: str) -> str:
+    """Say which of the two non-passing outcomes actually happened.
+
+    Rollback policy is identical either way - an unvalidated patch is not
+    accepted - but the sentence a human and a receipt read must not claim the
+    patch failed its tests when no test was ever executed.
+    """
+    if outcome != VALIDATION_INCONCLUSIVE:
+        return _validation_failed_message(kind)
+    return (
+        f"Patch plan applied, {kind} validation was inconclusive: it "
+        "established neither a pass nor a failure. Patch operations rolled "
+        "back. Validation side effects are outside patch rollback scope; "
+        "see validation_side_effects."
+    )
+
+
 def _validation_crashed_message() -> str:
     return (
         "Patch plan validation crashed. Patch operations rolled back. "
@@ -142,6 +226,64 @@ def _patch_touched_paths(root: Path, rollbacks: list[RollbackEntry]) -> list[str
     return paths
 
 
+def _inspect_plan_final_state(root: Path, baselines) -> tuple[list[str], list[str]]:
+    """Compare only the already-named targets with their exact baselines."""
+
+    changed: set[str] = set()
+    unverifiable: set[str] = set()
+    for baseline in baselines:
+        for path in baseline.paths:
+            relative = path.relative_to(root).as_posix()
+            try:
+                recheck_target(root, path)
+                if baseline.before_exists:
+                    matches = (
+                        path.is_file()
+                        and hashlib.sha256(path.read_bytes()).hexdigest()
+                        == baseline.before_sha256
+                        and stat.S_IMODE(path.stat().st_mode) == baseline.before_mode
+                    )
+                else:
+                    matches = not path.exists() and not path.is_symlink()
+                if not matches:
+                    changed.add(relative)
+            except Exception:
+                unverifiable.add(relative)
+    return sorted(changed), sorted(unverifiable)
+
+
+def _persist_plan_recovery_material(root: Path, baselines, outcome):
+    unresolved = set(outcome.remaining_changed_paths)
+    entries: list[tuple[str, bytes | None, bool, int | None]] = []
+    for baseline in baselines:
+        for path in baseline.paths:
+            relative = path.relative_to(root).as_posix()
+            if relative in unresolved:
+                entries.append(
+                    (
+                        relative,
+                        baseline.before_bytes,
+                        baseline.before_exists,
+                        baseline.before_mode if baseline.before_exists else None,
+                    )
+                )
+    entries.extend(
+        (relative, None, False, None)
+        for relative in outcome.remaining_created_directories
+    )
+    artifact_ids, artifact_error, source_execution_id = (
+        persist_failed_rollback_material(
+            root,
+            entries,
+            originating_rollback_status=outcome.status,
+        )
+    )
+    return (
+        outcome.with_recovery_material(artifact_ids, error=artifact_error),
+        source_execution_id,
+    )
+
+
 def apply_patch_plan(
     project_root: str,
     plan: list[dict],
@@ -149,40 +291,36 @@ def apply_patch_plan(
     safe_validation_command: SafeValidationCommand | None = None,
     require_safe_validation: bool = False,
 ) -> dict[str, Any]:
-    """Apply a list of ops with patch-operation rollback; never raises.
+    """Prepare the entire supplied plan before any transaction can mutate."""
+    try:
+        if (validation_command is not None and type(validation_command) is not str
+                or type(require_safe_validation) is not bool
+                or safe_validation_command is not None and
+                not isinstance(safe_validation_command, SafeValidationCommand)):
+            raise PlanError("invalid_plan_schema", "Invalid validation option types.")
+        prepared = prepare_patch_plan(project_root, plan)
+    except PlanError as error:
+        return plan_rejection(error)
+    except Exception:
+        return plan_rejection(PlanError("invalid_plan_schema", "Plan preparation failed."))
+    return execute_prepared_patch_plan(
+        prepared, validation_command, safe_validation_command, require_safe_validation,
+    )
 
-    Result shape:
-        success            : bool
-        applied_ops        : list of ops that were applied (or rolled back)
-        diffs              : list of unified-diff strings (one per replace_snippet)
-        rollback_performed : bool
-        atomicity_scope     : "patch_ops_only"
-        failed_op_index    : int | None  (only on failure)
-        failed_op          : dict | None
-        error              : str | None
-        message            : human-readable summary
+
+def execute_prepared_patch_plan(
+    prepared: PreparedPatchPlan,
+    validation_command: str | None = None,
+    safe_validation_command: SafeValidationCommand | None = None,
+    require_safe_validation: bool = False,
+) -> dict[str, Any]:
+    """Contain snapshot, ordered execution, validation and verified recovery.
+
+    Prepared plans are internal immutable state, not a deserialization API or
+    an authorization receipt. Existing caller authorization remains required.
     """
-    if not isinstance(plan, list) or not plan:
-        return with_atomicity_metadata({
-            "success": False,
-            "error": "patch_plan must be a non-empty list of ops",
-            "applied_ops": [],
-            "diffs": [],
-            "rollback_performed": False,
-            "message": "Empty or invalid patch_plan.",
-        })
-
-    root = Path(project_root).resolve()
-    if not root.is_dir():
-        return with_atomicity_metadata({
-            "success": False,
-            "error": f"project_root is not a directory: {project_root}",
-            "applied_ops": [],
-            "diffs": [],
-            "rollback_performed": False,
-            "message": "Bad project_root.",
-        })
-
+    if type(prepared) is not PreparedPatchPlan:
+        return plan_rejection(PlanError("invalid_plan_schema", "Expected a prepared patch plan."))
     if require_safe_validation and validation_command and safe_validation_command is None:
         message = (
             "Unsafe legacy shell validation is blocked: automation requires "
@@ -197,6 +335,7 @@ def apply_patch_plan(
             "failed_op": None,
             "error": message,
             "validation_ok": None,
+            "validation_outcome": VALIDATION_INCONCLUSIVE,
             "validation_command": validation_command,
             "validation_output": "",
             "validation_mode": "blocked_unsafe_legacy_shell",
@@ -204,101 +343,127 @@ def apply_patch_plan(
             "message": message,
         })
 
-    rollbacks: list[RollbackEntry] = []
-    diffs: list[str] = []
-    applied_ops: list[dict] = []
-
-    for idx, op in enumerate(plan):
-        if not isinstance(op, dict):
-            return _rollback_and_fail(
-                rollbacks, op, idx,
-                "op is not a JSON object", diffs, applied_ops,
+    with plan_mutation_lock:
+        try:
+            baselines = snapshot_targets(prepared)
+        except PlanError as error:
+            return plan_rejection(error)
+        except Exception:
+            return plan_rejection(PlanError("execution_failed", "Transaction snapshot failed before mutation."))
+        diffs: list[str] = []
+        applied_ops: list[dict] = []
+        created = []
+        progress = {"mutation_attempted": False, "ordinal": None, "op": None}
+        try:
+            result = _execute_prepared_operations(
+                prepared, baselines, created, progress, diffs, applied_ops,
+                validation_command, safe_validation_command,
             )
-
-        op_type = (op.get("op") or "").strip()
-        rel_path = op.get("relative_path") or op.get("file") or ""
-        target = _resolve_safe_target(root, rel_path)
-
-        if target is None:
-            return _rollback_and_fail(
-                rollbacks, op, idx,
-                f"path is absolute, empty, or escapes repo: {rel_path!r}",
+        except Exception as error:
+            result = _failed_result(
+                [], progress["op"], progress["ordinal"],
+                str(error) if isinstance(error, PlanError) else "Patch plan execution failed.",
                 diffs, applied_ops,
             )
-
-        # ---- create_file ----
-        if op_type == "create_file":
-            content = op.get("content", "")
-            if not isinstance(content, str):
-                return _rollback_and_fail(
-                    rollbacks, op, idx,
-                    "create_file: 'content' must be a string", diffs, applied_ops,
-                )
-            if target.exists():
-                return _rollback_and_fail(
-                    rollbacks, op, idx,
-                    f"create_file: target already exists: {rel_path}", diffs, applied_ops,
-                )
-            try:
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_text(content, encoding="utf-8")
-            except Exception as e:
-                return _rollback_and_fail(
-                    rollbacks, op, idx,
-                    f"create_file: write failed: {e}", diffs, applied_ops,
-                )
-            rollbacks.append((target, None))
-            diffs.append(_make_diff("", content, rel_path))
-            applied_ops.append(op)
-
-        # ---- replace_snippet ----
-        elif op_type == "replace_snippet":
-            target_snippet = op.get("target_snippet")
-            patched_snippet = op.get("patched_snippet")
-            if not isinstance(target_snippet, str) or not isinstance(patched_snippet, str):
-                return _rollback_and_fail(
-                    rollbacks, op, idx,
-                    "replace_snippet: target_snippet and patched_snippet must be strings",
-                    diffs, applied_ops,
-                )
-            if not target.is_file():
-                return _rollback_and_fail(
-                    rollbacks, op, idx,
-                    f"replace_snippet: target file does not exist: {rel_path}",
-                    diffs, applied_ops,
-                )
-            try:
-                original = target.read_text(encoding="utf-8")
-            except Exception as e:
-                return _rollback_and_fail(
-                    rollbacks, op, idx,
-                    f"replace_snippet: read failed: {e}", diffs, applied_ops,
-                )
-            if target_snippet not in original:
-                return _rollback_and_fail(
-                    rollbacks, op, idx,
-                    f"replace_snippet: target_snippet not found verbatim in {rel_path}",
-                    diffs, applied_ops,
-                )
-            # Replace first occurrence only (safer than replace_all).
-            new_text = original.replace(target_snippet, patched_snippet, 1)
-            try:
-                target.write_text(new_text, encoding="utf-8")
-            except Exception as e:
-                return _rollback_and_fail(
-                    rollbacks, op, idx,
-                    f"replace_snippet: write failed: {e}", diffs, applied_ops,
-                )
-            rollbacks.append((target, original))
-            diffs.append(_make_diff(original, new_text, rel_path))
-            applied_ops.append(op)
-
+            result["code"] = error.code if isinstance(error, PlanError) else "execution_failed"
+        result.update(mutation_attempted=progress["mutation_attempted"],
+                      recovery_attempted=False, recovery_complete=None,
+                      remaining_changed_paths=[], remaining_created_directories=[])
+        if not result["success"]:
+            result.setdefault("code", "execution_failed")
+            if progress["mutation_attempted"]:
+                result.update(recover_transaction(prepared.root, baselines, created))
+                if not result["recovery_complete"]:
+                    result["failure_code"] = result["code"]
+                    result["code"] = "recovery_incomplete"
+                    result["message"] = (
+                        "Patch plan failed; rollback is incomplete and the "
+                        "repository may still contain changes. Inspect "
+                        "remaining_changed_paths and remaining_created_directories."
+                    )
+            result.setdefault("message", result.get("error", "Patch plan failed."))
         else:
-            return _rollback_and_fail(
-                rollbacks, op, idx,
-                f"unknown op type: {op_type!r} (allowed: create_file, replace_snippet)",
-                diffs, applied_ops,
+            changed, unverifiable = _inspect_plan_final_state(
+                prepared.root, baselines
             )
+            result["final_repository_changed"] = bool(changed or unverifiable)
+            result["final_state_verified"] = not unverifiable
+
+        outcome = rollback_outcome_from_plan(result)
+        if outcome.status == ROLLBACK_INCOMPLETE:
+            outcome, source_execution_id = _persist_plan_recovery_material(
+                prepared.root, baselines, outcome
+            )
+            result["recovery_source_execution_id"] = source_execution_id
+            unresolved = list(outcome.remaining_changed_paths) + list(
+                outcome.remaining_created_directories
+            )
+            result["message"] = (
+                "Patch plan failed; rollback is incomplete and the repository "
+                "may still contain changes. Unresolved: "
+                + ", ".join(unresolved)
+                + ". "
+                + recovery_material_notice(outcome)
+            )
+        elif not progress["mutation_attempted"]:
+            outcome = rollback_not_required()
+        return attach_rollback_outcome(result, outcome)
+
+
+def _execute_prepared_operations(
+    prepared, baselines, created, progress, diffs, applied_ops,
+    validation_command, safe_validation_command,
+):
+    root = prepared.root
+    plan = prepared.operations
+    # Preserve the existing validation side-effect scope calculation. These
+    # pairs are baseline references, not per-op copies or durable Undo artifacts.
+    rollbacks = [(path, baseline.before_bytes) for baseline in baselines for path in baseline.paths]
+    for operation in plan:
+        idx = operation.ordinal
+        target = operation.target
+        rel_path = operation.requested_path or operation.relative_path
+        op_type = operation.kind
+        op = operation.as_dict()
+        progress.update(ordinal=idx, op=op)
+        recheck_target(root, target)
+        if op_type == "create_file":
+            if target.exists():
+                raise PlanError("precondition_failed", f"create_file: target already exists: {rel_path}", idx)
+            content = operation.content
+            progress["mutation_attempted"] = True
+            create_parents(root, target, created)
+            recheck_target(root, target)
+            target.write_bytes(content.encode("utf-8"))
+            diffs.append(_make_diff("", content, rel_path))
+        elif op_type == "replace_snippet":
+            if not target.is_file():
+                raise PlanError("precondition_failed", f"replace_snippet: target file does not exist: {rel_path}", idx)
+            original_bytes = target.read_bytes()
+            try:
+                raw_text = original_bytes.decode("utf-8")
+            except UnicodeError:
+                raise PlanError("precondition_failed", "replace_snippet: target is not valid UTF-8", idx) from None
+            original, collapsed = _universal_newline_view(raw_text)
+            match_start = original.find(operation.target_snippet)
+            if match_start < 0:
+                raise PlanError("precondition_failed", f"replace_snippet: target_snippet not found verbatim in {rel_path}", idx)
+            raw_start = _raw_offset(match_start, collapsed)
+            raw_end = _raw_offset(match_start + len(operation.target_snippet), collapsed)
+            newline = _newline_for(
+                raw_text[raw_start:raw_end],
+                "\r\n" if "\r\n" in raw_text else "\n",
+            )
+            replacement = _to_lf(operation.patched_snippet).replace("\n", newline)
+            new_raw = raw_text[:raw_start] + replacement + raw_text[raw_end:]
+            recheck_target(root, target)
+            progress["mutation_attempted"] = True
+            target.write_bytes(new_raw.encode("utf-8"))
+            diffs.append(_make_diff(original, _to_lf(new_raw), rel_path))
+        else:
+            raise PlanError("unsupported_operation", "unknown op type (allowed: create_file, replace_snippet)", idx)
+        applied_ops.append(op)
+    progress.update(ordinal=len(plan), op={"op": "validation"})
     # ---- validation after all ops ----
     validation_output = ""
     validation_ok = None
@@ -318,19 +483,56 @@ def apply_patch_plan(
         validation_output = safe_result.output or safe_result.block_reason
         validation_command_label = " ".join(safe_validation_command.command)
 
-        if not validation_ok:
-            from core.validator import classify_validation_output
+        # OPS.VALIDATE.1 - a runner that exited 0 having collected nothing has
+        # validated nothing, so it must not be accepted as a passing gate.
+        from core.validator import (
+            classify_validation_output,
+            detect_no_tests_collected,
+        )
+        from core.validation_outcome import (
+            CATEGORY_NO_TESTS_COLLECTED,
+            budget_exhausted_info,
+            outcome_reason,
+            validation_outcome,
+        )
 
-            info = (
-                {
+        no_tests_collected = validation_ok and detect_no_tests_collected(
+            validation_output,
+            exit_code=safe_result.exit_code,
+            command=validation_command_label,
+        )
+        if no_tests_collected:
+            validation_ok = False
+
+        if not validation_ok:
+            if safe_result.blocked:
+                info = {
                     "category": "unsafe_validation_command",
                     "reason": safe_result.block_reason,
                 }
-                if safe_result.blocked
-                else classify_validation_output(validation_output)
+            elif safe_result.timed_out:
+                # OPS.VALIDATE.2 - the plan is applied and the checks never
+                # reached a verdict about it.  The rollback below is unchanged:
+                # only a passing validation keeps a plan on disk.
+                info = budget_exhausted_info(safe_result.timeout_sec)
+            elif no_tests_collected:
+                info = {
+                    "category": CATEGORY_NO_TESTS_COLLECTED,
+                    "reason": outcome_reason(CATEGORY_NO_TESTS_COLLECTED),
+                }
+            else:
+                info = classify_validation_output(
+                    validation_output,
+                    exit_code=safe_result.exit_code,
+                    command=validation_command_label,
+                    timed_out=safe_result.timed_out,
+                    timeout_seconds=safe_result.timeout_sec,
+                )
+            outcome = validation_outcome(
+                category=info.get("category"), ok=False
             )
 
-            return _rollback_and_fail(
+            return _failed_result(
                 rollbacks=rollbacks,
                 op={
                     "op": "validation",
@@ -340,7 +542,7 @@ def apply_patch_plan(
                 },
                 idx=len(plan),
                 error=(
-                    f"validation failed ({info.get('category', 'unknown')}): "
+                    f"validation {outcome} ({info.get('category', 'unknown')}): "
                     f"{info.get('reason', '')}"
                 ),
                 diffs=diffs,
@@ -348,23 +550,41 @@ def apply_patch_plan(
                 validation_side_effects=validation_side_effects,
             ) | {
                 "validation_ok": False,
+                "validation_outcome": outcome,
                 "validation_command": validation_command_label,
                 "validation_output": validation_output,
                 "validation_info": info,
                 "validation_mode": "safe_argv",
                 "safe_validation_blocked": safe_result.blocked,
-                "message": _validation_failed_message("safe"),
+                "validation_timed_out": bool(safe_result.timed_out),
+                "validation_timeout_seconds": safe_result.timeout_sec,
+                "python_bytecode_cache_isolated": bool(
+                    safe_result.python_bytecode_cache_isolated
+                ),
+                "message": _validation_outcome_message("safe", outcome),
             }
 
     elif validation_command:
         try:
-            from core.validator import run_validation_command, classify_validation_output
+            from core.validator import (
+                classify_validation_output,
+                detect_no_tests_collected,
+                run_validation_command_detailed,
+            )
+            from core.validation_outcome import (
+                CATEGORY_NO_TESTS_COLLECTED,
+                budget_exhausted_info,
+                outcome_reason,
+                validation_outcome,
+            )
 
             before_validation = snapshot_repo_files(root)
-            validation_ok, validation_output = run_validation_command(
+            validation_run = run_validation_command_detailed(
                 validation_command,
                 cwd=str(root),
             )
+            validation_ok = validation_run.ok
+            validation_output = validation_run.output
             after_validation = snapshot_repo_files(root)
             validation_side_effects = diff_validation_side_effects(
                 root,
@@ -373,10 +593,36 @@ def apply_patch_plan(
                 _patch_touched_paths(root, rollbacks),
             )
 
-            if not validation_ok:
-                info = classify_validation_output(validation_output)
+            no_tests_collected = validation_ok and detect_no_tests_collected(
+                validation_output,
+                exit_code=validation_run.exit_code,
+                command=validation_command,
+            )
+            if no_tests_collected:
+                validation_ok = False
 
-                return _rollback_and_fail(
+            if not validation_ok:
+                if validation_run.timed_out:
+                    # OPS.VALIDATE.2 - see the safe-argv branch above.
+                    info = budget_exhausted_info(validation_run.timeout_seconds)
+                elif no_tests_collected:
+                    info = {
+                        "category": CATEGORY_NO_TESTS_COLLECTED,
+                        "reason": outcome_reason(CATEGORY_NO_TESTS_COLLECTED),
+                    }
+                else:
+                    info = classify_validation_output(
+                        validation_output,
+                        exit_code=validation_run.exit_code,
+                        command=validation_command,
+                        timed_out=validation_run.timed_out,
+                        timeout_seconds=validation_run.timeout_seconds,
+                    )
+                outcome = validation_outcome(
+                    category=info.get("category"), ok=False
+                )
+
+                return _failed_result(
                     rollbacks=rollbacks,
                     op={
                         "op": "validation",
@@ -385,7 +631,7 @@ def apply_patch_plan(
                     },
                     idx=len(plan),
                     error=(
-                        f"validation failed ({info.get('category', 'unknown')}): "
+                        f"validation {outcome} ({info.get('category', 'unknown')}): "
                         f"{info.get('reason', '')}"
                     ),
                     diffs=diffs,
@@ -393,24 +639,31 @@ def apply_patch_plan(
                     validation_side_effects=validation_side_effects,
                 ) | {
                     "validation_ok": False,
+                    "validation_outcome": outcome,
                     "validation_command": validation_command,
                     "validation_output": validation_output,
                     "validation_info": info,
                     "validation_mode": "legacy_shell",
-                    "message": _validation_failed_message("legacy shell"),
+                    "validation_timed_out": bool(validation_run.timed_out),
+                    "validation_timeout_seconds": validation_run.timeout_seconds,
+                    "python_bytecode_cache_isolated": bool(
+                        validation_run.python_bytecode_cache_isolated
+                    ),
+                    "message": _validation_outcome_message("legacy shell", outcome),
                 }
 
         except Exception as e:
-            return _rollback_and_fail(
+            return _failed_result(
                 rollbacks=rollbacks,
                 op={"op": "validation", "command": validation_command},
                 idx=len(plan),
-                error=f"validation runner crashed: {e}",
+                error="validation runner crashed",
                 diffs=diffs,
                 applied_ops=applied_ops,
                 validation_side_effects=validation_side_effects,
             ) | {
                 "validation_ok": False,
+                "validation_outcome": VALIDATION_INCONCLUSIVE,
                 "validation_command": validation_command,
                 "validation_output": validation_output,
                 "validation_mode": "legacy_shell",
@@ -426,6 +679,12 @@ def apply_patch_plan(
             "failed_op": None,
             "error": None,
             "validation_ok": validation_ok,
+            # Reached only when validation passed or was never requested.  A
+            # run with no validation command has no outcome to report, which is
+            # a different fact from an inconclusive one.
+            "validation_outcome": (
+                VALIDATION_PASSED if validation_ok is True else None
+            ),
             "validation_command": (
                 " ".join(safe_validation_command.command)
                 if safe_validation_command

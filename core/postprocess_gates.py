@@ -9,6 +9,7 @@ MissingJsonCallbackFn = Callable[[Any, str], None]
 
 
 def _load_patch_gates() -> dict[str, Callable[..., Any]]:
+    from core.control_engine import reject_ungrounded_control_patch
     from patching.patch_gates import (
         collect_patch_repair_reasons,
         normalize_patch_plan_schema,
@@ -20,6 +21,7 @@ def _load_patch_gates() -> dict[str, Callable[..., Any]]:
     )
 
     return {
+        "reject_ungrounded_control_patch": reject_ungrounded_control_patch,
         "collect_patch_repair_reasons": collect_patch_repair_reasons,
         "normalize_patch_plan_schema": normalize_patch_plan_schema,
         "promote_go_missing_import_candidate_to_patch_plan": (
@@ -67,7 +69,25 @@ def run_postprocess_gate_battery(
     """
     del mode_label  # Reserved for caller diagnostics without changing behavior.
 
+    # WAITER.LIVE.1 — this battery exists to repair, retry and promote *patch*
+    # payloads.  On a read-only route there is no patch to repair, and its
+    # "no JSON found -> retry structured JSON repair" branch would spend model
+    # turns badgering a prose answer into a patch schema nobody asked for.
+    from core.live_task_routing import route_is_read_only
+
+    if route_is_read_only(getattr(state, "live_route", None)):
+        return state
+
     gates = _load_patch_gates()
+    from core.localization_handoff import enforce_payload_target
+
+    enforce_payload_target(
+        getattr(state, "control_result", None), getattr(state, "json_block", None),
+        live_route=getattr(state, "live_route", None),
+    )
+    # CONTROL.SAFETY.LIVE.1: reject authority laundering before any structural
+    # repair retry can spend another existing model turn on an ungrounded patch.
+    gates["reject_ungrounded_control_patch"](state)
     promote_go = gates["promote_go_missing_import_candidate_to_patch_plan"]
     promote_ts_duplicate = gates[
         "promote_ts_duplicate_import_candidate_to_patch_plan"
@@ -117,6 +137,11 @@ def run_postprocess_gate_battery(
         on_missing_json_after_retries_fn(state, reviewed_answer)
 
     gates["normalize_patch_plan_schema"](state)
+    enforce_payload_target(
+        getattr(state, "control_result", None), getattr(state, "json_block", None),
+        live_route=getattr(state, "live_route", None),
+    )
+    gates["reject_ungrounded_control_patch"](state)
     gates["reject_ungrounded_patch"](state)
     gates["reject_ungrounded_candidate_quotes"](state)
     return state

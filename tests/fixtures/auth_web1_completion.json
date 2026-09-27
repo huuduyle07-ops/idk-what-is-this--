@@ -1,0 +1,410 @@
+{
+  "phase": "AUTH.WEB.1",
+  "completed_on": "2026-09-17",
+  "closed_findings": [
+    "SEC-02",
+    "UX-01"
+  ],
+  "remaining_findings": [
+    "UX-02",
+    "UX-03",
+    "UX-04",
+    "UX-05",
+    "UX-06"
+  ],
+  "out_of_scope": [
+    "general UI redesign",
+    "PREFLIGHT.REQUEST.1",
+    "T6 Round 11"
+  ],
+  "existing_files_changed": [
+    "web/auth_gate.py",
+    "web/app.py",
+    "web/templates/index.html",
+    "README.md",
+    "tests/test_web_mutation_auth_gate.py",
+    "tests/_data_rollback1_maintenance.py",
+    "tests/test_data_rollback1.py",
+    "docs/roadmap/phase_registry.json",
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py",
+    "tests/test_web_ui_command_hierarchy.py",
+    "tests/test_web_ui_cutoff_1.py",
+    "tests/test_web_ui_demo_flow.py",
+    "tests/test_web_ui_information_architecture.py",
+    "tests/test_web_ui_result_readability.py"
+  ],
+  "new_files": [
+    "web/request_origin.py",
+    "web/browser_session.py",
+    "web/static/request_integrity.js",
+    "tests/_auth_web1_maintenance.py",
+    "tests/test_auth_web1.py",
+    "tests/test_auth_web1_browser.py",
+    "tests/fixtures/auth_web1_reversal.json",
+    "tests/fixtures/auth_web1_frozen_boundaries.json",
+    "tests/fixtures/auth_web1_completion.json",
+    "docs/designs/2026-09-17-same-origin-request-integrity-and-browser-auth.md"
+  ],
+  "owners": {
+    "origin": "web/request_origin.py",
+    "browser_session_and_csrf": "web/browser_session.py",
+    "mutation_gate": "web/auth_gate.py::should_allow_mutation",
+    "gate_wiring_and_sign_in_routes": "web/app.py",
+    "frontend_transport": "web/static/request_integrity.js"
+  },
+  "origin_model": {
+    "representation": "Origin(scheme, host, effective port); browser ASCII serialization",
+    "default_allowed": "listening socket via wsgi.url_scheme, SERVER_NAME, SERVER_PORT; none for 0.0.0.0 or ::",
+    "explicit_allowlist": "WEB_ALLOWED_ORIGINS replaces the default; max 16 complete origins; invalid entries dropped",
+    "loopback_aliases_equivalent": false,
+    "missing_origin_browser_request": "origin_missing",
+    "null_origin": "origin_null",
+    "referer_trust": "never; marks browser context only"
+  },
+  "browser_auth_model": {
+    "bootstrap": "POST /auth/login form body web_auth_token, exact origin and CSRF required",
+    "session_cookie": "cattus_ui_session=v1.<id>.<a|u>.<issued>.<HMAC-SHA256>",
+    "cookie_attributes": [
+      "HttpOnly",
+      "SameSite=Lax",
+      "Path=/",
+      "Secure only over HTTPS"
+    ],
+    "session_secret": "per-process secrets.token_bytes(32)",
+    "ttl_seconds": 43200,
+    "restart": "invalidates every browser session and CSRF token",
+    "token_rotation": "invalidates authenticated sessions",
+    "csrf": "HMAC-SHA256(secret, session id); X-CSRF-Token header or csrf_token form field"
+  },
+  "sec02": {
+    "experiment": "POST /dream/references/import to http://localhost:5000, REMOTE_ADDR 127.0.0.1, WEB_AUTH_TOKEN unset; [status, reference_created, error_code]",
+    "pre_audited_gate_sha256": "38ebbf1a600788489e8b8cdf0fab65bc09feecd40edae5ffacee7a9e54fbdd94",
+    "pre": {
+      "same_origin": [
+        200,
+        true,
+        null
+      ],
+      "different_port": [
+        200,
+        true,
+        null
+      ],
+      "different_loopback_host": [
+        200,
+        true,
+        null
+      ],
+      "unrelated_host": [
+        403,
+        false,
+        null
+      ],
+      "wrong_scheme": [
+        200,
+        true,
+        null
+      ],
+      "wrong_port": [
+        200,
+        true,
+        null
+      ],
+      "wrong_host": [
+        200,
+        true,
+        null
+      ],
+      "null": [
+        200,
+        true,
+        null
+      ]
+    },
+    "post_without_csrf": {
+      "same_origin": [
+        403,
+        false,
+        "csrf_missing"
+      ],
+      "different_port": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "different_loopback_host": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "unrelated_host": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "wrong_scheme": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "wrong_port": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "wrong_host": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "null": [
+        403,
+        false,
+        "origin_null"
+      ]
+    },
+    "post_with_valid_session_csrf": {
+      "same_origin": [
+        200,
+        true,
+        null
+      ],
+      "different_port": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "different_loopback_host": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "unrelated_host": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "wrong_scheme": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "wrong_port": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "wrong_host": [
+        403,
+        false,
+        "origin_not_allowed"
+      ],
+      "null": [
+        403,
+        false,
+        "origin_null"
+      ]
+    }
+  },
+  "model_calls": 0,
+  "external_network_requests": 0,
+  "performance": {
+    "python": {
+      "origin_parse_and_check_us": 6.788,
+      "allowed_origin_derivation_us": 10.722,
+      "session_verification_us": 17.646,
+      "csrf_verification_us": 4.608,
+      "full_gate_decision_us": 17.314
+    },
+    "browser": {
+      "protected_request_preparation_us": 3.15
+    },
+    "method": "median per-operation microseconds; Python 15x400 batches, Chromium 15x2000 batches"
+  },
+  "test_runs": [
+    {
+      "scope": "affected_broad",
+      "files": 228,
+      "selection": "every test importing web or reading index.html, every reversal-chain user, DATA.ROLLBACK.1 edge suites, AUTH.WEB.1 suites, registry/picker and phase-advance checks",
+      "passed": 5533,
+      "failed": 49,
+      "skipped": 26,
+      "duration_seconds": 1281.57,
+      "failures_ab": "all 49 failures reproduce identically on reconstructed entry bytes with AUTH.WEB.1 files moved aside (pre-existing baseline: approval_enforcement, model_role, human_*, branch checkpoints, test_suite/slow-timing plans, run_progress_instrumentation_plan, patch_minimal_novelty_live KeyError)",
+      "junit_report": ".tmp/auth-web1/final_broad.xml"
+    },
+    {
+      "scope": "focused_auth_web1",
+      "passed": 176,
+      "failed": 0,
+      "skipped": 0,
+      "modules": {
+        "test_auth_web1": {
+          "passed": 132,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_auth_web1_browser": {
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_web_mutation_auth_gate": {
+          "passed": 21,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_web_mutation_surface_audit": {
+          "passed": 16,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "scope": "frozen_phase_suites",
+      "passed": 458,
+      "failed": 0,
+      "skipped": 0,
+      "modules": {
+        "test_sec_ui1": {
+          "passed": 30,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_data_undo1": {
+          "passed": 50,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_exec_plan1": {
+          "passed": 131,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_auth_dream1": {
+          "passed": 87,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_dream_apply_safety": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_data_rollback1": {
+          "passed": 22,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_data_rollback1_telemetry_edges": {
+          "passed": 64,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_data_rollback1_store_edges": {
+          "passed": 40,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_data_rollback1_executor_edges": {
+          "passed": 17,
+          "failed": 0,
+          "skipped": 0
+        },
+        "test_data_rollback1_consumers": {
+          "passed": 16,
+          "failed": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "scope": "registry_picker",
+      "passed": 267,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "scope": "http_harness_and_web_ui",
+      "passed": 97,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "scope": "track_a_pins_and_reversals",
+      "passed": 107,
+      "failed": 0,
+      "skipped": 0,
+      "selection": "13 Track-A suites, -k frozen|reversal|boundar|historical|maintenance|receipt|pin"
+    },
+    {
+      "scope": "template_readers",
+      "passed": 1092,
+      "failed": 0,
+      "skipped": 0,
+      "files": 55
+    },
+    {
+      "scope": "red_before_implementation",
+      "direct": "132 failed + 1 teardown error (PRE reproduction passed after dataclass exec fix)",
+      "browser": "7 failed"
+    }
+  ],
+  "checks": {
+    "compileall": "passed",
+    "benchmark_cases_check": "54 checked, 0 errors",
+    "git_diff_check": "passed",
+    "phase_picker_top_recommendation": "DOGFOOD.1B",
+    "registry_phases": 186,
+    "complete_or_history": 182,
+    "known_registry_failures_ab": "all 49 affected-broad failures identical on entry and post bytes"
+  },
+  "frozen_production_deltas": {
+    "SEC.UI.1": 0,
+    "DATA.UNDO.1": 0,
+    "EXEC.PLAN.1": 0,
+    "AUTH.DREAM.1": 0,
+    "DATA.ROLLBACK.1": 0,
+    "Track_A": 0,
+    "UX-02_and_later": 0,
+    "route_mutation_authority": 0
+  },
+  "limitations": [
+    "Browser sessions use a per-process secret: restart, a second worker process or a WEB_AUTH_TOKEN change requires signing in again.",
+    "No sign-out control or server-side revocation; a captured session cookie stays valid until restart, token rotation or 12-hour expiry.",
+    "A page on another port of the same host can overwrite the session cookie (sign-out nuisance) but cannot forge one; duplicate cookies fail closed.",
+    "Default allowed origin is the listening socket (http://127.0.0.1:5000 by default); localhost aliases, Docker published ports, reverse proxies and Host-derived WSGI servers need WEB_ALLOWED_ORIGINS.",
+    "Secure is not inferred behind a TLS-terminating proxy.",
+    "Engines that send neither Origin nor Fetch Metadata on cross-site POSTs are classified as non-browser clients.",
+    "Read (GET) routes remain unauthenticated and do not validate the Host header (DNS rebinding for reads is open).",
+    "No rate limiting on /auth/login."
+  ],
+  "source_sha256": {
+    "README.md": "87ba6540e68057b39290988f9079e32696094d9588d3bdae3b9ea436f6ef3438",
+    "docs/designs/2026-09-17-same-origin-request-integrity-and-browser-auth.md": "516eca535108d07947226a46d98e1de537f6129cb90395d475c04038eaa3488c",
+    "docs/roadmap/phase_registry.json": "164f1024a0b202d48c4417cb91e0937a16c85e2a7cdf3dde073d458b2b5c995d",
+    "tests/_auth_web1_maintenance.py": "ed5bff14ab86b149d7279d233410f21029b9be4d6a18596b2f613ef2ec272541",
+    "tests/_data_rollback1_maintenance.py": "e785857a6602455e12664351c3402f3c028a6cc383a9294ed6398d1b081b9ed4",
+    "tests/fixtures/auth_web1_frozen_boundaries.json": "899fc489372c8cf6ff5374776eb512eae7db12dbe55046e4bae712fad80d8e8b",
+    "tests/fixtures/auth_web1_reversal.json": "47fdde7a65648affd735a4e91d275ef91552522261d1abc13c1a7ffc840ab17f",
+    "tests/test_auth_web1.py": "6eacfba65a1e6e59982153f2ac31c877fe2a1dc7739dd86b7172dff2cdd3116c",
+    "tests/test_auth_web1_browser.py": "8bb83c215f180d3fd0b85209f8bae6c3eea475399f38f30ff6ee49d75cc46f40",
+    "tests/test_data_rollback1.py": "173d6594b9373c0e503a01ba28999aa9c5fe9fda1c1643710ffd6419c8e18585",
+    "tests/test_phase_picker.py": "4cd202a6ddcccd22907e4178288a48e6c4a2f371ef797d5314cf985edc58bc38",
+    "tests/test_phase_registry.py": "cf085037511a3aa8feca5e332fe742a1eef0ea887faa3a154eb36290b938a882",
+    "tests/test_web_mutation_auth_gate.py": "34ccd0ab8e91589f986d2362c890c382e7207b024a854a8fbef354972eaad2c2",
+    "tests/test_web_ui_command_hierarchy.py": "5ff4a34b5d412ff2183a86efa440e3df2b364732bbfacd151cc51e9177ee9ea7",
+    "tests/test_web_ui_cutoff_1.py": "772bfee56d555e2a3456015edcd80633460e80a9bb36f392448fd333132b3636",
+    "tests/test_web_ui_demo_flow.py": "766a76178fad27feddf3c3a0c57de0d2d81f0ba9cbfab4da765cb33d0d048d5e",
+    "tests/test_web_ui_information_architecture.py": "4465ff71d6385023ea5a370e3b17f42a88026bd6f9998cae89658607d76b4725",
+    "tests/test_web_ui_result_readability.py": "bb5bcd839e0e3cbe1286499263f8d6fe14da1b978e3449925f31ef17a323227e",
+    "web/app.py": "fc2195c2c26f4dd46ca05b163855ddb047ce6041705f400bf62f6b011519f864",
+    "web/auth_gate.py": "7dbcc67fe8cbbe18b554f413beae8b0f4ed5a5c3613de9b54ab39571a9117c87",
+    "web/browser_session.py": "396348e5ce941fc9fd7dec493cfe293c96ff074179caa778ee891982f23edfa8",
+    "web/request_origin.py": "b0d62c7f8481d7b090d937f6dd6a3908feaaa03fc003f8d2f6154130a830241f",
+    "web/static/request_integrity.js": "234a4ece3048bed04030cbd237a32ec862558d08f8869e48288d23c8ef66846e",
+    "web/templates/index.html": "b8b3e9fc5cd73f399315bf3eeae1315f34247b6e3d005afa6fcd9c55d7bdd231"
+  }
+}

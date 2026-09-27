@@ -1,0 +1,140 @@
+{
+  "schema_version": "patch_minimal_live_3_reversal_v1",
+  "phase_id": "PATCH.MINIMAL.LIVE.3",
+  "reason": "Combined LIVE.3A + LIVE.3B reversal to exact pre-LIVE.3 bytes. Older frozen pins are unchanged. New authoritative binding/result proof modules have no pre-LIVE.3 image.",
+  "reversals": [
+    {
+      "path": "patching/patch_gates.py",
+      "pre_sha256": "f9751b47f3abd63af8585ca0424413232b33023de8ede0a788b652429a0b6cc7",
+      "post_sha256": "069ff2cba10256f761b99840e37f7b574fbcfdcb07d205f3aeace47237c1a809",
+      "hunks": [
+        {
+          "pre": "import textwrap\r\nfrom pathlib import Path\r\n\r\nfrom agents.gemini_client import run_gemini_request\r\nfrom core.agent_state import AgentState\r\nfrom core.local_binding_novelty import (\r\n    classify_candidate_novelty,\r\n    describe_candidate_novelty,\r\n)\r\n",
+          "post": "import textwrap\r\nfrom pathlib import Path\r\n\r\nfrom agents.gemini_client import run_gemini_request\nfrom core.agent_state import AgentState\nfrom core.authoritative_binding_context import (\n    AuthoritativeBindingContext,\n    resolve_authoritative_candidate_bindings,\n)\nfrom core.local_binding_novelty import (\n    classify_candidate_novelty,\r\n    describe_candidate_novelty,\r\n)\r\n"
+        },
+        {
+          "pre": "        state.human_answer = state.final_answer\r\n\r\n\r\ndef _enforce_safe_minimal(state: AgentState) -> None:\r\n    \"\"\"For safe_minimal style, reject patches that introduce identifiers not\r\n    present in the source. Replaces patch_candidate with null + needs_escalation\r\n    instead of letting the user see an invented-API patch.\r\n",
+          "post": "        state.human_answer = state.final_answer\r\n\r\n\r\ndef _enforce_safe_minimal(\n    state: AgentState,\n    *,\n    authoritative_binding_context: AuthoritativeBindingContext | None = None,\n    authoritative_source: str = \"\",\n) -> None:\n    \"\"\"For safe_minimal style, reject patches that introduce identifiers not\r\n    present in the source. Replaces patch_candidate with null + needs_escalation\r\n    instead of letting the user see an invented-API patch.\r\n"
+        },
+        {
+          "pre": "    if not isinstance(candidate, dict):\r\n        return\r\n\r\n    target = candidate.get(\"target_snippet\") or \"\"\r\n    patched = candidate.get(\"patched_snippet\") or \"\"\r\n    if not target or not patched:\r\n        return\r\n\r\n    lang = (state.language or \"\").lower().strip()\r\n    family = _LANGUAGE_FAMILY_ALIASES.get(lang, lang)\r\n    builtins = _LANGUAGE_BUILTINS.get(family, set())\r\n\r\n    allowed = _identifiers_in(target, language=family) | _LANGUAGE_KEYWORDS | builtins\r\n    used = _identifiers_in(patched, language=family)\r\n    new_idents = sorted(used - allowed)\r\n\r\n    # PATCH.MINIMAL.LIVE.2 — a lexically new identifier is not by itself\r\n    # evidence that the candidate expanded what the program can reach.  Before\r\n",
+          "post": "    if not isinstance(candidate, dict):\r\n        return\r\n\r\n    target = candidate.get(\"target_snippet\") or \"\"\n    patched = candidate.get(\"patched_snippet\") or \"\"\n    if not target or not patched:\r\n        return\r\n\r\n    lang = (state.language or \"\").lower().strip()\r\n    family = _LANGUAGE_FAMILY_ALIASES.get(lang, lang)\n    builtins = _LANGUAGE_BUILTINS.get(family, set())\n\n    # PATCH.MINIMAL.LIVE.3 — the candidate cannot create its own baseline.\n    # Only a context built from the authoritative pre-candidate file and still\n    # matching that whole-file identity, target path, target symbol and target\n    # snippet participates.  Missing or stale context is exactly the legacy\n    # conservative environment.\n    context_current = False\n    if authoritative_binding_context is not None:\n        context_current = authoritative_binding_context.is_current_for(\n            authoritative_source=authoritative_source,\n            source_path=(\n                candidate.get(\"relative_path\") or candidate.get(\"file\") or \"\"\n            ),\n            target_symbol=(\n                candidate.get(\"target_node_name\")\n                or candidate.get(\"target_symbol\")\n                or \"\"\n            ),\n            target_snippet=target,\n        )\n        block.update(\n            authoritative_binding_context.as_telemetry(current=context_current)\n        )\n    effective_binding_context = (\n        authoritative_binding_context if context_current else None\n    )\n\n    allowed = _identifiers_in(target, language=family) | _LANGUAGE_KEYWORDS | builtins\n    used = _identifiers_in(patched, language=family)\n    lexical_delta = used - allowed\n    authoritative_names = frozenset(\n        resolve_authoritative_candidate_bindings(\n            effective_binding_context, patched_snippet=patched\n        )\n        if effective_binding_context is not None\n        else frozenset()\n    ) & lexical_delta\n    if effective_binding_context is not None:\n        block[\"authoritative_binding_context_reused_names\"] = sorted(\n            authoritative_names\n        )\n    new_idents = sorted(lexical_delta - authoritative_names)\n\r\n    # PATCH.MINIMAL.LIVE.2 — a lexically new identifier is not by itself\r\n    # evidence that the candidate expanded what the program can reach.  Before\r\n"
+        },
+        {
+          "pre": "        )\r\n\r\n        novelty = classify_candidate_novelty(\r\n            target_snippet=target,\r\n            patched_snippet=patched,\r\n            language=family,\r\n            allowed_identifiers=allowed,\r\n            target_node_kind=str(candidate.get(\"target_node_kind\") or \"\"),\r\n            target_node_name=str(candidate.get(\"target_node_name\") or \"\"),\r\n        )\r\n        block.update(\r\n            novelty.as_telemetry(\r\n                candidate_fingerprint=candidate_fingerprint_from_payload(block),\r\n",
+          "post": "        )\r\n\r\n        novelty = classify_candidate_novelty(\r\n            target_snippet=target,\n            patched_snippet=patched,\n            language=family,\n            allowed_identifiers=allowed | authoritative_names,\n            target_node_kind=str(candidate.get(\"target_node_kind\") or \"\"),\n            target_node_name=str(candidate.get(\"target_node_name\") or \"\"),\n            authoritative_binding_context=effective_binding_context,\n        )\n        block.update(\r\n            novelty.as_telemetry(\r\n                candidate_fingerprint=candidate_fingerprint_from_payload(block),\r\n"
+        }
+      ]
+    },
+    {
+      "path": "core/pipeline.py",
+      "pre_sha256": "92d2772d1cde074ff7006821f8cc7dd5d60f43254e99ab33729c7a512caad319",
+      "post_sha256": "b76cef3d654a4e2e15052c83ca3f7bf1712f9e0f1584c1b9ce5f44d99d3342be",
+      "hunks": [
+        {
+          "pre": "    ROLLBACK_ON_VALIDATION_FAIL,\r\n)\r\nfrom core.agent_memory import refresh_agent_context, refresh_memory_block\r\nfrom core.agent_state import AgentState, time_budget_exceeded\r\nfrom core.analysis_evidence import (\r\n    AnalysisEvidence,\r\n    build_analysis_answer_prompt,\r\n",
+          "post": "    ROLLBACK_ON_VALIDATION_FAIL,\r\n)\r\nfrom core.agent_memory import refresh_agent_context, refresh_memory_block\r\nfrom core.agent_state import AgentState, time_budget_exceeded\nfrom core.authoritative_binding_context import (\n    AuthoritativeBindingContext,\n    load_authoritative_binding_context,\n)\nfrom core.analysis_evidence import (\r\n    AnalysisEvidence,\r\n    build_analysis_answer_prompt,\r\n"
+        },
+        {
+          "pre": "    return \"\\n\".join(summary_lines)\r\n\r\n\r\ndef finalize_answer(state: AgentState, answer: str) -> None:\r\n    from core.session_io import strip_json_from_text  # avoid circular import\r\n\r\n    state.final_answer = answer\r\n",
+          "post": "    return \"\\n\".join(summary_lines)\r\n\r\n\r\ndef _safe_minimal_authoritative_binding_inputs(\n    state: AgentState,\n) -> tuple[AuthoritativeBindingContext | None, str]:\n    \"\"\"Resolve one CONTROL-bound baseline for the candidate gate.\n\n    No target discovery happens here.  The candidate must name the exact file\n    and function CONTROL already localized; otherwise safe_minimal receives no\n    context and retains its legacy conservative behavior.\n    \"\"\"\n\n    block = state.json_block\n    candidate = block.get(\"patch_candidate\") if isinstance(block, dict) else None\n    if not isinstance(candidate, dict) or not state.repo_path:\n        return None, \"\"\n    control = state.control_result or {}\n    intent = control.get(\"patch_intent\") or {}\n    source_path = str(\n        intent.get(\"relative_path\")\n        or intent.get(\"file\")\n        or intent.get(\"target_file\")\n        or \"\"\n    ).replace(\"\\\\\", \"/\")\n    target_symbol = str(\n        intent.get(\"target_symbol\")\n        or str(intent.get(\"target_symbol_full\") or \"\").rsplit(\"::\", 1)[-1]\n        or \"\"\n    ).strip()\n    candidate_path = str(\n        candidate.get(\"relative_path\") or candidate.get(\"file\") or \"\"\n    ).replace(\"\\\\\", \"/\")\n    candidate_symbol = str(\n        candidate.get(\"target_node_name\") or candidate.get(\"target_symbol\") or \"\"\n    ).strip()\n    if (\n        not source_path\n        or not target_symbol\n        or candidate_path != source_path\n        or candidate_symbol != target_symbol\n        or str(candidate.get(\"target_node_kind\") or \"\").strip().lower()\n        != \"function\"\n    ):\n        return None, \"\"\n    return load_authoritative_binding_context(\n        repo_root=state.repo_path,\n        source_path=source_path,\n        target_symbol=target_symbol,\n    )\n\n\ndef finalize_answer(state: AgentState, answer: str) -> None:\n    from core.session_io import strip_json_from_text  # avoid circular import\r\n\r\n    state.final_answer = answer\r\n"
+        },
+        {
+          "pre": "    # the candidate-shape preflight, because a candidate that changes zero bytes\r\n    # is not a patch whose shape is worth judging.  The two reasons stay\r\n    # separate: this one is \"no effect\", ``safe_minimal``'s is \"unsafe or\r\n    # non-minimal\", and the Round-7 candidate was structurally minimal.\r\n    _record_candidate_mutation_effect(state)\r\n    _enforce_safe_minimal(state)\r\n\r\n_FUNCTION_KEYWORD_PREFIXES = (\r\n    \"func \",\r\n",
+          "post": "    # the candidate-shape preflight, because a candidate that changes zero bytes\r\n    # is not a patch whose shape is worth judging.  The two reasons stay\r\n    # separate: this one is \"no effect\", ``safe_minimal``'s is \"unsafe or\r\n    # non-minimal\", and the Round-7 candidate was structurally minimal.\n    _record_candidate_mutation_effect(state)\n    binding_context, authoritative_source = (\n        _safe_minimal_authoritative_binding_inputs(state)\n    )\n    _enforce_safe_minimal(\n        state,\n        authoritative_binding_context=binding_context,\n        authoritative_source=authoritative_source,\n    )\n\r\n_FUNCTION_KEYWORD_PREFIXES = (\r\n    \"func \",\r\n"
+        },
+        {
+          "pre": "    \"candidate_novelty_candidate_shape\",\r\n    \"candidate_novelty_containing_functions\",\r\n    \"candidate_novelty_classification\",\r\n    \"candidate_novelty_local_binding_names\",\r\n    \"candidate_novelty_local_binding_count\",\r\n    \"candidate_novelty_findings\",\r\n    \"candidate_novelty_caps\",\r\n    \"candidate_novelty_novel_identifiers\",\r\n",
+          "post": "    \"candidate_novelty_candidate_shape\",\r\n    \"candidate_novelty_containing_functions\",\r\n    \"candidate_novelty_classification\",\r\n    \"candidate_novelty_local_binding_names\",\n    \"candidate_novelty_local_binding_count\",\n    \"candidate_novelty_findings\",\r\n    \"candidate_novelty_caps\",\r\n    \"candidate_novelty_novel_identifiers\",\r\n"
+        },
+        {
+          "pre": "    \"candidate_novelty_classification_seconds\",\r\n    \"candidate_novelty_model_calls\",\r\n    \"candidate_novelty_network_calls\",\r\n    \"candidate_novelty_repository_reads\",\r\n    \"candidate_novelty_repository_mutations\",\r\n    \"bounded_local_novelty_allowed\",\r\n)\r\n\r\n\r\n#: Run-bound PATCH.AUTHOR.LIVE.1 facts.  Unlike every group above these do NOT\r\n",
+          "post": "    \"candidate_novelty_classification_seconds\",\r\n    \"candidate_novelty_model_calls\",\r\n    \"candidate_novelty_network_calls\",\r\n    \"candidate_novelty_repository_reads\",\n    \"candidate_novelty_repository_mutations\",\n    \"bounded_local_novelty_allowed\",\n    \"authoritative_binding_context_phase_id\",\n    \"authoritative_binding_context_schema_version\",\n    \"authoritative_binding_context_current\",\n    \"authoritative_binding_context\",\n    \"authoritative_binding_context_construction_seconds\",\n    \"authoritative_binding_context_model_calls\",\n    \"authoritative_binding_context_network_calls\",\n    \"authoritative_binding_context_repository_traversals\",\n    \"authoritative_binding_context_repository_mutations\",\n    \"authoritative_binding_context_reused_names\",\n    \"immutable_result_return_type_proof_seconds\",\n    \"immutable_result_field_lookup_seconds\",\n)\n\r\n\r\n#: Run-bound PATCH.AUTHOR.LIVE.1 facts.  Unlike every group above these do NOT\r\n"
+        },
+        {
+          "pre": "    normalize_patch_candidate_with_control_source(state)\r\n    # Read before the gates run: this names the bytes the author returned, so a\r\n    # candidate the no-op gate then removes is still identifiable.\r\n    revised_fingerprint = candidate_fingerprint_from_payload(block)\r\n    _record_candidate_mutation_effect(state)\r\n    _enforce_safe_minimal(state)\r\n\r\n    revised_verification = _run_read_only_candidate_lifecycle(\r\n        state, project_root=project_root\r\n",
+          "post": "    normalize_patch_candidate_with_control_source(state)\r\n    # Read before the gates run: this names the bytes the author returned, so a\r\n    # candidate the no-op gate then removes is still identifiable.\r\n    revised_fingerprint = candidate_fingerprint_from_payload(block)\n    _record_candidate_mutation_effect(state)\n    binding_context, authoritative_source = (\n        _safe_minimal_authoritative_binding_inputs(state)\n    )\n    _enforce_safe_minimal(\n        state,\n        authoritative_binding_context=binding_context,\n        authoritative_source=authoritative_source,\n    )\n\r\n    revised_verification = _run_read_only_candidate_lifecycle(\r\n        state, project_root=project_root\r\n"
+        }
+      ]
+    },
+    {
+      "path": "core/local_binding_novelty.py",
+      "pre_sha256": "e77959dff4c82cfa344ba271ee25074edb7171591617c8796cca35f34f055a2b",
+      "post_sha256": "961a7aed7f8b3f74e9d850afaa86a60b882c9c5538e42170664a8caf29d94292",
+      "hunks": [
+        {
+          "pre": "The classifier is pure: it parses the two bounded snippets the gate already\nholds and reads nothing else.  No repository access, no traversal, no model\ncall, no network call, no subprocess.\n\"\"\"\n\nfrom __future__ import annotations\n",
+          "post": "The classifier is pure: it parses the two bounded snippets the gate already\nholds and reads nothing else.  No repository access, no traversal, no model\ncall, no network call, no subprocess.\n\nLIVE.3 additionally accepts occurrence-specific immutable result-field proofs\nfrom the authoritative baseline context. Those reads are data access; novel\nmethods, properties and unproven members keep the conservative rule.\n\"\"\"\n\nfrom __future__ import annotations\n"
+        },
+        {
+          "pre": "import textwrap\nimport time\nfrom dataclasses import dataclass, field\nfrom typing import Any, Iterable, Mapping, Sequence\n\n\nPHASE_ID = \"PATCH.MINIMAL.LIVE.2\"\n",
+          "post": "import textwrap\nimport time\nfrom dataclasses import dataclass, field\nfrom typing import Any, Iterable, Mapping, Sequence, TYPE_CHECKING\n\nfrom core.immutable_result_fields import (\n    PROVEN_IMMUTABLE_RESULT_FIELD_READ,\n    proven_field_read_nodes,\n)\n\nif TYPE_CHECKING:\n    from core.authoritative_binding_context import AuthoritativeBindingContext\n\n\nPHASE_ID = \"PATCH.MINIMAL.LIVE.2\"\n"
+        },
+        {
+          "pre": "    caps: NoveltyCaps = field(default_factory=NoveltyCaps)\n    classification_seconds: float = 0.0\n    schema_version: str = SCHEMA_VERSION\n\n    # ── the answer ──────────────────────────────────────────────────────────\n\n",
+          "post": "    caps: NoveltyCaps = field(default_factory=NoveltyCaps)\n    classification_seconds: float = 0.0\n    schema_version: str = SCHEMA_VERSION\n    proven_field_read_names: tuple[str, ...] = ()\n    field_lookup_seconds: float = 0.0\n\n    # ── the answer ──────────────────────────────────────────────────────────\n\n"
+        },
+        {
+          "pre": "\n    @property\n    def primary_reason(self) -> str:\n        if self.bounded_local_novelty_allowed:\n            return REASON_BOUNDED_LOCAL_IDENTIFIER_NOVELTY\n        blocking = self.blocking_reasons\n",
+          "post": "\n    @property\n    def primary_reason(self) -> str:\n        if self.proven_field_read_names and not self.blocking_reasons:\n            return PROVEN_IMMUTABLE_RESULT_FIELD_READ\n        if self.bounded_local_novelty_allowed:\n            return REASON_BOUNDED_LOCAL_IDENTIFIER_NOVELTY\n        blocking = self.blocking_reasons\n"
+        },
+        {
+          "pre": "        which is how mixed novelty (§14) stays blocked without a second rule.\n        \"\"\"\n\n        if not self.bounded_local_novelty_allowed:\n            return False\n        return set(novel_identifiers) <= set(self.local_binding_names)\n\n    def unexplained_identifiers(\n        self, novel_identifiers: Iterable[str]\n",
+          "post": "        which is how mixed novelty (§14) stays blocked without a second rule.\n        \"\"\"\n\n        if not self.bounded_local_novelty_allowed and not (\n            self.proven_field_read_names and self.language_supported\n            and self.candidate_shape != SHAPE_UNSUPPORTED and not self.blocking_reasons\n        ):\n            return False\n        return set(novel_identifiers) <= (set(self.local_binding_names) | set(self.proven_field_read_names))\n\n    def unexplained_identifiers(\n        self, novel_identifiers: Iterable[str]\n"
+        },
+        {
+          "pre": "        \"\"\"\n\n        names = sorted(set(str(name) for name in novel_identifiers))\n        if not self.bounded_local_novelty_allowed:\n            return tuple(names)\n        return tuple(name for name in names if name not in self.local_binding_names)\n",
+          "post": "        \"\"\"\n\n        names = sorted(set(str(name) for name in novel_identifiers))\n        if self.admits(names):\n            return ()\n        if not self.bounded_local_novelty_allowed:\n            return tuple(names)\n        return tuple(name for name in names if name not in self.local_binding_names)\n"
+        },
+        {
+          "pre": "            names = self._class_names(novelty_class)\n            return {\"names\": names, \"count\": len(names)}\n\n        return {\n            \"local_binding_novelty\": {\n                \"names\": sorted(self.local_binding_names),\n                \"count\": len(self.local_bindings),\n",
+          "post": "            names = self._class_names(novelty_class)\n            return {\"names\": names, \"count\": len(names)}\n\n        result = {\n            \"local_binding_novelty\": {\n                \"names\": sorted(self.local_binding_names),\n                \"count\": len(self.local_bindings),\n"
+        },
+        {
+          "pre": "            \"attribute_store_novelty\": group(NOVELTY_ATTRIBUTE_STORE),\n            \"unresolved_novelty\": group(NOVELTY_UNRESOLVED),\n        }\n\n    def as_dict(self) -> dict[str, Any]:\n        payload = {\n",
+          "post": "            \"attribute_store_novelty\": group(NOVELTY_ATTRIBUTE_STORE),\n            \"unresolved_novelty\": group(NOVELTY_UNRESOLVED),\n        }\n        if self.proven_field_read_names:\n            result[PROVEN_IMMUTABLE_RESULT_FIELD_READ] = {\n                \"names\": list(self.proven_field_read_names),\n                \"count\": len(self.proven_field_read_names),\n            }\n        return result\n\n    def as_dict(self) -> dict[str, Any]:\n        payload = {\n"
+        },
+        {
+          "pre": "            \"candidate_novelty_network_calls\": 0,\n            \"candidate_novelty_repository_reads\": 0,\n            \"candidate_novelty_repository_mutations\": 0,\n        }\n\n\n",
+          "post": "            \"candidate_novelty_network_calls\": 0,\n            \"candidate_novelty_repository_reads\": 0,\n            \"candidate_novelty_repository_mutations\": 0,\n            \"immutable_result_field_lookup_seconds\": self.field_lookup_seconds,\n        }\n\n\n"
+        },
+        {
+          "pre": "    allowed_identifiers: Iterable[str],\n    target_node_kind: str = \"\",\n    target_node_name: str = \"\",\n) -> CandidateNoveltyClassification:\n    \"\"\"Separate local binding novelty from external/structural novelty.\n\n",
+          "post": "    allowed_identifiers: Iterable[str],\n    target_node_kind: str = \"\",\n    target_node_name: str = \"\",\n    authoritative_binding_context: AuthoritativeBindingContext | None = None,\n) -> CandidateNoveltyClassification:\n    \"\"\"Separate local binding novelty from external/structural novelty.\n\n"
+        },
+        {
+          "pre": "            )\n        )\n\n    scopes, name_findings = _walk_scopes(\n        patched_tree, allowed, shape, containing\n    )\n    findings.extend(name_findings)\n\n",
+          "post": "            )\n        )\n\n    field_started = time.perf_counter()\n    field_reads = (\n        proven_field_read_nodes(patched_tree, authoritative_binding_context)\n        if authoritative_binding_context is not None else frozenset()\n    )\n    field_seconds = time.perf_counter() - field_started\n    scopes, name_findings = _walk_scopes(\n        patched_tree, allowed, shape, containing, field_reads\n    )\n    findings.extend(name_findings)\n\n"
+        },
+        {
+          "pre": "        findings=tuple(_deduplicate(findings)),\n        caps=caps,\n        classification_seconds=round(time.perf_counter() - started, 6),\n    )\n\n\n",
+          "post": "        findings=tuple(_deduplicate(findings)),\n        caps=caps,\n        classification_seconds=round(time.perf_counter() - started, 6),\n        proven_field_read_names=tuple(sorted({n.attr for n in field_reads})),\n        field_lookup_seconds=field_seconds,\n    )\n\n\n"
+        },
+        {
+          "pre": "    allowed: frozenset[str],\n    shape: str,\n    containing: Sequence[str],\n) -> tuple[list[_Scope], list[NoveltyFinding]]:\n    \"\"\"Bind, then resolve, every novel name in the patched tree.\n\n",
+          "post": "    allowed: frozenset[str],\n    shape: str,\n    containing: Sequence[str],\n    field_reads: frozenset[ast.Attribute] = frozenset(),\n) -> tuple[list[_Scope], list[NoveltyFinding]]:\n    \"\"\"Bind, then resolve, every novel name in the patched tree.\n\n"
+        },
+        {
+          "pre": "            descend(child, scope)\n\n    descend(patched_tree, root)\n    findings.extend(_resolve_names(placement, allowed, shape, containing))\n    return scopes, findings\n\n\n",
+          "post": "            descend(child, scope)\n\n    descend(patched_tree, root)\n    findings.extend(_resolve_names(placement, allowed, shape, containing, field_reads))\n    return scopes, findings\n\n\n"
+        },
+        {
+          "pre": "    allowed: frozenset[str],\n    shape: str,\n    containing: Sequence[str],\n) -> list[NoveltyFinding]:\n    \"\"\"Classify every novel ``Name`` and ``Attribute`` occurrence.\n\n",
+          "post": "    allowed: frozenset[str],\n    shape: str,\n    containing: Sequence[str],\n    field_reads: frozenset[ast.Attribute] = frozenset(),\n) -> list[NoveltyFinding]:\n    \"\"\"Classify every novel ``Name`` and ``Attribute`` occurrence.\n\n"
+        },
+        {
+          "pre": "\n    for node, scope in placement:\n        if isinstance(node, ast.Attribute):\n            if node.attr in allowed or isinstance(node.ctx, (ast.Store, ast.Del)):\n                # A store was already recorded; a load of an existing member\n                # name was never novel.\n",
+          "post": "\n    for node, scope in placement:\n        if isinstance(node, ast.Attribute):\n            if node in field_reads:\n                continue\n            if node.attr in allowed or isinstance(node.ctx, (ast.Store, ast.Del)):\n                # A store was already recorded; a load of an existing member\n                # name was never novel.\n"
+        },
+        {
+          "pre": "                    novelty_class=NOVELTY_EXTERNAL_REFERENCE,\n                    reason=REASON_NOVEL_EXTERNAL_REFERENCE,\n                    detail=(\n                        \"a novel member or callable is an external surface, \"\n                        \"whatever its receiver is\"\n                    ),\n                )\n            )\n",
+          "post": "                    novelty_class=NOVELTY_EXTERNAL_REFERENCE,\n                    reason=REASON_NOVEL_EXTERNAL_REFERENCE,\n                    detail=(\n                        \"a novel member or callable without immutable \"\n                        \"result-field proof is an external surface\"\n                    ),\n                )\n            )\n"
+        },
+        {
+          "pre": ") -> str:\n    \"\"\"One line an operator can act on, that claims nothing extra.\"\"\"\n\n    if classification.bounded_local_novelty_allowed:\n        names = \", \".join(sorted(classification.local_binding_names))\n        return (\n",
+          "post": ") -> str:\n    \"\"\"One line an operator can act on, that claims nothing extra.\"\"\"\n\n    if classification.proven_field_read_names and not classification.blocking_reasons:\n        return (\n            \"Proven immutable result-field read: \"\n            + \", \".join(classification.proven_field_read_names)\n            + \". The candidate is eligible for verification; no execution is authorized.\"\n        )\n    if classification.bounded_local_novelty_allowed:\n        names = \", \".join(sorted(classification.local_binding_names))\n        return (\n"
+        }
+      ]
+    }
+  ]
+}

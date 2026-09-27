@@ -6,15 +6,19 @@ from typing import Optional
 
 from core.agent_memory import build_memory_block
 from core.agent_state import AgentState
+from core.analysis_evidence import collect_analysis_evidence
 from core.code_parse import analyze_code_structure
 from core.code_dna import dna_to_prompt_block, get_or_compute_dna
 from core.control_engine import (
+    attach_preflight_validation,
     build_related_snippets,
     clear_graph_cache,
     run_control_structured,
 )
 from core.feature_context import maybe_enrich_with_scout
 from core.indexer import index_repository
+from core.repository_inventory import create_repository_inventory
+from core.live_task_routing import safe_route_live_task
 from core.pipeline import maybe_retrieve_context
 from core.preflight import run_preflight_validation
 from core.project_tag import build_project_tag
@@ -28,6 +32,7 @@ from core.validation_command import extract_user_validation_command
 from database.memory import (
     create_session,
     create_task_run,
+    db_enabled,
     get_engineering_memory,
     get_recent_messages,
     memory_note_exists,
@@ -141,10 +146,35 @@ def create_agent_state() -> AgentState | None:
     user_tag = input("Project tag (optional, Enter to auto-detect): ").strip()
     project_tag = build_project_tag(repo_path, user_tag)
 
+    # WAITER.LIVE.1 — route before indexing.  Deciding what kind of order this
+    # is costs no model call, no network call and no repository traversal, so
+    # an analysis question never pays for a call graph it will not read.
+    live_route = safe_route_live_task(user_input, repository_available=is_project_input)
+    live_route_payload = live_route.as_dict()
+    print(
+        "🧭 WAITER route: "
+        f"{live_route.task_shape} -> {live_route.selected_workflow} "
+        f"(change_need_source={live_route.change_need_source}, "
+        f"patch_localization_allowed={live_route.patch_localization_allowed})"
+    )
+
+    operation_inventory = (
+        create_repository_inventory(repo_path)
+        if is_project_input and repo_path
+        else None
+    )
     index_result = {}
-    if is_project_input and repo_path:
+    program_graph = None
+    if is_project_input and repo_path and live_route.repository_indexing_allowed:
         print(f"🧭 Indexing project before retrieval... [tag={project_tag}]")
-        index_result = index_repository(repo_path, project_tag=project_tag)
+        index_result = index_repository(
+            repo_path,
+            project_tag=project_tag,
+            inventory=operation_inventory,
+            include_operation_artifacts=True,
+        )
+        operation_artifacts = index_result.get("_operation_artifacts") or {}
+        program_graph = operation_artifacts.get("program_graph")
 
     input_mode = detect_input_mode(user_input)
     if is_project_input and repo_path:
@@ -165,6 +195,7 @@ def create_agent_state() -> AgentState | None:
     task_info["repo_path"] = repo_path
     task_info["patch_style"] = patch_style
     task_info["ignore_repo_dna"] = ignore_repo_dna
+    task_info["live_route"] = live_route_payload
 
     task_type = task_info["intent"]
 
@@ -175,36 +206,75 @@ def create_agent_state() -> AgentState | None:
         code_source = load_code_source(user_input, primary_file)
         code_analysis = analyze_code_structure(code_source, language=language)
 
-    session_id = create_session(
-        mode=mode,
-        language=language,
-        title=user_input[:80],
-        project_tag=project_tag,
+    # With persistence intentionally disabled, the CLI session lives in its
+    # AgentState and local session log. Keep the database API's exception
+    # contract intact for callers such as web, which allocate their own IDs.
+    session_id = (
+        create_session(
+            mode=mode,
+            language=language,
+            title=user_input[:80],
+            project_tag=project_tag,
+        )
+        if db_enabled() else 0
     )
     save_message(session_id, "user", user_input)
 
     context_data = maybe_retrieve_context(user_input, primary_file, task_info, file_paths)
     control_result = None
-    if is_project_input and repo_path:
+    analysis_evidence = None
+
+    # A read-only order reads documents, not a call graph: no preflight
+    # validation is executed and CONTROL patch localization is never entered.
+    if is_project_input and repo_path and not live_route.patch_localization_allowed:
+        analysis_evidence = collect_analysis_evidence(
+            repo_path,
+            inventory=operation_inventory,
+            requested_paths=live_route.requested_paths,
+            subjects=live_route.subjects,
+            # ANALYSIS.EVIDENCE.LIVE.1 — the obligations decide the evidence
+            # profile, so an architecture question reserves source evidence.
+            obligations=live_route.obligations,
+            # ANALYSIS.MULTIROOT.LIVE.1 — the analysis workflow, and only it,
+            # may also read a repository the user explicitly named.
+            analysis_only=live_route.analysis_only,
+        )
+        print(
+            "🧭 WAITER: analysis evidence acquired from "
+            f"{len(analysis_evidence.items)} bounded file(s) "
+            f"[profile={analysis_evidence.profile}, "
+            f"roles={analysis_evidence.files_by_role()}]"
+        )
+    elif is_project_input and repo_path:
         preflight_cmd = extract_user_validation_command(user_input)
         preflight = run_preflight_validation(
             repo_path=repo_path,
             language=language,
             command=preflight_cmd or None,
+            inventory=operation_inventory,
         )
         print("🧪 PREFLIGHT:")
         print(json.dumps(preflight, indent=2, ensure_ascii=False))
         clear_graph_cache(repo_path)
-        control_result = run_control_structured(user_input, repo_path)
+        control_result = run_control_structured(
+            user_input,
+            repo_path,
+            inventory=operation_inventory,
+            graph=program_graph,
+        )
         if control_result:
+            # Attach the route before any CONTROL safety refresh reads it.
+            control_result["live_route"] = live_route_payload
             control_result["phantom_limb"] = (
                 index_result.get("phantom_limb")
                 or load_phantom_limb_report(repo_path)
             )
-            control_result["preflight_validation"] = preflight
+            control_result = attach_preflight_validation(control_result, preflight)
             control_result["related_snippets"] = build_related_snippets(
                 control_result,
                 repo_path,
+                graph=program_graph,
+                inventory=operation_inventory,
             )
 
         eng_mem = get_engineering_memory(query_text=user_input, limit=5, project_tag=project_tag)
@@ -277,4 +347,8 @@ def create_agent_state() -> AgentState | None:
         control_result=control_result,
         project_tag=project_tag,
         ignore_repo_dna=ignore_repo_dna,
+        live_route=live_route_payload,
+        analysis_evidence=analysis_evidence,
+        repository_inventory=operation_inventory,
+        repository_graph=program_graph,
     )

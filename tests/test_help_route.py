@@ -18,4 +18,5 @@ def test_help_route_returns_html_fragment(client):
 
 def test_help_route_content_type(client):
     resp = client.get('/help')
-    assert 'text/html' in resp.content_type
+    assert 'text/plain' in resp.content_type
+    assert resp.headers['X-Content-Type-Options'] == 'nosniff'
