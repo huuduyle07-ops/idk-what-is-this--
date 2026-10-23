@@ -1,0 +1,777 @@
+{
+  "phase_id": "RUNTIME.JAVA.REQUIREMENT.PINNED.1",
+  "status": "RUNTIME_JAVA_REQUIREMENT_PINNED_1_COMPLETE",
+  "audit_date": "2026-10-09",
+  "timezone": "Asia/Seoul",
+  "scope": "additive_requirement_boundary_only",
+  "requirement_only": true,
+  "report_only": true,
+  "requirement": {
+    "phase_id": "RUNTIME.JAVA.REQUIREMENT.PINNED.1",
+    "java_profile_id": "RUNTIME.JAVA.PINNED.1",
+    "java_schema_version": "runtime_java_pinned_1_v1",
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "java": {
+      "path": "/opt/temurin-26.0.2.1/bin/java",
+      "sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2"
+    },
+    "javac": {
+      "path": "/opt/temurin-26.0.2.1/bin/javac",
+      "sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023"
+    },
+    "controller": {
+      "path": "/usr/local/bin/python",
+      "identity_kind": "exact_path_and_owner_authenticated_runtime_measurement",
+      "pinned_sha256": null,
+      "proof_obligations": [
+        "Resolve the exact path; measure bounded Linux amd64 ELF64 little-endian executable bytes and SHA-256.",
+        "Authenticate normalized path, resolved path, executable hash and image identity with the target inspection owner.",
+        "Authenticate that the runtime controller is that same measured executable in that same immutable image.",
+        "Bind controller source identity and frozen JAVA.1C invocation to the runtime evidence digest.",
+        "JAVA.1C currently lacks a controller binary identity field; an additive authenticated measurement attachment is required.",
+        "No stable fixed controller digest is established for requirement pinning; historical report hashes cannot supply it."
+      ]
+    },
+    "sandbox_profile_id": "runtime_sandbox_2_v1",
+    "sandbox_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "inspection_bounds": {
+      "export_timeout_ms": 30000,
+      "max_archive_bytes": 2147483648,
+      "max_archive_entries": 250000,
+      "max_executable_bytes": 134217728,
+      "max_link_hops": 40
+    },
+    "target_local_safety": [
+      [
+        "immutable_image",
+        "Exact required sha256 image ID, independently inspected metadata identity; tags are never identity."
+      ],
+      [
+        "platform",
+        "Image OS linux, architecture amd64; Linux amd64 ELF64 little-endian ET_EXEC/ET_DYN executables, machine 62."
+      ],
+      [
+        "java_identity",
+        "Exact normalized java path and SHA-256 of all measured executable bytes; remeasure at runtime."
+      ],
+      [
+        "javac_identity",
+        "Exact normalized javac path and SHA-256 of all measured executable bytes; remeasure at runtime."
+      ],
+      [
+        "toolchain_pair",
+        "Both exact binaries resolve to one valid same-directory toolchain pair; ambiguous target records/pairs block."
+      ],
+      [
+        "controller_identity",
+        "Exact /usr/local/bin/python plus owner-authenticated measured executable/runtime identity; presence is insufficient."
+      ],
+      [
+        "path_normalization",
+        "Frozen POSIX normalization; reject NUL, backslash, invalid paths and parent traversal."
+      ],
+      [
+        "root_escape_prevention",
+        "Resolve absolute/relative symlinks and root-relative hardlinks within the image root."
+      ],
+      [
+        "link_bounds",
+        "Reject symlink/hardlink cycles and resolution beyond the frozen 40-hop bound."
+      ],
+      [
+        "nonroot_access",
+        "Executable and known ancestor traversal checks for uid/gid 65534; unlisted ancestors require runtime confirmation."
+      ],
+      [
+        "no_extraction",
+        "Stream archive members in memory; never extract filesystem entries onto the host."
+      ],
+      [
+        "no_inspection_execution",
+        "Inspect a stopped phase-owned container; no container start, java, javac or controller execution during inspection."
+      ],
+      [
+        "bounded_archive",
+        "30-second per-target export, 2 GiB archive, 250000 entries; overflow/truncation/error blocks."
+      ],
+      [
+        "bounded_executable",
+        "20..134217728 executable bytes; bounded reads, full byte digest and ELF validation; truncation blocks."
+      ],
+      [
+        "safe_inspection_container",
+        "Independently inspect exact image, nonroot, network none, read-only root, no privilege/caps/mounts and frozen resource configuration."
+      ],
+      [
+        "no_declared_volumes",
+        "Reject image-declared volumes and all host Binds/Mounts; retain original inspection-container safety checks."
+      ],
+      [
+        "cleanup",
+        "Reap export/control processes, close pipes, remove phase containers and temporary state, independently verify absence."
+      ],
+      [
+        "no_pull",
+        "Required target must already be local; pull never."
+      ],
+      [
+        "no_build",
+        "No builds or provisioning."
+      ],
+      [
+        "no_tag_substitution",
+        "No mutable tag resolution, tag selection or automatic substitution."
+      ],
+      [
+        "no_fallback",
+        "No alternate provider, candidate ranking, first match, retry with another provider or generic discovery."
+      ]
+    ],
+    "runtime_safety": [
+      [
+        "sandbox",
+        "Exact runtime_sandbox_2_v1 and required policy; authenticate owner descriptor/receipt and every frozen SANDBOX.2 ladder gate."
+      ],
+      [
+        "invocation",
+        "Fresh RUNTIME.JAVA.1C/runtime_java_1c_v1 fixed source, javac/JVM argv, main/classpath and controller source; no caller command/flags/source."
+      ],
+      [
+        "versions",
+        "Successful nonempty exact java/javac version evidence from the authenticated SANDBOX.2 ladder; no generic version range."
+      ],
+      [
+        "isolation",
+        "Network none and frozen syscall denials; no shell, host mounts, image volumes or arbitrary commands; read-only root."
+      ],
+      [
+        "identity",
+        "PID 1, uid/gid 65534:65534, all capabilities dropped/zero, no-new-privileges, exact frozen eight-variable environment."
+      ],
+      [
+        "containment",
+        "Private PID/cgroup; IPC none; all seven measured namespaces; identical child/controller namespace and cgroup boundaries before/after."
+      ],
+      [
+        "resources",
+        "128 PIDs, 134217728 bytes memory, 1000000000 NanoCpus; /work 32 MiB rw,nosuid,nodev,1777; /tmp 16 MiB rw,nosuid,nodev,noexec,1777."
+      ],
+      [
+        "controller_threads",
+        "One Python and OS controller thread before/after; zero Thread.start attempts; frozen selector capture."
+      ],
+      [
+        "capture",
+        "10000 ms outer timeout, 5000 ms abort/shared controller deadline; independent bounded pipes/EOF; outer stdout/stderr 8192 each, version/runtime 1024 each, compiler 2048 each."
+      ],
+      [
+        "source_class_output",
+        "Exact 129-byte frozen source/hash/readback, initially empty workdir, sole valid class 1..32768 bytes, exact manifest and JAVA_SANDBOX_OK stdout/empty stderr; runtime leaves workspace unchanged."
+      ],
+      [
+        "cleanup",
+        "Kill/reap process groups/children, close pipes and selector, both EOFs, only PID 1 remains before container removal; authenticated removal/absence and ephemeral outputs."
+      ],
+      [
+        "authority",
+        "Provider evidence is infrastructure evidence only; no execution, SYNTH, reflection, lease, BANK, EXECUTOR or Apply authority."
+      ]
+    ],
+    "proof_kind": "exact_provider_proven",
+    "provider_selection": "exact_required_immutable_provider_only_no_selection_step",
+    "mismatch_action": "BLOCK",
+    "evidence_fields": [
+      "proof_owner_identity",
+      "proof_context_identity",
+      "requirement_profile",
+      "requirement_schema",
+      "target_inspection_owner_identity",
+      "target_image_identity",
+      "backend_route_identity",
+      "backend_server_version",
+      "target_inspection_evidence_fingerprint",
+      "backend_binding_evidence_fingerprint",
+      "backend_binding_sandbox_descriptor_fingerprint",
+      "backend_binding_sandbox_receipt_fingerprint",
+      "backend_binding_sandbox_receipt_evidence_digest",
+      "sandbox_pair_bridge_evidence_fingerprint",
+      "sandbox_descriptor_fingerprint",
+      "sandbox_receipt_fingerprint",
+      "sandbox_receipt_evidence_digest",
+      "java1c_descriptor_fingerprint",
+      "java1c_receipt_fingerprint",
+      "java1c_receipt_evidence_digest",
+      "java1c_image_identity",
+      "java_path",
+      "java_sha256",
+      "javac_path",
+      "javac_sha256",
+      "controller_path",
+      "controller_resolved_path",
+      "controller_measured_sha256",
+      "controller_runtime_identity_evidence_fingerprint",
+      "controller_source_identity",
+      "cleanup_result",
+      "cleanup_evidence_fingerprint"
+    ],
+    "evidence_graph": [
+      {
+        "source": "backend_binding",
+        "target": "target_inspection",
+        "equalities": [
+          [
+            "canonical_backend_identity",
+            "backend_route_identity"
+          ],
+          [
+            "canonical_backend_version",
+            "backend_server_version"
+          ],
+          [
+            "target_image_identity",
+            "target_image_identity"
+          ],
+          [
+            "target_inspection_evidence_fingerprint",
+            "evidence_fingerprint"
+          ],
+          [
+            "target_inspection_owner_identity",
+            "owner_identity"
+          ]
+        ],
+        "obligation": "Future additive target-binding owner authenticates inspection provenance and the original route/Server.Version bracket; string equality alone is insufficient."
+      },
+      {
+        "source": "target_inspection",
+        "target": "provider_identity",
+        "equalities": [
+          [
+            "evidence_fingerprint",
+            "target_inspection_evidence_fingerprint"
+          ],
+          [
+            "target_image_identity",
+            "provider_image_identity"
+          ],
+          [
+            "java_path",
+            "java_path"
+          ],
+          [
+            "java_sha256",
+            "java_sha256"
+          ],
+          [
+            "javac_path",
+            "javac_path"
+          ],
+          [
+            "javac_sha256",
+            "javac_sha256"
+          ],
+          [
+            "controller_path",
+            "controller_path"
+          ],
+          [
+            "controller_resolved_path",
+            "controller_resolved_path"
+          ],
+          [
+            "controller_measured_sha256",
+            "controller_measured_sha256"
+          ]
+        ],
+        "obligation": "Provider owner authenticates the exact inspection object and checks all required pins/local checks/bounds; metadata or fabricated hashes do not prove bytes."
+      },
+      {
+        "source": "backend_binding",
+        "target": "backend_binding_sandbox",
+        "equalities": [
+          [
+            "sandbox_descriptor_fingerprint",
+            "descriptor_fingerprint"
+          ],
+          [
+            "sandbox_receipt_fingerprint",
+            "receipt_fingerprint"
+          ],
+          [
+            "sandbox_receipt_evidence_digest",
+            "receipt_evidence_digest"
+          ],
+          [
+            "target_image_identity",
+            "image_identity"
+          ],
+          [
+            "canonical_backend_identity",
+            "backend_route_identity"
+          ],
+          [
+            "canonical_backend_version",
+            "backend_server_version"
+          ]
+        ],
+        "obligation": "Authenticate BIND's exact own sandbox pair, projecting its fingerprints/digest as backend_binding_sandbox evidence roles; these are not the actual JAVA.1C pair's fingerprints/digest."
+      },
+      {
+        "source": "backend_binding_sandbox",
+        "target": "java1c_sandbox",
+        "equalities": [
+          [
+            "image_identity",
+            "image_identity"
+          ],
+          [
+            "backend_route_identity",
+            "backend_route_identity"
+          ],
+          [
+            "backend_server_version",
+            "backend_server_version"
+          ]
+        ],
+        "obligation": "An additive owner-authenticated route/version bridge must bind both exact sandbox pairs and target inspection fingerprint/owner. Preserve distinct fingerprints/digests if separately issued; never equate pair fingerprints. Route/version are future authenticated attachment measurements, not fields claimed to exist in frozen SANDBOX.2 receipts. Never assume pairs are identical."
+      },
+      {
+        "source": "java1c_sandbox",
+        "target": "runtime",
+        "equalities": [
+          [
+            "descriptor_fingerprint",
+            "sandbox_descriptor_fingerprint"
+          ],
+          [
+            "receipt_fingerprint",
+            "sandbox_receipt_fingerprint"
+          ],
+          [
+            "receipt_evidence_digest",
+            "sandbox_receipt_evidence_digest"
+          ],
+          [
+            "image_identity",
+            "java1c_image_identity"
+          ],
+          [
+            "backend_route_identity",
+            "backend_route_identity"
+          ],
+          [
+            "backend_server_version",
+            "backend_server_version"
+          ]
+        ],
+        "obligation": "Authenticate fresh JAVA.1C descriptor/receipt with its own sandbox pair, exact policy and sandbox receipt evidence digest; its descriptor must reference that exact JAVA.1C receipt fingerprint. Future attachments must authenticate actual runtime route/version measurements too; frozen JAVA.1C exposes no such receipt fields."
+      },
+      {
+        "source": "provider_identity",
+        "target": "runtime",
+        "equalities": [
+          [
+            "provider_image_identity",
+            "java1c_image_identity"
+          ],
+          [
+            "java_path",
+            "java_path"
+          ],
+          [
+            "java_sha256",
+            "java_sha256"
+          ],
+          [
+            "javac_path",
+            "javac_path"
+          ],
+          [
+            "javac_sha256",
+            "javac_sha256"
+          ],
+          [
+            "controller_path",
+            "controller_path"
+          ],
+          [
+            "controller_resolved_path",
+            "controller_resolved_path"
+          ],
+          [
+            "controller_measured_sha256",
+            "controller_measured_sha256"
+          ]
+        ],
+        "obligation": "Future provider attachment authenticates inspection fingerprint, backend binding, runtime descriptor/receipt/digest and controller runtime measurement together. Frozen JAVA.1C lacks these cross-owner/controller fields; no implicit link is allowed."
+      },
+      {
+        "source": "target_inspection",
+        "target": "cleanup",
+        "equalities": [
+          [
+            "evidence_fingerprint",
+            "target_inspection_evidence_fingerprint"
+          ],
+          [
+            "cleanup_result",
+            "target_inspection_cleanup_result"
+          ]
+        ],
+        "obligation": "Authenticate successful inspection/export/control cleanup and zero remaining phase containers; incomplete cleanup blocks proof."
+      },
+      {
+        "source": "runtime",
+        "target": "cleanup",
+        "equalities": [
+          [
+            "java1c_receipt_fingerprint",
+            "java1c_receipt_fingerprint"
+          ],
+          [
+            "cleanup_result",
+            "runtime_cleanup_result"
+          ]
+        ],
+        "obligation": "Authenticate successful sandbox/runtime/child/capture/container cleanup. Final proof binds the cleanup evidence fingerprint; any cleanup failure blocks."
+      },
+      {
+        "source": "backend_binding",
+        "target": "cleanup",
+        "equalities": [
+          [
+            "evidence_fingerprint",
+            "backend_binding_evidence_fingerprint"
+          ],
+          [
+            "cleanup_result",
+            "backend_binding_cleanup_result"
+          ]
+        ],
+        "obligation": "Authenticate BIND pre/post control reaping, pipe closure, sandbox cleanup, workspace removal and zero remaining phase containers."
+      },
+      {
+        "source": "backend_binding_sandbox",
+        "target": "cleanup",
+        "equalities": [
+          [
+            "receipt_fingerprint",
+            "backend_binding_sandbox_receipt_fingerprint"
+          ],
+          [
+            "cleanup_result",
+            "backend_binding_sandbox_cleanup_result"
+          ]
+        ],
+        "obligation": "Authenticate cleanup of BIND's exact own sandbox pair; no cleanup result is inferred from a different pair."
+      },
+      {
+        "source": "java1c_sandbox",
+        "target": "cleanup",
+        "equalities": [
+          [
+            "receipt_fingerprint",
+            "sandbox_receipt_fingerprint"
+          ],
+          [
+            "cleanup_result",
+            "sandbox_cleanup_result"
+          ]
+        ],
+        "obligation": "Authenticate cleanup of the actual JAVA.1C sandbox pair; no cleanup result is inferred from BIND's pair or another node."
+      }
+    ],
+    "evidence_authentication": [
+      "One future provider owner must authenticate every node and edge, and bind all required identifiers/fingerprints/digests into one final proof root with the new requirement profile/schema.",
+      "Each node must identify its issuer/owner and a fresh owner-established proof context; explicit authenticated attachments must relate independently issued contexts.",
+      "Owner authenticators must validate original typed evidence and exact payload/fingerprint links; report JSON, copied objects and caller-supplied strings cannot replace owner provenance.",
+      "Fingerprints/digests must use their frozen owners' canonical full-payload SHA-256 semantics; additive attachments must define canonical domain-separated payloads covering all bindings and cleanup. Hash equality without owner authentication is insufficient.",
+      "Freshness requires newly authenticated owner evidence for this proof attempt; historical LOCAL reports/receipts cannot be replayed. Common process, endpoint or time order supplies no binding.",
+      "Original BIND.1 means fixed local-docker route plus exact Linux Server.Version before/after equality only; daemon instance identity, continuity and ABA resistance are not established or claimed.",
+      "A fresh BIND alone is insufficient. sandbox_backend_binding_satisfies_java1_discovery requires original discovery-owner evidence and must not be repurposed for target inspection.",
+      "Fresh JAVA.1C is one runtime component, not this requirement or an exact-provider proof; its actual newly issued SANDBOX.2 pair must be authenticated and bridged to the target binding.",
+      "All required equalities and authenticators must pass. Missing, conflicting, stale, fabricated, incomplete or unauthenticated evidence blocks; no best-effort acceptance."
+    ],
+    "negative_outcomes": [
+      {
+        "code": "PINNED_PROVIDER_ABSENT",
+        "condition": "Exact target conclusively unavailable locally",
+        "meaning": "Only required exact provider unavailable; never NO_SUITABLE_LOCAL_JAVA_ARTIFACT or global_java_provider_absent.",
+        "blocks_provider_proof": true,
+        "fallback_allowed": false,
+        "global_absence_claimed": false
+      },
+      {
+        "code": "PINNED_PROVIDER_METADATA_MISMATCH",
+        "condition": "Image ID/platform/volume/container metadata mismatch",
+        "meaning": "Required target failed exact metadata checks.",
+        "blocks_provider_proof": true,
+        "fallback_allowed": false,
+        "global_absence_claimed": false
+      },
+      {
+        "code": "PINNED_PROVIDER_INSPECTION_INCOMPLETE",
+        "condition": "Unavailable/failed/truncated/over-budget inspection or ambiguous target evidence",
+        "meaning": "Target authenticity unproven; transport/inspection failure cannot imply target absence.",
+        "blocks_provider_proof": true,
+        "fallback_allowed": false,
+        "global_absence_claimed": false
+      },
+      {
+        "code": "PINNED_TOOLCHAIN_MISMATCH",
+        "condition": "Exact java/javac path/hash/ELF/access/pair mismatch",
+        "meaning": "Required target toolchain unproven.",
+        "blocks_provider_proof": true,
+        "fallback_allowed": false,
+        "global_absence_claimed": false
+      },
+      {
+        "code": "PINNED_CONTROLLER_MISMATCH",
+        "condition": "Controller path/bytes/authenticity/runtime linkage missing or mismatched",
+        "meaning": "Required controller identity unproven, including unresolved provider-proof obligations.",
+        "blocks_provider_proof": true,
+        "fallback_allowed": false,
+        "global_absence_claimed": false
+      },
+      {
+        "code": "PINNED_BACKEND_BINDING_MISMATCH",
+        "condition": "Route/version/sandbox-pair/owner/target binding missing, stale or mismatched",
+        "meaning": "Required coherent target/backend/sandbox binding unproven.",
+        "blocks_provider_proof": true,
+        "fallback_allowed": false,
+        "global_absence_claimed": false
+      },
+      {
+        "code": "PINNED_RUNTIME_EVIDENCE_MISMATCH",
+        "condition": "Fresh JAVA.1C authenticity/identity/digest/constraints/linkage missing or mismatched",
+        "meaning": "Required runtime component unproven.",
+        "blocks_provider_proof": true,
+        "fallback_allowed": false,
+        "global_absence_claimed": false
+      },
+      {
+        "code": "PINNED_CLEANUP_FAILURE",
+        "condition": "Any inspection/backend/sandbox/runtime cleanup incomplete or failed",
+        "meaning": "Provider proof blocked regardless of other positive evidence.",
+        "blocks_provider_proof": true,
+        "fallback_allowed": false,
+        "global_absence_claimed": false
+      },
+      {
+        "code": "PINNED_PROOF_UNRESOLVED",
+        "condition": "Other unknown or unclassified proof condition",
+        "meaning": "Fail closed; no provider proof or absence inference.",
+        "blocks_provider_proof": true,
+        "fallback_allowed": false,
+        "global_absence_claimed": false
+      }
+    ],
+    "old_new_semantic_differences": [
+      [
+        "generic_ordered_provider_selection",
+        "Replaced intentionally by an explicit immutable provider pin; no selection step."
+      ],
+      [
+        "complete_domain_classification",
+        "Not required and not claimed; unrelated local images need no inspection/classification."
+      ],
+      [
+        "full_authenticated_inventory_witness",
+        "Not required and not claimed; new exact_provider_proven proof with explicit authenticated evidence graph is required instead."
+      ],
+      [
+        "global_absence_reporting",
+        "Not available; target_provider_absent != global_java_provider_absent."
+      ]
+    ],
+    "future_authorization_epoch": "SYNTH.AUTH.PINNED.1 (proposed identity; additive authorization epoch required before SYNTH use)",
+    "lifecycle_boundary": "Later explicit lifecycle compatibility review required; SYNTH.AUTH.LIFECYCLE.1 acceptance and existing handles cannot be assumed or migrated.",
+    "required_future_receipt_statement": "The explicitly required immutable provider was inspected, authenticated, coherently bound to the required backend and runtime evidence, and verified under the required sandbox/runtime constraints.",
+    "future_receipt_fields": [
+      "exact_provider_proven=true",
+      "provider_image_identity",
+      "provider_java_identity",
+      "provider_javac_identity",
+      "provider_controller_identity",
+      "target_inspection_evidence",
+      "backend_binding_evidence",
+      "sandbox_evidence",
+      "runtime_evidence",
+      "cleanup_evidence"
+    ],
+    "forbidden_equivalences": [
+      "exact_provider_proven != complete_inventory",
+      "exact_provider_proven != complete_local_artifact_discovery",
+      "target_provider_absent != global_java_provider_absent",
+      "event A happened before event B != A and B are authenticated as one provider proof",
+      "provider evidence != requirement identity"
+    ],
+    "proposed_future_chain": [
+      "RUNTIME.JAVA.REQUIREMENT.PINNED.1",
+      "target-specific provider proof implementation",
+      "provider proof validation",
+      "new SYNTH authorization epoch",
+      "lifecycle compatibility review",
+      "operational EXECUTOR retry"
+    ],
+    "old_requirement_preserved": true,
+    "global_inventory_required": false,
+    "global_inventory_claimed": false,
+    "global_provider_absence_claimed": false,
+    "global_provider_uniqueness_required": false,
+    "global_provider_uniqueness_claimed": false,
+    "inventory_boolean_adapter_allowed": false,
+    "fallback_allowed": false,
+    "tag_selection_allowed": false,
+    "provisioning_allowed": false,
+    "chronology_accepted_as_provenance": false,
+    "old_java1_compatibility_asserted": false,
+    "schema_alias": null,
+    "profile_alias": null,
+    "synth_auth1_modified": false,
+    "future_synth_authorization_epoch_required": true,
+    "runtime_authority": false,
+    "repository_write_authority": false,
+    "apply_authority": false,
+    "provider_proof_issued": false,
+    "report_only": true,
+    "requirement_only": true
+  },
+  "requirement_definition_complete": true,
+  "provider_proof_established": false,
+  "controller_requirement_decision": "exact path plus owner-authenticated runtime measurement; fixed controller digest unset; explicit future proof obligation",
+  "controller_proof_currently_available": false,
+  "backend_binding_obligation": "Future additive target-binding attachment/exact-provider owner; original BIND comparator cannot accept a different inspection owner. Authenticate BIND own pair and actual JAVA.1C pair with an explicit bridge if distinct.",
+  "target_inspection_evidence_obligation": "Authenticate exact target inspection owner, full measured path/bytes/hash/ELF/pair/access/bounds/cleanup record and fingerprint; no inspection occurred here.",
+  "java1c_evidence_obligation": "Authenticate fresh frozen JAVA.1C descriptor and receipt, evidence digest, image/tools/cleanup and its actual SANDBOX.2 pair. Add explicit target/backend/controller attachment; no runtime evidence issued here.",
+  "current_owner_gaps": [
+    "BIND.1 discovery comparator explicitly requires original JAVA.1 discovery owner, not target-only inspection.",
+    "JAVA.1C independently issues its own fresh SANDBOX.2 pair; chronological adjacency to BIND does not bridge the pairs.",
+    "JAVA.1C receipt does not bind target inspection owner/fingerprint or target route/Server.Version.",
+    "JAVA.1C does not measure/sign controller executable path/hash; future additive authenticated controller identity attachment required."
+  ],
+  "backend_identity_limits": {
+    "route_and_server_version_bracket_only": true,
+    "daemon_instance_identity_claimed": false,
+    "daemon_continuity_claimed": false,
+    "aba_resistance_claimed": false
+  },
+  "resource_bounds_changed": false,
+  "unrelated_image_diagnostic_justifies_target_timeout_change": false,
+  "future_receipt_issued": false,
+  "runtime_capability_issued": false,
+  "provider_implementation_added": false,
+  "compat2_created": false,
+  "java1d_retried": false,
+  "executor1r_retried": false,
+  "old_java1_satisfied_new_requirement_claimed": false,
+  "existing_auth_handles_migrated": false,
+  "existing_lifecycle_semantics_modified": false,
+  "runtime_consumers_modified": false,
+  "registry_modified": false,
+  "historical_drift_repinned": false,
+  "operational_effect_counts": {
+    "Docker": 0,
+    "containers": 0,
+    "exports": 0,
+    "Java": 0,
+    "javac": 0,
+    "compile": 0,
+    "network": 0,
+    "shell": 0,
+    "host mounts": 0,
+    "source projection": 0,
+    "runtime lease consumption": 0,
+    "reflection lease consumption": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0
+  },
+  "effect_count_scope": "prohibited operational workload/runtime effects; repository edits and host Python/test/benchmark/check invocations are development validation",
+  "source_audit": [
+    {
+      "file": "core/sandboxed_java_toolchain_discovery.py",
+      "lines": "24-39,84-225,292-351,414-416",
+      "finding": "frozen inspection bounds, controller measured identity, target-local checks and cleanup"
+    },
+    {
+      "file": "core/sandboxed_java_toolchain.py",
+      "lines": "427-446,479-498",
+      "finding": "generic ordered selection, original discovery/full inventory and controller path plus hash shape"
+    },
+    {
+      "file": "core/sandboxed_java_discovery_continuation.py",
+      "lines": "73-88",
+      "finding": "JAVA.1D controller digest shape, original discovery and unique exact target/pair gates"
+    },
+    {
+      "file": "core/sandbox_backend_binding.py",
+      "lines": "121-208,211-237",
+      "finding": "authentic own sandbox pair, original-discovery-only comparator, local route/server-version limitations"
+    },
+    {
+      "file": "core/sandboxed_java_positive_continuation.py",
+      "lines": "71-84,123-205,210-302,369-394",
+      "finding": "fresh own sandbox pair, retained runtime semantics, signed descriptor/receipt fields and missing target/controller attachment"
+    },
+    {
+      "file": "core/sandboxed_java_positive_probe.py",
+      "lines": "19,85-88",
+      "finding": "shared runtime deadline and rehash of java/javac only"
+    },
+    {
+      "file": "core/synthetic_runtime_authorization.py",
+      "lines": "27-30,103-146",
+      "finding": "unchanged SYNTH.AUTH.1 old requirement projection"
+    },
+    {
+      "file": "core/java_runtime_compatibility.py",
+      "lines": "114-128,188-207",
+      "finding": "frozen old inventory/backend gaps remain; no compatibility relation"
+    },
+    {
+      "file": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_REPORT.json",
+      "lines": "property_matrix,required_properties_unresolved",
+      "finding": "frozen requirement evolution conclusion and explicit evidence coherence gap"
+    }
+  ],
+  "historical_preservation_artifact": "preservation.json",
+  "validation_artifact": "validation.json",
+  "validation_state": "complete_with_preexisting_registry_picker_failures_unchanged",
+  "stop_boundary": "Requirement freeze only; downstream chain is proposed architecture and remains unimplemented.",
+  "preservation_baseline_artifact": "preservation_baseline.json",
+  "validation_summary": {
+    "focused_new_requirement_tests_passed": 64,
+    "frozen_pure_regressions_passed": 671,
+    "benchmark_cases_checked": 54,
+    "benchmark_errors": 0,
+    "registry_picker_baseline": {
+      "passed": 292,
+      "failed": 7
+    },
+    "registry_picker_after": {
+      "passed": 292,
+      "failed": 7
+    },
+    "baseline_vs_after_new_failures": [],
+    "registry_picker_failure_identities_unchanged": true,
+    "existing_files_preserved": 26106,
+    "changed_existing_files": [],
+    "missing_existing_files": [],
+    "unexpected_new_paths": [],
+    "historical_drift_repinned": false,
+    "prior_historical_drift_retained": true,
+    "in_memory_python_files_compiled": 41,
+    "git_diff_check_passed": true,
+    "whitespace_check_passed": true,
+    "json_parse_passed": true,
+    "successful_operational_effects": 0,
+    "denied_dependency_bootstrap_attempts_recorded_in": "validation.json"
+  },
+  "limitations": [
+    "Requirement definition complete; no provider proof, capability, authorization or compatibility relation exists.",
+    "Controller digest is intentionally unset; future authenticated target/runtime controller identity is mandatory.",
+    "Future additive target/backend/controller attachments and the bridge between distinct sandbox pairs remain unimplemented.",
+    "Seven direct registry/picker failures predate these additions and remain identical; historical sources and expectations were not repinned."
+  ]
+}

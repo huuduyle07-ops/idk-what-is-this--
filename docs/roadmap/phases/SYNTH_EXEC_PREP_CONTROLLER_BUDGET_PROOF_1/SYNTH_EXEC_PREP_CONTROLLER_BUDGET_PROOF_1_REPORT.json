@@ -1,0 +1,978 @@
+{
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.PROOF.1",
+  "typed_result": "AGGREGATE_BUDGET_SCOPE_UNRESOLVED",
+  "proof_kind": "pure_declarative_canonical_schema_and_scope_audit",
+  "cap_per_outer_stream": 8192,
+  "canonical_encoding": {
+    "encoding": "UTF-8",
+    "sort_keys": true,
+    "separators": [
+      ",",
+      ":"
+    ],
+    "ensure_ascii": true,
+    "allow_nan": false
+  },
+  "schema_sha256": "1c40559d4a48b747632ec4e75b49eaeae33bad9ed63fa7cbd5b19337d840406e",
+  "schema_changed": false,
+  "transport_selected": false,
+  "formal_successful_lifecycle_minimum_bytes": null,
+  "formal_successful_lifecycle_minimum_reason": "Frozen attempt endpoint/readiness-observation membership and attainable encodings of original identity references are unresolved. Canonical lower relaxations are bounds, not fully truthful successful witnesses.",
+  "existence_witness_produced": false,
+  "unconditional_impossibility_proved": false,
+  "budget_blocker_removed": false,
+  "requirement_evolution_required": "UNRESOLVED",
+  "no_feasibility_inference_from_subcap_relaxation": true,
+  "no_scope_resolution_by_favorable_exclusion": true,
+  "formal_conservative_payload_lower_bounds": {
+    "guaranteed_materialize_compile_response_payload_bytes": 6702,
+    "conditional_with_fresh_current_response_payload_bytes": 9423,
+    "conditional_basis": "If the new readiness OBSERVE_* belongs to the same attempt, these three complete logical response payloads are a universal conservative lower relaxation. Physical outer-stream placement is also conditional on transport.",
+    "attainable_minimum_claimed": false
+  },
+  "fresh_readiness_observation": "New OBSERVE_* challenge mandatory before readiness/handoff; mutation poststate cannot substitute. OBSERVE_PREPARED_ARTIFACTS requires an existing receipt, so not a prerequisite to initial receipt. OBSERVE_CURRENT_WORKSPACE permits stage-appropriate prepared snapshot; exact fresh tag unresolved.",
+  "direction_accounting": {
+    "semantic_schema": "No finally selected physical response channel; logical payload sizes remain transport independent.",
+    "candidate_a_requests": "Host to controller stdin; independently bounded frames/session; not captured controller stdout or stderr.",
+    "candidate_a_responses": "Controller stdout; full canonical response evidence plus4-byte header counted exactly once.",
+    "candidate_a_stderr": "Empty on success;0 bytes. No request or response duplication into stderr.",
+    "compiler": "Child stdout/stderr separate,2048 each; successful actual captures empty; their metadata already counted within response, no raw capture bytes exist in messages.",
+    "headers": "Exactly4 per frame, no magic/version prefix; request headers remain request-direction bytes.",
+    "independent_request_aggregate_8192": false,
+    "request_bounds": "Frozen observation request<=8192; candidate A all frames<=8192 and retained session<=65536 per direction,64 requests including reserved cleanup slots. No independent frozen8192 cumulative stdin cap stated.",
+    "cleanup": "Candidate final composite is in-process host evidence, not a second inner wire response; cleanup shape sizes are conditional logical schema sizes only."
+  },
+  "assumptions": [
+    "No physical transport selected. Candidate A accounting is conditional and does not accept its architecture.",
+    "PID1 plus one task is the smallest reviewed controller shape; all process namespace/cgroup fields included. Compiler is reaped, so absent from postcompile process list; capture retains its child/group identity.",
+    "Two tmpfs mounts with roots/metadata and exact options always included; no zero-process or omitted namespaces.",
+    "Writer-free lower relaxation does NOT assert truthful absence of the controller's potential write access. Separate controller-writer shape accounts for both roots.",
+    "Unspecified identity strings have schema lower bound1 but NO proven attainable semantic minimum. Probe strings do not create aliases or actual identities.",
+    "Frozen semantic schema alone does not impose candidate A's64-hex generation choices; both profiles are separated.",
+    "Relaxed non-null nullable-id slots only make universal byte bounds smaller; they are not coherent readiness states.",
+    "Class size1 and numeric mode0 are conservative length probes, not a successful Java class or measured filesystem metadata. Frozen mode textual semantics do not specify full st_mode versus permission bits.",
+    "Stress hashes are actual SHA256 computations over named synthetic inputs; only source, compiler/image and empty-capture hashes are frozen identities. No class bytes/hash predicted.",
+    "Operation catalog order follows the schema enum, not a chronological execution. Independent shape probes may violate identity relations; grouped byte sums do not authenticate those probe values.",
+    "Handoff and cleanup shape probes describe conditional schema records only. They do not invent a borrower, prove independent backend continuity or claim an inner process can report complete removal of itself.",
+    "Pre-effect local empty/source verification is mandatory evidence; no additional serialized pair inferred unless frozen semantics require it. Additional freshness pairs can only increase conditional totals."
+  ],
+  "requirement_evolution_targets_unselected": [
+    "increase aggregate cap",
+    "separate protocol evidence bytes from historical process capture budget",
+    "change mandatory evidence duplication",
+    "change message schema/projection",
+    "change preparation-attempt boundary"
+  ],
+  "authority_flags": {
+    "Apply": false,
+    "BANK": false,
+    "BANK_authority": false,
+    "apply_authority": false,
+    "arbitrary_Java": false,
+    "arbitrary_class_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "arbitrary_command": false,
+    "arbitrary_command_authority": false,
+    "arbitrary_filesystem": false,
+    "arbitrary_java_authority": false,
+    "arbitrary_method_authority": false,
+    "arbitrary_reflection_authority": false,
+    "arbitrary_source_authority": false,
+    "compilation_authority": false,
+    "constructor_reflection_authority": false,
+    "consumer_readiness_authority": false,
+    "container_creation": false,
+    "container_creation_authority": false,
+    "controller_implementation": false,
+    "enumeration_authority": false,
+    "exact_sandbox_materialization_authority": false,
+    "exact_scenario_compilation_authority": false,
+    "executor": false,
+    "executor_authority": false,
+    "field_write_authority": false,
+    "generic_reflection_authority": false,
+    "host_mount": false,
+    "host_mount_authority": false,
+    "network": false,
+    "network_authority": false,
+    "preparation_authority": false,
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection": false,
+    "reflection_execution_authority": false,
+    "repository_java_authority": false,
+    "repository_source_write_authority": false,
+    "repository_write": false,
+    "repository_write_authority": false,
+    "runtime_activation": false,
+    "runtime_activation_authority": false,
+    "runtime_authority": false,
+    "sandbox_materialization_authority": false,
+    "scenario_compilation": false,
+    "scenario_compilation_authority": false,
+    "shell": false,
+    "shell_authority": false,
+    "source_identity_authority_issued_by_this_phase": false,
+    "source_materialization": false,
+    "work_write_authority_from_workspace_possession": false,
+    "workspace_issuance": false,
+    "workspace_issuance_authority": false
+  },
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR.1R": 0,
+    "EXECUTOR_1R": 0,
+    "JAVA1C": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "auth_issuance": 0,
+    "capability_consumption": 0,
+    "capability_invalidation": 0,
+    "class_loading": 0,
+    "container_creation": 0,
+    "container_removal": 0,
+    "filesystem_runtime_writes": 0,
+    "java": 0,
+    "javac": 0,
+    "pinned_auth_issuance": 0,
+    "preparation_authority_issuance": 0,
+    "provider_issuance": 0,
+    "reflection": 0,
+    "reflection_admission_issuance": 0,
+    "reflection_issuance": 0,
+    "reflection_lease_issuance": 0,
+    "runtime_issuance": 0,
+    "runtime_lease_issuance": 0,
+    "source_materialization": 0,
+    "workspace_issuance": 0
+  },
+  "profile_totals": {
+    "frozen_semantic_relaxation": {
+      "materialize_compile": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 930,
+            "frame_overhead_bytes": 8,
+            "candidate_a_wire_bytes": 938,
+            "payload_minus_8192": -7262,
+            "wire_minus_8192": -7254
+          },
+          "response": {
+            "semantic_payload_bytes": 6702,
+            "frame_overhead_bytes": 8,
+            "candidate_a_wire_bytes": 6710,
+            "payload_minus_8192": -1490,
+            "wire_minus_8192": -1482
+          }
+        },
+        "semantic_payload_total_both_directions": 7632,
+        "frame_overhead_both_directions": 16,
+        "candidate_a_outer_stdout_bytes": 6710,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "Guaranteed materialize/compile core only"
+      },
+      "materialize_compile_fresh_current": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_CURRENT_WORKSPACE"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1424,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 1436,
+            "payload_minus_8192": -6768,
+            "wire_minus_8192": -6756
+          },
+          "response": {
+            "semantic_payload_bytes": 9423,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 9435,
+            "payload_minus_8192": 1231,
+            "wire_minus_8192": 1243
+          }
+        },
+        "semantic_payload_total_both_directions": 10847,
+        "frame_overhead_both_directions": 24,
+        "candidate_a_outer_stdout_bytes": 9435,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "materialize_compile_fresh_prepared": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_PREPARED_ARTIFACTS"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1483,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 1495,
+            "payload_minus_8192": -6709,
+            "wire_minus_8192": -6697
+          },
+          "response": {
+            "semantic_payload_bytes": 9425,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 9437,
+            "payload_minus_8192": 1233,
+            "wire_minus_8192": 1245
+          }
+        },
+        "semantic_payload_total_both_directions": 10908,
+        "frame_overhead_both_directions": 24,
+        "candidate_a_outer_stdout_bytes": 9437,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "empty_materialize_compile_fresh_current": {
+        "operations": [
+          "OBSERVE_EMPTY_WORKSPACE",
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_CURRENT_WORKSPACE"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1914,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 1930,
+            "payload_minus_8192": -6278,
+            "wire_minus_8192": -6262
+          },
+          "response": {
+            "semantic_payload_bytes": 11629,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 11645,
+            "payload_minus_8192": 3437,
+            "wire_minus_8192": 3453
+          }
+        },
+        "semantic_payload_total_both_directions": 13543,
+        "frame_overhead_both_directions": 32,
+        "candidate_a_outer_stdout_bytes": 11645,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "empty_materialize_compile_fresh_prepared": {
+        "operations": [
+          "OBSERVE_EMPTY_WORKSPACE",
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_PREPARED_ARTIFACTS"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1973,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 1989,
+            "payload_minus_8192": -6219,
+            "wire_minus_8192": -6203
+          },
+          "response": {
+            "semantic_payload_bytes": 11631,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 11647,
+            "payload_minus_8192": 3439,
+            "wire_minus_8192": 3455
+          }
+        },
+        "semantic_payload_total_both_directions": 13604,
+        "frame_overhead_both_directions": 32,
+        "candidate_a_outer_stdout_bytes": 11647,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      }
+    },
+    "candidate_a_relaxation": {
+      "materialize_compile": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1182,
+            "frame_overhead_bytes": 8,
+            "candidate_a_wire_bytes": 1190,
+            "payload_minus_8192": -7010,
+            "wire_minus_8192": -7002
+          },
+          "response": {
+            "semantic_payload_bytes": 7332,
+            "frame_overhead_bytes": 8,
+            "candidate_a_wire_bytes": 7340,
+            "payload_minus_8192": -860,
+            "wire_minus_8192": -852
+          }
+        },
+        "semantic_payload_total_both_directions": 8514,
+        "frame_overhead_both_directions": 16,
+        "candidate_a_outer_stdout_bytes": 7340,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "Guaranteed materialize/compile core only"
+      },
+      "materialize_compile_fresh_current": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_CURRENT_WORKSPACE"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1802,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 1814,
+            "payload_minus_8192": -6390,
+            "wire_minus_8192": -6378
+          },
+          "response": {
+            "semantic_payload_bytes": 10368,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 10380,
+            "payload_minus_8192": 2176,
+            "wire_minus_8192": 2188
+          }
+        },
+        "semantic_payload_total_both_directions": 12170,
+        "frame_overhead_both_directions": 24,
+        "candidate_a_outer_stdout_bytes": 10380,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "materialize_compile_fresh_prepared": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_PREPARED_ARTIFACTS"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1861,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 1873,
+            "payload_minus_8192": -6331,
+            "wire_minus_8192": -6319
+          },
+          "response": {
+            "semantic_payload_bytes": 10370,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 10382,
+            "payload_minus_8192": 2178,
+            "wire_minus_8192": 2190
+          }
+        },
+        "semantic_payload_total_both_directions": 12231,
+        "frame_overhead_both_directions": 24,
+        "candidate_a_outer_stdout_bytes": 10382,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "empty_materialize_compile_fresh_current": {
+        "operations": [
+          "OBSERVE_EMPTY_WORKSPACE",
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_CURRENT_WORKSPACE"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 2418,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 2434,
+            "payload_minus_8192": -5774,
+            "wire_minus_8192": -5758
+          },
+          "response": {
+            "semantic_payload_bytes": 12889,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 12905,
+            "payload_minus_8192": 4697,
+            "wire_minus_8192": 4713
+          }
+        },
+        "semantic_payload_total_both_directions": 15307,
+        "frame_overhead_both_directions": 32,
+        "candidate_a_outer_stdout_bytes": 12905,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "empty_materialize_compile_fresh_prepared": {
+        "operations": [
+          "OBSERVE_EMPTY_WORKSPACE",
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_PREPARED_ARTIFACTS"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 2477,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 2493,
+            "payload_minus_8192": -5715,
+            "wire_minus_8192": -5699
+          },
+          "response": {
+            "semantic_payload_bytes": 12891,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 12907,
+            "payload_minus_8192": 4699,
+            "wire_minus_8192": 4715
+          }
+        },
+        "semantic_payload_total_both_directions": 15368,
+        "frame_overhead_both_directions": 32,
+        "candidate_a_outer_stdout_bytes": 12907,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      }
+    },
+    "candidate_a_controller_writer_relaxation": {
+      "materialize_compile": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1182,
+            "frame_overhead_bytes": 8,
+            "candidate_a_wire_bytes": 1190,
+            "payload_minus_8192": -7010,
+            "wire_minus_8192": -7002
+          },
+          "response": {
+            "semantic_payload_bytes": 8052,
+            "frame_overhead_bytes": 8,
+            "candidate_a_wire_bytes": 8060,
+            "payload_minus_8192": -140,
+            "wire_minus_8192": -132
+          }
+        },
+        "semantic_payload_total_both_directions": 9234,
+        "frame_overhead_both_directions": 16,
+        "candidate_a_outer_stdout_bytes": 8060,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "Guaranteed materialize/compile core only"
+      },
+      "materialize_compile_fresh_current": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_CURRENT_WORKSPACE"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1802,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 1814,
+            "payload_minus_8192": -6390,
+            "wire_minus_8192": -6378
+          },
+          "response": {
+            "semantic_payload_bytes": 11450,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 11462,
+            "payload_minus_8192": 3258,
+            "wire_minus_8192": 3270
+          }
+        },
+        "semantic_payload_total_both_directions": 13252,
+        "frame_overhead_both_directions": 24,
+        "candidate_a_outer_stdout_bytes": 11462,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "materialize_compile_fresh_prepared": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_PREPARED_ARTIFACTS"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1861,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 1873,
+            "payload_minus_8192": -6331,
+            "wire_minus_8192": -6319
+          },
+          "response": {
+            "semantic_payload_bytes": 11452,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 11464,
+            "payload_minus_8192": 3260,
+            "wire_minus_8192": 3272
+          }
+        },
+        "semantic_payload_total_both_directions": 13313,
+        "frame_overhead_both_directions": 24,
+        "candidate_a_outer_stdout_bytes": 11464,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "empty_materialize_compile_fresh_current": {
+        "operations": [
+          "OBSERVE_EMPTY_WORKSPACE",
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_CURRENT_WORKSPACE"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 2418,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 2434,
+            "payload_minus_8192": -5774,
+            "wire_minus_8192": -5758
+          },
+          "response": {
+            "semantic_payload_bytes": 14333,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 14349,
+            "payload_minus_8192": 6141,
+            "wire_minus_8192": 6157
+          }
+        },
+        "semantic_payload_total_both_directions": 16751,
+        "frame_overhead_both_directions": 32,
+        "candidate_a_outer_stdout_bytes": 14349,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "empty_materialize_compile_fresh_prepared": {
+        "operations": [
+          "OBSERVE_EMPTY_WORKSPACE",
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_PREPARED_ARTIFACTS"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 2477,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 2493,
+            "payload_minus_8192": -5715,
+            "wire_minus_8192": -5699
+          },
+          "response": {
+            "semantic_payload_bytes": 14335,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 14351,
+            "payload_minus_8192": 6143,
+            "wire_minus_8192": 6159
+          }
+        },
+        "semantic_payload_total_both_directions": 16812,
+        "frame_overhead_both_directions": 32,
+        "candidate_a_outer_stdout_bytes": 14351,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      }
+    },
+    "stress_minimum_class_envelope": {
+      "materialize_compile": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1812,
+            "frame_overhead_bytes": 8,
+            "candidate_a_wire_bytes": 1820,
+            "payload_minus_8192": -6380,
+            "wire_minus_8192": -6372
+          },
+          "response": {
+            "semantic_payload_bytes": 9728,
+            "frame_overhead_bytes": 8,
+            "candidate_a_wire_bytes": 9736,
+            "payload_minus_8192": 1536,
+            "wire_minus_8192": 1544
+          }
+        },
+        "semantic_payload_total_both_directions": 11540,
+        "frame_overhead_both_directions": 16,
+        "candidate_a_outer_stdout_bytes": 9736,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "Guaranteed materialize/compile core only"
+      },
+      "materialize_compile_fresh_current": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_CURRENT_WORKSPACE"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 2684,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 2696,
+            "payload_minus_8192": -5508,
+            "wire_minus_8192": -5496
+          },
+          "response": {
+            "semantic_payload_bytes": 13812,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 13824,
+            "payload_minus_8192": 5620,
+            "wire_minus_8192": 5632
+          }
+        },
+        "semantic_payload_total_both_directions": 16496,
+        "frame_overhead_both_directions": 24,
+        "candidate_a_outer_stdout_bytes": 13824,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "materialize_compile_fresh_prepared": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_PREPARED_ARTIFACTS"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 2869,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 2881,
+            "payload_minus_8192": -5323,
+            "wire_minus_8192": -5311
+          },
+          "response": {
+            "semantic_payload_bytes": 13814,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 13826,
+            "payload_minus_8192": 5622,
+            "wire_minus_8192": 5634
+          }
+        },
+        "semantic_payload_total_both_directions": 16683,
+        "frame_overhead_both_directions": 24,
+        "candidate_a_outer_stdout_bytes": 13826,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "empty_materialize_compile_fresh_current": {
+        "operations": [
+          "OBSERVE_EMPTY_WORKSPACE",
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_CURRENT_WORKSPACE"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 3552,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 3568,
+            "payload_minus_8192": -4640,
+            "wire_minus_8192": -4624
+          },
+          "response": {
+            "semantic_payload_bytes": 17369,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 17385,
+            "payload_minus_8192": 9177,
+            "wire_minus_8192": 9193
+          }
+        },
+        "semantic_payload_total_both_directions": 20921,
+        "frame_overhead_both_directions": 32,
+        "candidate_a_outer_stdout_bytes": 17385,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "empty_materialize_compile_fresh_prepared": {
+        "operations": [
+          "OBSERVE_EMPTY_WORKSPACE",
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_PREPARED_ARTIFACTS"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 3737,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 3753,
+            "payload_minus_8192": -4455,
+            "wire_minus_8192": -4439
+          },
+          "response": {
+            "semantic_payload_bytes": 17371,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 17387,
+            "payload_minus_8192": 9179,
+            "wire_minus_8192": 9195
+          }
+        },
+        "semantic_payload_total_both_directions": 21108,
+        "frame_overhead_both_directions": 32,
+        "candidate_a_outer_stdout_bytes": 17387,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      }
+    },
+    "stress_plausible_class": {
+      "materialize_compile": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 1812,
+            "frame_overhead_bytes": 8,
+            "candidate_a_wire_bytes": 1820,
+            "payload_minus_8192": -6380,
+            "wire_minus_8192": -6372
+          },
+          "response": {
+            "semantic_payload_bytes": 9732,
+            "frame_overhead_bytes": 8,
+            "candidate_a_wire_bytes": 9740,
+            "payload_minus_8192": 1540,
+            "wire_minus_8192": 1548
+          }
+        },
+        "semantic_payload_total_both_directions": 11544,
+        "frame_overhead_both_directions": 16,
+        "candidate_a_outer_stdout_bytes": 9740,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "Guaranteed materialize/compile core only"
+      },
+      "materialize_compile_fresh_current": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_CURRENT_WORKSPACE"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 2684,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 2696,
+            "payload_minus_8192": -5508,
+            "wire_minus_8192": -5496
+          },
+          "response": {
+            "semantic_payload_bytes": 13818,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 13830,
+            "payload_minus_8192": 5626,
+            "wire_minus_8192": 5638
+          }
+        },
+        "semantic_payload_total_both_directions": 16502,
+        "frame_overhead_both_directions": 24,
+        "candidate_a_outer_stdout_bytes": 13830,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "materialize_compile_fresh_prepared": {
+        "operations": [
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_PREPARED_ARTIFACTS"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 2869,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 2881,
+            "payload_minus_8192": -5323,
+            "wire_minus_8192": -5311
+          },
+          "response": {
+            "semantic_payload_bytes": 13820,
+            "frame_overhead_bytes": 12,
+            "candidate_a_wire_bytes": 13832,
+            "payload_minus_8192": 5628,
+            "wire_minus_8192": 5640
+          }
+        },
+        "semantic_payload_total_both_directions": 16689,
+        "frame_overhead_both_directions": 24,
+        "candidate_a_outer_stdout_bytes": 13832,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "empty_materialize_compile_fresh_current": {
+        "operations": [
+          "OBSERVE_EMPTY_WORKSPACE",
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_CURRENT_WORKSPACE"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 3552,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 3568,
+            "payload_minus_8192": -4640,
+            "wire_minus_8192": -4624
+          },
+          "response": {
+            "semantic_payload_bytes": 17375,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 17391,
+            "payload_minus_8192": 9183,
+            "wire_minus_8192": 9199
+          }
+        },
+        "semantic_payload_total_both_directions": 20927,
+        "frame_overhead_both_directions": 32,
+        "candidate_a_outer_stdout_bytes": 17391,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      },
+      "empty_materialize_compile_fresh_prepared": {
+        "operations": [
+          "OBSERVE_EMPTY_WORKSPACE",
+          "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "COMPILE_EXACT_SCENARIO",
+          "OBSERVE_PREPARED_ARTIFACTS"
+        ],
+        "directions": {
+          "request": {
+            "semantic_payload_bytes": 3737,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 3753,
+            "payload_minus_8192": -4455,
+            "wire_minus_8192": -4439
+          },
+          "response": {
+            "semantic_payload_bytes": 17377,
+            "frame_overhead_bytes": 16,
+            "candidate_a_wire_bytes": 17393,
+            "payload_minus_8192": 9185,
+            "wire_minus_8192": 9201
+          }
+        },
+        "semantic_payload_total_both_directions": 21114,
+        "frame_overhead_both_directions": 32,
+        "candidate_a_outer_stdout_bytes": 17393,
+        "candidate_a_outer_stderr_bytes": 0,
+        "child_compiler_stdout_bytes": 0,
+        "child_compiler_stderr_bytes": 0,
+        "request_bytes_added_to_outer_stdout": 0,
+        "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+      }
+    }
+  },
+  "lifecycle_scope_conclusion": "AGGREGATE_BUDGET_SCOPE_UNRESOLVED",
+  "artifact_kind": "completed_pure_budget_scope_audit_with_reproducible_conditional_bounds",
+  "audit_complete": true,
+  "evidence": [
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1/proof.py",
+      "size_bytes": 34039,
+      "sha256": "1dbad05aa2efc13b2efee30f7e2a8ddce25fc3eebef59872d4cde8367c4d7531"
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1/budget_witness.json",
+      "size_bytes": 2894790,
+      "sha256": "a81a2759145cd118447db94a71e38d10b57ca4de8943163002c26154324655dd"
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1/byte_totals.json",
+      "size_bytes": 27545,
+      "sha256": "08e8152897398a19310d0456c2b98190313df7179b5fcd9767e3d31e47b9065b"
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1/lifecycle_audit.json",
+      "size_bytes": 22195,
+      "sha256": "6bb056522cfe3e16f20148dbce101dd346ffef81366d2c8a91e8f9f0135ed0cc"
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1/semantic_minima.json",
+      "size_bytes": 16756,
+      "sha256": "37305a01b3b14b1fffe651ea364379f21d835ef5862c21e59a1322d4eeda6001"
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1/REPORT.md",
+      "size_bytes": 16184,
+      "sha256": "b98f8c5788c7aef0920ac8b6053777e05a3b2e70a60f3acceed24947be6784cf"
+    }
+  ]
+}

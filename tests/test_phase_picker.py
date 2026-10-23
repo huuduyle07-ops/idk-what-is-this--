@@ -558,9 +558,9 @@ def test_seed_registry_produces_expected_buckets():
         "safe_to_prepare": 3,
         "sandbox_required": 1,
         "human_approval_required": 0,
-        "blocked": 0,
+        "blocked": 1,
         "deferred_or_parked": 0,
-        "complete_or_history": 201,
+        "complete_or_history": 219,
     }
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
     assert report["top_recommendation"]["recommended_next_step"] == "prepare_worker_assignment"
@@ -665,7 +665,7 @@ def test_seed_context_selection_phase_is_complete_history():
     assert "CTX.SELECT.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -761,7 +761,7 @@ def test_seed_content_acquisition_phase_is_complete_history():
     assert "ACQUIRE.3" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -780,7 +780,7 @@ def test_seed_evidence_verification_phase_is_complete_history():
     assert "EVIDENCE.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -799,7 +799,7 @@ def test_seed_evidence_set_phase_is_complete_history():
     assert "EVIDENCE.2" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -814,7 +814,7 @@ def test_seed_claim_assessment_phase_is_complete_history():
     assert phase["prerequisites"] == ["EVIDENCE.2"]
     assert "CLAIM.1" in {item["phase_id"] for item in report["complete_or_history"]}
     assert "CLAIM.1" not in {item["phase_id"] for item in report["safe_to_prepare"]}
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -833,7 +833,7 @@ def test_seed_structured_synthesis_phase_is_complete_history():
     assert "SYNTHESIS.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -849,7 +849,7 @@ def test_seed_post_run_reconciliation_phase_is_complete_history():
     assert phase["prerequisites"] == ["CTX.APPLY.0"]
     assert "CHECK.1" in {item["phase_id"] for item in report["complete_or_history"]}
     assert "CHECK.1" not in {item["phase_id"] for item in report["safe_to_prepare"]}
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -865,7 +865,7 @@ def test_seed_goal_fidelity_phase_is_complete_history():
     assert phase["prerequisites"] == ["CHECK.1", "CLAIM.1"]
     assert "CHECK.2" in {item["phase_id"] for item in report["complete_or_history"]}
     assert "CHECK.2" not in {item["phase_id"] for item in report["safe_to_prepare"]}
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -885,7 +885,7 @@ def test_seed_shadow_post_run_wiring_phase_is_complete_history():
     assert "CHECK.LIVE.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -904,7 +904,7 @@ def test_seed_independent_worker_declaration_phase_is_complete_history():
     assert "CHECK.LIVE.1B" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -924,7 +924,7 @@ def test_seed_native_worker_declaration_qualification_is_complete_history():
     assert "WORKER.DECL.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -944,7 +944,7 @@ def test_seed_strict_patch_response_envelope_is_complete_history():
     assert "WORKER.DECL.2A" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -964,7 +964,7 @@ def test_seed_strict_envelope_emission_experiment_is_complete_history():
     assert "WORKER.DECL.2A.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -986,7 +986,7 @@ def test_seed_live_strict_envelope_dogfood_is_complete_history():
     assert "WORKER.DECL.2A.2" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
     assert report["bucket_counts"]["safe_to_prepare"] == 3
     assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
 
@@ -1192,7 +1192,7 @@ def test_seed_pre_execution_change_intent_phase_remains_active_for_live_v2():
         item["phase_id"] for item in report["safe_to_prepare"]
     }
     assert report["bucket_counts"]["sandbox_required"] == 1
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_candidate_sandbox_validation_phase_is_complete_history():
@@ -1208,7 +1208,7 @@ def test_seed_candidate_sandbox_validation_phase_is_complete_history():
     assert "OPS.PATCH.2" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_typed_patch_basis_phase_is_complete_history():
@@ -1226,7 +1226,7 @@ def test_seed_typed_patch_basis_phase_is_complete_history():
     assert "PATCH.BASIS.LIVE.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_query_symbol_entry_recall_phase_is_complete_history():
@@ -1245,7 +1245,7 @@ def test_seed_query_symbol_entry_recall_phase_is_complete_history():
     assert "RETRIEVE.LIVE.2" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_production_query_recall_unification_is_complete_history():
@@ -1264,7 +1264,7 @@ def test_seed_production_query_recall_unification_is_complete_history():
     assert "RETRIEVE.LIVE.3" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_answer_entity_grounding_is_complete_check_history():
@@ -1283,7 +1283,7 @@ def test_seed_answer_entity_grounding_is_complete_check_history():
     assert "ANSWER.GROUND.LIVE.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_answer_symbol_grounding_is_complete_check_history():
@@ -1302,7 +1302,7 @@ def test_seed_answer_symbol_grounding_is_complete_check_history():
     assert "ANSWER.GROUND.LIVE.2" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_bounded_defect_probe_is_complete_ops_history():
@@ -1331,7 +1331,7 @@ def test_seed_bounded_defect_probe_is_complete_ops_history():
     assert "DEFECT.PROBE.LIVE.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_bounded_targeted_validation_is_complete_ops_history():
@@ -1350,7 +1350,7 @@ def test_seed_bounded_targeted_validation_is_complete_ops_history():
     assert "OPS.VALIDATE.3" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_immutable_candidate_defect_closure_is_complete_ops_history():
@@ -1369,7 +1369,7 @@ def test_seed_immutable_candidate_defect_closure_is_complete_ops_history():
     assert "DEFECT.PROBE.LIVE.2" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_existing_check_oracle_role_is_complete_ops_history():
@@ -1388,7 +1388,7 @@ def test_seed_existing_check_oracle_role_is_complete_ops_history():
     assert "VALIDATE.ORACLE.LIVE.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_execution_eligibility_policy_is_complete_ops_history():
@@ -1407,7 +1407,7 @@ def test_seed_execution_eligibility_policy_is_complete_ops_history():
     assert "EXEC.POLICY.LIVE.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_human_apply_binding_is_complete_ops_history():
@@ -1426,7 +1426,7 @@ def test_seed_human_apply_binding_is_complete_ops_history():
     assert "EXEC.APPROVAL.LIVE.1" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
 
 
 def test_seed_repository_specificity_entry_ordering_is_complete_index_history():
@@ -1443,4 +1443,212 @@ def test_seed_repository_specificity_entry_ordering_is_complete_index_history():
     assert "RETRIEVE.LIVE.4" not in {
         item["phase_id"] for item in report["safe_to_prepare"]
     }
-    assert report["bucket_counts"]["complete_or_history"] == 201
+    assert report["bucket_counts"]["complete_or_history"] == 219
+
+
+# PATCH.SCOPE.EXPAND.1 bookkeeping boundary.
+def test_seed_structural_scope_expansion_proposal_is_complete_control_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "PATCH.SCOPE.EXPAND.1"]
+    report = _report(data, report_id="r", created_at="t")
+    assert phase["track"] == "CONTROL"
+    assert phase["status"] == "complete"
+    assert phase["model_calls_allowed"] is False
+    assert "PATCH.SCOPE.EXPAND.1" in {
+        item["phase_id"] for item in report["complete_or_history"]}
+    assert "PATCH.SCOPE.EXPAND.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]}
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.SCOPE.EXPAND.1 bookkeeping boundary.
+
+
+# PATCH.SCOPE.RECHECK.1 bookkeeping boundary.
+def test_seed_scope_discovered_semantic_recheck_is_complete_control_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "PATCH.SCOPE.RECHECK.1"]
+    report = _report(data, report_id="r", created_at="t")
+    assert phase["track"] == "CONTROL"
+    assert phase["status"] == "complete"
+    assert phase["model_calls_allowed"] is False
+    assert "PATCH.SCOPE.RECHECK.1" in {
+        item["phase_id"] for item in report["complete_or_history"]}
+    assert "PATCH.SCOPE.RECHECK.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]}
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.SCOPE.RECHECK.1 bookkeeping boundary.
+
+
+# PATCH.SCOPE.REFRESH.1 bookkeeping boundary.
+def test_seed_semantic_scope_refresh_is_complete_control_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {item["phase_id"]: item for item in data["phases"]}[
+        "PATCH.SCOPE.REFRESH.1"]
+    report = _report(data, report_id="r", created_at="t")
+    assert phase["track"] == "CONTROL"
+    assert phase["status"] == "complete"
+    assert phase["model_calls_allowed"] is False
+    assert "PATCH.SCOPE.REFRESH.1" in {
+        item["phase_id"] for item in report["complete_or_history"]}
+    assert "PATCH.SCOPE.REFRESH.1" not in {
+        item["phase_id"] for item in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.SCOPE.REFRESH.1 bookkeeping boundary.
+
+
+# PATCH.SCOPE.APPROVE.1 bookkeeping boundary.
+def test_scope_approval_is_complete_control_history():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    report = _report(data, report_id="r", created_at="t")
+    assert "PATCH.SCOPE.APPROVE.1" in {p["phase_id"] for p in report["complete_or_history"]}
+    assert "PATCH.SCOPE.APPROVE.1" not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.SCOPE.APPROVE.1 bookkeeping boundary.
+
+
+# PATCH.SCOPE.PLAN.1 bookkeeping boundary.
+def test_plan_phase_is_complete_history_not_auto_selected():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    report = _report(data, report_id="r", created_at="t")
+    assert "PATCH.SCOPE.PLAN.1" in {p["phase_id"] for p in report["complete_or_history"]}
+    assert "PATCH.SCOPE.PLAN.1" not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.SCOPE.PLAN.1 bookkeeping boundary.
+
+
+# PATCH.SCOPE.ADMIT.1 bookkeeping boundary.
+def test_admit_phase_is_history_and_does_not_enable_auto_authoring():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    report = _report(data, report_id="r", created_at="t")
+    assert "PATCH.SCOPE.ADMIT.1" in {p["phase_id"] for p in report["complete_or_history"]}
+    assert "PATCH.SCOPE.ADMIT.1" not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.SCOPE.ADMIT.1 bookkeeping boundary.
+
+
+# PATCH.AUTHOR.STRUCTURAL.1 bookkeeping boundary.
+def test_structural_author_is_history_without_automatic_author_call():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    report = _report(data, report_id="r", created_at="t")
+    assert "PATCH.AUTHOR.STRUCTURAL.1" in {p["phase_id"] for p in report["complete_or_history"]}
+    assert "PATCH.AUTHOR.STRUCTURAL.1" not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.AUTHOR.STRUCTURAL.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.MATERIALIZE.1 bookkeeping boundary.
+def test_structural_candidate_materialization_is_history_without_automatic_execution():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    report = _report(data, report_id="r", created_at="t")
+    assert "PATCH.CANDIDATE.MATERIALIZE.1" in {p["phase_id"] for p in report["complete_or_history"]}
+    assert "PATCH.CANDIDATE.MATERIALIZE.1" not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.CANDIDATE.MATERIALIZE.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.VALIDATE.1A bookkeeping boundary.
+def test_structural_candidate_compile_validation_is_history_without_automatic_execution():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    report = _report(data, report_id="r", created_at="t")
+    assert "PATCH.CANDIDATE.VALIDATE.1A" in {p["phase_id"] for p in report["complete_or_history"]}
+    assert "PATCH.CANDIDATE.VALIDATE.1A" not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.CANDIDATE.VALIDATE.1A bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.BEHAVIOR.SPEC.1 bookkeeping boundary.
+def test_behavioral_specification_is_history_without_automatic_execution():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    report = _report(data, report_id="r", created_at="t")
+    assert "PATCH.CANDIDATE.BEHAVIOR.SPEC.1" in {p["phase_id"] for p in report["complete_or_history"]}
+    assert "PATCH.CANDIDATE.BEHAVIOR.SPEC.1" not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.CANDIDATE.BEHAVIOR.SPEC.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1 bookkeeping boundary.
+def test_behavioral_execution_plan_is_history_without_execution_authority():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    report = _report(data, report_id="r", created_at="t")
+    assert "PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1" in {p["phase_id"] for p in report["complete_or_history"]}
+    assert "PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1" not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.BEHAVIOR.REFLECT.1 bookkeeping boundary.
+def test_read_only_reflection_is_history_without_behavioral_execution_admission():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    report = _report(data, report_id="r", created_at="t")
+    assert "PATCH.CANDIDATE.BEHAVIOR.REFLECT.1" in {p["phase_id"] for p in report["complete_or_history"]}
+    assert "PATCH.CANDIDATE.BEHAVIOR.REFLECT.1" not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.CANDIDATE.BEHAVIOR.REFLECT.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.BEHAVIOR.EXEC.ADMIT.1 bookkeeping boundary.
+def test_behavioral_execution_admission_is_history_without_automatic_runtime_authority():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    report = _report(data, report_id="r", created_at="t")
+    assert "PATCH.CANDIDATE.BEHAVIOR.EXEC.ADMIT.1" in {p["phase_id"] for p in report["complete_or_history"]}
+    assert "PATCH.CANDIDATE.BEHAVIOR.EXEC.ADMIT.1" not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.CANDIDATE.BEHAVIOR.EXEC.ADMIT.1 bookkeeping boundary.
+
+
+# PREFLIGHT.RUNTIME.1 bookkeeping boundary.
+def test_runtime_diagnostic_policy_is_history_without_a_runtime_executor():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    report = _report(data, report_id="r", created_at="t")
+    assert "PREFLIGHT.RUNTIME.1" in {p["phase_id"] for p in report["complete_or_history"]}
+    assert "PREFLIGHT.RUNTIME.1" not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PREFLIGHT.RUNTIME.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1 bookkeeping boundary.
+def test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {p["phase_id"]: p for p in data["phases"]}["PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1"]
+    report = _report(data, report_id="r", created_at="t")
+    assert phase["track"] == "CONTROL" and phase["status"] == "active"
+    assert phase["risk_level"] == "blocked" and phase["budget_tier"] == "local_only"
+    blocked = [p for p in report["blocked"] if p["phase_id"] == phase["phase_id"]]
+    assert len(blocked) == 1
+    assert "risk_level is blocked" in blocked[0]["reasons"]
+    assert phase["phase_id"] not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert phase["phase_id"] not in {p["phase_id"] for p in report["complete_or_history"]}
+    assert report["bucket_counts"]["blocked"] == 1
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1 bookkeeping boundary.
+
+
+# RUNTIME.SANDBOX.1 bookkeeping boundary.
+def test_verified_runtime_sandbox_is_history_and_executor_stays_blocked():
+    data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+    phase = {p["phase_id"]: p for p in data["phases"]}["RUNTIME.SANDBOX.1"]
+    report = _report(data, report_id="r", created_at="t")
+    assert report["registry_valid"] is True
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["risk_level"] == "medium" and phase["budget_tier"] == "local_only"
+    assert phase["phase_id"] in {p["phase_id"] for p in report["complete_or_history"]}
+    assert phase["phase_id"] not in {p["phase_id"] for p in report["safe_to_prepare"]}
+    assert phase["phase_id"] not in {p["phase_id"] for p in report["sandbox_required"]}
+    assert {p["phase_id"] for p in report["blocked"]} == {"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1"}
+    assert report["bucket_counts"]["complete_or_history"] == 219
+    assert report["top_recommendation"]["phase_id"] == "DOGFOOD.1B"
+# End RUNTIME.SANDBOX.1 bookkeeping boundary.

@@ -1,0 +1,1131 @@
+{
+  "audit_date": "2026-10-09",
+  "classification_vocabulary": [
+    "DISCOVERY_MECHANISM",
+    "SECURITY_REQUIREMENT",
+    "AMBIGUITY_REQUIREMENT",
+    "PROVENANCE_REQUIREMENT",
+    "TOOLCHAIN_SELECTION_REQUIREMENT",
+    "BACKEND_BINDING_REQUIREMENT",
+    "RESOURCE_BOUND_REQUIREMENT",
+    "RECEIPT_COMPLETENESS_REQUIREMENT",
+    "HISTORICAL_IMPLEMENTATION_DETAIL",
+    "UNKNOWN"
+  ],
+  "compat1_interpretation": "Independent frozen completeness and receipt witness obligations, plus separate backend binding; exact equality based on historical selection is not downstream exclusive pin. Original block unchanged.",
+  "compat1_retroactively_changed": false,
+  "compat_dimension_matrix": [
+    {
+      "assessment": "Exact historical selected image matches target, but historical equality does not pin downstream requirement.",
+      "comparison": "PRESERVED",
+      "dimension": "toolchain_image_identity",
+      "evidence": [
+        "JAVA.1 frozen explicit_artifact_selection.image_identity",
+        "JAVA.1C JavaContinuationReceipt.image_identity"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "platform",
+      "evidence": [
+        "JAVA.1 verify_sandboxed_java_toolchain",
+        "JAVA.1C verify exact image inspection"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "java_executable_path",
+      "evidence": [
+        "JAVA.1 frozen java_executable_identity",
+        "JAVA.1C JavaContinuationReceipt.java_path"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "java_executable_digest",
+      "evidence": [
+        "JAVA.1 frozen java_executable_identity",
+        "JAVA.1C JavaContinuationReceipt.java_sha256"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "javac_executable_path",
+      "evidence": [
+        "JAVA.1 frozen javac_executable_identity",
+        "JAVA.1C JavaContinuationReceipt.javac_path"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "javac_executable_digest",
+      "evidence": [
+        "JAVA.1 frozen javac_executable_identity",
+        "JAVA.1C JavaContinuationReceipt.javac_sha256"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retains existing COMPAT intentional difference; this audit issues no compatibility relation or identity alias.",
+      "comparison": "SEPARATE_EXPLICIT_REVIEW_REQUIRED",
+      "dimension": "java_version_expectations",
+      "evidence": [
+        "JAVA.1 _java_failure identity stages and version()",
+        "JAVA.1C verify toolchain_versions"
+      ],
+      "original_compat1_comparison": "intentionally_different"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "compiler_invocation_restrictions",
+      "evidence": [
+        "sandboxed_java_toolchain_probe.COMPILE_ARGUMENTS",
+        "sandboxed_java_positive_probe.COMPILE_ARGV"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "runtime_invocation_restrictions",
+      "evidence": [
+        "sandboxed_java_toolchain_probe.RUNTIME_ARGUMENTS",
+        "sandboxed_java_positive_probe.RUNTIME_ARGV"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "bounded_capture",
+      "evidence": [
+        "JAVA.1 JAVA_PROBE_SOURCE.run",
+        "java_single_thread_capture.capture_process",
+        "JAVA.1C evaluate"
+      ],
+      "original_compat1_comparison": "stronger_provider"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "timeout",
+      "evidence": [
+        "JAVA.1 _invoke_java",
+        "JAVA.1C _invoke",
+        "sandboxed_java_positive_probe.BODY"
+      ],
+      "original_compat1_comparison": "stronger_provider"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "stdout_cap",
+      "evidence": [
+        "JAVA.1 _java_failure",
+        "JAVA.1C INVOCATIONS; SANDBOX.2 version gates"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "stderr_cap",
+      "evidence": [
+        "JAVA.1 _java_failure",
+        "JAVA.1C evaluate and _progress"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "cleanup",
+      "evidence": [
+        "JAVA.1 _invoke_java and JAVA_PROBE_SOURCE.run",
+        "JAVA.1C evaluate and verify"
+      ],
+      "original_compat1_comparison": "stronger_provider"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "network_prohibition",
+      "evidence": [
+        "SANDBOX.1 _safe_configuration_facts and _facts_passed",
+        "SANDBOX.2 safe_configuration and classify"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "host_mount_prohibition",
+      "evidence": [
+        "SANDBOX.1 _safe_configuration_facts",
+        "JAVA.1C safe_configuration and verify"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "root_filesystem",
+      "evidence": [
+        "SANDBOX.1 _safe_configuration_facts",
+        "JAVA.1C _state_safe"
+      ],
+      "original_compat1_comparison": "stronger_provider"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "uid_gid",
+      "evidence": [
+        "SANDBOX.1 _safe_configuration_facts",
+        "JAVA.1C _state_safe"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "capability_drop",
+      "evidence": [
+        "SANDBOX.1 _safe_configuration_facts",
+        "JAVA.1C _state_safe"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "no_new_privileges",
+      "evidence": [
+        "SANDBOX.1 _safe_configuration_facts",
+        "JAVA.1C _state_safe"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "pid_namespace_budget",
+      "evidence": [
+        "JAVA.1 JAVA_PROBE_SOURCE.boundary",
+        "JAVA.1C _state_safe and evaluate"
+      ],
+      "original_compat1_comparison": "stronger_provider"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "memory_limit",
+      "evidence": [
+        "SANDBOX.1 _safe_configuration_facts",
+        "JAVA.1C _state_safe"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "cpu_limit",
+      "evidence": [
+        "SANDBOX.1 _safe_configuration_facts",
+        "JAVA.1C _state_safe"
+      ],
+      "original_compat1_comparison": "stronger_provider"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "environment_closure",
+      "evidence": [
+        "SANDBOX.1 _WORKLOAD_ENVIRONMENT",
+        "JAVA.1C _state_safe and safe_configuration"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "temporary_filesystems",
+      "evidence": [
+        "SANDBOX.1 _safe_configuration_facts",
+        "JAVA.1C safe_configuration and verify"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retains existing COMPAT intentional difference; this audit issues no compatibility relation or identity alias.",
+      "comparison": "SEPARATE_EXPLICIT_REVIEW_REQUIRED",
+      "dimension": "seccomp_policy",
+      "evidence": [
+        "SYNTH.AUTH.1 SANDBOX_POLICY_SHA256",
+        "SANDBOX.2 policy_diff/validate_policy_bytes",
+        "JAVA.1C authenticate_sandbox2"
+      ],
+      "original_compat1_comparison": "intentionally_different"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "controller_threads",
+      "evidence": [
+        "JAVA.1 JAVA_PROBE_SOURCE.run",
+        "JAVA.1C _state_safe; positive_probe.BODY"
+      ],
+      "original_compat1_comparison": "stronger_provider"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "source_projection",
+      "evidence": [
+        "JAVA.1 ExactJavaSandboxInput",
+        "JAVA.1C evaluate; positive_probe.execute"
+      ],
+      "original_compat1_comparison": "stronger_provider"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "class_projection",
+      "evidence": [
+        "JAVA.1 _java_failure",
+        "JAVA.1C evaluate"
+      ],
+      "original_compat1_comparison": "stronger_provider"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "arbitrary_command_prohibition",
+      "evidence": [
+        "JAVA.1 JavaToolchainExecutionSpec",
+        "JAVA.1C verify; positive_probe.source"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "shell_prohibition",
+      "evidence": [
+        "JAVA.1 JAVA_PROBE_SOURCE.run",
+        "java_single_thread_capture.capture_process; JAVA.1C receipt"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Fresh different exact-provider receipt could bind safety facts but cannot truthfully include old complete inventory.",
+      "comparison": "CHANGED_REQUIREMENT",
+      "dimension": "runtime_receipt_semantics",
+      "evidence": [
+        "JAVA.1 SandboxedJavaToolchainVerificationReceipt",
+        "JAVA.1C JavaContinuationReceipt"
+      ],
+      "original_compat1_comparison": "unproven"
+    },
+    {
+      "assessment": "Retain original constraints and authenticated fresh JAVA.1C evidence; no live claim in audit.",
+      "comparison": "PRESERVABLE_BY_HYPOTHETICAL",
+      "dimension": "descriptor_authentication",
+      "evidence": [
+        "JAVA.1 validate_java_descriptor",
+        "JAVA.1C validate_descriptor; java_toolchain_satisfies_executor_runtime"
+      ],
+      "original_compat1_comparison": "equal"
+    },
+    {
+      "assessment": "Retains existing COMPAT intentional difference; this audit issues no compatibility relation or identity alias.",
+      "comparison": "SEPARATE_EXPLICIT_REVIEW_REQUIRED",
+      "dimension": "sandbox_owner_relationship",
+      "evidence": [
+        "JAVA.1 java_toolchain_satisfies_executor_runtime",
+        "JAVA.1C authenticate_sandbox2"
+      ],
+      "original_compat1_comparison": "intentionally_different"
+    },
+    {
+      "assessment": "Exact target evidence cannot prove full-domain classification; independent frozen dimension.",
+      "comparison": "LOST",
+      "dimension": "complete_local_artifact_discovery",
+      "evidence": [
+        "JAVA.1 verify_sandboxed_java_toolchain: java_artifact_discovery_incomplete",
+        "JAVA.1C verify; JavaContinuationReceipt"
+      ],
+      "original_compat1_comparison": "unproven"
+    },
+    {
+      "assessment": "Fresh BIND plus JAVA.1C sequence is insufficient without actual target/backend/runtime evidence linkage.",
+      "comparison": "CONDITIONAL_UNPROVEN",
+      "dimension": "discovery_backend_binding",
+      "evidence": [
+        "JAVA.1 verify_sandboxed_java_toolchain: backend_binding_changed",
+        "SANDBOX.2 ThreadCompatibleSandboxReceipt; JAVA.1C JavaContinuationReceipt"
+      ],
+      "original_compat1_comparison": "unproven"
+    }
+  ],
+  "critical_distinctions": [
+    "global discovery completeness != exact provider authenticity",
+    "different mechanism != different semantic guarantee"
+  ],
+  "current_requirement": {
+    "exact_provider_pinned_in_requirement": false,
+    "java_profile_id": "RUNTIME.JAVA.1",
+    "java_schema_version": "runtime_java_1_v1",
+    "sandbox_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "sandbox_profile_id": "runtime_sandbox_2_v1",
+    "selection": "generic_original_discovery_then_first_matching_image_and_controller_preferred_pair"
+  },
+  "diagnostic": {
+    "bytes_received": 384237059,
+    "classification": "EXPORT_TRANSPORT_EXCEEDS_BOUND",
+    "export_budget_ms": 30000,
+    "image": "sha256:09361da47d33ad0d44f89947d5e99003e94594e885328cdb5cd7b1c515a1a089",
+    "independent_of_semantic_necessity": true,
+    "new_measurement": false,
+    "not_proven": [
+      "daemon production alone bottleneck",
+      "host capture dominates",
+      "artifact never completes in 30s",
+      "parser cost zero",
+      "repeat cold/warm runs identical"
+    ],
+    "parser_trial_skipped": true,
+    "semantic_archive_parsing_occurred": false,
+    "status": "RUNTIME_JAVA_DISCOVERY_DIAG_1_COMPLETE_WITH_WARNINGS"
+  },
+  "effect_scope": "Operational runtime effects; host repository/Python/pytest/report maintenance is separate. Existing pure regressions may issue fabricated development-only memory fixtures, never live operational capabilities.",
+  "equivalent_consumers": [
+    {
+      "classification": "DISCOVERY_MECHANISM",
+      "downstream_decision": "All-enumerated-ID classification propagates to complete_inventory; unavailable/invalid/empty early constructors at 383-400.",
+      "field": "local complete producer/aggregate reason/result",
+      "file": "core/sandboxed_java_toolchain_discovery.py",
+      "lines": [
+        378,
+        401,
+        421,
+        437,
+        442,
+        447,
+        452
+      ]
+    },
+    {
+      "classification": "RESOURCE_BOUND_REQUIREMENT",
+      "downstream_decision": "Eligible inspection that cannot complete within unchanged bounds leaves completeness false.",
+      "field": "archive/executable/entry/export resource limits",
+      "file": "core/sandboxed_java_toolchain_discovery.py",
+      "lines": [
+        24,
+        25,
+        26,
+        27,
+        236,
+        269,
+        271,
+        273
+      ]
+    },
+    {
+      "classification": "SECURITY_REQUIREMENT",
+      "downstream_decision": "Unverified resource removal blocks success; cleanup distinct from full classification.",
+      "field": "cleanup",
+      "file": "core/sandboxed_java_toolchain_discovery.py",
+      "lines": [
+        420,
+        421,
+        425,
+        435,
+        440,
+        441
+      ]
+    },
+    {
+      "classification": "RECEIPT_COMPLETENESS_REQUIREMENT",
+      "downstream_decision": "Full receipt payload affects authentication/fingerprint; COMPLETE determines verified descriptor consumed indirectly by public predicate.",
+      "field": "artifact_inventory and authenticated receipt/descriptor status",
+      "file": "core/sandboxed_java_toolchain.py",
+      "lines": [
+        109,
+        110,
+        160,
+        162,
+        163,
+        164,
+        217,
+        219,
+        235,
+        238,
+        479,
+        481,
+        496
+      ]
+    },
+    {
+      "classification": "TOOLCHAIN_SELECTION_REQUIREMENT",
+      "downstream_decision": "Generic ordered selection has no requirement-level pin, global uniqueness or fallback.",
+      "field": "first matching artifact and preferred controller pair",
+      "file": "core/sandboxed_java_toolchain.py",
+      "lines": [
+        427,
+        428,
+        430,
+        431
+      ]
+    },
+    {
+      "classification": "BACKEND_BINDING_REQUIREMENT",
+      "downstream_decision": "Distinct prelaunch backend match; complete coverage cannot substitute for authenticity.",
+      "field": "discovery backend identity/version equality",
+      "file": "core/sandboxed_java_toolchain.py",
+      "lines": [
+        442,
+        443,
+        444
+      ]
+    },
+    {
+      "classification": "RECEIPT_COMPLETENESS_REQUIREMENT",
+      "downstream_decision": "All owner records retained, including non-target and duplicate distinctions; target-only witness changes receipt contract.",
+      "field": "canonical inventory, sources, count, hash and positive receipt",
+      "file": "core/sandboxed_java_discovery_continuation.py",
+      "lines": [
+        56,
+        58,
+        60,
+        122,
+        123,
+        125,
+        126,
+        143,
+        270,
+        356
+      ]
+    },
+    {
+      "classification": "AMBIGUITY_REQUIREMENT",
+      "downstream_decision": "Rejects duplicate/missing target records/pairs, not alternatives elsewhere in global domain.",
+      "field": "exact target record and exact matching pair cardinality",
+      "file": "core/sandboxed_java_discovery_continuation.py",
+      "lines": [
+        73,
+        76,
+        77,
+        81,
+        86,
+        87,
+        88
+      ]
+    },
+    {
+      "classification": "PROVENANCE_REQUIREMENT",
+      "downstream_decision": "Report copies cannot authenticate typed owners or replace source/backend/runtime coherence.",
+      "field": "exact original discovery owner and authenticated runtime/BIND evidence",
+      "file": "core/sandboxed_java_discovery_continuation.py",
+      "lines": [
+        64,
+        70,
+        71,
+        91,
+        93,
+        178,
+        187,
+        189,
+        190
+      ]
+    },
+    {
+      "classification": "RECEIPT_COMPLETENESS_REQUIREMENT",
+      "downstream_decision": "Full inventory witness is independently observable, authenticated and includes unrelated records.",
+      "field": "inventory_count, inventory_sha256 tamper and canonical record retention",
+      "file": "tests/test_runtime_java1d_retry.py",
+      "lines": [
+        71,
+        113,
+        156,
+        162,
+        167,
+        176
+      ]
+    },
+    {
+      "classification": "RECEIPT_COMPLETENESS_REQUIREMENT",
+      "downstream_decision": "Dynamic receipt-field mutation includes inventory/completeness without literal field-token reference.",
+      "field": "all-fields tamper and authenticated receipt binding",
+      "file": "tests/test_runtime_java1.py",
+      "lines": [
+        185,
+        195,
+        198,
+        202
+      ]
+    },
+    {
+      "classification": "TOOLCHAIN_SELECTION_REQUIREMENT",
+      "downstream_decision": "Exact generic old requirement; no image/executable pin adopted by downstream authorization.",
+      "field": "java profile/schema projection",
+      "file": "core/synthetic_runtime_authorization.py",
+      "lines": [
+        29,
+        30,
+        118,
+        119,
+        145,
+        146,
+        168,
+        174,
+        264,
+        269
+      ]
+    },
+    {
+      "classification": "TOOLCHAIN_SELECTION_REQUIREMENT",
+      "downstream_decision": "Executor records original exact Java profile/schema, no new target-only requirement.",
+      "field": "Java requirement projection",
+      "file": "core/behavioral_diagnostic_executor_retry.py",
+      "lines": [
+        85,
+        86
+      ]
+    },
+    {
+      "classification": "TOOLCHAIN_SELECTION_REQUIREMENT",
+      "downstream_decision": "Exact SYNTH Java schema/policy mismatch blocks independently; no alias of JAVA.1C.",
+      "field": "frozen contract mismatch gate",
+      "file": "core/behavioral_diagnostic_executor_lifecycle_retry.py",
+      "lines": [
+        70,
+        81,
+        82,
+        83,
+        89,
+        90,
+        91,
+        98,
+        105,
+        195,
+        202
+      ]
+    },
+    {
+      "classification": "RESOURCE_BOUND_REQUIREMENT",
+      "downstream_decision": "Raw timeout stops parser trial and cannot supply discovery completeness; not a semantic necessity argument.",
+      "field": "completed_within_bound/timed_out",
+      "file": "scripts/measure_runtime_java_discovery_diag1.py",
+      "lines": [
+        36,
+        46,
+        51,
+        208,
+        222,
+        237,
+        378,
+        384,
+        385
+      ]
+    }
+  ],
+  "excluded_unrelated_inventory_domains": [
+    "core/evidence_quality_* artifact inventories",
+    "tests/test_file_capabilities.py incomplete_inventory mapping test name",
+    "tests/test_run_progress_live_branch_checkpoint.py complete_inventory test name"
+  ],
+  "global_completeness_inherently_required_for_fixed_provider_safety": "not_established_by_frozen_source_tests",
+  "global_completeness_required_under_existing_contract": true,
+  "global_negative_facts": {
+    "complete_absence_of_eligible_provider": "lost_by_exact_only_proof",
+    "exactly_one_global_java_toolchain": "not_required_or_proven",
+    "no_other_eligible_provider": "not_required_or_proven",
+    "no_unknown_classification_in_enumerated_domain": "required_old_coverage_fact_lost_outside_target"
+  },
+  "global_uniqueness_required": false,
+  "hypothetical_provider": {
+    "controller": "exact actual path/hash required by hypothetical; no new pin created in audit",
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "java_path": "/opt/temurin-26.0.2.1/bin/java",
+    "java_sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+    "javac_path": "/opt/temurin-26.0.2.1/bin/javac",
+    "javac_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+    "live_evidence": false,
+    "selection": "exact_only_no_fallback_no_tags_no_provisioning"
+  },
+  "independent_global_uniqueness_safety_requirement_demonstrated": false,
+  "named_occurrences": [
+    {
+      "classification": "RECEIPT_COMPLETENESS_REQUIREMENT",
+      "downstream_decision": "Separate old-contract completeness/receipt dimension stays unproven; frozen metadata cannot fill gap.",
+      "file": "core/java_runtime_compatibility.py",
+      "line": 114,
+      "term": "discovery_complete"
+    },
+    {
+      "classification": "TOOLCHAIN_SELECTION_REQUIREMENT",
+      "downstream_decision": "Separate old-contract completeness/receipt dimension stays unproven; frozen metadata cannot fill gap.",
+      "file": "core/java_runtime_compatibility.py",
+      "line": 123,
+      "term": "complete_local_artifact_discovery"
+    },
+    {
+      "classification": "TOOLCHAIN_SELECTION_REQUIREMENT",
+      "downstream_decision": "Separate old-contract completeness/receipt dimension stays unproven; frozen metadata cannot fill gap.",
+      "file": "core/java_runtime_compatibility.py",
+      "line": 123,
+      "term": "discovery_complete"
+    },
+    {
+      "classification": "TOOLCHAIN_SELECTION_REQUIREMENT",
+      "downstream_decision": "Requires original complete inventory before binding, exact membership, or JAVA.1C.",
+      "file": "core/sandboxed_java_discovery_continuation.py",
+      "line": 68,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "RECEIPT_COMPLETENESS_REQUIREMENT",
+      "downstream_decision": "Positive continuation receipt asserts complete inventory only after owner gates.",
+      "file": "core/sandboxed_java_discovery_continuation.py",
+      "line": 143,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "HISTORICAL_IMPLEMENTATION_DETAIL",
+      "downstream_decision": "Initial unknown/observed report projection; JSON is never a provider.",
+      "file": "core/sandboxed_java_discovery_continuation.py",
+      "line": 211,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "HISTORICAL_IMPLEMENTATION_DETAIL",
+      "downstream_decision": "Initial unknown/observed report projection; JSON is never a provider.",
+      "file": "core/sandboxed_java_discovery_continuation.py",
+      "line": 269,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "HISTORICAL_IMPLEMENTATION_DETAIL",
+      "downstream_decision": "Initial unknown/observed report projection; JSON is never a provider.",
+      "file": "core/sandboxed_java_discovery_continuation.py",
+      "line": 269,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "RECEIPT_COMPLETENESS_REQUIREMENT",
+      "downstream_decision": "Binds full inventory/completeness into authenticated original receipt payload.",
+      "file": "core/sandboxed_java_toolchain.py",
+      "line": 110,
+      "term": "discovery_complete"
+    },
+    {
+      "classification": "DISCOVERY_MECHANISM",
+      "downstream_decision": "Distinguishes established absence from incomplete knowledge.",
+      "file": "core/sandboxed_java_toolchain.py",
+      "line": 435,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "TOOLCHAIN_SELECTION_REQUIREMENT",
+      "downstream_decision": "Blocks selected candidate before image boundary or Java launch on incomplete discovery.",
+      "file": "core/sandboxed_java_toolchain.py",
+      "line": 445,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "RECEIPT_COMPLETENESS_REQUIREMENT",
+      "downstream_decision": "Binds full inventory/completeness into authenticated original receipt payload.",
+      "file": "core/sandboxed_java_toolchain.py",
+      "line": 481,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "DISCOVERY_MECHANISM",
+      "downstream_decision": "Declares complete classification result for the enumerated local immutable image IDs.",
+      "file": "core/sandboxed_java_toolchain_discovery.py",
+      "line": 62,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "RESOURCE_BOUND_REQUIREMENT",
+      "downstream_decision": "Stops additional replay attempt when original receipt is incompatible or incomplete.",
+      "file": "scripts/replay_runtime_java1.py",
+      "line": 35,
+      "term": "discovery_complete"
+    },
+    {
+      "classification": "HISTORICAL_IMPLEMENTATION_DETAIL",
+      "downstream_decision": "Records unknown discovery at earlier binding stop or prints existing report fields.",
+      "file": "scripts/replay_runtime_java1d.py",
+      "line": 68,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "HISTORICAL_IMPLEMENTATION_DETAIL",
+      "downstream_decision": "Records unknown discovery at earlier binding stop or prints existing report fields.",
+      "file": "scripts/replay_runtime_java1d_retry.py",
+      "line": 22,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "DISCOVERY_MECHANISM",
+      "downstream_decision": "Complete empty fixture establishes unavailable result without runtime success.",
+      "file": "tests/test_runtime_java1.py",
+      "line": 97,
+      "term": "discovery_complete"
+    },
+    {
+      "classification": "DISCOVERY_MECHANISM",
+      "downstream_decision": "Tests incomplete unavailable backend versus fully classified ineligible or empty inventory.",
+      "file": "tests/test_runtime_java1_discovery.py",
+      "line": 171,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "DISCOVERY_MECHANISM",
+      "downstream_decision": "Tests incomplete unavailable backend versus fully classified ineligible or empty inventory.",
+      "file": "tests/test_runtime_java1_discovery.py",
+      "line": 190,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "DISCOVERY_MECHANISM",
+      "downstream_decision": "Tests incomplete unavailable backend versus fully classified ineligible or empty inventory.",
+      "file": "tests/test_runtime_java1_discovery.py",
+      "line": 210,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "DISCOVERY_MECHANISM",
+      "downstream_decision": "Tests incomplete unavailable backend versus fully classified ineligible or empty inventory.",
+      "file": "tests/test_runtime_java1_discovery.py",
+      "line": 226,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "HISTORICAL_IMPLEMENTATION_DETAIL",
+      "downstream_decision": "Earlier binding stop leaves completeness/count/hash unmeasured.",
+      "file": "tests/test_runtime_java1d.py",
+      "line": 71,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "RECEIPT_COMPLETENESS_REQUIREMENT",
+      "downstream_decision": "Incomplete fixture blocks before JAVA.1C; positive fabricated receipt retains complete inventory.",
+      "file": "tests/test_runtime_java1d_retry.py",
+      "line": 69,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "TOOLCHAIN_SELECTION_REQUIREMENT",
+      "downstream_decision": "Incomplete fixture blocks before JAVA.1C; positive fabricated receipt retains complete inventory.",
+      "file": "tests/test_runtime_java1d_retry.py",
+      "line": 100,
+      "term": "complete_inventory"
+    },
+    {
+      "classification": "TOOLCHAIN_SELECTION_REQUIREMENT",
+      "downstream_decision": "Freezes separate unproven completeness dimension, rejects caller claims, and shows JAVA.1C missing discovery witnesses.",
+      "file": "tests/test_runtime_java_compat1.py",
+      "line": 42,
+      "term": "complete_local_artifact_discovery"
+    },
+    {
+      "classification": "TOOLCHAIN_SELECTION_REQUIREMENT",
+      "downstream_decision": "Freezes separate unproven completeness dimension, rejects caller claims, and shows JAVA.1C missing discovery witnesses.",
+      "file": "tests/test_runtime_java_compat1.py",
+      "line": 111,
+      "term": "complete_local_artifact_discovery"
+    },
+    {
+      "classification": "RECEIPT_COMPLETENESS_REQUIREMENT",
+      "downstream_decision": "Freezes separate unproven completeness dimension, rejects caller claims, and shows JAVA.1C missing discovery witnesses.",
+      "file": "tests/test_runtime_java_compat1.py",
+      "line": 157,
+      "term": "discovery_complete"
+    },
+    {
+      "classification": "RECEIPT_COMPLETENESS_REQUIREMENT",
+      "downstream_decision": "Freezes separate unproven completeness dimension, rejects caller claims, and shows JAVA.1C missing discovery witnesses.",
+      "file": "tests/test_runtime_java_compat1.py",
+      "line": 161,
+      "term": "complete_inventory"
+    }
+  ],
+  "occurrence_scope": "All complete_inventory, complete_local_artifact_discovery, discovery_complete tokens in historical core/scripts/tests Python; equivalent producers and transitive consumers are catalogued in Markdown. New audit files excluded. No unrelated same-name Java field found.",
+  "occurrence_source_files": [
+    "core/java_runtime_compatibility.py",
+    "core/sandboxed_java_discovery_continuation.py",
+    "core/sandboxed_java_toolchain.py",
+    "core/sandboxed_java_toolchain_discovery.py",
+    "scripts/replay_runtime_java1.py",
+    "scripts/replay_runtime_java1d.py",
+    "scripts/replay_runtime_java1d_retry.py",
+    "tests/test_runtime_java1.py",
+    "tests/test_runtime_java1_discovery.py",
+    "tests/test_runtime_java1d.py",
+    "tests/test_runtime_java1d_retry.py",
+    "tests/test_runtime_java_compat1.py"
+  ],
+  "old_contract_rewritten": false,
+  "operational_effect_counts": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker calls": 0,
+    "EXECUTOR.1R": 0,
+    "Java": 0,
+    "compile": 0,
+    "containers": 0,
+    "exports": 0,
+    "host mounts": 0,
+    "javac": 0,
+    "network": 0,
+    "reflection lease consumption": 0,
+    "runtime lease consumption": 0,
+    "shell": 0,
+    "source projection": 0
+  },
+  "phase_id": "RUNTIME.JAVA.DISCOVERY.CONTRACT.1",
+  "preservation_report": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_PRESERVATION.json",
+  "properties_changed": [
+    "generic_ordered_provider_selection"
+  ],
+  "properties_lost": [
+    "complete_local_domain_classification",
+    "full_authenticated_inventory_witness",
+    "global_absence_reporting"
+  ],
+  "properties_preserved": [
+    "immutable_image_identity",
+    "linux_amd64_metadata_and_elf",
+    "java_javac_pair_paths_and_hashes",
+    "controller_authenticity",
+    "filesystem_path_link_traversal_and_nonroot_checks",
+    "no_fallback_tags_or_provisioning",
+    "sandbox_isolation_and_invocation_boundaries",
+    "resource_bounded_inspection"
+  ],
+  "property_matrix": [
+    {
+      "comparison": "LOST",
+      "evidence": [
+        "core/sandboxed_java_toolchain_discovery.py:393-452",
+        "core/sandboxed_java_toolchain.py:445"
+      ],
+      "historical_guarantee": "Every immutable ID returned by bounded local enumeration classified with no eligible inspection gap.",
+      "hypothetical_exact_proof": "Only target classified; cannot prove other classifications.",
+      "property": "complete_local_domain_classification"
+    },
+    {
+      "comparison": "CHANGED_REQUIREMENT",
+      "evidence": [
+        "core/sandboxed_java_toolchain.py:427-431",
+        "core/synthetic_runtime_authorization.py:103-146"
+      ],
+      "historical_guarantee": "First matching artifact and preferred controller pair from original ordered inventory; no requirement image pin.",
+      "hypothetical_exact_proof": "Exact provider only; cannot establish original selector result without other candidate evidence.",
+      "property": "generic_ordered_provider_selection"
+    },
+    {
+      "comparison": "LOST",
+      "evidence": [
+        "core/sandboxed_java_toolchain.py:109-111",
+        "core/sandboxed_java_toolchain.py:479-498",
+        "core/java_runtime_compatibility.py:114-128"
+      ],
+      "historical_guarantee": "Original receipt signs complete inventory and discovery_complete.",
+      "hypothetical_exact_proof": "Different truthful exact-provider evidence cannot claim old full inventory.",
+      "property": "full_authenticated_inventory_witness"
+    },
+    {
+      "comparison": "LOST",
+      "evidence": [
+        "core/sandboxed_java_toolchain_discovery.py:399-400",
+        "core/sandboxed_java_toolchain.py:434-437"
+      ],
+      "historical_guarantee": "Complete empty or classified domain supports no eligible provider result.",
+      "hypothetical_exact_proof": "Target absent does not imply no other eligible provider.",
+      "property": "global_absence_reporting"
+    },
+    {
+      "comparison": "NOT_REQUIRED_OR_PROVEN",
+      "evidence": [
+        "core/sandboxed_java_toolchain.py:427-431",
+        "core/sandboxed_java_discovery_continuation.py:73-88"
+      ],
+      "historical_guarantee": "No global exactly-one/no-other predicate; multiple providers allowed.",
+      "hypothetical_exact_proof": "Do not assert global uniqueness.",
+      "property": "global_unique_provider"
+    },
+    {
+      "comparison": "PRESERVED",
+      "evidence": [
+        "core/sandboxed_java_toolchain_discovery.py:354-372",
+        "core/sandboxed_java_positive_continuation.py:378-394"
+      ],
+      "historical_guarantee": "Immutable ID and metadata identity; no tag-based execution.",
+      "hypothetical_exact_proof": "Exact immutable f6 target equality; any mismatch blocks.",
+      "property": "immutable_image_identity"
+    },
+    {
+      "comparison": "PRESERVED",
+      "evidence": [
+        "core/sandboxed_java_toolchain_discovery.py:125-161",
+        "core/sandboxed_java_toolchain_discovery.py:355-372",
+        "core/sandboxed_java_toolchain_discovery.py:411-413",
+        "tests/test_runtime_java1_discovery.py:66-102"
+      ],
+      "historical_guarantee": "Exact OS/architecture plus ELF64 little-endian x86_64 and eligible executable checks.",
+      "hypothetical_exact_proof": "Original checks retained for target.",
+      "property": "linux_amd64_metadata_and_elf"
+    },
+    {
+      "comparison": "PRESERVED",
+      "evidence": [
+        "core/sandboxed_java_toolchain_discovery.py:176-226",
+        "core/sandboxed_java_positive_continuation.py:139-205"
+      ],
+      "historical_guarantee": "Resolved same-directory pairs, measured hashes, runtime rehash, fixed argv.",
+      "hypothetical_exact_proof": "Exact paths/digests plus original pair/link checks and fresh JAVA.1C.",
+      "property": "java_javac_pair_paths_and_hashes"
+    },
+    {
+      "comparison": "PRESERVED",
+      "evidence": [
+        "core/sandboxed_java_toolchain_discovery.py:203-226",
+        "core/sandboxed_java_discovery_continuation.py:81-88"
+      ],
+      "historical_guarantee": "Fixed controller path, resolved executable bytes/hash and nonroot execution/traversal; original 1D checks hash shape not fixed digest.",
+      "hypothetical_exact_proof": "Hypothetical explicitly checks exact actual controller path/hash; report contains no new controller pin or live attestation.",
+      "property": "controller_authenticity"
+    },
+    {
+      "comparison": "PRESERVED",
+      "evidence": [
+        "core/sandboxed_java_toolchain_discovery.py:86-226",
+        "tests/test_runtime_java1_discovery.py:66-148"
+      ],
+      "historical_guarantee": "No extraction; rejects path escape/link cycle/invalid ELF/permissions.",
+      "hypothetical_exact_proof": "Retain original checks within target filesystem, no global inventory claim.",
+      "property": "filesystem_path_link_traversal_and_nonroot_checks"
+    },
+    {
+      "comparison": "CONDITIONAL_UNPROVEN",
+      "evidence": [
+        "core/sandboxed_java_toolchain.py:442-444",
+        "core/sandbox_backend_binding.py:179-206",
+        "core/sandboxed_java_positive_continuation.py:294-302"
+      ],
+      "historical_guarantee": "Discovery route AND server version equal authenticated sandbox evidence; BIND authenticates own exact pair.",
+      "hypothetical_exact_proof": "Sequence alone lacks explicit actual target-inspection and JAVA.1C pair linkage; future contract must define it.",
+      "property": "route_and_server_version_binding"
+    },
+    {
+      "comparison": "PRESERVED",
+      "evidence": [
+        "core/sandboxed_java_toolchain.py:427-470",
+        "core/sandboxed_java_toolchain_discovery.py:317-332"
+      ],
+      "historical_guarantee": "Immutable selected launch, pull never; failure does not try later candidate.",
+      "hypothetical_exact_proof": "Exact only, no alternate selection/fallback/tags/provisioning, mismatch blocks.",
+      "property": "no_fallback_tags_or_provisioning"
+    },
+    {
+      "comparison": "PRESERVED",
+      "evidence": [
+        "core/java_runtime_compatibility.py:59-113",
+        "core/sandboxed_java_positive_continuation.py:139-205"
+      ],
+      "historical_guarantee": "Authenticated containment, exact source/class/argv, no network/mount/shell, bounded capture and cleanup.",
+      "hypothetical_exact_proof": "Retain all original checks and obtain fresh JAVA.1C; not measured here.",
+      "property": "sandbox_isolation_and_invocation_boundaries"
+    },
+    {
+      "comparison": "PRESERVED",
+      "evidence": [
+        "core/sandboxed_java_toolchain_discovery.py:24-27",
+        "core/sandboxed_java_toolchain_discovery.py:231-289"
+      ],
+      "historical_guarantee": "30s per export, 2GiB archive, 250000 entries, 128MiB executable; errors block.",
+      "hypothetical_exact_proof": "Preserve original bounds; no prediction target export will fit; full-domain feasibility unproven.",
+      "property": "resource_bounded_inspection"
+    },
+    {
+      "comparison": "NOT_REQUIRED_OR_PROVEN",
+      "evidence": [
+        "core/sandbox_backend_binding.py:1-5",
+        "core/sandbox_backend_binding.py:156-159"
+      ],
+      "historical_guarantee": "BIND explicitly claims neither; inventory is not atomic ongoing daemon state.",
+      "hypothetical_exact_proof": "Do not invent continuity/ABA protection from exact image or sequence.",
+      "property": "daemon_continuity_and_aba"
+    }
+  ],
+  "proposed_boundary_only": {
+    "backend_runtime_evidence_binding_required": true,
+    "complete_inventory_claim_allowed": false,
+    "explicit_compatibility_migration_review": true,
+    "explicit_pinned_provider_semantics": true,
+    "new_additive_requirement_epoch": true,
+    "old_requirement_preserved": true,
+    "synth_authorization_epoch_if_needed": true,
+    "truthful_distinct_proof_kind": "exact_provider_proven (proposal only)"
+  },
+  "provider_specific_proof_equivalent": false,
+  "recommended_next_slice": "Explicit additive pinned-provider requirement boundary review, before any implementation or later compatibility/migration/SYNTH epoch. Keep JAVA.1D blocked; stop here.",
+  "remediation_implemented": false,
+  "replacement_without_semantic_weakening": false,
+  "report_only": true,
+  "required_properties_unresolved": [
+    "hypothetical sequence does not explicitly authenticate target inspection route/version and bind fresh JAVA.1C own sandbox evidence; cannot claim preserved backend provenance by chronology",
+    "original generic selector result in future domain cannot be established from target-only evidence"
+  ],
+  "semantic_conclusion": "REQUIREMENT_EVOLUTION_REQUIRED",
+  "source_evidence_sha256": {
+    "core/behavioral_diagnostic_executor_lifecycle_retry.py": "e3c68db9c9484b8a4d421ec5f4458679a91a5a5f84ddfd75916e5caf31a8ccc0",
+    "core/behavioral_diagnostic_executor_retry.py": "faa6431a840c74baae5c98dc7e9485d05435d02e9915964cfb2b08c0db85e53d",
+    "core/java_runtime_compatibility.py": "f0a30c1f8ef90bfcab523ac0b99ce72095985ce583c64a438e36f1aebcbcca35",
+    "core/sandbox_backend_binding.py": "202cd1190494beaaf24874ac798b89a8eac276fa8361b496663a573770cdf1ed",
+    "core/sandboxed_java_discovery_continuation.py": "e035f04ee7d03ff7c53e252069da463fdcc67873478a2158bee4672d354ba1ac",
+    "core/sandboxed_java_positive_continuation.py": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+    "core/sandboxed_java_toolchain.py": "ed96e56a875535d4cafaa107721ee6eafd5c0c1b0f8d14f59f4ad728f00288c9",
+    "core/sandboxed_java_toolchain_discovery.py": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff",
+    "core/synthetic_runtime_authorization.py": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88",
+    "core/thread_compatible_runtime_sandbox.py": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+    "scripts/measure_runtime_java_discovery_diag1.py": "171d0bd4a13086a634eb79c718c1991225f6d7839e1af7467b485828a65df036",
+    "scripts/replay_runtime_java1.py": "d3f66af04eb582b8ea1276b270174482d69b6c4084d1e3c774af61b87f7764e6",
+    "scripts/replay_runtime_java1d.py": "9e850a3af2c8394215f1ef2e92c460923845ff5ad29e483aa40f68c35166b315",
+    "scripts/replay_runtime_java1d_retry.py": "799f254b39c9545aa030e348500965cda0a8252a2ffc20e6c624cb53f3cb2da6",
+    "tests/test_patch_candidate_behavior_executor1r.py": "dc3d5b13b5f205bfa0d3343814252325133d153d0cbda6c25d116faba3e6774d",
+    "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py": "0d93227bd2ae29833762e7d09fe98e2eb7b30de3acf626a4594cc1f36453a8f6",
+    "tests/test_runtime_java1.py": "ab71e7ff6c983b508b9a06b67b525cef5aa1b14e75ddefa6875472fdd3264a2d",
+    "tests/test_runtime_java1_discovery.py": "9ce83dea5c6b12dacd3b3b1148b962c5b18d7358321d744fcb1e53363f569f77",
+    "tests/test_runtime_java1_governance.py": "04503cb9f337235923cedddc07b642f2c8f36369df8f2560beb2449a1c66205e",
+    "tests/test_runtime_java1d.py": "d2865a900872e370c3a7b1e6918b5690f29a95cb85dff13765a33db421543c16",
+    "tests/test_runtime_java1d_retry.py": "1b1d0ded59c634670d8e5f9b2dbf6c4cd0de9e4037ebe37317c48a209d774bb9",
+    "tests/test_runtime_java_compat1.py": "7b6cf5aa66886da3db278c4266d9eaf601415fa447fcbe64b90fea0f71d5821e",
+    "tests/test_runtime_java_discovery_diag1.py": "b4847c4b2201ee904c7e46201fa9cd5041e9d641c965948db834144443682084",
+    "tests/test_runtime_sandbox_bind1.py": "6a09d0a928ab3b41e64f7fd26741d273d7dacc6b9ac659052afe50e920936ffc",
+    "tests/test_synthetic_runtime_authorization.py": "9109efb7e070dcb3928da6d64e97418a87f6ee856bd9e0230004034fd089bc8b"
+  },
+  "status": "RUNTIME_JAVA_DISCOVERY_CONTRACT_1_COMPLETE_WITH_WARNINGS",
+  "timezone": "Asia/Seoul",
+  "validation_report": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_VALIDATION.json",
+  "warnings": [
+    "Exact-only proof is not equivalent under unchanged requirement.",
+    "Hypothetical backend/runtime linkage remains an explicit unproven obligation.",
+    "Pre-existing direct registry/picker failures and frozen historical hash drift must not be repinned."
+  ]
+}

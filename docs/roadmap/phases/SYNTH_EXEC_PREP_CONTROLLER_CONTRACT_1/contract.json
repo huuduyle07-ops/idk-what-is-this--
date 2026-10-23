@@ -1,0 +1,1146 @@
+{
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.CONTRACT.1",
+  "schema_version": "synthetic_execution_preparation_controller_contract_1_v1",
+  "artifact_kind": "pure_additive_retained_preparation_controller_protocol_contract",
+  "typed_result": "SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1_COMPLETE",
+  "completion_marker": "SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1_COMPLETE",
+  "protocol_frozen": true,
+  "result_meaning": "The additive retained-live preparation controller protocol is frozen. No controller implementation, workspace or operational capability exists.",
+  "implementation_authorized": false,
+  "owners_implemented": false,
+  "controller_implemented": false,
+  "workspace_exists_by_this_phase": false,
+  "capabilities_issued": false,
+  "behavioral_activation_ready": false,
+  "runtime_consumption_ready": false,
+  "reason": "PROOF_UNRESOLVED",
+  "stop_after_contract": true,
+  "foundation": {
+    "workspace_contract": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+    "preparation_contract": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+    "workspace_result_preserved": "WORKSPACE_REQUIRES_CONTROLLER_EVOLUTION",
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "sandbox_profile": "runtime_sandbox_2_v1",
+    "sandbox_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "sandbox": {
+      "network": "none",
+      "rootfs_readonly": true,
+      "host_mounts": [],
+      "image_declared_volumes_allowed": false,
+      "uid_gid": "65534:65534",
+      "cap_drop": [
+        "ALL"
+      ],
+      "no_new_privileges": true,
+      "pids_max": 128,
+      "memory_bytes": 134217728,
+      "nano_cpus": 1000000000,
+      "tmpfs": {
+        "/work": "rw,nosuid,nodev,size=32m,mode=1777",
+        "/tmp": "rw,nosuid,nodev,noexec,size=16m,mode=1777"
+      },
+      "environment": {
+        "PATH": "/usr/local/bin:/usr/bin:/bin",
+        "LANG": "C.UTF-8",
+        "GPG_KEY": "",
+        "PYTHON_VERSION": "",
+        "PYTHON_SHA256": "",
+        "SANDBOX_PUBLIC_SENTINEL": "phase-owned",
+        "HOME": "/work",
+        "HOSTNAME": "runtime-sandbox1"
+      },
+      "environment_source": "Exact eight-variable core.candidate_runtime_sandbox._WORKLOAD_ENVIRONMENT, source-pinned in evidence_index.json; no caller environment extension.",
+      "remaining_checks": "Every unchanged SANDBOX.2 inspection/ladder/resource/namespace/cgroup/controller gate; same backend route/version, immutable image and authenticated actual workspace/container generation.",
+      "provider_proof_workspace_reusable": false,
+      "live_workspace_requirement": "Provider proof's successfully cleaned workspace is historical evidence, never the scenario workspace. A separate authorized live workspace must be authenticated and bound to the original provider graph by public evidence. This contract grants no sandbox/container issuance."
+    },
+    "additional_unchanged_inspection_pins": {
+      "privileged": false,
+      "pid_mode": "private default ('', None)",
+      "ipc_mode": "none",
+      "cgroupns_mode": "private",
+      "cap_add": [],
+      "log_driver": "none",
+      "working_directory": "/work",
+      "controller_entrypoint": [
+        "/usr/local/bin/python"
+      ]
+    },
+    "scenario": {
+      "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+      "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+      "source_owner": "core.synthetic_runtime_authorization",
+      "source_accessor": "get_executor1r_decrement_3_source",
+      "source_kind": "phase_owned_synthetic_fixture",
+      "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+      "source_size_bytes": 239,
+      "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+      "class_name": "SyntheticStateBox",
+      "method_signature": "boolean SyntheticStateBox.decrement(int)",
+      "arguments": [
+        3
+      ],
+      "field": "SyntheticStateBox.value:int",
+      "source_regeneration_allowed": false,
+      "source_rewriting_allowed": false,
+      "alternative_implementation_allowed": false,
+      "expected_values_are_observed_evidence": false
+    },
+    "dimensions_widened": [],
+    "historical_controller": {
+      "owner": "core.sandboxed_java_positive_continuation",
+      "source_owner": "core.sandboxed_java_positive_probe",
+      "source_accessor": "source",
+      "phase": "RUNTIME.JAVA.1C",
+      "normalized_executable": "/usr/local/bin/python",
+      "resolved_executable": "/usr/local/bin/python3.12",
+      "executable_sha256": "0e6475dfda68a9b2d93501449fc47593ca169010e8f4881577b97463fd0c1263",
+      "source_sha256": "4f81640e2f01bc1f7a1a833beb269a9d1df51088b69cf24c8369fb6683f11a58",
+      "source_size_bytes": 13037,
+      "identity_kind": "frozen historical provider proof metadata; no current liveness claim",
+      "observed_source_semantics": [
+        "one fixed JavaSandboxProbe.java fixture",
+        "requires initially empty /work",
+        "creates /work/classes, compiles fixed fixture and then executes its fixed Java main",
+        "no caller source/flags/environment/stdin",
+        "outer finally kills/removes container and independently observes absence before returning",
+        "successful provider evidence requires verified cleanup"
+      ],
+      "retains_live_empty_workspace": false,
+      "offers_exclusive_live_artifact_handoff": false,
+      "may_be_widened_here": false
+    },
+    "historical_provider_is_live_authority": false
+  },
+  "identity": {
+    "conceptual_owner": "core.synthetic_execution_preparation_controller_pinned",
+    "protocol_id": "synthetic_preparation_controller_pinned_1_v1",
+    "python_class_frozen": false,
+    "source_bytes": null,
+    "source_sha256": null,
+    "source_size_bytes": null,
+    "normalized_executable": "/usr/local/bin/python",
+    "resolved_executable": "/usr/local/bin/python3.12",
+    "interpreter_sha256": "0e6475dfda68a9b2d93501449fc47593ca169010e8f4881577b97463fd0c1263",
+    "interpreter_authenticates_new_source": false,
+    "missing_source_identity_permits_readiness": false,
+    "must_bind": [
+      "protocol ID/schema",
+      "exact controller source bytes/SHA256/size",
+      "normalized/resolved executable paths and interpreter SHA256",
+      "immutable image identity",
+      "sandbox profile/policy and exact configuration/environment/resources",
+      "issuing/owning host process and exact original workspace object relation",
+      "actual full container identity and backend generation relation",
+      "controller incarnation/generation",
+      "workspace generation",
+      "launch/bootstrap arguments",
+      "closed environment",
+      "stdin/stdout/stderr or other transport endpoint/session identity",
+      "protocol framing/version",
+      "resource/capture limits",
+      "cleanup responsibility"
+    ],
+    "no_historical_repin": true
+  },
+  "authority_separation": {
+    "independent_boundaries": [
+      "controller protocol",
+      "workspace capability",
+      "preparation authority",
+      "preparation receipt",
+      "runtime activation authority",
+      "consumer authority"
+    ],
+    "workspace_owner": "core.synthetic_execution_preparation_workspace_pinned",
+    "workspace_type": "PinnedSyntheticPreparationWorkspace",
+    "workspace_schema": "synthetic_preparation_workspace_pinned_1_v1",
+    "preparation_owner": "core.synthetic_execution_preparation_pinned",
+    "permission_decision_owner": "appropriate original capability owner only",
+    "controller_decides_policy_permission": false,
+    "controller_spends_authority": false,
+    "admission": "Owning boundary authenticates and spends its own exact facet where required, then supplies a separately authenticated single-operation admission bound to exact originals, tag, attempt, generations, observation and local fence. Controller checks only this authenticated relation and its local operational predicates; it cannot replace owner validation, issue permission or spend/refund facets.",
+    "scalar_admission_id_is_authority": false,
+    "receipt_is_workspace_or_runtime_authority": false
+  },
+  "transport": {
+    "architecture": null,
+    "concrete_transport": null,
+    "launch_bootstrap_argv": null,
+    "status": "IMPLEMENTATION_SELECTION_DEFERRED",
+    "reason": "Repository proves only a historical one-shot in-container controller plus host supervisor that always removes it. No retained transport/launch evidence yet selects an inner persistent process or host-supervised fixed operations truthfully.",
+    "logical_responsibilities": [
+      "retained generation-local observation/admission fence",
+      "bounded fixed preparation children/captures",
+      "independent host/control-plane teardown/absence observer"
+    ],
+    "requirements": [
+      "authenticate exact source/executable/protocol and host/container/endpoint relation",
+      "observable exact controller incarnation/generation; bind all channel endpoints and closed env",
+      "complete bounded canonical typed messages; no caller commands or generic attach/exec",
+      "detect disconnect, truncation, extra frames, endpoint replacement and generation loss",
+      "no reconnection resurrects lost generation; permanent invalidity and outer cleanup",
+      "prove containment inspection/SANDBOX.2 controller gates without changing historical pins"
+    ],
+    "unselected_transport_grants_readiness": false
+  },
+  "operations": [
+    {
+      "tag": "OBSERVE_EMPTY_WORKSPACE",
+      "required_admission_owner": "core.synthetic_execution_preparation_workspace_pinned",
+      "permissible_predicates": [
+        "same original live controller/container/workspace generation",
+        "exclusive",
+        "no active mutation or handoff",
+        "not cleanup-started",
+        "not invalid"
+      ],
+      "input_projection": {},
+      "fixed_paths": [
+        "/work",
+        "/tmp"
+      ],
+      "allowed_subprocess": null,
+      "bounds_profile": "observation",
+      "postconditions": [
+        "one complete current snapshot; /work and /tmp empty; /work/classes absent",
+        "full mounts/manifests/process/writer inventory; no target JVM or target activation",
+        "observed exact preparation-empty predicate; owner independently authenticates readiness"
+      ],
+      "failure_behavior": "Incomplete observation yields CONTROLLER_OBSERVATION_INCOMPLETE or PROOF_UNRESOLVED; unexpected state preserves workspace semantic error; never repair.",
+      "cleanup_interaction": "Read-only; cleanup barrier preempts observation and prevents ready result.",
+      "controller_spends_authority": false,
+      "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#initial_workspace"
+    },
+    {
+      "tag": "OBSERVE_CURRENT_WORKSPACE",
+      "required_admission_owner": "core.synthetic_execution_preparation_workspace_pinned",
+      "permissible_predicates": [
+        "same original live generation",
+        "exclusive",
+        "coherent controller fence",
+        "no active mutation or handoff",
+        "not cleanup-started",
+        "not invalid"
+      ],
+      "input_projection": {},
+      "fixed_paths": [
+        "/work",
+        "/tmp"
+      ],
+      "allowed_subprocess": null,
+      "bounds_profile": "observation",
+      "postconditions": [
+        "complete current snapshot of stage-appropriate exact manifest",
+        "stage derived from original same-attempt preparation evidence, never caller stage",
+        "partial progress is neither preparation-empty nor prepared-artifacts-present"
+      ],
+      "failure_behavior": "No cached/unchanged-manifest shortcut; incomplete observation fails closed; altered inputs invalidate eligibility.",
+      "cleanup_interaction": "Read-only; cleanup preempts and denies readiness.",
+      "controller_spends_authority": false,
+      "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#workspace_state_digest"
+    },
+    {
+      "tag": "OBSERVE_PREPARED_ARTIFACTS",
+      "required_admission_owner": "core.synthetic_execution_preparation_workspace_pinned",
+      "permissible_predicates": [
+        "same original live generation",
+        "prepared-artifacts-present from preparation owner",
+        "cleanup pending",
+        "exclusive",
+        "no active mutation or handoff",
+        "compiler fully reaped; captures closed and EOF",
+        "not cleanup-started",
+        "not invalid"
+      ],
+      "input_projection": {
+        "preparation_attempt_id": "id",
+        "preparation_receipt_id": "id"
+      },
+      "fixed_paths": [
+        "/work",
+        "/tmp",
+        "/work/SyntheticStateBox.java",
+        "/work/classes",
+        "/work/classes/SyntheticStateBox.class"
+      ],
+      "allowed_subprocess": null,
+      "bounds_profile": "observation",
+      "postconditions": [
+        "fresh complete source/class manifest matches original same-attempt receipt",
+        "no compiler/target JVM/unexpected writer; live artifacts remain in same generation",
+        "evidence only; no consumer readiness or runtime activation permission"
+      ],
+      "failure_behavior": "Missing original receipt relation or changed artifacts fail closed; no recompile or repair.",
+      "cleanup_interaction": "Read-only; cleanup preempts and denies readiness.",
+      "controller_spends_authority": false,
+      "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#preparation_interaction.receipt_readiness"
+    },
+    {
+      "tag": "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+      "required_admission_owner": "core.synthetic_execution_preparation_pinned",
+      "permissible_predicates": [
+        "same original live eligible generation",
+        "preparation-empty",
+        "exclusive",
+        "runtime ISSUED according to owning boundary at admission",
+        "exact materialization facet already spent/admitted",
+        "no active operation/handoff",
+        "not cleanup-started",
+        "not invalid"
+      ],
+      "input_projection": {
+        "preparation_attempt_id": "id"
+      },
+      "fixed_paths": [
+        "/work",
+        "/tmp",
+        "/work/classes",
+        "/work/SyntheticStateBox.java"
+      ],
+      "allowed_subprocess": null,
+      "bounds_profile": "preparation_attempt",
+      "postconditions": [
+        "exclusive /work/classes creation then exclusive source creation",
+        "exact authenticated existing 239 bytes; complete no-follow readback size/hash/bytes",
+        "exact materialized manifest, no compilation"
+      ],
+      "failure_behavior": "Facet remains spent on any failure; no overwrite/refund/reissue/retry; begin bounded cleanup; no success receipt.",
+      "cleanup_interaction": "Cleanup preempts active write; cancel, account for partial files, no readiness, tear down whole generation.",
+      "controller_spends_authority": false,
+      "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json#materialization; docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#initial_workspace.classes_directory"
+    },
+    {
+      "tag": "COMPILE_EXACT_SCENARIO",
+      "required_admission_owner": "core.synthetic_execution_preparation_pinned",
+      "permissible_predicates": [
+        "same original eligible generation",
+        "verified same-attempt materialization",
+        "exact source/readback unchanged; exclusive classes directory from materialization",
+        "runtime ISSUED according to owning boundary at admission",
+        "exact compilation facet already spent/admitted",
+        "exclusive",
+        "no active operation/handoff",
+        "not cleanup-started",
+        "not invalid"
+      ],
+      "input_projection": {
+        "preparation_attempt_id": "id"
+      },
+      "fixed_paths": [
+        "/work",
+        "/tmp",
+        "/work/SyntheticStateBox.java",
+        "/work/classes",
+        "/work/classes/SyntheticStateBox.class"
+      ],
+      "allowed_subprocess": [
+        "/opt/temurin-26.0.2.1/bin/javac",
+        "-J-Xms8m",
+        "-J-Xmx32m",
+        "-J-XX:ActiveProcessorCount=1",
+        "-J-XX:-UsePerfData",
+        "-d",
+        "/work/classes",
+        "/work/SyntheticStateBox.java"
+      ],
+      "bounds_profile": "preparation_attempt",
+      "postconditions": [
+        "one bounded javac only; fully reap; complete empty captures and both EOFs",
+        "exact one-class 1..32768 byte envelope; hash actual bytes; source unchanged",
+        "inert bounded classfile metadata inspection only, never load target",
+        "return preparation observations; preparation owner alone authenticates success receipt"
+      ],
+      "failure_behavior": "Spent facet stays spent; child start/timeout/capture/reap failures typed separately; compile/output semantic errors preserved; cleanup mandatory.",
+      "cleanup_interaction": "Cleanup barrier cancels/kills/reaps compiler group; no raced success readiness.",
+      "controller_spends_authority": false,
+      "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json#compiler; #compile_output"
+    },
+    {
+      "tag": "PREPARE_EXCLUSIVE_HANDOFF",
+      "required_admission_owner": "core.synthetic_execution_preparation_workspace_pinned with separately authenticated future consumer boundary",
+      "permissible_predicates": [
+        "same controller/workspace generation",
+        "prepared-artifacts-present",
+        "cleanup pending",
+        "same source/class manifest",
+        "exact original preparation attempt/receipt",
+        "no compiler/target process",
+        "all preparation captures complete/reaped",
+        "no unexpected writer",
+        "no active handoff or mutation",
+        "not cleanup-started",
+        "not invalid"
+      ],
+      "input_projection": {
+        "preparation_attempt_id": "id",
+        "preparation_receipt_id": "id",
+        "authenticated_borrower_relation_id": "id"
+      },
+      "fixed_paths": [
+        "/work",
+        "/tmp",
+        "/work/SyntheticStateBox.java",
+        "/work/classes",
+        "/work/classes/SyntheticStateBox.class"
+      ],
+      "allowed_subprocess": null,
+      "bounds_profile": "observation",
+      "postconditions": [
+        "controller-local exclusive reservation binds exact generation/attempt/receipt/artifact manifest/borrower relation",
+        "no artifact copy/export or target launch; reservation is not consumer authority",
+        "activation unavailable until separately reviewed consumer contract; currently PROOF_UNRESOLVED"
+      ],
+      "failure_behavior": "CONTROLLER_HANDOFF_UNRESOLVED or PROOF_UNRESOLVED without authenticated future borrower; no anonymous reservation; disconnect/failure triggers cleanup.",
+      "cleanup_interaction": "Reservation holds exclusive fence; cleanup cancels it and never returns BUSY.",
+      "controller_spends_authority": false,
+      "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#lifecycle.handoff; docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json#cleanup.after_preparation_success"
+    },
+    {
+      "tag": "BEGIN_CLEANUP",
+      "required_admission_owner": "independent exact-generation cleanup custodian",
+      "permissible_predicates": [
+        "retained authenticated immutable cleanup identity",
+        "any lifecycle condition including invalid or controller lost"
+      ],
+      "input_projection": {
+        "cleanup_reason": "cleanup_reason_enum"
+      },
+      "fixed_paths": [],
+      "allowed_subprocess": null,
+      "bounds_profile": "cleanup",
+      "postconditions": [
+        "set monotonic barrier under controller-local fence if controller reachable",
+        "outer custodian records terminal readiness withdrawal even if inner lost",
+        "deny new work; cancel active mutation/handoff; no success readiness"
+      ],
+      "failure_behavior": "Never BUSY and never requires ISSUED, unspent facets or inner challenge; lost inner delegates outer teardown; unknown identity yields WORKSPACE_CLEANUP_UNRESOLVED.",
+      "cleanup_interaction": "Preempts every operation; idempotent barrier re-observation never reopens generation.",
+      "controller_spends_authority": false,
+      "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#lifecycle.predicates.cleanup-started"
+    },
+    {
+      "tag": "CLEANUP_AND_REPORT",
+      "required_admission_owner": "independent exact-generation cleanup custodian",
+      "permissible_predicates": [
+        "retained authenticated immutable cleanup identity",
+        "cleanup-started (establish barrier first if absent)"
+      ],
+      "input_projection": {},
+      "fixed_paths": [
+        "/work",
+        "/tmp"
+      ],
+      "allowed_subprocess": null,
+      "bounds_profile": "cleanup",
+      "postconditions": [
+        "kill/reap children/groups; close captures/pipes/selectors; observe EOF",
+        "outer fixed primitive removes exact container and independently verifies absence",
+        "complete bounded composite cleanup evidence; /work and /tmp generation gone",
+        "terminal evidence only; incomplete child/EOF/absence proof remains unresolved"
+      ],
+      "failure_behavior": "CONTROLLER_CLEANUP_UNRESOLVED at controller layer, WORKSPACE_CLEANUP_UNRESOLVED at workspace mapping; do not infer lost reaping/EOF from removal success.",
+      "cleanup_interaction": "Only bounded exact-identity teardown retry allowed; no readiness restoration or new generation.",
+      "controller_spends_authority": false,
+      "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#cleanup; docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json#cleanup"
+    }
+  ],
+  "minimum_operation_review": {
+    "accepted_tags": [
+      "OBSERVE_EMPTY_WORKSPACE",
+      "OBSERVE_CURRENT_WORKSPACE",
+      "OBSERVE_PREPARED_ARTIFACTS",
+      "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+      "COMPILE_EXACT_SCENARIO",
+      "PREPARE_EXCLUSIVE_HANDOFF",
+      "BEGIN_CLEANUP",
+      "CLEANUP_AND_REPORT"
+    ],
+    "observations_distinct": "Empty verifies issuance predicate; current authenticates stage-appropriate state; prepared verifies exact original receipt/artifacts for handoff. All share one complete snapshot schema, never a generic file-read API.",
+    "cleanup_split": "BEGIN_CLEANUP must preempt without waiting for active effect completion; CLEANUP_AND_REPORT completes bounded teardown/evidence. Both belong to one monotonic cleanup duty.",
+    "scenario_JVM_dispatch_included": false,
+    "forbidden_surfaces": [
+      "shell",
+      "caller command string",
+      "arbitrary argv",
+      "arbitrary environment",
+      "Docker CLI passthrough",
+      "generic file read/write",
+      "generic subprocess execution",
+      "generic Java execution",
+      "generic class loading",
+      "generic reflection",
+      "arbitrary path"
+    ]
+  },
+  "bounds": {
+    "preparation_attempt": {
+      "max_attempts": 1,
+      "compiler_stdout_max_bytes": 2048,
+      "compiler_stderr_max_bytes": 2048,
+      "outer_stdout_max_bytes": 8192,
+      "outer_stderr_max_bytes": 8192,
+      "outer_timeout_ms": 10000,
+      "shared_controller_deadline_ms": 5000
+    },
+    "attempt_budget_scope": "One monotonic 5000ms deadline starts at materialization admission and includes materialize, compile, in-attempt observations and intervening time; never reset per operation. Outer preparation attempt hard timeout 10000ms. Total outer stdout/stderr each <=8192 over all attempt frames, not 8192 per unlimited frame. Retained lifetime is not this attempt budget and confers no indefinite readiness.",
+    "observation": {
+      "timeout_ms": 5000,
+      "outer_timeout_ms": 10000,
+      "request_max_bytes": 8192,
+      "response_max_bytes": 8192,
+      "work_entries_max": 3,
+      "tmp_entries_max": 0,
+      "process_tasks_max": 128,
+      "regular_file_bytes_max": 33007,
+      "writer_records_max": 128,
+      "writer_handles_max": 128,
+      "mount_records_max": 2
+    },
+    "cleanup": {
+      "outer_timeout_ms": 10000,
+      "response_max_bytes": 8192,
+      "automatic_retry_max": 0,
+      "explicit_retry_scope": "bounded same original identity only; permanent invalidity"
+    },
+    "limit_rule": "All limits are ceilings, never permission to expand PREP/SANDBOX.2. Full metadata/inventory exceeding any bound is incomplete, never a truncated successful snapshot. All tasks/threads count against pids128; no first-N process sample. Timeout/overflow denies success and invokes bounded cleanup.",
+    "retention": "Exclusive workspace remains only until completion/abort/timeout/abandonment/upstream loss. No new retained lifetime numeric duration is preauthorized; future owner must enforce separately reviewed bounded lifetime policy before readiness."
+  },
+  "observations": {
+    "source_observations_only": true,
+    "mutates_workspace": false,
+    "single_bounded_current_generation_snapshot": true,
+    "workspace_state_digest": {
+      "algorithm": "SHA256",
+      "domain": "CATTUS:SYNTH.EXEC.PREP.WORKSPACE.PINNED.1:exact-live-workspace:v1",
+      "role": "workspace-state-digest",
+      "framing": "ASCII domain + NUL + ASCII fixed role + NUL + strict canonical payload bytes using authentication.canonical_types and authentication.canonical_encoding",
+      "top_level_payload_fields": [
+        "workspace_capability_id",
+        "stable_fingerprint",
+        "issuing_pid",
+        "container_identity",
+        "workspace_generation",
+        "controller_identity",
+        "controller_generation",
+        "observation_sequence",
+        "observation_challenge",
+        "stage",
+        "mounts",
+        "work_manifest",
+        "tmp_manifest",
+        "process_exclusivity_observation"
+      ],
+      "identity_fields": "Exact retained originals and current generation/sequence/challenge; all must match the enclosing workspace-current-state HMAC and current owner registry.",
+      "stage": "preparation-empty, materialized or prepared is derived only from authenticated initial state or the original preparation owner's same-attempt evidence. Partial/failed operations confer no prepared readiness. No harness stage is authorized.",
+      "mounts": "Exactly two ordered records /tmp then /work: path, observed mount identity and namespace/generation, filesystem kind=tmpfs, exact frozen options, subordinate_mount_count=0. Include authenticated root identity/metadata; missing or unproved mount relation fails closed.",
+      "manifest_entry_fields": [
+        "path",
+        "kind",
+        "mode",
+        "uid",
+        "gid",
+        "link_count",
+        "size_bytes",
+        "sha256"
+      ],
+      "manifest_scope": "Complete descriptor-relative no-follow recursive entries beneath each authenticated root, including directories; roots are in mounts. Paths are exact absolute POSIX paths, sorted by UTF-8 path bytes, unique, without dot/parent/alias/NUL/backslash components. Each regular file has exact integer byte size, complete content SHA256 and link_count=1. Directory size_bytes and sha256 are null; directories have observed integer metadata and are never followed through links or other mounts. Links/special files are rejected, not omitted or normalized into regular entries.",
+      "work_manifest": "Empty at workspace readiness. Thereafter inherit only PREP's stage-appropriate exact /work/SyntheticStateBox.java, /work/classes directory, and /work/classes/SyntheticStateBox.class, with full source/readback and bounded class size/hash checks from the unchanged preparation owner. No predicted class hash or extra artifact is accepted.",
+      "tmp_manifest": "Complete no-follow manifest under /tmp with the same entry schema plus its exact mount. Preparation-empty contains no inputs or artifacts; later allowed infrastructure-only entries, if any, require a separately reviewed closed fixed controller operation and never supply compiler inputs. Unknown entries or unproved /tmp closure abort; no generic metadata exception or harness addition is preauthorized.",
+      "process_exclusivity_observation": "Authenticate exact controller/process namespace/generation, full bounded process/writer inventory and descendant/operation identities, exclusive owner or exact authorized borrower, absence of shared writers/target JVM/target activation, and no cleanup barrier. Unexpected processes/writers or an incomplete inventory abort readiness. Later consumer observation/activation requires its separate contract; this digest grants none.",
+      "metadata_only": true,
+      "artifact_bytes_exported": false,
+      "digest_alone_authenticates": false,
+      "authenticated_by": "workspace-current-state HMAC covers this digest, fixed algorithm/domain/role/scope identity, same observation/generation binding and current predicates; original full observations remain bound in the owner registry. A scalar digest or replayed manifest never establishes readiness."
+    },
+    "required_observations": [
+      "container identity/generation",
+      "controller identity/generation",
+      "/work mount identity",
+      "/tmp mount identity",
+      "complete descriptor-relative no-follow manifests",
+      "file kinds",
+      "link counts",
+      "regular file sizes and full SHA256",
+      "unexpected mount crossings",
+      "process and task inventory",
+      "writer/exclusivity inventory",
+      "cleanup barrier sequence",
+      "active operation/handoff identity"
+    ],
+    "freshness_bindings": [
+      "workspace_capability_id",
+      "controller_generation",
+      "workspace_generation",
+      "observation_sequence",
+      "owner_challenge",
+      "requested_operation",
+      "requested_purpose",
+      "complete_observed_state"
+    ],
+    "owner_challenge": {
+      "issuer": "core.synthetic_execution_preparation_workspace_pinned",
+      "random_bytes": 32,
+      "encoding": "64 lowercase hex characters",
+      "fresh_unpredictable_single_use": true,
+      "sequence": "strictly owner-monotonic for original live relation; never reset/wrap within generation",
+      "verification": "Owner matches outstanding exact operation/purpose/generations/sequence/challenge and original object/controller relation before independently authenticating full observations. No caller challenge and no replay."
+    },
+    "workspace_owner_independently_authenticates": true,
+    "controller_digest_is_workspace_HMAC": false,
+    "controller_digest_is_readiness": false,
+    "challenge_proves_daemon_continuity": false,
+    "continuity_limit": "Fresh challenge proves current response only by separately authenticated exact retained controller relation. Backend route/version/name equality and cryptographic freshness do not prove daemon continuity or eliminate ABA; unobservable generation continuity is PROOF_UNRESOLVED.",
+    "forbidden_shortcuts": [
+      "caller booleans",
+      "directory listing alone",
+      "timestamp alone",
+      "replayed observation",
+      "unchanged manifest",
+      "container name",
+      "scalar digest"
+    ],
+    "tmp_entries_policy": "No /tmp infrastructure entries are accepted by this protocol. Nonempty /tmp invalidates its closed input envelope; any future exception needs a separately reviewed fixed operation and cannot become compiler input.",
+    "failure_status": "CONTROLLER_OBSERVATION_INCOMPLETE or PROOF_UNRESOLVED"
+  },
+  "materialization": {
+    "frozen_effect": {
+      "destination": "/work/SyntheticStateBox.java",
+      "workspace_root": "/work",
+      "workspace_kind": "already-authorized container-local ephemeral tmpfs; never host repository or bind mount",
+      "initial_workspace": "empty, exclusively owned by one attempt; no image volume, host mount, shared writer, preexisting source/class or other Java input",
+      "maximum_materialized_source_files": 1,
+      "maximum_materialized_source_bytes": 239,
+      "directories_created": [
+        "/work/classes"
+      ],
+      "maximum_preparation_regular_files": 2,
+      "file_count_scope": "/work source/output workspace; /tmp is separately bounded by the exact SANDBOX.2 tmpfs policy and must contain no compiler input, exported artifact or retained file after teardown",
+      "allowed_preparation_regular_files": [
+        "/work/SyntheticStateBox.java",
+        "/work/classes/SyntheticStateBox.class"
+      ],
+      "harness_files_included": false,
+      "symlink_policy": "Allow only the independently verified expected /work tmpfs root mount; reject unexpected/subordinate mount crossings, symlinks, hardlink aliases and special files at destination/output and workspace path components. lstat/descriptor-relative no-follow checks, exclusive creation and single-link regular file readback; no path re-resolution race or shared writer.",
+      "path_policy": "No caller path; exact absolute POSIX allowlist. Reject NUL, backslash, dot/parent components, path aliases, traversal, unexpected entries and root escapes before any write.",
+      "overwrite_policy": "Never overwrite or truncate existing paths; binary exclusive creation only. Existing file/directory conflicts abort the attempt, including byte-identical files.",
+      "byte_policy": "Copy existing exact frozen bytes only, full size/hash and byte-for-byte readback; no encoding/newline conversion, regeneration, formatting or rewriting.",
+      "repository_source_write_authority": false,
+      "persistent_artifacts_allowed": false,
+      "export_source_or_class_to_host_allowed": false
+    },
+    "source_identity": {
+      "sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+      "size_bytes": 239
+    },
+    "sequence": [
+      "owner authenticates existing frozen source and spends exact materialization facet",
+      "controller final same-generation fence admission with complete empty current snapshot",
+      "descriptor-relative exclusive /work/classes mkdir; no preexisting path even if identical",
+      "descriptor-relative binary exclusive /work/SyntheticStateBox.java creation",
+      "write exactly original authenticated 239 bytes from frozen source relation, never caller bytes",
+      "full bounded no-follow readback verifies exact bytes/size/hash and single link",
+      "observe complete exact materialized manifest and same generation; retain cleanup pending"
+    ],
+    "source_projection": "Existing source owner accessor is a future authenticated in-memory projection only, not a protocol payload/source upload. This contract reads AST source identity and writes no Java file.",
+    "fsync_required": false,
+    "fsync_basis": "No frozen repository/runtime convention requires it; ephemeral tmpfs with full readback, not persistence.",
+    "compile_in_materialize": false,
+    "failure_spends_facet": true
+  },
+  "compilation": {
+    "compiler": {
+      "path": "/opt/temurin-26.0.2.1/bin/javac",
+      "sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+      "image": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+      "sandbox_profile": "runtime_sandbox_2_v1",
+      "sandbox_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "historical_JAVA_1C_argv": [
+        "/opt/temurin-26.0.2.1/bin/javac",
+        "-J-Xms8m",
+        "-J-Xmx32m",
+        "-J-XX:ActiveProcessorCount=1",
+        "-J-XX:-UsePerfData",
+        "-d",
+        "/work/classes",
+        "/work/JavaSandboxProbe.java"
+      ],
+      "exact_scenario_argv": [
+        "/opt/temurin-26.0.2.1/bin/javac",
+        "-J-Xms8m",
+        "-J-Xmx32m",
+        "-J-XX:ActiveProcessorCount=1",
+        "-J-XX:-UsePerfData",
+        "-d",
+        "/work/classes",
+        "/work/SyntheticStateBox.java"
+      ],
+      "template_derivation": "Recover every flag and output path unchanged from JAVA.1C; explicitly freeze only the scenario source operand substitution as new scope. Historical invocation, controller and provider remain unchanged and cannot perform this operation.",
+      "shell": false,
+      "cwd": "/work",
+      "caller_flags_allowed": false,
+      "argument_files_allowed": false,
+      "arbitrary_classpath_allowed": false,
+      "maven_allowed": false,
+      "gradle_allowed": false,
+      "dependency_download_allowed": false,
+      "network_allowed": false,
+      "processor_plugin_inputs_allowed": false,
+      "input_closure": "Only the exact frozen source and immutable pinned JDK/image; no class/JAR/processor/service/config inputs in initially empty cwd or writable tmpfs, no source imports/annotations, no caller CLASSPATH/JDK_JAVAC_OPTIONS/JAVA_TOOL_OPTIONS/_JAVA_OPTIONS. Do not invent -proc:none or other flags.",
+      "max_attempts": 1,
+      "compiler_stdout_max_bytes": 2048,
+      "compiler_stderr_max_bytes": 2048,
+      "outer_stdout_max_bytes": 8192,
+      "outer_stderr_max_bytes": 8192,
+      "outer_timeout_ms": 10000,
+      "shared_controller_deadline_ms": 5000,
+      "output_directory": "/work/classes"
+    },
+    "compile_output": {
+      "expected_path": "/work/classes/SyntheticStateBox.class",
+      "expected_relative_class_set": [
+        "SyntheticStateBox.class"
+      ],
+      "maximum_class_files": 1,
+      "minimum_class_bytes": 1,
+      "maximum_class_bytes": 32768,
+      "bound_basis": "Adopt the frozen JAVA.1C 1..32768 single-class envelope; scenario class bytes/size/hash have not been measured.",
+      "predicted_class_sha256": null,
+      "manifest": "Full sorted no-follow workspace manifest: exact directory/file types, paths, sizes, SHA256 for source and class, no extra files, same source bytes before/after. Parse bounded classfile metadata as inert data to check internal class identity; never load it for verification.",
+      "unexpected_file_behavior": "COMPILE_OUTPUT_MISMATCH; publish no ready receipt, revoke preparation eligibility, tear down entire attempt workspace. No selective retention, new flags, retry or fallback.",
+      "success_requirements": [
+        "exit code exactly zero",
+        "bounded complete empty stdout/stderr and both EOFs, preserving JAVA.1C diagnostic expectations",
+        "compiler process fully reaped without timeout",
+        "exact authenticated source unchanged",
+        "exact single output set and byte bounds",
+        "signed output/source manifest and compiler/context measurements"
+      ],
+      "exit_zero_proves_source_identity": false,
+      "compile_success_proves_behavior_success": false
+    },
+    "runtime_state_required": "ISSUED",
+    "classes_directory_recreation_allowed": false,
+    "class_loading_allowed": false,
+    "behavior_success_claimed": false,
+    "revalidate": "Immediately before launch, exact same-attempt source/readback/manifest and original generations under local fence plus separately authenticated owner admission. If owner ISSUED continuity at effect cannot be observed, PROOF_UNRESOLVED before launch.",
+    "postprocess": "Fully reap compiler and observe both EOFs; verify unchanged source and exact single-class envelope; full class hash and inert bounded classfile metadata identity only. No target load/link/initialize, JVM dispatch, reflection or SyntheticStateBox instance."
+  },
+  "handoff": {
+    "kind": "controller-local exclusive reservation/binding only",
+    "bindings": [
+      "workspace_generation",
+      "controller_generation",
+      "preparation_attempt_id",
+      "preparation_receipt_id",
+      "exact_artifact_manifest",
+      "authenticated_future_borrower_identity"
+    ],
+    "consumer_type": null,
+    "consumer_schema": null,
+    "activation_status": "PROOF_UNRESOLVED",
+    "consumer_authority_granted": false,
+    "artifact_export_allowed": false,
+    "generation_transfer_allowed": false,
+    "target_activation_allowed": false,
+    "current_admission": "No consumer contract/borrower authenticator exists, so current request cannot establish reservation or activation. Freeze conditional semantics only, never a placeholder borrower token."
+  },
+  "serialization": {
+    "controller_local_admission_fence": true,
+    "max_active_mutation_or_exclusive_handoff": 1,
+    "observation_races_mutation": false,
+    "snapshot_boundary": "Acquire local fence, verify exact generations and owner admission, inspect complete state without mutation/writer race, bind result to same fence epoch. If coherence cannot be observed fail unresolved; read-only inventory is not an external writer lock.",
+    "cleanup_started_monotonic": true,
+    "after_cleanup_reject": [
+      "materialize",
+      "compile",
+      "new handoff",
+      "preparation observation as ready"
+    ],
+    "cleanup_preempts_busy": true,
+    "active_on_cleanup": "Set barrier and revoke success publication under fence first; cancel/terminate active child group or write, fully reap, close/EOF captures, cancel reservation, then continue outer teardown. Never publish raced readiness. Cleanup bypasses BUSY.",
+    "duplicate_or_replay": "Reject repeated operation/request/admission IDs, consumed challenges and stale sequences. Never rerun a mutation even if previous response lost; mark outcome unresolved and clean. Cleanup barrier/teardown may be re-observed with a fresh cleanup request and bounded same-identity retry only."
+  },
+  "coordination": {
+    "cross_owner_transaction_claimed": false,
+    "private_lock_bridge_allowed": false,
+    "sequence": [
+      "workspace owner authenticates original retained graph and fresh exact-generation current state",
+      "preparation owner independently authenticates own originals/facet and runtime ISSUED report",
+      "preparation owner spends exact one-shot facet and authenticates fixed-operation admission bound to same state/generation/fence",
+      "controller final local admission checks generation/fence/barrier/current state and exact admitted operation",
+      "if any relevant owner precondition can change across unobservable gap, abort before effect with PROOF_UNRESOLVED",
+      "perform fixed effect only after all relevant observable admission predicates; no owner lock sharing",
+      "post-observe complete same-generation state/captures/reaping under fence; owning boundary authenticates evidence",
+      "late loss suppresses success/receipt/readiness, no facet refund; mandatory independent cleanup"
+    ],
+    "runtime_owner_unchanged": true,
+    "report_only_runtime_check_is_reservation": false,
+    "coordination_implementation_proven": false
+  },
+  "cleanup": {
+    "required_after": [
+      "preparation failure",
+      "consumer failure",
+      "timeout",
+      "runtime activation failure",
+      "abandonment",
+      "invalidated upstream"
+    ],
+    "normal_sequence": [
+      "set cleanup-started barrier; terminal readiness withdrawal",
+      "deny new work/handoff and cancel active operations",
+      "kill active bounded children/process groups",
+      "fully reap children/groups",
+      "close captures/pipes/selectors; observe EOF",
+      "invoke independent outer fixed removal of exact container/workspace",
+      "fresh independent absence verification; exact /work and /tmp generation gone",
+      "return bounded composite evidence; preserve unresolved components truthfully"
+    ],
+    "inner_can_remove_self_and_report_absence": false,
+    "outer": {
+      "owner_role": "independently authorized fixed host/control-plane cleanup custodian",
+      "operations": [
+        "TERMINATE_REMOVE_EXACT_RETAINED_GENERATION",
+        "OBSERVE_EXACT_RETAINED_GENERATION_ABSENCE"
+      ],
+      "target": "Retained authenticated immutable full original container ID/backend and workspace/controller generation relation, never name or caller ID alone; independently prove safe targeting on current control plane or fail unresolved.",
+      "requires_workspace_readiness": false,
+      "requires_runtime_ISSUED": false,
+      "requires_unspent_preparation_facet": false,
+      "requires_inner_controller_challenge": false,
+      "input_projection": [
+        "retained_authenticated_cleanup_relation_id",
+        "fresh_cleanup_request_id"
+      ],
+      "generic_Docker_command_authority": false,
+      "may_create_or_restore": false,
+      "bounds": "Fixed 10000ms invocation deadline and <=8192-byte bounded response, no automatic retry. Explicit same-identity cleanup retry never restores readiness.",
+      "absence": "Fresh independent exact same-backend full-ID inspect/absence observation with authenticated observer identity/method and generation relation. Removal exit status, transient inspect failure, name absence or inner self-report alone insufficient.",
+      "identity_target_failure": "WORKSPACE_CLEANUP_UNRESOLVED",
+      "lost_inner_evidence": "Kill/remove/absence must still be attempted safely after inner loss. Unknown child/group reap or capture EOF stays unresolved even if container absent; never fabricate composite cleanup success."
+    },
+    "evidence_fields": [
+      "original_workspace_capability_id",
+      "original_workspace_generation",
+      "original_controller_identity",
+      "original_controller_generation",
+      "original_full_container_identity",
+      "original_backend_relation",
+      "preparation_attempt_id",
+      "handoff_identity",
+      "cleanup_barrier_sequence",
+      "children_and_process_group_results",
+      "capture_closure_and_EOF",
+      "remove_result",
+      "fresh_independent_absence_observation",
+      "observer_method_and_identity",
+      "work_and_tmp_generation_gone",
+      "no_surviving_artifact_export",
+      "typed_unresolved_components"
+    ],
+    "evidence_is_preparation_success": false,
+    "evidence_is_behavior_success": false,
+    "evidence_is_future_authority": false,
+    "workspace_failure_status": "WORKSPACE_CLEANUP_UNRESOLVED"
+  },
+  "framing": {
+    "protocol_id": "synthetic_preparation_controller_pinned_1_v1",
+    "version": 1,
+    "canonical_types": "Exact schema-defined str/int/bool/None/list/dict types only; bool is not int. String keys only; reject missing/extra fields, duplicate keys, unsupported types, nonfinite numbers and implicit coercion. No caller JSON restore path exists.",
+    "canonical_payload_encoding": "UTF-8 JSON with sort_keys=true, separators=(',', ':'), ensure_ascii=true, allow_nan=false; schema-defined list order, no normalization or default=str",
+    "wire_transport_frozen": false,
+    "framing_requirement": "Exactly one length-delimited canonical typed payload per request/response with unambiguous length/version/endpoint relation. Concrete transport prefix/encoding is deferred; reject overlong, trailing, partial, duplicate, unexpected or multiplexed frames before any effect. Never caller text commands.",
+    "request_max_bytes": 8192,
+    "response_max_bytes": 8192,
+    "request_fields": {
+      "protocol_id": "constant_protocol",
+      "version": "constant_int_1",
+      "operation": "closed_operation_enum",
+      "request_id": "id",
+      "operation_id": "id",
+      "workspace_capability_id": "id",
+      "container_identity": "id",
+      "workspace_generation": "id",
+      "controller_generation": "id",
+      "sequence": "positive_int",
+      "challenge": "challenge_or_null_by_operation",
+      "purpose": "same_closed_operation_tag",
+      "admission_relation_id": "id",
+      "payload": "exact_per_operation_input_projection"
+    },
+    "response_fields": {
+      "protocol_id": "constant_protocol",
+      "version": "constant_int_1",
+      "operation": "closed_operation_enum",
+      "request_id": "exact_request_id",
+      "operation_id": "exact_operation_id",
+      "workspace_capability_id": "exact_request_workspace_id",
+      "container_identity": "exact_original_full_container_identity",
+      "workspace_generation": "exact_request_generation",
+      "controller_generation": "exact_request_generation",
+      "sequence": "exact_request_sequence",
+      "challenge": "exact_request_challenge",
+      "purpose": "exact_request_purpose",
+      "status": "status_enum",
+      "result": "exact_per_operation_result_or_null",
+      "error": "typed_error_or_null"
+    },
+    "operation_payloads_closed": true,
+    "primitive_rules": {
+      "id": "exact str, nonempty, <=256 UTF-8 bytes, no NUL; reference only to authenticated original relation, never restore authority from string",
+      "positive_int": "exact int in 1..9223372036854775807; bool rejected; no wrap/reuse",
+      "challenge": "exact str, 64 lowercase hex chars from owner 32 unpredictable bytes; required for three observation tags; null for other tags, whose admission still binds final observation",
+      "json": "Reject duplicate/missing/unknown keys at every nesting, nonfinite/float values, unknown enum, coercion and unsupported types; exact schema str/int/bool/null/list/dict only.",
+      "status_enum": [
+        "COMPLETE",
+        "REJECTED",
+        "FAILED",
+        "PROOF_UNRESOLVED"
+      ],
+      "cleanup_reason_enum": [
+        "preparation_failure",
+        "consumer_failure",
+        "activation_failure",
+        "timeout",
+        "abandonment",
+        "upstream_invalidation",
+        "normal_completion",
+        "controller_loss"
+      ]
+    },
+    "result_schemas": {
+      "observation": [
+        "workspace_state",
+        "cleanup_barrier_sequence",
+        "active_operation_id",
+        "handoff_identity"
+      ],
+      "materialize": [
+        "workspace_state",
+        "preparation_attempt_id",
+        "source_readback_size",
+        "source_readback_sha256",
+        "source_readback_exact"
+      ],
+      "compile": [
+        "workspace_state",
+        "preparation_attempt_id",
+        "compiler_identity",
+        "capture_and_reap",
+        "class_metadata"
+      ],
+      "handoff": [
+        "reservation_identity",
+        "reservation_bindings",
+        "activation_status"
+      ],
+      "begin_cleanup": [
+        "cleanup_barrier_sequence",
+        "cancelled_operation_id",
+        "outer_teardown_required"
+      ],
+      "cleanup": [
+        "cleanup_evidence"
+      ]
+    },
+    "nested_schema_rule": "message_schema.json freezes every exact closed nested record and cross-field predicate as declarative data. Workspace state uses unchanged digest payload fields plus the full mount/manifest/process source observations within those fields. No raw source/class/capture bytes or arbitrary maps. Wire transport prefix remains deferred; semantic schemas are frozen here.",
+    "success_rule": "COMPLETE requires exactly complete bounded operation-specific evidence, null error, matched IDs/generations/sequence/challenge/purpose, and all postconditions. Other statuses carry exact typed error and null result, except cleanup operations may carry bounded partial cleanup evidence with explicit unresolved components. Partial cleanup evidence never claims completion/readiness. COMPLETE never means owner readiness or behavior success; BEGIN_CLEANUP completion only means barrier recorded.",
+    "error_fields": {
+      "layer": "controller|workspace|preparation|provider|runtime",
+      "code": "closed originating layer enum",
+      "origin_status": "exact originating status",
+      "origin_reason": "exact bounded originating reason",
+      "authenticated_origin_relation_id": "id_or_null",
+      "operation_id": "exact_operation_id",
+      "cleanup_required": "exact_bool",
+      "detail_id": "closed controller reason enum in message_schema.json"
+    },
+    "semantic_schema_file": "message_schema.json"
+  },
+  "authentication": {
+    "protocol_is_authority": false,
+    "future_workspace_owner_binds_exact_controller": true,
+    "original_workspace_authentication": {
+      "domain": "CATTUS:SYNTH.EXEC.PREP.WORKSPACE.PINNED.1:exact-live-workspace:v1",
+      "algorithm": "HMAC-SHA256",
+      "independent_secret": true,
+      "secret_reuse_forbidden": [
+        "SANDBOX.2 private verifier",
+        "provider owners",
+        "preparation owner",
+        "runtime owner",
+        "reflection owners"
+      ],
+      "registry": "Exact process-local registry retains the original workspace object, immutable signed payload, original graph/controller references, monotonic observations and permanent terminal tombstones; full type and identity checks precede accepting its projection.",
+      "canonical_types": "Exact schema-defined str/int/bool/None/list/dict types only; bool is not int. String keys only; reject missing/extra fields, duplicate keys, unsupported types, nonfinite numbers and implicit coercion. No caller JSON restore path exists.",
+      "canonical_encoding": "UTF-8 JSON with sort_keys=true, separators=(',', ':'), ensure_ascii=true, allow_nan=false; schema-defined list order, no normalization or default=str",
+      "framing": "ASCII domain + NUL + ASCII fixed role + NUL + canonical payload bytes",
+      "roles": [
+        "workspace-identity",
+        "workspace-current-state",
+        "workspace-cleanup-evidence"
+      ],
+      "identity_hmac_payload": "immutable signed bindings; signed payload retains the independently computed stable fingerprint",
+      "stable_fingerprint": "SHA256(domain + NUL + 'workspace-identity' + NUL + canonical immutable identity payload excluding signature and fingerprint); public report digest is never authentication",
+      "state_hmac_payload": "workspace ID/stable fingerprint/issuing PID + exact original graph/controller binding + generation + owner-monotonic sequence + fresh owner challenge + all current predicates/state digest + operation/handoff ID + cleanup barrier; signs no authority permission",
+      "freshness": "Require current owner registry sequence and a current challenge response from the exact retained controller for the guarded operation. Cached HMACs, a timestamp, unchanged digest, container name or route/version equality alone cannot establish current readiness.",
+      "validation": "Compare HMAC in constant time and match canonical originally retained bytes. Reauthenticate every retained upstream through its unchanged public validator. Then evaluate current eligibility independently of historical authenticity.",
+      "terminal_evidence_may_authenticate": true,
+      "terminal_evidence_grants_readiness": false,
+      "cleanup_only_exception": "Fresh readiness/challenge and successful current upstream reauthentication are operation admission requirements, not prerequisites for mandatory teardown. After controller loss or upstream invalidity use retained authenticated immutable cleanup identity and the independently authorized fixed teardown/absence path; it never restores readiness."
+    },
+    "controller_evidence": "Only semantics frozen: exact original source/executable/protocol/incarnation/host/container/generation/transport/bootstrap/configuration and bounded observations; independently authenticated by future workspace owner. No separately signed controller receipt type or issuer is required/frozen here, and none is issued.",
+    "secret_reuse_forbidden": [
+      "provider",
+      "preparation",
+      "runtime",
+      "reflection",
+      "SANDBOX.2"
+    ],
+    "secret_or_signature_created": false
+  },
+  "errors": {
+    "controller_codes": [
+      "CONTROLLER_UNAUTHENTICATED",
+      "CONTROLLER_WRONG_GENERATION",
+      "CONTROLLER_PROTOCOL_MISMATCH",
+      "CONTROLLER_OPERATION_NOT_ALLOWED",
+      "CONTROLLER_BUSY",
+      "CONTROLLER_OBSERVATION_INCOMPLETE",
+      "CONTROLLER_SOURCE_MISMATCH",
+      "CONTROLLER_EXECUTABLE_MISMATCH",
+      "CONTROLLER_CHILD_START_FAILED",
+      "CONTROLLER_CHILD_TIMEOUT",
+      "CONTROLLER_CAPTURE_INCOMPLETE",
+      "CONTROLLER_CHILD_REAP_UNRESOLVED",
+      "CONTROLLER_HANDOFF_UNRESOLVED",
+      "CONTROLLER_CLEANUP_UNRESOLVED",
+      "PROOF_UNRESOLVED"
+    ],
+    "classification": "Controller authentication/source/executable/protocol/generation failures describe controller layer only. Existing provider/workspace/preparation/runtime semantic failures retain original layer and exact typed code; never rebrand as CONTROLLER_UNAUTHENTICATED.",
+    "busy_exception": "CONTROLLER_BUSY applies to ordinary operations only, never BEGIN_CLEANUP/mandatory teardown.",
+    "observation_failure": "Incomplete full inventory/capture/coherence/response is failure, never ready. Unobservable owner/generation continuity is PROOF_UNRESOLVED.",
+    "cleanup_mapping": "Keep CONTROLLER_CLEANUP_UNRESOLVED evidence separate; workspace owner may report its existing WORKSPACE_CLEANUP_UNRESOLVED without erasing root cause."
+  },
+  "harness_boundary": {
+    "scenario_JVM_dispatch": false,
+    "full_harness_source": false,
+    "scenario_main_class": null,
+    "scenario_JVM_argv": null,
+    "behavioral_loader_protocol": null,
+    "BEFORE_AFTER_runtime_protocol": null,
+    "runtime_fail_closed_preserved": true
+  },
+  "authority_flags": {
+    "Apply": false,
+    "BANK": false,
+    "BANK_authority": false,
+    "apply_authority": false,
+    "arbitrary_Java": false,
+    "arbitrary_class_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "arbitrary_command": false,
+    "arbitrary_command_authority": false,
+    "arbitrary_filesystem": false,
+    "arbitrary_java_authority": false,
+    "arbitrary_method_authority": false,
+    "arbitrary_reflection_authority": false,
+    "arbitrary_source_authority": false,
+    "compilation_authority": false,
+    "constructor_reflection_authority": false,
+    "consumer_readiness_authority": false,
+    "container_creation": false,
+    "container_creation_authority": false,
+    "controller_implementation": false,
+    "enumeration_authority": false,
+    "exact_sandbox_materialization_authority": false,
+    "exact_scenario_compilation_authority": false,
+    "executor": false,
+    "executor_authority": false,
+    "field_write_authority": false,
+    "generic_reflection_authority": false,
+    "host_mount": false,
+    "host_mount_authority": false,
+    "network": false,
+    "network_authority": false,
+    "preparation_authority": false,
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection": false,
+    "reflection_execution_authority": false,
+    "repository_java_authority": false,
+    "repository_source_write_authority": false,
+    "repository_write": false,
+    "repository_write_authority": false,
+    "runtime_activation": false,
+    "runtime_activation_authority": false,
+    "runtime_authority": false,
+    "sandbox_materialization_authority": false,
+    "scenario_compilation": false,
+    "scenario_compilation_authority": false,
+    "shell": false,
+    "shell_authority": false,
+    "source_identity_authority_issued_by_this_phase": false,
+    "source_materialization": false,
+    "work_write_authority_from_workspace_possession": false,
+    "workspace_issuance": false,
+    "workspace_issuance_authority": false
+  },
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR.1R": 0,
+    "EXECUTOR_1R": 0,
+    "JAVA1C": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "auth_issuance": 0,
+    "capability_consumption": 0,
+    "capability_invalidation": 0,
+    "class_loading": 0,
+    "container_creation": 0,
+    "container_removal": 0,
+    "filesystem_runtime_writes": 0,
+    "java": 0,
+    "javac": 0,
+    "pinned_auth_issuance": 0,
+    "preparation_authority_issuance": 0,
+    "provider_issuance": 0,
+    "reflection": 0,
+    "reflection_admission_issuance": 0,
+    "reflection_issuance": 0,
+    "reflection_lease_issuance": 0,
+    "runtime_issuance": 0,
+    "runtime_lease_issuance": 0,
+    "source_materialization": 0,
+    "workspace_issuance": 0
+  },
+  "effect_counter_scope": "Required zero by design plus measured pure-validation guards; described future effects are not run or issued by this phase.",
+  "historical_preservation": {
+    "all_prior_noncache_bytes_unchanged": true,
+    "no_repin": true,
+    "no_stash_reset_clean": true,
+    "historical_controller_API_or_cleanup_changed": false,
+    "immutable_foundations": [
+      "core.sandboxed_java_positive_probe",
+      "core.sandboxed_java_positive_continuation",
+      "SANDBOX.2",
+      "JAVA.1C",
+      "PINNED provider chain",
+      "pinned auth/runtime/reflection owners",
+      "PREP closure",
+      "workspace contract",
+      "historical receipts"
+    ]
+  },
+  "unresolved": [
+    "new controller source bytes/SHA256/size and implementation",
+    "concrete retained architecture/transport/bootstrap satisfying frozen semantic message schemas",
+    "truthful live controller/backend generation continuity and independent cleanup targeting",
+    "observable effect coordination without private cross-owner locks",
+    "authorized bounded retained lifetime and live workspace/preparation owner implementation",
+    "separately reviewed harness/consumer/borrower authentication and activation"
+  ]
+}

@@ -1,0 +1,236 @@
+{
+  "authored_artifact_whitespace": {
+    "issues": [],
+    "passed": true,
+    "raw_diagnostic_logs_reformatted": false
+  },
+  "benchmark_structure_check": {
+    "checked": 54,
+    "errors": 0,
+    "exit_code": 0,
+    "real_effect_attempts": []
+  },
+  "environmental_recheck": {
+    "confirmed_initial_reason": "local_java_artifact_detection_failed:PermissionError",
+    "failing_tests_rechecked": 3,
+    "frozen_source_changes": false,
+    "mock_only_reproduction": "Only fixture version/inventory calls; failed before filesystem metadata inspection; no Docker or Java launched.",
+    "passed": 3,
+    "temporary_directory": "workspace .tmp/java_discovery_contract1_host_temp"
+  },
+  "git_diff_check": {
+    "exit_code": 0,
+    "note": "Existing Git line-ending conversion notices are unrelated; no whitespace errors.",
+    "stdout": ""
+  },
+  "historical_preservation": {
+    "changed": [],
+    "existing_files_checked": 1852,
+    "preexisting_missing_count": 8,
+    "preexisting_missing_restored": [],
+    "source_evidence_hashes_match": true,
+    "unexpected_new_paths": []
+  },
+  "in_memory_python_compilation": {
+    "code_executed": false,
+    "files": [
+      "core/behavioral_diagnostic_executor_lifecycle_retry.py",
+      "core/behavioral_diagnostic_executor_retry.py",
+      "core/java_runtime_compatibility.py",
+      "core/sandbox_backend_binding.py",
+      "core/sandboxed_java_discovery_continuation.py",
+      "core/sandboxed_java_positive_continuation.py",
+      "core/sandboxed_java_toolchain.py",
+      "core/sandboxed_java_toolchain_discovery.py",
+      "core/synthetic_runtime_authorization.py",
+      "core/thread_compatible_runtime_sandbox.py",
+      "scripts/measure_runtime_java_discovery_diag1.py",
+      "scripts/replay_runtime_java1.py",
+      "scripts/replay_runtime_java1d.py",
+      "scripts/replay_runtime_java1d_retry.py",
+      "tests/test_patch_candidate_behavior_executor1r.py",
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py",
+      "tests/test_runtime_java1.py",
+      "tests/test_runtime_java1_discovery.py",
+      "tests/test_runtime_java1_governance.py",
+      "tests/test_runtime_java1d.py",
+      "tests/test_runtime_java1d_retry.py",
+      "tests/test_runtime_java_compat1.py",
+      "tests/test_runtime_java_discovery_contract1.py",
+      "tests/test_runtime_java_discovery_diag1.py",
+      "tests/test_runtime_sandbox_bind1.py",
+      "tests/test_synthetic_runtime_authorization.py"
+    ],
+    "passed": true
+  },
+  "initial_pure_regressions": {
+    "collected": 555,
+    "exit_code": 1,
+    "failures": [
+      {
+        "nodeid": "tests/test_runtime_java1_discovery.py::test_wrong_platform_inventory_never_creates_or_starts_container[windows-amd64]",
+        "outcome": "failed",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_runtime_java1_discovery.py::test_wrong_platform_inventory_never_creates_or_starts_container[linux-arm64]",
+        "outcome": "failed",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_runtime_java1_discovery.py::test_declared_image_volumes_are_rejected_before_container_creation",
+        "outcome": "failed",
+        "when": "call"
+      }
+    ],
+    "passed": 552,
+    "real_effect_attempts": [],
+    "test_files": [
+      "tests/test_runtime_java_discovery_contract1.py",
+      "tests/test_runtime_java1.py",
+      "tests/test_runtime_java1_discovery.py",
+      "tests/test_runtime_java1_governance.py",
+      "tests/test_runtime_java_compat1.py",
+      "tests/test_runtime_java1d.py",
+      "tests/test_runtime_java1d_retry.py",
+      "tests/test_runtime_java_discovery_diag1.py",
+      "tests/test_runtime_sandbox_bind1.py",
+      "tests/test_synthetic_runtime_authorization.py",
+      "tests/test_patch_candidate_behavior_executor1r.py",
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+    ]
+  },
+  "operational_effect_counts": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker calls": 0,
+    "EXECUTOR.1R": 0,
+    "Java": 0,
+    "compile": 0,
+    "containers": 0,
+    "exports": 0,
+    "host mounts": 0,
+    "javac": 0,
+    "network": 0,
+    "reflection lease consumption": 0,
+    "runtime lease consumption": 0,
+    "shell": 0,
+    "source projection": 0
+  },
+  "phase_id": "RUNTIME.JAVA.DISCOVERY.CONTRACT.1",
+  "pure_regressions": {
+    "collected": 555,
+    "exit_code": 0,
+    "failures": [],
+    "passed": 555,
+    "real_effect_attempts": [],
+    "suites": {
+      "tests/test_patch_candidate_behavior_executor1r.py": {
+        "failed": 0,
+        "passed": 12,
+        "skipped": 0
+      },
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py": {
+        "failed": 0,
+        "passed": 46,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1.py": {
+        "failed": 0,
+        "passed": 91,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1_discovery.py": {
+        "failed": 0,
+        "passed": 24,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1_governance.py": {
+        "failed": 0,
+        "passed": 7,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1d.py": {
+        "failed": 0,
+        "passed": 10,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1d_retry.py": {
+        "failed": 0,
+        "passed": 27,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_compat1.py": {
+        "failed": 0,
+        "passed": 67,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_discovery_contract1.py": {
+        "failed": 0,
+        "passed": 10,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_discovery_diag1.py": {
+        "failed": 0,
+        "passed": 15,
+        "skipped": 0
+      },
+      "tests/test_runtime_sandbox_bind1.py": {
+        "failed": 0,
+        "passed": 129,
+        "skipped": 0
+      },
+      "tests/test_synthetic_runtime_authorization.py": {
+        "failed": 0,
+        "passed": 117,
+        "skipped": 0
+      }
+    },
+    "temporary_directory": "workspace .tmp/java_discovery_contract1_host_temp",
+    "test_files": [
+      "tests/test_runtime_java_discovery_contract1.py",
+      "tests/test_runtime_java1.py",
+      "tests/test_runtime_java1_discovery.py",
+      "tests/test_runtime_java1_governance.py",
+      "tests/test_runtime_java_compat1.py",
+      "tests/test_runtime_java1d.py",
+      "tests/test_runtime_java1d_retry.py",
+      "tests/test_runtime_java_discovery_diag1.py",
+      "tests/test_runtime_sandbox_bind1.py",
+      "tests/test_synthetic_runtime_authorization.py",
+      "tests/test_patch_candidate_behavior_executor1r.py",
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+    ]
+  },
+  "registry_picker": {
+    "after": {
+      "failed": 7,
+      "failure_identities": [
+        "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked"
+      ],
+      "passed": 292
+    },
+    "baseline": {
+      "failed": 7,
+      "failure_identities": [
+        "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked"
+      ],
+      "passed": 292
+    },
+    "new_failure_identities": [],
+    "same_failure_identities": true
+  },
+  "report_only": true
+}

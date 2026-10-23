@@ -835,8 +835,20 @@ def run_agent_web(
                     )
                 except Exception as e:
                     print(f"⚠️ DB memory save skipped: {e}")
-        # CONTROL's existing prompt preparation projects RepairScope without
-        # invoking the patch author; the detector consumes that measured scope.
+        # OOP.INTENT.DETECT.2 owns applicable future-design semantics before
+        # prompt preparation can construct or expand RepairScope.
+        future_design_owned = False
+        if state.interface == "agent" and not live_route.read_only and state.control_result:
+            from web.oop_intent_adapter import admit_future_design_control_wait
+            future_wait, future_design_owned = admit_future_design_control_wait(
+                control=state.control_result, repo_path=state.repo_path or "",
+                task_text=query)
+            if future_wait is not None:
+                return {**future_wait, "project_tag": final_tag,
+                        "live_route": live_route_payload, **runtime_state,
+                        "runtime_environment_description": runtime_description}
+
+        # CONTROL's existing prompt preparation may now project RepairScope.
         if state.interface == "agent" and not live_route.read_only and state.control_result:
             build_control_prompt(
                 control_result=state.control_result, user_query=query,
@@ -875,7 +887,8 @@ def run_agent_web(
                 "runtime_environment_description": runtime_description,
                 **_harness_payload(base_harness_decision),
             }
-        if state.interface == "agent" and not live_route.read_only and state.control_result:
+        if (not future_design_owned and state.interface == "agent"
+                and not live_route.read_only and state.control_result):
             from web.oop_intent_adapter import admit_oop_patch_wait
             oop_wait = admit_oop_patch_wait(
                 control=state.control_result, repo_path=state.repo_path or "",

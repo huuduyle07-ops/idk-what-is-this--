@@ -1,0 +1,47 @@
+{
+  "checks": {
+    "focused_full_provider_graph_passed": true,
+    "frozen_semantic_regressions_passed": true,
+    "known_bookkeeping_drift_preserved": true,
+    "benchmark_check_passed": true,
+    "registry_picker_no_new_failures": true,
+    "pure_validation_no_operational_effects": true,
+    "in_memory_compilation_passed": true,
+    "authored_whitespace_and_JSON_passed": true,
+    "git_diff_check_passed": true,
+    "historical_bytes_preserved": true
+  },
+  "focused": {
+    "collected": 179,
+    "passed": 179,
+    "skipped": 0
+  },
+  "frozen": {
+    "collected": 1201,
+    "passed": 1200,
+    "skipped": 0
+  },
+  "frozen_accepted_preexisting_failure_ids": [
+    "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts"
+  ],
+  "registry_baseline_failure_count": 7,
+  "registry_after_failure_count": 7,
+  "new_registry_failure_ids": [],
+  "preservation": {
+    "files_checked": 1989,
+    "changed": [],
+    "missing": [],
+    "all_bytes_preserved": true,
+    "historical_repins": false
+  },
+  "in_memory_compilation_files": 39,
+  "compilation_errors": [],
+  "whitespace_errors": [],
+  "JSON_errors": [],
+  "benchmark_check_exit_code": 0,
+  "benchmark_denied_import_event": [
+    "socket.bind"
+  ],
+  "full_suite_claimed": false,
+  "historical_owners_changed": false
+}

@@ -1,0 +1,65 @@
+{
+  "checks": {
+    "reviewed_corrected_provider_source_unchanged": true,
+    "focused_corrected_provider_passed": true,
+    "explicit_independent_config_paths_and_controls_passed": true,
+    "frozen_semantic_regressions_passed_with_only_known_drift": true,
+    "known_bookkeeping_failure_identity_unchanged": true,
+    "registry_picker_baseline_failures_unchanged": true,
+    "pure_validation_no_operational_effects": true,
+    "pure_validation_temporary_workspaces_removed": true,
+    "benchmark_check_passed": true,
+    "in_memory_compilation_passed": true,
+    "JSON_and_authored_whitespace_passed": true,
+    "git_diff_check_passed": true,
+    "historical_bytes_preserved": true,
+    "registry_picker_after_live_unchanged": true,
+    "after_live_pure_and_temporaries_clean": true
+  },
+  "current_provider_source_sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+  "first_attempt_source_sha256": "e1edf506c522515199a98a0ff90e1985dbfce0235854ac9978b549c5938b8bee",
+  "reviewed_corrected_source_sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+  "focused": {
+    "collected": 199,
+    "passed": 199,
+    "skipped": 0
+  },
+  "config_path_controls": {
+    "collected": 13,
+    "passed": 13,
+    "skipped": 0
+  },
+  "frozen": {
+    "collected": 1201,
+    "passed": 1200,
+    "skipped": 0
+  },
+  "known_bookkeeping_failure_identity": {
+    "nodeid": "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+    "when": "call",
+    "outcome": "failed",
+    "assertion": "E       AssertionError: ('docs/roadmap/phase_registry.json', 'unattributed runtime-sandbox change')",
+    "unchanged_assertion_present": true,
+    "failure_site": "tests/_runtime_sandbox1_maintenance.py:13: AssertionError"
+  },
+  "registry_baseline_failure_count": 7,
+  "new_registry_failure_ids": [],
+  "historical_preservation": {
+    "files_checked": 2021,
+    "changed": [],
+    "missing": [],
+    "all_bytes_preserved": true,
+    "historical_repins": false,
+    "reviewed_source_snapshot_sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+    "reviewed_source_snapshot_preserved": true
+  },
+  "compilation_errors": [],
+  "compiled_source_count": 45,
+  "whitespace_errors": [],
+  "JSON_errors": [],
+  "benchmark_denied_import_events": [
+    "socket.bind"
+  ],
+  "full_suite_claimed": false,
+  "historical_repins": false
+}

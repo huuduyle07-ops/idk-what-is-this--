@@ -1,0 +1,20 @@
+{
+  "command": [
+    "C:\\Python314\\python.exe",
+    "-B",
+    "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+    "worker",
+    "context-contracts"
+  ],
+  "completed_summary_available": false,
+  "final_scope": "five frozen PINNED1C context/config helpers, nine SYNTH pure contract cases, complete stubbed replay suite",
+  "historical_pin_changes": false,
+  "initial_combined_broad_fixture_worker": "context-contracts",
+  "limitation": "Exhaustive combined provider/authorization fixture suites did not complete in the bounded worker; focused requested context/contract coverage is run to completion separately.",
+  "outcome": "TIMEOUT",
+  "reason": "subprocess.TimeoutExpired after 300 seconds",
+  "subprocess_run_timeout_cleanup": "worker killed and reaped by subprocess.run timeout handling; worker guard allowed no child processes",
+  "successful_operational_effects_prevented_by_worker_audit_guard": true,
+  "timed_out_worker_final_attempt_counters": "UNAVAILABLE_NO_COMPLETED_SUMMARY",
+  "timeout_seconds": 300
+}

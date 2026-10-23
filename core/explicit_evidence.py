@@ -17,7 +17,7 @@ no authority of any kind.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Iterator
 
 from core.behavioral_expectation import (
@@ -25,6 +25,7 @@ from core.behavioral_expectation import (
     BehavioralExpectation,
     extract_behavioral_expectations,
 )
+from core.explicit_design_evidence import DesignEvidence, extract_design_evidence
 
 
 PHASE_ID = "INPUT.1"
@@ -292,6 +293,8 @@ class ExplicitEvidence:
     #: here so no downstream consumer re-reads the user's sentence for them.
     behavioral_expectations: tuple[BehavioralExpectation, ...] = ()
     truncated_fields: tuple[str, ...] = ()
+    #: OOP.INTENT.DESIGN.1 — additive typed literals, owned by this intake pass.
+    design_evidence: DesignEvidence = field(default_factory=DesignEvidence)
 
     def is_empty(self) -> bool:
         return not (
@@ -334,6 +337,8 @@ class ExplicitEvidence:
                 item.as_dict() for item in self.behavioral_expectations
             ],
             "truncated_fields": list(self.truncated_fields),
+            **({"design_evidence": self.design_evidence.as_dict()}
+               if not self.design_evidence.is_empty() else {}),
         }
 
 
@@ -664,4 +669,5 @@ def extract_explicit_evidence(raw_text: str) -> ExplicitEvidence:
         constraints=tuple(constraints),
         behavioral_expectations=behavioral_expectations,
         truncated_fields=tuple(dict.fromkeys(truncated)),
+        design_evidence=extract_design_evidence(raw_text),
     )

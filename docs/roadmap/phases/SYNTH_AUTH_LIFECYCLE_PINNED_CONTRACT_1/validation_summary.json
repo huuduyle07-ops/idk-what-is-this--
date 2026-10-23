@@ -1,0 +1,356 @@
+{
+  "benchmark_check": {
+    "checked": 54,
+    "errors": 0,
+    "exit_code": 0
+  },
+  "benchmark_check_passed": true,
+  "focused_collected": 71,
+  "focused_passed_count": 71,
+  "focused_tests_passed": true,
+  "git_diff_check": {
+    "exit_code": 0,
+    "stderr": "warning: in the working copy of 'core/explicit_evidence.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/input_understanding.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/live_task_shape.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/oop_intent_session.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/oop_semantic_review.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/phase_registry.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/requirement_preservation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/semantic_waiter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/semantic_waiter_adapter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/task_contract.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/roadmap/phase_registry.json', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'main.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/_oop_intent_ui1_maintenance.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_input_understanding.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_phase_picker.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_phase_registry.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/app.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/oop_intent_adapter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/runner.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/session_presentation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/templates/index.html', LF will be replaced by CRLF the next time Git touches it\n",
+    "stdout": ""
+  },
+  "guarded_modes": {
+    "benchmark": {
+      "audit_guard": {
+        "live_verification_or_execution_attempts": 0,
+        "network_attempts": 0,
+        "owner_issuance_or_consumption_attempts": 0,
+        "process_attempts": 0,
+        "repository_write_attempts": 0
+      },
+      "blocked_actions": []
+    },
+    "focused": {
+      "audit_guard": {
+        "live_verification_or_execution_attempts": 0,
+        "network_attempts": 0,
+        "owner_issuance_or_consumption_attempts": 0,
+        "process_attempts": 0,
+        "repository_write_attempts": 0
+      },
+      "blocked_actions": []
+    },
+    "registry_after": {
+      "audit_guard": {
+        "live_verification_or_execution_attempts": 0,
+        "network_attempts": 0,
+        "owner_issuance_or_consumption_attempts": 0,
+        "process_attempts": 0,
+        "repository_write_attempts": 0
+      },
+      "blocked_actions": []
+    },
+    "registry_baseline": {
+      "audit_guard": {
+        "live_verification_or_execution_attempts": 0,
+        "network_attempts": 0,
+        "owner_issuance_or_consumption_attempts": 0,
+        "process_attempts": 0,
+        "repository_write_attempts": 0
+      },
+      "blocked_actions": []
+    }
+  },
+  "historical_preservation": {
+    "audit_artifact_output": "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_CONTRACT_1/historical_preservation.json",
+    "binding_count_failures": 0,
+    "check_count": 23,
+    "checks": [
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 2246,
+        "drift": [],
+        "expected_binding_count": 2246,
+        "label": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1R/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 2246
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 355,
+        "drift": [],
+        "expected_binding_count": 355,
+        "label": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 355
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 355,
+        "drift": [],
+        "expected_binding_count": 355,
+        "label": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/historical_preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 355
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1,
+        "drift": [],
+        "expected_binding_count": 1,
+        "label": "PINNED.1R original source identity checksum",
+        "passed": true,
+        "unchanged_count": 1
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1,
+        "drift": [],
+        "expected_binding_count": 1,
+        "label": "Original prior baseline checksum: docs/roadmap/phases/SYNTH_AUTH_PINNED_1/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 1
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 355,
+        "drift": [],
+        "expected_binding_count": 355,
+        "label": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 355
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1,
+        "drift": [],
+        "expected_binding_count": 1,
+        "label": "Original prior baseline checksum: docs/roadmap/phases/RUNTIME_JAVA_1C_AUTH_DIAG_1/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 1
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1828,
+        "drift": [],
+        "expected_binding_count": 1828,
+        "label": "docs/roadmap/phases/RUNTIME_JAVA_1C_AUTH_DIAG_1/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 1828
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1,
+        "drift": [],
+        "expected_binding_count": 1,
+        "label": "Original prior baseline checksum: docs/roadmap/phases/RUNTIME_SANDBOX_2_PRELADDER_DIAG_1/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 1
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 2126,
+        "drift": [],
+        "expected_binding_count": 2126,
+        "label": "docs/roadmap/phases/RUNTIME_SANDBOX_2_PRELADDER_DIAG_1/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 2126
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1,
+        "drift": [],
+        "expected_binding_count": 1,
+        "label": "Original prior baseline checksum: docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 1
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 2185,
+        "drift": [],
+        "expected_binding_count": 2185,
+        "label": "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 2185
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 359,
+        "drift": [],
+        "expected_binding_count": 359,
+        "label": "PINNED.1R original expected source pins",
+        "passed": true,
+        "unchanged_count": 359
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 21,
+        "drift": [],
+        "expected_binding_count": 21,
+        "label": "PINNED.1R frozen live graph source subset",
+        "passed": true,
+        "unchanged_count": 21
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1,
+        "drift": [],
+        "expected_binding_count": 1,
+        "label": "PINNED.1 original frozen gate checksum",
+        "passed": true,
+        "unchanged_count": 1
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 359,
+        "drift": [],
+        "expected_binding_count": 359,
+        "label": "PINNED.1 original gate source pins",
+        "passed": true,
+        "unchanged_count": 359
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1,
+        "drift": [],
+        "expected_binding_count": 1,
+        "label": "Supplemental original gate checksum",
+        "passed": true,
+        "unchanged_count": 1
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 13,
+        "drift": [],
+        "expected_binding_count": 13,
+        "label": "Supplemental original gate source pins",
+        "passed": true,
+        "unchanged_count": 13
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1,
+        "drift": [],
+        "expected_binding_count": 1,
+        "label": "Additional provenance original pin: docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 1
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1,
+        "drift": [],
+        "expected_binding_count": 1,
+        "label": "Additional provenance original pin: docs/roadmap/phases/RUNTIME_JAVA_REQUIREMENT_PINNED_1/preservation_baseline.json",
+        "passed": true,
+        "unchanged_count": 1
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 10,
+        "drift": [],
+        "expected_binding_count": 10,
+        "label": "PINNED.1R original artifact manifest",
+        "passed": true,
+        "unchanged_count": 10
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1,
+        "drift": [],
+        "expected_binding_count": 1,
+        "label": "Historical original replay runner checksum",
+        "passed": true,
+        "unchanged_count": 1
+      },
+      {
+        "binding_count_matches": true,
+        "bindings_checked": 1,
+        "drift": [],
+        "expected_binding_count": 1,
+        "label": "Historical original blocked authorization report checksum",
+        "passed": true,
+        "unchanged_count": 1
+      }
+    ],
+    "drift_count": 0,
+    "error": null,
+    "expected_hash_origin": "Unchanged stored historical manifests and source-identity records only",
+    "historical_drift_repinned": false,
+    "historical_preservation_verified": true,
+    "operational_effect_counts": {
+      "Apply": 0,
+      "BANK": 0,
+      "Docker": 0,
+      "EXECUTOR_1R": 0,
+      "JAVA1C": 0,
+      "PINNED1A_export": 0,
+      "SANDBOX2_issuance": 0,
+      "SyntheticStateBox": 0,
+      "authorization_issuance": 0,
+      "execution_lease_consumption": 0,
+      "execution_lease_issuance": 0,
+      "owner_imports": 0,
+      "provider_issuance": 0,
+      "reflection": 0,
+      "repository_runtime_writes": 0,
+      "tests_run": 0
+    },
+    "phase_id": "SYNTH.AUTH.LIFECYCLE.PINNED.CONTRACT.1",
+    "reproduce": "python -B docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_CONTRACT_1/check_preservation.py --mode after",
+    "result": "HISTORICAL_PRESERVATION_VERIFIED",
+    "reused_frozen_checker": "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/check_historical_preservation.py",
+    "reused_frozen_checker_sha256": "72bab3aaa5e51d86855a2bd251462ebf9e2db691fd7d78390e879674f363849c",
+    "schema_version": "historical_preservation_audit_v1",
+    "scope_limit": "Historical stored-pin integrity only; the phase's separate 2263-file baseline is checked independently.",
+    "unique_current_files_hashed": 2257
+  },
+  "in_memory_compilation": {
+    "compiled_count": 1349,
+    "errors": []
+  },
+  "initial_guarded_validation": {
+    "blocked_actions": [
+      "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\runtime_diagnostic_authorization.py:issue_synthetic_runtime_authorization_source"
+    ],
+    "explanation": "A newly selected frozen historical compatibility node attempted an invalid-input issuer entry; the guard rejected it before its body. That node was removed. A new preservation test also used a directory-glob operation denied by the existing strict fixture, and was corrected to select stored baseline keys.",
+    "guard_attempts": {
+      "live_verification_or_execution_attempts": 0,
+      "network_attempts": 0,
+      "owner_issuance_or_consumption_attempts": 1,
+      "process_attempts": 0,
+      "repository_write_attempts": 0
+    },
+    "preserved_artifact": "focused_initial_guarded.json",
+    "successful_effects": 0
+  },
+  "json_validation_count": 13,
+  "operational_effect_counts": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR_1R": 0,
+    "JAVA1C": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "authorization_issuance": 0,
+    "execution_lease_issuance": 0,
+    "lease_consumption": 0,
+    "lease_invalidation": 0,
+    "pinned_provider_issuance": 0,
+    "reflection": 0,
+    "repository_runtime_writes": 0
+  },
+  "phase_id": "SYNTH.AUTH.LIFECYCLE.PINNED.CONTRACT.1",
+  "preservation_log": "{\"changed\": [], \"files_checked\": 2289, \"historical_drift_count\": 0, \"historical_result\": \"HISTORICAL_PRESERVATION_VERIFIED\", \"unexpected_added\": []}\n",
+  "pure_contract_validation_passed": true,
+  "registry_existing_failure_count": 7,
+  "registry_picker_baseline_preserved": true,
+  "scope_limit": "Pure frozen boundary contract and selected zero-issuance dependencies only; no implementation acceptance or runtime readiness claim.",
+  "whitespace_errors": [],
+  "workspace_preservation": {
+    "baseline_sha256": "b8da47c2afb644447e3fa0d0ae0bba35bfbfbe7fe2cd10a57089a476aa35e11e",
+    "changed": [],
+    "files_checked": 2289,
+    "historical_drift_repinned": false,
+    "passed": true,
+    "phase_id": "SYNTH.AUTH.LIFECYCLE.PINNED.CONTRACT.1",
+    "unexpected_added": []
+  },
+  "zero_guarded_operational_effects": true
+}

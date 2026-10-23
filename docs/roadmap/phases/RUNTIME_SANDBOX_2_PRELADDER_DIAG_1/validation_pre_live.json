@@ -1,0 +1,250 @@
+{
+  "all_output_confined_to_new_phase": true,
+  "checks": {
+    "auth-artifacts": {
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\validation.py",
+        "worker",
+        "auth-artifacts"
+      ],
+      "exit_code": 0,
+      "passed": true,
+      "stderr_retained": "auth-artifacts.stderr.txt",
+      "stdout_retained": "auth-artifacts.stdout.txt",
+      "worker_result": {
+        "Docker_controls": 0,
+        "JSON_artifacts_parsed": 16,
+        "Java_effects": 0,
+        "all_historical_assertions_executed": true,
+        "audit_guard": {
+          "allowed_pure_domain_children": 0,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "authored_whitespace_passed": true,
+        "captured_original_stdout": "{\"passed\": true, \"historical_files_preserved\": 1828, \"diagnostic_python_sources_compiled_in_memory\": 6, \"JSON_artifacts_parsed\": 16, \"markdown_links_checked\": 18, \"authored_whitespace_passed\": true, \"live_owner_invocations\": 0, \"Docker_controls\": 0, \"Java_effects\": 0, \"evidence_consistency_passed\": true, \"single_effectful_call_site_and_exclusive_marker\": true}\n",
+        "diagnostic_python_sources_compiled_in_memory": 6,
+        "evidence_consistency_passed": true,
+        "historical_files_preserved": 1828,
+        "live_owner_invocations": 0,
+        "markdown_links_checked": 18,
+        "original_frozen_source_sha256": "8c764d5f98ba297f8d335f796442e3f9f1d13c14589fb5a6ccaaba77dbf616f6",
+        "passed": true,
+        "removed_statement_source_line": 105,
+        "single_effectful_call_site_and_exclusive_marker": true,
+        "sole_final_historical_write_removed_in_memory": true
+      }
+    },
+    "auth-matrix": {
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\validation.py",
+        "worker",
+        "auth-matrix"
+      ],
+      "exit_code": 0,
+      "passed": true,
+      "stderr_retained": "auth-matrix.stderr.txt",
+      "stdout_retained": "auth-matrix.stdout.txt",
+      "worker_result": {
+        "audit_guard": {
+          "allowed_pure_domain_children": 1,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "case_count": 57,
+        "effect_counts": {
+          "caller_shell": 0,
+          "docker": 0,
+          "forbidden_attempts": 0,
+          "java": 0,
+          "other_process": 0,
+          "python_domain_child": 1,
+          "socket": 0
+        },
+        "original_child_command_preserved": true,
+        "original_frozen_source_sha256": "e0455b4eb9b5328bf1484dad08a6f57733e93d9e54bc10e84154ba2e7993bab6",
+        "output_only_rebound_to_new_phase": true,
+        "passed": true
+      }
+    },
+    "benchmark": {
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-S",
+        "-B",
+        "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\validation.py",
+        "worker",
+        "benchmark"
+      ],
+      "exit_code": 0,
+      "passed": true,
+      "stderr_retained": "benchmark.stderr.txt",
+      "stdout_retained": "benchmark.stdout.txt",
+      "worker_result": {
+        "arguments": [
+          "benchmarks/run_benchmarks.py",
+          "--check"
+        ],
+        "audit_guard": {
+          "allowed_pure_domain_children": 0,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "exit_code": 0,
+        "passed": true
+      }
+    },
+    "historical_byte_preservation": {
+      "changed_or_missing": [],
+      "historical_file_count": 2126,
+      "passed": true,
+      "unexpected_new_files_outside_phase": []
+    },
+    "pytest": {
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\validation.py",
+        "worker",
+        "pytest"
+      ],
+      "exit_code": 0,
+      "passed": true,
+      "stderr_retained": "pytest.stderr.txt",
+      "stdout_retained": "pytest.stdout.txt",
+      "worker_result": {
+        "args": [
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "-o",
+          "addopts=",
+          "-o",
+          "log_file=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\validation_tmp\\pytest-log-sandbox2.txt",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\validation_tmp\\pytest-basetemp-sandbox2-11660",
+          "tests/test_runtime_sandbox2.py",
+          "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\test_classifier.py"
+        ],
+        "audit_guard": {
+          "allowed_pure_domain_children": 0,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "exit_code": 0,
+        "failed_test_count": 0,
+        "failed_test_ids": [],
+        "passed": true,
+        "passed_test_count": 230,
+        "skipped_test_ids": [],
+        "temporary_root_confined_to_new_phase": true
+      }
+    },
+    "registry_picker_baseline_vs_after": {
+      "passed": true,
+      "picker_equal": true,
+      "registry_equal": true
+    },
+    "registry_picker_pure_test_baseline_vs_after": {
+      "after": {
+        "exit_code": 1,
+        "failed_test_count": 7,
+        "failed_test_ids": [
+          {
+            "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+            "when": "call"
+          }
+        ],
+        "passed_test_count": 292,
+        "skipped_test_ids": []
+      },
+      "after_retained": "worker_registry-picker-after.json",
+      "audit_guards_no_effect_attempts": true,
+      "baseline": {
+        "exit_code": 1,
+        "failed_test_count": 7,
+        "failed_test_ids": [
+          {
+            "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+            "when": "call"
+          }
+        ],
+        "passed_test_count": 292,
+        "skipped_test_ids": []
+      },
+      "baseline_retained": "registry_picker_pure_test_baseline.json",
+      "passed": true,
+      "same_failure_ids_and_outcome_counts": true,
+      "unchanged_historical_failures_preserved": true
+    },
+    "source_json_whitespace_diff_checks": {
+      "authored_text_files_checked": 26,
+      "bytecode_emission": false,
+      "failures": [],
+      "git_diff_check_exit_code": 0,
+      "new_json_files_parsed": 18,
+      "new_python_sources_compiled_in_memory": 4,
+      "passed": true
+    }
+  },
+  "passed": true,
+  "phase_id": "RUNTIME.SANDBOX.2.PRELADDER.DIAG.1",
+  "validation_Docker_controls": 0,
+  "validation_Java_effects": 0,
+  "validation_live_owner_invocations": 0
+}

@@ -1,0 +1,161 @@
+{
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+  "audit_method": "Read source text only. Existing owner modules were not imported, instantiated, issued, consumed, invalidated or executed.",
+  "audit_status": "EXISTING_OWNER_CONVENTIONS_AUDITED",
+  "historical_sources_modified": false,
+  "live_owner_issuance_count": 0,
+  "operational_effect_count": 0,
+  "authority_granted": false,
+  "common_existing_encoding": {
+    "generator": "secrets.token_hex(32)",
+    "exact_ascii_bytes": 64,
+    "alphabet": "0123456789abcdef",
+    "random_bits_requested": 256,
+    "canonical_case": "lowercase",
+    "encoding_is_authentication": false,
+    "historical_convention_is_required_for_future_handles": false,
+    "reason": "The scalar selects a private registry entry; validation independently requires the original typed object, current owner process, authenticated retained graph and HMAC. A copied scalar is insufficient."
+  },
+  "owners": [
+    {
+      "family": "authorization_ids",
+      "variant": "legacy",
+      "source": "core/synthetic_runtime_authorization.py",
+      "sha256": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88",
+      "ids": ["issuance_id"],
+      "generator_reference": "core/synthetic_runtime_authorization.py:286",
+      "registry_reference": "core/synthetic_runtime_authorization.py:288",
+      "authentication_reference": "core/synthetic_runtime_authorization.py:294-313",
+      "registry_kind": "WeakValueDictionary",
+      "collision_handling": "No explicit retry before assigning the weak registry key.",
+      "tombstone": "No standalone authorization tombstone; lifecycle owns permanent one-shot issuance accounting."
+    },
+    {
+      "family": "authorization_ids",
+      "variant": "pinned",
+      "source": "core/synthetic_runtime_authorization_pinned.py",
+      "sha256": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c",
+      "ids": ["authorization_id", "proof_context_id"],
+      "generator_reference": "core/synthetic_runtime_authorization_pinned.py:336-337",
+      "registry_reference": "core/synthetic_runtime_authorization_pinned.py:340-344",
+      "authentication_reference": "core/synthetic_runtime_authorization_pinned.py:261-288",
+      "registry_kind": "Strong original-object record retaining the original provider graph",
+      "collision_handling": "No explicit retry before assigning the authorization registry key; no scalar collision-reuse rule should be inherited from this omission.",
+      "tombstone": "No authorization terminal state; pinned lifecycle supplies permanent issuance tombstone."
+    },
+    {
+      "family": "runtime_lease_ids",
+      "variant": "legacy",
+      "source": "core/synthetic_runtime_authorization_lifecycle.py",
+      "sha256": "dc7cc307a17c63cf65eea0e898015140806ca98e2614c391423c50adfd0e6029",
+      "ids": ["lease_id"],
+      "generator_reference": "core/synthetic_runtime_authorization_lifecycle.py:219-221",
+      "authentication_reference": "core/synthetic_runtime_authorization_lifecycle.py:185-208",
+      "registry_kind": "Lease records contain a weakref to the exact lease and retain authorization; permanent authorization-to-lease map",
+      "collision_handling": "Retry against all retained lease IDs while holding owner lock.",
+      "tombstone": "Authorization-to-lease map and lease records remain after terminal state; terminal state is HMAC authenticated."
+    },
+    {
+      "family": "runtime_lease_ids",
+      "variant": "pinned",
+      "source": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+      "sha256": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4",
+      "ids": ["lease_id"],
+      "generator_reference": "core/synthetic_runtime_authorization_pinned_lifecycle.py:433-439",
+      "authentication_reference": "core/synthetic_runtime_authorization_pinned_lifecycle.py:383-422",
+      "registry_kind": "Atomic owner-store replacement; exact lease weakref and strongly retained upstream authorization",
+      "collision_handling": "Validate lowercase hex and retry against retained lease registry under owner lock; one publication at line 444.",
+      "tombstone": "Permanent owner/phase/schema/PID/authorization-ID key at lines 240-242 and 430-432; maps retained at terminal transition lines 480-486. Consume currently fails closed at separate consumer-readiness gate."
+    },
+    {
+      "family": "provider_ids",
+      "variant": "pinned_exact_provider_and_runtime_attachment",
+      "source": "core/runtime_java_pinned_provider.py",
+      "sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+      "ids": ["proof_context_identity", "RuntimeProviderAttachment.receipt_id", "PinnedJavaExactProviderReceipt.receipt_id"],
+      "generator_reference": "core/runtime_java_pinned_provider.py:507,564,575",
+      "authentication_reference": "core/runtime_java_pinned_provider.py:445-488",
+      "registry_kind": "Strong original objects in separate attachment and provider registries; proof context in attempt registry",
+      "collision_handling": "No explicit retry at context/receipt insertion.",
+      "tombstone": "Fresh attempt PID and exact receipt retained at lines 480-482; this is proof provenance, not a scalar bearer capability or generic lifecycle permission."
+    },
+    {
+      "family": "reflection_admission_ids",
+      "variant": "legacy",
+      "source": "core/synthetic_reflection_execution_admission.py",
+      "sha256": "ae6d60d7ef418cff366317ad4507d0f2de93f2aa9d188e8e12d453c66ed77b19",
+      "ids": ["admission_id"],
+      "generator_reference": "core/synthetic_reflection_execution_admission.py:294-296",
+      "authentication_reference": "core/synthetic_reflection_execution_admission.py:189-215",
+      "registry_kind": "WeakValueDictionary requiring exact original admission",
+      "collision_handling": "Retry against currently retained weak admissions.",
+      "tombstone": "No admission-owned permanent slot; legacy reflection lifecycle keeps permanent admission-to-lease accounting."
+    },
+    {
+      "family": "reflection_admission_ids",
+      "variant": "pinned",
+      "source": "core/synthetic_reflection_execution_admission_pinned.py",
+      "sha256": "974075ac1827b4013e1e8a2b236ea278e19c8be138e378bed3b70613f590aaa0",
+      "ids": ["admission_id"],
+      "generator_reference": "core/synthetic_reflection_execution_admission_pinned.py:490-496",
+      "authentication_reference": "core/synthetic_reflection_execution_admission_pinned.py:457-478",
+      "registry_kind": "Exact admission weakref; strongly retained authorization/runtime/request and immutable canonical projection",
+      "collision_handling": "Validate lowercase hex and retry against retained admission IDs under lock; atomic publication at line 504.",
+      "tombstone": "Permanent runtime/role slot at lines 291-297 and 487-500. Admission is immutable; current runtime eligibility is checked separately."
+    },
+    {
+      "family": "reflection_lease_ids",
+      "variant": "legacy",
+      "source": "core/synthetic_reflection_execution_lifecycle.py",
+      "sha256": "c2b85e845f79332b83f3c17e754ba290db739e9c19378317fed16c6402e686ba",
+      "ids": ["lease_id"],
+      "generator_reference": "core/synthetic_reflection_execution_lifecycle.py:276-278",
+      "authentication_reference": "core/synthetic_reflection_execution_lifecycle.py:222-265",
+      "registry_kind": "Exact lease weakref with retained upstreams and permanent admission-to-lease map",
+      "collision_handling": "Retry against retained leases while owner lock is held.",
+      "tombstone": "Permanent map is created at lines 287-288; signed current state updated at line 337."
+    },
+    {
+      "family": "reflection_lease_ids",
+      "variant": "pinned",
+      "source": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+      "sha256": "c88d743d5820cdeb4877c4311470b745d1f8abf97a53dd4db8f93e4b1c155057",
+      "ids": ["lease_id"],
+      "generator_reference": "core/synthetic_reflection_execution_lifecycle_pinned.py:574-580",
+      "authentication_reference": "core/synthetic_reflection_execution_lifecycle_pinned.py:536-563",
+      "registry_kind": "Exact lease weakref, retained original admission/authorization/runtime/request, permanent admission-to-lease map",
+      "collision_handling": "Validate lowercase hex and retry against retained IDs under lock; atomic publication at line 589.",
+      "tombstone": "Original admission is strongly retained forever; one-shot key at lines 340-343, rejection lines 571-573; terminal map preserved and state re-signed at lines 645-659."
+    }
+  ],
+  "supporting_reflection_request_convention": {
+    "source": "core/synthetic_read_only_reflection.py",
+    "sha256": "d24422b68c0eae96890a7e63a177ebc8adcbd64300bf7cfb42d3ada041a5d5bc",
+    "field": "issuance_id",
+    "generator_reference": "core/synthetic_read_only_reflection.py:193",
+    "authentication_reference": "core/synthetic_read_only_reflection.py:164-185",
+    "exact_ascii_bytes": 64,
+    "future_request_id_equivalence_assumed": false
+  },
+  "security_distinctions": {
+    "scalar_id": "Registry lookup/correlation key. Existing source does not authenticate solely from scalar possession.",
+    "stable_fingerprint": "Separate 64-lowercase-hex SHA256 digest of domain-separated immutable projection. Detects projection mismatch only when checked through authenticated owner provenance; not a secret or bearer credential.",
+    "hmac": "Separate HMAC-SHA256 authentication with owner-local 32-byte secret, independent of scalar-ID entropy.",
+    "exact_original_object": "Prevents same-process reconstructed dataclass, JSON/copy, wrapper and subclass substitutions even when every scalar is copied.",
+    "pid": "Rejects live foreign process and fork inheritance. PID alone does not handle PID reuse; fresh process secret, empty registry and impossibility of original-object continuity provide that boundary.",
+    "tombstone": "Prevents duplicate issuance/reopening independently of ID encoding. A digest or long random ID does not by itself prevent stale replay."
+  },
+  "future_preparation_implication": {
+    "non_secret_opaque_scalar_permitted": true,
+    "scalar_unpredictability_required_by_audited_authentication_model": false,
+    "conditions": [
+      "Every authority-bearing operation authenticates the exact original typed owner/relation object in its private owner registry, current process and authenticated immutable graph before lookup results can confer authority.",
+      "Domain/PID/owner binding and current lifecycle state remain HMAC-authenticated; stable fingerprint and HMAC remain separate from the scalar.",
+      "Freshness/collision/reuse checks cover active records and permanent tombstones, with atomic allocation/publication under a private owner lock.",
+      "No string-only endpoint may acquire an original authoritative object or bypass the admission relation merely by presenting an ID.",
+      "A process restart/fork cannot reuse prior authoritative objects; scalar equality outside the retained namespace has no authority meaning.",
+      "Any future bearer boundary is a different security model and must not inherit this non-secret-handle conclusion without explicit requirement evolution."
+    ],
+    "finite_counter_model": "Semantically permissible if namespace, atomic increment, no rollback/reset/wrap, fail-closed exhaustion, permanent tombstones and process/owner separation are frozen. A counter's guessability does not defeat exact-original-object/HMAC checks. No generator is implemented here."
+  }
+}

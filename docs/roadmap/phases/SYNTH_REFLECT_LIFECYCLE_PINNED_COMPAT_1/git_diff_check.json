@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "scope": "existing tracked worktree diff; new audit artifacts separately checked for whitespace",
+  "command": "git diff --check",
+  "output_artifact": "git_diff_check.txt"
+}

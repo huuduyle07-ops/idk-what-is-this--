@@ -1,0 +1,1002 @@
+{
+  "phase_id": "SYNTH.REFLECT.PINNED.CONTRACT.1",
+  "artifact_kind": "normative_semantic_contract_report_only",
+  "date": "2026-10-13",
+  "timezone": "Asia/Seoul",
+  "completion_marker": "SYNTH_REFLECT_PINNED_CONTRACT_1_COMPLETE",
+  "unresolved_marker": "CONTRACT_UNRESOLVED",
+  "implementation_authorized": false,
+  "adapter_implemented": false,
+  "capabilities_created": false,
+  "stop_after_contract_freeze": true,
+  "scope": "Documentation and pure source/AST validation only; all operations below are future contracts, not implemented APIs.",
+  "compatibility_audit": {
+    "phase_id": "SYNTH.REFLECT.LIFECYCLE.PINNED.COMPAT.1",
+    "outcome": "REFLECTION_PINNED_REQUIRES_ADDITIVE_ADAPTER",
+    "semantics_reusable": true,
+    "old_implementation_accepts_pinned": false
+  },
+  "owner_naming_decision": {
+    "freeze_owner_names": true,
+    "reason": "Existing additive pinned authorization and runtime owners use distinct pinned module, type, phase and schema identities. The same repository convention supports these names; no modules, classes, registries or secrets are created."
+  },
+  "admission_owner": {
+    "owner_identity": "core.synthetic_reflection_execution_admission_pinned",
+    "phase_id": "SYNTH.REFLECT.ADMIT.PINNED.1",
+    "exact_type": "PinnedSyntheticReflectionExecutionAdmission",
+    "schema_version": "synthetic_reflection_execution_admission_pinned_1_v1",
+    "implemented": false,
+    "schema_aliases": [],
+    "registered_in_phase_registry": false
+  },
+  "lifecycle_owner": {
+    "owner_identity": "core.synthetic_reflection_execution_lifecycle_pinned",
+    "phase_id": "SYNTH.REFLECT.LIFECYCLE.PINNED.1",
+    "exact_type": "PinnedSyntheticReflectionExecutionLease",
+    "schema_version": "synthetic_reflection_execution_lease_pinned_1_v1",
+    "implemented": false,
+    "schema_aliases": [],
+    "registered_in_phase_registry": false
+  },
+  "pinned_runtime": {
+    "owner_identity": "core.synthetic_runtime_authorization_pinned_lifecycle",
+    "phase_id": "SYNTH.AUTH.LIFECYCLE.PINNED.1",
+    "exact_type": "PinnedSyntheticRuntimeExecutionLease",
+    "schema_version": "synthetic_runtime_execution_lease_pinned_1_v1",
+    "implementation_status": "SYNTH_AUTH_LIFECYCLE_PINNED_1A_COMPLETE",
+    "unchanged": true
+  },
+  "primitive": {
+    "owner_identity": "core.synthetic_read_only_reflection",
+    "phase_id": "SYNTH.REFLECT.1",
+    "semantics_unchanged": true,
+    "second_primitive_created": false,
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "source_kind": "phase_owned_synthetic_fixture",
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "source_size_bytes": 239,
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "field_owner": "SyntheticStateBox",
+    "field_name": "value",
+    "field_type": "int",
+    "operation": "read_exact_bound_field",
+    "read_semantics": "exact read-only field observation",
+    "roles": {
+      "BEFORE": "exact_private_state_before",
+      "AFTER": "exact_private_state_after"
+    },
+    "invocation": {
+      "owner": "SyntheticStateBox",
+      "public_method": "decrement",
+      "method_signature": "boolean SyntheticStateBox.decrement(int)",
+      "arguments": [
+        3
+      ],
+      "argument_types": [
+        "int"
+      ],
+      "return_type": "boolean"
+    },
+    "expected_observations": {
+      "BEFORE": 10,
+      "public_return": true,
+      "AFTER": 7
+    },
+    "semantic_equality_is_authorization_compatibility": false
+  },
+  "request_reuse": {
+    "decision": "A",
+    "exact_type": "SyntheticReflectionRequest",
+    "owner_identity": "core.synthetic_read_only_reflection",
+    "schema_version": "synthetic_reflection_request_v1",
+    "mandatory_public_validator": "core.synthetic_read_only_reflection.validate_synthetic_reflection_request",
+    "public_renderer": "core.synthetic_read_only_reflection.render_synthetic_read_only_reflection",
+    "request_payload_embeds_old_authorization_identity": false,
+    "source_proof": [
+      "core/synthetic_read_only_reflection.py:77",
+      "core/synthetic_read_only_reflection.py:120",
+      "core/synthetic_read_only_reflection.py:125",
+      "core/synthetic_read_only_reflection.py:164",
+      "core/synthetic_read_only_reflection.py:207",
+      "core/synthetic_read_only_reflection.py:263"
+    ],
+    "reason": "The exact request payload binds its own live identity and fixed source/field/role only. Validation and renderer authenticate the independent request. Only the separate frozen authorization compatibility predicate is old-auth-specific.",
+    "new_compatibility_predicate_owner": "core.synthetic_reflection_execution_admission_pinned",
+    "new_compatibility_predicate": "pinned_synthetic_reflection_request_satisfies_runtime",
+    "new_predicate_inputs": [
+      "exact original pinned authorization",
+      "exact original pinned runtime lease",
+      "exact original existing reflection request",
+      "exact semantic role"
+    ],
+    "new_predicate_checks": [
+      "mandatory unchanged pinned auth validator returns same original",
+      "mandatory unchanged pinned runtime validator(lease, authorization=original_auth) returns same original",
+      "unchanged public request validator returns same original",
+      "exact scenario/source/definition/invocation/field/read/role scope match",
+      "public renderer identity and fixed role helper fingerprint match"
+    ],
+    "new_predicate_is_authority": false,
+    "old_compatibility_predicate_unchanged": true,
+    "old_compatibility_predicate_used_for_pinned": false,
+    "request_bytes_changed": false,
+    "new_request_type_defined": false,
+    "request_issuance_authorized_in_this_phase": false,
+    "request_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "fingerprint_is_fixed_per_role_not_original_request_identity": true
+  },
+  "upstream_graph": {
+    "public_validators": [
+      "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+      "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+    ],
+    "validators_unchanged": true,
+    "public_validators_on_every_admission_operation": true,
+    "public_validators_on_every_lifecycle_operation": true,
+    "authorization_exact_type": "PinnedSyntheticRuntimeAuthorization",
+    "runtime_exact_type": "PinnedSyntheticRuntimeExecutionLease",
+    "exact_original_objects_required": true,
+    "validator_must_return_original_input": true,
+    "original_authorization_strongly_retained": true,
+    "original_runtime_strongly_retained": true,
+    "original_request_strongly_retained": true,
+    "original_admission_strongly_retained_by_lease": true,
+    "runtime_validator_supplied_authorization": "the exact retained original, passed by identity on every operation",
+    "supplied_authorization_must_be_retained_original": true,
+    "supplied_runtime_request_admission_must_be_retained_originals": true,
+    "omitted_inputs_use_retained_originals": true,
+    "matching_projection_is_authenticity": false,
+    "authorization_identity_field": "authorization_id",
+    "authorization_issuance_id_assumed": false,
+    "authorization_fingerprint_api": "validated_original_authorization.fingerprint",
+    "runtime_fingerprint_api": "validated_original_runtime_lease.fingerprint",
+    "runtime_state_api": "core.synthetic_runtime_authorization_pinned_lifecycle.pinned_synthetic_runtime_execution_lease_state(lease, authorization=original_auth)",
+    "runtime_state_from_initial_state_or_json": false,
+    "forbidden_bridges": [
+      "field_copy",
+      "JSON_reconstruction",
+      "wrapper",
+      "subclass",
+      "schema_alias",
+      "ID_substitution",
+      "fingerprint_substitution",
+      "old_auth_synthesis",
+      "old_runtime_synthesis"
+    ]
+  },
+  "provider_provenance": {
+    "decision": "INHERIT_TRANSITIVELY",
+    "path": [
+      "exact original pinned runtime lease",
+      "exact original pinned authorization",
+      "retained authenticated PINNED provider graph"
+    ],
+    "caller_provider_input_accepted": false,
+    "direct_provider_projection_required": false,
+    "independent_reflection_provider_requirement_found": false,
+    "graph_reauthenticated_by_unchanged_pinned_public_validators": true,
+    "reason": "The exact read introduces no independent provider requirement. Runtime/authentication already retain and authenticate the PINNED graph.",
+    "provider_proof_is_reflection_permission": false,
+    "provider_issuance_allowed": false
+  },
+  "renderer_binding": {
+    "required": true,
+    "renderer_identity": "SYNTH.REFLECT.1.render_synthetic_read_only_reflection",
+    "renderer_phase": "SYNTH.REFLECT.1",
+    "renderer_schema_version": "synthetic_reflection_request_v1",
+    "fixed_helper_sha256_source": "SHA-256 of UTF-8 text from the unchanged public renderer after original request authentication",
+    "renderer_fingerprint_source": "new admission-domain renderer-evidence digest over renderer identity, phase, schema and fixed_helper_sha256",
+    "old_private_signing_or_hash_helpers_used": false,
+    "text_output_is_read_evidence": false,
+    "rendering_grants_compilation_authority": false,
+    "rendered_helper_executed_in_this_phase": false
+  },
+  "admission_identity": {
+    "minimum_signed_bindings": [
+      "admission_owner_phase_schema",
+      "issuing_pid",
+      "admission_id",
+      "semantic_role_and_exact_request_role",
+      "authorization_owner_phase_schema_PID_and_authorization_id",
+      "authorization_fingerprint",
+      "authorization_proof_context_id",
+      "runtime_owner_phase_schema_PID_and_lease_id",
+      "stable_authenticated_runtime_fingerprint",
+      "authenticated_runtime_state_at_issuance",
+      "scenario_phase_and_id",
+      "source_kind_sha256_size_and_definition_sha256",
+      "exact_public_invocation",
+      "field_owner_name_type_and_read_operation",
+      "original_request_issuance_id_PID_and_authenticated_fingerprint",
+      "renderer_identity_and_fingerprint",
+      "admission_evidence_digest_and_stable_fingerprint"
+    ],
+    "exact_original_bindings_retained_outside_scalar_payload": true,
+    "authenticated_runtime_state_at_issuance": "ISSUED",
+    "admission_issuance_is_behavior": false,
+    "admission_has_no_consumption_state_machine": true,
+    "fixed_admission_fingerprint_mutates_with_runtime_state": false,
+    "runtime_state_gate_is_additive_to_old_admission": true,
+    "runtime_state_at_issuance_is_current_state_substitute": false
+  },
+  "admission_one_shot": {
+    "maximum_admissions_per_runtime_role": 1,
+    "maximum_roles_per_runtime": 2,
+    "key_fields": [
+      "admission_owner_phase_schema_PID",
+      "authorization_owner_phase_schema_PID_authorization_id",
+      "runtime_owner_phase_schema_PID_lease_id",
+      "semantic_role",
+      "exact_scenario_source_definition_field_read_scope"
+    ],
+    "key_derived_only_after_original_public_authentication": true,
+    "excluded_key_fields": [
+      "request_issuance_id",
+      "request_fingerprint",
+      "renderer_fingerprint",
+      "authorization_fingerprint",
+      "authorization_proof_context_id",
+      "runtime_fingerprint"
+    ],
+    "request_identity_signed_and_retained_separately": true,
+    "fresh_same_role_request_reopens_issuance": false,
+    "permanent_tombstones": true,
+    "tombstone_lifetime": "issuing owner process lifetime",
+    "collection_reopens_issuance": false,
+    "refund_allowed": false,
+    "reissue_allowed": false
+  },
+  "state_machine": {
+    "states": [
+      "ISSUED",
+      "CONSUMED",
+      "INVALIDATED"
+    ],
+    "initial_state": "ISSUED",
+    "transitions": [
+      [
+        "ISSUED",
+        "CONSUMED"
+      ],
+      [
+        "ISSUED",
+        "INVALIDATED"
+      ]
+    ],
+    "terminal_states": [
+      "CONSUMED",
+      "INVALIDATED"
+    ],
+    "maximum_leases_per_admission": 1,
+    "maximum_terminal_commits_per_lease": 1,
+    "roles_independent": true,
+    "separate_admission_and_lease_for_each_role": true,
+    "one_shot_lease_key": [
+      "admission_owner_phase_schema_PID",
+      "original_admission_id"
+    ],
+    "permanent_admission_and_lease_tombstones": true,
+    "tombstone_lifetime": "issuing owner process lifetime",
+    "refund_allowed": false,
+    "reissue_allowed": false,
+    "collection_reopens_issuance": false,
+    "new_semantic_state": null,
+    "stable_lease_fingerprint_includes_mutable_current_state": false,
+    "current_state_authenticated_in_separate_signed_record": true,
+    "terminal_evidence_valid_if_all_original_upstreams_authenticate": true,
+    "terminal_validation_grants_readiness": false
+  },
+  "runtime_state_rules": {
+    "admission_issuance": {
+      "roles": [
+        "BEFORE",
+        "AFTER"
+      ],
+      "reflection_state": null,
+      "runtime_state": "ISSUED",
+      "runtime_authentication_required": true,
+      "auth_request_required": true
+    },
+    "lease_issuance": {
+      "roles": [
+        "BEFORE",
+        "AFTER"
+      ],
+      "reflection_state": null,
+      "runtime_state": "ISSUED",
+      "runtime_authentication_required": true,
+      "admission_authentication_required": true,
+      "initial_reflection_state": "ISSUED"
+    },
+    "pre_execution_readiness": {
+      "roles": [
+        "BEFORE",
+        "AFTER"
+      ],
+      "reflection_state": "ISSUED",
+      "runtime_state": "ISSUED",
+      "runtime_authentication_required": true,
+      "readiness_field": "reflection_local_ready"
+    },
+    "active_readiness": {
+      "roles": [
+        "BEFORE",
+        "AFTER"
+      ],
+      "reflection_state": "ISSUED",
+      "runtime_state": "CONSUMED",
+      "runtime_authentication_required": true,
+      "readiness_field": "reflection_active_ready"
+    },
+    "consumption": {
+      "roles": [
+        "BEFORE",
+        "AFTER"
+      ],
+      "reflection_state": "ISSUED",
+      "runtime_state": "CONSUMED",
+      "runtime_authentication_required": true,
+      "target_reflection_state": "CONSUMED"
+    },
+    "invalidation": {
+      "roles": [
+        "BEFORE",
+        "AFTER"
+      ],
+      "reflection_state": "ISSUED",
+      "runtime_state": null,
+      "runtime_authentication_required": true,
+      "target_reflection_state": "INVALIDATED",
+      "runtime_states": [
+        "ISSUED",
+        "CONSUMED",
+        "INVALIDATED"
+      ]
+    },
+    "terminal_validation": {
+      "roles": [
+        "BEFORE",
+        "AFTER"
+      ],
+      "reflection_state": null,
+      "runtime_state": null,
+      "runtime_authentication_required": true,
+      "reflection_states": [
+        "CONSUMED",
+        "INVALIDATED"
+      ],
+      "runtime_states": [
+        "ISSUED",
+        "CONSUMED",
+        "INVALIDATED"
+      ],
+      "grants_readiness": false
+    }
+  },
+  "ordering": [
+    "authenticate all capability gates",
+    "source/harness ready",
+    "consume pinned runtime lease",
+    "consume BEFORE reflection lease",
+    "perform BEFORE read",
+    "invoke public decrement(3)",
+    "consume AFTER reflection lease",
+    "perform AFTER read"
+  ],
+  "first_behavior_boundary": {
+    "runtime_commit": "ISSUED -> CONSUMED immediately before the first behavioral effect after all authenticated consumer gates",
+    "first_behavioral_effect": "BEFORE exact read",
+    "before_reflection_consumption_is_permission_state_mutation": true,
+    "before_reflection_consumption_is_behavioral_read": false,
+    "runtime_consumption_precedes_before_permission_and_read": true,
+    "runtime_consumption_after_before_read_allowed": false,
+    "reflection_owner_performs_reads": false,
+    "reflection_owner_invokes_method": false,
+    "executor_responsible_for_order_and_effect_evidence": true,
+    "consumed_reflection_means": "one exact role permission consumed; does not prove a field read occurred",
+    "consumed_runtime_means": "runtime activation permission consumed; does not prove BEFORE read, invocation or AFTER read",
+    "failure_after_commit_refunds": false,
+    "already_consumed_runtime_reachable_by_this_contract": false
+  },
+  "authentication_domains": {
+    "admission": {
+      "domain": "CATTUS:SYNTH.REFLECT.ADMIT.PINNED.1:exact-reflection-admission:v1",
+      "roles": [
+        "renderer-evidence",
+        "admission-evidence",
+        "admission-fingerprint",
+        "admission-record-hmac"
+      ],
+      "algorithm": "HMAC-SHA256",
+      "independent_private_secret_required": true,
+      "secret_created_in_this_phase": false
+    },
+    "lifecycle": {
+      "domain": "CATTUS:SYNTH.REFLECT.LIFECYCLE.PINNED.1:exact-reflection-lease:v1",
+      "roles": [
+        "lease-evidence",
+        "lease-fingerprint",
+        "lease-record-hmac"
+      ],
+      "algorithm": "HMAC-SHA256",
+      "independent_private_secret_required": true,
+      "secret_created_in_this_phase": false
+    },
+    "canonical_payload": "strict exact primitive and nested types; JSON sorted keys, compact separators, allow_nan=false, UTF-8; domain + NUL + role + NUL + canonical bytes",
+    "independent_of": [
+      "old_reflection_admission_secret_domain",
+      "old_reflection_lifecycle_secret_domain",
+      "pinned_authorization_secret_domain",
+      "pinned_runtime_lifecycle_secret_domain"
+    ],
+    "separate_locks_registries_records_and_secrets": true,
+    "exact_class_required": true,
+    "live_original_registry_identity_required": true,
+    "issuing_PID_required": true,
+    "wrong_PID_rejected_before_lock": true,
+    "rejected_inputs": [
+      "copy",
+      "deepcopy",
+      "dataclasses.replace",
+      "manual_reconstruction",
+      "JSON",
+      "report",
+      "ID_string",
+      "fingerprint_string",
+      "wrapper",
+      "subclass",
+      "old_type",
+      "schema_relabel"
+    ],
+    "secrets_signatures_registries_exported": false,
+    "reports_restore_capabilities": false
+  },
+  "atomicity": {
+    "owner_lock_scope": "independent process-local lock for each new owner; wrong PID before lock",
+    "admission_locked_sequence": [
+      "authenticate exact original auth/runtime/request graph through unchanged public validators",
+      "derive permanent role-and-scope admission key",
+      "duplicate check against permanent tombstone",
+      "construct and sign admission immutable payload and record",
+      "final authenticated public runtime ISSUED eligibility check",
+      "prepare complete immutable owner store with tombstone and original identity record",
+      "single owner-store replacement publishes atomically"
+    ],
+    "lease_locked_sequence": [
+      "authenticate exact original pinned admission through new public validator",
+      "authenticate exact original auth/runtime/request graph through unchanged public validators",
+      "require runtime ISSUED",
+      "duplicate check against permanent admission-to-lease tombstone",
+      "construct and sign immutable lease projection and ISSUED record",
+      "final authenticated public runtime ISSUED eligibility check",
+      "prepare complete immutable owner store with permanent key and lease record",
+      "single owner-store replacement publishes atomically"
+    ],
+    "terminal_locked_sequence": [
+      "authenticate exact original lease/admission/request/runtime/authorization and signed projection/current state",
+      "check exact role and bound scope",
+      "require reflection ISSUED",
+      "for consumption only authenticate runtime CONSUMED; invalidation imposes no runtime state",
+      "sign terminal record",
+      "replace complete owner store at exactly one linearization point"
+    ],
+    "read_validation_state_and_readiness_under_owner_lock": true,
+    "no_partial_publication": true,
+    "failed_operation_preserves_store": true,
+    "concurrent_terminal_commits_at_most_one": true,
+    "upstream_public_validators_use_independent_locks": true,
+    "cross_owner_atomic_transaction_claimed": false,
+    "runtime_ISSUED_check_is_issuance_eligibility_point": true,
+    "runtime_state_can_change_after_eligibility_check": true,
+    "stale_precheck_is_reservation": false,
+    "upstream_private_lock_access_allowed": false,
+    "runtime_CONSUMED_terminal_once_authenticated": true,
+    "admission_lease_issuance_never_consumes_upstreams": true,
+    "owner_store_records_retain_upstreams_strongly_and_capability_identity_weakly": true,
+    "collected_capability_identity_cannot_be_reconstructed_from_tombstone": true
+  },
+  "readiness": {
+    "reflection_local_ready": "all exact originals authenticate AND reflection lease ISSUED AND runtime lease ISSUED",
+    "reflection_active_ready": "all exact originals authenticate AND reflection lease ISSUED AND runtime lease CONSUMED",
+    "behavioral_activation_ready": false,
+    "reason": "PROOF_UNRESOLVED",
+    "local_implies_active": false,
+    "local_or_active_implies_behavioral": false,
+    "terminal_reflection_readiness": false,
+    "output_kind": "authenticated immutable report-only snapshot, never a capability or reservation",
+    "caller_boolean_or_JSON_readiness_accepted": false,
+    "pinned_runtime_current_readiness_unchanged": true,
+    "active_state_table_is_reachability_proof": false,
+    "overall_behavior_blocked_until_separate_source_compile_consumer_contract": true
+  },
+  "authority": {
+    "exact_role_read_only_permission": true,
+    "admission_can_prepare_lease_only": true,
+    "lease_consumption_performs_read": false,
+    "field": "SyntheticStateBox.value:int",
+    "operation": "read_exact_bound_field",
+    "false_in_all_states": [
+      "runtime_authority",
+      "real_task_runtime_authority",
+      "repository_write_authority",
+      "apply_authority",
+      "network_authority",
+      "host_mount_authority",
+      "shell_authority",
+      "arbitrary_java_authority",
+      "arbitrary_reflection_authority",
+      "arbitrary_class_authority",
+      "arbitrary_method_authority",
+      "private_method_authority",
+      "field_write_authority",
+      "enumeration_authority",
+      "executor_authority",
+      "BANK_authority",
+      "compilation_authority"
+    ],
+    "compilation_authority": false,
+    "consumption_widens_scope": false,
+    "provider_proof_is_permission": false
+  },
+  "request_renderer_evidence": {
+    "request_validity_is_admission_authority": false,
+    "admission_authority_is_lease_authority": false,
+    "lease_authority_is_read_evidence": false,
+    "renderer_text_is_read_evidence": false,
+    "observation_data_validation_is_read_evidence": false,
+    "actual_read_evidence_owner": "downstream executor"
+  },
+  "conceptual_public_api": {
+    "implemented": false,
+    "common_authentication": "Every operation, including validation, fingerprints, predicates, state and readiness, reauthenticates exact retained original auth/runtime through both unchanged pinned validators, exact request through unchanged request validator, and admission/lease when supplied. Omitted optional upstreams use retained originals; supplied ones must be those exact objects. Wrong PID before lock.",
+    "compatibility_predicate": {
+      "mandatory_upstream_validators": [
+        "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+        "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+      ],
+      "all_originals_reauthenticated": true,
+      "supplied_originals_checked_by_identity": true,
+      "conceptual_only": true,
+      "name": "pinned_synthetic_reflection_request_satisfies_runtime",
+      "inputs": [
+        "authorization",
+        "runtime",
+        "request",
+        "role"
+      ],
+      "output": "report-only compatibility result with typed mismatch reason; no admission or permission",
+      "runtime_state_required": null
+    },
+    "admission_operations": [
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "issue_pinned_synthetic_reflection_execution_admission",
+        "required_inputs": [
+          "authorization",
+          "runtime",
+          "request",
+          "role"
+        ],
+        "runtime_state_required": "ISSUED",
+        "output": "new original pinned admission",
+        "mutation": "atomic admission publication with permanent role key"
+      },
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "validate_pinned_synthetic_reflection_execution_admission",
+        "required_inputs": [
+          "admission"
+        ],
+        "optional_inputs": [
+          "authorization",
+          "runtime",
+          "request",
+          "role"
+        ],
+        "runtime_state_required": null,
+        "output": "same original admission",
+        "mutation": "none"
+      },
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "pinned_synthetic_reflection_execution_admission_fingerprint",
+        "required_inputs": [
+          "admission"
+        ],
+        "runtime_state_required": null,
+        "output": "stable authenticated admission fingerprint",
+        "mutation": "none"
+      },
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "pinned_synthetic_reflection_admission_satisfies_executor",
+        "required_inputs": [
+          "admission",
+          "authorization",
+          "runtime",
+          "request",
+          "role"
+        ],
+        "runtime_state_required": "ISSUED",
+        "output": "report-only admission preparation compatibility, not lease readiness",
+        "mutation": "none"
+      }
+    ],
+    "lifecycle_operations": [
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "issue_pinned_synthetic_reflection_execution_lease",
+        "required_inputs": [
+          "admission",
+          "request",
+          "runtime",
+          "authorization",
+          "role"
+        ],
+        "runtime_state_required": "ISSUED",
+        "reflection_state_required": null,
+        "output": "new original reflection lease in ISSUED",
+        "mutation": "atomic lease publication and permanent admission key"
+      },
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "validate_pinned_synthetic_reflection_execution_lease",
+        "required_inputs": [
+          "lease"
+        ],
+        "optional_inputs": [
+          "admission",
+          "request",
+          "runtime",
+          "authorization",
+          "role"
+        ],
+        "runtime_state_required": null,
+        "reflection_state_required": null,
+        "output": "same original lease in any authenticated state",
+        "mutation": "none"
+      },
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "pinned_synthetic_reflection_execution_lease_fingerprint",
+        "required_inputs": [
+          "lease"
+        ],
+        "runtime_state_required": null,
+        "reflection_state_required": null,
+        "output": "stable authenticated issuance fingerprint",
+        "mutation": "none"
+      },
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "pinned_synthetic_reflection_execution_lease_state",
+        "required_inputs": [
+          "lease"
+        ],
+        "runtime_state_required": null,
+        "reflection_state_required": null,
+        "output": "authenticated ISSUED, CONSUMED or INVALIDATED",
+        "mutation": "none"
+      },
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "check_pinned_synthetic_reflection_execution_lease_preconditions",
+        "required_inputs": [
+          "lease",
+          "admission",
+          "request",
+          "runtime",
+          "authorization",
+          "role"
+        ],
+        "runtime_state_required": "ISSUED",
+        "reflection_state_required": "ISSUED",
+        "output": "reflection_local_ready with independent false behavioral_activation_ready",
+        "mutation": "none"
+      },
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "check_pinned_synthetic_reflection_active_readiness",
+        "required_inputs": [
+          "lease",
+          "admission",
+          "request",
+          "runtime",
+          "authorization",
+          "role"
+        ],
+        "runtime_state_required": "CONSUMED",
+        "reflection_state_required": "ISSUED",
+        "output": "reflection_active_ready with independent false behavioral_activation_ready",
+        "mutation": "none"
+      },
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "consume_pinned_synthetic_reflection_execution_lease",
+        "required_inputs": [
+          "lease",
+          "admission",
+          "request",
+          "runtime",
+          "authorization",
+          "role"
+        ],
+        "runtime_state_required": "CONSUMED",
+        "reflection_state_required": "ISSUED",
+        "output": "same original lease now authenticated CONSUMED",
+        "mutation": "single terminal permission-state commit; no read"
+      },
+      {
+        "mandatory_upstream_validators": [
+          "core.synthetic_runtime_authorization_pinned.validate_pinned_synthetic_runtime_authorization",
+          "core.synthetic_runtime_authorization_pinned_lifecycle.validate_pinned_synthetic_runtime_execution_lease"
+        ],
+        "all_originals_reauthenticated": true,
+        "supplied_originals_checked_by_identity": true,
+        "conceptual_only": true,
+        "name": "invalidate_pinned_synthetic_reflection_execution_lease",
+        "required_inputs": [
+          "lease"
+        ],
+        "optional_inputs": [
+          "admission",
+          "request",
+          "runtime",
+          "authorization",
+          "role"
+        ],
+        "runtime_state_required": null,
+        "reflection_state_required": "ISSUED",
+        "output": "same original lease now authenticated INVALIDATED",
+        "mutation": "single terminal permission-state commit"
+      }
+    ],
+    "readiness_error_delivery": "Authentication/role/scope failures raise typed categories. Authenticated terminal lease returns both reflection readiness flags false with terminal reason. Authentic wrong runtime state yields requested readiness false with PINNED_RUNTIME_STATE_MISMATCH. Local/active success still returns behavioral_activation_ready=false and PROOF_UNRESOLVED. Mutating operations raise on the same failed gates.",
+    "optional_role_rule": "If supplied, exact semantic role must equal retained role and fixed request-role mapping; otherwise retained role is used."
+  },
+  "error_taxonomy": {
+    "PINNED_AUTH_UNAUTHENTICATED": "wrong exact pinned auth class, nonoriginal/copy/missing live registry/signature or rejected exact upstream identity; retain upstream code/reason",
+    "PINNED_RUNTIME_LEASE_UNAUTHENTICATED": "wrong exact pinned runtime class, nonoriginal/copy/missing live record/signature or supplied auth not exact retained original",
+    "PINNED_AUTH_SCOPE_MISMATCH": "known pinned auth scope failure; preserve category and upstream code/reason",
+    "PINNED_PROVIDER_PROVENANCE_MISMATCH": "known retained pinned provider graph/requirement/image/sandbox/controller/cleanup failure; preserve category and upstream code/reason",
+    "PINNED_RUNTIME_STATE_MISMATCH": "authenticated runtime state differs from operation requirement; not an authentication failure",
+    "REFLECTION_REQUEST_UNAUTHENTICATED": "unchanged request public authentication rejects exact request/original/PID/signature",
+    "REFLECTION_SCOPE_MISMATCH": "authenticated scenario/source/definition/invocation/field/read/renderer projection mismatch; never relabeled authentication failure",
+    "REFLECTION_ADMISSION_UNAUTHENTICATED": "wrong exact new admission class, nonoriginal/missing live registry/signed record or wrong supplied original request/runtime/admission binding",
+    "DUPLICATE_REFLECTION_ADMISSION": "permanent authenticated runtime/role/scope admission key already exists, even after terminal state or collection",
+    "REFLECTION_LEASE_UNAUTHENTICATED": "wrong exact new lease class, nonoriginal/missing live registry/signed immutable/current-state record or wrong supplied original admission/request/runtime binding",
+    "DUPLICATE_REFLECTION_LEASE": "permanent authenticated admission key already leased, including terminal or collected lease",
+    "REFLECTION_LEASE_ALREADY_CONSUMED": "authenticated reflection lease CONSUMED when ISSUED required",
+    "REFLECTION_LEASE_INVALIDATED": "authenticated reflection lease INVALIDATED when ISSUED required",
+    "REFLECTION_ROLE_MISMATCH": "unsupported exact role or supplied role disagrees with retained role/request mapping",
+    "REFLECTION_WRONG_PROCESS": "owner or authenticated supplied handle issuing PID differs; reject before inherited owner lock",
+    "PROOF_UNRESOLVED": "unknown upstream validator failure, unavailable proof or unresolved downstream behavioral/source/compile dependency; fail closed and preserve upstream code/reason"
+  },
+  "error_mapping": {
+    "known_authentication_failure_is_scope_failure": false,
+    "known_state_or_scope_mismatch_relabelled_authentication": false,
+    "unknown_upstream_validator_failure": "PROOF_UNRESOLVED",
+    "upstream_code_and_reason_preserved": true,
+    "runtime_LEASE_ALREADY_CONSUMED_or_LEASE_INVALIDATED_when_runtime_ISSUED_required": "PINNED_RUNTIME_STATE_MISMATCH",
+    "request_synthetic_reflection_scope_mismatch": "REFLECTION_SCOPE_MISMATCH"
+  },
+  "executor_projection": {
+    "minimum_fields": [
+      "semantic_role",
+      "exact_request_observation_role",
+      "lease_id",
+      "stable_authenticated_fingerprint",
+      "authenticated_state_API",
+      "scenario_phase_and_id",
+      "source_kind_sha256_size_definition_sha256",
+      "exact_public_invocation",
+      "field_owner_name_type_read_operation",
+      "runtime_owner_phase_schema_PID_lease_id_fingerprint",
+      "authorization_owner_phase_schema_PID_authorization_id_fingerprint_proof_context_id",
+      "original_admission_id_fingerprint_binding",
+      "original_request_issuance_id_PID_fingerprint_binding"
+    ],
+    "original_objects_required_alongside_projection": true,
+    "scalar_projection_substitutes_for_originals": false,
+    "secrets_or_private_signatures_included": false,
+    "original_bindings_authenticated_via_public_apis": true,
+    "terminal_projection_is_readiness": false
+  },
+  "old_owner_isolation": {
+    "old_primitive_request_admission_lifecycle_unchanged": true,
+    "pinned_authorization_runtime_unchanged": true,
+    "new_types_subclass_or_alias_old": false,
+    "old_registries_used": false,
+    "old_validators_modified": false,
+    "old_private_signing_helpers_used": false,
+    "historical_receipts_registry_reversal_executor_runtime_provider_bytes_unchanged": true,
+    "prohibited": [
+      "insert_pinned_into_old_registries",
+      "fabricate_old_admission",
+      "fabricate_old_reflection_lease",
+      "fabricate_old_auth",
+      "fabricate_old_runtime",
+      "reuse_old_private_signing_helpers",
+      "modify_old_public_validators",
+      "change_old_auth_runtime_acceptance",
+      "change_old_request_bytes",
+      "rewrite_receipt_history",
+      "schema_alias",
+      "subclass_bridge",
+      "repin",
+      "stash",
+      "reset",
+      "clean"
+    ],
+    "frozen_phases": [
+      "SYNTH.REFLECT.1",
+      "SYNTH.REFLECT.ADMIT.1",
+      "SYNTH.REFLECT.LIFECYCLE.1",
+      "SYNTH.AUTH.1",
+      "SYNTH.AUTH.LIFECYCLE.1",
+      "SYNTH.AUTH.PINNED.1",
+      "SYNTH.AUTH.LIFECYCLE.PINNED.1",
+      "all runtime/provider phases",
+      "all executor history",
+      "registry/reversal history"
+    ]
+  },
+  "downstream_dependencies": {
+    "source_materialization_position": "UNRESOLVED_DOWNSTREAM_DEPENDENCY",
+    "scenario_compilation_timing_authority": "UNRESOLVED_DOWNSTREAM_DEPENDENCY",
+    "pinned_consumer_executor_contract": "UNRESOLVED_DOWNSTREAM_DEPENDENCY",
+    "compilation_authority": false,
+    "source_compile_resolution_in_this_phase": false,
+    "provider_infrastructure_compile_is_scenario_compile": false,
+    "blocks_behavioral_activation_ready": true,
+    "blocks_pinned_runtime_consumption": true,
+    "caller_readiness_flag_can_resolve": false
+  },
+  "operational_effects": {
+    "Docker": 0,
+    "SANDBOX2": 0,
+    "JAVA1C": 0,
+    "provider_issuance": 0,
+    "pinned_authorization_issuance": 0,
+    "pinned_runtime_lease_issuance": 0,
+    "runtime_lease_consumption": 0,
+    "runtime_lease_invalidation": 0,
+    "reflection_request_operational_issuance": 0,
+    "reflection_admission_issuance": 0,
+    "reflection_lease_issuance": 0,
+    "reflection_lease_consumption": 0,
+    "reflection_lease_invalidation": 0,
+    "reflection_read": 0,
+    "SyntheticStateBox": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0,
+    "repository_runtime_writes": 0
+  },
+  "validation_policy": {
+    "pure_source_AST_only": true,
+    "capability_modules_imported_by_new_contract_tests": false,
+    "issuance_dependent_suites_allowed": false,
+    "required": [
+      "primitive semantics unchanged",
+      "explicit request reuse decision",
+      "distinct admission/lifecycle owners",
+      "mandatory unchanged public pinned validators",
+      "exact originals",
+      "frozen runtime state matrix",
+      "BEFORE/AFTER order",
+      "permanent one-shot terminal semantics",
+      "transitive provider provenance",
+      "no old-type bridge",
+      "consumption is not effect evidence",
+      "fail-closed behavioral readiness",
+      "compilation authority false",
+      "all operational effects zero",
+      "safe source/AST historical regression selection",
+      "registry/picker baseline versus after",
+      "benchmark --check",
+      "in-memory compilation",
+      "JSON/whitespace",
+      "git diff --check",
+      "historical preservation"
+    ]
+  },
+  "lease_identity": {
+    "minimum_signed_bindings": [
+      "lifecycle_owner_phase_schema",
+      "issuing_pid",
+      "lease_id",
+      "initial_reflection_state_ISSUED",
+      "semantic_role_and_exact_request_role",
+      "original_admission_owner_phase_schema_PID_id_and_authenticated_fingerprint",
+      "original_request_issuance_id_PID_and_authenticated_fingerprint",
+      "renderer_identity_and_fingerprint",
+      "authorization_owner_phase_schema_PID_authorization_id",
+      "authorization_fingerprint",
+      "authorization_proof_context_id",
+      "runtime_owner_phase_schema_PID_lease_id",
+      "stable_authenticated_runtime_fingerprint",
+      "authenticated_runtime_state_at_issuance_ISSUED",
+      "scenario_phase_and_id",
+      "source_kind_sha256_size_and_definition_sha256",
+      "exact_public_invocation",
+      "field_owner_name_type_and_read_operation",
+      "authority_matrix",
+      "lease_evidence_digest",
+      "stable_authenticated_lease_fingerprint"
+    ],
+    "exact_original_bindings_retained_outside_scalar_payload": true,
+    "current_state_signed_separately_with_immutable_projection": true,
+    "stable_fingerprint_includes_mutable_current_state": false,
+    "runtime_state_at_issuance_is_current_state_substitute": false,
+    "secret_or_private_record_signature_in_public_payload": false
+  },
+  "completion_rule": "SYNTH_REFLECT_PINNED_CONTRACT_1_COMPLETE requires frozen additive semantics, passing pure validation and unchanged historical bytes. CONTRACT_UNRESOLVED if request reuse, exact upstream binding or runtime/reflection ordering cannot preserve frozen invariants. Stop after freeze; no adapter, reflection capability or behavioral effect exists."
+}

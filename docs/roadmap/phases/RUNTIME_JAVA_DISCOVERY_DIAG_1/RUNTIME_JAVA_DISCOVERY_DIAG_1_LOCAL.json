@@ -1,0 +1,838 @@
+{
+  "archive_persisted": false,
+  "authority_changes": [],
+  "cleanup_verified": true,
+  "compat2_created": false,
+  "compatibility_relations_created": 0,
+  "controller_threads": {
+    "after": 1,
+    "before": 1,
+    "benign_control_thread_start_attempts": 14,
+    "explanation": "All 14 starts are the frozen bounded Docker-control stdout/stderr readers (two per control). Raw export uses no reader/supervisor thread. Unexecuted original parser would use its original two export host threads.",
+    "operational_thread_start_attempts": 14,
+    "raw_export_thread_start_attempts": 0
+  },
+  "decision_boundary": {
+    "future_architectural_decision_only": [
+      "explicitly evolve the discovery contract",
+      "explicitly change the discovery domain",
+      "define a semantically equivalent provider-specific discovery proof"
+    ],
+    "parser_trial_skipped_by_required_stop": true,
+    "remediation_implemented": false,
+    "result": "The frozen complete-export resource bound is incompatible with this artifact under measured local conditions.",
+    "selected_architectural_option": null,
+    "third_trial_justified": false
+  },
+  "diagnostic_source": {
+    "changed_after_live_trial": false,
+    "path": "scripts/measure_runtime_java_discovery_diag1.py",
+    "sha256": "171d0bd4a13086a634eb79c718c1991225f6d7839e1af7467b485828a65df036"
+  },
+  "discovery_scope_changed": false,
+  "docker_controls": [
+    {
+      "command": [
+        "version",
+        "--format",
+        "{{json .}}"
+      ],
+      "elapsed_ms": 855.16,
+      "exit_code": 0,
+      "status": "sandbox_completed",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "image",
+        "inspect",
+        "sha256:09361da47d33ad0d44f89947d5e99003e94594e885328cdb5cd7b1c515a1a089",
+        "--format",
+        "{{json .}}"
+      ],
+      "elapsed_ms": 990.637,
+      "exit_code": 0,
+      "status": "sandbox_completed",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "create",
+        "--name",
+        "runtime-java1-discovery-1abd356a6f11e2a8dd31bebe",
+        "--pull",
+        "never",
+        "--hostname",
+        "runtime-sandbox1",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "65534:65534",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges=true",
+        "--security-opt",
+        "seccomp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_java_discovery_diag1_20261009\\temp\\runtime-java-discovery-diag1-oy_veq14\\seccomp.json",
+        "--cgroupns",
+        "private",
+        "--ipc",
+        "none",
+        "--pids-limit",
+        "128",
+        "--memory",
+        "128m",
+        "--cpus",
+        "1",
+        "--log-driver",
+        "none",
+        "--tmpfs",
+        "/work:rw,nosuid,nodev,size=32m,mode=1777",
+        "--tmpfs",
+        "/tmp:rw,nosuid,nodev,noexec,size=16m,mode=1777",
+        "--workdir",
+        "/work",
+        "--entrypoint",
+        "/usr/local/bin/python",
+        "sha256:09361da47d33ad0d44f89947d5e99003e94594e885328cdb5cd7b1c515a1a089",
+        "-I",
+        "-S",
+        "-B",
+        "-c",
+        "raise SystemExit(64)"
+      ],
+      "elapsed_ms": 1211.024,
+      "exit_code": 0,
+      "status": "sandbox_completed",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "inspect",
+        "runtime-java1-discovery-1abd356a6f11e2a8dd31bebe",
+        "--format",
+        "{{json .}}"
+      ],
+      "elapsed_ms": 960.374,
+      "exit_code": 0,
+      "status": "sandbox_completed",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "rm",
+        "--force",
+        "--volumes",
+        "runtime-java1-discovery-1abd356a6f11e2a8dd31bebe"
+      ],
+      "elapsed_ms": 1043.846,
+      "exit_code": 0,
+      "status": "sandbox_completed",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "inspect",
+        "runtime-java1-discovery-1abd356a6f11e2a8dd31bebe",
+        "--format",
+        "{{.State.Running}}"
+      ],
+      "elapsed_ms": 1199.927,
+      "exit_code": 1,
+      "status": "sandbox_completed",
+      "stderr": "error: no such object: runtime-java1-discovery-1abd356a6f11e2a8dd31bebe\n"
+    },
+    {
+      "command": [
+        "ps",
+        "--all",
+        "--filter",
+        "name=runtime-java1-discovery-",
+        "--format",
+        "{{.Names}}"
+      ],
+      "elapsed_ms": 978.813,
+      "exit_code": 0,
+      "status": "sandbox_completed",
+      "stderr": ""
+    }
+  ],
+  "effect_scope": "Operational Docker/controller effects only. Development commands, pytest fixtures, evidence writes and temporary host profile files are accounted separately; no operational shell=True or container command execution.",
+  "effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "EXECUTOR_1R": 0,
+    "container_creates": 1,
+    "container_starts": 0,
+    "docker_control_calls": 7,
+    "docker_total_calls": 8,
+    "export_calls": 1,
+    "host_child_processes": 8,
+    "host_mounts": 0,
+    "image_identity_inspections": 1,
+    "java_compilations": 0,
+    "java_executions": 0,
+    "javac_executions": 0,
+    "network": 0,
+    "optional_third_diagnostic_export_calls": 0,
+    "parser_path_export_calls": 0,
+    "raw_drain_export_calls": 1,
+    "reflection_lease_consumption": 0,
+    "repository_runtime_writes": 0,
+    "shell": 0,
+    "source_projections": 0,
+    "synth_runtime_lease_consumption": 0
+  },
+  "effects_including_failed_endpoint_preflight": {
+    "Apply": 0,
+    "BANK": 0,
+    "EXECUTOR_1R": 0,
+    "container_creates": 1,
+    "container_starts": 0,
+    "docker_control_calls": 8,
+    "docker_total_calls": 9,
+    "export_calls": 1,
+    "host_child_processes": 9,
+    "host_mounts": 0,
+    "image_identity_inspections": 1,
+    "java_compilations": 0,
+    "java_executions": 0,
+    "javac_executions": 0,
+    "network": 0,
+    "optional_third_diagnostic_export_calls": 0,
+    "parser_path_export_calls": 0,
+    "raw_drain_export_calls": 1,
+    "reflection_lease_consumption": 0,
+    "repository_runtime_writes": 0,
+    "shell": 0,
+    "source_projections": 0,
+    "synth_runtime_lease_consumption": 0
+  },
+  "historical_preservation": {
+    "already_missing_paths_still_missing": [
+      "tmp_tests_continue1_authority/test_browser_candidate_payload0/repo/reviewed.txt",
+      "tmp_tests_continue1_authority/test_exact_audit_post_executes0/repo/reviewed.txt",
+      "tmp_tests_continue1_authority/test_exact_audit_pre_latest_se0/repo/unreviewed.txt",
+      "tmp_tests_continue1_authority/test_legacy_report_requires_fr0/repo/reviewed.txt",
+      "tmp_tests_continue1_authority/test_replay_preserves_existing0/repo/reviewed.txt",
+      "tmp_tests_continue1_browser/test_browser_candidate_payload0/repo/reviewed.txt",
+      "tmp_tests_continue1_browser/test_browser_exact_a_selection0/repo/reviewed.txt",
+      "tmp_tests_continue1_browser/test_browser_review_transition4/repo/reviewed.txt"
+    ],
+    "changed_paths": [],
+    "historical_artifacts_repinned": false,
+    "historical_manifest_verification": {
+      "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_PRESERVATION.json": {
+        "changed_paths": [],
+        "paths": 1812
+      },
+      "RUNTIME_JAVA_1D_PRESERVATION.json": {
+        "changed_paths": [],
+        "paths": 1824
+      },
+      "RUNTIME_JAVA_1D_RETRY_PRESERVATION.json": {
+        "changed_paths": [],
+        "paths": 1841
+      },
+      "RUNTIME_JAVA_COMPAT_1_PRESERVATION.json": {
+        "changed_paths": [],
+        "paths": 1818
+      },
+      "RUNTIME_SANDBOX_2P_PRESERVATION.json": {
+        "changed_paths": [],
+        "paths": 1837
+      },
+      "RUNTIME_SANDBOX_BIND_1_PRESERVATION.json": {
+        "changed_paths": [],
+        "paths": 1843
+      },
+      "SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json": {
+        "changed_paths": [],
+        "paths": 1800
+      },
+      "SYNTH_REFLECT_LIFECYCLE_1_PRESERVATION.json": {
+        "changed_paths": [],
+        "paths": 1806
+      }
+    },
+    "preexisting_files_byte_identical": 1847,
+    "preexisting_paths": 1855,
+    "registry_changed": false,
+    "stash_reset_clean_used": false
+  },
+  "host_children": [
+    {
+      "command": "version",
+      "pid": 26464,
+      "pipes_closed": true,
+      "reaped": true
+    },
+    {
+      "command": "image",
+      "pid": 41468,
+      "pipes_closed": true,
+      "reaped": true
+    },
+    {
+      "command": "create",
+      "pid": 42980,
+      "pipes_closed": true,
+      "reaped": true
+    },
+    {
+      "command": "inspect",
+      "pid": 40256,
+      "pipes_closed": true,
+      "reaped": true
+    },
+    {
+      "command": "export",
+      "pid": 40972,
+      "pipes_closed": true,
+      "reaped": true
+    },
+    {
+      "command": "rm",
+      "pid": 26672,
+      "pipes_closed": true,
+      "reaped": true
+    },
+    {
+      "command": "inspect",
+      "pid": 37716,
+      "pipes_closed": true,
+      "reaped": true
+    },
+    {
+      "command": "ps",
+      "pid": 44600,
+      "pipes_closed": true,
+      "reaped": true
+    }
+  ],
+  "image_metadata": {
+    "architecture": "amd64",
+    "cleanup_verified": true,
+    "created": "2026-07-18T13:56:06.820503358Z",
+    "image_declared_volumes": [],
+    "image_environment": [
+      "PATH=/home/appuser/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "LANG=C.UTF-8",
+      "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+      "PYTHON_VERSION=3.12.13",
+      "PYTHON_SHA256=c08bc65a81971c1dd5783182826503369466c7e67374d1646519adf05207b684",
+      "PYTHONDONTWRITEBYTECODE=1",
+      "PYTHONUNBUFFERED=1",
+      "WEB_HOST=0.0.0.0"
+    ],
+    "image_identity": "sha256:09361da47d33ad0d44f89947d5e99003e94594e885328cdb5cd7b1c515a1a089",
+    "image_size_bytes": 139358132,
+    "image_user": "appuser",
+    "os": "linux",
+    "reason": "",
+    "repo_digests": [
+      "cattus-cattus-web@sha256:09361da47d33ad0d44f89947d5e99003e94594e885328cdb5cd7b1c515a1a089"
+    ],
+    "rootfs_layer_count": 11,
+    "status": "not_inspected",
+    "toolchains": [],
+    "variant": ""
+  },
+  "java1c_invoked": false,
+  "java1d_retried": false,
+  "local_endpoint": "npipe:////./pipe/dockerDesktopLinuxEngine",
+  "measurement_date_kst": "2026-10-09",
+  "measurement_scope": "diagnostic evidence only; no runtime capability schema, authority or compatibility relation",
+  "optional_third_trial_count": 0,
+  "original_export_timeout_ms": 30000,
+  "original_owner_implementation": {
+    "archive_max_bytes": 2147483648,
+    "archive_max_entries": 250000,
+    "cleanup": "stop guard; kill living export child; wait up to 2 seconds; join each guard/reader up to 2 seconds; close stdout/stderr; rm --force --volumes then inspect known absence",
+    "control_stderr_max_bytes": 16384,
+    "control_stdout_max_bytes": 65536,
+    "control_timeout_ms": 8000,
+    "executable_max_bytes": 134217728,
+    "executable_semantics": "java/javac/python basename candidates; 20-byte minimum and 128 MiB maximum; sha256 in 65536-byte reads; executable for uid/gid 65534; Linux amd64 ELF64 little-endian ET_EXEC/ET_DYN; ancestor traversal checks",
+    "export_stderr_max_bytes": 8192,
+    "export_timeout_ms": 30000,
+    "filesystem_semantics": "no extraction or execution; all normalized paths checked; relative symlink and hardlink resolution with root-escape and 40-link/cycle checks; directory permissions tracked",
+    "functions": {
+      "_container_files": {
+        "line": 315,
+        "source_sha256": "84316527ac591ceeb942e432cb9546f45c618ed4dc5ff02d42948996f1080d1e"
+      },
+      "_export_filesystem": {
+        "line": 228,
+        "source_sha256": "f7b96a59833aa2c9d99d7a12c17c7945c3c0675c3f8f8241f9fa3f97e4c1da6e"
+      },
+      "_image_path": {
+        "line": 84,
+        "source_sha256": "af726fad61b5c0e5591c99f1a45f62db574a1569d28e730afd2fca37994fc564"
+      },
+      "_inspect_tar": {
+        "line": 180,
+        "source_sha256": "5d922aecb5d090cc9932b1e7a56fcd89bad22a6227ced9cad527a259da51fc05"
+      },
+      "_link_target": {
+        "line": 93,
+        "source_sha256": "9dfc95b4bd9613c7d83811d18666419fcac030058d32853a6cd8055e759cf202"
+      },
+      "_read_executable": {
+        "line": 149,
+        "source_sha256": "6ddf8b968d4ab24a4168e3cdaba93c48afd839ad5b4e3b9b3f97287387509ce8"
+      },
+      "_resolve_link": {
+        "line": 109,
+        "source_sha256": "717c3dda0516e53d58e18f5c15d2f6cb2c6f2a67112227f9abb5c93037c8edb9"
+      },
+      "_stopped_configuration_safe": {
+        "line": 292,
+        "source_sha256": "58150f3b450caf9ca878a9b3c239a8decf1404ff1ecc8a1cc9403840e0979917"
+      }
+    },
+    "path": "core/sandboxed_java_toolchain_discovery.py",
+    "path_semantics": "image PATH retained as metadata; _inspect_tar does not search or restrict to PATH; java/javac aliases resolve to binaries paired by actual parent directory; controller fixed at /usr/local/bin/python",
+    "reuse": "unchanged original _container_files and _stopped_configuration_safe used for live stopped-container creation/configuration verification/removal; only export body replaced in memory for raw control; no source file changed",
+    "sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff",
+    "stderr_capture": "one daemon reader uses 256-byte reads, retains at most 8192 bytes and kills on overflow",
+    "stdout_capture": "main-thread buffered PIPE reads wrapped by _BoundedArchiveStream; tarfile r|; bounded 65536-byte remainder drain",
+    "timeout_supervision": "deadline created after Popen; one daemon guard checks every .02 seconds and kills the export child at expiry",
+    "unexecuted_parser_instrumentation": "calls unchanged original _export_filesystem/_inspect_tar with transparent PIPE read timing and archive-yield counting; original archive, entry, path/link and executable rules retained; two original host export threads would remain"
+  },
+  "parser_path_completed_within_bound": null,
+  "parser_path_measurement": {
+    "archive_entries_observed": null,
+    "bytes_read_from_export": null,
+    "completed_within_bound": null,
+    "parser_processing_ms": null,
+    "performed": false,
+    "producer_backpressure_deterministically_observed": null,
+    "reader_wait_ms": null,
+    "reason": "Mandatory critical decision boundary: raw drain exceeded 30000 ms; stop before parser measurement or optimization"
+  },
+  "phase_id": "RUNTIME.JAVA.DISCOVERY.DIAG.1",
+  "preflight_diagnostic": {
+    "container_creates": 0,
+    "container_starts": 0,
+    "docker_version_calls": 1,
+    "exports": 0,
+    "failure": "local_docker_backend_unavailable",
+    "followup": "same frozen endpoint measured through authorized unsandboxed execution; no JAVA.1D retry",
+    "host_child_processes": 1,
+    "image_inspections": 0,
+    "log_sha256": "55da08942aefabd9bf5b5b7577afcdf1e0e08a823b95131b755a3af2891bd1f4",
+    "sandbox_endpoint_attempts": 1,
+    "stderr_exit_and_thread_metrics": "not retained by the failed preflight; no live export trial occurred"
+  },
+  "production_discovery_code_changed": false,
+  "production_discovery_success_issued": false,
+  "production_timeout_changed": false,
+  "python_threads_after": 1,
+  "python_threads_before": 1,
+  "raw_drain_completed_within_bound": false,
+  "raw_measurement_sha256": "259a68ed5957817a322c6acb056d612eafd45649c381bda85d4ebd386d0cb4f4",
+  "remaining_diagnostic_containers": 0,
+  "root_cause_classification": "EXPORT_TRANSPORT_EXCEEDS_BOUND",
+  "root_cause_confidence": {
+    "cache_order_caveat": "Only raw trial 1 ran. No second-trial performance comparison or cache-warming advantage is claimed.",
+    "classification": "high for the measured complete-export transport/host-pipe path exceeding the frozen bound without any semantic parser",
+    "concurrent_activity": "The corrected pure baseline fixture selection overlapped the operational run; host contention may contribute. No extra export was run after the raw timeout.",
+    "unresolved_dimensions": [
+      "Docker daemon byte-production time versus client/pipe scheduling cannot be separated from this host-only trace",
+      "raw polling capture has measurable CPU/probe cost; deterministic producer blocking and a controller-dominance claim are not established",
+      "complete archive size and entry count not measured",
+      "parser-specific overhead not measured because the raw stop boundary applied",
+      "single current-condition measurement does not establish a stable cold/warm-cache rate"
+    ]
+  },
+  "server_version": "29.6.1",
+  "status": "RUNTIME_JAVA_DISCOVERY_DIAG_1_COMPLETE_WITH_WARNINGS",
+  "target_image": "sha256:09361da47d33ad0d44f89947d5e99003e94594e885328cdb5cd7b1c515a1a089",
+  "temporary_controller_state_removed": true,
+  "thread_start_attempts": [
+    {
+      "stage": "version",
+      "target": "read",
+      "trial": null
+    },
+    {
+      "stage": "version",
+      "target": "read",
+      "trial": null
+    },
+    {
+      "stage": "image",
+      "target": "read",
+      "trial": null
+    },
+    {
+      "stage": "image",
+      "target": "read",
+      "trial": null
+    },
+    {
+      "stage": "create",
+      "target": "read",
+      "trial": "raw_drain"
+    },
+    {
+      "stage": "create",
+      "target": "read",
+      "trial": "raw_drain"
+    },
+    {
+      "stage": "inspect",
+      "target": "read",
+      "trial": "raw_drain"
+    },
+    {
+      "stage": "inspect",
+      "target": "read",
+      "trial": "raw_drain"
+    },
+    {
+      "stage": "rm",
+      "target": "read",
+      "trial": "raw_drain"
+    },
+    {
+      "stage": "rm",
+      "target": "read",
+      "trial": "raw_drain"
+    },
+    {
+      "stage": "inspect",
+      "target": "read",
+      "trial": "raw_drain"
+    },
+    {
+      "stage": "inspect",
+      "target": "read",
+      "trial": "raw_drain"
+    },
+    {
+      "stage": "ps",
+      "target": "read",
+      "trial": null
+    },
+    {
+      "stage": "ps",
+      "target": "read",
+      "trial": null
+    }
+  ],
+  "throughput_comparison": {
+    "comparison_available": false,
+    "parser_bytes_per_second": null,
+    "raw_bytes_per_second": 12800866.312
+  },
+  "trial_count": 1,
+  "trial_order": [
+    "raw_drain"
+  ],
+  "trials": [
+    {
+      "archive_entries_observed": null,
+      "average_stream_bytes_per_second": 12800866.312,
+      "bytes_received": 384237059,
+      "capture_method": "single_thread_PeekNamedPipe_incremental_os_read",
+      "child_reaped": true,
+      "completed_within_bound": false,
+      "container_cleanup_ms": 2243.773,
+      "container_cleanup_verified": true,
+      "container_id": "365d119c6414863f1201d8cb93144a6d9dbe80d50572f950fc24f6e8d322c5bb",
+      "container_name": "runtime-java1-discovery-1abd356a6f11e2a8dd31bebe",
+      "container_started": false,
+      "control_calls": [
+        {
+          "command": [
+            "create",
+            "--name",
+            "runtime-java1-discovery-1abd356a6f11e2a8dd31bebe",
+            "--pull",
+            "never",
+            "--hostname",
+            "runtime-sandbox1",
+            "--network",
+            "none",
+            "--read-only",
+            "--user",
+            "65534:65534",
+            "--cap-drop",
+            "ALL",
+            "--security-opt",
+            "no-new-privileges=true",
+            "--security-opt",
+            "seccomp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_java_discovery_diag1_20261009\\temp\\runtime-java-discovery-diag1-oy_veq14\\seccomp.json",
+            "--cgroupns",
+            "private",
+            "--ipc",
+            "none",
+            "--pids-limit",
+            "128",
+            "--memory",
+            "128m",
+            "--cpus",
+            "1",
+            "--log-driver",
+            "none",
+            "--tmpfs",
+            "/work:rw,nosuid,nodev,size=32m,mode=1777",
+            "--tmpfs",
+            "/tmp:rw,nosuid,nodev,noexec,size=16m,mode=1777",
+            "--workdir",
+            "/work",
+            "--entrypoint",
+            "/usr/local/bin/python",
+            "sha256:09361da47d33ad0d44f89947d5e99003e94594e885328cdb5cd7b1c515a1a089",
+            "-I",
+            "-S",
+            "-B",
+            "-c",
+            "raise SystemExit(64)"
+          ],
+          "elapsed_ms": 1211.024,
+          "exit_code": 0,
+          "status": "sandbox_completed",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "inspect",
+            "runtime-java1-discovery-1abd356a6f11e2a8dd31bebe",
+            "--format",
+            "{{json .}}"
+          ],
+          "elapsed_ms": 960.374,
+          "exit_code": 0,
+          "status": "sandbox_completed",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "rm",
+            "--force",
+            "--volumes",
+            "runtime-java1-discovery-1abd356a6f11e2a8dd31bebe"
+          ],
+          "elapsed_ms": 1043.846,
+          "exit_code": 0,
+          "status": "sandbox_completed",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "inspect",
+            "runtime-java1-discovery-1abd356a6f11e2a8dd31bebe",
+            "--format",
+            "{{.State.Running}}"
+          ],
+          "elapsed_ms": 1199.927,
+          "exit_code": 1,
+          "status": "sandbox_completed",
+          "stderr": "error: no such object: runtime-java1-discovery-1abd356a6f11e2a8dd31bebe\n"
+        }
+      ],
+      "elapsed_ms": 30016.489,
+      "export_exit_code": 1,
+      "export_process_launch_latency_ms": 771.788,
+      "export_thread_start_count": 0,
+      "kill_requested_after_ms": 30000.689,
+      "mode": "raw_drain",
+      "original_container_status": "image_export_timeout",
+      "pipes_closed": true,
+      "python_threads_after": 1,
+      "python_threads_before": 1,
+      "raw_idle_sleep_ms": 23870.471000000085,
+      "raw_main_thread_cpu_ms": 6343.75,
+      "raw_pipe_probe_ms": 3337.418999999524,
+      "raw_poll_iterations": 29314,
+      "reader_wait_and_copy_ms": 1142.319,
+      "setup_latency_ms": 2171.398,
+      "stderr": "",
+      "stderr_bytes_received": 0,
+      "stdout_read_calls": 13432,
+      "stream_or_reap_elapsed_ms": 30016.348,
+      "supervisor_overshoot_ms": 0.6889999999984866,
+      "termination_ms": 15.659,
+      "thread_start_attempts": [
+        {
+          "stage": "create",
+          "target": "read",
+          "trial": "raw_drain"
+        },
+        {
+          "stage": "create",
+          "target": "read",
+          "trial": "raw_drain"
+        },
+        {
+          "stage": "inspect",
+          "target": "read",
+          "trial": "raw_drain"
+        },
+        {
+          "stage": "inspect",
+          "target": "read",
+          "trial": "raw_drain"
+        },
+        {
+          "stage": "rm",
+          "target": "read",
+          "trial": "raw_drain"
+        },
+        {
+          "stage": "rm",
+          "target": "read",
+          "trial": "raw_drain"
+        },
+        {
+          "stage": "inspect",
+          "target": "read",
+          "trial": "raw_drain"
+        },
+        {
+          "stage": "inspect",
+          "target": "read",
+          "trial": "raw_drain"
+        }
+      ],
+      "time_to_first_byte_ms": 218.008,
+      "timed_out": true,
+      "trial_total_ms": 35204.578
+    }
+  ],
+  "validation": {
+    "compat": {
+      "after": {
+        "deselected": 0,
+        "exit_code": 0,
+        "failed": 0,
+        "passed": 287
+      },
+      "after_failure_identities": [],
+      "baseline": {
+        "deselected": 0,
+        "exit_code": 0,
+        "failed": 0,
+        "passed": 287
+      },
+      "baseline_failure_identities": [],
+      "selection": [
+        "tests/test_runtime_java_compat1.py",
+        "tests/test_runtime_java1d.py",
+        "tests/test_runtime_sandbox_bind1.py",
+        "tests/test_runtime_sandbox2p.py",
+        "tests/test_runtime_java1d_retry.py"
+      ]
+    },
+    "fixture_environment_note": "Initial infrastructure fixture run in sandbox default Temp had 14 failures because temporary-directory cleanup was denied. Retained as baseline_infrastructure_sandbox_temp_diagnostic.json/log. Baseline and after use writable workspace temporary state: 498 pass and one known failure in both. No owner/fixture/registry file was modified or projected.",
+    "full_suite_run": false,
+    "git_diff_check": "passed",
+    "infrastructure": {
+      "after": {
+        "deselected": 5,
+        "exit_code": 1,
+        "failed": 1,
+        "passed": 498
+      },
+      "after_failure_identities": [
+        "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+      ],
+      "baseline": {
+        "deselected": 5,
+        "exit_code": 1,
+        "failed": 1,
+        "passed": 498
+      },
+      "baseline_failure_identities": [
+        "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+      ],
+      "selection": [
+        "tests/test_runtime_sandbox1.py",
+        "tests/test_runtime_sandbox2.py",
+        "tests/test_runtime_java1.py",
+        "tests/test_runtime_java1_discovery.py",
+        "tests/test_runtime_java1_governance.py",
+        "tests/test_runtime_java1a.py",
+        "tests/test_runtime_java1b.py",
+        "tests/test_runtime_java1c.py"
+      ]
+    },
+    "new_diagnostic_tests": {
+      "failed": 0,
+      "meaningful_coverage": [
+        "original semantic scanner retained through archive observer",
+        "original entry/path/link rejection retained",
+        "bounded stderr and unbounded-read rejection",
+        "raw timeout kills/reaps/closes",
+        "raw completion never invokes parser",
+        "mandatory raw-timeout stop forbids parser trial/full inventory/provider continuation",
+        "classification keeps missing measurements unresolved"
+      ],
+      "passed": 15,
+      "selection": [
+        "tests/test_runtime_java_discovery_diag1.py"
+      ]
+    },
+    "new_failure_identities": [],
+    "new_python_in_memory_compilation": {
+      "bytecode_emitted": false,
+      "failed": 0,
+      "files": 2
+    },
+    "registry": {
+      "after": {
+        "deselected": 0,
+        "exit_code": 1,
+        "failed": 12,
+        "passed": 292
+      },
+      "after_failure_identities": [
+        "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1 [call]",
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts [call]",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts [call]",
+        "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation [call]",
+        "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets [call]",
+        "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked [call]",
+        "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call [call]",
+        "tests/test_phase_registry.py::test_seed_registry_has_expected_phases [call]",
+        "tests/test_phase_registry.py::test_seed_registry_is_conservative [call]",
+        "tests/test_phase_registry.py::test_seed_registry_summary_counts [call]",
+        "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts [call]",
+        "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+      ],
+      "baseline": {
+        "deselected": 0,
+        "exit_code": 1,
+        "failed": 12,
+        "passed": 292
+      },
+      "baseline_failure_identities": [
+        "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1 [call]",
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts [call]",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts [call]",
+        "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation [call]",
+        "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets [call]",
+        "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked [call]",
+        "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call [call]",
+        "tests/test_phase_registry.py::test_seed_registry_has_expected_phases [call]",
+        "tests/test_phase_registry.py::test_seed_registry_is_conservative [call]",
+        "tests/test_phase_registry.py::test_seed_registry_summary_counts [call]",
+        "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts [call]",
+        "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+      ],
+      "selection": [
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts",
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+        "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping",
+        "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1"
+      ]
+    }
+  }
+}

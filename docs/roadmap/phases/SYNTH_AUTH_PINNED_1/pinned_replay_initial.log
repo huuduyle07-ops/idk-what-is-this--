@@ -1,0 +1,7 @@
+Initial replay/gate validation: 44 passed, 1 failed, 1 warning in 50.22s.
+Command: python -B -m pytest -q tests/test_synthetic_runtime_authorization_pinned_replay.py -p no:cacheprovider --basetemp .agent/test_tmp_pinned_replay_6f25eb9624c9476fabf10e2c474f8016
+Failed test: test_exception_in_negative_controls_preserves_effect_ledger_and_withdraws_authorization
+Failure: KeyError: 'negative_authentication_matrix' at scripts/replay_synth_auth_pinned1.py:109.
+Cause: replacing report with outcome.as_dict() dropped initial matrix defaults before an exception in the negative-control function.
+Parent fixed replay by merging initial report defaults with outcome.as_dict().
+This log records the initial result and failure summary; the terminal traceback was not saved verbatim.

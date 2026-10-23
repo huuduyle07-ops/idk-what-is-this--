@@ -1,0 +1,15 @@
+Command: python -m pytest -q -p no:cacheprovider tests/test_synthetic_runtime_authorization_pinned.py
+PYTHONDONTWRITEBYTECODE=1
+Terminal summary: 1 failed, 138 passed, 1 warning in 184.35s (0:03:04)
+Exit code: 1
+
+Failed case:
+tests/test_synthetic_runtime_authorization_pinned.py::test_authorization_report_is_report_only_and_never_exports_hmac
+
+Failure was an assertion in the new test, not an authorization-owner defect.
+The substring check for _signature also matched the required method_signature
+projection key. The assertion was corrected to check the exact JSON key
+"_signature". The original negative-matrix test completed successfully.
+
+This file records the observed terminal summary; the initial run was streamed
+through tool output and no complete raw terminal transcript was saved.

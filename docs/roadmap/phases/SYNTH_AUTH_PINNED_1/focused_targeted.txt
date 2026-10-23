@@ -1,0 +1,14 @@
+Command: python -m pytest -q -p no:cacheprovider tests/test_synthetic_runtime_authorization_pinned.py -k 'report_is_report_only or missing_exact_frozen_source or scope_is_authorization_only or fresh_issuance_reauthenticates'
+PYTHONDONTWRITEBYTECODE=1
+
+....                                                                     [100%]
+============================== warnings summary ===============================
+google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4 passed, 136 deselected, 1 warning in 9.58s
+Exit code: 0
+
+The corrected report assertion, newly added frozen-source recovery gate,
+updated fixture isolation, scope immutability, and retained public-validator
+graph checks passed. This file preserves the observed command and terminal
+result; paths in the warning are abbreviated from the tool output.

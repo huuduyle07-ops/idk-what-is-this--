@@ -1,0 +1,29 @@
+{
+  "mode": "preservation_check",
+  "exit_code": 0,
+  "checked_file_count": 1989,
+  "changed_existing_files": [],
+  "missing_existing_files": [],
+  "all_existing_bytes_preserved": true,
+  "real_effect_attempts": [],
+  "denied_attempts": [],
+  "elapsed_seconds": 2.233,
+  "scope": "Pure host maintenance and fabricated in-memory fixtures only. Audit hook and frozen guard deny operational processes/network before execution. Owner/control mocks validate contracts; no live Docker, Java, javac, controller, authorization, lease, executor or Apply executes. Repository reads, Python validation and new phase temporary/artifact writes are maintenance. Historical registry projection is deliberately disabled so pre-existing drift remains visible.",
+  "successful_operational_effect_counts": {
+    "Docker": 0,
+    "containers": 0,
+    "exports": 0,
+    "Java": 0,
+    "javac": 0,
+    "controller": 0,
+    "network": 0,
+    "shell": 0,
+    "host mounts": 0,
+    "source projection": 0,
+    "runtime lease consumption": 0,
+    "reflection lease consumption": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0
+  }
+}

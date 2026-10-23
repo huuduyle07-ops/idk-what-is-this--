@@ -1,0 +1,22 @@
+{
+  "capability_objects_constructed": false,
+  "checks": {
+    "behavioral_diagnostic_executor_lifecycle_retry_historical_stop_preserved": true,
+    "behavioral_diagnostic_executor_lifecycle_retry_no_transition_or_executor_added": true,
+    "behavioral_diagnostic_executor_refresh_historical_stop_preserved": true,
+    "behavioral_diagnostic_executor_refresh_no_transition_or_executor_added": true,
+    "behavioral_diagnostic_executor_retry_historical_stop_preserved": true,
+    "behavioral_diagnostic_executor_retry_no_transition_or_executor_added": true,
+    "old_admission_uses_unchanged_public_auth_and_request_validators": true,
+    "old_lifecycle_keeps_original_public_epoch": true,
+    "old_renderer_only_authenticates_original_request": true,
+    "pinned_admission_keeps_public_graph_authentication": true,
+    "pinned_admission_retains_original_graph_and_signed_identity": true,
+    "pinned_runtime_behavioral_readiness_remains_false": true,
+    "pinned_runtime_consumer_still_unconditionally_unresolved": true,
+    "pinned_runtime_state_uses_public_exact_authorization": true
+  },
+  "owner_modules_imported": false,
+  "passed": true,
+  "passed_count": 14
+}

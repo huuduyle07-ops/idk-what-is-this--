@@ -1,0 +1,335 @@
+{
+  "limitation": "Parent harness, native policy, optional dependency import behavior and historical dynamic state were not fully retained.",
+  "matches": [
+    {
+      "line": 294,
+      "path": "core/candidate_runtime_sandbox.py",
+      "text": "env = {name: os.environ[name] for name in ('SystemRoot', 'WINDIR') if name in os.environ}"
+    },
+    {
+      "line": 299,
+      "path": "core/candidate_runtime_sandbox.py",
+      "text": "process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,"
+    },
+    {
+      "line": 364,
+      "path": "core/candidate_runtime_sandbox.py",
+      "text": "binary, endpoint = shutil.which('docker'), _local_endpoint()"
+    },
+    {
+      "line": 371,
+      "path": "core/candidate_runtime_sandbox.py",
+      "text": "absent_config = str(Path(tempfile.gettempdir()) / ('runtime-sandbox1-no-config-' + secrets.token_hex(16)))"
+    },
+    {
+      "line": 379,
+      "path": "core/candidate_runtime_sandbox.py",
+      "text": "observed = SandboxBackendObservation(host, '', '', '', bool(shutil.which('docker')),"
+    },
+    {
+      "line": 575,
+      "path": "core/candidate_runtime_sandbox.py",
+      "text": "with tempfile.TemporaryDirectory(prefix='runtime-sandbox1-verifier-') as root:"
+    },
+    {
+      "line": 579,
+      "path": "core/candidate_runtime_sandbox.py",
+      "text": "with socket.socket() as endpoint, socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as dns:"
+    },
+    {
+      "line": 580,
+      "path": "core/candidate_runtime_sandbox.py",
+      "text": "endpoint.bind(('127.0.0.1', 0)); endpoint.listen(1)"
+    },
+    {
+      "line": 582,
+      "path": "core/candidate_runtime_sandbox.py",
+      "text": "dns.bind(('127.0.0.1', port))"
+    },
+    {
+      "line": 38,
+      "path": "core/candidate_runtime_sandbox_probe.py",
+      "text": "socket_results[name] = denied(lambda family=family, kind=kind: socket.socket(family, kind))"
+    },
+    {
+      "line": 40,
+      "path": "core/candidate_runtime_sandbox_probe.py",
+      "text": "pair_denied = denied(socket.socketpair)"
+    },
+    {
+      "line": 41,
+      "path": "core/candidate_runtime_sandbox_probe.py",
+      "text": "env = dict(os.environ)"
+    },
+    {
+      "line": 52,
+      "path": "core/candidate_runtime_sandbox_probe.py",
+      "text": "child = subprocess.Popen([sys.executable, '-I', '-S', '-B', '-c', child_source], stdout=subprocess.PIPE)"
+    },
+    {
+      "line": 28,
+      "path": "core/java_single_thread_capture.py",
+      "text": "child = subprocess.Popen(argv, shell=False, stdin=subprocess.DEVNULL,"
+    },
+    {
+      "line": 30,
+      "path": "core/java_single_thread_capture.py",
+      "text": "env=dict(os.environ), cwd='/work', start_new_session=True)"
+    },
+    {
+      "line": 370,
+      "path": "core/runtime_java_pinned_backend_target_binding.py",
+      "text": "with patch.object(sandbox, \"_bounded_process\", observed), patch.object(sandbox2, \"replay\", observed_sandbox):"
+    },
+    {
+      "line": 525,
+      "path": "core/runtime_java_pinned_backend_target_binding.py",
+      "text": "with patch.object(os, \"getpid\", return_value=receipt.issuing_pid + 1):"
+    },
+    {
+      "line": 290,
+      "path": "core/runtime_java_pinned_provider.py",
+      "text": "sys.setprofile(observer)"
+    },
+    {
+      "line": 293,
+      "path": "core/runtime_java_pinned_provider.py",
+      "text": "sys.setprofile(previous)"
+    },
+    {
+      "line": 656,
+      "path": "core/runtime_java_pinned_provider.py",
+      "text": "with patch.object(os, \"getpid\", return_value=os.getpid() + 1):"
+    },
+    {
+      "line": 253,
+      "path": "core/runtime_java_pinned_target_inspection.py",
+      "text": "return tempfile.TemporaryDirectory(prefix=\"runtime-java-pinned1a-\")"
+    },
+    {
+      "line": 298,
+      "path": "core/runtime_java_pinned_target_inspection.py",
+      "text": "env = {key: os.environ[key] for key in (\"SystemRoot\", \"WINDIR\") if key in os.environ}"
+    },
+    {
+      "line": 299,
+      "path": "core/runtime_java_pinned_target_inspection.py",
+      "text": "process = subprocess.Popen((*prefix, \"export\", name), stdin=subprocess.DEVNULL,"
+    },
+    {
+      "line": 306,
+      "path": "core/sandbox_backend_binding.py",
+      "text": "with patch.object(sandbox, '_bounded_process', observed):"
+    },
+    {
+      "line": 417,
+      "path": "core/sandbox_backend_binding.py",
+      "text": "with patch.object(os, 'getpid', return_value=attachment.issuing_pid + 1):"
+    },
+    {
+      "line": 137,
+      "path": "core/sandboxed_java_capture_recovery.py",
+      "text": "old_source, old_invoke = java.JAVA_PROBE_SOURCE, java._invoke_java"
+    },
+    {
+      "line": 144,
+      "path": "core/sandboxed_java_capture_recovery.py",
+      "text": "java.JAVA_PROBE_SOURCE = recovered_java_source()"
+    },
+    {
+      "line": 145,
+      "path": "core/sandboxed_java_capture_recovery.py",
+      "text": "java._invoke_java = exact_image_only"
+    },
+    {
+      "line": 149,
+      "path": "core/sandboxed_java_capture_recovery.py",
+      "text": "java.JAVA_PROBE_SOURCE, java._invoke_java = old_source, old_invoke"
+    },
+    {
+      "line": 176,
+      "path": "core/sandboxed_java_capture_recovery.py",
+      "text": "with tempfile.TemporaryDirectory(prefix='runtime-java1b-') as root:"
+    },
+    {
+      "line": 395,
+      "path": "core/sandboxed_java_positive_continuation.py",
+      "text": "with tempfile.TemporaryDirectory(prefix='runtime-java1c-profile-') as root:"
+    },
+    {
+      "line": 34,
+      "path": "core/sandboxed_java_positive_probe.py",
+      "text": "'environment': dict(os.environ), 'boundary': boundary(os.getpid()),"
+    },
+    {
+      "line": 8,
+      "path": "core/sandboxed_java_single_thread_probe.py",
+      "text": "from core.sandboxed_java_toolchain_probe import JAVA_PROBE_SOURCE"
+    },
+    {
+      "line": 62,
+      "path": "core/sandboxed_java_single_thread_probe.py",
+      "text": "tree = ast.parse(JAVA_PROBE_SOURCE)"
+    },
+    {
+      "line": 64,
+      "path": "core/sandboxed_java_single_thread_probe.py",
+      "text": "lines = JAVA_PROBE_SOURCE.splitlines(keepends=True)"
+    },
+    {
+      "line": 88,
+      "path": "core/sandboxed_java_single_thread_probe.py",
+      "text": "boundary = next(ast.get_source_segment(JAVA_PROBE_SOURCE, n)"
+    },
+    {
+      "line": 89,
+      "path": "core/sandboxed_java_single_thread_probe.py",
+      "text": "for n in ast.parse(JAVA_PROBE_SOURCE).body"
+    },
+    {
+      "line": 25,
+      "path": "core/sandboxed_java_toolchain.py",
+      "text": "SOURCE_PATH, COMPILE_ARGUMENTS, RUNTIME_ARGUMENTS, JAVA_PROBE_SOURCE)"
+    },
+    {
+      "line": 257,
+      "path": "core/sandboxed_java_toolchain.py",
+      "text": "settings.get('Cmd') != ['-I', '-S', '-B', '-c', JAVA_PROBE_SOURCE]): return False"
+    },
+    {
+      "line": 322,
+      "path": "core/sandboxed_java_toolchain.py",
+      "text": "with socket.socket() as endpoint, socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as dns:"
+    },
+    {
+      "line": 323,
+      "path": "core/sandboxed_java_toolchain.py",
+      "text": "endpoint.bind(('127.0.0.1', 0)); endpoint.listen(1)"
+    },
+    {
+      "line": 324,
+      "path": "core/sandboxed_java_toolchain.py",
+      "text": "port = endpoint.getsockname()[1]; dns.bind(('127.0.0.1', port))"
+    },
+    {
+      "line": 364,
+      "path": "core/sandboxed_java_toolchain.py",
+      "text": "'-I', '-S', '-B', '-c', JAVA_PROBE_SOURCE)"
+    },
+    {
+      "line": 448,
+      "path": "core/sandboxed_java_toolchain.py",
+      "text": "with tempfile.TemporaryDirectory(prefix='runtime-java1-verifier-') as root:"
+    },
+    {
+      "line": 229,
+      "path": "core/sandboxed_java_toolchain_discovery.py",
+      "text": "env = {key: os.environ[key] for key in ('SystemRoot', 'WINDIR') if key in os.environ}"
+    },
+    {
+      "line": 231,
+      "path": "core/sandboxed_java_toolchain_discovery.py",
+      "text": "process = subprocess.Popen((*prefix, 'export', name), stdin=subprocess.DEVNULL,"
+    },
+    {
+      "line": 402,
+      "path": "core/sandboxed_java_toolchain_discovery.py",
+      "text": "with tempfile.TemporaryDirectory(prefix='runtime-java1-discovery-') as directory:"
+    },
+    {
+      "line": 16,
+      "path": "core/sandboxed_java_toolchain_probe.py",
+      "text": "JAVA_PROBE_SOURCE = r'''"
+    },
+    {
+      "line": 21,
+      "path": "core/sandboxed_java_toolchain_probe.py",
+      "text": "'source_size_bytes': 0, 'environment': dict(os.environ), 'uid': os.getuid(),"
+    },
+    {
+      "line": 34,
+      "path": "core/sandboxed_java_toolchain_probe.py",
+      "text": "child = subprocess.Popen(argv, shell=False, stdin=subprocess.DEVNULL,"
+    },
+    {
+      "line": 35,
+      "path": "core/sandboxed_java_toolchain_probe.py",
+      "text": "stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=dict(os.environ), cwd='/work')"
+    },
+    {
+      "line": 400,
+      "path": "core/synthetic_runtime_authorization_pinned.py",
+      "text": "with patch.object(os, \"getpid\", return_value=os.getpid() + 1):"
+    },
+    {
+      "line": 335,
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "text": "with tempfile.TemporaryDirectory(prefix='runtime-sandbox2-') as root:"
+    },
+    {
+      "line": 339,
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "text": "with socket.socket() as endpoint, socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as dns:"
+    },
+    {
+      "line": 340,
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "text": "endpoint.bind(('127.0.0.1', 0))"
+    },
+    {
+      "line": 341,
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "text": "endpoint.listen(1)"
+    },
+    {
+      "line": 343,
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "text": "dns.bind(('127.0.0.1', port))"
+    },
+    {
+      "line": 87,
+      "path": "core/thread_compatible_runtime_sandbox_probe.py",
+      "text": "s = socket.socket()"
+    },
+    {
+      "line": 49,
+      "path": "scripts/replay_synth_auth_pinned1.py",
+      "text": "previous_tempdir = tempfile.tempdir"
+    },
+    {
+      "line": 61,
+      "path": "scripts/replay_synth_auth_pinned1.py",
+      "text": "tempfile.tempdir = str(PHASE)"
+    },
+    {
+      "line": 102,
+      "path": "scripts/replay_synth_auth_pinned1.py",
+      "text": "tempfile.tempdir = previous_tempdir"
+    }
+  ],
+  "not_runtime_attestation": true,
+  "scope": "AST-discovered project imports from exact retained live graph; line matches are lexical evidence and can include embedded workload strings",
+  "sources": [
+    "core/candidate_runtime_sandbox.py",
+    "core/candidate_runtime_sandbox_probe.py",
+    "core/java_single_thread_capture.py",
+    "core/runtime_java_pinned_backend_target_binding.py",
+    "core/runtime_java_pinned_provider.py",
+    "core/runtime_java_pinned_requirement.py",
+    "core/runtime_java_pinned_target_archive.py",
+    "core/runtime_java_pinned_target_inspection.py",
+    "core/sandbox_backend_binding.py",
+    "core/sandboxed_java_capture_recovery.py",
+    "core/sandboxed_java_positive_continuation.py",
+    "core/sandboxed_java_positive_probe.py",
+    "core/sandboxed_java_single_thread_probe.py",
+    "core/sandboxed_java_toolchain.py",
+    "core/sandboxed_java_toolchain_discovery.py",
+    "core/sandboxed_java_toolchain_probe.py",
+    "core/synthetic_runtime_authorization.py",
+    "core/synthetic_runtime_authorization_pinned.py",
+    "core/thread_compatible_runtime_sandbox.py",
+    "core/thread_compatible_runtime_sandbox_probe.py",
+    "scripts/replay_synth_auth_pinned1.py"
+  ]
+}

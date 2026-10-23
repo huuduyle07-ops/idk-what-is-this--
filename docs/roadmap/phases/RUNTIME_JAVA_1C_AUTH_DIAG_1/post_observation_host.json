@@ -1,0 +1,24 @@
+{
+  "config_absent_after": true,
+  "config_absent_before": true,
+  "context": "host",
+  "exact_image": {
+    "exit_code": 1,
+    "identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "stderr": "template parsing error: template: :1:99: executing \"\" at <.Config.Volumes>: map has no entry for key \"Volumes\"\n",
+    "stdout": "\n"
+  },
+  "observed_utc": "2026-10-10T02:34:00.891195+00:00",
+  "phase_containers": {
+    "count": 0,
+    "exit_code": 0,
+    "names": [],
+    "stderr": ""
+  },
+  "private_config_path": "C:\\Users\\Admin\\AppData\\Local\\Temp\\runtime-sandbox1-no-config-fbe94eafe8c094836f397edda774bb5f",
+  "processes_reaped_and_pipes_closed": true,
+  "provider_issuance": 0,
+  "read_only_Docker_controls": 2,
+  "scope": "Post-attempt read-only observations, not original standalone measurements.",
+  "standalone_owner_invocations": 0
+}

@@ -32,6 +32,7 @@ the opt-in live one.
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import Any, Protocol, runtime_checkable
 
 from core.explicit_evidence import (
@@ -649,9 +650,13 @@ class SemanticWaiterModelAdapter:
         explicit_evidence: ExplicitEvidence,
     ) -> SemanticInterpretation:
         """First attempt: read the order and report what it means."""
-        return parse_semantic_response(
+        interpretation = parse_semantic_response(
             self._complete(build_interpretation_request(raw_prompt, explicit_evidence))
         )
+        # OOP.INTENT.DESIGN.1: these typed literals belong to intake, so model
+        # JSON cannot author or rewrite them.  Transport them beside its result
+        # without changing the model schema, prompt, or number of calls.
+        return replace(interpretation, design_evidence=explicit_evidence.design_evidence)
 
     def repair(
         self,
@@ -664,9 +669,10 @@ class SemanticWaiterModelAdapter:
         Not part of the INPUT.1 protocol — the runner calls it directly, and
         only once.
         """
-        return parse_semantic_response(
+        interpretation = parse_semantic_response(
             self._complete(build_repair_request(raw_prompt, explicit_evidence, preservation))
         )
+        return replace(interpretation, design_evidence=explicit_evidence.design_evidence)
 
 
 class ScriptedSemanticModelClient:

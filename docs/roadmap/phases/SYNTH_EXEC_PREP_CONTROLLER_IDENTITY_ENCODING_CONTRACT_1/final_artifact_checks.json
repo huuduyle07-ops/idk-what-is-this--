@@ -1,0 +1,43 @@
+{
+  "finalizer_blocked_actions": [],
+  "finalizer_guard": {
+    "capability_or_transition_attempts": 0,
+    "capability_owner_import_attempts": 0,
+    "execution_or_verification_attempts": 0,
+    "network_attempts": 0,
+    "outside_phase_write_attempts": 0,
+    "process_attempts": 0
+  },
+  "json_validated": [
+    "benchmark.json",
+    "budget_ledger_audit.json",
+    "budget_projection.json",
+    "contract.json",
+    "contract_review.json",
+    "existing_owner_audit.json",
+    "final_artifact_checks.json",
+    "focused.json",
+    "git_validation.json",
+    "git_validation_baseline.json",
+    "git_validation_raw_crlf_baseline.json",
+    "preservation_after.json",
+    "preservation_baseline.json",
+    "preservation_comparison.json",
+    "registry_after.json",
+    "registry_baseline.json",
+    "registry_comparison.json",
+    "report_review.json",
+    "static_validation.json",
+    "SYNTH_EXEC_PREP_CONTROLLER_IDENTITY_ENCODING_CONTRACT_1_REPORT.json",
+    "validation_summary.json"
+  ],
+  "passed": true,
+  "python_compiled": [
+    "budget_projection.py",
+    "finalize_artifacts.py",
+    "validate_pure.py",
+    "tests/test_identity_contract.py"
+  ],
+  "report_sha256": "f22758d4ada376bac8a34350edca08e17550f887fcd698b47b62bef8b91a338f",
+  "whitespace_errors": []
+}

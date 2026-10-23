@@ -1,0 +1,36 @@
+{
+  "phase_id": "RUNTIME.JAVA.PINNED.1A",
+  "checks": {
+    "report_copies_all_local_fields_exactly": true,
+    "report_local_artifact_sha256_matches": true,
+    "compiled_safety_sources_unchanged_after_pure_gate_and_live_proof": true,
+    "all_46_python_files_compile_in_memory": true,
+    "final_authored_whitespace_passed": true,
+    "final_json_parse_passed": true,
+    "git_diff_check_passed": true,
+    "live_target_proof_completed": true,
+    "only_single_stopped_target_container_and_single_export": true,
+    "all_prohibited_operational_effects_zero": true,
+    "all_cleanup_verified_with_zero_remaining_containers": true,
+    "all_11_negative_authentication_controls_rejected": true,
+    "receipt_authenticated_before_and_after_negative_controls": true,
+    "no_global_inventory_backend_runtime_or_provider_proof_claims": true,
+    "validation_fixture_trees_removed": true
+  },
+  "passed": true,
+  "source_hash_mismatches": [],
+  "compilation_errors": [],
+  "whitespace_issues": [],
+  "json_errors": [],
+  "forbidden_nonzero_effects": {},
+  "historical_hash_scan_repeated": false,
+  "local_artifact_sha256": "b779d8c11f9797c2e1f4cbd324cf77f50f344af7ee5e1d8b7fa076d94a1a7585",
+  "new_source_paths": [
+    "core/runtime_java_pinned_target_inspection.py",
+    "core/runtime_java_pinned_target_archive.py",
+    "scripts/replay_runtime_java_pinned1a.py",
+    "tests/test_runtime_java_pinned_target_inspection.py",
+    "tests/test_runtime_java_pinned_target_archive.py"
+  ],
+  "remaining_validation_fixture_directories": []
+}

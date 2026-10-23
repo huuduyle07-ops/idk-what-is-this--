@@ -1,0 +1,713 @@
+{
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.KERNEL.IDENTITY.CONTRACT.1",
+  "schema_version": "kernel_observation_identity_contract_1_v1",
+  "artifact_kind": "pure_additive_partial_observation_projection_contract_and_unresolved_identity_report",
+  "typed_result": "KERNEL_IDENTITY_CONTRACT_UNRESOLVED",
+  "created_at": "2026-10-19",
+  "contract_frozen": false,
+  "settled_projection_rules_frozen": true,
+  "stop_after_contract": true,
+  "result_meaning": "Observation projections and numeric meanings are frozen below. Exact incarnation-bearing mount/root/process/task/group/descriptor encodings remain unresolved. No impossibility or mandatory requirement evolution is established.",
+  "schema_modified": false,
+  "historical_contracts_modified": false,
+  "requirement_evolution_required": false,
+  "historical_budget_result": "BUDGET_WITNESS_UNRESOLVED",
+  "cap_bytes": 8192,
+  "candidate_A_selected": false,
+  "sources": {
+    "controller": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "sha256": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328"
+    },
+    "schema": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+      "sha256": "1c40559d4a48b747632ec4e75b49eaeae33bad9ed63fa7cbd5b19337d840406e"
+    },
+    "workspace": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+      "sha256": "259f3e60a9f33677a335cb6f309b5b89a4f60d7321a2dc623dff186fd98a692d"
+    },
+    "owner_encoding": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_IDENTITY_ENCODING_CONTRACT_1/contract.json",
+      "sha256": "a461f49bcc3b18426490028ee1aaf11a371d7ea1f9bc2bc5afc07dd72fa02265"
+    },
+    "budget": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1R/budget_witness.json",
+      "sha256": "33a3a8d9484e4d61991959dfb733e30db2e2b87ca0f436e22269d8515812d6fe"
+    },
+    "candidate": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/selection.json",
+      "sha256": "d96d57dcabd07f8b77a358a1188b1f5dd2240e9e6d3ed6ea36677f6efbf2e7f6"
+    }
+  },
+  "core_distinction": [
+    "raw kernel fact",
+    "serialized field projection",
+    "authenticated workspace state",
+    "authority"
+  ],
+  "binding": {
+    "required": [
+      "exact original authenticated container/workspace/controller generation",
+      "exact original retained controller and process/PID-numbering view",
+      "current single coherent observation sequence/challenge or operation-bound poststate",
+      "complete same-generation snapshot and workspace-local admission fence",
+      "unchanged owner registry/HMAC/current eligibility and permanent terminal rules"
+    ],
+    "equality_rule": "Projection equality is necessary equality evidence only. Never use it as a bearer credential, authentication, generation freshness or proof that no replacement occurred. Retain exact source observations separately in authenticated original state; digest collisions or aliases cannot upgrade equality to continuity.",
+    "continuity_rule": "If namespace/mount/process/task/group/descriptor continuity is not independently proved in the same authenticated generation, fail PROOF_UNRESOLVED before effects. A new spelling, digest, PID, timestamp, container name or hidden generation counter cannot fill the proof gap.",
+    "snapshot_limit": "No claim that sequential proc/stat reads are atomic. Future coherent observation/lifetime proof remains unimplemented and unaudited."
+  },
+  "identity_matrix": [
+    {
+      "fields": [
+        "mount_identity"
+      ],
+      "semantic_source": "Mount namespace plus exact mount relation; mountinfo mount ID, parent ID, major:minor, root, mountpoint and filesystem kind are candidates, not historical observations.",
+      "canonical_representation": null,
+      "semantic_role": "Exact /tmp or /work mount incarnation, also referenced by writer handles. Numeric mount ID is a reusable namespace-local relation, not standalone incarnation proof.",
+      "status": "INCARNATION_ENCODING_UNRESOLVED",
+      "minimum_content_bytes": null,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "namespace_generation"
+      ],
+      "semantic_source": "Mount namespace observation plus authenticated generation and continuity.",
+      "canonical_representation": null,
+      "semantic_role": "Per-mount stale namespace replacement protection. A raw namespaces.mnt alias would identify the observed namespace but cannot alone prove nonreplacement across an unobserved gap; no alias or hidden counter is adopted.",
+      "status": "INCARNATION_ENCODING_UNRESOLVED",
+      "minimum_content_bytes": null,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "root_identity"
+      ],
+      "semantic_source": "No-follow root st_dev, st_ino, file type and exact mount relation, bound to current authenticated generation.",
+      "canonical_representation": null,
+      "semantic_role": "Exact root object of each tmpfs mount. Device/inode may be reused; metadata mode/uid/gid/link_count are separate observations, not identity inputs. Root path or device equality does not establish no-cross-mount.",
+      "status": "INCARNATION_ENCODING_UNRESOLVED",
+      "minimum_content_bytes": null,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "controller_process_identity",
+        "writer.process_identity"
+      ],
+      "semantic_source": "PID in observer PID-numbering view; process stat field 22 starttime; target active PID namespace; authenticated container/workspace/controller generation.",
+      "canonical_representation": null,
+      "semantic_role": "Both fields must reference the SAME inventoried original controller process on the lower profile. A full process projection is distinct from start_identity alone. Tuple/digest choice deferred: a digest cannot repair noninjective facts or missing continuity.",
+      "status": "INCARNATION_ENCODING_UNRESOLVED",
+      "minimum_content_bytes": null,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "namespace_identity"
+      ],
+      "semantic_source": "All seven exact controller namespace observations in fixed order.",
+      "canonical_representation": "64 lowercase hexadecimal SHA256 of the namespace preimage below.",
+      "semantic_role": "Aggregate equality key for the entire seven-namespace observation. Individual fields remain interpretable kernel facts. A changed component changes the preimage; digest equality alone is neither authentication nor namespace incarnation continuity.",
+      "status": "OBSERVATION_PROJECTION_FROZEN",
+      "minimum_content_bytes": 64,
+      "maximum_semantic_content_bytes": 64,
+      "finite_semantic_width_guaranteed": true,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "namespaces.user"
+      ],
+      "semantic_source": "Exact os.readlink('/proc/<pid>/ns/user') source convention.",
+      "canonical_representation": "user:[<canonical unsigned decimal inode>]",
+      "semantic_role": "Namespace object-number observation in the exact authenticated current snapshot. Not a bearer credential or global generation ID.",
+      "status": "OBSERVATION_PROJECTION_FROZEN",
+      "minimum_content_bytes": 8,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "namespaces.mnt"
+      ],
+      "semantic_source": "Exact os.readlink('/proc/<pid>/ns/mnt') source convention.",
+      "canonical_representation": "mnt:[<canonical unsigned decimal inode>]",
+      "semantic_role": "Namespace object-number observation in the exact authenticated current snapshot. Not a bearer credential or global generation ID.",
+      "status": "OBSERVATION_PROJECTION_FROZEN",
+      "minimum_content_bytes": 7,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "namespaces.net"
+      ],
+      "semantic_source": "Exact os.readlink('/proc/<pid>/ns/net') source convention.",
+      "canonical_representation": "net:[<canonical unsigned decimal inode>]",
+      "semantic_role": "Namespace object-number observation in the exact authenticated current snapshot. Not a bearer credential or global generation ID.",
+      "status": "OBSERVATION_PROJECTION_FROZEN",
+      "minimum_content_bytes": 7,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "namespaces.pid"
+      ],
+      "semantic_source": "Exact os.readlink('/proc/<pid>/ns/pid') source convention.",
+      "canonical_representation": "pid:[<canonical unsigned decimal inode>]",
+      "semantic_role": "Namespace object-number observation in the exact authenticated current snapshot. Not a bearer credential or global generation ID.",
+      "status": "OBSERVATION_PROJECTION_FROZEN",
+      "minimum_content_bytes": 7,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "namespaces.ipc"
+      ],
+      "semantic_source": "Exact os.readlink('/proc/<pid>/ns/ipc') source convention.",
+      "canonical_representation": "ipc:[<canonical unsigned decimal inode>]",
+      "semantic_role": "Namespace object-number observation in the exact authenticated current snapshot. Not a bearer credential or global generation ID.",
+      "status": "OBSERVATION_PROJECTION_FROZEN",
+      "minimum_content_bytes": 7,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "namespaces.cgroup"
+      ],
+      "semantic_source": "Exact os.readlink('/proc/<pid>/ns/cgroup') source convention.",
+      "canonical_representation": "cgroup:[<canonical unsigned decimal inode>]",
+      "semantic_role": "Namespace object-number observation in the exact authenticated current snapshot. Not a bearer credential or global generation ID.",
+      "status": "OBSERVATION_PROJECTION_FROZEN",
+      "minimum_content_bytes": 10,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "namespaces.uts"
+      ],
+      "semantic_source": "Exact os.readlink('/proc/<pid>/ns/uts') source convention.",
+      "canonical_representation": "uts:[<canonical unsigned decimal inode>]",
+      "semantic_role": "Namespace object-number observation in the exact authenticated current snapshot. Not a bearer credential or global generation ID.",
+      "status": "OBSERVATION_PROJECTION_FROZEN",
+      "minimum_content_bytes": 7,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "cgroup_identity"
+      ],
+      "semantic_source": "Exact bytes of the complete /proc/<pid>/cgroup observation (historical source preserves file text; the new byte preimage is an explicit additive decision).",
+      "canonical_representation": "64 lowercase hexadecimal SHA256 of the cgroup preimage below.",
+      "semantic_role": "Equality projection of the observed membership listing in its observation/PID/cgroup namespace context. Does not prove same underlying cgroup object after path reuse, rename, recreation or namespace replacement.",
+      "status": "OBSERVATION_PROJECTION_FROZEN",
+      "minimum_content_bytes": 64,
+      "maximum_semantic_content_bytes": 64,
+      "finite_semantic_width_guaranteed": true,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "process.start_identity"
+      ],
+      "semantic_source": "Field 22 starttime in /proc/<pid>/stat: elapsed boot clock ticks at process start, not wall time.",
+      "canonical_representation": "Unsigned canonical decimal text: 0|[1-9][0-9]*; one JSON string, not a JSON integer.",
+      "semantic_role": "Exact starttime FACT only, scoped by enclosing pid, active PID namespace, original process and authenticated generation. Tick quantization is not proven collision-free; no PID+tick uniqueness claim.",
+      "status": "OBSERVATION_PROJECTION_FROZEN",
+      "minimum_content_bytes": 1,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "task.start_identity"
+      ],
+      "semantic_source": "Field 22 of /proc/<pid>/task/<tid>/stat for that task; do not copy the leader's value.",
+      "canonical_representation": "Unsigned canonical decimal text: 0|[1-9][0-9]*; one JSON string, not a JSON integer.",
+      "semantic_role": "Task's own starttime FACT, scoped by tid and enclosing original process/PID namespace/generation. Distinct role from writer.task_identity; no TID-only or tick-only incarnation assertion.",
+      "status": "OBSERVATION_PROJECTION_FROZEN",
+      "minimum_content_bytes": 1,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "writer.task_identity"
+      ],
+      "semantic_source": "Enclosing original process relation plus exact task TID, task stat starttime and PID namespace in current generation.",
+      "canonical_representation": null,
+      "semantic_role": "Join one writer record to its inventoried task incarnation; do not alias task.start_identity alone. Missing continuity proof is not solved by tuple concatenation.",
+      "status": "INCARNATION_ENCODING_UNRESOLVED",
+      "minimum_content_bytes": null,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "process_group_identity"
+      ],
+      "semantic_source": "Observed PGID, admitted compiler child and original leader process incarnation/start/PID namespace, bound to the same admitted operation and generation.",
+      "canonical_representation": null,
+      "semantic_role": "Capture/reap evidence for the exact admitted child/group. Historical start_new_session makes child PID the group selector, but PGID alone or a recreated same-PGID group cannot be accepted. Preserve retained relation through leader exit/reaping; this phase issues no token.",
+      "status": "INCARNATION_ENCODING_UNRESOLVED",
+      "minimum_content_bytes": null,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    },
+    {
+      "fields": [
+        "writer_handle.descriptor_identity"
+      ],
+      "semantic_source": "access_kind selects actual open_writable_handle or synthetic potential_write_access relation.",
+      "canonical_representation": null,
+      "semantic_role": "Both kinds exist in the frozen schema. Actual FD requires exact process/task + observed descriptor slot + coherent observation/mount/object relation; close/reopen reuses a number. Potential access is not an FD and needs its independently defined relation semantics. No tagged grammar is frozen until both preimages are truthful; no record counts/topology/potential-access rules are decided.",
+      "status": "INCARNATION_ENCODING_UNRESOLVED",
+      "minimum_content_bytes": null,
+      "maximum_semantic_content_bytes": null,
+      "finite_semantic_width_guaranteed": false,
+      "admission": "Existing id: 1..256 UTF-8 bytes, no NUL; reject unrepresentable evidence, never truncate."
+    }
+  ],
+  "namespaces": {
+    "order": [
+      "user",
+      "mnt",
+      "net",
+      "pid",
+      "ipc",
+      "cgroup",
+      "uts"
+    ],
+    "fields": {
+      "user": {
+        "regex": "user:\\[(0|[1-9][0-9]*)\\]",
+        "minimum_content_bytes": 8,
+        "minimum_canonical_json_bytes": 10,
+        "maximum_semantic_inode_digits": null,
+        "maximum_admitted_inode_digits": 249
+      },
+      "mnt": {
+        "regex": "mnt:\\[(0|[1-9][0-9]*)\\]",
+        "minimum_content_bytes": 7,
+        "minimum_canonical_json_bytes": 9,
+        "maximum_semantic_inode_digits": null,
+        "maximum_admitted_inode_digits": 250
+      },
+      "net": {
+        "regex": "net:\\[(0|[1-9][0-9]*)\\]",
+        "minimum_content_bytes": 7,
+        "minimum_canonical_json_bytes": 9,
+        "maximum_semantic_inode_digits": null,
+        "maximum_admitted_inode_digits": 250
+      },
+      "pid": {
+        "regex": "pid:\\[(0|[1-9][0-9]*)\\]",
+        "minimum_content_bytes": 7,
+        "minimum_canonical_json_bytes": 9,
+        "maximum_semantic_inode_digits": null,
+        "maximum_admitted_inode_digits": 250
+      },
+      "ipc": {
+        "regex": "ipc:\\[(0|[1-9][0-9]*)\\]",
+        "minimum_content_bytes": 7,
+        "minimum_canonical_json_bytes": 9,
+        "maximum_semantic_inode_digits": null,
+        "maximum_admitted_inode_digits": 250
+      },
+      "cgroup": {
+        "regex": "cgroup:\\[(0|[1-9][0-9]*)\\]",
+        "minimum_content_bytes": 10,
+        "minimum_canonical_json_bytes": 12,
+        "maximum_semantic_inode_digits": null,
+        "maximum_admitted_inode_digits": 247
+      },
+      "uts": {
+        "regex": "uts:\\[(0|[1-9][0-9]*)\\]",
+        "minimum_content_bytes": 7,
+        "minimum_canonical_json_bytes": 9,
+        "maximum_semantic_inode_digits": null,
+        "maximum_admitted_inode_digits": 250
+      }
+    },
+    "canonical": "Exact built-in str, ASCII, lowercase kind, literal colon and square brackets, canonical unsigned decimal. Reject whitespace, signs, leading-zero aliases, alternate case, escape spellings and non-ASCII; no normalization. JSON uses the frozen canonical encoder.",
+    "source": "core/sandboxed_java_positive_probe.py:22-25",
+    "active_pid_namespace": "Use /proc/<pid>/ns/pid, not pid_for_children. Numeric IDs are interpreted in the fixed observer procfs PID-numbering view; a target's namespace inode alone does not define observer numbering.",
+    "width_limit": "No Linux semantic inode digit maximum is established by historical source or frozen platform requirements. 256 is an accepted wire ceiling only. Reject unrepresentable observations without truncation or silent hashing."
+  },
+  "namespace_identity": {
+    "role": "aggregate equality projection",
+    "algorithm": "SHA256",
+    "content_regex": "[0-9a-f]{64}",
+    "domain": "CATTUS:SYNTH.EXEC.PREP.CONTROLLER.KERNEL.IDENTITY.1:namespace-tuple:v1",
+    "preimage": "ASCII domain + one NUL byte + canonical JSON bytes of the fixed seven-element list [user,mnt,net,pid,ipc,cgroup,uts] containing the exact validated raw strings. ensure_ascii=true, sort_keys=true, separators=(',', ':'), allow_nan=false, ASCII encoding, no newline. No outer generation or dictionary keys are added to this preimage; they remain independently authenticated bindings.",
+    "collision_rule": "SHA256 collision resistance is a projection assumption, not proof of authentication or unique kernel incarnation. Raw components are retained and compared where exact equality is required.",
+    "decision": "Raw tuple-as-string would embed JSON quoting and conflate the aggregate equality key with human-readable individual observations; ad hoc concatenation is rejected. Digest chosen for this aggregate equality role with frozen preimage, not to meet the cap."
+  },
+  "cgroup_identity": {
+    "role": "membership observation equality projection",
+    "algorithm": "SHA256",
+    "content_regex": "[0-9a-f]{64}",
+    "domain": "CATTUS:SYNTH.EXEC.PREP.CONTROLLER.KERNEL.IDENTITY.1:cgroup-raw:v1",
+    "preimage": "ASCII domain + one NUL byte + exact raw-byte length encoded as unsigned 8-byte big-endian + the complete exact raw bytes. No decode/re-encode, strip, trim, line-ending conversion, line sorting, path normalization, parsed normalization or automatic final newline. Reject incomplete/oversized reads before a complete claim. Length >=2^64 is unrepresentable and fails unresolved.",
+    "raw_width": "No semantic listing byte maximum is pinned; the length-prefix acceptance ceiling is 2^64-1, not a kernel bound or an observer input budget. A future observer must prove a complete bounded read under existing timeout/byte/record limits.",
+    "source_limit": "Historical open(...).read() preserves text at Python's text layer; it does not prove byte-exact acquisition or a cgroup object-incarnation identity. This explicit raw-byte digest rule is new declarative semantics only.",
+    "decision": "Direct raw text can contain multiple lines and arbitrary path bytes, with no established 256-byte semantic bound. Parsing/normalizing would erase distinctions. Digest chosen because consumers compare complete membership observations; raw bytes remain authenticated retained evidence, not protocol-exported content. No HMAC substitution or budget-driven digest choice."
+  },
+  "start_facts": {
+    "regex": "0|[1-9][0-9]*",
+    "minimum_content_bytes": 1,
+    "maximum_semantic_digits": null,
+    "maximum_admitted_digits": 256,
+    "parser_requirement": "Stat field 22 is a numbered Linux format field. comm can contain spaces and parentheses; naive whitespace split of the whole stat line or first ')' delimiter is insufficient. Process/task fact collection must prove correct parsing and coherent binding; no parser or live read is implemented here.",
+    "counter_limit": "No architecture clock width, tick frequency, wrap semantics, boot-ID encoding or PID reuse interval is pinned. Do not infer 19 digits from the numeric schema: start_identity is an id string, not a uint field."
+  },
+  "numeric_metadata": [
+    {
+      "field": "mode",
+      "semantic_source": "Full int(st_mode), including file type, special and permission bits; never stat.S_IMODE. Check file type against kind, reject special files and links. Root must be directory. Metadata is not object identity.",
+      "representation": "Exact built-in int; ordinary canonical JSON decimal. No bool, float, sign on nonnegative values, leading zeros, exponent, octal, quotes or coercion.",
+      "minimum_accepted": 0,
+      "maximum_accepted": 9223372036854775807,
+      "minimum_json_bytes": 5,
+      "maximum_json_bytes": 19,
+      "range_basis": "Existing uint/positive_int schema admission; not a claimed native Linux kernel type width.",
+      "mode_width_basis": "Allowed Linux regular-file/directory full type bits require at least five decimal digits; schema-only upper envelope remains 19. No permissions-only alternative."
+    },
+    {
+      "field": "uid",
+      "semantic_source": "Observed numeric owner user ID in the observer's authenticated user-namespace view; no name lookup, host-ID inference or remapping.",
+      "representation": "Exact built-in int; ordinary canonical JSON decimal. No bool, float, sign on nonnegative values, leading zeros, exponent, octal, quotes or coercion.",
+      "minimum_accepted": 0,
+      "maximum_accepted": 9223372036854775807,
+      "minimum_json_bytes": 1,
+      "maximum_json_bytes": 19,
+      "range_basis": "Existing uint/positive_int schema admission; not a claimed native Linux kernel type width.",
+      "mode_width_basis": null
+    },
+    {
+      "field": "gid",
+      "semantic_source": "Observed numeric owner group ID in the same authenticated user-namespace view; no name lookup or inferred host ID.",
+      "representation": "Exact built-in int; ordinary canonical JSON decimal. No bool, float, sign on nonnegative values, leading zeros, exponent, octal, quotes or coercion.",
+      "minimum_accepted": 0,
+      "maximum_accepted": 9223372036854775807,
+      "minimum_json_bytes": 1,
+      "maximum_json_bytes": 19,
+      "range_basis": "Existing uint/positive_int schema admission; not a claimed native Linux kernel type width.",
+      "mode_width_basis": null
+    },
+    {
+      "field": "link_count",
+      "semantic_source": "Observed st_nlink; regular allowed files must equal 1. Directory counts are observed, not guessed as 2.",
+      "representation": "Exact built-in int; ordinary canonical JSON decimal. No bool, float, sign on nonnegative values, leading zeros, exponent, octal, quotes or coercion.",
+      "minimum_accepted": 1,
+      "maximum_accepted": 9223372036854775807,
+      "minimum_json_bytes": 1,
+      "maximum_json_bytes": 19,
+      "range_basis": "Existing uint/positive_int schema admission; not a claimed native Linux kernel type width.",
+      "mode_width_basis": null
+    },
+    {
+      "field": "pid",
+      "semantic_source": "Inventoried process ID in the fixed controller procfs/observer PID-numbering view (not an unlabelled host PID).",
+      "representation": "Exact built-in int; ordinary canonical JSON decimal. No bool, float, sign on nonnegative values, leading zeros, exponent, octal, quotes or coercion.",
+      "minimum_accepted": 1,
+      "maximum_accepted": 9223372036854775807,
+      "minimum_json_bytes": 1,
+      "maximum_json_bytes": 19,
+      "range_basis": "Existing uint/positive_int schema admission; not a claimed native Linux kernel type width.",
+      "mode_width_basis": null
+    },
+    {
+      "field": "parent_pid",
+      "semantic_source": "Observed parent process ID in that same view; zero is permitted at the namespace boundary. Not proof of ancestry continuity.",
+      "representation": "Exact built-in int; ordinary canonical JSON decimal. No bool, float, sign on nonnegative values, leading zeros, exponent, octal, quotes or coercion.",
+      "minimum_accepted": 0,
+      "maximum_accepted": 9223372036854775807,
+      "minimum_json_bytes": 1,
+      "maximum_json_bytes": 19,
+      "range_basis": "Existing uint/positive_int schema admission; not a claimed native Linux kernel type width.",
+      "mode_width_basis": null
+    },
+    {
+      "field": "tid",
+      "semantic_source": "Observed task ID in the same procfs/observer PID-numbering view, joined to its enclosing process and own starttime.",
+      "representation": "Exact built-in int; ordinary canonical JSON decimal. No bool, float, sign on nonnegative values, leading zeros, exponent, octal, quotes or coercion.",
+      "minimum_accepted": 1,
+      "maximum_accepted": 9223372036854775807,
+      "minimum_json_bytes": 1,
+      "maximum_json_bytes": 19,
+      "range_basis": "Existing uint/positive_int schema admission; not a claimed native Linux kernel type width.",
+      "mode_width_basis": null
+    },
+    {
+      "field": "child_pid",
+      "semantic_source": "Exact admitted compiler child PID in the same controller view, retained through capture/reaping; not a replacement child.",
+      "representation": "Exact built-in int; ordinary canonical JSON decimal. No bool, float, sign on nonnegative values, leading zeros, exponent, octal, quotes or coercion.",
+      "minimum_accepted": 1,
+      "maximum_accepted": 9223372036854775807,
+      "minimum_json_bytes": 1,
+      "maximum_json_bytes": 19,
+      "range_basis": "Existing uint/positive_int schema admission; not a claimed native Linux kernel type width.",
+      "mode_width_basis": null
+    },
+    {
+      "field": "subordinate_mount_count",
+      "semantic_source": "Exact complete subordinate-mount count for the authenticated root; accepted complete state is integer 0 only, never sampled absence.",
+      "representation": "Exact built-in int; ordinary canonical JSON decimal. No bool, float, sign on nonnegative values, leading zeros, exponent, octal, quotes or coercion.",
+      "minimum_accepted": 0,
+      "maximum_accepted": 0,
+      "minimum_json_bytes": 1,
+      "maximum_json_bytes": 1,
+      "range_basis": "Existing enum",
+      "mode_width_basis": null
+    }
+  ],
+  "representation_decisions": [
+    {
+      "family": "namespaces.*",
+      "raw": "Adopt exact readlink spelling; directly interpretable and source-supported.",
+      "structured": "Already typed by seven exact field names; no extra tuple inside each scalar.",
+      "digest": "Rejected for individual fields: hides useful kernel interpretation and cannot prove namespace continuity."
+    },
+    {
+      "family": "namespace_identity",
+      "raw": "No independent aggregate raw kernel string exists in the audited source.",
+      "structured": "Adopt the exact ordered seven-string tuple as canonical preimage, not ambiguous concatenation.",
+      "digest": "Adopt SHA256 equality projection with distinct domain; raw observations stay retained."
+    },
+    {
+      "family": "cgroup_identity",
+      "raw": "Complete exact raw listing has no established small semantic width and may contain arbitrary path bytes; keep it internally.",
+      "structured": "Parsed/normalized listing rejected: would silently identify distinct raw observations.",
+      "digest": "Adopt role-separated exact-byte equality digest, not authentication or durable cgroup object identity."
+    },
+    {
+      "family": "process.start_identity,task.start_identity",
+      "raw": "Adopt canonical decimal clock-tick FACT text with contextual binding.",
+      "structured": "PID/TID/namespace/generation remain separately bound; adding them here would conflate start fact with full process/task identity.",
+      "digest": "Rejected: hides meaningful ticks without resolving reuse or quantization."
+    },
+    {
+      "family": "namespace_generation",
+      "raw": "Raw mount namespace alias considered but not adopted: cannot certify no replacement in an unobserved interval.",
+      "structured": "Needs explicit retained namespace lifetime context; no owner generation counter exists here.",
+      "digest": "Rejected as repair for missing continuity; no chosen preimage or grammar."
+    },
+    {
+      "family": "mount_identity",
+      "raw": "Mount ID alone can be reused. Parent ID, root/mountpoint path, filesystem kind or device number alone are also insufficient.",
+      "structured": "Mount-namespace plus mount/root incarnation relation is the smallest candidate. Parent ID/topology belongs to subordinate-mount verification; paths/options/fs kind remain separately checked. No fields added merely for apparent uniqueness.",
+      "digest": "Deferred: no truthful continuity-bearing tuple is frozen, so hashing candidate primitives cannot complete identity."
+    },
+    {
+      "family": "root_identity",
+      "raw": "Device/inode/type alone is reusable and not a mount discriminator.",
+      "structured": "Candidate no-follow (st_dev,st_ino,file_type) bound to the exact mount and generation. Metadata remains separate; retained original-object relation still needs proof.",
+      "digest": "Deferred: obscures interpretable facts without curing incarnation gaps."
+    },
+    {
+      "family": "controller_process_identity,writer.process_identity,writer.task_identity",
+      "raw": "PID/TID or start ticks alone rejected.",
+      "structured": "Process candidate PID+own start+PID namespace; task adds enclosing original process+TID+own start. Exact equality is not proven injective under tick quantization/reuse, and coherent lifetime binding remains missing.",
+      "digest": "Deferred: no advantage until the canonical relation and continuity proof are established."
+    },
+    {
+      "family": "process_group_identity",
+      "raw": "Numeric PGID alone rejected.",
+      "structured": "Candidate original admitted leader process incarnation plus observed PGID, operation and authenticated generation; must retain group relation through leader exit.",
+      "digest": "Deferred; no random token or cryptographic credential substitutes for observed group ownership."
+    },
+    {
+      "family": "writer_handle.descriptor_identity",
+      "raw": "Bare numeric FD aliases potential-access records and fd close/reopen.",
+      "structured": "Distinct actual versus potential tags are necessary, but not sufficient without fully defined per-kind relation preimages. Potential-access semantics are outside scope.",
+      "digest": "Deferred: no fully frozen truthful preimages; must not hash an underspecified relation."
+    },
+    {
+      "family": "numeric metadata",
+      "raw": "Adopt exact JSON decimal int from the stated fact; full st_mode for mode.",
+      "structured": "No scalar string wrappers or alternate octal display serialization.",
+      "digest": "Rejected: these fields require numeric interpretation, not equality-only identity."
+    }
+  ],
+  "unresolved_decisions": [
+    {
+      "field": [
+        "mount_identity"
+      ],
+      "reason": "Exact /tmp or /work mount incarnation, also referenced by writer handles. Numeric mount ID is a reusable namespace-local relation, not standalone incarnation proof.",
+      "next_evidence": "A separately reviewed read-only lifetime/continuity projection and canonical grammar; no owner counter/token invented here."
+    },
+    {
+      "field": [
+        "namespace_generation"
+      ],
+      "reason": "Per-mount stale namespace replacement protection. A raw namespaces.mnt alias would identify the observed namespace but cannot alone prove nonreplacement across an unobserved gap; no alias or hidden counter is adopted.",
+      "next_evidence": "A separately reviewed read-only lifetime/continuity projection and canonical grammar; no owner counter/token invented here."
+    },
+    {
+      "field": [
+        "root_identity"
+      ],
+      "reason": "Exact root object of each tmpfs mount. Device/inode may be reused; metadata mode/uid/gid/link_count are separate observations, not identity inputs. Root path or device equality does not establish no-cross-mount.",
+      "next_evidence": "A separately reviewed read-only lifetime/continuity projection and canonical grammar; no owner counter/token invented here."
+    },
+    {
+      "field": [
+        "controller_process_identity",
+        "writer.process_identity"
+      ],
+      "reason": "Both fields must reference the SAME inventoried original controller process on the lower profile. A full process projection is distinct from start_identity alone. Tuple/digest choice deferred: a digest cannot repair noninjective facts or missing continuity.",
+      "next_evidence": "A separately reviewed read-only lifetime/continuity projection and canonical grammar; no owner counter/token invented here."
+    },
+    {
+      "field": [
+        "writer.task_identity"
+      ],
+      "reason": "Join one writer record to its inventoried task incarnation; do not alias task.start_identity alone. Missing continuity proof is not solved by tuple concatenation.",
+      "next_evidence": "A separately reviewed read-only lifetime/continuity projection and canonical grammar; no owner counter/token invented here."
+    },
+    {
+      "field": [
+        "process_group_identity"
+      ],
+      "reason": "Capture/reap evidence for the exact admitted child/group. Historical start_new_session makes child PID the group selector, but PGID alone or a recreated same-PGID group cannot be accepted. Preserve retained relation through leader exit/reaping; this phase issues no token.",
+      "next_evidence": "A separately reviewed read-only lifetime/continuity projection and canonical grammar; no owner counter/token invented here."
+    },
+    {
+      "field": [
+        "writer_handle.descriptor_identity"
+      ],
+      "reason": "Both kinds exist in the frozen schema. Actual FD requires exact process/task + observed descriptor slot + coherent observation/mount/object relation; close/reopen reuses a number. Potential access is not an FD and needs its independently defined relation semantics. No tagged grammar is frozen until both preimages are truthful; no record counts/topology/potential-access rules are decided.",
+      "next_evidence": "A separately reviewed read-only lifetime/continuity projection and canonical grammar; no owner counter/token invented here."
+    }
+  ],
+  "descriptor_boundary": {
+    "actual": "Actual numeric FD denotes a slot within a file table at an observation. Slot reuse and shared file tables require explicit scope; inode/readlink/fdinfo equality alone is no durable open-file-description identity.",
+    "potential": "Synthetic potential-access relation has no kernel FD. Its causal semantics are intentionally outside this phase. A future tagged grammar must bind exact process/task, mount/path/access kind and independently established relation without aliasing actual handles.",
+    "selection": null,
+    "tagged_grammar_frozen": false,
+    "records_per_writer_decided": false
+  },
+  "excluded_scope": [
+    "writer record count",
+    "writer completeness topology",
+    "potential-access semantics",
+    "descendant/per-path handle enumeration",
+    "umask/creation topology",
+    "borrower identities",
+    "handoff identities",
+    "container/workspace/controller-generation encodings",
+    "future owner IDs",
+    "physical framing/stream mapping"
+  ],
+  "writer_completeness": "WRITER_INVENTORY_COMPLETENESS_UNRESOLVED",
+  "budget_projection": "Read budget_projection.json: exact partial lower subtotals and symbolic residuals only; full projected response sizes remain unestablished. Conditional physical arithmetic does not select Candidate A or alter 8192.",
+  "authority_flags": {
+    "source_identity_authority_issued_by_this_phase": false,
+    "sandbox_materialization_authority": false,
+    "exact_sandbox_materialization_authority": false,
+    "scenario_compilation_authority": false,
+    "exact_scenario_compilation_authority": false,
+    "compilation_authority": false,
+    "runtime_activation_authority": false,
+    "runtime_authority": false,
+    "real_task_runtime_authority": false,
+    "repository_write_authority": false,
+    "repository_source_write_authority": false,
+    "repository_java_authority": false,
+    "apply_authority": false,
+    "network_authority": false,
+    "host_mount_authority": false,
+    "shell_authority": false,
+    "arbitrary_java_authority": false,
+    "arbitrary_command_authority": false,
+    "arbitrary_source_authority": false,
+    "arbitrary_class_authority": false,
+    "arbitrary_method_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "reflection_execution_authority": false,
+    "generic_reflection_authority": false,
+    "arbitrary_reflection_authority": false,
+    "constructor_reflection_authority": false,
+    "field_write_authority": false,
+    "private_method_authority": false,
+    "enumeration_authority": false,
+    "executor_authority": false,
+    "BANK_authority": false,
+    "preparation_authority": false,
+    "consumer_readiness_authority": false,
+    "workspace_issuance_authority": false,
+    "container_creation_authority": false,
+    "work_write_authority_from_workspace_possession": false,
+    "observer_implementation": false,
+    "writer_inventory_implementation": false,
+    "transport_selection": false,
+    "schema_change": false,
+    "repin": false,
+    "owner_handle_change": false,
+    "requirement_evolution": false
+  },
+  "operational_effects": {
+    "Docker": 0,
+    "SANDBOX2": 0,
+    "JAVA1C": 0,
+    "provider_issuance": 0,
+    "pinned_auth_issuance": 0,
+    "runtime_lease_issuance": 0,
+    "reflection_admission_issuance": 0,
+    "reflection_lease_issuance": 0,
+    "preparation_authority_issuance": 0,
+    "capability_consumption": 0,
+    "capability_invalidation": 0,
+    "source_materialization": 0,
+    "filesystem_runtime_writes": 0,
+    "javac": 0,
+    "java": 0,
+    "class_loading": 0,
+    "reflection": 0,
+    "SyntheticStateBox": 0,
+    "BANK": 0,
+    "EXECUTOR_1R": 0,
+    "Apply": 0,
+    "workspace_issuance": 0,
+    "container_creation": 0,
+    "container_removal": 0,
+    "owner_import": 0,
+    "network": 0,
+    "live_proc_reads": 0,
+    "live_namespace_inspection": 0,
+    "target_runtime_stat": 0,
+    "runtime_probe": 0,
+    "controller_execution": 0,
+    "identity_generation": 0
+  },
+  "effect_counter_scope": "Scenario/runtime operations only. Additive documentation/test/evidence writes and guarded validation are not target workspace effects."
+}

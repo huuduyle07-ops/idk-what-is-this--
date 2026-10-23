@@ -653,6 +653,7 @@ class LiveTaskFieldsInterpreter:
             # behavioral claim is not one of them, and re-reading the prompt for
             # it here would be the second semantic system this phase forbids.
             behavioral_expectations=base.behavioral_expectations,
+            design_evidence=base.design_evidence,
             ambiguities=base.ambiguities,
             missing_information=base.missing_information,
             execution_requirements=ExecutionRequirements(

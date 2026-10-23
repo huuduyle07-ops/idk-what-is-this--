@@ -1,0 +1,4 @@
+{
+  "scope": "entire existing tracked worktree diff; new authored files additionally receive explicit whitespace checks",
+  "exit_code": 0
+}

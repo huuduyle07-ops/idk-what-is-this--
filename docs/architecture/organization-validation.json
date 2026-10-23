@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "scope": "First extraction: 9 synthetic runtime owners, 14 test modules, 36 existing source files including consumers.",
+  "collection": {
+    "before": 16605,
+    "after": 16610,
+    "missing": [],
+    "added": [
+      "tests/architecture/test_source_layout.py::test_every_relocation_is_unique_and_reconstructs_its_original_source",
+      "tests/architecture/test_source_layout.py::test_runtime_changes_are_only_import_relocations",
+      "tests/architecture/test_source_layout.py::test_unrecorded_code_change_is_never_hidden_by_historical_projection",
+      "tests/architecture/test_source_layout.py::test_modified_reversal_must_still_match_original_hash",
+      "tests/architecture/test_source_layout.py::test_source_resolution_rejects_paths_outside_repository"
+    ],
+    "duplicate_nodeids": [],
+    "normalization": "Map moved paths and module names embedded in parametrized IDs back to their recorded previous names."
+  },
+  "execution": {
+    "method": "Latest result per node across affected-family execution, consumer execution, and final rerun of the two adjusted contract modules plus architecture checks. Not a full-repository execution.",
+    "unique_test_cases": 1814,
+    "outcomes": {
+      "passed": 1810,
+      "failed": 4
+    },
+    "failed_nodes": [
+      "tests.runtime.synthetic.test_synthetic_read_only_reflection::test_compatibility_rejects_historical_bank_authorization_object",
+      "tests.runtime.synthetic.test_synthetic_reflection_execution_admission::test_bank_historical_authorization_and_historical_reflection_request_are_rejected",
+      "tests.runtime.synthetic.test_synthetic_reflection_pinned_contract::test_contract_freezes_semantics_and_creates_no_owners_types_or_registry_entries",
+      "tests.runtime.synthetic.test_synthetic_runtime_authorization_lifecycle_pinned_contract::test_contract_is_additive_and_has_no_owner_implementation_or_registry_entry"
+    ],
+    "runs": [
+      {
+        "log": ".tmp/repository-organization-tests-after.txt",
+        "cases": 1641,
+        "outcomes": {
+          "passed": 1639,
+          "failed": 2
+        }
+      },
+      {
+        "log": ".tmp/repository-organization-consumers.txt",
+        "cases": 168,
+        "outcomes": {
+          "passed": 168
+        }
+      },
+      {
+        "log": ".tmp/repository-organization-contracts.txt",
+        "cases": 196,
+        "outcomes": {
+          "passed": 194,
+          "failed": 2
+        }
+      }
+    ]
+  },
+  "baseline_failures": {
+    "confirmed_before_layout": 4,
+    "bank_fixture_failures": 2,
+    "historical_owner_absence_assertions": 2,
+    "confirmation": "All four failed in the initial run and were independently reproduced using saved pre-edit owner/test sources. The broad initial run was interrupted; it is not reported as a complete baseline pass.",
+    "logs": [
+      ".tmp/repository-organization-baseline-two.txt",
+      ".tmp/repository-organization-baseline-contracts.txt"
+    ]
+  },
+  "integrity": {
+    "existing_py_json_md_files_preserved_outside_scope": 2310,
+    "unrelated_existing_file_differences": [],
+    "historical_fixture_and_roadmap_evidence_edited": false,
+    "runtime_ast_changes": "ImportFrom module paths only, checked by tests/architecture/test_source_layout.py",
+    "stale_python_imports_to_moved_modules": 0
+  },
+  "limits": [
+    "No full-repository test execution.",
+    "No live Docker/Java replay or one-shot operational gate was run.",
+    "Pre-migration source-bound operational gates require fresh validation; historical source projection is not used for operational source approval.",
+    "Remaining flat modules/tests are not yet physically migrated."
+  ]
+}

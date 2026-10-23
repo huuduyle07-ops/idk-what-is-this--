@@ -1,0 +1,194 @@
+{
+  "phase_id": "RUNTIME.JAVA.1C.AUTH.DIAG.1",
+  "kind": "read_only_static_call_context_comparison",
+  "report_only": true,
+  "applicability": "If the sole standalone diagnostic passes, use this comparison for STANDALONE_PASS_CONTEXT_SENSITIVE. Historical bounds also apply if standalone fails.",
+  "standalone_outcome_asserted_by_this_artifact": false,
+  "comparison_performed_with_additional_live_issuance": false,
+  "historical_records": {
+    "successful_retry": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/RUNTIME_JAVA_PINNED_1C_RETRY_LOCAL.json",
+    "successful_retry_status": "RUNTIME_JAVA_PINNED_1C_COMPLETE",
+    "successful_java1c_status": "RUNTIME_JAVA_1_COMPLETE_WITH_WARNINGS",
+    "successful_java1c_invocations": 1,
+    "successful_cleanup_verified": true,
+    "successful_remaining_phase_containers": 0,
+    "successful_source_hash_record": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/pure_preoperational_gates.json#/source_bindings",
+    "blocked_nested": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/SYNTH_AUTH_PINNED_1_LOCAL.json",
+    "blocked_nested_status": "SYNTH_AUTH_PINNED_1_BLOCKED",
+    "blocked_java1c_status": "RUNTIME_JAVA_1C_BLOCKED_AUTHENTICATION",
+    "blocked_java1c_reason": "not_authenticated",
+    "blocked_java1c_controller_error": "ValueError: java1c_live_sandbox2_binding_rejected",
+    "blocked_java1c_invocations": 1,
+    "blocked_source_hash_record": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/pure_preoperational_gates.json#/source_bindings"
+  },
+  "source_hash_comparison_method": "Read the original historical source_bindings in both immutable preoperational gate records and compare each with SHA256 of current source bytes; historical hashes were not updated.",
+  "source_hash_comparison": [
+    {
+      "path": "core/runtime_java_pinned_provider.py",
+      "successful_retry_sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+      "blocked_nested_sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+      "current_sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+      "all_equal": true
+    },
+    {
+      "path": "core/sandboxed_java_positive_continuation.py",
+      "successful_retry_sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+      "blocked_nested_sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+      "current_sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+      "all_equal": true
+    },
+    {
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "successful_retry_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "blocked_nested_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "current_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "all_equal": true
+    },
+    {
+      "path": "core/candidate_runtime_sandbox.py",
+      "successful_retry_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "blocked_nested_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "current_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "all_equal": true
+    },
+    {
+      "path": "core/sandboxed_java_capture_recovery.py",
+      "successful_retry_sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861",
+      "blocked_nested_sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861",
+      "current_sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861",
+      "all_equal": true
+    }
+  ],
+  "context_comparison": [
+    {
+      "dependency": "provider_return_observer",
+      "successful_retry": "Provider installs sys.setprofile(observer) during runtime.verify().",
+      "blocked_nested": "Same frozen provider installs the same observer during runtime.verify().",
+      "standalone": "No PINNED.1C owner or provider observer is required; the diagnostic observation mechanism is separately recorded by the diagnostic runner.",
+      "source": {"path": "core/runtime_java_pinned_provider.py", "start_line": 246, "end_line": 293},
+      "conclusion": "Profiler presence alone does not explain why the nested attempt failed because the successful retry also had this profiler."
+    },
+    {
+      "dependency": "additional_retry_private_config_trace",
+      "successful_retry": "PrivateConfigObserver installs sys.settrace and observes only the exact frozen Docker prefix/control code objects; the provider profiler operates inside it.",
+      "blocked_nested": "SYNTH replay script does not install PrivateConfigObserver or another tracer.",
+      "sources": [
+        {"path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/authentication_controls.py", "start_line": 27, "end_line": 69},
+        {"path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/authentication_controls.py", "start_line": 130, "end_line": 144},
+        {"path": "scripts/replay_runtime_java_pinned1c_retry.py", "start_line": 53, "end_line": 65},
+        {"path": "scripts/replay_synth_auth_pinned1.py", "start_line": 49, "end_line": 65}
+      ],
+      "conclusion": "A measured difference in replay instrumentation exists. No causal effect is established."
+    },
+    {
+      "dependency": "temporary_root_and_private_docker_config",
+      "successful_retry": "tempfile.tempdir is docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY during issuance.",
+      "blocked_nested": "tempfile.tempdir is docs/roadmap/phases/SYNTH_AUTH_PINNED_1 during issuance.",
+      "sources": [
+        {"path": "scripts/replay_runtime_java_pinned1c_retry.py", "start_line": 53, "end_line": 65},
+        {"path": "scripts/replay_synth_auth_pinned1.py", "start_line": 49, "end_line": 65},
+        {"path": "core/candidate_runtime_sandbox.py", "start_line": 363, "end_line": 372},
+        {"path": "core/thread_compatible_runtime_sandbox.py", "start_line": 335, "end_line": 344}
+      ],
+      "conclusion": "The global temporary root determines random absent Docker config paths and phase workspace location. Historical roots differ, but the report does not establish a path failure."
+    },
+    {
+      "dependency": "owner_wrappers_and_transport_residue",
+      "successful_retry": "PINNED.1B and BIND temporarily wrap baseline transport, and PINNED.1B also wraps SANDBOX replay before JAVA.1C.",
+      "blocked_nested": "The same frozen scoped wrappers precede JAVA.1C.",
+      "sources": [
+        {"path": "core/runtime_java_pinned_backend_target_binding.py", "start_line": 347, "end_line": 373},
+        {"path": "core/sandbox_backend_binding.py", "start_line": 290, "end_line": 333},
+        {"path": "core/runtime_java_pinned_provider.py", "start_line": 523, "end_line": 537}
+      ],
+      "conclusion": "patch.object scopes finish before JAVA.1C. Static source provides no evidence of residual wrappers. Historical runtime function identities were not separately retained, so absence of residue cannot be retrospectively measured."
+    },
+    {
+      "dependency": "target_export_threads_and_transport_cleanup",
+      "sources": [
+        {"path": "core/runtime_java_pinned_target_inspection.py", "start_line": 352, "end_line": 379},
+        {"path": "core/runtime_java_pinned_target_inspection.py", "start_line": 487, "end_line": 494}
+      ],
+      "historical_blocked_upstream_cleanup": "bind_cleanup_verified, bind_sandbox_cleanup_verified and inspection_cleanup_verified are true; both upstream remaining container counts are zero.",
+      "conclusion": "Frozen target owner joins export threads and closes pipes before issuing successful evidence. The records do not implicate live export threads during JAVA.1C."
+    },
+    {
+      "dependency": "process_local_authentication_and_registries",
+      "sources": [
+        {"path": "core/thread_compatible_runtime_sandbox.py", "start_line": 44, "end_line": 44},
+        {"path": "core/thread_compatible_runtime_sandbox.py", "start_line": 136, "end_line": 168},
+        {"path": "core/sandboxed_java_positive_continuation.py", "start_line": 38, "end_line": 79},
+        {"path": "core/runtime_java_pinned_provider.py", "start_line": 42, "end_line": 44},
+        {"path": "core/runtime_java_pinned_provider.py", "start_line": 505, "end_line": 550}
+      ],
+      "conclusion": "SANDBOX.2/JAVA.1C use independent module-local HMAC secrets. They expose no issuing PID or live registry and have no exact-object membership check. Earlier PINNED graph work populates provider registries, but frozen SANDBOX/JAVA validators do not consume those registries. No secret or signature is disclosed."
+    },
+    {
+      "dependency": "call_stack_and_owner_module_context",
+      "sources": [
+        {"path": "core/synthetic_runtime_authorization_pinned.py", "start_line": 303, "end_line": 335},
+        {"path": "core/runtime_java_pinned_provider.py", "start_line": 505, "end_line": 537},
+        {"path": "core/runtime_java_pinned_provider.py", "start_line": 271, "end_line": 287}
+      ],
+      "conclusion": "Nested SYNTH adds imports and caller frames around the provider graph. Provider observation traverses frames only to classify effect accounting. No frozen SANDBOX/JAVA semantic predicate depends directly on SYNTH caller identity."
+    }
+  ],
+  "historical_blocked_effect_bound": {
+    "record_pointer": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/SYNTH_AUTH_PINNED_1_LOCAL.json#/provider_proof_report/runtime_docker_controls",
+    "record_lines": {"effects_start": 2736, "effects_end": 2775},
+    "controls": [
+      {"scope": "JAVA1C_SANDBOX2_infrastructure", "command": "image inspect", "completed": true, "exit_code": 0},
+      {"scope": "JAVA1C_SANDBOX2_infrastructure", "command": "ps", "completed": true, "exit_code": 0},
+      {"scope": "JAVA1C_controls", "command": "ps", "completed": true, "exit_code": 0}
+    ],
+    "java1c_own_sandbox_container_creates": 0,
+    "java1c_own_sandbox_container_starts": 0,
+    "java1c_fixed_controller_container_creates": 0,
+    "java1c_fixed_controller_container_starts": 0,
+    "java_compiles": 0,
+    "jvm_probe_runs": 0,
+    "earlier_bind_sandbox_status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+    "bounded_inference": "The JAVA.1C SANDBOX replay failed before any ladder invocation. Potential frozen pre-ladder paths include image metadata parse/eligibility or temporary directory, policy/sentinel file and socket setup. A particular deeper failure cannot be recovered from the frozen report.",
+    "source": {"path": "core/thread_compatible_runtime_sandbox.py", "start_line": 328, "end_line": 344}
+  },
+  "hmac_distinction": {
+    "source": {"path": "core/sandboxed_java_positive_continuation.py", "start_line": 51, "end_line": 67},
+    "historical_error_implies": "The public sandbox descriptor validator and policy validator returned before java1c_live_sandbox2_binding_rejected was raised by the semantic branch.",
+    "historical_error_demonstrates_hmac_failure": false,
+    "specific_semantic_operand_retained_in_historical_report": false
+  },
+  "observation_constraints": {
+    "capture_consumed_pair": "Capture authenticate_sandbox2 call arguments or the _evidence_pair return whose caller is _obtain_live_sandbox2. SANDBOX replay signs an earlier pair, while JAVA.1C builds a second pair consumed by its gate.",
+    "sources": [
+      {"path": "core/sandboxed_java_positive_continuation.py", "start_line": 71, "end_line": 85},
+      {"path": "core/thread_compatible_runtime_sandbox.py", "start_line": 378, "end_line": 382}
+    ],
+    "block_preexisting_incompatible_system_thread_or_monitoring_instrumentation": true,
+    "fixed_code_objects_only": true,
+    "read_arguments_locals_and_returns_without_mutation": true,
+    "never_replace_owner_functions_or_validators": true,
+    "never_change_return_values_or_receipts": true,
+    "retain_original_objects_only_in_diagnostic_process": true,
+    "never_reconstruct_pair_for_live_validation": true,
+    "restore_instrumentation_in_finally": true,
+    "do_not_retain_frames_or_expose_hmac_secrets": true,
+    "instrumentation_timing_influence_cannot_be_excluded": true
+  },
+  "limitations": [
+    "No second live issuance was performed for comparison.",
+    "Historical SANDBOX replay report and consumed object identities are absent from the blocked JAVA.1C report.",
+    "Historical instrumentation and runtime function identities were not independently recorded.",
+    "Matching source bytes do not prove equal process-global state or equal Docker responses at different times.",
+    "Static context differences identify possible dependencies; none is a demonstrated cause.",
+    "A passing standalone diagnostic establishes reproducibility in that process and context, and does not prove the historical nested failure was caused by nesting."
+  ],
+  "effects_of_this_comparison": {
+    "runtime_owner_calls": 0,
+    "docker_calls": 0,
+    "java_calls": 0,
+    "synthetic_authorization_retries": 0,
+    "owner_mutation_occurred": false,
+    "historical_files_changed": false,
+    "remediation_implemented": false
+  }
+}

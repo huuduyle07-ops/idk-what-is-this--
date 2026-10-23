@@ -1,0 +1,14 @@
+{
+  "historical_paths_removed": 0,
+  "live_owner_workspaces_affected": 0,
+  "directory_count": 5,
+  "phase_id": "RUNTIME.JAVA.PINNED.1B",
+  "removed_validation_temp_directories": [
+    "validation_temp_focused_b167e0e68b86468285f55a0c268e72c3",
+    "validation_temp_frozen_validation_158a5bb8c6d341ad88cc89fc08172d43",
+    "validation_temp_frozen_validation_30d603d4bdad4793bda0cd94eb1603c2",
+    "validation_temp_registry_after_d3856529f6d64d01a669d0f3e906c242",
+    "validation_temp_registry_baseline_df844e2306994e26b947903a2eb86550"
+  ],
+  "resolved_absolute_scope_verified": true
+}

@@ -1,0 +1,48 @@
+{
+  "mode": "focused_validation",
+  "exit_code": 0,
+  "collected": 179,
+  "passed": 179,
+  "skipped": 0,
+  "failures": [],
+  "suites": {
+    "tests/test_runtime_java_pinned_provider.py": {
+      "passed": 179,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "test_files": [
+    "tests/test_runtime_java_pinned_provider.py"
+  ],
+  "pytest_arguments": [
+    "--basetemp=tmp_tests",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1C\\validation_temp_focused_validation_da6bb499494c4ab1b30a28083fddaa6b\\pytest",
+    "tests/test_runtime_java_pinned_provider.py"
+  ],
+  "real_effect_attempts": [],
+  "denied_attempts": {},
+  "registry_projection_plugin_used": false,
+  "elapsed_seconds": 143.408,
+  "scope": "Pure host maintenance and fabricated in-memory fixtures only. Audit hook and frozen guard deny operational processes/network before execution. Owner/control mocks validate contracts; no live Docker, Java, javac, controller, authorization, lease, executor or Apply executes. Repository reads, Python validation and new phase temporary/artifact writes are maintenance. Historical registry projection is deliberately disabled so pre-existing drift remains visible.",
+  "successful_operational_effect_counts": {
+    "Docker": 0,
+    "containers": 0,
+    "exports": 0,
+    "Java": 0,
+    "javac": 0,
+    "controller": 0,
+    "network": 0,
+    "shell": 0,
+    "host mounts": 0,
+    "source projection": 0,
+    "runtime lease consumption": 0,
+    "reflection lease consumption": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0
+  }
+}

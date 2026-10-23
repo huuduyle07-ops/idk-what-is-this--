@@ -1,0 +1,152 @@
+{
+  "artifact_checks": {
+    "errors": [],
+    "json_count": 15,
+    "whitespace_file_count": 23
+  },
+  "benchmark_check": {
+    "checked": 54,
+    "errors": 0,
+    "exit_code": 0
+  },
+  "current_workspace_preservation": {
+    "authorized_new_files": [
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1.md",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1_REPORT.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/authorization_comparison.md",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/benchmark.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/benchmark.txt",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/benchmark_bootstrap_initial.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/benchmark_bootstrap_initial.txt",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/benchmark_bootstrap_second.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/benchmark_bootstrap_second.txt",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/check_historical_preservation.py",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/finalize_audit.py",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/focused.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/focused.txt",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/focused_bootstrap_initial.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/focused_bootstrap_initial.txt",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/focused_bootstrap_second.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/focused_bootstrap_second.txt",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/git_diff_check.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/historical_preservation.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/lifecycle_trace.md",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/preservation_after.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/preservation_baseline.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/reflection_dependencies.md",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/registry_after.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/registry_after.txt",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/registry_baseline.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/registry_baseline.txt",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/registry_baseline_bootstrap_initial.json",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/registry_baseline_bootstrap_initial.txt",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/validate_pure_audit.py",
+      "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/validation_summary.json",
+      "tests/test_synthetic_runtime_authorization_lifecycle_pinned_compat.py"
+    ],
+    "baseline_file_count": 2263,
+    "drift": [],
+    "existing_lifecycle_source_changed": false,
+    "passed": true,
+    "pinned_auth_source_changed": false,
+    "repinned_drift": false,
+    "unexpected_new_files": []
+  },
+  "final_worker_guard_attempts": {
+    "benchmark": {
+      "live_verification_or_execution_attempts": 0,
+      "network_attempts": 0,
+      "owner_issuance_or_consumption_attempts": 0,
+      "process_attempts": 0,
+      "repository_write_attempts": 0
+    },
+    "focused": {
+      "live_verification_or_execution_attempts": 0,
+      "network_attempts": 0,
+      "owner_issuance_or_consumption_attempts": 0,
+      "process_attempts": 0,
+      "repository_write_attempts": 0
+    },
+    "registry_after": {
+      "live_verification_or_execution_attempts": 0,
+      "network_attempts": 0,
+      "owner_issuance_or_consumption_attempts": 0,
+      "process_attempts": 0,
+      "repository_write_attempts": 0
+    },
+    "registry_baseline": {
+      "live_verification_or_execution_attempts": 0,
+      "network_attempts": 0,
+      "owner_issuance_or_consumption_attempts": 0,
+      "process_attempts": 0,
+      "repository_write_attempts": 0
+    }
+  },
+  "focused": {
+    "collected": 30,
+    "failed": [],
+    "passed": 30,
+    "suite_counts": {
+      "tests/test_patch_candidate_behavior_executor1r.py": 1,
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py": 2,
+      "tests/test_synthetic_runtime_authorization.py": 5,
+      "tests/test_synthetic_runtime_authorization_lifecycle.py": 1,
+      "tests/test_synthetic_runtime_authorization_lifecycle_pinned_compat.py": 20,
+      "tests/test_synthetic_runtime_authorization_pinned.py": 1
+    }
+  },
+  "frozen_fixture_note": "pinned signature fixture reversibly replaces unused provider entrypoints and virtual transports and isolates empty registries; no public validator patched or handle registered",
+  "full_frozen_suites_run": false,
+  "git_diff_check_exit_code": 0,
+  "historical_preservation_passed": true,
+  "in_memory_compilation": {
+    "errors": [],
+    "file_count": 1345
+  },
+  "initial_bootstrap_denials": {
+    "existing_directory_mkdir": 4,
+    "shell_metadata_fallback": 1,
+    "socket_availability_probe": 1,
+    "successful_effects": 0
+  },
+  "passed": true,
+  "phase_id": "SYNTH.AUTH.LIFECYCLE.PINNED.COMPAT.1",
+  "reflection_validation": "frozen source/test dependency inspection plus new AST and inert validator rejection tests; no issuance-dependent frozen test run",
+  "registry_picker": {
+    "after_passed": 292,
+    "before_passed": 292,
+    "changed_comparison_keys": [],
+    "collected": 299,
+    "failure_ids": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "failure_ids_match_frozen_1r": true
+  }
+}

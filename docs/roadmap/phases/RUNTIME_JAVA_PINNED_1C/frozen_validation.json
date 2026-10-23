@@ -1,0 +1,188 @@
+{
+  "mode": "frozen_validation",
+  "exit_code": 1,
+  "collected": 1201,
+  "passed": 1200,
+  "skipped": 0,
+  "failures": [
+    {
+      "nodeid": "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+      "when": "call",
+      "outcome": "failed",
+      "detail": "def test_bookkeeping_reversal_preserves_exact_frozen_receipts():\n        from tests._patch_candidate_behavior_executor1_maintenance import before_patch_candidate_behavior_executor1\n        root = Path(__file__).resolve().parents[1]\n        reversal = json.loads((root / \"tests/fixtures/patch_candidate_behavior_executor1_reversal.json\").read_text(encoding=\"utf-8\"))\n        assert len(reversal[\"reversals\"]) == 4\n        for record in reversal[\"reversals\"]:\n            content = (root / record[\"path\"]).read_bytes()\n>           assert sha256(before_patch_candidate_behavior_executor1(record[\"path\"], content)).hexdigest() == record[\"entry_sha256\"]\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_patch_candidate_behavior_executor1.py:498: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_patch_candidate_behavior_executor1_maintenance.py:9: in before_patch_candidate_behavior_executor1\n    content = before_runtime_sandbox1(relative, content)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'docs/roadmap/phase_registry.json'\ncontent = b'{\\n  \"schema_version\": \"1.0\",\\n  \"updated_at\": \"2026-09-06T00:00:00+09:00\",\\n  \"phases\": [\\n    {\\n      \"phase_id\":... First remaining blocker: bounded Java controller thread startup under the frozen boundary.\"\\n      ]\\n    }\\n  ]\\n}\\n'\n\n    def before_runtime_sandbox1(relative: str, content: bytes) -> bytes:\n        receipt = json.loads((Path(__file__).parent / \"fixtures\" /\n                              \"runtime_sandbox1_reversal.json\").read_text(encoding=\"utf-8\"))\n        record = next((row for row in receipt[\"reversals\"] if row[\"path\"] == relative), None)\n        if record is None:\n            return content\n>       assert sha256(content).hexdigest() == record[\"post_sha256\"], (relative, \"unattributed runtime-sandbox change\")\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       AssertionError: ('docs/roadmap/phase_registry.json', 'unattributed runtime-sandbox change')\n\ntests\\_runtime_sandbox1_maintenance.py:13: AssertionError"
+    }
+  ],
+  "suites": {
+    "tests/test_runtime_java_requirement_pinned1.py": {
+      "passed": 64,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java_pinned_target_archive.py": {
+      "passed": 62,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java_pinned_target_inspection.py": {
+      "passed": 101,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java_pinned_backend_target_binding.py": {
+      "passed": 152,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_sandbox_bind1.py": {
+      "passed": 129,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_sandbox2.py": {
+      "passed": 75,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1c.py": {
+      "passed": 89,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java_discovery_contract1.py": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_synthetic_runtime_authorization.py": {
+      "passed": 117,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_patch_candidate_behavior_executor1.py": {
+      "passed": 75,
+      "failed": 1,
+      "skipped": 0
+    },
+    "tests/test_patch_candidate_behavior_executor1r.py": {
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_patch_candidate_behavior_executor1r_retry.py": {
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py": {
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java_discovery_diag1.py": {
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1.py": {
+      "passed": 91,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1_discovery.py": {
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1_governance.py": {
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java_compat1.py": {
+      "passed": 67,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1d.py": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1d_retry.py": {
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "test_files": [
+    "tests/test_runtime_java_requirement_pinned1.py",
+    "tests/test_runtime_java_pinned_target_archive.py",
+    "tests/test_runtime_java_pinned_target_inspection.py",
+    "tests/test_runtime_java_pinned_backend_target_binding.py",
+    "tests/test_runtime_sandbox_bind1.py",
+    "tests/test_runtime_sandbox2.py",
+    "tests/test_runtime_java1c.py",
+    "tests/test_runtime_java_discovery_contract1.py",
+    "tests/test_synthetic_runtime_authorization.py",
+    "tests/test_patch_candidate_behavior_executor1.py",
+    "tests/test_patch_candidate_behavior_executor1r.py",
+    "tests/test_patch_candidate_behavior_executor1r_retry.py",
+    "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py",
+    "tests/test_runtime_java_discovery_diag1.py",
+    "tests/test_runtime_java1.py",
+    "tests/test_runtime_java1_discovery.py",
+    "tests/test_runtime_java1_governance.py",
+    "tests/test_runtime_java_compat1.py",
+    "tests/test_runtime_java1d.py",
+    "tests/test_runtime_java1d_retry.py"
+  ],
+  "pytest_arguments": [
+    "--basetemp=tmp_tests",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1C\\validation_temp_frozen_validation_a1538b1c8bcb4833bdc76d821088629d\\pytest",
+    "tests/test_runtime_java_requirement_pinned1.py",
+    "tests/test_runtime_java_pinned_target_archive.py",
+    "tests/test_runtime_java_pinned_target_inspection.py",
+    "tests/test_runtime_java_pinned_backend_target_binding.py",
+    "tests/test_runtime_sandbox_bind1.py",
+    "tests/test_runtime_sandbox2.py",
+    "tests/test_runtime_java1c.py",
+    "tests/test_runtime_java_discovery_contract1.py",
+    "tests/test_synthetic_runtime_authorization.py",
+    "tests/test_patch_candidate_behavior_executor1.py",
+    "tests/test_patch_candidate_behavior_executor1r.py",
+    "tests/test_patch_candidate_behavior_executor1r_retry.py",
+    "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py",
+    "tests/test_runtime_java_discovery_diag1.py",
+    "tests/test_runtime_java1.py",
+    "tests/test_runtime_java1_discovery.py",
+    "tests/test_runtime_java1_governance.py",
+    "tests/test_runtime_java_compat1.py",
+    "tests/test_runtime_java1d.py",
+    "tests/test_runtime_java1d_retry.py"
+  ],
+  "real_effect_attempts": [],
+  "denied_attempts": {},
+  "registry_projection_plugin_used": false,
+  "elapsed_seconds": 719.929,
+  "scope": "Pure host maintenance and fabricated in-memory fixtures only. Audit hook and frozen guard deny operational processes/network before execution. Owner/control mocks validate contracts; no live Docker, Java, javac, controller, authorization, lease, executor or Apply executes. Repository reads, Python validation and new phase temporary/artifact writes are maintenance. Historical registry projection is deliberately disabled so pre-existing drift remains visible.",
+  "successful_operational_effect_counts": {
+    "Docker": 0,
+    "containers": 0,
+    "exports": 0,
+    "Java": 0,
+    "javac": 0,
+    "controller": 0,
+    "network": 0,
+    "shell": 0,
+    "host mounts": 0,
+    "source projection": 0,
+    "runtime lease consumption": 0,
+    "reflection lease consumption": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0
+  }
+}

@@ -1,0 +1,12 @@
+........................................................................ [ 31%]
+........................................................................ [ 62%]
+........................................................................ [ 93%]
+..............                                                           [100%]
+============================== warnings summary ===============================
+tests/test_runtime_sandbox2.py::test_only_clone3_errno_changes_and_baseline_bytes_remain_pinned
+  C:\Users\Admin\AppData\Roaming\Python\Python314\site-packages\google\genai\types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+230 passed, 1 warning in 8.81s
+{"args": ["-q", "-p", "no:cacheprovider", "-o", "addopts=", "-o", "log_file=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\validation_tmp\\pytest-log-sandbox2.txt", "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\validation_tmp\\pytest-basetemp-sandbox2-11660", "tests/test_runtime_sandbox2.py", "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\test_classifier.py"], "audit_guard": {"allowed_pure_domain_children": 0, "forbidden_process_attempts": 0, "forbidden_socket_attempts": 0, "forbidden_write_attempts": 0}, "exit_code": 0, "failed_test_count": 0, "failed_test_ids": [], "passed": true, "passed_test_count": 230, "skipped_test_ids": [], "temporary_root_confined_to_new_phase": true}

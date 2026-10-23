@@ -1,0 +1,559 @@
+{
+  "all_output_confined_to_new_phase": true,
+  "checks": {
+    "auth-artifacts": {
+      "exit_code": 0,
+      "frozen_historical_pins_rechecked_before_reuse": true,
+      "passed": true,
+      "reused_unchanged_passing_worker": true,
+      "stderr_retained": "auth-artifacts.stderr.txt",
+      "stdout_retained": "auth-artifacts.stdout.txt",
+      "worker_result": {
+        "Docker_controls": 0,
+        "JSON_artifacts_parsed": 16,
+        "Java_effects": 0,
+        "all_historical_assertions_executed": true,
+        "audit_guard": {
+          "allowed_pure_domain_children": 0,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "authored_whitespace_passed": true,
+        "captured_original_stdout": "{\"passed\": true, \"historical_files_preserved\": 1828, \"diagnostic_python_sources_compiled_in_memory\": 6, \"JSON_artifacts_parsed\": 16, \"markdown_links_checked\": 18, \"authored_whitespace_passed\": true, \"live_owner_invocations\": 0, \"Docker_controls\": 0, \"Java_effects\": 0, \"evidence_consistency_passed\": true, \"single_effectful_call_site_and_exclusive_marker\": true}\n",
+        "diagnostic_python_sources_compiled_in_memory": 6,
+        "evidence_consistency_passed": true,
+        "historical_files_preserved": 1828,
+        "live_owner_invocations": 0,
+        "markdown_links_checked": 18,
+        "original_frozen_source_sha256": "8c764d5f98ba297f8d335f796442e3f9f1d13c14589fb5a6ccaaba77dbf616f6",
+        "passed": true,
+        "removed_statement_source_line": 105,
+        "single_effectful_call_site_and_exclusive_marker": true,
+        "sole_final_historical_write_removed_in_memory": true
+      }
+    },
+    "auth-matrix": {
+      "exit_code": 0,
+      "frozen_historical_pins_rechecked_before_reuse": true,
+      "passed": true,
+      "reused_unchanged_passing_worker": true,
+      "stderr_retained": "auth-matrix.stderr.txt",
+      "stdout_retained": "auth-matrix.stdout.txt",
+      "worker_result": {
+        "audit_guard": {
+          "allowed_pure_domain_children": 1,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "case_count": 57,
+        "effect_counts": {
+          "caller_shell": 0,
+          "docker": 0,
+          "forbidden_attempts": 0,
+          "java": 0,
+          "other_process": 0,
+          "python_domain_child": 1,
+          "socket": 0
+        },
+        "original_child_command_preserved": true,
+        "original_frozen_source_sha256": "e0455b4eb9b5328bf1484dad08a6f57733e93d9e54bc10e84154ba2e7993bab6",
+        "output_only_rebound_to_new_phase": true,
+        "passed": true
+      }
+    },
+    "benchmark": {
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-S",
+        "-B",
+        "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+        "worker",
+        "benchmark"
+      ],
+      "exit_code": 0,
+      "passed": true,
+      "stderr_retained": "benchmark.stderr.txt",
+      "stdout_retained": "benchmark.stdout.txt",
+      "worker_result": {
+        "arguments": [
+          "benchmarks/run_benchmarks.py",
+          "--check"
+        ],
+        "audit_guard": {
+          "allowed_pure_domain_children": 0,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "exit_code": 0,
+        "passed": true
+      }
+    },
+    "context-audit": {
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+        "worker",
+        "context-audit"
+      ],
+      "exit_code": 0,
+      "passed": true,
+      "stderr_retained": "context-audit.stderr.txt",
+      "stdout_retained": "context-audit.stdout.txt",
+      "worker_result": {
+        "args": [
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "-o",
+          "addopts=",
+          "-o",
+          "log_file=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-log-context-audit.txt",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-basetemp-context-audit-11828",
+          "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\test_context_audit.py"
+        ],
+        "audit_guard": {
+          "allowed_pure_domain_children": 0,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "collected_test_count": 11,
+        "collected_test_ids": [
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_does_not_install_denial_or_mutate_owner_functions",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_is_active_at_stub_boundary_and_restored[False]",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_is_active_at_stub_boundary_and_restored[True]",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_runner_is_bound_to_historical_gates",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_missing_boundary_evidence_fails_closed_without_promoting_differences",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_outcome_distinguishes_capability_from_historical_proof",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_reproducer_refuses_historical_root_before_any_write",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_runner_override_lexically_contains_issuer_and_restores_afterward",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_same_attempt_success_excludes_unconditional_temp_socket_process_denial",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_same_temp_state_selects_config_and_exact_workspace_without_historical_writes",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_upstream_wrappers_exit_before_runtime_snapshot"
+        ],
+        "controlled_fixture_owner_frames_permitted": false,
+        "coverage_selection": "complete selected frozen suites",
+        "exit_code": 0,
+        "failed_test_count": 0,
+        "failed_test_ids": [],
+        "live_owner_issuance": 0,
+        "passed": true,
+        "passed_test_count": 11,
+        "passed_test_ids": [
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_does_not_install_denial_or_mutate_owner_functions",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_is_active_at_stub_boundary_and_restored[False]",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_is_active_at_stub_boundary_and_restored[True]",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_runner_is_bound_to_historical_gates",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_missing_boundary_evidence_fails_closed_without_promoting_differences",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_outcome_distinguishes_capability_from_historical_proof",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_reproducer_refuses_historical_root_before_any_write",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_runner_override_lexically_contains_issuer_and_restores_afterward",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_same_attempt_success_excludes_unconditional_temp_socket_process_denial",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_same_temp_state_selects_config_and_exact_workspace_without_historical_writes",
+          "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_upstream_wrappers_exit_before_runtime_snapshot"
+        ],
+        "skipped_test_ids": [],
+        "successful_operational_effects": 0,
+        "temporary_root_confined_to_new_phase": true
+      }
+    },
+    "context-contracts": {
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+        "worker",
+        "context-contracts"
+      ],
+      "exit_code": 0,
+      "negative_scope_coverage": "Selected original negative_authentication_matrix validates report/JSON/constructor/copy/subclass rejection, every scenario/auth/provider field, HMAC/process domains, original upstream relation and exact source scope under inert fixtures.",
+      "passed": true,
+      "selected_test_ids": [
+        "tests/test_runtime_java_pinned_provider.py::test_existing_docker_configuration_path_cannot_replace_frozen_empty_configuration",
+        "tests/test_runtime_java_pinned_provider.py::test_frozen_fresh_empty_docker_config_paths_do_not_change_backend_identity",
+        "tests/test_runtime_java_pinned_provider.py::test_issuer_accepts_no_caller_source_route_or_evidence",
+        "tests/test_runtime_java_pinned_provider.py::test_observer_restores_profiler_even_when_public_owner_raises",
+        "tests/test_runtime_java_pinned_provider.py::test_prior_profiler_blocks_before_any_upstream_effect",
+        "tests/test_synthetic_runtime_authorization_pinned.py::test_issuance_and_validation_add_no_lifecycle_or_reflection_effects",
+        "tests/test_synthetic_runtime_authorization_pinned.py::test_missing_exact_frozen_source_stops_before_provider_issuance",
+        "tests/test_synthetic_runtime_authorization_pinned.py::test_negative_matrix_is_reversible_and_performs_no_additional_provider_effects",
+        "tests/test_synthetic_runtime_authorization_pinned.py::test_new_epoch_uses_exact_historical_source_and_scenario",
+        "tests/test_synthetic_runtime_authorization_pinned.py::test_provider_failure_closes_before_scenario_authorization",
+        "tests/test_synthetic_runtime_authorization_pinned.py::test_public_issuer_accepts_no_free_form_inputs",
+        "tests/test_synthetic_runtime_authorization_pinned.py::test_report_separates_provider_infrastructure_from_zero_synthetic_effects",
+        "tests/test_synthetic_runtime_authorization_pinned.py::test_scope_is_authorization_only_and_public_objects_are_immutable",
+        "tests/test_synthetic_runtime_authorization_pinned.py::test_validation_calls_public_provider_validator_even_after_issuance",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_all_bound_pure_gates_accept_without_issuance",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-authored_whitespace_and_JSON_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-benchmark_check_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-focused_authorization_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-frozen_semantic_regressions_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-git_diff_check_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-historical_bytes_preserved]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-in_memory_compilation_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-known_bookkeeping_drift_preserved]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-pure_validation_no_operational_effects]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-registry_picker_no_new_failures]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-authored_whitespace_and_JSON_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-benchmark_check_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-focused_authorization_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-frozen_semantic_regressions_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-git_diff_check_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-historical_bytes_preserved]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-in_memory_compilation_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-known_bookkeeping_drift_preserved]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-pure_validation_no_operational_effects]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-registry_picker_no_new_failures]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-authored_whitespace_and_JSON_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-benchmark_check_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-focused_authorization_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-frozen_semantic_regressions_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-git_diff_check_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-historical_bytes_preserved]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-in_memory_compilation_passed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-known_bookkeeping_drift_preserved]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-pure_validation_no_operational_effects]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-registry_picker_no_new_failures]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_exception_after_reservation_records_blocker_and_restores_tempdir",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_exception_in_negative_controls_preserves_effect_ledger_and_withdraws_authorization",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_exclusive_report_reservation_prevents_second_issuance",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_failed_negative_matrix_withdraws_scope_without_consuming_provider[authorization]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_failed_negative_matrix_withdraws_scope_without_consuming_provider[provider]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_gate_identity_readiness_and_nonempty_bindings_are_required[phase_id-SYNTH.AUTH.1]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_gate_identity_readiness_and_nonempty_bindings_are_required[pure_gates_ready-1]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_gate_identity_readiness_and_nonempty_bindings_are_required[pure_gates_ready-False]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_gate_identity_readiness_and_nonempty_bindings_are_required[source_bindings-value3]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_gate_identity_readiness_and_nonempty_bindings_are_required[validation_bindings-value4]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_replay_rejects_arguments_before_gates_or_issuance",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_source_validation_and_preservation_drift_stop_before_reservation[historical-historical_bytes_changed]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_source_validation_and_preservation_drift_stop_before_reservation[source-source_changed_after_gates]",
+        "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_source_validation_and_preservation_drift_stop_before_reservation[validation-validation_changed_after_gates]"
+      ],
+      "selection_manifest": "worker_context-contracts-collect.json",
+      "selection_verified_by_guarded_collection_without_execution_rerun": true,
+      "stderr_retained": "context-contracts.stderr.txt",
+      "stdout_retained": "context-contracts.stdout.txt",
+      "worker_result": {
+        "args": [
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "-o",
+          "addopts=",
+          "-o",
+          "log_file=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-log-context-contracts.txt",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-basetemp-context-contracts-30520",
+          "tests/test_runtime_java_pinned_provider.py::test_issuer_accepts_no_caller_source_route_or_evidence",
+          "tests/test_runtime_java_pinned_provider.py::test_prior_profiler_blocks_before_any_upstream_effect",
+          "tests/test_runtime_java_pinned_provider.py::test_observer_restores_profiler_even_when_public_owner_raises",
+          "tests/test_runtime_java_pinned_provider.py::test_frozen_fresh_empty_docker_config_paths_do_not_change_backend_identity",
+          "tests/test_runtime_java_pinned_provider.py::test_existing_docker_configuration_path_cannot_replace_frozen_empty_configuration",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_new_epoch_uses_exact_historical_source_and_scenario",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_scope_is_authorization_only_and_public_objects_are_immutable",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_public_issuer_accepts_no_free_form_inputs",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_provider_failure_closes_before_scenario_authorization",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_missing_exact_frozen_source_stops_before_provider_issuance",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_validation_calls_public_provider_validator_even_after_issuance",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_report_separates_provider_infrastructure_from_zero_synthetic_effects",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_negative_matrix_is_reversible_and_performs_no_additional_provider_effects",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_issuance_and_validation_add_no_lifecycle_or_reflection_effects",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py"
+        ],
+        "audit_guard": {
+          "allowed_pure_domain_children": 0,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "collected_test_count": 59,
+        "controlled_fixture_owner_frames_permitted": true,
+        "coverage_selection": "five frozen PINNED1C context/config helpers, nine SYNTH pure contract tests, complete stubbed replay suite",
+        "exit_code": 0,
+        "failed_test_count": 0,
+        "failed_test_ids": [],
+        "live_owner_issuance": 0,
+        "passed": true,
+        "passed_test_count": 59,
+        "skipped_test_ids": [],
+        "successful_operational_effects": 0,
+        "temporary_root_confined_to_new_phase": true
+      }
+    },
+    "context-report": {
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+        "worker",
+        "context-report"
+      ],
+      "exit_code": 0,
+      "passed": true,
+      "stderr_retained": "context-report.stderr.txt",
+      "stdout_retained": "context-report.stdout.txt",
+      "worker_result": {
+        "audit_guard": {
+          "allowed_pure_domain_children": 0,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "context_audit_source_sha256": "c288c7922764e40c4bd7f12b6fe85e3c49864d2d7c6bb3328352fb9ee5cca4dd",
+        "exact_historical_root_cause_established": false,
+        "operational_effects": {
+          "Apply": 0,
+          "BANK": 0,
+          "Docker": 0,
+          "EXECUTOR.1R": 0,
+          "JAVA1C": 0,
+          "PINNED1A_export": 0,
+          "PINNED1B": 0,
+          "PINNED1C": 0,
+          "SANDBOX2_issuance": 0,
+          "SYNTH_retry": 0,
+          "SyntheticStateBox": 0,
+          "execution_leases": 0,
+          "provider_root": 0,
+          "reflection": 0
+        },
+        "passed": true,
+        "profiler_pure_controls_passed": true,
+        "pure_reproducer_passed": true,
+        "status": "UNRESOLVED"
+      }
+    },
+    "historical-blocked": {
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+        "worker",
+        "historical-blocked"
+      ],
+      "exit_code": 0,
+      "passed": true,
+      "stderr_retained": "historical-blocked.stderr.txt",
+      "stdout_retained": "historical-blocked.stdout.txt",
+      "worker_result": {
+        "audit_guard": {
+          "allowed_pure_domain_children": 0,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "historical_bytes_unchanged": true,
+        "historical_live_attempts_unchanged": 1,
+        "historical_reason": "authorization_prerequisite_failed:pinned_provider_incomplete: fresh_java1c_failed:not_authenticated",
+        "historical_status": "SYNTH_AUTH_PINNED_1_BLOCKED",
+        "new_live_attempts": 0,
+        "passed": true,
+        "sha256": "fb4b952a606b6d3e3a2ae6dc3d2893f1c24c8cbee5b7708b01e8f0b67a08c8b4",
+        "source": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/SYNTH_AUTH_PINNED_1_LOCAL.json"
+      }
+    },
+    "historical_byte_preservation": {
+      "changed_or_missing": [],
+      "historical_file_count": 2185,
+      "passed": true,
+      "prior_historical_pin_integrity": {
+        "historical_drift_not_repinned": true,
+        "passed": true,
+        "prior_pin_sets": [
+          {
+            "changed_or_missing": [],
+            "historical_pins_checked": 1828,
+            "passed": true,
+            "prior_phase": "RUNTIME_JAVA_1C_AUTH_DIAG_1"
+          },
+          {
+            "changed_or_missing": [],
+            "historical_pins_checked": 2126,
+            "passed": true,
+            "prior_phase": "RUNTIME_SANDBOX_2_PRELADDER_DIAG_1"
+          }
+        ]
+      },
+      "unexpected_new_files_outside_phase": []
+    },
+    "pytest": {
+      "exit_code": 0,
+      "frozen_historical_pins_rechecked_before_reuse": true,
+      "passed": true,
+      "reused_unchanged_passing_worker": true,
+      "stderr_retained": "pytest.stderr.txt",
+      "stdout_retained": "pytest.stdout.txt",
+      "worker_result": {
+        "args": [
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "-o",
+          "addopts=",
+          "-o",
+          "log_file=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-log-sandbox2.txt",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-basetemp-sandbox2-25504",
+          "tests/test_runtime_sandbox2.py",
+          "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\test_classifier.py"
+        ],
+        "audit_guard": {
+          "allowed_pure_domain_children": 0,
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "collected_test_count": 230,
+        "controlled_fixture_owner_frames_permitted": true,
+        "exit_code": 0,
+        "failed_test_count": 0,
+        "failed_test_ids": [],
+        "live_owner_issuance": 0,
+        "passed": true,
+        "passed_test_count": 230,
+        "skipped_test_ids": [],
+        "successful_operational_effects": 0,
+        "temporary_root_confined_to_new_phase": true
+      }
+    },
+    "registry_picker_baseline_vs_after": {
+      "passed": true,
+      "picker_equal": true,
+      "registry_equal": true
+    },
+    "registry_picker_pure_test_baseline_vs_after": {
+      "after": {
+        "collected_test_count": 299,
+        "exit_code": 1,
+        "failed_test_count": 7,
+        "failed_test_ids": [
+          {
+            "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+            "when": "call"
+          }
+        ],
+        "passed_test_count": 292,
+        "skipped_test_ids": []
+      },
+      "after_retained": "worker_registry-picker-after.json",
+      "audit_guards_no_effect_attempts": true,
+      "baseline": {
+        "collected_test_count": 299,
+        "exit_code": 1,
+        "failed_test_count": 7,
+        "failed_test_ids": [
+          {
+            "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+            "when": "call"
+          },
+          {
+            "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+            "when": "call"
+          }
+        ],
+        "passed_test_count": 292,
+        "skipped_test_ids": []
+      },
+      "baseline_retained": "registry_picker_pure_test_baseline.json",
+      "passed": true,
+      "same_failure_ids_and_outcome_counts": true,
+      "unchanged_historical_failures_preserved": true
+    },
+    "source_json_whitespace_diff_checks": {
+      "authored_text_files_checked": 34,
+      "bytecode_emission": false,
+      "failures": [],
+      "git_diff_check_exit_code": 0,
+      "new_json_files_parsed": 26,
+      "new_python_sources_compiled_in_memory": 4,
+      "passed": true
+    }
+  },
+  "controlled_fixture_frames_are_not_live_operational_issuance": true,
+  "final_context_source_refreshed_without_broad_rerun": true,
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR1R": 0,
+    "JAVA1C": 0,
+    "PINNED1A_export": 0,
+    "PINNED1B": 0,
+    "PINNED1C": 0,
+    "SANDBOX2_issuance": 0,
+    "SYNTH_retry": 0,
+    "SyntheticStateBox": 0,
+    "reflection": 0
+  },
+  "passed": true,
+  "phase_id": "RUNTIME.SANDBOX.2.NESTED.CONTEXT.DIAG.1",
+  "validation_Docker_controls": 0,
+  "validation_Java_effects": 0,
+  "validation_live_owner_invocations": 0,
+  "validation_scope_limit": {
+    "command": [
+      "C:\\Python314\\python.exe",
+      "-B",
+      "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+      "worker",
+      "context-contracts"
+    ],
+    "completed_summary_available": false,
+    "final_scope": "five frozen PINNED1C context/config helpers, nine SYNTH pure contract cases, complete stubbed replay suite",
+    "historical_pin_changes": false,
+    "initial_combined_broad_fixture_worker": "context-contracts",
+    "limitation": "Exhaustive combined provider/authorization fixture suites did not complete in the bounded worker; focused requested context/contract coverage is run to completion separately.",
+    "outcome": "TIMEOUT",
+    "reason": "subprocess.TimeoutExpired after 300 seconds",
+    "subprocess_run_timeout_cleanup": "worker killed and reaped by subprocess.run timeout handling; worker guard allowed no child processes",
+    "successful_operational_effects_prevented_by_worker_audit_guard": true,
+    "timed_out_worker_final_attempt_counters": "UNAVAILABLE_NO_COMPLETED_SUMMARY",
+    "timeout_seconds": 300
+  }
+}

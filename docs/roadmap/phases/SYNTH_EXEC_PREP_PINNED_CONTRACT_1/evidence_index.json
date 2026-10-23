@@ -1,0 +1,373 @@
+{
+  "files": {
+    "core/behavioral_diagnostic_executor_lifecycle_retry.py": {
+      "anchors": [
+        {
+          "line": 198,
+          "text": "java_profile_contract_mismatch"
+        },
+        {
+          "line": 157,
+          "text": "No effectful runner"
+        },
+        {
+          "line": 128,
+          "text": "harness_sha256"
+        }
+      ],
+      "bytes": 14330,
+      "sha256": "e3c68db9c9484b8a4d421ec5f4458679a91a5a5f84ddfd75916e5caf31a8ccc0"
+    },
+    "core/behavioral_diagnostic_executor_refresh.py": {
+      "anchors": [
+        {
+          "line": 147,
+          "text": "existing_synthetic_issuer_cannot_reconstruct_independent_scenario"
+        },
+        {
+          "line": 151,
+          "text": "harness_sha256"
+        }
+      ],
+      "bytes": 8412,
+      "sha256": "ffb031b5693f3f0fcfefc92daa4f968e907a137ffd2c4a13e86a010f9630c157"
+    },
+    "core/behavioral_diagnostic_executor_retry.py": {
+      "anchors": [
+        {
+          "line": 176,
+          "text": "frozen_synth_auth_1_has_no_public_consumption_contract"
+        },
+        {
+          "line": 74,
+          "text": "harness_sha256"
+        }
+      ],
+      "bytes": 11035,
+      "sha256": "faa6431a840c74baae5c98dc7e9485d05435d02e9915964cfb2b08c0db85e53d"
+    },
+    "core/candidate_runtime_sandbox.py": {
+      "anchors": [
+        {
+          "line": 48,
+          "text": "_WORKLOAD_ENVIRONMENT ="
+        },
+        {
+          "line": 211,
+          "text": "ephemeral_tmpfs_exact_inputs_only"
+        }
+      ],
+      "bytes": 34833,
+      "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913"
+    },
+    "core/runtime_java_pinned_provider.py": {
+      "anchors": [
+        {
+          "line": 473,
+          "text": "def validate_pinned_java_exact_provider"
+        }
+      ],
+      "bytes": 42111,
+      "sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa"
+    },
+    "core/runtime_java_pinned_requirement.py": {
+      "anchors": [
+        {
+          "line": 13,
+          "text": "IMAGE ="
+        },
+        {
+          "line": 14,
+          "text": "POLICY_SHA256 ="
+        },
+        {
+          "line": 229,
+          "text": "e21c219e"
+        },
+        {
+          "line": 221,
+          "text": "class PinnedJavaRequirement"
+        },
+        {
+          "line": 99,
+          "text": "source_class_output"
+        }
+      ],
+      "bytes": 22597,
+      "sha256": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1"
+    },
+    "core/sandboxed_java_positive_continuation.py": {
+      "anchors": [
+        {
+          "line": 87,
+          "text": "def safe_configuration"
+        },
+        {
+          "line": 139,
+          "text": "def evaluate"
+        },
+        {
+          "line": 197,
+          "text": "32768"
+        },
+        {
+          "line": 352,
+          "text": "def verify"
+        }
+      ],
+      "bytes": 28167,
+      "sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f"
+    },
+    "core/sandboxed_java_positive_probe.py": {
+      "anchors": [
+        {
+          "line": 43,
+          "text": "followlinks=False"
+        },
+        {
+          "line": 107,
+          "text": "32768"
+        },
+        {
+          "line": 14,
+          "text": "def "
+        }
+      ],
+      "bytes": 7358,
+      "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f"
+    },
+    "core/sandboxed_java_toolchain_probe.py": {
+      "anchors": [
+        {
+          "line": 9,
+          "text": "COMPILE_ARGUMENTS ="
+        }
+      ],
+      "bytes": 5690,
+      "sha256": "58e791ed6ac7c99a41386345ce8d392ca74cb8f574a8207fe1c85afa335ec606"
+    },
+    "core/structural_compile_validation.py": {
+      "anchors": [
+        {
+          "line": 1,
+          "text": "diagnostic authority only"
+        }
+      ],
+      "bytes": 36409,
+      "sha256": "0f435be022304e22d7afd07e185934b134306de713c7441b63f554468c945fea"
+    },
+    "core/synthetic_read_only_reflection.py": {
+      "anchors": [
+        {
+          "line": 243,
+          "text": "_BEFORE_HELPER ="
+        },
+        {
+          "line": 252,
+          "text": "_AFTER_HELPER ="
+        },
+        {
+          "line": 263,
+          "text": "def render_synthetic_read_only_reflection"
+        }
+      ],
+      "bytes": 16023,
+      "sha256": "d24422b68c0eae96890a7e63a177ebc8adcbd64300bf7cfb42d3ada041a5d5bc"
+    },
+    "core/synthetic_reflection_execution_admission_pinned.py": {
+      "anchors": [
+        {
+          "line": 482,
+          "text": "def issue_pinned_synthetic_reflection_execution_admission"
+        }
+      ],
+      "bytes": 29405,
+      "sha256": "974075ac1827b4013e1e8a2b236ea278e19c8be138e378bed3b70613f590aaa0"
+    },
+    "core/synthetic_reflection_execution_lifecycle_pinned.py": {
+      "anchors": [
+        {
+          "line": 45,
+          "text": "EXECUTOR_SEQUENCE ="
+        },
+        {
+          "line": 42,
+          "text": "BEFORE_HELPER_SHA256 ="
+        },
+        {
+          "line": 43,
+          "text": "AFTER_HELPER_SHA256 ="
+        },
+        {
+          "line": 296,
+          "text": "def _authenticate_graph"
+        },
+        {
+          "line": 566,
+          "text": "def issue_pinned_synthetic_reflection_execution_lease"
+        },
+        {
+          "line": 645,
+          "text": "def _transition"
+        }
+      ],
+      "bytes": 37770,
+      "sha256": "c88d743d5820cdeb4877c4311470b745d1f8abf97a53dd4db8f93e4b1c155057"
+    },
+    "core/synthetic_runtime_authorization.py": {
+      "anchors": [
+        {
+          "line": 36,
+          "text": "_SOURCE ="
+        },
+        {
+          "line": 37,
+          "text": "private int value = 10;"
+        },
+        {
+          "line": 186,
+          "text": "def _validate_source"
+        },
+        {
+          "line": 181,
+          "text": "def get_executor1r_decrement_3_source"
+        }
+      ],
+      "bytes": 14991,
+      "sha256": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88"
+    },
+    "core/synthetic_runtime_authorization_lifecycle.py": {
+      "anchors": [
+        {
+          "line": 38,
+          "text": "CONSUMPTION_POLICY ="
+        },
+        {
+          "line": 43,
+          "text": "COMPILATION_POLICY ="
+        }
+      ],
+      "bytes": 15627,
+      "sha256": "dc7cc307a17c63cf65eea0e898015140806ca98e2614c391423c50adfd0e6029"
+    },
+    "core/synthetic_runtime_authorization_pinned.py": {
+      "anchors": [
+        {
+          "line": 145,
+          "text": "def _authenticate_provider"
+        },
+        {
+          "line": 261,
+          "text": "def validate_pinned_synthetic_runtime_authorization"
+        }
+      ],
+      "bytes": 24720,
+      "sha256": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c"
+    },
+    "core/synthetic_runtime_authorization_pinned_lifecycle.py": {
+      "anchors": [
+        {
+          "line": 41,
+          "text": "_LOCK = Lock()"
+        },
+        {
+          "line": 469,
+          "text": "def _consumer_readiness"
+        },
+        {
+          "line": 474,
+          "text": "def _transition"
+        },
+        {
+          "line": 486,
+          "text": "_STORE = updated  # The only terminal"
+        }
+      ],
+      "bytes": 25692,
+      "sha256": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4"
+    },
+    "core/thread_compatible_runtime_sandbox.py": {
+      "anchors": [
+        {
+          "line": 171,
+          "text": "def safe_configuration"
+        },
+        {
+          "line": 272,
+          "text": "size=32m"
+        },
+        {
+          "line": 273,
+          "text": "size=16m"
+        }
+      ],
+      "bytes": 22400,
+      "sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45"
+    },
+    "docs/roadmap/RUNTIME_SANDBOX_2_SECCOMP.json": {
+      "anchors": [],
+      "bytes": 1642,
+      "sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75"
+    },
+    "docs/roadmap/phases/RUNTIME_JAVA_1C/RUNTIME_JAVA_1C.md": {
+      "anchors": [
+        {
+          "line": 39,
+          "text": "Exact compile argv"
+        },
+        {
+          "line": 5,
+          "text": "JAVA_SANDBOX_OK"
+        }
+      ],
+      "bytes": 10498,
+      "sha256": "55af14657a1a9ac802ed88a8f139467e7800b729a6d63d8a4be4eef4f2f864be"
+    },
+    "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_CONTRACT_1/contract.json": {
+      "anchors": [
+        {
+          "line": 161,
+          "text": "source_harness_readiness_before_consumption"
+        },
+        {
+          "line": 157,
+          "text": "immediately before the first behavioral runtime effect"
+        }
+      ],
+      "bytes": 22842,
+      "sha256": "dccb2d374d28cb3754e11ac8f46f8b667cc164bb165f27af62bdf8b7b15d9473"
+    },
+    "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/SYNTH_REFLECT_LIFECYCLE_PINNED_1A_REPORT.md": {
+      "anchors": [
+        {
+          "line": 3,
+          "text": "SYNTH_REFLECT_LIFECYCLE_PINNED_1A_COMPLETE"
+        },
+        {
+          "line": 53,
+          "text": "Normative ordering remains"
+        }
+      ],
+      "bytes": 6571,
+      "sha256": "92e4057851f13ea025ebbeda2df4e0a7fee6427e75f5e4e9393d949f7a50b010"
+    },
+    "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json": {
+      "anchors": [
+        {
+          "line": 387,
+          "text": "first_behavior_boundary"
+        },
+        {
+          "line": 389,
+          "text": "\"first_behavioral_effect\": \"BEFORE exact read\""
+        }
+      ],
+      "bytes": 43231,
+      "sha256": "45f8201fd15adffe41b75859bfcd0458881ab2b50edd13641a1f69be5b13ec97"
+    }
+  },
+  "method": "raw byte SHA256 and source-text anchors only",
+  "owner_modules_imported": false,
+  "phase_id": "SYNTH.EXEC.PREP.PINNED.CONTRACT.1",
+  "source_materialized": false
+}

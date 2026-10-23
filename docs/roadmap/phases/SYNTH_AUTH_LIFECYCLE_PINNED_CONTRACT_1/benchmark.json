@@ -1,0 +1,23 @@
+{
+  "all_operational_effects_zero": true,
+  "audit_guard": {
+    "live_verification_or_execution_attempts": 0,
+    "network_attempts": 0,
+    "owner_issuance_or_consumption_attempts": 0,
+    "process_attempts": 0,
+    "repository_write_attempts": 0
+  },
+  "blocked_actions": [],
+  "bytecode_writes_disabled": true,
+  "exit_code": 0,
+  "external_pytest_directory": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\11\\01a12a0f-a405-7a03-aad6-5f94799dacd7\\cattus-pinned-contract-acewpfyz",
+  "frozen_pinned_test_fixture_isolates_empty_registries": false,
+  "frozen_pinned_test_fixture_patches_virtual_transports": false,
+  "frozen_pinned_test_fixture_replaces_unused_provider_entrypoints": false,
+  "full_frozen_suites_run": false,
+  "historical_owners_modified": false,
+  "live_registry_fixtures_seeded": false,
+  "mode": "benchmark",
+  "production_validators_patched": false,
+  "provider_proofs_or_registered_handles_constructed": false
+}

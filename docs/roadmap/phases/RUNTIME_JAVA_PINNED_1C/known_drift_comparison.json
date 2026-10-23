@@ -1,0 +1,46 @@
+{
+  "registry_baseline_collected": 299,
+  "registry_baseline_passed": 292,
+  "registry_baseline_failure_count": 7,
+  "prior_phase": "RUNTIME.JAVA.PINNED.1B",
+  "failure_ids_match_prior_baseline": true,
+  "unchanged_failure_ids": [
+    [
+      "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+      "call",
+      "failed"
+    ],
+    [
+      "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+      "call",
+      "failed"
+    ],
+    [
+      "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+      "call",
+      "failed"
+    ],
+    [
+      "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+      "call",
+      "failed"
+    ],
+    [
+      "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+      "call",
+      "failed"
+    ],
+    [
+      "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+      "call",
+      "failed"
+    ],
+    [
+      "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+      "call",
+      "failed"
+    ]
+  ],
+  "new_failure_ids": [],
+  "reason": "Existing historical registry/picker bookkeeping drift is exposed without registry projection or repinning. Frozen byte-preservation check authenticates unchanged existing file contents separately."
+}

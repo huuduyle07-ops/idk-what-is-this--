@@ -1,0 +1,133 @@
+{
+  "benchmark": {
+    "checked": 54,
+    "errors": 0,
+    "exit_code": 0
+  },
+  "completion_marker_earned": false,
+  "focused": {
+    "collected": 17,
+    "exit_code": 0,
+    "passed": 17
+  },
+  "git": {
+    "existing_whitespace_unchanged": true,
+    "passed": true,
+    "phase_whitespace_passed": true
+  },
+  "operational_guard": {
+    "author": {
+      "all_operational_effects_zero": true,
+      "blocked_actions": [],
+      "counters": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "imported_capability_owners": []
+    },
+    "benchmark": {
+      "all_operational_effects_zero": true,
+      "blocked_actions": [],
+      "counters": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "imported_capability_owners": []
+    },
+    "focused": {
+      "all_operational_effects_zero": true,
+      "blocked_actions": [],
+      "counters": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "imported_capability_owners": []
+    },
+    "registry_after": {
+      "all_operational_effects_zero": true,
+      "blocked_actions": [],
+      "counters": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "imported_capability_owners": []
+    },
+    "registry_baseline": {
+      "all_operational_effects_zero": true,
+      "blocked_actions": [],
+      "counters": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "imported_capability_owners": []
+    }
+  },
+  "passed": true,
+  "preservation": {
+    "added_outside_new_phase": [],
+    "after_file_count": 26856,
+    "allowed_additions_outside_phase": [],
+    "baseline_file_count": 26856,
+    "changed": [],
+    "deleted": [],
+    "historical_preservation_passed": true,
+    "scope": "entire non-cache workspace including root/config/web and frozen history"
+  },
+  "registry_picker": {
+    "collected": 299,
+    "existing_failure_count": 7,
+    "failed_nodes": [
+      "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+      "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+      "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+      "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+      "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+      "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+      "tests/test_phase_registry.py::test_seed_registry_summary_counts"
+    ],
+    "passed": 292,
+    "unchanged": true
+  },
+  "selection_complete": false,
+  "sizing_guard": {
+    "blocked_effects": [],
+    "mode": "pure_schema_sizing",
+    "operational_guard_counters": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "passed": true
+  },
+  "static": {
+    "compiled_count": 1360,
+    "errors": [],
+    "json_count": 19,
+    "passed": true,
+    "whitespace_errors": []
+  },
+  "typed_result": "TRANSPORT_SELECTION_UNRESOLVED"
+}

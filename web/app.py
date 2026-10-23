@@ -102,6 +102,8 @@ from web.routes.harness_controls_routes import bp as harness_controls_routes_bp
 from web.routes.project_evolution_approval_routes import bp as project_evolution_approval_routes_bp
 from web.routes.replay_routes import bp as replay_routes_bp
 from web.routes.history_routes import bp as history_routes_bp
+from web.routes.learning_routes import bp as learning_routes_bp
+from web.routes.learning_material_routes import bp as learning_material_routes_bp
 from graph.builder import build_graph_from_repo
 from graph.exporter import safe_id, escape_mermaid_label
 from web.graph_evidence import (
@@ -119,6 +121,8 @@ app.register_blueprint(harness_controls_routes_bp)
 app.register_blueprint(project_evolution_approval_routes_bp)
 app.register_blueprint(replay_routes_bp)
 app.register_blueprint(history_routes_bp)
+app.register_blueprint(learning_routes_bp)
+app.register_blueprint(learning_material_routes_bp)
 
 import os as _os_gate
 
@@ -790,6 +794,15 @@ def generate_patch():
 
 def _generate_patch_from_control(repo_path, control):
     """The unchanged CONTROL-dependent Generate Patch pipeline, for prior or bootstrapped CONTROL."""
+    # OOP.INTENT.DETECT.2 owns applicable future-design semantics before
+    # build_control_prompt can construct or expand RepairScope.
+    from web.oop_intent_adapter import admit_future_design_control_wait
+    task_text = preserved_task_text(control)
+    future_wait, future_design_owned = admit_future_design_control_wait(
+        control=control, repo_path=repo_path or "", task_text=task_text)
+    if future_wait is not None:
+        return {**future_wait, "usage": {"patch_author_calls": 0}}
+
     harness_block = _patch_generation_harness_block(repo_path, control)
     if harness_block:
         return harness_block
@@ -812,7 +825,6 @@ def _generate_patch_from_control(repo_path, control):
     # CONTROL has now projected the measured RepairScope. Admit an exact
     # compiler-bound ambiguity before the patch-author provider call.
     from core.repair_intent_ambiguity import detect_repair_intent_ambiguity
-    task_text = preserved_task_text(control)
     detection = detect_repair_intent_ambiguity(
         task_text=task_text, control=control, repo_path=repo_path or "",
     ) if task_text else None
@@ -830,11 +842,12 @@ def _generate_patch_from_control(repo_path, control):
                 "repair_intent_gap": gap.as_dict(),
                 "ambiguity_detection": detection.as_dict(),
                 "usage": {"patch_author_calls": 0}}
-    from web.oop_intent_adapter import admit_oop_patch_wait
-    oop_wait = admit_oop_patch_wait(
-        control=control, repo_path=repo_path or "", task_text=task_text)
-    if oop_wait is not None:
-        return {**oop_wait, "usage": {"patch_author_calls": 0}}
+    if not future_design_owned:
+        from web.oop_intent_adapter import admit_oop_patch_wait
+        oop_wait = admit_oop_patch_wait(
+            control=control, repo_path=repo_path or "", task_text=task_text)
+        if oop_wait is not None:
+            return {**oop_wait, "usage": {"patch_author_calls": 0}}
     if (control.get("repair_scope") or {}).get("status") == "complete":
         prompt += "\n\n" + author_escalation_directive(control["repair_scope"])
 
@@ -993,6 +1006,36 @@ def answer_repair_intent():
     return result
 
 
+# PATCH.SCOPE.APPROVE.1 action boundary.
+@app.route("/scope_approval/decision", methods=["POST"])
+def scope_approval_decision():
+    """Structured human action under the existing auth/origin/CSRF gate."""
+    from collections.abc import Mapping
+    from web.structural_scope_approval import submit_scope_approval_decision
+    data = request.get_json(silent=True) if request.is_json else request.form
+    allowed = {"session_id", "repo_path", "proposal_fingerprint", "review_fingerprint", "decision", "note", "csrf_token"}
+    if (not isinstance(data, Mapping) or set(data) - allowed
+            or (not request.is_json and any(len(data.getlist(k)) != 1 for k in data))
+            or any(not isinstance(v, str) for v in data.values())):
+        return {"status": "rejected", "code": "invalid_scope_approval_action"}, 400
+    stored = find_session(data.get("session_id", ""))
+    if stored is None:
+        return {"status": "rejected", "code": "wrong_scope_approval_session"}, 404
+    try:
+        if not data.get("repo_path") or Path(data["repo_path"]).resolve() != Path(stored["repo_path"]).resolve():
+            raise ValueError("wrong_repository")
+        return submit_scope_approval_decision(data.get("session_id", ""),
+            proposal_fingerprint=data.get("proposal_fingerprint", ""),
+            review_fingerprint=data.get("review_fingerprint", ""),
+            decision=data.get("decision", ""), note=data.get("note", ""))
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, RecursionError) as exc:
+        code = "reacquisition_required" if isinstance(exc, OSError) else str(exc)
+        return {"status": code if code in {"approval_stale", "reacquisition_required", "approval_unavailable"} else "rejected",
+                "code": code, "patch": "", "candidate": None, "write_authority": False,
+                "execution_authorized": False, "apply_authority": False}, 409
+# End PATCH.SCOPE.APPROVE.1 action boundary.
+
+
 @app.route("/oop_intent/answer", methods=["POST"])
 def answer_oop_intent():
     """Bind human intent to one exact OOP review without patch execution."""
@@ -1008,6 +1051,14 @@ def answer_oop_intent():
     repo_path = (request.form.get("repo_path") or "").strip()
     if not repo_path or Path(repo_path).resolve() != Path(session["repo_path"]).resolve():
         return {"status": "rejected", "code": "wrong_repository"}, 409
+    if ((session.get("oop_intent_gap") or {}).get("scope_recheck_schema") is not None
+            or (session.get("oop_intent_gap") or {}).get("dimension") == "existing_savings_transition"
+            or (session.get("result") or {}).get("scope_recheck_inputs") is not None):
+        # Scope-discovered semantics return through the existing OOP lifecycle.
+        from web.scope_semantic_recheck import project_stored_scope_transition_answer
+        return project_stored_scope_transition_answer(
+            session_id, answer_text=request.form.get("answer") or "",
+            gap_id=request.form.get("gap_id"), decline=request.form.get("decline") == "true")
     try:
         gap = validate_stored_gap(
             session["oop_intent_gap"], task_text=session["query"],
@@ -1033,6 +1084,9 @@ def answer_oop_intent():
         code = str(exc)
         return {"status": "rejected", "code": code}, (409 if code == "clarification_conflict" else 400)
     if previous is not None:
+        if gap.get("admission_schema") == "oop_intent_detect_2_v1":
+            from web.oop_intent_continuation import project_stored_oop_answer
+            return project_stored_oop_answer(session_id)
         return session.get("result") or {"status": session["status"], "patch": ""}
     if session.get("status") != "waiting_for_clarification":
         return {"status": "rejected", "code": "clarification_not_waiting"}, 409
@@ -1042,6 +1096,16 @@ def answer_oop_intent():
                   "write_authority": False, "execution_authorized": False, "auto_apply": False}
         update_oop_intent_wait(session_id, status="reacquisition_required", result=result)
         return result, 409
+    if gap.get("admission_schema") == "oop_intent_detect_2_v1":
+        # CONTINUE.1 consumes a durable answer on this original waiting session.
+        update_oop_intent_wait(
+            session_id, status="clarification_supplied_pending_projection",
+            answer=answer.as_dict(),
+            result={"status": "clarification_supplied_pending_projection", "patch": "",
+                    "write_authority": False, "execution_authorized": False,
+                    "auto_apply": False, "repair_scope_authority": False})
+        from web.oop_intent_continuation import project_stored_oop_answer
+        return project_stored_oop_answer(session_id)
     review_only = session.get("task_mode") == "review"
     if not review_only:
         control = session.get("control")
@@ -2909,6 +2973,16 @@ def generate_candidates():
 
 def _generate_candidates_from_control(repo_path, control):
     """The unchanged CONTROL-dependent Generate Candidates pipeline, for prior or bootstrapped CONTROL."""
+    # Future-design intent must settle before any of the three candidate
+    # authors receive a prompt or RepairScope can be projected.
+    from web.oop_intent_adapter import admit_future_design_control_wait
+    task_text = preserved_task_text(control)
+    future_wait, _future_design_owned = admit_future_design_control_wait(
+        control=control, repo_path=repo_path or "", task_text=task_text)
+    if future_wait is not None:
+        return {**future_wait, "candidates": [],
+                "usage": {"patch_author_calls": 0}}
+
     harness_block = _patch_generation_harness_block(repo_path, control)
     if harness_block:
         return harness_block

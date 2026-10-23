@@ -1,0 +1,97 @@
+{
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.SCOPE.REQ.1",
+  "typed_result": "SYNTH_EXEC_PREP_CONTROLLER_BUDGET_SCOPE_REQ_1_COMPLETE",
+  "created_at": "2026-10-19",
+  "requirement_file": "requirement.json",
+  "requirement_sha256": "df23b2518d91fce37baff77efc33c329916604bc1574ef5bbbff5ff971d98b03",
+  "all_required_validation_checks_passed": true,
+  "focused_tests_collected": 80,
+  "focused_tests_passed": 80,
+  "focused_selected_nodes": [
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_SCOPE_REQ_1/tests/test_scope_requirement.py",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/test_contract.py",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py"
+  ],
+  "benchmark_cases_checked": 54,
+  "benchmark_errors": 0,
+  "registry_picker_baseline": {
+    "collected": 299,
+    "passed": 292,
+    "failed": 7
+  },
+  "registry_picker_after": {
+    "collected": 299,
+    "passed": 292,
+    "failed": 7
+  },
+  "registry_picker_and_existing_failures_unchanged": true,
+  "baseline_failure_normalization": "Raw diagnostics retained; normalize only Python repr allocator ' at 0x...>' addresses before comparing. All node IDs, assertion text, expected/actual values and failure phases are exact.",
+  "preservation": {
+    "added_outside_new_phase": [],
+    "after_file_count": 26928,
+    "allowed_additions_outside_phase": [],
+    "baseline_file_count": 26928,
+    "changed": [],
+    "deleted": [],
+    "historical_preservation_passed": true,
+    "scope": "entire non-cache workspace including root/config/web and frozen history"
+  },
+  "preservation_baseline_sha256": "0085b86487096b161165f0d51d09b6506ced057a769a95be32b85b8541bb0532",
+  "registry_baseline_sha256": "a9b6b77171ea7d9cf38cbd86cf73f25aee8bd54c9ce515262d40317bc00fc121",
+  "static_check_passed": true,
+  "git_diff_check_passed": true,
+  "git_baseline_vs_after_identical": true,
+  "all_operational_effects_zero": true,
+  "guarded_modes": {
+    "focused": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "benchmark": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "registry_baseline": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "registry_after": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    }
+  },
+  "no_capability_owner_imports": true,
+  "historical_bytes_preserved": true,
+  "new_requirement_only": true,
+  "no_transport_selected": true,
+  "all_authority_flags_false": true,
+  "old_budget_proof_retried": false,
+  "final_feasibility_or_impossibility_claim": false,
+  "scope_clarification_only": true,
+  "evidence_files": [
+    "focused.json",
+    "benchmark.json",
+    "registry_baseline.json",
+    "registry_after.json",
+    "registry_comparison.json",
+    "preservation_comparison.json",
+    "static_validation.json",
+    "git_validation.json"
+  ]
+}

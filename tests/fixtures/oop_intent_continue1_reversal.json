@@ -1,0 +1,12 @@
+{
+  "web/app.py": [
+    {
+      "after": "    if gap.get(\"admission_schema\") == \"oop_intent_detect_2_v1\":\n        # CONTINUE.1 consumes a durable answer on this original waiting session.\n        update_oop_intent_wait(\n            session_id, status=\"clarification_supplied_pending_projection\",\n            answer=answer.as_dict(),\n            result={\"status\": \"clarification_supplied_pending_projection\", \"patch\": \"\",\n                    \"write_authority\": False, \"execution_authorized\": False,\n                    \"auto_apply\": False, \"repair_scope_authority\": False})\n        from web.oop_intent_continuation import project_stored_oop_answer\n        return project_stored_oop_answer(session_id)\n",
+      "before": "    if gap.get(\"admission_schema\") == \"oop_intent_detect_2_v1\":\n        # Frozen DESIGN.1 has no answer-to-projection continuation contract.\n        # Preserve the human evidence durably, but do not let free text bypass\n        # DETECT.2 into RepairScope construction or patch authoring.\n        result = {\n            \"status\": \"clarification_supplied_pending_projection\",\n            \"answer\": \"Clarification recorded; a typed design projection is required before authoring.\",\n            \"patch\": \"\", \"patch_candidate\": None, \"patch_plan\": None,\n            \"clarification_answer\": answer.as_dict(),\n            \"write_authority\": False, \"execution_authorized\": False,\n            \"auto_apply\": False, \"repair_scope_authority\": False,\n            \"usage\": {\"patch_author_calls\": 0},\n        }\n        update_oop_intent_wait(\n            session_id, status=\"clarification_supplied_pending_projection\",\n            answer=answer.as_dict(), result=result)\n        return result\n"
+    },
+    {
+      "after": "    if previous is not None:\n        if gap.get(\"admission_schema\") == \"oop_intent_detect_2_v1\":\n            from web.oop_intent_continuation import project_stored_oop_answer\n            return project_stored_oop_answer(session_id)\n        return session.get(\"result\") or {\"status\": session[\"status\"], \"patch\": \"\"}\n    if session.get(\"status\") != \"waiting_for_clarification\":\n",
+      "before": "    if previous is not None:\n        return session.get(\"result\") or {\"status\": session[\"status\"], \"patch\": \"\"}\n    if session.get(\"status\") != \"waiting_for_clarification\":\n"
+    }
+  ]
+}

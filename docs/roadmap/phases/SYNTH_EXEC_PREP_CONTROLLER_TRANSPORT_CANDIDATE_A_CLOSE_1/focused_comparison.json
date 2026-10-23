@@ -1,0 +1,38 @@
+{
+  "baseline_note": "Historical-only focused run was captured after the initial combined run exposed this existing frozen-source failure. Historical sources are byte-identical to the pre-work snapshot.",
+  "current_collected": 297,
+  "current_failed": [
+    {
+      "nodeid": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_KERNEL_IDENTITY_CONTRACT_1/tests/test_kernel_identity_contract.py::test_new_phase_python_has_no_owner_import_runtime_probe_or_process_launch",
+      "signature": "def test_new_phase_python_has_no_owner_import_runtime_probe_or_process_launch():\n        forbidden_imports = (\"core\", \"subprocess\", \"socket\", \"requests\", \"urllib\", \"http\", \"importlib\")\n        forbidden_calls = {\"exec\", \"eval\", \"__import__\", \"Popen\", \"run\", \"check_output\",\n                           \"system\", \"fork\", \"spawn\", \"stat\", \"lstat\", \"readlink\"}\n        # Validation has explicit instrumentation and source readers; the contract\n        # writer, arithmetic and this fixture file must remain inert source tools.\n        for path in PHASE.rglob(\"*.py\"):\n            if path.name == \"validate_pure.py\":\n                continue\n            tree = ast.parse(path.read_text(encoding=\"utf-8\"), filename=str(path))\n            for node in ast.walk(tree):\n                if isinstance(node, ast.Import):\n>                   assert not any(alias.name.split(\".\")[0] in forbidden_imports for alias in node.names), path\nE                   AssertionError: WindowsPath('C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_KERNEL_IDENTITY_CONTRACT_1/git_checks.py')\nE                   assert not True\nE                    +  where True = any(<generator object test_new_phase_python_has_no_owner_import_runtime_probe_or_process_launch.<locals>.<genexpr> at 0x000001C3C0FE5EE0>)\n\ndocs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_KERNEL_IDENTITY_CONTRACT_1\\tests\\test_kernel_identity_contract.py:485: AssertionError",
+      "when": "call"
+    }
+  ],
+  "current_failure_count": 1,
+  "current_passed": 296,
+  "existing_failure_source_not_modified": true,
+  "failure_signatures_identical_after_allocator_address_normalization": true,
+  "historical_collected": 288,
+  "historical_failed": [
+    {
+      "nodeid": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_KERNEL_IDENTITY_CONTRACT_1/tests/test_kernel_identity_contract.py::test_new_phase_python_has_no_owner_import_runtime_probe_or_process_launch",
+      "signature": "def test_new_phase_python_has_no_owner_import_runtime_probe_or_process_launch():\n        forbidden_imports = (\"core\", \"subprocess\", \"socket\", \"requests\", \"urllib\", \"http\", \"importlib\")\n        forbidden_calls = {\"exec\", \"eval\", \"__import__\", \"Popen\", \"run\", \"check_output\",\n                           \"system\", \"fork\", \"spawn\", \"stat\", \"lstat\", \"readlink\"}\n        # Validation has explicit instrumentation and source readers; the contract\n        # writer, arithmetic and this fixture file must remain inert source tools.\n        for path in PHASE.rglob(\"*.py\"):\n            if path.name == \"validate_pure.py\":\n                continue\n            tree = ast.parse(path.read_text(encoding=\"utf-8\"), filename=str(path))\n            for node in ast.walk(tree):\n                if isinstance(node, ast.Import):\n>                   assert not any(alias.name.split(\".\")[0] in forbidden_imports for alias in node.names), path\nE                   AssertionError: WindowsPath('C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_KERNEL_IDENTITY_CONTRACT_1/git_checks.py')\nE                   assert not True\nE                    +  where True = any(<generator object test_new_phase_python_has_no_owner_import_runtime_probe_or_process_launch.<locals>.<genexpr> at 0x00000247C6F459A0>)\n\ndocs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_KERNEL_IDENTITY_CONTRACT_1\\tests\\test_kernel_identity_contract.py:485: AssertionError",
+      "when": "call"
+    }
+  ],
+  "historical_failure_count": 1,
+  "historical_passed": 287,
+  "new_passed_count": 9,
+  "new_passed_nodes": [
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_CANDIDATE_A_CLOSE_1/tests/test_candidate_a_closure.py::test_all_88_listed_residuals_are_nonnegative_minimum_width_differences",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_CANDIDATE_A_CLOSE_1/tests/test_candidate_a_closure.py::test_conservative_width_sensitivity_is_separate_and_always_exceeds_cap",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_CANDIDATE_A_CLOSE_1/tests/test_candidate_a_closure.py::test_every_input_and_embedded_source_hash_matches",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_CANDIDATE_A_CLOSE_1/tests/test_candidate_a_closure.py::test_exact_8829_is_conditional_on_five_class_digits",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_CANDIDATE_A_CLOSE_1/tests/test_candidate_a_closure.py::test_frozen_candidate_scope_and_cumulative_cap",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_CANDIDATE_A_CLOSE_1/tests/test_candidate_a_closure.py::test_no_rejection_selection_authority_or_completion_is_published",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_CANDIDATE_A_CLOSE_1/tests/test_candidate_a_closure.py::test_omitted_class_fields_prevent_requested_exact_minimum",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_CANDIDATE_A_CLOSE_1/tests/test_candidate_a_closure.py::test_roadmap_addendum_does_not_supersede_historical_preference",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_CANDIDATE_A_CLOSE_1/tests/test_candidate_a_closure.py::test_writer_profile_is_lower_and_additional_records_add_bytes"
+  ],
+  "unchanged_historical_tests": true
+}

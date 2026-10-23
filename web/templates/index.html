@@ -18,6 +18,9 @@
 {% set page_web_mode = active_web_mode|default('instant') %}
 {% set selected_runtime_environment = current.runtime_environment|default('auto') if current else 'auto' %}
 {% set waiting = (presentation.clarification if presentation is defined and presentation else none) %}
+{# PATCH.SCOPE.APPROVE.1 review binding. #}
+{% set scope_approval = (presentation.scope_approval if presentation is defined and presentation else none) %}
+{# End PATCH.SCOPE.APPROVE.1 review binding. #}
 <body data-product-mode="{{ page_web_mode }}">
 
 <div class="layout">
@@ -35,6 +38,13 @@
         </div>
 
         <nav class="mode-switcher" aria-label="Workspace mode">
+            <a class="mode-switcher__item" href="{{ url_for('learning.page') }}" style="text-decoration:none;color:inherit">
+                <span class="mode-switcher__icon" aria-hidden="true">↗</span>
+                <span class="mode-switcher__text">
+                    <strong>Học cùng C.A.T.T.U.S</strong>
+                    <small>Bài thử Java · Kế thừa</small>
+                </span>
+            </a>
             <button type="button" class="mode-switcher__item" data-product-mode="chat" onclick="setProductMode('chat')">
                 <span class="mode-switcher__icon">?</span>
                 <span class="mode-switcher__text">
@@ -448,8 +458,8 @@
                into a collapsed "More actions" group. All onclick handlers are
                preserved verbatim. -->
           <div class="actions actions--primary">
-            <button type="button" onclick="generatePatch()">Generate Patch</button>
-            <button type="button" onclick="applyPatch()" {% if waiting %}hidden disabled{% endif %}>Apply / Review Patch</button>
+            <button type="button" onclick="generatePatch()" {% if scope_approval %}hidden disabled{% endif %}>Generate Patch</button>
+            <button type="button" onclick="applyPatch()" {% if waiting or scope_approval %}hidden disabled{% endif %}>Apply / Review Patch</button>
           </div>
           <!-- anti-lesson-control-per-run -->
           <!-- Phase 11.7c: per-run-only opt-in for the experimental anti-lesson
@@ -469,7 +479,7 @@
           <details class="more-actions" data-ui-group="chat-more-actions">
             <summary class="more-actions__summary">More actions</summary>
             <div class="actions actions--secondary">
-              <button type="button" onclick="generateCandidates()">Generate Candidates</button>
+              <button type="button" onclick="generateCandidates()" {% if scope_approval %}hidden disabled{% endif %}>Generate Candidates</button>
               <button type="button" onclick="testPatch()">Test Run Patch</button>
               <button type="button" onclick="undoPatch()">Undo</button>
               <button type="button" onclick="localCritique()" title="Send current patch to local Ollama DeepSeek for review (does not auto-apply)">&#x1F9E0; Local Critique</button>
@@ -516,6 +526,9 @@
             <button type="button" onclick="submitOOPIntent(false)">Continue {{ 'task' if waiting and waiting.task_mode == 'patch' else 'review' }}</button>
             <button type="button" onclick="submitOOPIntent(true)">Decline to clarify</button>
           </div>
+          {# PATCH.SCOPE.APPROVE.1 review surface. #}
+          {% if scope_approval %}{% include 'scope_approval_review.html' %}{% endif %}
+          {# End PATCH.SCOPE.APPROVE.1 review surface. #}
           <pre id="context" class="tab-content">{{ result.context if result else "" }}</pre>
           <pre id="state" class="tab-content">{{ result.state if result else "" }}</pre>
           <div id="patch" class="tab-content">

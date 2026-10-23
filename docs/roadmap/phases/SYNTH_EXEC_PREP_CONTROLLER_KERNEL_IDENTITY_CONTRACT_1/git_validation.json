@@ -1,0 +1,12 @@
+{
+  "baseline_timing": "Whole-workspace snapshot preceded all validation. Fixed Git before/after verification brackets final checks; the earlier diagnostic was captured after additive contract files were created. No existing file was edited at any point.",
+  "before_after_identical": true,
+  "cached_diff_check_exit_code": 0,
+  "diff_check_exit_code": 0,
+  "early_powershell_diagnostic": "git_baseline.json retains early output/status but had unavailable native exit codes; authoritative exit codes are in git_before.json/git_after.json.",
+  "passed": true,
+  "read_only_git_processes": "git_checks.py invokes only fixed Git diff/status commands required by the user; these are not target runtime subprocess probes. Guarded pytest/benchmark process-attempt counters are zero.",
+  "stash_reset_clean_used": false,
+  "status_identical": true,
+  "whitespace_configuration": "blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol"
+}

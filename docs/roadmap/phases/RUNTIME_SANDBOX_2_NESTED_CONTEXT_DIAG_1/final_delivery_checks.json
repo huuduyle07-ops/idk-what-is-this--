@@ -1,0 +1,65 @@
+{
+  "benchmark_cases": 54,
+  "focused_test_counts": {
+    "AUTH_matrix_cases": 57,
+    "PINNED_SYNTH_contract_replay": 59,
+    "SANDBOX2_PRELADDER": 230,
+    "context": 11
+  },
+  "historical_preservation": {
+    "changed_or_missing": [],
+    "historical_file_count": 2185,
+    "passed": true,
+    "prior_historical_pin_integrity": {
+      "historical_drift_not_repinned": true,
+      "passed": true,
+      "prior_pin_sets": [
+        {
+          "changed_or_missing": [],
+          "historical_pins_checked": 1828,
+          "passed": true,
+          "prior_phase": "RUNTIME_JAVA_1C_AUTH_DIAG_1"
+        },
+        {
+          "changed_or_missing": [],
+          "historical_pins_checked": 2126,
+          "passed": true,
+          "prior_phase": "RUNTIME_SANDBOX_2_PRELADDER_DIAG_1"
+        }
+      ]
+    },
+    "unexpected_new_files_outside_phase": []
+  },
+  "initial_broad_fixture_timeout_disclosed": true,
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR.1R": 0,
+    "JAVA1C": 0,
+    "PINNED1A_export": 0,
+    "PINNED1B": 0,
+    "PINNED1C": 0,
+    "SANDBOX2_issuance": 0,
+    "SYNTH_retry": 0,
+    "SyntheticStateBox": 0,
+    "execution_leases": 0,
+    "provider_root": 0,
+    "reflection": 0
+  },
+  "passed": true,
+  "phase_id": "RUNTIME.SANDBOX.2.NESTED.CONTEXT.DIAG.1",
+  "registry_picker_baseline_after_equal": true,
+  "report_source_identity_matches_guarded_production": true,
+  "report_validation_matches_final_summary": true,
+  "source_checks": {
+    "authored_text_files_checked": 36,
+    "bytecode_emission": false,
+    "failures": [],
+    "git_diff_check_exit_code": 0,
+    "new_json_files_parsed": 26,
+    "new_python_sources_compiled_in_memory": 4,
+    "passed": true
+  },
+  "status": "UNRESOLVED"
+}

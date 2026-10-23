@@ -1,0 +1,963 @@
+{
+  "apply_authority": false,
+  "arbitrary_command_authority": false,
+  "bank_execution_count": 0,
+  "behavioral_execution_count": 0,
+  "cleanup_verified": true,
+  "compile_count": 0,
+  "console_count": 0,
+  "descriptor": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+    "eligible_for_java1_continuation": true,
+    "host_mount_authority": false,
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "network_authority": false,
+    "phase_id": "RUNTIME.SANDBOX.2",
+    "relationship": "additive_epoch_preserving_SANDBOX_1_history",
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "sandbox_descriptor_fingerprint": "4cf6c8cb972c0a0b8c592cae686c2e2a132b30274f1feecc4825a9e808cbf85f",
+    "schema_version": "runtime_sandbox_2_v1",
+    "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "shell_available": false,
+    "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+    "verification_receipt_fingerprint": "9adda01b89ab9493cce28c1f02e988ae8aa31e70bc840a3df6a92f02bc6ba4c8"
+  },
+  "executor_refreshed_or_resumed": false,
+  "exported_json_is_report_only": true,
+  "host_mount_authority": false,
+  "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+  "java1_completed": false,
+  "java_version_count": 1,
+  "javac_version_count": 1,
+  "jvm_fixture_count": 0,
+  "network_authority": false,
+  "phase_container_count_after_teardown": 0,
+  "phase_id": "RUNTIME.SANDBOX.2",
+  "policy_diff": {
+    "baseline_profile": "runtime_sandbox_1_v1",
+    "baseline_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+    "candidate_profile": "runtime_sandbox_2_v1",
+    "candidate_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "legacy_clone_policy": "allow_except_seven_forbidden_namespace_bits",
+    "legacy_clone_rules_unchanged": true,
+    "semantic_changes": [
+      {
+        "execution_allowed_after": false,
+        "execution_allowed_before": false,
+        "new_action": "SCMP_ACT_ERRNO",
+        "new_errno": 38,
+        "old_action": "SCMP_ACT_ERRNO",
+        "old_errno": 1,
+        "syscall": "clone3"
+      }
+    ],
+    "thread_only_clone_enforced": false
+  },
+  "policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+  "profile_id": "runtime_sandbox_2_v1",
+  "receipt_authenticated_in_issuing_process": true,
+  "reflection_count": 0,
+  "repository_write_authority": false,
+  "runtime_authority": false,
+  "runtime_policy_authorizations_consumed": 0,
+  "shell_available": false,
+  "stages": [
+    {
+      "capture_status": "sandbox_completed",
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "facts": {
+        "after": {
+          "capabilities_zero": true,
+          "cgroup": "0::/",
+          "gid": 65534,
+          "memory_max": "134217728",
+          "namespaces": {
+            "cgroup": "cgroup:[4026532487]",
+            "ipc": "ipc:[4026532406]",
+            "mnt": "mnt:[4026532403]",
+            "net": "net:[4026532488]",
+            "pid": "pid:[4026532474]",
+            "user": "user:[4026531837]",
+            "uts": "uts:[4026532405]"
+          },
+          "no_new_privileges": true,
+          "os_threads": 1,
+          "pid": 1,
+          "pids_current": "1",
+          "pids_max": "128",
+          "ppid": 0,
+          "processes": [
+            1
+          ],
+          "tid": 1,
+          "uid": 65534
+        },
+        "before": {
+          "capabilities_zero": true,
+          "cgroup": "0::/",
+          "gid": 65534,
+          "memory_max": "134217728",
+          "namespaces": {
+            "cgroup": "cgroup:[4026532487]",
+            "ipc": "ipc:[4026532406]",
+            "mnt": "mnt:[4026532403]",
+            "net": "net:[4026532488]",
+            "pid": "pid:[4026532474]",
+            "user": "user:[4026531837]",
+            "uts": "uts:[4026532405]"
+          },
+          "no_new_privileges": true,
+          "os_threads": 1,
+          "pid": 1,
+          "pids_current": "1",
+          "pids_max": "128",
+          "ppid": 0,
+          "processes": [
+            1
+          ],
+          "tid": 1,
+          "uid": 65534
+        },
+        "clone3": {
+          "errno": 38,
+          "result": -1
+        },
+        "libc_version": "2.41"
+      },
+      "host_endpoints_quiet": true,
+      "host_sentinel_unchanged": true,
+      "measured_termination_ms": null,
+      "mode": "clone3",
+      "outer_stderr": "",
+      "stderr_size": 0,
+      "stdout_size": 979,
+      "termination_verified": false,
+      "termination_within_deadline": true,
+      "verdict": "stage_passed"
+    },
+    {
+      "capture_status": "sandbox_completed",
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "facts": {
+        "after": {
+          "capabilities_zero": true,
+          "cgroup": "0::/",
+          "gid": 65534,
+          "memory_max": "134217728",
+          "namespaces": {
+            "cgroup": "cgroup:[4026532487]",
+            "ipc": "ipc:[4026532406]",
+            "mnt": "mnt:[4026532403]",
+            "net": "net:[4026532488]",
+            "pid": "pid:[4026532474]",
+            "user": "user:[4026531837]",
+            "uts": "uts:[4026532405]"
+          },
+          "no_new_privileges": true,
+          "os_threads": 1,
+          "pid": 1,
+          "pids_current": "1",
+          "pids_max": "128",
+          "ppid": 0,
+          "processes": [
+            1
+          ],
+          "tid": 1,
+          "uid": 65534
+        },
+        "before": {
+          "capabilities_zero": true,
+          "cgroup": "0::/",
+          "gid": 65534,
+          "memory_max": "134217728",
+          "namespaces": {
+            "cgroup": "cgroup:[4026532487]",
+            "ipc": "ipc:[4026532406]",
+            "mnt": "mnt:[4026532403]",
+            "net": "net:[4026532488]",
+            "pid": "pid:[4026532474]",
+            "user": "user:[4026531837]",
+            "uts": "uts:[4026532405]"
+          },
+          "no_new_privileges": true,
+          "os_threads": 1,
+          "pid": 1,
+          "pids_current": "1",
+          "pids_max": "128",
+          "ppid": 0,
+          "processes": [
+            1
+          ],
+          "tid": 1,
+          "uid": 65534
+        },
+        "libc_version": "2.41",
+        "namespace_probes": {
+          "cgroup": {
+            "clone": {
+              "errno": 1,
+              "result": -1
+            },
+            "setns": {
+              "errno": 1,
+              "result": -1
+            },
+            "unshare": {
+              "errno": 1,
+              "result": -1
+            }
+          },
+          "ipc": {
+            "clone": {
+              "errno": 1,
+              "result": -1
+            },
+            "setns": {
+              "errno": 1,
+              "result": -1
+            },
+            "unshare": {
+              "errno": 1,
+              "result": -1
+            }
+          },
+          "mnt": {
+            "clone": {
+              "errno": 1,
+              "result": -1
+            },
+            "setns": {
+              "errno": 1,
+              "result": -1
+            },
+            "unshare": {
+              "errno": 1,
+              "result": -1
+            }
+          },
+          "net": {
+            "clone": {
+              "errno": 1,
+              "result": -1
+            },
+            "setns": {
+              "errno": 1,
+              "result": -1
+            },
+            "unshare": {
+              "errno": 1,
+              "result": -1
+            }
+          },
+          "pid": {
+            "clone": {
+              "errno": 1,
+              "result": -1
+            },
+            "setns": {
+              "errno": 1,
+              "result": -1
+            },
+            "unshare": {
+              "errno": 1,
+              "result": -1
+            }
+          },
+          "user": {
+            "clone": {
+              "errno": 1,
+              "result": -1
+            },
+            "setns": {
+              "errno": 1,
+              "result": -1
+            },
+            "unshare": {
+              "errno": 1,
+              "result": -1
+            }
+          },
+          "uts": {
+            "clone": {
+              "errno": 1,
+              "result": -1
+            },
+            "setns": {
+              "errno": 1,
+              "result": -1
+            },
+            "unshare": {
+              "errno": 1,
+              "result": -1
+            }
+          }
+        },
+        "pthreads": [
+          {
+            "after": {
+              "capabilities_zero": true,
+              "cgroup": "0::/",
+              "gid": 65534,
+              "memory_max": "134217728",
+              "namespaces": {
+                "cgroup": "cgroup:[4026532487]",
+                "ipc": "ipc:[4026532406]",
+                "mnt": "mnt:[4026532403]",
+                "net": "net:[4026532488]",
+                "pid": "pid:[4026532474]",
+                "user": "user:[4026531837]",
+                "uts": "uts:[4026532405]"
+              },
+              "no_new_privileges": true,
+              "os_threads": 1,
+              "pid": 1,
+              "pids_current": "1",
+              "pids_max": "128",
+              "ppid": 0,
+              "processes": [
+                1
+              ],
+              "tid": 1,
+              "uid": 65534
+            },
+            "before": {
+              "capabilities_zero": true,
+              "cgroup": "0::/",
+              "gid": 65534,
+              "memory_max": "134217728",
+              "namespaces": {
+                "cgroup": "cgroup:[4026532487]",
+                "ipc": "ipc:[4026532406]",
+                "mnt": "mnt:[4026532403]",
+                "net": "net:[4026532488]",
+                "pid": "pid:[4026532474]",
+                "user": "user:[4026531837]",
+                "uts": "uts:[4026532405]"
+              },
+              "no_new_privileges": true,
+              "os_threads": 1,
+              "pid": 1,
+              "pids_current": "1",
+              "pids_max": "128",
+              "ppid": 0,
+              "processes": [
+                1
+              ],
+              "tid": 1,
+              "uid": 65534
+            },
+            "create_return_code": 0,
+            "join_return_code": 0,
+            "label": "candidate_unmodified",
+            "socket_errno": 1,
+            "thread": {
+              "capabilities_zero": true,
+              "cgroup": "0::/",
+              "gid": 65534,
+              "memory_max": "134217728",
+              "namespaces": {
+                "cgroup": "cgroup:[4026532487]",
+                "ipc": "ipc:[4026532406]",
+                "mnt": "mnt:[4026532403]",
+                "net": "net:[4026532488]",
+                "pid": "pid:[4026532474]",
+                "user": "user:[4026531837]",
+                "uts": "uts:[4026532405]"
+              },
+              "no_new_privileges": true,
+              "os_threads": 2,
+              "pid": 1,
+              "pids_current": "2",
+              "pids_max": "128",
+              "ppid": 0,
+              "processes": [
+                1
+              ],
+              "tid": 7,
+              "uid": 65534
+            }
+          },
+          {
+            "after": {
+              "capabilities_zero": true,
+              "cgroup": "0::/",
+              "gid": 65534,
+              "memory_max": "134217728",
+              "namespaces": {
+                "cgroup": "cgroup:[4026532487]",
+                "ipc": "ipc:[4026532406]",
+                "mnt": "mnt:[4026532403]",
+                "net": "net:[4026532488]",
+                "pid": "pid:[4026532474]",
+                "user": "user:[4026531837]",
+                "uts": "uts:[4026532405]"
+              },
+              "no_new_privileges": true,
+              "os_threads": 1,
+              "pid": 1,
+              "pids_current": "1",
+              "pids_max": "128",
+              "ppid": 0,
+              "processes": [
+                1
+              ],
+              "tid": 1,
+              "uid": 65534
+            },
+            "before": {
+              "capabilities_zero": true,
+              "cgroup": "0::/",
+              "gid": 65534,
+              "memory_max": "134217728",
+              "namespaces": {
+                "cgroup": "cgroup:[4026532487]",
+                "ipc": "ipc:[4026532406]",
+                "mnt": "mnt:[4026532403]",
+                "net": "net:[4026532488]",
+                "pid": "pid:[4026532474]",
+                "user": "user:[4026531837]",
+                "uts": "uts:[4026532405]"
+              },
+              "no_new_privileges": true,
+              "os_threads": 1,
+              "pid": 1,
+              "pids_current": "1",
+              "pids_max": "128",
+              "ppid": 0,
+              "processes": [
+                1
+              ],
+              "tid": 1,
+              "uid": 65534
+            },
+            "create_return_code": 0,
+            "join_return_code": 0,
+            "label": "exact_legacy_clone_flags",
+            "socket_errno": 1,
+            "thread": {
+              "capabilities_zero": true,
+              "cgroup": "0::/",
+              "gid": 65534,
+              "memory_max": "134217728",
+              "namespaces": {
+                "cgroup": "cgroup:[4026532487]",
+                "ipc": "ipc:[4026532406]",
+                "mnt": "mnt:[4026532403]",
+                "net": "net:[4026532488]",
+                "pid": "pid:[4026532474]",
+                "user": "user:[4026531837]",
+                "uts": "uts:[4026532405]"
+              },
+              "no_new_privileges": true,
+              "os_threads": 2,
+              "pid": 1,
+              "pids_current": "2",
+              "pids_max": "128",
+              "ppid": 0,
+              "processes": [
+                1
+              ],
+              "tid": 8,
+              "uid": 65534
+            }
+          }
+        ],
+        "witness_filter": {
+          "errno": 0,
+          "result": 0
+        },
+        "witness_flags": 4001536,
+        "witness_rejects_other_flags": {
+          "errno": 1,
+          "result": -1
+        }
+      },
+      "host_endpoints_quiet": true,
+      "host_sentinel_unchanged": true,
+      "measured_termination_ms": null,
+      "mode": "pthread",
+      "outer_stderr": "",
+      "stderr_size": 0,
+      "stdout_size": 4918,
+      "termination_verified": false,
+      "termination_within_deadline": true,
+      "verdict": "stage_passed"
+    },
+    {
+      "capture_status": "sandbox_completed",
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "facts": {
+        "capabilities_zero": true,
+        "environment": {
+          "GPG_KEY": "",
+          "HOME": "/work",
+          "HOSTNAME": "runtime-sandbox1",
+          "LANG": "C.UTF-8",
+          "PATH": "/usr/local/bin:/usr/bin:/bin",
+          "PYTHON_SHA256": "",
+          "PYTHON_VERSION": "",
+          "SANDBOX_PUBLIC_SENTINEL": "phase-owned"
+        },
+        "external_read_denied": true,
+        "external_write_denied": true,
+        "host_secret_absent": true,
+        "local_connect_denied": true,
+        "manifest": [
+          {
+            "path": "projection.txt",
+            "sha256": "8dbe754d8c894788500505a0c4a0537f63cfb6439a9706853968474f5fabbd9b",
+            "size_bytes": 45
+          }
+        ],
+        "namespaces": [
+          "cgroup",
+          "ipc",
+          "mnt",
+          "net",
+          "pid"
+        ],
+        "no_new_privileges": true,
+        "pid_is_one": true,
+        "root_write_denied": true,
+        "socket_denials": {
+          "dns_udp": true,
+          "ipv4_tcp": true,
+          "ipv6_tcp": true,
+          "unix_socket": true
+        },
+        "socketpair_denied": true,
+        "uid": 65534,
+        "workspace_write": true
+      },
+      "host_endpoints_quiet": true,
+      "host_sentinel_unchanged": true,
+      "measured_termination_ms": null,
+      "mode": "boundary",
+      "outer_stderr": "",
+      "stderr_size": 0,
+      "stdout_size": 798,
+      "termination_verified": false,
+      "termination_within_deadline": true,
+      "verdict": "stage_passed"
+    },
+    {
+      "capture_status": "sandbox_completed",
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "facts": {
+        "child_alive": true,
+        "child_spawned": true,
+        "pid_is_one": true,
+        "same_cgroup": true,
+        "same_namespaces": true
+      },
+      "host_endpoints_quiet": true,
+      "host_sentinel_unchanged": true,
+      "measured_termination_ms": null,
+      "mode": "descendant",
+      "outer_stderr": "",
+      "stderr_size": 0,
+      "stdout_size": 111,
+      "termination_verified": false,
+      "termination_within_deadline": true,
+      "verdict": "stage_passed"
+    },
+    {
+      "capture_status": "sandbox_timeout",
+      "cleanup_verified": true,
+      "exit_code": 1,
+      "facts": {
+        "child_alive": true,
+        "child_spawned": true,
+        "pid_is_one": true,
+        "same_cgroup": true,
+        "same_namespaces": true
+      },
+      "host_endpoints_quiet": true,
+      "host_sentinel_unchanged": true,
+      "measured_termination_ms": 6832.250800000111,
+      "mode": "timeout",
+      "outer_stderr": "",
+      "stderr_size": 0,
+      "stdout_size": 111,
+      "termination_verified": true,
+      "termination_within_deadline": true,
+      "verdict": "stage_passed"
+    },
+    {
+      "capture_status": "sandbox_output_limit_exceeded",
+      "cleanup_verified": true,
+      "exit_code": 1,
+      "facts": {},
+      "host_endpoints_quiet": true,
+      "host_sentinel_unchanged": true,
+      "measured_termination_ms": 2707.042900000033,
+      "mode": "stdout",
+      "outer_stderr": "",
+      "stderr_size": 0,
+      "stdout_size": 8192,
+      "termination_verified": true,
+      "termination_within_deadline": true,
+      "verdict": "stage_passed"
+    },
+    {
+      "capture_status": "sandbox_output_limit_exceeded",
+      "cleanup_verified": true,
+      "exit_code": 1,
+      "facts": {},
+      "host_endpoints_quiet": true,
+      "host_sentinel_unchanged": true,
+      "measured_termination_ms": 2821.7326000003595,
+      "mode": "stderr",
+      "outer_stderr": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "stderr_size": 8192,
+      "stdout_size": 0,
+      "termination_verified": true,
+      "termination_within_deadline": true,
+      "verdict": "stage_passed"
+    },
+    {
+      "capture_status": "sandbox_completed",
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "facts": {
+        "gid": 65534,
+        "removed": [
+          true,
+          true
+        ],
+        "uid": 65534,
+        "writable": [
+          "/work",
+          "/tmp"
+        ]
+      },
+      "host_endpoints_quiet": true,
+      "host_sentinel_unchanged": true,
+      "measured_termination_ms": null,
+      "mode": "tmp",
+      "outer_stderr": "",
+      "stderr_size": 0,
+      "stdout_size": 85,
+      "termination_verified": false,
+      "termination_within_deadline": true,
+      "verdict": "stage_passed"
+    },
+    {
+      "capture_status": "sandbox_completed",
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "facts": {
+        "controller_after": {
+          "os_threads": 1,
+          "pid": 1,
+          "python_threads": 1,
+          "thread_start_attempts": 0
+        },
+        "controller_before": {
+          "os_threads": 1,
+          "pid": 1,
+          "python_threads": 1,
+          "thread_start_attempts": 0
+        },
+        "descendants_contained": true,
+        "phase_pids_after_cleanup": [
+          1
+        ],
+        "stages": {
+          "non_java_boundary": {
+            "argv": [
+              "/usr/local/bin/python",
+              "-I",
+              "-S",
+              "-B",
+              "-c",
+              "import io,sys\nsys.stdin=io.TextIOWrapper(io.BytesIO(b'{\"inputs\": [{\"path\": \"projection.txt\", \"bytes\": \"UlVOVElNRS5TQU5EQk9YLjEgZXhhY3Qgc3ludGhldGljIHByb2plY3Rpb24K\"}], \"host_paths\": [], \"port\": 1}\\n'))\nsys.argv=['runtime-sandbox1','boundary']\n\nimport base64, errno, hashlib, json, os, signal, socket, subprocess, sys, time\n\nrequest = json.loads(sys.stdin.buffer.readline(131073))\nmode = sys.argv[1]\ndef emit(value):\n    print(json.dumps(value, sort_keys=True), flush=True)\ndef denied(operation):\n    try:\n        result = operation()\n        if hasattr(result, 'close'): result.close()\n        return False\n    except OSError as error:\n        return error.errno in (errno.EPERM, errno.EACCES, errno.EROFS, errno.ENOENT)\ndef boundary():\n    return {name: os.readlink('/proc/self/ns/' + name)\n            for name in ('pid', 'mnt', 'net', 'ipc', 'cgroup')}\nif mode == 'boundary':\n    manifest = []\n    for item in request['inputs']:\n        data = base64.b64decode(item['bytes'])\n        path = '/work/' + item['path']\n        with open(path, 'xb') as output: output.write(data)\n        with open(path, 'rb') as source: actual = source.read()\n        manifest.append({'path': item['path'], 'sha256': hashlib.sha256(actual).hexdigest(),\n                         'size_bytes': len(actual)})\n    with open('/work/workspace-write', 'xb') as output: output.write(b'workspace-write')\n    host_reads = [denied(lambda path=path: open(path, 'rb')) for path in request['host_paths']]\n    host_writes = [denied(lambda path=path: open(path, 'wb')) for path in request['host_paths']]\n    root_denied = denied(lambda: open('/phase-owned-root-write', 'wb'))\n    socket_results = {}\n    for name, family, kind in (('ipv4_tcp', socket.AF_INET, socket.SOCK_STREAM),\n            ('ipv6_tcp', socket.AF_INET6, socket.SOCK_STREAM),\n            ('dns_udp', socket.AF_INET, socket.SOCK_DGRAM),\n            ('unix_socket', socket.AF_UNIX, socket.SOCK_STREAM)):\n        socket_results[name] = denied(lambda family=family, kind=kind: socket.socket(family, kind))\n    local_denied = denied(lambda: socket.create_connection(('127.0.0.1', request['port']), .2))\n    pair_denied = denied(socket.socketpair)\n    env = dict(os.environ)\n    emit({'manifest': manifest, 'workspace_write': True, 'external_read_denied': all(host_reads),\n          'external_write_denied': all(host_writes), 'root_write_denied': root_denied,\n          'socket_denials': socket_results, 'local_connect_denied': local_denied,\n          'socketpair_denied': pair_denied, 'environment': env,\n          'host_secret_absent': 'CATTUS_SANDBOX_HOST_ONLY' not in env,\n          'uid': os.getuid(), 'namespaces': sorted(boundary()), 'pid_is_one': os.getpid() == 1,\n          'no_new_privileges': 'NoNewPrivs:\\t1' in open('/proc/self/status').read(),\n          'capabilities_zero': 'CapEff:\\t0000000000000000' in open('/proc/self/status').read()})\nelif mode in ('descendant', 'timeout'):\n    child_source = \"import json,os,time; print(json.dumps({'namespaces':{n:os.readlink('/proc/self/ns/'+n) for n in ('pid','mnt','net','ipc','cgroup')},'cgroup':open('/proc/self/cgroup').read()}),flush=True); time.sleep(60)\"\n    child = subprocess.Popen([sys.executable, '-I', '-S', '-B', '-c', child_source], stdout=subprocess.PIPE)\n    evidence = json.loads(child.stdout.readline(4096))\n    emit({'child_spawned': True, 'child_alive': child.poll() is None,\n          'same_namespaces': evidence['namespaces'] == boundary(),\n          'same_cgroup': evidence['cgroup'] == open('/proc/self/cgroup').read(),\n          'pid_is_one': os.getpid() == 1})\n    if mode == 'timeout':\n        while True: time.sleep(.1)\nelif mode in ('stdout', 'stderr'):\n    stream = 1 if mode == 'stdout' else 2\n    while True: os.write(stream, b'X' * 4096)\nelse:\n    raise SystemExit(64)\n"
+            ],
+            "capture_method": "single_thread_selector",
+            "child_waited": true,
+            "cleanup_errors": [],
+            "cleanup_verified": true,
+            "controller_error": "",
+            "eof": [
+              true,
+              true
+            ],
+            "exit_code": 0,
+            "limit_bytes": 1024,
+            "overflow": false,
+            "pid": 7,
+            "pipes_closed": true,
+            "read_bytes": [
+              799,
+              0
+            ],
+            "status": "completed",
+            "stderr_b64": "",
+            "stdout_b64": "eyJjYXBhYmlsaXRpZXNfemVybyI6IHRydWUsICJlbnZpcm9ubWVudCI6IHsiR1BHX0tFWSI6ICIiLCAiSE9NRSI6ICIvd29yayIsICJIT1NUTkFNRSI6ICJydW50aW1lLXNhbmRib3gxIiwgIkxBTkciOiAiQy5VVEYtOCIsICJQQVRIIjogIi91c3IvbG9jYWwvYmluOi91c3IvYmluOi9iaW4iLCAiUFlUSE9OX1NIQTI1NiI6ICIiLCAiUFlUSE9OX1ZFUlNJT04iOiAiIiwgIlNBTkRCT1hfUFVCTElDX1NFTlRJTkVMIjogInBoYXNlLW93bmVkIn0sICJleHRlcm5hbF9yZWFkX2RlbmllZCI6IHRydWUsICJleHRlcm5hbF93cml0ZV9kZW5pZWQiOiB0cnVlLCAiaG9zdF9zZWNyZXRfYWJzZW50IjogdHJ1ZSwgImxvY2FsX2Nvbm5lY3RfZGVuaWVkIjogdHJ1ZSwgIm1hbmlmZXN0IjogW3sicGF0aCI6ICJwcm9qZWN0aW9uLnR4dCIsICJzaGEyNTYiOiAiOGRiZTc1NGQ4Yzg5NDc4ODUwMDUwNWEwYzRhMDUzN2Y2M2NmYjY0MzlhOTcwNjg1Mzk2ODQ3NGY1ZmFiYmQ5YiIsICJzaXplX2J5dGVzIjogNDV9XSwgIm5hbWVzcGFjZXMiOiBbImNncm91cCIsICJpcGMiLCAibW50IiwgIm5ldCIsICJwaWQiXSwgIm5vX25ld19wcml2aWxlZ2VzIjogdHJ1ZSwgInBpZF9pc19vbmUiOiBmYWxzZSwgInJvb3Rfd3JpdGVfZGVuaWVkIjogdHJ1ZSwgInNvY2tldF9kZW5pYWxzIjogeyJkbnNfdWRwIjogdHJ1ZSwgImlwdjRfdGNwIjogdHJ1ZSwgImlwdjZfdGNwIjogdHJ1ZSwgInVuaXhfc29ja2V0IjogdHJ1ZX0sICJzb2NrZXRwYWlyX2RlbmllZCI6IHRydWUsICJ1aWQiOiA2NTUzNCwgIndvcmtzcGFjZV93cml0ZSI6IHRydWV9Cg==",
+            "threads_after": {
+              "os_threads": 1,
+              "pid": 1,
+              "python_threads": 1,
+              "thread_start_attempts": 0
+            },
+            "threads_before": {
+              "os_threads": 1,
+              "pid": 1,
+              "python_threads": 1,
+              "thread_start_attempts": 0
+            },
+            "timed_out": false
+          }
+        },
+        "synthetic_java_execution_count": 0,
+        "toolchain_launch_count": 1,
+        "work_files_after_cleanup": []
+      },
+      "host_endpoints_quiet": true,
+      "host_sentinel_unchanged": true,
+      "measured_termination_ms": null,
+      "mode": "controller",
+      "outer_stderr": "",
+      "stderr_size": 0,
+      "stdout_size": 6012,
+      "termination_verified": false,
+      "termination_within_deadline": true,
+      "verdict": "stage_passed"
+    },
+    {
+      "capture_status": "sandbox_completed",
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "facts": {
+        "controller_after": {
+          "os_threads": 1,
+          "pid": 1,
+          "python_threads": 1,
+          "thread_start_attempts": 0
+        },
+        "controller_before": {
+          "os_threads": 1,
+          "pid": 1,
+          "python_threads": 1,
+          "thread_start_attempts": 0
+        },
+        "descendants_contained": true,
+        "javac_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+        "phase_pids_after_cleanup": [
+          1
+        ],
+        "stages": {
+          "javac_identity": {
+            "argv": [
+              "/opt/temurin-26.0.2.1/bin/javac",
+              "-version"
+            ],
+            "capture_method": "single_thread_selector",
+            "child_waited": true,
+            "cleanup_errors": [],
+            "cleanup_verified": true,
+            "controller_error": "",
+            "eof": [
+              true,
+              true
+            ],
+            "exit_code": 0,
+            "limit_bytes": 1024,
+            "overflow": false,
+            "pid": 7,
+            "pipes_closed": true,
+            "read_bytes": [
+              15,
+              0
+            ],
+            "status": "completed",
+            "stderr_b64": "",
+            "stdout_b64": "amF2YWMgMjYuMC4yLjEK",
+            "threads_after": {
+              "os_threads": 1,
+              "pid": 1,
+              "python_threads": 1,
+              "thread_start_attempts": 0
+            },
+            "threads_before": {
+              "os_threads": 1,
+              "pid": 1,
+              "python_threads": 1,
+              "thread_start_attempts": 0
+            },
+            "timed_out": false
+          }
+        },
+        "synthetic_java_execution_count": 0,
+        "toolchain_launch_count": 1,
+        "work_files_after_cleanup": []
+      },
+      "host_endpoints_quiet": true,
+      "host_sentinel_unchanged": true,
+      "measured_termination_ms": null,
+      "mode": "javac_version",
+      "outer_stderr": "",
+      "stderr_size": 0,
+      "stdout_size": 1163,
+      "termination_verified": false,
+      "termination_within_deadline": true,
+      "verdict": "stage_passed"
+    },
+    {
+      "capture_status": "sandbox_completed",
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "facts": {
+        "controller_after": {
+          "os_threads": 1,
+          "pid": 1,
+          "python_threads": 1,
+          "thread_start_attempts": 0
+        },
+        "controller_before": {
+          "os_threads": 1,
+          "pid": 1,
+          "python_threads": 1,
+          "thread_start_attempts": 0
+        },
+        "descendants_contained": true,
+        "javac_sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+        "phase_pids_after_cleanup": [
+          1
+        ],
+        "stages": {
+          "javac_identity": {
+            "argv": [
+              "/opt/temurin-26.0.2.1/bin/java",
+              "-version"
+            ],
+            "capture_method": "single_thread_selector",
+            "child_waited": true,
+            "cleanup_errors": [],
+            "cleanup_verified": true,
+            "controller_error": "",
+            "eof": [
+              true,
+              true
+            ],
+            "exit_code": 0,
+            "limit_bytes": 1024,
+            "overflow": false,
+            "pid": 7,
+            "pipes_closed": true,
+            "read_bytes": [
+              0,
+              188
+            ],
+            "status": "completed",
+            "stderr_b64": "b3BlbmpkayB2ZXJzaW9uICIyNi4wLjIuMSIgMjAyNi0wOC0xOApPcGVuSkRLIFJ1bnRpbWUgRW52aXJvbm1lbnQgVGVtdXJpbi0yNi4wLjIuMSsxIChidWlsZCAyNi4wLjIuMSsxKQpPcGVuSkRLIDY0LUJpdCBTZXJ2ZXIgVk0gVGVtdXJpbi0yNi4wLjIuMSsxIChidWlsZCAyNi4wLjIuMSsxLCBtaXhlZCBtb2RlLCBzaGFyaW5nKQo=",
+            "stdout_b64": "",
+            "threads_after": {
+              "os_threads": 1,
+              "pid": 1,
+              "python_threads": 1,
+              "thread_start_attempts": 0
+            },
+            "threads_before": {
+              "os_threads": 1,
+              "pid": 1,
+              "python_threads": 1,
+              "thread_start_attempts": 0
+            },
+            "timed_out": false
+          }
+        },
+        "synthetic_java_execution_count": 0,
+        "toolchain_launch_count": 1,
+        "work_files_after_cleanup": []
+      },
+      "host_endpoints_quiet": true,
+      "host_sentinel_unchanged": true,
+      "measured_termination_ms": null,
+      "mode": "java_version",
+      "outer_stderr": "",
+      "stderr_size": 0,
+      "stdout_size": 1396,
+      "termination_verified": false,
+      "termination_within_deadline": true,
+      "verdict": "stage_passed"
+    }
+  ],
+  "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+  "temporary_workspace_removed": true,
+  "verification_receipt": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "authority": "infrastructure_compatibility_measurement_only",
+    "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+    "baseline_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+    "baseline_seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+    "cleanup_verified": true,
+    "compatibility_classification": "eligible_for_JAVA_1_continuation_only",
+    "evidence_sha256": "6dd5671a4fa752db4eb839e3a504a26051357ed33d53dd8ce551bb043bbfb380",
+    "host_mount_authority": false,
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "network_authority": false,
+    "phase_id": "RUNTIME.SANDBOX.2",
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "schema_version": "runtime_sandbox_2_v1",
+    "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "shell_available": false,
+    "stage_results": [
+      [
+        "clone3",
+        "stage_passed"
+      ],
+      [
+        "pthread",
+        "stage_passed"
+      ],
+      [
+        "boundary",
+        "stage_passed"
+      ],
+      [
+        "descendant",
+        "stage_passed"
+      ],
+      [
+        "timeout",
+        "stage_passed"
+      ],
+      [
+        "stdout",
+        "stage_passed"
+      ],
+      [
+        "stderr",
+        "stage_passed"
+      ],
+      [
+        "tmp",
+        "stage_passed"
+      ],
+      [
+        "controller",
+        "stage_passed"
+      ],
+      [
+        "javac_version",
+        "stage_passed"
+      ],
+      [
+        "java_version",
+        "stage_passed"
+      ]
+    ],
+    "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+    "verification_receipt_fingerprint": "9adda01b89ab9493cce28c1f02e988ae8aa31e70bc840a3df6a92f02bc6ba4c8"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "audit_guard": {
+    "live_verification_or_execution_attempts": 0,
+    "network_attempts": 0,
+    "owner_issuance_or_consumption_attempts": 0,
+    "process_attempts": 1,
+    "repository_write_attempts": 0
+  },
+  "blocked_actions": [
+    "subprocess.Popen"
+  ],
+  "error": "AssertionError: Pure compatibility audit denied: subprocess.Popen",
+  "exit_code": 2,
+  "external_pytest_directory": "C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{ee85e4a5-c5f5-43b8-9744-fe8cb2c7ad56}\\AC\\Temp\\cattus-pinned-lifecycle-audit-ag0rsld6",
+  "full_frozen_suites_run": false,
+  "live_registry_fixtures_seeded": false,
+  "mode": "benchmark",
+  "production_validators_patched": false
+}

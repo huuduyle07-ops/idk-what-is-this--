@@ -1,0 +1,420 @@
+{
+  "admission_consumption_API_implemented": false,
+  "all_originals_reauthenticated_on_public_reads": true,
+  "atomicity": {
+    "concurrent_same_role_duplicates": 1,
+    "concurrent_same_role_successes": 1,
+    "cross_owner_transaction": false,
+    "failed_signing_publishes_nothing": true,
+    "final_ISSUED_check_is_eligibility_snapshot": true,
+    "final_runtime_state_change_publishes_nothing": true,
+    "independent_owner_lock": true,
+    "permanent_slots_survive_collection": true,
+    "publication_by_one_complete_store_replacement": true,
+    "upstream_private_lock_access": false,
+    "wrong_PID_before_lock": true
+  },
+  "authenticated_instance_reads": [
+    "fingerprint",
+    "as_dict"
+  ],
+  "authentication_domain": "CATTUS:SYNTH.REFLECT.ADMIT.PINNED.1:exact-reflection-admission:v1",
+  "authority": {
+    "admission_can_prepare_lease_only": true,
+    "compilation_authority": false,
+    "consumption_widens_scope": false,
+    "exact_role_read_only_permission": true,
+    "false_in_all_states": [
+      "runtime_authority",
+      "real_task_runtime_authority",
+      "repository_write_authority",
+      "apply_authority",
+      "network_authority",
+      "host_mount_authority",
+      "shell_authority",
+      "arbitrary_java_authority",
+      "arbitrary_reflection_authority",
+      "arbitrary_class_authority",
+      "arbitrary_method_authority",
+      "private_method_authority",
+      "field_write_authority",
+      "enumeration_authority",
+      "executor_authority",
+      "BANK_authority",
+      "compilation_authority"
+    ],
+    "field": "SyntheticStateBox.value:int",
+    "lease_consumption_performs_read": false,
+    "operation": "read_exact_bound_field",
+    "provider_proof_is_permission": false
+  },
+  "behavioral_activation_ready": false,
+  "behavioral_readiness_reason": "PROOF_UNRESOLVED",
+  "compilation_authority": false,
+  "completion_meaning": "The additive pinned reflection admission owner is implemented and pure-validated. No operational admission, reflection lease or reflection effect exists.",
+  "date": "2026-10-13",
+  "error_categories": [
+    "PINNED_AUTH_UNAUTHENTICATED",
+    "PINNED_RUNTIME_LEASE_UNAUTHENTICATED",
+    "PINNED_AUTH_SCOPE_MISMATCH",
+    "PINNED_PROVIDER_PROVENANCE_MISMATCH",
+    "PINNED_RUNTIME_STATE_MISMATCH",
+    "REFLECTION_REQUEST_UNAUTHENTICATED",
+    "REFLECTION_SCOPE_MISMATCH",
+    "DUPLICATE_REFLECTION_ADMISSION",
+    "REFLECTION_ADMISSION_UNAUTHENTICATED",
+    "REFLECTION_ROLE_MISMATCH",
+    "REFLECTION_WRONG_PROCESS",
+    "PROOF_UNRESOLVED"
+  ],
+  "exact_type": "PinnedSyntheticReflectionExecutionAdmission",
+  "issuance_state_gate": {
+    "AFTER": "ISSUED",
+    "BEFORE": "ISSUED",
+    "CONSUMED_or_INVALIDATED": "PINNED_RUNTIME_STATE_MISMATCH",
+    "unresolved": "PROOF_UNRESOLVED"
+  },
+  "lifecycle_owner_implemented": false,
+  "module": "core.synthetic_reflection_execution_admission_pinned",
+  "old_admission_request_sources_changed": false,
+  "old_auth_compatibility_predicate_called": false,
+  "old_registry_insertion": false,
+  "one_shot_key": {
+    "collection_reopens_issuance": false,
+    "excluded_key_fields": [
+      "request_issuance_id",
+      "request_fingerprint",
+      "renderer_fingerprint",
+      "authorization_fingerprint",
+      "authorization_proof_context_id",
+      "runtime_fingerprint"
+    ],
+    "fresh_same_role_request_reopens_issuance": false,
+    "key_derived_only_after_original_public_authentication": true,
+    "key_fields": [
+      "admission_owner_phase_schema_PID",
+      "authorization_owner_phase_schema_PID_authorization_id",
+      "runtime_owner_phase_schema_PID_lease_id",
+      "semantic_role",
+      "exact_scenario_source_definition_field_read_scope"
+    ],
+    "maximum_admissions_per_runtime_role": 1,
+    "maximum_roles_per_runtime": 2,
+    "permanent_tombstones": true,
+    "refund_allowed": false,
+    "reissue_allowed": false,
+    "request_identity_signed_and_retained_separately": true,
+    "tombstone_lifetime": "issuing owner process lifetime"
+  },
+  "operational_admission_issued": false,
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR.1R": 0,
+    "JAVA1C": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "pinned_authorization_issuance": 0,
+    "pinned_reflection_admission_operational_issuance": 0,
+    "pinned_runtime_lease_issuance": 0,
+    "provider_issuance": 0,
+    "reflection_lease_consumption": 0,
+    "reflection_lease_invalidation": 0,
+    "reflection_lease_issuance": 0,
+    "reflection_read": 0,
+    "reflection_request_operational_issuance": 0,
+    "repository_runtime_writes": 0,
+    "runtime_lease_consumption": 0,
+    "runtime_lease_invalidation": 0
+  },
+  "originals_retained_separately": [
+    "authorization",
+    "runtime",
+    "request"
+  ],
+  "owner_source_sha256": "974075ac1827b4013e1e8a2b236ea278e19c8be138e378bed3b70613f590aaa0",
+  "phase_id": "SYNTH.REFLECT.ADMIT.PINNED.1",
+  "pinned_auth_runtime_owner_changed": false,
+  "pinned_compatibility": {
+    "current_runtime_state_authenticated_publicly": true,
+    "issues_permission": false,
+    "report_predicate_only": true,
+    "requires_specific_runtime_state": false,
+    "runtime_validator_receives_exact_original_auth": true,
+    "same_original_validator_returns_required": true
+  },
+  "production_registries_seeded": false,
+  "production_validators_modified": false,
+  "projection_fields": [
+    "admission_id",
+    "issuing_pid",
+    "semantic_role",
+    "exact_request_observation_role",
+    "authorization_owner_identity",
+    "authorization_phase_id",
+    "authorization_schema_version",
+    "authorization_issuing_pid",
+    "authorization_id",
+    "authorization_fingerprint",
+    "authorization_proof_context_id",
+    "runtime_owner_identity",
+    "runtime_phase_id",
+    "runtime_schema_version",
+    "runtime_issuing_pid",
+    "runtime_lease_id",
+    "runtime_lease_fingerprint",
+    "request_issuance_id",
+    "request_issuing_pid",
+    "request_fingerprint",
+    "renderer_helper_sha256",
+    "renderer_fingerprint",
+    "evidence_digest",
+    "stable_fingerprint",
+    "owner_identity",
+    "phase_id",
+    "schema_version",
+    "runtime_state_at_issuance",
+    "scenario_phase_id",
+    "scenario_id",
+    "source_kind",
+    "source_sha256",
+    "source_size_bytes",
+    "definition_sha256",
+    "class_name",
+    "method_name",
+    "method_signature",
+    "arguments",
+    "argument_types",
+    "return_type",
+    "field_owner",
+    "field_name",
+    "field_type",
+    "operation",
+    "renderer_identity",
+    "renderer_phase",
+    "renderer_schema_version",
+    "exact_role_read_only_permission",
+    "admission_can_prepare_lease_only",
+    "runtime_authority",
+    "real_task_runtime_authority",
+    "repository_write_authority",
+    "apply_authority",
+    "network_authority",
+    "host_mount_authority",
+    "shell_authority",
+    "arbitrary_java_authority",
+    "arbitrary_reflection_authority",
+    "arbitrary_class_authority",
+    "arbitrary_method_authority",
+    "private_method_authority",
+    "field_write_authority",
+    "enumeration_authority",
+    "executor_authority",
+    "BANK_authority",
+    "compilation_authority",
+    "constructor_reflection_authority",
+    "arbitrary_class_loading_authority",
+    "behavioral_activation_ready",
+    "behavioral_readiness_reason"
+  ],
+  "provider_executor_history_changed": false,
+  "provider_inheritance": {
+    "direct_provider_input": false,
+    "direct_provider_validation": false,
+    "transitive_original_runtime_auth_provider_graph": true
+  },
+  "public_APIs": [
+    "issue_pinned_synthetic_reflection_execution_admission",
+    "validate_pinned_synthetic_reflection_execution_admission",
+    "pinned_synthetic_reflection_execution_admission_fingerprint",
+    "pinned_synthetic_reflection_request_satisfies_runtime",
+    "pinned_synthetic_reflection_admission_satisfies_executor"
+  ],
+  "registry_reversal_history_changed": false,
+  "renderer_binding": {
+    "fixed_helper_UTF8_SHA256": {
+      "AFTER": "4d85951e886bfedabae50c7f64e8e0fa4985e8fa515e4edab9af0a355b10f4ea",
+      "BEFORE": "c88aeea914c88ef17a335a184abe6d5b618a9c0c70a7121621ba67edd9919531"
+    },
+    "hash_source": "unchanged renderer literal bytes authenticated by source/AST preservation",
+    "identity": "SYNTH.REFLECT.1.render_synthetic_read_only_reflection",
+    "independent_domain_role": "renderer-evidence",
+    "renderer_invoked": false,
+    "text_grants_compilation_authority": false,
+    "text_is_effect_evidence": false
+  },
+  "request_decision": "A",
+  "request_exact_type": "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+  "request_roles_unchanged": true,
+  "request_validator_unchanged": true,
+  "role_mapping": {
+    "AFTER": "exact_private_state_after",
+    "BEFORE": "exact_private_state_before"
+  },
+  "schema_version": "synthetic_reflection_execution_admission_pinned_1_v1",
+  "slot_behavior": {
+    "BEFORE_and_AFTER_independent": true,
+    "collection_reopens": false,
+    "fresh_same_role_request_reopens": false,
+    "maximum_each_per_runtime_graph": 1
+  },
+  "stable_fingerprint_after_terminal_runtime": true,
+  "status": "SYNTH_REFLECT_ADMIT_PINNED_1A_COMPLETE",
+  "stop_after_admission": true,
+  "test_local_inert_handles_are_operational_evidence": false,
+  "timezone": "Asia/Seoul",
+  "unknown_validator_failure": "PROOF_UNRESOLVED",
+  "upstream_code_reason_preserved": true,
+  "validation": {
+    "additional_historical_source_checks": {
+      "capability_objects_constructed": false,
+      "failed": [],
+      "operational_effects_zero": true,
+      "owner_modules_imported": false,
+      "passed": [
+        "old_request_payload_has_no_upstream_authorization_or_runtime_identity",
+        "old_renderer_authenticates_only_independent_original_request",
+        "old_auth_compatibility_keeps_unchanged_public_old_auth_validator",
+        "old_admission_authenticates_old_auth_and_original_request_publicly",
+        "old_admission_has_no_pinned_or_runtime_or_provider_bridge",
+        "old_admission_scope_preserves_invocation_observation_role_and_read_operation",
+        "old_reflection_original_record_and_signed_terminal_state_authentication",
+        "old_reflection_consumption_requires_consumed_runtime_but_invalidation_does_not",
+        "old_reflection_permanent_one_admission_one_lease_tombstones",
+        "pinned_runtime_keeps_false_behavioral_readiness_and_unresolved_consumer"
+      ],
+      "passed_count": 10,
+      "success": true
+    },
+    "benchmark_cases": 54,
+    "benchmark_errors": 0,
+    "focused_isolated_admission": {
+      "collected_admission_does_not_reopen_permanent_role_slot": true,
+      "concurrent_duplicate_rejections": 1,
+      "concurrent_same_role_publications": 1,
+      "duration_seconds": 33.99,
+      "exit_code": 0,
+      "failed": 0,
+      "failed_record_signing_publishes_nothing": true,
+      "final_runtime_state_race_publishes_nothing": true,
+      "fixture_kind": "source-loaded isolated owners; manually constructed inert upstream dataclasses; exact-original public-validator and runtime-state seams",
+      "fresh_same_role_request_does_not_reopen_permanent_slot": true,
+      "full_suite_run": false,
+      "guarded_effect_attempts": {},
+      "historical_sources_unchanged_during_tests": true,
+      "invocation": "python -B -m pytest -p no:cacheprovider tests/test_synthetic_reflection_execution_admission_pinned.py -q",
+      "old_auth_predicate_called": false,
+      "operational_admission_issuance": 0,
+      "operational_reflection_request_issuance": 0,
+      "passed": 140,
+      "production_capability_issuance": 0,
+      "production_registry_seeding": 0,
+      "production_store_and_registry_snapshots_unchanged": true,
+      "provider_issuance": 0,
+      "reflection_lease_issuance_consumption": 0,
+      "reflection_reads": 0,
+      "renderer_hashes_verified_via_ast_literals": true,
+      "renderer_invocations": 0,
+      "runtime_consume_invalidate": 0,
+      "runtime_lease_issuance": 0,
+      "status": "PURE_ADMISSION_TESTS_PASSED",
+      "terminal_runtime_preserves_stable_authenticated_reads": true,
+      "warning": "Third-party google.genai.types DeprecationWarning for Python _UnionGenericAlias; tests all passed.",
+      "warnings": 1,
+      "wrong_process_and_supplied_handle_pid_reject_before_lock": true
+    },
+    "frozen_contract_source_AST": {
+      "collected": 152,
+      "failed": [],
+      "passed_count": 152
+    },
+    "full_issuance_dependent_suites_run": false,
+    "git_diff_check_exit_code": 0,
+    "historical_source_AST_selection": {
+      "collected": 14,
+      "failed": [],
+      "passed_count": 14
+    },
+    "in_memory_compile_AST_JSON_whitespace": true,
+    "independent_contract_review": "no remaining actionable findings",
+    "preservation": {
+      "baseline_preexisting_file_count": 2410,
+      "changed": [],
+      "comparison_basis": "current preimplementation workspace bytes, including preexisting untracked history",
+      "deleted": [],
+      "historical_preservation_passed": true
+    },
+    "registry_picker": {
+      "after_collected": 299,
+      "after_failed": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "after_passed": 292,
+      "baseline_collected": 299,
+      "baseline_failed": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "baseline_passed": 292,
+      "existing_failures_preserved": true,
+      "registry_and_picker_projections_identical": true,
+      "unchanged": true
+    },
+    "safe_historical_summary": "safe_validation_summary.json"
+  },
+  "validity_implies_readiness": false
+}

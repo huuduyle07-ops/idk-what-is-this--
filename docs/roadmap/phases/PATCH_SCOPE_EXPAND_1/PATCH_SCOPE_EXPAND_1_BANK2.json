@@ -1,0 +1,504 @@
+{
+  "author_calls": 0,
+  "authoring_scope_delta": 0,
+  "authority": {
+    "auto_apply": false,
+    "execution_authorized": false,
+    "repair_scope_authority": false,
+    "scope_authority": "proposal_only",
+    "write_authority": false
+  },
+  "base_design_unchanged": true,
+  "candidate": null,
+  "current_context_unchanged": true,
+  "current_edit_scope": "none",
+  "deterministic": true,
+  "effective_design_unchanged": true,
+  "first_remaining_blocker": "SCOPE_EXPANSION_REQUIRED",
+  "fixture_constants": {
+    "answer": "scripts.replay_oop_intent_continue1.ANSWERS[complete]",
+    "source": "scripts.replay_oop_intent_detect2.BANK",
+    "task": "scripts.replay_oop_intent_detect2.BANK2_TASK"
+  },
+  "fixture_kind": "frozen_synthetic_complete_continuation_in_memory_only",
+  "fixture_source_files_created": 0,
+  "fixture_source_files_modified": 0,
+  "forbidden_boundaries": [
+    "core.semantic_waiter_adapter.SemanticWaiterModelAdapter._complete",
+    "core.control_engine.build_control_prompt",
+    "core.control_engine.authoring_context_for_control_result",
+    "core.pipeline.run_gemini_request",
+    "core.pipeline.run_deepseek_review",
+    "socket.create_connection",
+    "socket.socket.connect",
+    "subprocess.run",
+    "subprocess.Popen",
+    "os.system",
+    "os.walk",
+    "os.scandir",
+    "os.listdir",
+    "pathlib.Path.open",
+    "pathlib.Path.read_bytes",
+    "pathlib.Path.read_text",
+    "pathlib.Path.write_bytes",
+    "pathlib.Path.write_text",
+    "builtins.open"
+  ],
+  "model_calls": 0,
+  "patch": "",
+  "performance": {
+    "expansion_classification_seconds": {
+      "max_ms": 0.0064,
+      "median_ms": 0.0034
+    },
+    "proposal_serialization_seconds": {
+      "max_ms": 15.9536,
+      "median_ms": 8.3363
+    },
+    "provider_latency": "not_applicable",
+    "samples": 100,
+    "semantic_ready_validation_seconds": {
+      "max_ms": 18.1407,
+      "median_ms": 7.3884
+    },
+    "structural_comparison_seconds": {
+      "max_ms": 24.647,
+      "median_ms": 12.4918
+    },
+    "total_seconds": {
+      "max_ms": 56.5869,
+      "median_ms": 28.88065
+    }
+  },
+  "phase_id": "PATCH.SCOPE.EXPAND.1",
+  "proposal": {
+    "apply_authority": false,
+    "authority": "proposal_only",
+    "auto_apply": false,
+    "blast_radius": [
+      "member",
+      "cross-class",
+      "new-definition",
+      "API-surface"
+    ],
+    "candidate": null,
+    "current_edit_scope": {
+      "fingerprint": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "members": [],
+      "repair_scope_fingerprint": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "snapshot": null,
+      "status": "none"
+    },
+    "deferred_decisions": [
+      {
+        "alternatives": [
+          "repository_convention_evidence_needed"
+        ],
+        "decision": "source_layout",
+        "semantic_recheck_if_behavior_changes": false,
+        "target": "SavingAccount"
+      },
+      {
+        "alternatives": [],
+        "decision": "constructor_signature_and_initialization_details",
+        "semantic_recheck_if_behavior_changes": false,
+        "target": "SavingAccount"
+      },
+      {
+        "alternatives": [],
+        "decision": "state_type_visibility_and_initial_value",
+        "semantic_recheck_if_behavior_changes": false,
+        "target": "SavingAccount::savingBalance"
+      },
+      {
+        "alternatives": [],
+        "decision": "credential_field_method_decomposition_and_verification_API",
+        "semantic_recheck_if_behavior_changes": false,
+        "target": "SavingAccount"
+      },
+      {
+        "alternatives": [],
+        "decision": "base_debit_API_signature_and_encapsulation_strategy",
+        "semantic_recheck_if_behavior_changes": false,
+        "target": "BankAccount"
+      },
+      {
+        "alternatives": [
+          "retirement",
+          "override",
+          "relocation",
+          "compatibility_preservation"
+        ],
+        "decision": "existing_savings_transition",
+        "semantic_recheck_if_behavior_changes": true,
+        "target": "BankAccount::saving"
+      }
+    ],
+    "design_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+    "detection_fingerprint": "51ab177566b759da64452fe80d850456a275153a9de627158a2c888b3ee9a9ad",
+    "effective_design_fingerprint": "23577d7b10c3f3aedc677777d6c8c2ca7b19f1ea1cfb03df014b413af578b7c8",
+    "evidence": [
+      {
+        "binding_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+        "fact": "SavingAccount extends BankAccount.",
+        "provenance": "explicit_human",
+        "reference": "explicit_human:db26debc928d53a7f2971174ed99cadf869a4312303350ea09debf8719781b63"
+      },
+      {
+        "binding_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+        "fact": "exact acquired structure of BankAccount",
+        "provenance": "current_source_fact",
+        "reference": "current_source_fact:04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+      },
+      {
+        "binding_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+        "fact": "savingBalance should belong only to SavingAccount,\nbecause not every BankAccount needs savings state.",
+        "provenance": "explicit_human",
+        "reference": "explicit_human:6f886535f9346ed6af5816a0dfb34b183516c28bf528f7fea74c81e513d9b0b4"
+      },
+      {
+        "binding_fingerprint": "75e89cb4fb12ff9c1b6541557afa71fccdfadcb3f5df57bc24a0de6620ac6810",
+        "fact": "For this exercise, let SavingAccount own a simple password in memory",
+        "provenance": "validated_continuation",
+        "reference": "validated_continuation:027596846dd4a6e38d12d51c361877b4c095d8d8aeb36378eadc8f3ff3fc7bbf"
+      },
+      {
+        "binding_fingerprint": "75e89cb4fb12ff9c1b6541557afa71fccdfadcb3f5df57bc24a0de6620ac6810",
+        "fact": "For this exercise, let SavingAccount own a simple password in memory",
+        "provenance": "validated_continuation",
+        "reference": "validated_continuation:66eab3e6ba281916356ae7ceef03520cdea5592fe82f5cb5de9dbcfd89d7a562"
+      },
+      {
+        "binding_fingerprint": "75e89cb4fb12ff9c1b6541557afa71fccdfadcb3f5df57bc24a0de6620ac6810",
+        "fact": "For this exercise, let SavingAccount own a simple password in memory",
+        "provenance": "validated_continuation",
+        "reference": "validated_continuation:d855d967a054d09bd8759311096c4d941d70bac2d058f78eca9bc3f841c92233"
+      },
+      {
+        "binding_fingerprint": "75e89cb4fb12ff9c1b6541557afa71fccdfadcb3f5df57bc24a0de6620ac6810",
+        "fact": "For this exercise, let SavingAccount own a simple password in memory",
+        "provenance": "validated_continuation",
+        "reference": "validated_continuation:755f8aeda6b814b0609845b667d0b9a2ddcd67dd34dd9477ec35f905bb2c01d0"
+      },
+      {
+        "binding_fingerprint": "75e89cb4fb12ff9c1b6541557afa71fccdfadcb3f5df57bc24a0de6620ac6810",
+        "fact": "Verify it when a savings operation is requested",
+        "provenance": "validated_continuation",
+        "reference": "validated_continuation:b0e2cb2ebe54d9eeef4b4353cbe10d999b6c2bab119fd9d09ea757d27be75dbc"
+      },
+      {
+        "binding_fingerprint": "75e89cb4fb12ff9c1b6541557afa71fccdfadcb3f5df57bc24a0de6620ac6810",
+        "fact": "savingBalance should receive money transferred from the inherited balance",
+        "provenance": "validated_continuation",
+        "reference": "validated_continuation:4f74d7bb2655c4692da6d564a9477108ef4065805cb7460d95f74e0a27fe950c"
+      },
+      {
+        "binding_fingerprint": "75e89cb4fb12ff9c1b6541557afa71fccdfadcb3f5df57bc24a0de6620ac6810",
+        "fact": "and interest should apply only to savingBalance",
+        "provenance": "validated_continuation",
+        "reference": "validated_continuation:42e5bbdc955aaeb00b7d8a40791f4355277b55f2e9b8d5a33f885d95f02d1e15"
+      },
+      {
+        "binding_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+        "fact": "Using the savings functionality should depend on the user\nentering the correct password.",
+        "provenance": "explicit_human",
+        "reference": "explicit_human:8f272bf6d3330bbe9fba2e4519abb499f16a73bed77eb23ddd103f4297f49673"
+      },
+      {
+        "binding_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+        "fact": "BankAccount::withdraw: not_established; subclass_visibility_or_debit_contract_not_established; return=void; visibility=package",
+        "provenance": "current_source_fact",
+        "reference": "current_source_fact:fa774401fe4df737d9eae08f227e689321df9c5fbc84a29488ca191dc79ffa59"
+      }
+    ],
+    "execution_authorized": false,
+    "existing_targets": [
+      {
+        "api_surface": true,
+        "category": "MAY_REQUIRE_EXISTING_API_CHANGE",
+        "declaration_fingerprint": null,
+        "evidence_refs": [
+          "explicit_human:6f886535f9346ed6af5816a0dfb34b183516c28bf528f7fea74c81e513d9b0b4",
+          "validated_continuation:4f74d7bb2655c4692da6d564a9477108ef4065805cb7460d95f74e0a27fe950c",
+          "current_source_fact:04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+        ],
+        "file": "bank.java",
+        "kind": "capability",
+        "member_span": null,
+        "name": "successful_balance_debit_capability",
+        "owner": "BankAccount",
+        "parent": null,
+        "reason": "private_or_inaccessible_balance_and_no_proven_subclass_visible_successful_debit",
+        "target": "BankAccount::successful_balance_debit_capability"
+      },
+      {
+        "api_surface": false,
+        "category": "DEFERRED_IMPLEMENTATION_TARGET",
+        "declaration_fingerprint": "42669aae621021df99ed7b754a42dc1075f31cd757fde8c3f40bbfb958dc4b5c",
+        "evidence_refs": [
+          "explicit_human:6f886535f9346ed6af5816a0dfb34b183516c28bf528f7fea74c81e513d9b0b4",
+          "validated_continuation:42e5bbdc955aaeb00b7d8a40791f4355277b55f2e9b8d5a33f885d95f02d1e15",
+          "current_source_fact:04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+        ],
+        "file": "bank.java",
+        "kind": "existing_method",
+        "member_span": [
+          6,
+          6
+        ],
+        "name": "saving",
+        "owner": "BankAccount",
+        "parent": null,
+        "reason": "existing_base_savings_ownership_transition_requires_later_decision",
+        "target": "BankAccount::saving"
+      }
+    ],
+    "logical_creation_required": true,
+    "new_logical_targets": [
+      {
+        "api_surface": false,
+        "category": "MUST_CREATE_LOGICAL",
+        "declaration_fingerprint": null,
+        "evidence_refs": [
+          "explicit_human:db26debc928d53a7f2971174ed99cadf869a4312303350ea09debf8719781b63",
+          "current_source_fact:04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+        ],
+        "file": null,
+        "kind": "new_class",
+        "member_span": null,
+        "name": "SavingAccount",
+        "owner": "SavingAccount",
+        "parent": "BankAccount",
+        "reason": "explicit_inheritance_requires_missing_logical_definition",
+        "target": "SavingAccount"
+      },
+      {
+        "api_surface": false,
+        "category": "MUST_CREATE_LOGICAL",
+        "declaration_fingerprint": null,
+        "evidence_refs": [
+          "explicit_human:6f886535f9346ed6af5816a0dfb34b183516c28bf528f7fea74c81e513d9b0b4"
+        ],
+        "file": null,
+        "kind": "new_field_required",
+        "member_span": null,
+        "name": "savingBalance",
+        "owner": "SavingAccount",
+        "parent": null,
+        "reason": "exclusive_state_missing_from_desired_owner",
+        "target": "SavingAccount::savingBalance"
+      },
+      {
+        "api_surface": false,
+        "category": "MUST_CREATE_LOGICAL",
+        "declaration_fingerprint": null,
+        "evidence_refs": [
+          "explicit_human:8f272bf6d3330bbe9fba2e4519abb499f16a73bed77eb23ddd103f4297f49673",
+          "validated_continuation:027596846dd4a6e38d12d51c361877b4c095d8d8aeb36378eadc8f3ff3fc7bbf",
+          "validated_continuation:66eab3e6ba281916356ae7ceef03520cdea5592fe82f5cb5de9dbcfd89d7a562",
+          "validated_continuation:755f8aeda6b814b0609845b667d0b9a2ddcd67dd34dd9477ec35f905bb2c01d0",
+          "validated_continuation:d855d967a054d09bd8759311096c4d941d70bac2d058f78eca9bc3f841c92233",
+          "validated_continuation:b0e2cb2ebe54d9eeef4b4353cbe10d999b6c2bab119fd9d09ea757d27be75dbc"
+        ],
+        "file": null,
+        "kind": "capability",
+        "member_span": null,
+        "name": "authentication_gated_savings_capability",
+        "owner": "SavingAccount",
+        "parent": null,
+        "reason": "missing_authentication_gated_capability",
+        "target": "SavingAccount::authentication_gated_savings_capability"
+      },
+      {
+        "api_surface": false,
+        "category": "MUST_CREATE_LOGICAL",
+        "declaration_fingerprint": null,
+        "evidence_refs": [
+          "explicit_human:8f272bf6d3330bbe9fba2e4519abb499f16a73bed77eb23ddd103f4297f49673",
+          "validated_continuation:027596846dd4a6e38d12d51c361877b4c095d8d8aeb36378eadc8f3ff3fc7bbf",
+          "validated_continuation:66eab3e6ba281916356ae7ceef03520cdea5592fe82f5cb5de9dbcfd89d7a562",
+          "validated_continuation:755f8aeda6b814b0609845b667d0b9a2ddcd67dd34dd9477ec35f905bb2c01d0",
+          "validated_continuation:d855d967a054d09bd8759311096c4d941d70bac2d058f78eca9bc3f841c92233",
+          "validated_continuation:b0e2cb2ebe54d9eeef4b4353cbe10d999b6c2bab119fd9d09ea757d27be75dbc"
+        ],
+        "file": null,
+        "kind": "capability",
+        "member_span": null,
+        "name": "credential_state_and_verification",
+        "owner": "SavingAccount",
+        "parent": null,
+        "reason": "owner_requires_credential_bearing_capability",
+        "target": "SavingAccount::credential_state_and_verification"
+      },
+      {
+        "api_surface": false,
+        "category": "MUST_CREATE_LOGICAL",
+        "declaration_fingerprint": null,
+        "evidence_refs": [
+          "explicit_human:6f886535f9346ed6af5816a0dfb34b183516c28bf528f7fea74c81e513d9b0b4",
+          "validated_continuation:42e5bbdc955aaeb00b7d8a40791f4355277b55f2e9b8d5a33f885d95f02d1e15"
+        ],
+        "file": null,
+        "kind": "capability",
+        "member_span": null,
+        "name": "savings_interest_behavior",
+        "owner": "SavingAccount",
+        "parent": null,
+        "reason": "subclass_savings_interest_capability_required",
+        "target": "SavingAccount::savings_interest_behavior"
+      }
+    ],
+    "patch": "",
+    "phase_id": "PATCH.SCOPE.EXPAND.1",
+    "reasons": [
+      "exclusive_state_missing_from_desired_owner",
+      "existing_base_savings_ownership_transition_requires_later_decision",
+      "explicit_inheritance_requires_missing_logical_definition",
+      "missing_authentication_gated_capability",
+      "owner_requires_credential_bearing_capability",
+      "private_or_inaccessible_balance_and_no_proven_subclass_visible_successful_debit",
+      "subclass_savings_interest_capability_required"
+    ],
+    "repair_scope_authority": false,
+    "repository_id": "c-a-t-t-u-s-70868012c5a8c5a5e3d0caa91a5347a4",
+    "required_capabilities": [
+      {
+        "certainty": "MUST_SUPPORT",
+        "code": "new_subtype_definition",
+        "evidence_refs": [
+          "explicit_human:db26debc928d53a7f2971174ed99cadf869a4312303350ea09debf8719781b63",
+          "current_source_fact:04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+        ],
+        "requirement": "logical subtype with required parent; absence is limited to acquired source",
+        "target": "SavingAccount"
+      },
+      {
+        "certainty": "MUST_SUPPORT",
+        "code": "subclass_initialization",
+        "evidence_refs": [
+          "explicit_human:db26debc928d53a7f2971174ed99cadf869a4312303350ea09debf8719781b63",
+          "current_source_fact:04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+        ],
+        "requirement": "initialization path must compatibly initialize the explicit base constructor via super construction",
+        "target": "SavingAccount"
+      },
+      {
+        "certainty": "MUST_SUPPORT",
+        "code": "subclass_owned_state",
+        "evidence_refs": [
+          "explicit_human:6f886535f9346ed6af5816a0dfb34b183516c28bf528f7fea74c81e513d9b0b4"
+        ],
+        "requirement": "required state belongs exclusively to the explicit owner",
+        "target": "SavingAccount::savingBalance"
+      },
+      {
+        "certainty": "MUST_SUPPORT",
+        "code": "credential_state",
+        "evidence_refs": [
+          "explicit_human:8f272bf6d3330bbe9fba2e4519abb499f16a73bed77eb23ddd103f4297f49673",
+          "validated_continuation:027596846dd4a6e38d12d51c361877b4c095d8d8aeb36378eadc8f3ff3fc7bbf",
+          "validated_continuation:66eab3e6ba281916356ae7ceef03520cdea5592fe82f5cb5de9dbcfd89d7a562",
+          "validated_continuation:755f8aeda6b814b0609845b667d0b9a2ddcd67dd34dd9477ec35f905bb2c01d0",
+          "validated_continuation:d855d967a054d09bd8759311096c4d941d70bac2d058f78eca9bc3f841c92233",
+          "validated_continuation:b0e2cb2ebe54d9eeef4b4353cbe10d999b6c2bab119fd9d09ea757d27be75dbc"
+        ],
+        "requirement": "credential-bearing verification capability owned by the specified class; in-memory password when committed",
+        "target": "SavingAccount"
+      },
+      {
+        "certainty": "MUST_SUPPORT",
+        "code": "authentication_gated_savings_operation",
+        "evidence_refs": [
+          "explicit_human:8f272bf6d3330bbe9fba2e4519abb499f16a73bed77eb23ddd103f4297f49673",
+          "validated_continuation:027596846dd4a6e38d12d51c361877b4c095d8d8aeb36378eadc8f3ff3fc7bbf",
+          "validated_continuation:66eab3e6ba281916356ae7ceef03520cdea5592fe82f5cb5de9dbcfd89d7a562",
+          "validated_continuation:755f8aeda6b814b0609845b667d0b9a2ddcd67dd34dd9477ec35f905bb2c01d0",
+          "validated_continuation:d855d967a054d09bd8759311096c4d941d70bac2d058f78eca9bc3f841c92233",
+          "validated_continuation:b0e2cb2ebe54d9eeef4b4353cbe10d999b6c2bab119fd9d09ea757d27be75dbc"
+        ],
+        "requirement": "verification boundary gates each requested savings operation when operation_gated is committed",
+        "target": "SavingAccount"
+      },
+      {
+        "certainty": "MUST_SUPPORT",
+        "code": "savings_funding_transition",
+        "evidence_refs": [
+          "explicit_human:6f886535f9346ed6af5816a0dfb34b183516c28bf528f7fea74c81e513d9b0b4",
+          "validated_continuation:4f74d7bb2655c4692da6d564a9477108ef4065805cb7460d95f74e0a27fe950c"
+        ],
+        "requirement": "credit savings state only with money successfully debited from inherited account state",
+        "target": "SavingAccount"
+      },
+      {
+        "certainty": "MUST_SUPPORT",
+        "code": "base_balance_debit",
+        "evidence_refs": [
+          "explicit_human:6f886535f9346ed6af5816a0dfb34b183516c28bf528f7fea74c81e513d9b0b4",
+          "validated_continuation:4f74d7bb2655c4692da6d564a9477108ef4065805cb7460d95f74e0a27fe950c",
+          "current_source_fact:04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+        ],
+        "requirement": "subclass needs a justified successful debit of inherited balance; private state cannot be directly accessed",
+        "target": "BankAccount"
+      },
+      {
+        "certainty": "MUST_SUPPORT",
+        "code": "savings_interest_behavior",
+        "evidence_refs": [
+          "explicit_human:6f886535f9346ed6af5816a0dfb34b183516c28bf528f7fea74c81e513d9b0b4",
+          "validated_continuation:42e5bbdc955aaeb00b7d8a40791f4355277b55f2e9b8d5a33f885d95f02d1e15"
+        ],
+        "requirement": "interest applies only to the subclass savings state",
+        "target": "SavingAccount::savingBalance"
+      },
+      {
+        "certainty": "NEEDS_TRANSITION_DECISION",
+        "code": "existing_savings_transition",
+        "evidence_refs": [
+          "explicit_human:6f886535f9346ed6af5816a0dfb34b183516c28bf528f7fea74c81e513d9b0b4",
+          "validated_continuation:42e5bbdc955aaeb00b7d8a40791f4355277b55f2e9b8d5a33f885d95f02d1e15",
+          "current_source_fact:04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+        ],
+        "requirement": "base savings currently mutates base balance; desired subclass savings operates on subclass state",
+        "target": "BankAccount::saving"
+      }
+    ],
+    "schema_version": "patch_scope_expand_1_v1",
+    "scope_authority": "proposal_only",
+    "source_bindings": [
+      [
+        "bank.java",
+        "BankAccount",
+        "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+        "04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+      ]
+    ],
+    "status": "expansion_required",
+    "task_contract_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+    "write_authority": false
+  },
+  "proposal_fingerprint": "7f5387de185dff7df32cd0fd591fd718ce700558612b732e9e497be1cce50779",
+  "real_waiting_answer_consumed": false,
+  "repair_scope_delta": 0,
+  "repository_traversals": 0,
+  "scope_status": "expansion_required",
+  "semantic_detection_status": "no_gap",
+  "semantic_status": "ready",
+  "serialized_proposal_bytes": 15207,
+  "session_io": 0,
+  "source": {
+    "bytes": 270,
+    "class": "BankAccount",
+    "fields": [
+      "balance"
+    ],
+    "fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+    "fixture_note": "Frozen replay source has private balance, a constructor(double opening), unconditional void withdraw(double amount), and saving(double rate). The conditional void withdraw measured-source case is a separate focused fixture.",
+    "methods": [
+      "deposit",
+      "withdraw",
+      "saving"
+    ],
+    "path": "bank.java"
+  },
+  "source_bytes_unchanged": true
+}

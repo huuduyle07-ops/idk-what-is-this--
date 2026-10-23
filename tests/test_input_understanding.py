@@ -63,6 +63,9 @@ INPUT_1_MODULES = (
     # and is consumed by the extractor above, so it lives under the same import,
     # stdlib and provider-token rules the rest of INPUT.1 does.
     "behavioral_expectation",
+    # OOP.INTENT.DESIGN.1 adds bounded literal design evidence at intake and
+    # inherits the same purity and authority checks as the frozen boundary.
+    "explicit_design_evidence",
 )
 
 

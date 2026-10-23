@@ -1,0 +1,1673 @@
+{
+  "phase_id": "RUNTIME.JAVA.PINNED.1B",
+  "focused_binding_tests": {
+    "mode": "focused",
+    "exit_code": 0,
+    "collected": 152,
+    "passed": 152,
+    "skipped": 0,
+    "failures": [],
+    "suites": {
+      "tests/test_runtime_java_pinned_backend_target_binding.py": {
+        "passed": 152,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    "test_files": [
+      "tests/test_runtime_java_pinned_backend_target_binding.py"
+    ],
+    "pytest_arguments": [
+      "--basetemp=tmp_tests",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1B\\validation_temp_focused_b167e0e68b86468285f55a0c268e72c3\\pytest",
+      "tests/test_runtime_java_pinned_backend_target_binding.py"
+    ],
+    "real_effect_attempts": [],
+    "denied_attempts": {},
+    "registry_projection_plugin_used": false,
+    "elapsed_seconds": 21.194,
+    "scope": "Pure host maintenance and fabricated in-memory fixtures only. Audit hooks and frozen guard deny operational processes/network before execution. Tests may mock owners/controls to validate contracts; no live Docker, Java, javac, controller, authorization, lease, executor, or Apply is run. Repository reads, Python validation, and new phase temporary/artifact writes are maintenance.",
+    "successful_operational_effect_counts": {
+      "Docker": 0,
+      "containers": 0,
+      "exports": 0,
+      "Java": 0,
+      "javac": 0,
+      "controller": 0,
+      "network": 0,
+      "shell": 0,
+      "host mounts": 0,
+      "source projection": 0,
+      "runtime lease consumption": 0,
+      "reflection lease consumption": 0,
+      "BANK": 0,
+      "EXECUTOR.1R": 0,
+      "Apply": 0
+    }
+  },
+  "frozen_pure_regressions": {
+    "mode": "frozen_validation",
+    "exit_code": 1,
+    "collected": 1049,
+    "passed": 1048,
+    "skipped": 0,
+    "failures": [
+      {
+        "nodeid": "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_bookkeeping_reversal_preserves_exact_frozen_receipts():\n        from tests._patch_candidate_behavior_executor1_maintenance import before_patch_candidate_behavior_executor1\n        root = Path(__file__).resolve().parents[1]\n        reversal = json.loads((root / \"tests/fixtures/patch_candidate_behavior_executor1_reversal.json\").read_text(encoding=\"utf-8\"))\n        assert len(reversal[\"reversals\"]) == 4\n        for record in reversal[\"reversals\"]:\n            content = (root / record[\"path\"]).read_bytes()\n>           assert sha256(before_patch_candidate_behavior_executor1(record[\"path\"], content)).hexdigest() == record[\"entry_sha256\"]\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_patch_candidate_behavior_executor1.py:498: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\ntests\\_patch_candidate_behavior_executor1_maintenance.py:9: in before_patch_candidate_behavior_executor1\n    content = before_runtime_sandbox1(relative, content)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nrelative = 'docs/roadmap/phase_registry.json'\ncontent = b'{\\n  \"schema_version\": \"1.0\",\\n  \"updated_at\": \"2026-09-06T00:00:00+09:00\",\\n  \"phases\": [\\n    {\\n      \"phase_id\":... First remaining blocker: bounded Java controller thread startup under the frozen boundary.\"\\n      ]\\n    }\\n  ]\\n}\\n'\n\n    def before_runtime_sandbox1(relative: str, content: bytes) -> bytes:\n        receipt = json.loads((Path(__file__).parent / \"fixtures\" /\n                              \"runtime_sandbox1_reversal.json\").read_text(encoding=\"utf-8\"))\n        record = next((row for row in receipt[\"reversals\"] if row[\"path\"] == relative), None)\n        if record is None:\n            return content\n>       assert sha256(content).hexdigest() == record[\"post_sha256\"], (relative, \"unattributed runtime-sandbox change\")\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       AssertionError: ('docs/roadmap/phase_registry.json', 'unattributed runtime-sandbox change')\n\ntests\\_runtime_sandbox1_maintenance.py:13: AssertionError"
+      }
+    ],
+    "suites": {
+      "tests/test_runtime_java_requirement_pinned1.py": {
+        "passed": 64,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_pinned_target_archive.py": {
+        "passed": 62,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_pinned_target_inspection.py": {
+        "passed": 101,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_sandbox_bind1.py": {
+        "passed": 129,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_sandbox2.py": {
+        "passed": 75,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1c.py": {
+        "passed": 89,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_discovery_contract1.py": {
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_synthetic_runtime_authorization.py": {
+        "passed": 117,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_patch_candidate_behavior_executor1.py": {
+        "passed": 75,
+        "failed": 1,
+        "skipped": 0
+      },
+      "tests/test_patch_candidate_behavior_executor1r.py": {
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_patch_candidate_behavior_executor1r_retry.py": {
+        "passed": 27,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py": {
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_discovery_diag1.py": {
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1.py": {
+        "passed": 91,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1_discovery.py": {
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1_governance.py": {
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_compat1.py": {
+        "passed": 67,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1d.py": {
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1d_retry.py": {
+        "passed": 27,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    "test_files": [
+      "tests/test_runtime_java_requirement_pinned1.py",
+      "tests/test_runtime_java_pinned_target_archive.py",
+      "tests/test_runtime_java_pinned_target_inspection.py",
+      "tests/test_runtime_sandbox_bind1.py",
+      "tests/test_runtime_sandbox2.py",
+      "tests/test_runtime_java1c.py",
+      "tests/test_runtime_java_discovery_contract1.py",
+      "tests/test_synthetic_runtime_authorization.py",
+      "tests/test_patch_candidate_behavior_executor1.py",
+      "tests/test_patch_candidate_behavior_executor1r.py",
+      "tests/test_patch_candidate_behavior_executor1r_retry.py",
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py",
+      "tests/test_runtime_java_discovery_diag1.py",
+      "tests/test_runtime_java1.py",
+      "tests/test_runtime_java1_discovery.py",
+      "tests/test_runtime_java1_governance.py",
+      "tests/test_runtime_java_compat1.py",
+      "tests/test_runtime_java1d.py",
+      "tests/test_runtime_java1d_retry.py"
+    ],
+    "pytest_arguments": [
+      "--basetemp=tmp_tests",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1B\\validation_temp_frozen_validation_30d603d4bdad4793bda0cd94eb1603c2\\pytest",
+      "tests/test_runtime_java_requirement_pinned1.py",
+      "tests/test_runtime_java_pinned_target_archive.py",
+      "tests/test_runtime_java_pinned_target_inspection.py",
+      "tests/test_runtime_sandbox_bind1.py",
+      "tests/test_runtime_sandbox2.py",
+      "tests/test_runtime_java1c.py",
+      "tests/test_runtime_java_discovery_contract1.py",
+      "tests/test_synthetic_runtime_authorization.py",
+      "tests/test_patch_candidate_behavior_executor1.py",
+      "tests/test_patch_candidate_behavior_executor1r.py",
+      "tests/test_patch_candidate_behavior_executor1r_retry.py",
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py",
+      "tests/test_runtime_java_discovery_diag1.py",
+      "tests/test_runtime_java1.py",
+      "tests/test_runtime_java1_discovery.py",
+      "tests/test_runtime_java1_governance.py",
+      "tests/test_runtime_java_compat1.py",
+      "tests/test_runtime_java1d.py",
+      "tests/test_runtime_java1d_retry.py"
+    ],
+    "real_effect_attempts": [],
+    "denied_attempts": {},
+    "registry_projection_plugin_used": false,
+    "elapsed_seconds": 563.592,
+    "scope": "Pure host maintenance and fabricated in-memory fixtures only. Audit hooks and frozen guard deny operational processes/network before execution. Tests may mock owners/controls to validate contracts; no live Docker, Java, javac, controller, authorization, lease, executor, or Apply is run. Repository reads, Python validation, and new phase temporary/artifact writes are maintenance.",
+    "successful_operational_effect_counts": {
+      "Docker": 0,
+      "containers": 0,
+      "exports": 0,
+      "Java": 0,
+      "javac": 0,
+      "controller": 0,
+      "network": 0,
+      "shell": 0,
+      "host mounts": 0,
+      "source projection": 0,
+      "runtime lease consumption": 0,
+      "reflection lease consumption": 0,
+      "BANK": 0,
+      "EXECUTOR.1R": 0,
+      "Apply": 0
+    },
+    "execution_provenance": {
+      "command": "python -B docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/pure_validation.py frozen_validation",
+      "filesystem_permission": "require_escalated automatic approval accepted",
+      "reason": "Allow read-only directory metadata required by historical synthetic fixtures for Path.resolve(strict=True); normal Windows filesystem sandbox returns WinError 5.",
+      "initial_environment_failure_artifacts": [
+        "frozen_validation_initial_environment.json",
+        "frozen_validation_initial_environment.txt"
+      ],
+      "original_owner_and_test_files_changed": false,
+      "root_canonicalizer_patched": false,
+      "owner_validator_bypasses": false,
+      "process_network_runtime_denial_guard_active": true,
+      "guard_harness_sha256": "2c97a3b5a9cde42969abcb9e39fd669ef03d2181690f1e90aaa76c721e0bb4d2"
+    },
+    "preexisting_bookkeeping_drift_observation": {
+      "nodeid": "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+      "present_in_initial_run": true,
+      "initial_failure_detail_same": true,
+      "registry_sha256_at_initial_snapshot": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+      "registry_sha256_after_run": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+      "registry_bytes_unchanged": true,
+      "historical_reversal_receipts_repinned": false,
+      "required_runtime_blocked_semantic_tests_all_passed": true,
+      "classification": "Historical reversal maintenance assertion, outside runtime blocked-path semantics. Preserved as failure evidence rather than repinning."
+    }
+  },
+  "frozen_regression_assessment": {
+    "phase_id": "RUNTIME.JAVA.PINNED.1B",
+    "report_schema": "runtime_java_pinned_1b_frozen_regression_assessment_v1",
+    "raw_validation_artifact": "frozen_validation.json",
+    "raw_validation_sha256": "4bfdd8ec9c032e0affd825052c04acc593d7ca0dafcc849f682e0d32f22220eb",
+    "raw_exit_code_preserved": 1,
+    "collected": 1049,
+    "passed": 1048,
+    "skipped": 0,
+    "preexisting_bookkeeping_failure_count": 1,
+    "sole_maintenance_failure_id": "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+    "all_other_tests_passed": true,
+    "semantic_regressions_passed": true,
+    "classification_rule": "Only the exact separately preserved historical bookkeeping reversal failure may be classified as preexisting. Every other selected pure/blocked regression must pass, all preexisting baseline bytes must remain identical, and the failure must match initial-run evidence. No expected hash or historical file is updated.",
+    "historical_failure_trace": {
+      "test": "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+      "maintenance_helper": "tests/_patch_candidate_behavior_executor1_maintenance.py:9 -> tests/_runtime_sandbox1_maintenance.py:13",
+      "fixture": "tests/fixtures/runtime_sandbox1_reversal.json",
+      "fixture_record": {
+        "path": "docs/roadmap/phase_registry.json",
+        "entry_sha256": "a9b557bfc9fe33a8e1ef421a5da3675bc852073b870f8c845e075844deddc999",
+        "post_sha256": "33334b0eed9cf0bfc55bf7484abff0766ff5d9e2afff705cd4e65b4a01c8c87a"
+      },
+      "registry_path": "docs/roadmap/phase_registry.json",
+      "initial_registry_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+      "current_registry_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+      "historical_expected_post_sha256": "33334b0eed9cf0bfc55bf7484abff0766ff5d9e2afff705cd4e65b4a01c8c87a",
+      "historical_expectation_disagrees_with_initial_and_current": true,
+      "failure_present_in_initial_environment_run": true,
+      "initial_and_elevated_failure_details_identical": true
+    },
+    "affected_frozen_bytes": [
+      {
+        "path": "docs/roadmap/phase_registry.json",
+        "initial_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+        "after_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+        "bytes_unchanged": true
+      },
+      {
+        "path": "tests/fixtures/runtime_sandbox1_reversal.json",
+        "initial_sha256": "b93c55772993454a871cee0eb2baa232ef1c4979c347463e8ac8fef7b3d55c32",
+        "after_sha256": "b93c55772993454a871cee0eb2baa232ef1c4979c347463e8ac8fef7b3d55c32",
+        "bytes_unchanged": true
+      },
+      {
+        "path": "tests/fixtures/patch_candidate_behavior_executor1_reversal.json",
+        "initial_sha256": "429295d7b064163a293afea47188292d2fd8dfbd867be966e6441b1ae9fd4538",
+        "after_sha256": "429295d7b064163a293afea47188292d2fd8dfbd867be966e6441b1ae9fd4538",
+        "bytes_unchanged": true
+      },
+      {
+        "path": "tests/test_patch_candidate_behavior_executor1.py",
+        "initial_sha256": "b7870bce23c8d5080d4bf2fa962a42663c25657b1ab9161b529161cdfd14a238",
+        "after_sha256": "b7870bce23c8d5080d4bf2fa962a42663c25657b1ab9161b529161cdfd14a238",
+        "bytes_unchanged": true
+      },
+      {
+        "path": "tests/_patch_candidate_behavior_executor1_maintenance.py",
+        "initial_sha256": "f51c291c48626e8b8ea1b156512d1b199622f058fafef3bad1eefdf4a1beb522",
+        "after_sha256": "f51c291c48626e8b8ea1b156512d1b199622f058fafef3bad1eefdf4a1beb522",
+        "bytes_unchanged": true
+      },
+      {
+        "path": "tests/_runtime_sandbox1_maintenance.py",
+        "initial_sha256": "41e36924002812cd4a652f59f062ed51467f7f03b623968b14751db6d4d0fba7",
+        "after_sha256": "41e36924002812cd4a652f59f062ed51467f7f03b623968b14751db6d4d0fba7",
+        "bytes_unchanged": true
+      }
+    ],
+    "preservation_baseline_files_checked": 1962,
+    "all_preexisting_baseline_bytes_unchanged": true,
+    "changed_preexisting_files": [],
+    "missing_preexisting_files": [],
+    "historical_repins": false,
+    "execution_provenance": {
+      "command": "python -B docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/pure_validation.py frozen_validation",
+      "filesystem_permission": "require_escalated automatic approval accepted",
+      "reason": "Allow read-only directory metadata required by historical synthetic fixtures for Path.resolve(strict=True); normal Windows filesystem sandbox returns WinError 5.",
+      "initial_environment_failure_artifacts": [
+        "frozen_validation_initial_environment.json",
+        "frozen_validation_initial_environment.txt"
+      ],
+      "original_owner_and_test_files_changed": false,
+      "root_canonicalizer_patched": false,
+      "owner_validator_bypasses": false,
+      "process_network_runtime_denial_guard_active": true,
+      "guard_harness_sha256": "2c97a3b5a9cde42969abcb9e39fd669ef03d2181690f1e90aaa76c721e0bb4d2"
+    },
+    "real_effect_attempts": [],
+    "denied_attempts": {},
+    "successful_operational_effect_counts": {
+      "Docker": 0,
+      "containers": 0,
+      "exports": 0,
+      "Java": 0,
+      "javac": 0,
+      "controller": 0,
+      "network": 0,
+      "shell": 0,
+      "host mounts": 0,
+      "source projection": 0,
+      "runtime lease consumption": 0,
+      "reflection lease consumption": 0,
+      "BANK": 0,
+      "EXECUTOR.1R": 0,
+      "Apply": 0
+    },
+    "runtime_authority_issued": false,
+    "preexisting_bookkeeping_drift_verified": true,
+    "accepted_preexisting_failure_ids": [
+      "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts"
+    ]
+  },
+  "registry_picker_baseline": {
+    "mode": "registry_baseline",
+    "exit_code": 1,
+    "collected": 299,
+    "passed": 292,
+    "skipped": 0,
+    "failures": [
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_has_expected_phases():\n        data = load_phase_registry(str(_SEED_PATH))\n        ids = {p[\"phase_id\"] for p in data[\"phases\"]}\n        assert {\n            \"ROAD.1\", \"ROAD.2\", \"ROAD.3\", \"ROAD.4\", \"AUTO.2a\", \"AUTO.2b\", \"AUTO.2c\",\n            \"MODEL.1\", \"MODEL.2\", \"MODEL.3\", \"MODEL.N1\", \"MODEL.N2\", \"MODEL.N3\", \"MODEL.N4\", \"MODEL.N5\", \"MODEL.N6\", \"MODEL.N7\", \"MODEL.CLOSE\", \"EVAL.1\", \"EVAL.2\", \"EVAL.3\", \"EVAL.N1\", \"EVAL.N2\", \"EVAL.N3\", \"EVAL.N4\", \"EVAL.N5\", \"EVAL.N6\", \"EVAL.N7\", \"EVAL.CLOSE\", \"HUMAN.N1\", \"HUMAN.N2\", \"HUMAN.N3\", \"HUMAN.N4\", \"HUMAN.CLOSE\", \"ADOPT.MODEL.1\", \"ADOPT.MODEL.2\", \"ADOPT.MODEL.CLOSE\", \"CMD.1\", \"CMD.2\", \"CMD.3\", \"CMD.4\", \"CMD.N1\", \"CMD.N2\", \"CMD.N3\", \"CMD.N4\", \"CMD.N5\", \"CMD.N6\", \"CMD.CLOSE\",\n            \"HARDEN.1\", \"HARDEN.2\", \"HARDEN.3\", \"HARDEN.CLOSE\", \"HARDEN.N1\", \"HARDEN.N2\", \"HARDEN.N3\", \"HARDEN.N4\", \"HARDEN.PROGRESS.1\", \"OPS.TEST.1\", \"OPS.TEST.2\", \"OPS.TEST.3\", \"OPS.TEST.CLOSE\", \"UX.RUN.1\", \"UX.RUN.2\", \"UX.RUN.3\", \"UX.1\", \"UX.2\", \"UX.3\", \"UX.4\", \"UX.5\", \"UX.6\", \"UX.7\", \"UX.8\", \"UX.9\", \"UX.10\", \"UX.11\",\n            \"UX.CLOSE\", \"MIRROR.1\", \"MIRROR.2\", \"MIRROR.3\", \"MIRROR.4\", \"MIRROR.5\", \"MIRROR.6\", \"MIRROR.CLOSE\", \"MIRROR.7\", \"MIRROR.8\", \"MIRROR.9\", \"MIRROR.10\", \"MIRROR.11\", \"MIRROR.12\", \"MIRROR.CLOSE3\", \"MIRROR.13\",\n        } <= ids\n        assert {\"UX.RUN.CLOSE\", \"UX.LIVE.1\", \"UX.LIVE.2\", \"UX.LIVE.3\", \"UX.LIVE.4\", \"UX.LIVE.5\", \"UX.LIVE.6\", \"UX.LIVE.7\", \"UX.LIVE.8\", \"UX.LIVE.9\", \"UX.LIVE.10\", \"UX.LIVE.CLOSE\", \"DOGFOOD.1A\", \"DOGFOOD.1B\", \"VERIFY.TEST.1\"} <= ids\n        assert {\n            \"INDEX.1D.1\",\n            \"INDEX.1D.2A\",\n            \"INDEX.1D.2B\",\n            \"INDEX.1D.2C\",\n            \"INDEX.1D.3\",\n            \"INDEX.1E.0\",\n            \"INDEX.1E.1\",\n            \"INDEX.1E.2\",\n        } <= ids\n        assert {\n            \"CTX.SELECT.1\",\n            \"CTX.SEARCH.1\",\n            \"CTX.READ.1\",\n            \"CTX.PATCH.1\",\n            \"CTX.APPLY.0\",\n        } <= ids\n        assert {\"INPUT.1\", \"INPUT.2\", \"INPUT.3\"} <= ids\n        assert {\"WAITER.1\", \"WAITER.2\"} <= ids\n        assert {\"ACQUIRE.1\", \"ACQUIRE.2\", \"ACQUIRE.3\"} <= ids\n        assert {\"EVIDENCE.1\", \"EVIDENCE.2\"} <= ids\n        assert {\"CLAIM.1\"} <= ids\n        assert {\"SYNTHESIS.1\"} <= ids\n        assert {\"CHECK.1\", \"CHECK.2\"} <= ids\n        assert {\n            \"WORKER.DECL.1\",\n            \"WORKER.DECL.2A\",\n            \"WORKER.DECL.2A.1\",\n            \"WORKER.DECL.2A.2\",\n            \"WORKER.DECL.2B\",\n        } <= ids\n        assert \"CONTROL.SAFETY.LIVE.1\" in ids\n        assert \"WAITER.LIVE.1\" in ids\n        assert \"PATCH.BASIS.LIVE.1\" in ids\n        assert \"OPS.PATCH.2\" in ids\n        assert {\n            \"RETRIEVE.LIVE.1\",\n            \"RETRIEVE.LIVE.2\",\n            \"RETRIEVE.LIVE.3\",\n            \"RETRIEVE.LIVE.4\",\n        } <= ids\n        assert \"ANSWER.GROUND.LIVE.1\" in ids\n        assert \"DEFECT.PROBE.LIVE.1\" in ids\n        assert \"VALIDATE.ORACLE.LIVE.1\" in ids\n        assert \"EXEC.POLICY.LIVE.1\" in ids\n        assert \"EXEC.APPROVAL.LIVE.1\" in ids\n        assert \"ANSWER.GROUND.LIVE.2\" in ids\n        assert \"CONTROL.LOCALIZE.LIVE.2\" in ids\n        assert \"REPAIR.INTENT.1\" in ids\n        assert \"REPAIR.INTENT.ADMIT.1\" in ids\n        assert \"REPAIR.INTENT.UI.1\" in ids\n        assert \"CTX.OOP.1A\" in ids\n        assert \"CTX.OOP.1C\" in ids\n        assert \"OOP.INTENT.UI.1\" in ids\n        assert \"OOP.INTENT.DESIGN.1\" in ids\n        assert \"OOP.INTENT.DETECT.2\" in ids\n        assert \"OOP.INTENT.CONTINUE.1\" in ids\n        assert \"PATCH.SCOPE.EXPAND.1\" in ids\n        assert \"PATCH.SCOPE.RECHECK.1\" in ids\n        assert \"PATCH.SCOPE.REFRESH.1\" in ids\n>       assert len(data[\"phases\"]) == 224\nE       AssertionError: assert 225 == 224\nE        +  where 225 = len([{'phase_id': 'ROAD.1', 'title': 'Machine-Readable Phase Registry', 'track': 'ROAD', 'status': 'complete', ...}, {'pha...ase_id': 'MODEL.1', 'title': 'C.A.T.T.U.S Artifact Dataset Builder', 'track': 'MODEL', 'status': 'complete', ...}, ...])\n\ntests\\test_phase_registry.py:591: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call():\n        \"\"\"It spends provider calls, and the registry says so in the only way it can.\n    \n        ``model_calls_allowed`` is the registry's vocabulary for provider traffic and\n        is legal only under the approval budget tier, so a dogfood phase must carry\n        both.  ``network_allowed`` stays false because ROAD.1 rejects true outright;\n        that flag is not this phase claiming it made no requests.\n        \"\"\"\n        data = load_phase_registry(str(_SEED_PATH))\n        phases = data[\"phases\"]\n        by_id = {phase[\"phase_id\"]: phase for phase in phases}\n        phase = by_id[\"WORKER.DECL.2A.2\"]\n    \n        assert phase[\"model_calls_allowed\"] is True\n        assert phase[\"budget_tier\"] == \"strong_model_requires_approval\"\n        assert phase[\"requires_sandbox\"] is True\n        # ROAD.1 forbids raw network access for every managed phase, this one included.\n        assert phase[\"network_allowed\"] is False\n        assert not validate_phase_registry(data)[\"errors\"]\n    \n        # And it really is the first.  The set of phases allowed to spend provider\n        # calls is enumerated here, deliberately: a phase that wants provider\n        # traffic has to be added to this literal and to pay the approval price\n        # below, so it cannot arrive quietly.  PATCH.AUTHOR.LIVE.1 joined on\n        # 2026-09-09 with a hard cap of one verification-guided revision per run.\n        declared_model_call_phases = {\n            \"WORKER.DECL.2A.2\",\n            \"WORKER.DECL.2B\",\n            \"PATCH.AUTHOR.LIVE.1\",\n            # CONTROL.BOOTSTRAP.1 joined on 2026-09-18 with one bootstrap authoring call per fresh request.\n            \"CONTROL.BOOTSTRAP.1\",\n            # PLAN.1 exposes one already-authorized planner call and no author call.\n            \"PATCH.SCOPE.PLAN.1\",\n            # AUTHOR.STRUCTURAL.1 permits one injected read-only author call.\n            \"PATCH.AUTHOR.STRUCTURAL.1\",\n        }\n        others = [\n            item for item in phases if item[\"phase_id\"] not in declared_model_call_phases\n        ]\n        assert all(item[\"model_calls_allowed\"] is False for item in others)\n>       assert all(item[\"budget_tier\"] == \"local_only\" for item in others)\nE       assert False\nE        +  where False = all(<generator object test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call.<locals>.<genexpr> at 0x0000021692D4CC70>)\n\ntests\\test_phase_registry.py:2130: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_is_conservative():\n        \"\"\"No phase merges or reaches the network, and none writes speculatively.\n    \n        A phase may declare model calls, but only by paying the registry's price for\n        them: the approval budget tier, which routes it to human approval and out of\n        the safe-to-prepare bucket.  A phase cannot quietly grant itself provider\n        traffic under ``local_only``.\n    \n        ``writes_real_repo`` is the same shape of price.  It is not forbidden - a\n        live production fix such as OPS.PATCH.1 genuinely edits shipped runtime\n        code, and recording that as observation-only would make the registry lie -\n        but it is only ever true for shipped history that already went through\n        human approval and still may not merge itself.  That is the rule the\n        registry validator enforces at ``core/phase_registry.py``; this asserts the\n        seed actually obeys it, so no *proposed* or *active* phase can hold write\n        authority over the real worktree.\n        \"\"\"\n        data = load_phase_registry(str(_SEED_PATH))\n        for phase in data[\"phases\"]:\n            assert phase[\"automation_level\"] != \"AUTO_4_AUTO_MERGE\"\n            assert phase[\"merge_allowed\"] is False\n            assert phase[\"network_allowed\"] is False\n            if phase[\"writes_real_repo\"]:\n                assert phase[\"status\"] == \"complete\", phase[\"phase_id\"]\n                assert phase[\"human_approval_required\"] is True, phase[\"phase_id\"]\n                assert phase[\"merge_allowed\"] is False, phase[\"phase_id\"]\n            if phase[\"model_calls_allowed\"]:\n                assert phase[\"budget_tier\"] == \"strong_model_requires_approval\", (\n                    phase[\"phase_id\"]\n                )\n                assert phase[\"human_approval_required\"] is True, phase[\"phase_id\"]\n            else:\n>               assert phase[\"budget_tier\"] == \"local_only\", phase[\"phase_id\"]\nE               AssertionError: RUNTIME.JAVA.1\nE               assert 'blocked' == 'local_only'\nE                 \nE                 - local_only\nE                 + blocked\n\ntests\\test_phase_registry.py:2249: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_summary_counts():\n        data = load_phase_registry(str(_SEED_PATH))\n        report = summarize_phase_registry(data, report_id=\"r\", created_at=\"t\")\n>       assert report[\"counts_by_track\"] == {\n            \"ADOPT\": 3,\n            \"AUTO\": 3,\n            \"CMD\": 11,\n            \"CTX\": 5,\n            \"DOGFOOD\": 2,\n            \"VERIFY\": 1,\n            \"EVAL\": 11,\n            \"HARDEN\": 16,\n            \"HUMAN\": 5,\n            # RETRIEVE.LIVE.* is an ID namespace inside INDEX, not a new track.\n            \"INDEX\": 12,\n            \"ACQUIRE\": 3,\n            \"CLAIM\": 1,\n            \"EVIDENCE\": 2,\n            \"INPUT\": 4,\n            \"SYNTHESIS\": 1,\n                \"CHECK\": 9,\n                \"CONTROL\": 42,\n                \"WAITER\": 5,\n            \"WORKER\": 5,\n            \"MIRROR\": 15,\n            \"MODEL\": 11,\n            \"OPS\": 22,\n            \"ROAD\": 4,\n                \"UX\": 31,\n        }\nE       AssertionError: assert {'ACQUIRE': 3...HECK': 9, ...} == {'ADOPT': 3, ...'CTX': 5, ...}\nE         \nE         Omitting 23 identical items, use -vv to show\nE         Differing items:\nE         {'CONTROL': 43} != {'CONTROL': 42}\nE         Use -v to get more diff\n\ntests\\test_phase_registry.py:2257: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_produces_expected_buckets():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        report = _report(data, report_id=\"r\", created_at=\"t\", registry_path=str(_SEED_PATH))\n        assert report[\"registry_valid\"] is True\n>       assert report[\"bucket_counts\"] == {\n            \"safe_to_prepare\": 3,\n            \"sandbox_required\": 1,\n            \"human_approval_required\": 0,\n            \"blocked\": 1,\n            \"deferred_or_parked\": 0,\n            \"complete_or_history\": 219,\n        }\nE       AssertionError: assert {'safe_to_pre...cked': 2, ...} == {'safe_to_pre...cked': 1, ...}\nE         \nE         Omitting 5 identical items, use -vv to show\nE         Differing items:\nE         {'blocked': 2} != {'blocked': 1}\nE         Use -v to get more diff\n\ntests\\test_phase_picker.py:557: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        phase = {p[\"phase_id\"]: p for p in data[\"phases\"]}[\"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1\"]\n        report = _report(data, report_id=\"r\", created_at=\"t\")\n        assert phase[\"track\"] == \"CONTROL\" and phase[\"status\"] == \"active\"\n        assert phase[\"risk_level\"] == \"blocked\" and phase[\"budget_tier\"] == \"local_only\"\n        blocked = [p for p in report[\"blocked\"] if p[\"phase_id\"] == phase[\"phase_id\"]]\n        assert len(blocked) == 1\n        assert \"risk_level is blocked\" in blocked[0][\"reasons\"]\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"safe_to_prepare\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"complete_or_history\"]}\n>       assert report[\"bucket_counts\"][\"blocked\"] == 1\nE       assert 2 == 1\n\ntests\\test_phase_picker.py:1634: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_verified_runtime_sandbox_is_history_and_executor_stays_blocked():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        phase = {p[\"phase_id\"]: p for p in data[\"phases\"]}[\"RUNTIME.SANDBOX.1\"]\n        report = _report(data, report_id=\"r\", created_at=\"t\")\n        assert report[\"registry_valid\"] is True\n        assert phase[\"track\"] == \"CONTROL\" and phase[\"status\"] == \"complete\"\n        assert phase[\"risk_level\"] == \"medium\" and phase[\"budget_tier\"] == \"local_only\"\n        assert phase[\"phase_id\"] in {p[\"phase_id\"] for p in report[\"complete_or_history\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"safe_to_prepare\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"sandbox_required\"]}\n>       assert {p[\"phase_id\"] for p in report[\"blocked\"]} == {\"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1\"}\nE       AssertionError: assert {'PATCH.CANDI...NTIME.JAVA.1'} == {'PATCH.CANDI...R.EXECUTOR.1'}\nE         \nE         Extra items in the left set:\nE         'RUNTIME.JAVA.1'\nE         Use -v to get more diff\n\ntests\\test_phase_picker.py:1651: AssertionError"
+      }
+    ],
+    "suites": {
+      "tests/test_phase_registry.py": {
+        "passed": 179,
+        "failed": 4,
+        "skipped": 0
+      },
+      "tests/test_phase_picker.py": {
+        "passed": 113,
+        "failed": 3,
+        "skipped": 0
+      }
+    },
+    "test_files": [
+      "tests/test_phase_registry.py",
+      "tests/test_phase_picker.py"
+    ],
+    "pytest_arguments": [
+      "--basetemp=tmp_tests",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1B\\validation_temp_registry_baseline_df844e2306994e26b947903a2eb86550\\pytest",
+      "tests/test_phase_registry.py",
+      "tests/test_phase_picker.py"
+    ],
+    "real_effect_attempts": [],
+    "denied_attempts": {},
+    "registry_projection_plugin_used": false,
+    "elapsed_seconds": 74.14,
+    "scope": "Pure host maintenance and fabricated in-memory fixtures only. Audit hooks and frozen guard deny operational processes/network before execution. Tests may mock owners/controls to validate contracts; no live Docker, Java, javac, controller, authorization, lease, executor, or Apply is run. Repository reads, Python validation, and new phase temporary/artifact writes are maintenance.",
+    "successful_operational_effect_counts": {
+      "Docker": 0,
+      "containers": 0,
+      "exports": 0,
+      "Java": 0,
+      "javac": 0,
+      "controller": 0,
+      "network": 0,
+      "shell": 0,
+      "host mounts": 0,
+      "source projection": 0,
+      "runtime lease consumption": 0,
+      "reflection lease consumption": 0,
+      "BANK": 0,
+      "EXECUTOR.1R": 0,
+      "Apply": 0
+    }
+  },
+  "registry_picker_after": {
+    "mode": "registry_after",
+    "exit_code": 1,
+    "collected": 299,
+    "passed": 292,
+    "skipped": 0,
+    "failures": [
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_has_expected_phases():\n        data = load_phase_registry(str(_SEED_PATH))\n        ids = {p[\"phase_id\"] for p in data[\"phases\"]}\n        assert {\n            \"ROAD.1\", \"ROAD.2\", \"ROAD.3\", \"ROAD.4\", \"AUTO.2a\", \"AUTO.2b\", \"AUTO.2c\",\n            \"MODEL.1\", \"MODEL.2\", \"MODEL.3\", \"MODEL.N1\", \"MODEL.N2\", \"MODEL.N3\", \"MODEL.N4\", \"MODEL.N5\", \"MODEL.N6\", \"MODEL.N7\", \"MODEL.CLOSE\", \"EVAL.1\", \"EVAL.2\", \"EVAL.3\", \"EVAL.N1\", \"EVAL.N2\", \"EVAL.N3\", \"EVAL.N4\", \"EVAL.N5\", \"EVAL.N6\", \"EVAL.N7\", \"EVAL.CLOSE\", \"HUMAN.N1\", \"HUMAN.N2\", \"HUMAN.N3\", \"HUMAN.N4\", \"HUMAN.CLOSE\", \"ADOPT.MODEL.1\", \"ADOPT.MODEL.2\", \"ADOPT.MODEL.CLOSE\", \"CMD.1\", \"CMD.2\", \"CMD.3\", \"CMD.4\", \"CMD.N1\", \"CMD.N2\", \"CMD.N3\", \"CMD.N4\", \"CMD.N5\", \"CMD.N6\", \"CMD.CLOSE\",\n            \"HARDEN.1\", \"HARDEN.2\", \"HARDEN.3\", \"HARDEN.CLOSE\", \"HARDEN.N1\", \"HARDEN.N2\", \"HARDEN.N3\", \"HARDEN.N4\", \"HARDEN.PROGRESS.1\", \"OPS.TEST.1\", \"OPS.TEST.2\", \"OPS.TEST.3\", \"OPS.TEST.CLOSE\", \"UX.RUN.1\", \"UX.RUN.2\", \"UX.RUN.3\", \"UX.1\", \"UX.2\", \"UX.3\", \"UX.4\", \"UX.5\", \"UX.6\", \"UX.7\", \"UX.8\", \"UX.9\", \"UX.10\", \"UX.11\",\n            \"UX.CLOSE\", \"MIRROR.1\", \"MIRROR.2\", \"MIRROR.3\", \"MIRROR.4\", \"MIRROR.5\", \"MIRROR.6\", \"MIRROR.CLOSE\", \"MIRROR.7\", \"MIRROR.8\", \"MIRROR.9\", \"MIRROR.10\", \"MIRROR.11\", \"MIRROR.12\", \"MIRROR.CLOSE3\", \"MIRROR.13\",\n        } <= ids\n        assert {\"UX.RUN.CLOSE\", \"UX.LIVE.1\", \"UX.LIVE.2\", \"UX.LIVE.3\", \"UX.LIVE.4\", \"UX.LIVE.5\", \"UX.LIVE.6\", \"UX.LIVE.7\", \"UX.LIVE.8\", \"UX.LIVE.9\", \"UX.LIVE.10\", \"UX.LIVE.CLOSE\", \"DOGFOOD.1A\", \"DOGFOOD.1B\", \"VERIFY.TEST.1\"} <= ids\n        assert {\n            \"INDEX.1D.1\",\n            \"INDEX.1D.2A\",\n            \"INDEX.1D.2B\",\n            \"INDEX.1D.2C\",\n            \"INDEX.1D.3\",\n            \"INDEX.1E.0\",\n            \"INDEX.1E.1\",\n            \"INDEX.1E.2\",\n        } <= ids\n        assert {\n            \"CTX.SELECT.1\",\n            \"CTX.SEARCH.1\",\n            \"CTX.READ.1\",\n            \"CTX.PATCH.1\",\n            \"CTX.APPLY.0\",\n        } <= ids\n        assert {\"INPUT.1\", \"INPUT.2\", \"INPUT.3\"} <= ids\n        assert {\"WAITER.1\", \"WAITER.2\"} <= ids\n        assert {\"ACQUIRE.1\", \"ACQUIRE.2\", \"ACQUIRE.3\"} <= ids\n        assert {\"EVIDENCE.1\", \"EVIDENCE.2\"} <= ids\n        assert {\"CLAIM.1\"} <= ids\n        assert {\"SYNTHESIS.1\"} <= ids\n        assert {\"CHECK.1\", \"CHECK.2\"} <= ids\n        assert {\n            \"WORKER.DECL.1\",\n            \"WORKER.DECL.2A\",\n            \"WORKER.DECL.2A.1\",\n            \"WORKER.DECL.2A.2\",\n            \"WORKER.DECL.2B\",\n        } <= ids\n        assert \"CONTROL.SAFETY.LIVE.1\" in ids\n        assert \"WAITER.LIVE.1\" in ids\n        assert \"PATCH.BASIS.LIVE.1\" in ids\n        assert \"OPS.PATCH.2\" in ids\n        assert {\n            \"RETRIEVE.LIVE.1\",\n            \"RETRIEVE.LIVE.2\",\n            \"RETRIEVE.LIVE.3\",\n            \"RETRIEVE.LIVE.4\",\n        } <= ids\n        assert \"ANSWER.GROUND.LIVE.1\" in ids\n        assert \"DEFECT.PROBE.LIVE.1\" in ids\n        assert \"VALIDATE.ORACLE.LIVE.1\" in ids\n        assert \"EXEC.POLICY.LIVE.1\" in ids\n        assert \"EXEC.APPROVAL.LIVE.1\" in ids\n        assert \"ANSWER.GROUND.LIVE.2\" in ids\n        assert \"CONTROL.LOCALIZE.LIVE.2\" in ids\n        assert \"REPAIR.INTENT.1\" in ids\n        assert \"REPAIR.INTENT.ADMIT.1\" in ids\n        assert \"REPAIR.INTENT.UI.1\" in ids\n        assert \"CTX.OOP.1A\" in ids\n        assert \"CTX.OOP.1C\" in ids\n        assert \"OOP.INTENT.UI.1\" in ids\n        assert \"OOP.INTENT.DESIGN.1\" in ids\n        assert \"OOP.INTENT.DETECT.2\" in ids\n        assert \"OOP.INTENT.CONTINUE.1\" in ids\n        assert \"PATCH.SCOPE.EXPAND.1\" in ids\n        assert \"PATCH.SCOPE.RECHECK.1\" in ids\n        assert \"PATCH.SCOPE.REFRESH.1\" in ids\n>       assert len(data[\"phases\"]) == 224\nE       AssertionError: assert 225 == 224\nE        +  where 225 = len([{'phase_id': 'ROAD.1', 'title': 'Machine-Readable Phase Registry', 'track': 'ROAD', 'status': 'complete', ...}, {'pha...ase_id': 'MODEL.1', 'title': 'C.A.T.T.U.S Artifact Dataset Builder', 'track': 'MODEL', 'status': 'complete', ...}, ...])\n\ntests\\test_phase_registry.py:591: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call():\n        \"\"\"It spends provider calls, and the registry says so in the only way it can.\n    \n        ``model_calls_allowed`` is the registry's vocabulary for provider traffic and\n        is legal only under the approval budget tier, so a dogfood phase must carry\n        both.  ``network_allowed`` stays false because ROAD.1 rejects true outright;\n        that flag is not this phase claiming it made no requests.\n        \"\"\"\n        data = load_phase_registry(str(_SEED_PATH))\n        phases = data[\"phases\"]\n        by_id = {phase[\"phase_id\"]: phase for phase in phases}\n        phase = by_id[\"WORKER.DECL.2A.2\"]\n    \n        assert phase[\"model_calls_allowed\"] is True\n        assert phase[\"budget_tier\"] == \"strong_model_requires_approval\"\n        assert phase[\"requires_sandbox\"] is True\n        # ROAD.1 forbids raw network access for every managed phase, this one included.\n        assert phase[\"network_allowed\"] is False\n        assert not validate_phase_registry(data)[\"errors\"]\n    \n        # And it really is the first.  The set of phases allowed to spend provider\n        # calls is enumerated here, deliberately: a phase that wants provider\n        # traffic has to be added to this literal and to pay the approval price\n        # below, so it cannot arrive quietly.  PATCH.AUTHOR.LIVE.1 joined on\n        # 2026-09-09 with a hard cap of one verification-guided revision per run.\n        declared_model_call_phases = {\n            \"WORKER.DECL.2A.2\",\n            \"WORKER.DECL.2B\",\n            \"PATCH.AUTHOR.LIVE.1\",\n            # CONTROL.BOOTSTRAP.1 joined on 2026-09-18 with one bootstrap authoring call per fresh request.\n            \"CONTROL.BOOTSTRAP.1\",\n            # PLAN.1 exposes one already-authorized planner call and no author call.\n            \"PATCH.SCOPE.PLAN.1\",\n            # AUTHOR.STRUCTURAL.1 permits one injected read-only author call.\n            \"PATCH.AUTHOR.STRUCTURAL.1\",\n        }\n        others = [\n            item for item in phases if item[\"phase_id\"] not in declared_model_call_phases\n        ]\n        assert all(item[\"model_calls_allowed\"] is False for item in others)\n>       assert all(item[\"budget_tier\"] == \"local_only\" for item in others)\nE       assert False\nE        +  where False = all(<generator object test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call.<locals>.<genexpr> at 0x0000017F342D4AD0>)\n\ntests\\test_phase_registry.py:2130: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_is_conservative():\n        \"\"\"No phase merges or reaches the network, and none writes speculatively.\n    \n        A phase may declare model calls, but only by paying the registry's price for\n        them: the approval budget tier, which routes it to human approval and out of\n        the safe-to-prepare bucket.  A phase cannot quietly grant itself provider\n        traffic under ``local_only``.\n    \n        ``writes_real_repo`` is the same shape of price.  It is not forbidden - a\n        live production fix such as OPS.PATCH.1 genuinely edits shipped runtime\n        code, and recording that as observation-only would make the registry lie -\n        but it is only ever true for shipped history that already went through\n        human approval and still may not merge itself.  That is the rule the\n        registry validator enforces at ``core/phase_registry.py``; this asserts the\n        seed actually obeys it, so no *proposed* or *active* phase can hold write\n        authority over the real worktree.\n        \"\"\"\n        data = load_phase_registry(str(_SEED_PATH))\n        for phase in data[\"phases\"]:\n            assert phase[\"automation_level\"] != \"AUTO_4_AUTO_MERGE\"\n            assert phase[\"merge_allowed\"] is False\n            assert phase[\"network_allowed\"] is False\n            if phase[\"writes_real_repo\"]:\n                assert phase[\"status\"] == \"complete\", phase[\"phase_id\"]\n                assert phase[\"human_approval_required\"] is True, phase[\"phase_id\"]\n                assert phase[\"merge_allowed\"] is False, phase[\"phase_id\"]\n            if phase[\"model_calls_allowed\"]:\n                assert phase[\"budget_tier\"] == \"strong_model_requires_approval\", (\n                    phase[\"phase_id\"]\n                )\n                assert phase[\"human_approval_required\"] is True, phase[\"phase_id\"]\n            else:\n>               assert phase[\"budget_tier\"] == \"local_only\", phase[\"phase_id\"]\nE               AssertionError: RUNTIME.JAVA.1\nE               assert 'blocked' == 'local_only'\nE                 \nE                 - local_only\nE                 + blocked\n\ntests\\test_phase_registry.py:2249: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_summary_counts():\n        data = load_phase_registry(str(_SEED_PATH))\n        report = summarize_phase_registry(data, report_id=\"r\", created_at=\"t\")\n>       assert report[\"counts_by_track\"] == {\n            \"ADOPT\": 3,\n            \"AUTO\": 3,\n            \"CMD\": 11,\n            \"CTX\": 5,\n            \"DOGFOOD\": 2,\n            \"VERIFY\": 1,\n            \"EVAL\": 11,\n            \"HARDEN\": 16,\n            \"HUMAN\": 5,\n            # RETRIEVE.LIVE.* is an ID namespace inside INDEX, not a new track.\n            \"INDEX\": 12,\n            \"ACQUIRE\": 3,\n            \"CLAIM\": 1,\n            \"EVIDENCE\": 2,\n            \"INPUT\": 4,\n            \"SYNTHESIS\": 1,\n                \"CHECK\": 9,\n                \"CONTROL\": 42,\n                \"WAITER\": 5,\n            \"WORKER\": 5,\n            \"MIRROR\": 15,\n            \"MODEL\": 11,\n            \"OPS\": 22,\n            \"ROAD\": 4,\n                \"UX\": 31,\n        }\nE       AssertionError: assert {'ACQUIRE': 3...HECK': 9, ...} == {'ADOPT': 3, ...'CTX': 5, ...}\nE         \nE         Omitting 23 identical items, use -vv to show\nE         Differing items:\nE         {'CONTROL': 43} != {'CONTROL': 42}\nE         Use -v to get more diff\n\ntests\\test_phase_registry.py:2257: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_produces_expected_buckets():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        report = _report(data, report_id=\"r\", created_at=\"t\", registry_path=str(_SEED_PATH))\n        assert report[\"registry_valid\"] is True\n>       assert report[\"bucket_counts\"] == {\n            \"safe_to_prepare\": 3,\n            \"sandbox_required\": 1,\n            \"human_approval_required\": 0,\n            \"blocked\": 1,\n            \"deferred_or_parked\": 0,\n            \"complete_or_history\": 219,\n        }\nE       AssertionError: assert {'safe_to_pre...cked': 2, ...} == {'safe_to_pre...cked': 1, ...}\nE         \nE         Omitting 5 identical items, use -vv to show\nE         Differing items:\nE         {'blocked': 2} != {'blocked': 1}\nE         Use -v to get more diff\n\ntests\\test_phase_picker.py:557: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        phase = {p[\"phase_id\"]: p for p in data[\"phases\"]}[\"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1\"]\n        report = _report(data, report_id=\"r\", created_at=\"t\")\n        assert phase[\"track\"] == \"CONTROL\" and phase[\"status\"] == \"active\"\n        assert phase[\"risk_level\"] == \"blocked\" and phase[\"budget_tier\"] == \"local_only\"\n        blocked = [p for p in report[\"blocked\"] if p[\"phase_id\"] == phase[\"phase_id\"]]\n        assert len(blocked) == 1\n        assert \"risk_level is blocked\" in blocked[0][\"reasons\"]\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"safe_to_prepare\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"complete_or_history\"]}\n>       assert report[\"bucket_counts\"][\"blocked\"] == 1\nE       assert 2 == 1\n\ntests\\test_phase_picker.py:1634: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_verified_runtime_sandbox_is_history_and_executor_stays_blocked():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        phase = {p[\"phase_id\"]: p for p in data[\"phases\"]}[\"RUNTIME.SANDBOX.1\"]\n        report = _report(data, report_id=\"r\", created_at=\"t\")\n        assert report[\"registry_valid\"] is True\n        assert phase[\"track\"] == \"CONTROL\" and phase[\"status\"] == \"complete\"\n        assert phase[\"risk_level\"] == \"medium\" and phase[\"budget_tier\"] == \"local_only\"\n        assert phase[\"phase_id\"] in {p[\"phase_id\"] for p in report[\"complete_or_history\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"safe_to_prepare\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"sandbox_required\"]}\n>       assert {p[\"phase_id\"] for p in report[\"blocked\"]} == {\"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1\"}\nE       AssertionError: assert {'PATCH.CANDI...NTIME.JAVA.1'} == {'PATCH.CANDI...R.EXECUTOR.1'}\nE         \nE         Extra items in the left set:\nE         'RUNTIME.JAVA.1'\nE         Use -v to get more diff\n\ntests\\test_phase_picker.py:1651: AssertionError"
+      }
+    ],
+    "suites": {
+      "tests/test_phase_registry.py": {
+        "passed": 179,
+        "failed": 4,
+        "skipped": 0
+      },
+      "tests/test_phase_picker.py": {
+        "passed": 113,
+        "failed": 3,
+        "skipped": 0
+      }
+    },
+    "test_files": [
+      "tests/test_phase_registry.py",
+      "tests/test_phase_picker.py"
+    ],
+    "pytest_arguments": [
+      "--basetemp=tmp_tests",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1B\\validation_temp_registry_after_d3856529f6d64d01a669d0f3e906c242\\pytest",
+      "tests/test_phase_registry.py",
+      "tests/test_phase_picker.py"
+    ],
+    "real_effect_attempts": [],
+    "denied_attempts": {},
+    "registry_projection_plugin_used": false,
+    "elapsed_seconds": 44.884,
+    "scope": "Pure host maintenance and fabricated in-memory fixtures only. Audit hooks and frozen guard deny operational processes/network before execution. Tests may mock owners/controls to validate contracts; no live Docker, Java, javac, controller, authorization, lease, executor, or Apply is run. Repository reads, Python validation, and new phase temporary/artifact writes are maintenance.",
+    "successful_operational_effect_counts": {
+      "Docker": 0,
+      "containers": 0,
+      "exports": 0,
+      "Java": 0,
+      "javac": 0,
+      "controller": 0,
+      "network": 0,
+      "shell": 0,
+      "host mounts": 0,
+      "source projection": 0,
+      "runtime lease consumption": 0,
+      "reflection lease consumption": 0,
+      "BANK": 0,
+      "EXECUTOR.1R": 0,
+      "Apply": 0
+    }
+  },
+  "baseline_vs_after": {
+    "registry_picker_failure_ids_unchanged": true,
+    "registry_picker_new_failures": [],
+    "historical_sources_changed": false,
+    "historical_repins": false
+  },
+  "benchmark_structure_check": {
+    "mode": "benchmark_check",
+    "exit_code": 0,
+    "real_effect_attempts": [
+      "socket.bind"
+    ],
+    "denied_attempts": {},
+    "benchmark_arguments": [
+      "benchmarks/run_benchmarks.py",
+      "--check"
+    ],
+    "elapsed_seconds": 6.212,
+    "scope": "Pure host maintenance and fabricated in-memory fixtures only. Audit hooks and frozen guard deny operational processes/network before execution. Tests may mock owners/controls to validate contracts; no live Docker, Java, javac, controller, authorization, lease, executor, or Apply is run. Repository reads, Python validation, and new phase temporary/artifact writes are maintenance.",
+    "successful_operational_effect_counts": {
+      "Docker": 0,
+      "containers": 0,
+      "exports": 0,
+      "Java": 0,
+      "javac": 0,
+      "controller": 0,
+      "network": 0,
+      "shell": 0,
+      "host mounts": 0,
+      "source projection": 0,
+      "runtime lease consumption": 0,
+      "reflection lease consumption": 0,
+      "BANK": 0,
+      "EXECUTOR.1R": 0,
+      "Apply": 0
+    }
+  },
+  "in_memory_python_compilation": {
+    "files": [
+      {
+        "path": "core/candidate_runtime_sandbox.py",
+        "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913"
+      },
+      {
+        "path": "core/runtime_java_pinned_backend_target_binding.py",
+        "sha256": "94c95d674c0b43cde5811762998d13a65c3eee71c442cf05ff8699e02ec59da9"
+      },
+      {
+        "path": "core/runtime_java_pinned_requirement.py",
+        "sha256": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1"
+      },
+      {
+        "path": "core/runtime_java_pinned_target_archive.py",
+        "sha256": "d8693eabcfc2c8290cd0a4318a4edcce2d11b94a28ed8f8eddd82360b84afe2b"
+      },
+      {
+        "path": "core/runtime_java_pinned_target_inspection.py",
+        "sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59"
+      },
+      {
+        "path": "core/sandbox_backend_binding.py",
+        "sha256": "202cd1190494beaaf24874ac798b89a8eac276fa8361b496663a573770cdf1ed"
+      },
+      {
+        "path": "core/sandboxed_java_capture_recovery.py",
+        "sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861"
+      },
+      {
+        "path": "core/sandboxed_java_positive_probe.py",
+        "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f"
+      },
+      {
+        "path": "core/sandboxed_java_toolchain_discovery.py",
+        "sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff"
+      },
+      {
+        "path": "core/thread_compatible_runtime_sandbox.py",
+        "sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45"
+      },
+      {
+        "path": "core/thread_compatible_runtime_sandbox_probe.py",
+        "sha256": "be45d3a0106186d84a0464234f701140df6e90e99107477af358886cf5568075"
+      },
+      {
+        "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/check_preoperational_gates.py",
+        "sha256": "90f54da8d3a0bef4b13a385c456e24010a11a2964b049208dd939dd262dda2cb"
+      },
+      {
+        "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/finalize_validation.py",
+        "sha256": "84f8d86019573808fb0f68bd834c5206a48c89f92a605ab846a326b14d840ce5"
+      },
+      {
+        "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/pure_validation.py",
+        "sha256": "2c97a3b5a9cde42969abcb9e39fd669ef03d2181690f1e90aaa76c721e0bb4d2"
+      },
+      {
+        "path": "scripts/replay_runtime_java_pinned1b.py",
+        "sha256": "3480fdec3677ebc9091293adb7db47c5b946f0ae79219c915719ef152c2188dd"
+      },
+      {
+        "path": "tests/test_patch_candidate_behavior_executor1.py",
+        "sha256": "b7870bce23c8d5080d4bf2fa962a42663c25657b1ab9161b529161cdfd14a238"
+      },
+      {
+        "path": "tests/test_patch_candidate_behavior_executor1r.py",
+        "sha256": "dc3d5b13b5f205bfa0d3343814252325133d153d0cbda6c25d116faba3e6774d"
+      },
+      {
+        "path": "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py",
+        "sha256": "0d93227bd2ae29833762e7d09fe98e2eb7b30de3acf626a4594cc1f36453a8f6"
+      },
+      {
+        "path": "tests/test_patch_candidate_behavior_executor1r_retry.py",
+        "sha256": "8eef6bfdb7281b59312b86a30140e2155bc51c26f519a42af2ddef3b70e512ca"
+      },
+      {
+        "path": "tests/test_runtime_java1.py",
+        "sha256": "ab71e7ff6c983b508b9a06b67b525cef5aa1b14e75ddefa6875472fdd3264a2d"
+      },
+      {
+        "path": "tests/test_runtime_java1_discovery.py",
+        "sha256": "9ce83dea5c6b12dacd3b3b1148b962c5b18d7358321d744fcb1e53363f569f77"
+      },
+      {
+        "path": "tests/test_runtime_java1_governance.py",
+        "sha256": "04503cb9f337235923cedddc07b642f2c8f36369df8f2560beb2449a1c66205e"
+      },
+      {
+        "path": "tests/test_runtime_java1c.py",
+        "sha256": "67a5b71e38550a671a20c7393f246d6740f8faed7de60d32ff87857e5ae2fe3a"
+      },
+      {
+        "path": "tests/test_runtime_java1d.py",
+        "sha256": "d2865a900872e370c3a7b1e6918b5690f29a95cb85dff13765a33db421543c16"
+      },
+      {
+        "path": "tests/test_runtime_java1d_retry.py",
+        "sha256": "1b1d0ded59c634670d8e5f9b2dbf6c4cd0de9e4037ebe37317c48a209d774bb9"
+      },
+      {
+        "path": "tests/test_runtime_java_compat1.py",
+        "sha256": "7b6cf5aa66886da3db278c4266d9eaf601415fa447fcbe64b90fea0f71d5821e"
+      },
+      {
+        "path": "tests/test_runtime_java_discovery_contract1.py",
+        "sha256": "a425f35fa163b99dcf7e673d872b289b1142302c1fb720fc87d52dbb0bea80f5"
+      },
+      {
+        "path": "tests/test_runtime_java_discovery_diag1.py",
+        "sha256": "b4847c4b2201ee904c7e46201fa9cd5041e9d641c965948db834144443682084"
+      },
+      {
+        "path": "tests/test_runtime_java_pinned_backend_target_binding.py",
+        "sha256": "691566165526d3f00c70e35100f3df7a33fe28697fb44a86d7ca77c9de26ae91"
+      },
+      {
+        "path": "tests/test_runtime_java_pinned_target_archive.py",
+        "sha256": "faf07a98ef6b051f0c15e8a314981b921ca13b11a228fdda2358585139dcd833"
+      },
+      {
+        "path": "tests/test_runtime_java_pinned_target_inspection.py",
+        "sha256": "f0afd4229bb241f893aaf3b1f16d49914ba734e76ff15eae2e98fe0a82386c33"
+      },
+      {
+        "path": "tests/test_runtime_java_requirement_pinned1.py",
+        "sha256": "9d786697c0d957ca72ad4212fc4c9db563bbdeb9d831b7e8e41fb586da4c28cd"
+      },
+      {
+        "path": "tests/test_runtime_sandbox2.py",
+        "sha256": "b492f70ae45d6c3e4e09173e24b7b1396cae75fa9885edf4c4ff00815202e08c"
+      },
+      {
+        "path": "tests/test_runtime_sandbox_bind1.py",
+        "sha256": "6a09d0a928ab3b41e64f7fd26741d273d7dacc6b9ac659052afe50e920936ffc"
+      },
+      {
+        "path": "tests/test_synthetic_runtime_authorization.py",
+        "sha256": "9109efb7e070dcb3928da6d64e97418a87f6ee856bd9e0230004034fd089bc8b"
+      }
+    ],
+    "errors": [],
+    "passed": true,
+    "code_executed": false
+  },
+  "git_diff_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "warning: in the working copy of 'core/explicit_evidence.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/input_understanding.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/live_task_shape.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/oop_intent_session.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/oop_semantic_review.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/phase_registry.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/requirement_preservation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/semantic_waiter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/semantic_waiter_adapter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/task_contract.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/roadmap/phase_registry.json', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'main.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/_oop_intent_ui1_maintenance.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_input_understanding.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_phase_picker.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_phase_registry.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/app.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/oop_intent_adapter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/runner.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/session_presentation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/templates/index.html', LF will be replaced by CRLF the next time Git touches it\n"
+  },
+  "authored_whitespace_and_json": {
+    "files_checked": 20,
+    "whitespace_issues": [],
+    "json_errors": [],
+    "passed": true
+  },
+  "historical_preservation": {
+    "phase_id": "RUNTIME.JAVA.PINNED.1B",
+    "existing_files_checked": 1962,
+    "changed": [],
+    "missing": [],
+    "historical_preservation": true,
+    "historical_repins": false,
+    "registry_and_reversal_receipt_bytes_preserved": true,
+    "prior_historical_expectations": [
+      {
+        "manifest": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_PRESERVATION.json",
+        "preexisting_drift": [],
+        "after_drift": [],
+        "excluded_or_preexisting_missing_expectations": [
+          "debug.log",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1.md",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DESIGN_1.md",
+          "docs/roadmap/OOP_INTENT_DESIGN_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DETECT_2.md",
+          "docs/roadmap/OOP_INTENT_DETECT_2_BANK2.json",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1.md",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1_BANK2.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A.md",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A_SYNTHETIC.json",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1.md",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1.md",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1.md",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1.md",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1.md",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1.md",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1_BANK2.json",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1.md",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json",
+          "docs/roadmap/RUNTIME_JAVA_1.md",
+          "docs/roadmap/RUNTIME_JAVA_1A.md",
+          "docs/roadmap/RUNTIME_JAVA_1A_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1B.md",
+          "docs/roadmap/RUNTIME_JAVA_1B_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1C.md",
+          "docs/roadmap/RUNTIME_JAVA_1C_ATTEMPT1.json",
+          "docs/roadmap/RUNTIME_SANDBOX_1.md",
+          "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2.md",
+          "docs/roadmap/RUNTIME_SANDBOX_2_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_1.md",
+          "docs/roadmap/SYNTH_AUTH_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json",
+          "docs/roadmap/SYNTH_REFLECT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_PRESERVATION.json"
+        ],
+        "historical_drift_unchanged": true
+      },
+      {
+        "manifest": "docs/roadmap/phases/RUNTIME_JAVA_1D/RUNTIME_JAVA_1D_PRESERVATION.json",
+        "preexisting_drift": [],
+        "after_drift": [],
+        "excluded_or_preexisting_missing_expectations": [
+          "debug.log",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1.md",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DESIGN_1.md",
+          "docs/roadmap/OOP_INTENT_DESIGN_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DETECT_2.md",
+          "docs/roadmap/OOP_INTENT_DETECT_2_BANK2.json",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1.md",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1_BANK2.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_PRESERVATION.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A.md",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A_SYNTHETIC.json",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1.md",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1.md",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1.md",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1.md",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1.md",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1.md",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1_BANK2.json",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1.md",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json",
+          "docs/roadmap/RUNTIME_JAVA_1.md",
+          "docs/roadmap/RUNTIME_JAVA_1A.md",
+          "docs/roadmap/RUNTIME_JAVA_1A_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1B.md",
+          "docs/roadmap/RUNTIME_JAVA_1B_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1C.md",
+          "docs/roadmap/RUNTIME_JAVA_1C_ATTEMPT1.json",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1.md",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_SANDBOX_1.md",
+          "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2.md",
+          "docs/roadmap/RUNTIME_SANDBOX_2_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_1.md",
+          "docs/roadmap/SYNTH_AUTH_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json",
+          "docs/roadmap/SYNTH_REFLECT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_PRESERVATION.json"
+        ],
+        "historical_drift_unchanged": true
+      },
+      {
+        "manifest": "docs/roadmap/phases/RUNTIME_JAVA_1D/RUNTIME_JAVA_1D_RETRY_PRESERVATION.json",
+        "preexisting_drift": [],
+        "after_drift": [],
+        "excluded_or_preexisting_missing_expectations": [
+          "debug.log",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1.md",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DESIGN_1.md",
+          "docs/roadmap/OOP_INTENT_DESIGN_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DETECT_2.md",
+          "docs/roadmap/OOP_INTENT_DETECT_2_BANK2.json",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1.md",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1_BANK2.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_PRESERVATION.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A.md",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A_SYNTHETIC.json",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1.md",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1.md",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1.md",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1.md",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1.md",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1.md",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1_BANK2.json",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1.md",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json",
+          "docs/roadmap/RUNTIME_JAVA_1.md",
+          "docs/roadmap/RUNTIME_JAVA_1A.md",
+          "docs/roadmap/RUNTIME_JAVA_1A_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1B.md",
+          "docs/roadmap/RUNTIME_JAVA_1B_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1C.md",
+          "docs/roadmap/RUNTIME_JAVA_1C_ATTEMPT1.json",
+          "docs/roadmap/RUNTIME_JAVA_1D.md",
+          "docs/roadmap/RUNTIME_JAVA_1D_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1D_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1.md",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_SANDBOX_1.md",
+          "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2.md",
+          "docs/roadmap/RUNTIME_SANDBOX_2P.md",
+          "docs/roadmap/RUNTIME_SANDBOX_2P_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2P_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_BIND_1.md",
+          "docs/roadmap/RUNTIME_SANDBOX_BIND_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_BIND_1_PRESERVATION.json",
+          "docs/roadmap/SYNTH_AUTH_1.md",
+          "docs/roadmap/SYNTH_AUTH_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json",
+          "docs/roadmap/SYNTH_REFLECT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_PRESERVATION.json"
+        ],
+        "historical_drift_unchanged": true
+      },
+      {
+        "manifest": "docs/roadmap/phases/RUNTIME_JAVA_COMPAT_1/RUNTIME_JAVA_COMPAT_1_PRESERVATION.json",
+        "preexisting_drift": [],
+        "after_drift": [],
+        "excluded_or_preexisting_missing_expectations": [
+          "debug.log",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1.md",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DESIGN_1.md",
+          "docs/roadmap/OOP_INTENT_DESIGN_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DETECT_2.md",
+          "docs/roadmap/OOP_INTENT_DETECT_2_BANK2.json",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1.md",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1_BANK2.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_PRESERVATION.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A.md",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A_SYNTHETIC.json",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1.md",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1.md",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1.md",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1.md",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1.md",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1.md",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1_BANK2.json",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1.md",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json",
+          "docs/roadmap/RUNTIME_JAVA_1.md",
+          "docs/roadmap/RUNTIME_JAVA_1A.md",
+          "docs/roadmap/RUNTIME_JAVA_1A_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1B.md",
+          "docs/roadmap/RUNTIME_JAVA_1B_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1C.md",
+          "docs/roadmap/RUNTIME_JAVA_1C_ATTEMPT1.json",
+          "docs/roadmap/RUNTIME_SANDBOX_1.md",
+          "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2.md",
+          "docs/roadmap/RUNTIME_SANDBOX_2_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_1.md",
+          "docs/roadmap/SYNTH_AUTH_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json",
+          "docs/roadmap/SYNTH_REFLECT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_PRESERVATION.json"
+        ],
+        "historical_drift_unchanged": true
+      },
+      {
+        "manifest": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_CONTRACT_1/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_PRESERVATION.json",
+        "preexisting_drift": [],
+        "after_drift": [],
+        "excluded_or_preexisting_missing_expectations": [
+          "debug.log",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1.md",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DESIGN_1.md",
+          "docs/roadmap/OOP_INTENT_DESIGN_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DETECT_2.md",
+          "docs/roadmap/OOP_INTENT_DETECT_2_BANK2.json",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1.md",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1_BANK2.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_PRESERVATION.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A.md",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A_SYNTHETIC.json",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1.md",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1.md",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1.md",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1.md",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1.md",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1.md",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1_BANK2.json",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1.md",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json",
+          "docs/roadmap/RUNTIME_JAVA_1.md",
+          "docs/roadmap/RUNTIME_JAVA_1A.md",
+          "docs/roadmap/RUNTIME_JAVA_1A_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1B.md",
+          "docs/roadmap/RUNTIME_JAVA_1B_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1C.md",
+          "docs/roadmap/RUNTIME_JAVA_1C_ATTEMPT1.json",
+          "docs/roadmap/RUNTIME_JAVA_1D.md",
+          "docs/roadmap/RUNTIME_JAVA_1D_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1D_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_JAVA_1D_RETRY.md",
+          "docs/roadmap/RUNTIME_JAVA_1D_RETRY_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1D_RETRY_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1.md",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_JAVA_DISCOVERY_DIAG_1.md",
+          "docs/roadmap/RUNTIME_JAVA_DISCOVERY_DIAG_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_DISCOVERY_DIAG_1_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_SANDBOX_1.md",
+          "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2.md",
+          "docs/roadmap/RUNTIME_SANDBOX_2P.md",
+          "docs/roadmap/RUNTIME_SANDBOX_2P_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2P_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_BIND_1.md",
+          "docs/roadmap/RUNTIME_SANDBOX_BIND_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_BIND_1_PRESERVATION.json",
+          "docs/roadmap/SYNTH_AUTH_1.md",
+          "docs/roadmap/SYNTH_AUTH_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json",
+          "docs/roadmap/SYNTH_REFLECT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_PRESERVATION.json"
+        ],
+        "historical_drift_unchanged": true
+      },
+      {
+        "manifest": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_DIAG_1/RUNTIME_JAVA_DISCOVERY_DIAG_1_PRESERVATION.json",
+        "preexisting_drift": [],
+        "after_drift": [],
+        "excluded_or_preexisting_missing_expectations": [
+          "debug.log",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1.md",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DESIGN_1.md",
+          "docs/roadmap/OOP_INTENT_DESIGN_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DETECT_2.md",
+          "docs/roadmap/OOP_INTENT_DETECT_2_BANK2.json",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1.md",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1_BANK2.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_PRESERVATION.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A.md",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A_SYNTHETIC.json",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1.md",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1.md",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1.md",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1.md",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1.md",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1.md",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1_BANK2.json",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1.md",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json",
+          "docs/roadmap/RUNTIME_JAVA_1.md",
+          "docs/roadmap/RUNTIME_JAVA_1A.md",
+          "docs/roadmap/RUNTIME_JAVA_1A_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1B.md",
+          "docs/roadmap/RUNTIME_JAVA_1B_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1C.md",
+          "docs/roadmap/RUNTIME_JAVA_1C_ATTEMPT1.json",
+          "docs/roadmap/RUNTIME_JAVA_1D.md",
+          "docs/roadmap/RUNTIME_JAVA_1D_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1D_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_JAVA_1D_RETRY.md",
+          "docs/roadmap/RUNTIME_JAVA_1D_RETRY_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1D_RETRY_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1.md",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_COMPAT_1_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_SANDBOX_1.md",
+          "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2.md",
+          "docs/roadmap/RUNTIME_SANDBOX_2P.md",
+          "docs/roadmap/RUNTIME_SANDBOX_2P_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2P_PRESERVATION.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_BIND_1.md",
+          "docs/roadmap/RUNTIME_SANDBOX_BIND_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_BIND_1_PRESERVATION.json",
+          "docs/roadmap/SYNTH_AUTH_1.md",
+          "docs/roadmap/SYNTH_AUTH_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json",
+          "docs/roadmap/SYNTH_REFLECT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_PRESERVATION.json"
+        ],
+        "historical_drift_unchanged": true
+      },
+      {
+        "manifest": "docs/roadmap/phases/RUNTIME_SANDBOX_2P/RUNTIME_SANDBOX_2P_PRESERVATION.json",
+        "preexisting_drift": [],
+        "after_drift": [],
+        "excluded_or_preexisting_missing_expectations": [],
+        "historical_drift_unchanged": true
+      },
+      {
+        "manifest": "docs/roadmap/phases/RUNTIME_SANDBOX_BIND_1/RUNTIME_SANDBOX_BIND_1_PRESERVATION.json",
+        "preexisting_drift": [],
+        "after_drift": [],
+        "excluded_or_preexisting_missing_expectations": [],
+        "historical_drift_unchanged": true
+      },
+      {
+        "manifest": "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_1/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json",
+        "preexisting_drift": [],
+        "after_drift": [],
+        "excluded_or_preexisting_missing_expectations": [
+          "debug.log",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1.md",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DESIGN_1.md",
+          "docs/roadmap/OOP_INTENT_DESIGN_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DETECT_2.md",
+          "docs/roadmap/OOP_INTENT_DETECT_2_BANK2.json",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1.md",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1_BANK2.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A.md",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A_SYNTHETIC.json",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1.md",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1.md",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1.md",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1.md",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1.md",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1.md",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1_BANK2.json",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1.md",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json",
+          "docs/roadmap/RUNTIME_JAVA_1.md",
+          "docs/roadmap/RUNTIME_JAVA_1A.md",
+          "docs/roadmap/RUNTIME_JAVA_1A_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1B.md",
+          "docs/roadmap/RUNTIME_JAVA_1B_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1C.md",
+          "docs/roadmap/RUNTIME_JAVA_1C_ATTEMPT1.json",
+          "docs/roadmap/RUNTIME_SANDBOX_1.md",
+          "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2.md",
+          "docs/roadmap/RUNTIME_SANDBOX_2_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_1.md",
+          "docs/roadmap/SYNTH_AUTH_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1_LOCAL.json"
+        ],
+        "historical_drift_unchanged": true
+      },
+      {
+        "manifest": "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_1/SYNTH_REFLECT_LIFECYCLE_1_PRESERVATION.json",
+        "preexisting_drift": [],
+        "after_drift": [],
+        "excluded_or_preexisting_missing_expectations": [
+          "debug.log",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1.md",
+          "docs/roadmap/OOP_INTENT_CONTINUE_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DESIGN_1.md",
+          "docs/roadmap/OOP_INTENT_DESIGN_1_BANK2.json",
+          "docs/roadmap/OOP_INTENT_DETECT_2.md",
+          "docs/roadmap/OOP_INTENT_DETECT_2_BANK2.json",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1.md",
+          "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1_BANK2.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY_LOCAL.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1.md",
+          "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1_SYNTHETIC.json",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A.md",
+          "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A_SYNTHETIC.json",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1.md",
+          "docs/roadmap/PATCH_SCOPE_ADMIT_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1.md",
+          "docs/roadmap/PATCH_SCOPE_APPROVE_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1.md",
+          "docs/roadmap/PATCH_SCOPE_EXPAND_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1.md",
+          "docs/roadmap/PATCH_SCOPE_PLAN_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1.md",
+          "docs/roadmap/PATCH_SCOPE_RECHECK_1_BANK2.json",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1.md",
+          "docs/roadmap/PATCH_SCOPE_REFRESH_1_BANK2.json",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1.md",
+          "docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json",
+          "docs/roadmap/RUNTIME_JAVA_1.md",
+          "docs/roadmap/RUNTIME_JAVA_1A.md",
+          "docs/roadmap/RUNTIME_JAVA_1A_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1B.md",
+          "docs/roadmap/RUNTIME_JAVA_1B_LOCAL.json",
+          "docs/roadmap/RUNTIME_JAVA_1C.md",
+          "docs/roadmap/RUNTIME_JAVA_1C_ATTEMPT1.json",
+          "docs/roadmap/RUNTIME_SANDBOX_1.md",
+          "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json",
+          "docs/roadmap/RUNTIME_SANDBOX_2.md",
+          "docs/roadmap/RUNTIME_SANDBOX_2_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_1.md",
+          "docs/roadmap/SYNTH_AUTH_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1.md",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_LOCAL.json",
+          "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json",
+          "docs/roadmap/SYNTH_REFLECT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_1_LOCAL.json",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1.md",
+          "docs/roadmap/SYNTH_REFLECT_ADMIT_1_LOCAL.json"
+        ],
+        "historical_drift_unchanged": true
+      }
+    ],
+    "prior_drift_retained": true,
+    "allowed_additive_sources": [
+      "core/runtime_java_pinned_backend_target_binding.py",
+      "scripts/replay_runtime_java_pinned1b.py",
+      "tests/test_runtime_java_pinned_backend_target_binding.py"
+    ],
+    "allowed_artifact_directory": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B",
+    "note": "Compares against the beginning-of-task working tree, including unrelated edits. Older drift remains an observation and has not been repinned."
+  },
+  "preoperational_gates": {
+    "phase_id": "RUNTIME.JAVA.PINNED.1B",
+    "pure_gates_ready": true,
+    "checks": {
+      "focused_binding_tests_passed": true,
+      "frozen_semantic_regressions_passed": true,
+      "benchmark_structure_check_passed": true,
+      "registry_picker_has_no_new_failures": true,
+      "safety_code_compiles_in_memory": true,
+      "authored_whitespace_and_json_passed": true,
+      "git_diff_check_passed": true,
+      "historical_bytes_preserved": true
+    },
+    "focused_tests_passed": 152,
+    "frozen_tests_passed": 1048,
+    "in_memory_compilation": {
+      "files": [
+        {
+          "path": "core/candidate_runtime_sandbox.py",
+          "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+          "size_bytes": 34833
+        },
+        {
+          "path": "core/runtime_java_pinned_backend_target_binding.py",
+          "sha256": "94c95d674c0b43cde5811762998d13a65c3eee71c442cf05ff8699e02ec59da9",
+          "size_bytes": 34173
+        },
+        {
+          "path": "core/runtime_java_pinned_requirement.py",
+          "sha256": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1",
+          "size_bytes": 22597
+        },
+        {
+          "path": "core/runtime_java_pinned_target_archive.py",
+          "sha256": "d8693eabcfc2c8290cd0a4318a4edcce2d11b94a28ed8f8eddd82360b84afe2b",
+          "size_bytes": 13725
+        },
+        {
+          "path": "core/runtime_java_pinned_target_inspection.py",
+          "sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59",
+          "size_bytes": 28903
+        },
+        {
+          "path": "core/sandbox_backend_binding.py",
+          "sha256": "202cd1190494beaaf24874ac798b89a8eac276fa8361b496663a573770cdf1ed",
+          "size_bytes": 26216
+        },
+        {
+          "path": "core/sandboxed_java_capture_recovery.py",
+          "sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861",
+          "size_bytes": 12218
+        },
+        {
+          "path": "core/sandboxed_java_positive_probe.py",
+          "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+          "size_bytes": 7358
+        },
+        {
+          "path": "core/sandboxed_java_toolchain_discovery.py",
+          "sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff",
+          "size_bytes": 21386
+        },
+        {
+          "path": "core/thread_compatible_runtime_sandbox.py",
+          "sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+          "size_bytes": 22400
+        },
+        {
+          "path": "core/thread_compatible_runtime_sandbox_probe.py",
+          "sha256": "be45d3a0106186d84a0464234f701140df6e90e99107477af358886cf5568075",
+          "size_bytes": 7784
+        },
+        {
+          "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/check_preoperational_gates.py",
+          "sha256": "90f54da8d3a0bef4b13a385c456e24010a11a2964b049208dd939dd262dda2cb",
+          "size_bytes": 6212
+        },
+        {
+          "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/finalize_validation.py",
+          "sha256": "84f8d86019573808fb0f68bd834c5206a48c89f92a605ab846a326b14d840ce5",
+          "size_bytes": 9676
+        },
+        {
+          "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/pure_validation.py",
+          "sha256": "2c97a3b5a9cde42969abcb9e39fd669ef03d2181690f1e90aaa76c721e0bb4d2",
+          "size_bytes": 7050
+        },
+        {
+          "path": "scripts/replay_runtime_java_pinned1b.py",
+          "sha256": "3480fdec3677ebc9091293adb7db47c5b946f0ae79219c915719ef152c2188dd",
+          "size_bytes": 3963
+        },
+        {
+          "path": "tests/test_runtime_java_pinned_backend_target_binding.py",
+          "sha256": "691566165526d3f00c70e35100f3df7a33fe28697fb44a86d7ca77c9de26ae91",
+          "size_bytes": 27976
+        }
+      ],
+      "errors": [],
+      "code_executed": false
+    },
+    "artifact_checks": {
+      "files_checked": 17,
+      "whitespace_issues": [],
+      "json_errors": [],
+      "passed": true
+    },
+    "historical_files_checked": 1962,
+    "historical_files_changed": [],
+    "historical_files_missing": [],
+    "frozen_regression_assessment": {
+      "phase_id": "RUNTIME.JAVA.PINNED.1B",
+      "report_schema": "runtime_java_pinned_1b_frozen_regression_assessment_v1",
+      "raw_validation_artifact": "frozen_validation.json",
+      "raw_validation_sha256": "4bfdd8ec9c032e0affd825052c04acc593d7ca0dafcc849f682e0d32f22220eb",
+      "raw_exit_code_preserved": 1,
+      "collected": 1049,
+      "passed": 1048,
+      "skipped": 0,
+      "preexisting_bookkeeping_failure_count": 1,
+      "sole_maintenance_failure_id": "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+      "all_other_tests_passed": true,
+      "semantic_regressions_passed": true,
+      "classification_rule": "Only the exact separately preserved historical bookkeeping reversal failure may be classified as preexisting. Every other selected pure/blocked regression must pass, all preexisting baseline bytes must remain identical, and the failure must match initial-run evidence. No expected hash or historical file is updated.",
+      "historical_failure_trace": {
+        "test": "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+        "maintenance_helper": "tests/_patch_candidate_behavior_executor1_maintenance.py:9 -> tests/_runtime_sandbox1_maintenance.py:13",
+        "fixture": "tests/fixtures/runtime_sandbox1_reversal.json",
+        "fixture_record": {
+          "path": "docs/roadmap/phase_registry.json",
+          "entry_sha256": "a9b557bfc9fe33a8e1ef421a5da3675bc852073b870f8c845e075844deddc999",
+          "post_sha256": "33334b0eed9cf0bfc55bf7484abff0766ff5d9e2afff705cd4e65b4a01c8c87a"
+        },
+        "registry_path": "docs/roadmap/phase_registry.json",
+        "initial_registry_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+        "current_registry_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+        "historical_expected_post_sha256": "33334b0eed9cf0bfc55bf7484abff0766ff5d9e2afff705cd4e65b4a01c8c87a",
+        "historical_expectation_disagrees_with_initial_and_current": true,
+        "failure_present_in_initial_environment_run": true,
+        "initial_and_elevated_failure_details_identical": true
+      },
+      "affected_frozen_bytes": [
+        {
+          "path": "docs/roadmap/phase_registry.json",
+          "initial_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+          "after_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+          "bytes_unchanged": true
+        },
+        {
+          "path": "tests/fixtures/runtime_sandbox1_reversal.json",
+          "initial_sha256": "b93c55772993454a871cee0eb2baa232ef1c4979c347463e8ac8fef7b3d55c32",
+          "after_sha256": "b93c55772993454a871cee0eb2baa232ef1c4979c347463e8ac8fef7b3d55c32",
+          "bytes_unchanged": true
+        },
+        {
+          "path": "tests/fixtures/patch_candidate_behavior_executor1_reversal.json",
+          "initial_sha256": "429295d7b064163a293afea47188292d2fd8dfbd867be966e6441b1ae9fd4538",
+          "after_sha256": "429295d7b064163a293afea47188292d2fd8dfbd867be966e6441b1ae9fd4538",
+          "bytes_unchanged": true
+        },
+        {
+          "path": "tests/test_patch_candidate_behavior_executor1.py",
+          "initial_sha256": "b7870bce23c8d5080d4bf2fa962a42663c25657b1ab9161b529161cdfd14a238",
+          "after_sha256": "b7870bce23c8d5080d4bf2fa962a42663c25657b1ab9161b529161cdfd14a238",
+          "bytes_unchanged": true
+        },
+        {
+          "path": "tests/_patch_candidate_behavior_executor1_maintenance.py",
+          "initial_sha256": "f51c291c48626e8b8ea1b156512d1b199622f058fafef3bad1eefdf4a1beb522",
+          "after_sha256": "f51c291c48626e8b8ea1b156512d1b199622f058fafef3bad1eefdf4a1beb522",
+          "bytes_unchanged": true
+        },
+        {
+          "path": "tests/_runtime_sandbox1_maintenance.py",
+          "initial_sha256": "41e36924002812cd4a652f59f062ed51467f7f03b623968b14751db6d4d0fba7",
+          "after_sha256": "41e36924002812cd4a652f59f062ed51467f7f03b623968b14751db6d4d0fba7",
+          "bytes_unchanged": true
+        }
+      ],
+      "preservation_baseline_files_checked": 1962,
+      "all_preexisting_baseline_bytes_unchanged": true,
+      "changed_preexisting_files": [],
+      "missing_preexisting_files": [],
+      "historical_repins": false,
+      "execution_provenance": {
+        "command": "python -B docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/pure_validation.py frozen_validation",
+        "filesystem_permission": "require_escalated automatic approval accepted",
+        "reason": "Allow read-only directory metadata required by historical synthetic fixtures for Path.resolve(strict=True); normal Windows filesystem sandbox returns WinError 5.",
+        "initial_environment_failure_artifacts": [
+          "frozen_validation_initial_environment.json",
+          "frozen_validation_initial_environment.txt"
+        ],
+        "original_owner_and_test_files_changed": false,
+        "root_canonicalizer_patched": false,
+        "owner_validator_bypasses": false,
+        "process_network_runtime_denial_guard_active": true,
+        "guard_harness_sha256": "2c97a3b5a9cde42969abcb9e39fd669ef03d2181690f1e90aaa76c721e0bb4d2"
+      },
+      "real_effect_attempts": [],
+      "denied_attempts": {},
+      "successful_operational_effect_counts": {
+        "Docker": 0,
+        "containers": 0,
+        "exports": 0,
+        "Java": 0,
+        "javac": 0,
+        "controller": 0,
+        "network": 0,
+        "shell": 0,
+        "host mounts": 0,
+        "source projection": 0,
+        "runtime lease consumption": 0,
+        "reflection lease consumption": 0,
+        "BANK": 0,
+        "EXECUTOR.1R": 0,
+        "Apply": 0
+      },
+      "runtime_authority_issued": false,
+      "preexisting_bookkeeping_drift_verified": true,
+      "accepted_preexisting_failure_ids": [
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts"
+      ]
+    },
+    "operational_calls_performed_by_this_gate": 0,
+    "maintenance_effect_note": "Git whitespace checks and Python validation are host maintenance; no upstream owner is invoked here."
+  },
+  "single_live_attempt_artifact": "RUNTIME_JAVA_PINNED_1B_LOCAL.json",
+  "live_status": "RUNTIME_JAVA_PINNED_1B_COMPLETE",
+  "single_live_attempt": true,
+  "pure_validation_operational_effect_counts": {
+    "Docker": 0,
+    "containers": 0,
+    "exports": 0,
+    "Java": 0,
+    "javac": 0,
+    "Java_compilations": 0,
+    "network": 0,
+    "shell": 0,
+    "host_mounts": 0,
+    "source_projections": 0,
+    "runtime_lease_consumption": 0,
+    "reflection_lease_consumption": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0,
+    "JAVA.1C_invocations": 0
+  },
+  "maintenance_scope": "Repository reads and Python/Git validation/artifact writes are host maintenance. Frozen SANDBOX.2 infrastructure probes belong only to the separate live report.",
+  "passed": true
+}

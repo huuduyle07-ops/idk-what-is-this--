@@ -1,0 +1,248 @@
+{
+  "artifact_kind": "read_only_historical_symbolic_ledger_audit_and_owner_width_substitution",
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+  "historical_ledger": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1R/budget_witness.json",
+  "historical_source": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1R/proof.py",
+  "historical_reference_profile": "candidate_A_writer_lower_widths_class_5_digits",
+  "historical_proof_rerun": false,
+  "historical_files_modified": false,
+  "source_inspection_only": true,
+  "budget_cap_bytes": 8192,
+  "baseline": {
+    "owner_content_width_bytes": 1,
+    "owner_quoted_json_width_bytes": 3,
+    "materialize_response_bytes": 3251,
+    "compile_response_bytes": 4809,
+    "response_payload_total_bytes": 8060,
+    "candidate_A_response_framing_bytes": 8,
+    "conditional_candidate_A_framed_total_bytes": 8068,
+    "remaining_margin_bytes": 124,
+    "class_size_decimal_width": 5,
+    "class_size_occurrences_in_compile_response": 2,
+    "kernel_identity_widths": "historical unresolved lower placeholders retained exactly",
+    "container_and_generation_widths": "historical Candidate A conditional widths retained exactly",
+    "one_accounted_writer_per_response": true,
+    "two_potential_root_handles_per_writer": true
+  },
+  "response_identity_ledger": [
+    {
+      "identity_family": "workspace_capability_id",
+      "materialize_occurrences": 2,
+      "compile_occurrences": 2,
+      "total_occurrences": 4,
+      "paths_in_each_response": [
+        "/workspace_capability_id",
+        "/result/workspace_state/workspace_capability_id"
+      ],
+      "accepted_content_width_bytes": 17,
+      "delta_from_one_byte_relaxation_bytes": 64
+    },
+    {
+      "identity_family": "controller_identity",
+      "materialize_occurrences": 1,
+      "compile_occurrences": 1,
+      "total_occurrences": 2,
+      "paths_in_each_response": [
+        "/result/workspace_state/controller_identity"
+      ],
+      "accepted_content_width_bytes": 17,
+      "delta_from_one_byte_relaxation_bytes": 32
+    },
+    {
+      "identity_family": "exclusive_owner_relation_id",
+      "materialize_occurrences": 1,
+      "compile_occurrences": 1,
+      "total_occurrences": 2,
+      "paths_in_each_response": [
+        "/result/workspace_state/process_exclusivity_observation/exclusive_owner_relation_id"
+      ],
+      "accepted_content_width_bytes": 17,
+      "delta_from_one_byte_relaxation_bytes": 32
+    },
+    {
+      "identity_family": "writer.accounted_original_relation_id",
+      "materialize_occurrences": 1,
+      "compile_occurrences": 1,
+      "total_occurrences": 2,
+      "paths_in_each_response": [
+        "/result/workspace_state/process_exclusivity_observation/writers/0/accounted_original_relation_id"
+      ],
+      "symbolic_identity_alias": "exclusive_owner_relation_id",
+      "alias_rule": "This field reuses the authenticated original exclusive owner relation identity; it is not a separately generated ID.",
+      "accepted_content_width_bytes": 17,
+      "delta_from_one_byte_relaxation_bytes": 32
+    },
+    {
+      "identity_family": "admission_relation_id",
+      "materialize_occurrences": 0,
+      "compile_occurrences": 0,
+      "total_occurrences": 0,
+      "paths_in_each_response": [],
+      "request_occurrences": 2,
+      "absence_rule": "Present once in each effect request and absent from the complete successful response envelope and result.",
+      "accepted_content_width_bytes": 17,
+      "delta_from_one_byte_relaxation_bytes": 0
+    },
+    {
+      "identity_family": "preparation_attempt_id",
+      "materialize_occurrences": 1,
+      "compile_occurrences": 1,
+      "total_occurrences": 2,
+      "paths_in_each_response": [
+        "/result/preparation_attempt_id"
+      ],
+      "accepted_content_width_bytes": 17,
+      "delta_from_one_byte_relaxation_bytes": 32
+    },
+    {
+      "identity_family": "request_id",
+      "materialize_occurrences": 1,
+      "compile_occurrences": 1,
+      "total_occurrences": 2,
+      "paths_in_each_response": [
+        "/request_id"
+      ],
+      "distinct_exchange_symbols": ["request_id.materialize", "request_id.compile"],
+      "accepted_content_width_bytes": 17,
+      "delta_from_one_byte_relaxation_bytes": 32
+    },
+    {
+      "identity_family": "operation_id",
+      "materialize_occurrences": 1,
+      "compile_occurrences": 1,
+      "total_occurrences": 2,
+      "paths_in_each_response": [
+        "/operation_id"
+      ],
+      "distinct_exchange_symbols": ["operation_id.materialize", "operation_id.compile"],
+      "accepted_content_width_bytes": 17,
+      "delta_from_one_byte_relaxation_bytes": 32
+    },
+    {
+      "identity_family": "deadline_identity",
+      "materialize_occurrences": 0,
+      "compile_occurrences": 1,
+      "total_occurrences": 1,
+      "paths_in_compile_response": [
+        "/result/capture_and_reap/deadline_identity"
+      ],
+      "accepted_content_width_bytes": 17,
+      "delta_from_one_byte_relaxation_bytes": 16
+    }
+  ],
+  "nullable_identity_fields": [
+    {
+      "identity_family": "process.admitted_operation_id",
+      "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/processes/0/admitted_operation_id",
+      "null_occurrences_per_response": 1,
+      "nonnull_occurrences_in_budget_reference": 0,
+      "nonnull_content_width_bytes": 17,
+      "budget_delta_bytes": 0
+    },
+    {
+      "identity_family": "writer_handle.admitted_operation_id",
+      "paths_in_each_response": [
+        "/result/workspace_state/process_exclusivity_observation/writers/0/handles/0/admitted_operation_id",
+        "/result/workspace_state/process_exclusivity_observation/writers/0/handles/1/admitted_operation_id"
+      ],
+      "null_occurrences_per_response": 2,
+      "nonnull_occurrences_in_budget_reference": 0,
+      "nonnull_content_width_bytes": 17,
+      "budget_delta_bytes": 0
+    },
+    {
+      "identity_family": "active_operation_id",
+      "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/active_operation_id",
+      "null_occurrences_per_response": 1,
+      "nonnull_occurrences_in_budget_reference": 0,
+      "nonnull_content_width_bytes": 17,
+      "budget_delta_bytes": 0
+    },
+    {
+      "identity_family": "authorized_borrower_relation_id",
+      "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/authorized_borrower_relation_id",
+      "null_occurrences_per_response": 1,
+      "nonnull_encoding_selected": false,
+      "budget_delta_bytes": 0
+    },
+    {
+      "identity_family": "handoff_identity",
+      "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/handoff_identity",
+      "null_occurrences_per_response": 1,
+      "nonnull_encoding_selected": false,
+      "budget_delta_bytes": 0
+    }
+  ],
+  "counts": {
+    "materialize_nonnull_owner_id_occurrences": 8,
+    "compile_nonnull_owner_id_occurrences": 9,
+    "total_nonnull_owner_id_occurrences": 17,
+    "truthful_null_identity_occurrences_per_response": 6,
+    "truthful_null_identity_occurrences_both_responses": 12,
+    "distinct_symbolic_owner_ids_across_responses": 9,
+    "request_bytes_added_to_candidate_A_stdout_budget": 0
+  },
+  "substitution_formula": {
+    "width_definition": "Every w is ASCII content bytes; canonical JSON quotes add two bytes both before and after substitution, so per occurrence delta is w-1.",
+    "materialize": "3251 + 2*(w_workspace-1) + (w_controller-1) + 2*(w_exclusive-1) + (w_attempt-1) + (w_request_materialize-1) + (w_operation_materialize-1)",
+    "compile": "4809 + 2*(w_workspace-1) + (w_controller-1) + 2*(w_exclusive-1) + (w_attempt-1) + (w_request_compile-1) + (w_operation_compile-1) + (w_deadline-1)",
+    "candidate_A_framed_total": "8068 + 4*(w_workspace-1) + 2*(w_controller-1) + 4*(w_exclusive-1) + 2*(w_attempt-1) + (w_request_materialize-1) + (w_request_compile-1) + (w_operation_materialize-1) + (w_operation_compile-1) + (w_deadline-1)",
+    "same_width_all_nonnull_ids": "8068 + 17*(w-1)",
+    "different_class_size_decimal_width_d": "Subtract 2*(5-d) from compile response and framed total, for d in 1..5."
+  },
+  "accepted_width_substitution": {
+    "encoding_content_bytes": 17,
+    "canonical_quoted_json_bytes": 19,
+    "per_occurrence_delta_bytes": 16,
+    "materialize_delta_bytes": 128,
+    "compile_delta_bytes": 144,
+    "total_delta_bytes": 272,
+    "conditional_materialize_response_bytes": 3379,
+    "conditional_compile_response_bytes": 4953,
+    "conditional_response_payload_total_bytes": 8332,
+    "conditional_candidate_A_framed_total_bytes": 8340,
+    "remaining_margin_bytes": -148,
+    "excess_bytes": 148,
+    "status": "OWNER_ENCODING_ALONE_EXCEEDS_8192_FOR_CANDIDATE_A",
+    "result_kind": "CONDITIONAL_OWNER_WIDTH_CONSEQUENCE_ONLY",
+    "candidate_A_selected": false,
+    "full_budget_feasibility_result": "UNRESOLVED",
+    "physical_transport_feasibility_result": "UNRESOLVED",
+    "does_not_resolve_kernel_identity_encodings": true,
+    "does_not_establish_attainable_execution_witness": true,
+    "minimum_class_width_conditional_framed_total_bytes": 8332
+  },
+  "independent_check_expectations": {
+    "ledger_leaf_count_matches_historical_sensitivity": 17,
+    "materialize_and_compile_counts_sum": "8+9=17",
+    "all_one_byte_substitution_recovers_baseline": 8068,
+    "all_32_byte_substitution_recovers_historical_sensitivity": 8595,
+    "all_64_byte_substitution_recovers_historical_sensitivity": 9139,
+    "changing_admission_width_does_not_change_response_budget": true,
+    "changing_request_width_affects_exactly_two_response_occurrences": true,
+    "changing_operation_width_affects_exactly_two_response_occurrences": true,
+    "changing_exclusive_width_affects_four_occurrences_including_writer_aliases": true,
+    "null_values_remain_four_byte_json_literals": true,
+    "quoted_width_increment_equals_content_width_increment_for_ascii": true,
+    "no_import_or_execution_of_historical_proof_required": true
+  },
+  "authority_flags": {
+    "owner_implementation": false,
+    "identity_generator_implementation": false,
+    "transport_selection": false,
+    "workspace_issuance": false,
+    "capability_issuance": false,
+    "source_materialization": false,
+    "scenario_compilation": false,
+    "runtime_activation": false
+  },
+  "operational_effects": {
+    "Docker": 0,
+    "process_runtime": 0,
+    "network": 0,
+    "owner_import": 0,
+    "live_owner_issuance": 0,
+    "historical_proof_execution": 0,
+    "kernel_inspection": 0
+  }
+}

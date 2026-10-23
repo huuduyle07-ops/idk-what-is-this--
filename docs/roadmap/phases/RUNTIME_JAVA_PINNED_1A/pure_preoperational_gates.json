@@ -1,0 +1,93 @@
+{
+  "phase_id": "RUNTIME.JAVA.PINNED.1A",
+  "pure_gates_ready": true,
+  "checks": {
+    "focused_new_target_tests_passed": true,
+    "frozen_pure_regressions_passed": true,
+    "benchmark_structure_check_passed": true,
+    "registry_picker_has_no_new_failures": true,
+    "safety_code_compiles_in_memory": true,
+    "authored_whitespace_passed": true,
+    "git_diff_check_passed": true
+  },
+  "focused_tests_passed": 163,
+  "frozen_tests_passed": 735,
+  "in_memory_compilation": {
+    "files": [
+      {
+        "path": "core/runtime_java_pinned_target_inspection.py",
+        "sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59",
+        "size_bytes": 28903
+      },
+      {
+        "path": "core/runtime_java_pinned_target_archive.py",
+        "sha256": "d8693eabcfc2c8290cd0a4318a4edcce2d11b94a28ed8f8eddd82360b84afe2b",
+        "size_bytes": 13725
+      },
+      {
+        "path": "scripts/replay_runtime_java_pinned1a.py",
+        "sha256": "286232723d8f3d42597fdfc9c2b7a219f655a4b44b099a1ec7afe9adebfb3bd1",
+        "size_bytes": 5704
+      },
+      {
+        "path": "tests/test_runtime_java_pinned_target_inspection.py",
+        "sha256": "f0afd4229bb241f893aaf3b1f16d49914ba734e76ff15eae2e98fe0a82386c33",
+        "size_bytes": 23918
+      },
+      {
+        "path": "tests/test_runtime_java_pinned_target_archive.py",
+        "sha256": "faf07a98ef6b051f0c15e8a314981b921ca13b11a228fdda2358585139dcd833",
+        "size_bytes": 20785
+      },
+      {
+        "path": "core/runtime_java_pinned_requirement.py",
+        "sha256": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1",
+        "size_bytes": 22597
+      },
+      {
+        "path": "core/sandboxed_java_toolchain_discovery.py",
+        "sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff",
+        "size_bytes": 21386
+      },
+      {
+        "path": "core/candidate_runtime_sandbox.py",
+        "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+        "size_bytes": 34833
+      },
+      {
+        "path": "core/sandboxed_java_positive_probe.py",
+        "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+        "size_bytes": 7358
+      }
+    ],
+    "errors": [],
+    "code_executed": false
+  },
+  "preoperational_artifact_whitespace": {
+    "checked_files": [
+      "core/runtime_java_pinned_target_inspection.py",
+      "core/runtime_java_pinned_target_archive.py",
+      "scripts/replay_runtime_java_pinned1a.py",
+      "tests/test_runtime_java_pinned_target_inspection.py",
+      "tests/test_runtime_java_pinned_target_archive.py",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/benchmark_check.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/check_preoperational_gates.py",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/finalize_validation.py",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/frozen_after.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/frozen_baseline.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/git_diff_check.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/new_target_inspection.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/preoperational_artifact_checks.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/preservation_baseline.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/pure_preoperational_gates.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/README.md",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/registry_after.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/registry_baseline.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/validate_pure_phase.py"
+    ],
+    "issues": [],
+    "passed": true
+  },
+  "operational_calls_performed_by_this_gate": 0,
+  "note": "Gate only records pure test, benchmark and compile results. Root owns the separately authorized single exact-target operational proof; no inspection, Docker or execution occurs here."
+}

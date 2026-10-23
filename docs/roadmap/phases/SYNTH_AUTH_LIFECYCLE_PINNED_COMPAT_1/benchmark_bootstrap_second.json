@@ -1,0 +1,18 @@
+{
+  "audit_guard": {
+    "live_verification_or_execution_attempts": 0,
+    "network_attempts": 1,
+    "owner_issuance_or_consumption_attempts": 0,
+    "process_attempts": 0,
+    "repository_write_attempts": 0
+  },
+  "blocked_actions": [
+    "socket.bind"
+  ],
+  "exit_code": 0,
+  "external_pytest_directory": "C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{b9f776ef-4285-4dc4-8733-e61d5c407db8}\\AC\\Temp\\cattus-pinned-lifecycle-audit-zb4eulb0",
+  "full_frozen_suites_run": false,
+  "live_registry_fixtures_seeded": false,
+  "mode": "benchmark",
+  "production_validators_patched": false
+}

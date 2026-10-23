@@ -1,0 +1,1238 @@
+{
+  "apply_authority": false,
+  "attested_artifact_version": "Temurin 26.0.2.1+1 supplied provenance; compiler/runtime version calls did not complete",
+  "author_calls": 0,
+  "bank_execution_count": 0,
+  "behavioral_scenario_count": 0,
+  "console_count": 0,
+  "descriptor": {
+    "apply_authority": false,
+    "architecture": "amd64",
+    "available": true,
+    "class_output_projection_supported": false,
+    "compile_invocation_identity": "35691118b6126615aae22f5ccddb7dc991ced0d23d4c5df0837c320be4f8064b",
+    "compiler_version": "",
+    "invocation_surface": "fixed_phase_owned_source_javac_and_standalone_main_only",
+    "java_artifact_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "java_descriptor_fingerprint": "5f738cee049f10972bf25800f027ddb5360bb98ae47931c3b0598d8556c74da5",
+    "java_executable_identity": "/opt/temurin-26.0.2.1/bin/java@sha256:a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+    "java_runtime_available": true,
+    "javac_available": true,
+    "javac_executable_identity": "/opt/temurin-26.0.2.1/bin/javac@sha256:e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+    "os": "linux",
+    "phase_id": "RUNTIME.JAVA.1",
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "runtime_invocation_identity": "67873f1fd2b8f83d3c75bdfb8a5c615c4359efa85372872573f8995757738cab",
+    "runtime_version": "",
+    "sandbox_compatibility": false,
+    "sandbox_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+    "sandbox_verification_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+    "schema_version": "runtime_java_1_v1",
+    "source_projection_supported": false,
+    "verification_receipt_fingerprint": "6d9121d1f3e84b4ed47c704bbf674d70322b4035c9afaa3ff39e7c38f52ffab3",
+    "verified": false
+  },
+  "downloads": 0,
+  "executor_java_requirements_satisfied": false,
+  "executor_refreshed_or_resumed": false,
+  "explicit_artifact_selection": {
+    "image": {
+      "architecture": "amd64",
+      "cleanup_verified": true,
+      "image_declared_volumes": [],
+      "image_environment": [
+        "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "LANG=C.UTF-8",
+        "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+        "PYTHON_VERSION=3.12.13",
+        "PYTHON_SHA256=c08bc65a81971c1dd5783182826503369466c7e67374d1646519adf05207b684"
+      ],
+      "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+      "image_size_bytes": 188948499,
+      "image_user": "65534:65534",
+      "os": "linux",
+      "reason": "exact_local_elf_toolchain_and_controller_present",
+      "repo_digests": [
+        "cattus-java26-offline@sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a"
+      ],
+      "status": "local_java_toolchain_present",
+      "toolchains": [
+        {
+          "controller_path": "/usr/local/bin/python",
+          "controller_sha256": "0e6475dfda68a9b2d93501449fc47593ca169010e8f4881577b97463fd0c1263",
+          "java_path": "/opt/temurin-26.0.2.1/bin/java",
+          "java_sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+          "javac_path": "/opt/temurin-26.0.2.1/bin/javac",
+          "javac_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023"
+        }
+      ],
+      "variant": ""
+    },
+    "image_and_hashes_verified_before_java": true,
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "java_sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+    "javac_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+    "jdk_root": "/opt/temurin-26.0.2.1",
+    "sole_eligible_toolchain_in_measured_inventory": true,
+    "toolchain": {
+      "controller_path": "/usr/local/bin/python",
+      "controller_sha256": "0e6475dfda68a9b2d93501449fc47593ca169010e8f4881577b97463fd0c1263",
+      "java_path": "/opt/temurin-26.0.2.1/bin/java",
+      "java_sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+      "javac_path": "/opt/temurin-26.0.2.1/bin/javac",
+      "javac_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023"
+    }
+  },
+  "final_teardown": {
+    "control_exit_code": 0,
+    "control_status": "sandbox_completed",
+    "persistent_runtime_source_or_class_outputs": 0,
+    "remaining_phase_containers": 0
+  },
+  "first_remaining_blocker": "sandbox_java_incompatible:sandbox_completed",
+  "host_java_fallback": false,
+  "image_builds": 0,
+  "image_pulls": 0,
+  "installations": 0,
+  "java_candidate_execution_count": 0,
+  "live_repetitions": 1,
+  "measured_failure": {
+    "bounded_capture_protocol_completed": false,
+    "compilation_reached": false,
+    "completed_version_stages": 0,
+    "controller_diagnostic": "RuntimeError: can't start new thread",
+    "first_stage_identified_from_unchanged_controller_traceback": true,
+    "invocation": [
+      "/opt/temurin-26.0.2.1/bin/javac",
+      "-version"
+    ],
+    "probe_jvm_execution_reached": false,
+    "receipt_launch_counts": "unknown (null); do not replace with zero",
+    "specific_denied_syscall_diagnosed": false,
+    "stage": "javac_identity"
+  },
+  "model_calls": 0,
+  "net_verifier_or_test_source_changes": false,
+  "operational_diagnostics": {
+    "bounded_control_stderr": "Traceback (most recent call last):\n  File \"<string>\", line 90, in <module>\n  File \"<string>\", line 73, in execute\n  File \"<string>\", line 41, in run\n  File \"/usr/local/lib/python3.12/threading.py\", line 994, in start\n    _start_new_thread(self._bootstrap, ())\nRuntimeError: can't start new thread\n",
+    "capture_status": "sandbox_completed",
+    "compile_diagnostics": "",
+    "reason": "sandbox_java_incompatible:sandbox_completed",
+    "sandbox_binding_authenticated": true,
+    "sandbox_verified": true,
+    "selected_image_size_bytes": 188948499
+  },
+  "performance_seconds": {
+    "artifact_discovery_seconds": 51.52865719993133,
+    "image_boundary_verification_seconds": 42.07354040001519,
+    "java_seconds": 0.0,
+    "javac_seconds": 0.0,
+    "sandbox_startup_seconds": 2.2136928000254557,
+    "source_projection_seconds": 0.0,
+    "teardown_seconds": 2.653942200005986,
+    "toolchain_identity_seconds": 0.0,
+    "total_seconds": 99.67329219996464
+  },
+  "persistent_footprint": {
+    "new_images_bytes": 0,
+    "new_workers_or_services": 0,
+    "persistent_source_or_class_outputs": 0,
+    "selected_existing_image_size_bytes": 188948499
+  },
+  "phase_id": "RUNTIME.JAVA.1",
+  "prelaunch_pin_discovery_seconds": 67.11376330000348,
+  "previous_phase_report": {
+    "apply_authority": false,
+    "author_calls": 0,
+    "bank_execution_count": 0,
+    "behavioral_scenario_count": 0,
+    "console_count": 0,
+    "descriptor": {
+      "apply_authority": false,
+      "architecture": "",
+      "available": false,
+      "class_output_projection_supported": false,
+      "compile_invocation_identity": "",
+      "compiler_version": "",
+      "invocation_surface": "fixed_phase_owned_source_javac_and_standalone_main_only",
+      "java_artifact_identity": "",
+      "java_descriptor_fingerprint": "ec5e96e5e1102a739c8a2d150aa8ebc5ebf27f36f4c11d55d57748dc9893b6b2",
+      "java_executable_identity": "",
+      "java_runtime_available": false,
+      "javac_available": false,
+      "javac_executable_identity": "",
+      "os": "",
+      "phase_id": "RUNTIME.JAVA.1",
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "runtime_invocation_identity": "",
+      "runtime_version": "",
+      "sandbox_compatibility": false,
+      "sandbox_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+      "sandbox_verification_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+      "schema_version": "runtime_java_1_v1",
+      "source_projection_supported": false,
+      "verification_receipt_fingerprint": "b49404378c2bfeb21fac6916db138f74d042dc7da737d965b8871120b13bf375",
+      "verified": false
+    },
+    "determinism_measured_repetitions": 2,
+    "determinism_scope": "same sandbox/artifact/source/compiler/runtime/canonical results; excludes timing/temp/container IDs",
+    "deterministic": true,
+    "discovery_sources": [
+      "fixed_local_docker_image_inventory_including_untagged_images",
+      "immutable_local_image_inspect",
+      "bounded_stopped_container_filesystem_export"
+    ],
+    "downloads": 0,
+    "executor_java_requirements_satisfied": false,
+    "executor_refreshed_or_resumed": false,
+    "first_remaining_blocker": "no_suitable_local_java_artifact",
+    "host_java_fallback": false,
+    "image_pulls": 0,
+    "installations": 0,
+    "java_candidate_execution_count": 0,
+    "local_java_artifact_available": false,
+    "maven_or_gradle": false,
+    "model_calls": 0,
+    "offline_artifact_route": "none_explicitly_supplied_or_configured; no_host_disk_search",
+    "operational_diagnostics": {
+      "bounded_control_stderr": "",
+      "capture_status": "not_executed",
+      "compile_diagnostics": "",
+      "reason": "no_suitable_local_java_artifact",
+      "sandbox_binding_authenticated": true,
+      "sandbox_verified": true,
+      "selected_image_size_bytes": 0
+    },
+    "performance": {
+      "artifact_discovery_seconds": {
+        "max_ms": 49355.506,
+        "median_ms": 44360.007
+      },
+      "image_boundary_verification_seconds": {
+        "max_ms": 0.0,
+        "median_ms": 0.0
+      },
+      "java_seconds": {
+        "max_ms": 0.0,
+        "median_ms": 0.0
+      },
+      "javac_seconds": {
+        "max_ms": 0.0,
+        "median_ms": 0.0
+      },
+      "sandbox_startup_seconds": {
+        "max_ms": 0.0,
+        "median_ms": 0.0
+      },
+      "source_projection_seconds": {
+        "max_ms": 0.0,
+        "median_ms": 0.0
+      },
+      "teardown_seconds": {
+        "max_ms": 0.0,
+        "median_ms": 0.0
+      },
+      "toolchain_identity_seconds": {
+        "max_ms": 0.0,
+        "median_ms": 0.0
+      },
+      "total_seconds": {
+        "max_ms": 49359.826,
+        "median_ms": 44364.466
+      }
+    },
+    "persistent_footprint": {
+      "existing_inventory_image_size_bytes": 368450066,
+      "existing_process_snapshot": {
+        "aggregate_working_set_bytes": 1566265344.0,
+        "phase_added_persistent_processes": 0,
+        "process_count": 10,
+        "processes": [
+          {
+            "ProcessName": "com.docker.backend",
+            "WorkingSet64": 24522752
+          },
+          {
+            "ProcessName": "com.docker.backend",
+            "WorkingSet64": 131870720
+          },
+          {
+            "ProcessName": "Docker Desktop",
+            "WorkingSet64": 11657216
+          },
+          {
+            "ProcessName": "Docker Desktop",
+            "WorkingSet64": 55058432
+          },
+          {
+            "ProcessName": "Docker Desktop",
+            "WorkingSet64": 3334144
+          },
+          {
+            "ProcessName": "Docker Desktop",
+            "WorkingSet64": 11513856
+          },
+          {
+            "ProcessName": "Docker Desktop",
+            "WorkingSet64": 2318336
+          },
+          {
+            "ProcessName": "vmcompute",
+            "WorkingSet64": 7282688
+          },
+          {
+            "ProcessName": "vmmemWSL",
+            "WorkingSet64": 1306079232
+          },
+          {
+            "ProcessName": "wslservice",
+            "WorkingSet64": 12627968
+          }
+        ],
+        "scope": "preexisting matching Docker/WSL process snapshot, not exclusively attributed to this phase"
+      },
+      "new_images_bytes": 0,
+      "new_workers_or_services": 0,
+      "persistent_source_or_class_outputs": 0,
+      "scope": "image inspect logical sizes; existing Docker/WSL cost measured separately"
+    },
+    "phase_id": "RUNTIME.JAVA.1",
+    "plain_subprocess_candidate_fallback": false,
+    "product_source_projected": false,
+    "reflection_count": 0,
+    "remote_registry_discovery": false,
+    "report_only": true,
+    "repository_traversals": 0,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "runtime_policy_authorizations_consumed": 0,
+    "sandbox_authentication": {
+      "descriptor": {
+        "apply_authority": false,
+        "arbitrary_command_authority": false,
+        "available": true,
+        "backend_identity": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+        "backend_kind": "docker_linux_local",
+        "backend_version": "29.6.1",
+        "child_process_policy": "descendants_confined_to_private_namespaces_and_cgroup_then_destroyed",
+        "child_process_policy_enforced": true,
+        "enforced_requirements": [
+          "ephemeral_working_directory",
+          "fixed_executable_and_arguments",
+          "exact_source_and_classpath",
+          "hard_wall_clock_timeout",
+          "hard_stdout_stderr_bounds",
+          "all_child_process_cleanup",
+          "no_persistent_diagnostic_artifacts",
+          "candidate_filesystem_isolation",
+          "candidate_network_isolation",
+          "candidate_environment_isolation",
+          "candidate_extra_process_prevention"
+        ],
+        "environment_isolation_enforced": true,
+        "host_filesystem_isolation_enforced": true,
+        "image_identity": "sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+        "network_isolation_enforced": true,
+        "persistent_artifact_policy_enforced": true,
+        "phase_id": "RUNTIME.SANDBOX.1",
+        "process_tree_cleanup_enforced": true,
+        "repository_write_authority": false,
+        "runtime_authority": false,
+        "sandbox_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+        "schema_version": "runtime_sandbox_1_v1",
+        "shell_available": false,
+        "stderr_bound_enforced": true,
+        "stdout_bound_enforced": true,
+        "supported_host_platform": "Windows-AMD64",
+        "timeout_enforced": true,
+        "verification_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+        "verified": true,
+        "workspace_filesystem_policy": "ephemeral_tmpfs_exact_inputs_only"
+      },
+      "historical_receipt_modified": false,
+      "operational_diagnostics": {
+        "boundary": {
+          "cleanup_verified": true,
+          "control_stderr": "",
+          "deadline_triggered": false,
+          "measured_confirmed_termination_ms": null,
+          "measured_probe_and_teardown_seconds": 6.11942140001338,
+          "requested_timeout_ms": 5000,
+          "status": "sandbox_completed",
+          "supervisor_abort_trigger_ms": 5000,
+          "termination_verified": false,
+          "termination_within_requested_deadline": true
+        },
+        "descendant": {
+          "cleanup_verified": true,
+          "control_stderr": "",
+          "deadline_triggered": false,
+          "measured_confirmed_termination_ms": null,
+          "measured_probe_and_teardown_seconds": 6.266088199976366,
+          "requested_timeout_ms": 5000,
+          "status": "sandbox_completed",
+          "supervisor_abort_trigger_ms": 5000,
+          "termination_verified": false,
+          "termination_within_requested_deadline": true
+        },
+        "stderr": {
+          "cleanup_verified": true,
+          "control_stderr": "",
+          "deadline_triggered": false,
+          "measured_confirmed_termination_ms": 2990.9212000202388,
+          "measured_probe_and_teardown_seconds": 7.457973799959291,
+          "requested_timeout_ms": 5000,
+          "status": "sandbox_output_limit_exceeded",
+          "supervisor_abort_trigger_ms": 5000,
+          "termination_verified": true,
+          "termination_within_requested_deadline": true
+        },
+        "stdout": {
+          "cleanup_verified": true,
+          "control_stderr": "",
+          "deadline_triggered": false,
+          "measured_confirmed_termination_ms": 3417.310799995903,
+          "measured_probe_and_teardown_seconds": 7.9332352000055835,
+          "requested_timeout_ms": 5000,
+          "status": "sandbox_output_limit_exceeded",
+          "supervisor_abort_trigger_ms": 5000,
+          "termination_verified": true,
+          "termination_within_requested_deadline": true
+        },
+        "timeout": {
+          "cleanup_verified": true,
+          "control_stderr": "",
+          "deadline_triggered": true,
+          "measured_confirmed_termination_ms": 6769.676399999298,
+          "measured_probe_and_teardown_seconds": 11.315648599993438,
+          "requested_timeout_ms": 10000,
+          "status": "sandbox_timeout",
+          "supervisor_abort_trigger_ms": 5000,
+          "termination_verified": true,
+          "termination_within_requested_deadline": true
+        }
+      },
+      "performance": {
+        "backend_availability_seconds": 1.796911200042814,
+        "descendant_seconds": 6.266091700003017,
+        "environment_seconds": 6.119425699987914,
+        "filesystem_seconds": 6.119425699987914,
+        "network_seconds": 6.119425699987914,
+        "probe_execution_seconds": 16.026427499949932,
+        "sandbox_startup_seconds": 9.661860400054138,
+        "stderr_seconds": 7.4579772999859415,
+        "stdout_seconds": 7.933239999983925,
+        "teardown_seconds": 13.400139600038528,
+        "timeout_seconds": 11.315651700017042,
+        "total_seconds": 40.90502420003759
+      },
+      "seconds": 40.90920170000754,
+      "status": "RUNTIME_SANDBOX_1_COMPLETE_WITH_WARNINGS",
+      "verification_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9"
+    },
+    "sandbox_requirements_weakened": false,
+    "semantic_fingerprints": [
+      "b49404378c2bfeb21fac6916db138f74d042dc7da737d965b8871120b13bf375",
+      "b49404378c2bfeb21fac6916db138f74d042dc7da737d965b8871120b13bf375"
+    ],
+    "source_mutation_count": 0,
+    "status": "RUNTIME_JAVA_1_BLOCKED_TOOLCHAIN_UNAVAILABLE",
+    "total_replay_seconds_including_authentication": 129.64643610001076,
+    "validation": {
+      "adjacent_executor_preflight": {
+        "node_ids": [
+          "tests/test_patch_candidate_behavior_executor1.py::test_descriptor_truthfully_declares_required_isolation_unavailable",
+          "tests/test_patch_candidate_behavior_executor1.py::test_exact_synthetic_authority_reaches_only_capability_incomplete_boundary[successful_transfer]",
+          "tests/test_patch_candidate_behavior_executor1.py::test_real_BANK_without_operational_runtime_authority_is_authenticated_negative",
+          "tests/test_patch_candidate_behavior_executor1.py::test_unsigned_or_tampered_execution_receipt_never_authenticates[signature]",
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+          "tests/test_preflight_runtime1.py::test_BANK_without_runtime_source_preserves_frozen_negative_authority",
+          "tests/test_preflight_runtime1.py::test_caller_JSON_approval_is_never_an_authenticated_source[explicit_human_runtime_authorization]",
+          "tests/test_preflight_runtime1.py::test_mandatory_effect_prohibition_cannot_be_removed[arbitrary_environment_inspection_forbidden]",
+          "tests/test_preflight_runtime1.py::test_false_authorities_and_unavailable_execution_cannot_be_escalated[apply_authority]",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts"
+        ],
+        "passed": 10,
+        "scope": "effect-denied pure blocked/authenticity/authority/history regressions",
+        "seconds": 200.4
+      },
+      "authority_apply_path": {
+        "modules": [
+          "tests/test_human_apply_authorization.py",
+          "tests/test_executor_single_file_path.py",
+          "tests/test_mcp_artifact_write_server.py"
+        ],
+        "passed": 63,
+        "seconds": 13.83
+      },
+      "benchmarks_check": {
+        "case_execution": false,
+        "cases": 54,
+        "errors": 0
+      },
+      "combined_focused_and_frozen_registry_sandbox": {
+        "current_scope": "Java-owned governance tests inspect full 225-phase registry/picker",
+        "frozen_registry_picker": 299,
+        "frozen_sandbox_pure_authentication": 150,
+        "historical_scope": "explicit -p tests._runtime_java1_frozen_regressions; exact authenticated pre-Java registry bytes",
+        "passed": 571,
+        "seconds": 21.94
+      },
+      "compileall": "passed",
+      "final_focused_frozen_recheck": {
+        "after_final_registry_note_and_java_only_post_hash_update": true,
+        "passed": 571,
+        "seconds": 15.0
+      },
+      "final_phase_container_inventory": {
+        "query_exit_code": 0,
+        "remaining_phase_containers": 0
+      },
+      "focused_java": {
+        "current_governance": 7,
+        "discovery": 24,
+        "owner": 91,
+        "passed": 122,
+        "scope": "pure negative/contract tests; no successful runtime evidence fabricated"
+      },
+      "git_diff_check": "passed_existing_line_ending_warnings_only",
+      "registry": {
+        "errors": 0,
+        "executor_picker_blocked": true,
+        "is_valid": true,
+        "java_picker_blocked": true,
+        "phases": 225,
+        "warnings": 0
+      },
+      "superseded_overbroad_adjacent_run": {
+        "complete": false,
+        "replacement": "ten_selected_blocked_and_pure_regressions_all_passed",
+        "reported_as_passed": false,
+        "status": "stopped_only_after_exact_owned_command_line_and_process_identity_verification"
+      }
+    },
+    "verification_receipt": {
+      "apply_authority": false,
+      "architecture": "",
+      "artifact_inventory": [
+        {
+          "architecture": "amd64",
+          "cleanup_verified": true,
+          "image_declared_volumes": [],
+          "image_environment": [
+            "PATH=/home/appuser/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            "LANG=C.UTF-8",
+            "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+            "PYTHON_VERSION=3.12.13",
+            "PYTHON_SHA256=c08bc65a81971c1dd5783182826503369466c7e67374d1646519adf05207b684",
+            "PYTHONDONTWRITEBYTECODE=1",
+            "PYTHONUNBUFFERED=1",
+            "WEB_HOST=0.0.0.0"
+          ],
+          "image_identity": "sha256:09361da47d33ad0d44f89947d5e99003e94594e885328cdb5cd7b1c515a1a089",
+          "image_size_bytes": 139358132,
+          "image_user": "appuser",
+          "os": "linux",
+          "reason": "no_executable_linux_amd64_java_javac_pair",
+          "repo_digests": [
+            "cattus-cattus-web@sha256:09361da47d33ad0d44f89947d5e99003e94594e885328cdb5cd7b1c515a1a089"
+          ],
+          "status": "local_java_toolchain_absent",
+          "toolchains": [],
+          "variant": ""
+        },
+        {
+          "architecture": "amd64",
+          "cleanup_verified": true,
+          "image_declared_volumes": [
+            "/var/lib/postgresql/data"
+          ],
+          "image_environment": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin",
+            "GOSU_VERSION=1.19",
+            "LANG=en_US.utf8",
+            "PG_MAJOR=16",
+            "PG_VERSION=16.14-1.pgdg12+1",
+            "PGDATA=/var/lib/postgresql/data"
+          ],
+          "image_identity": "sha256:1d533553fefe4f12e5d80c7b80622ba0c382abb5758856f52983d8789179f0fb",
+          "image_size_bytes": 156146536,
+          "image_user": "",
+          "os": "linux",
+          "reason": "image_declared_volumes_violate_frozen_no_mount_contract",
+          "repo_digests": [
+            "pgvector/pgvector@sha256:1d533553fefe4f12e5d80c7b80622ba0c382abb5758856f52983d8789179f0fb"
+          ],
+          "status": "local_image_mounts_ineligible",
+          "toolchains": [],
+          "variant": ""
+        },
+        {
+          "architecture": "amd64",
+          "cleanup_verified": true,
+          "image_declared_volumes": [],
+          "image_environment": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          ],
+          "image_identity": "sha256:4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90",
+          "image_size_bytes": 29744763,
+          "image_user": "",
+          "os": "linux",
+          "reason": "no_executable_linux_amd64_java_javac_pair",
+          "repo_digests": [
+            "ubuntu@sha256:4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90"
+          ],
+          "status": "local_java_toolchain_absent",
+          "toolchains": [],
+          "variant": ""
+        },
+        {
+          "architecture": "amd64",
+          "cleanup_verified": true,
+          "image_declared_volumes": [],
+          "image_environment": [
+            "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            "LANG=C.UTF-8",
+            "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+            "PYTHON_VERSION=3.12.13",
+            "PYTHON_SHA256=c08bc65a81971c1dd5783182826503369466c7e67374d1646519adf05207b684"
+          ],
+          "image_identity": "sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+          "image_size_bytes": 43200635,
+          "image_user": "",
+          "os": "linux",
+          "reason": "no_executable_linux_amd64_java_javac_pair",
+          "repo_digests": [
+            "python@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de"
+          ],
+          "status": "local_java_toolchain_absent",
+          "toolchains": [],
+          "variant": ""
+        }
+      ],
+      "author_calls": 0,
+      "authority": "synthetic_java_infrastructure_measurement_only",
+      "bank_execution_count": 0,
+      "behavioral_scenario_count": 0,
+      "bounded_stderr": "",
+      "bounded_stdout": "",
+      "candidate_execution_count": 0,
+      "canonical_results": [],
+      "class_output": [],
+      "cleanup_result": "discovery_resources_removed_no_java_workload",
+      "compile_invocation_identity": "",
+      "compile_result": "not_executed",
+      "compiler_version": "",
+      "console_count": 0,
+      "discovery_complete": true,
+      "discovery_reason": "no_eligible_exact_local_java_toolchain",
+      "downloads": 0,
+      "expected_output": "JAVA_SANDBOX_OK",
+      "image_boundary_outcomes": [],
+      "image_pulls": 0,
+      "installations": 0,
+      "java_artifact_identity": "",
+      "java_executable_identity": "",
+      "java_workload_launch_attempted": false,
+      "javac_executable_identity": "",
+      "model_calls": 0,
+      "os": "",
+      "phase_id": "RUNTIME.JAVA.1",
+      "reason": "no_suitable_local_java_artifact",
+      "reflection_count": 0,
+      "repository_traversals": 0,
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "runtime_invocation_identity": "",
+      "runtime_result": "not_executed",
+      "runtime_version": "",
+      "sandbox_binding_authenticated": true,
+      "sandbox_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+      "sandbox_verification_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+      "schema_version": "runtime_java_1_v1",
+      "seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+      "source_mutation": 0,
+      "source_sha256": "3975c5e03edb79439d6146b7714a6d3c31af86ce42f05624cdf6c28f69b4e224",
+      "status": "RUNTIME_JAVA_1_BLOCKED_TOOLCHAIN_UNAVAILABLE",
+      "stderr_limit_bytes": 8192,
+      "stdout_limit_bytes": 8192,
+      "synthetic_java_execution_count": 0,
+      "timeout_ms": 10000,
+      "toolchain_launch_count": 0,
+      "verification_receipt_fingerprint": "b49404378c2bfeb21fac6916db138f74d042dc7da737d965b8871120b13bf375"
+    },
+    "warnings": [
+      "Docker/WSL startup and memory cost remain; no always-on worker added",
+      "Java compile/runtime/selected-image seccomp compatibility unmeasured without a suitable local artifact",
+      "Exported JSON is report-only; signatures and authority cannot be restored from it",
+      "Existing matching Docker/WSL process working sets were about 1493.7 MiB during verification; snapshot includes preexisting workload/cache and is not exclusively attributable to this phase",
+      "Local image content inspection median 44.360 s; one frozen sandbox authentication 40.909 s; two-check replay total 129.646 s",
+      "Selected adjacent pure lineage checks cost 200.40 s; third-party google.genai deprecation warning and existing Git LF/CRLF warnings remain"
+    ]
+  },
+  "previous_phase_report_sha256": "1c393cade282700a86fa92dc0e60b9a2436f92f3ec4e809e51e8fc142affd0e9",
+  "reflection_count": 0,
+  "report_only": true,
+  "repository_traversals": 0,
+  "repository_write_authority": false,
+  "resumed_pure_tests_already_run": {
+    "elapsed_seconds": 15.31,
+    "further_pytest_compileall_benchmarks_or_adjacent_checks": false,
+    "passed": 272,
+    "performed_before_latest_no_test_repeat_instruction": true,
+    "scope": "122 original Java contract/discovery/governance plus 150 frozen sandbox pure/authentication tests"
+  },
+  "runtime_authority": false,
+  "runtime_policy_authorizations_consumed": 0,
+  "sandbox_authentication": {
+    "descriptor": {
+      "apply_authority": false,
+      "arbitrary_command_authority": false,
+      "available": true,
+      "backend_identity": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+      "backend_kind": "docker_linux_local",
+      "backend_version": "29.6.1",
+      "child_process_policy": "descendants_confined_to_private_namespaces_and_cgroup_then_destroyed",
+      "child_process_policy_enforced": true,
+      "enforced_requirements": [
+        "ephemeral_working_directory",
+        "fixed_executable_and_arguments",
+        "exact_source_and_classpath",
+        "hard_wall_clock_timeout",
+        "hard_stdout_stderr_bounds",
+        "all_child_process_cleanup",
+        "no_persistent_diagnostic_artifacts",
+        "candidate_filesystem_isolation",
+        "candidate_network_isolation",
+        "candidate_environment_isolation",
+        "candidate_extra_process_prevention"
+      ],
+      "environment_isolation_enforced": true,
+      "host_filesystem_isolation_enforced": true,
+      "image_identity": "sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+      "network_isolation_enforced": true,
+      "persistent_artifact_policy_enforced": true,
+      "phase_id": "RUNTIME.SANDBOX.1",
+      "process_tree_cleanup_enforced": true,
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "sandbox_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+      "schema_version": "runtime_sandbox_1_v1",
+      "shell_available": false,
+      "stderr_bound_enforced": true,
+      "stdout_bound_enforced": true,
+      "supported_host_platform": "Windows-AMD64",
+      "timeout_enforced": true,
+      "verification_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+      "verified": true,
+      "workspace_filesystem_policy": "ephemeral_tmpfs_exact_inputs_only"
+    },
+    "historical_receipt_modified": false,
+    "operational_diagnostics": {
+      "boundary": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": null,
+        "measured_probe_and_teardown_seconds": 5.81180939998012,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_completed",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": false,
+        "termination_within_requested_deadline": true
+      },
+      "descendant": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": null,
+        "measured_probe_and_teardown_seconds": 5.671516500064172,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_completed",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": false,
+        "termination_within_requested_deadline": true
+      },
+      "stderr": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": 3086.1971999984235,
+        "measured_probe_and_teardown_seconds": 8.645307200029492,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_output_limit_exceeded",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": true,
+        "termination_within_requested_deadline": true
+      },
+      "stdout": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": 3079.6882999129593,
+        "measured_probe_and_teardown_seconds": 7.84374309994746,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_output_limit_exceeded",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": true,
+        "termination_within_requested_deadline": true
+      },
+      "timeout": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": true,
+        "measured_confirmed_termination_ms": 6977.6971999090165,
+        "measured_probe_and_teardown_seconds": 11.857553499983624,
+        "requested_timeout_ms": 10000,
+        "status": "sandbox_timeout",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": true,
+        "termination_within_requested_deadline": true
+      }
+    },
+    "performance": {
+      "backend_availability_seconds": 2.14819360000547,
+      "descendant_seconds": 5.671520299976692,
+      "environment_seconds": 5.811816700035706,
+      "filesystem_seconds": 5.811816700035706,
+      "network_seconds": 5.811816700035706,
+      "probe_execution_seconds": 15.762838700087741,
+      "sandbox_startup_seconds": 9.494894000235945,
+      "stderr_seconds": 8.645311100059189,
+      "stdout_seconds": 7.843746799975634,
+      "teardown_seconds": 14.568095900001936,
+      "timeout_seconds": 11.857557000010274,
+      "total_seconds": 41.99624160001986
+    },
+    "status": "RUNTIME_SANDBOX_1_COMPLETE_WITH_WARNINGS",
+    "verification_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9"
+  },
+  "sandbox_requirements_weakened": false,
+  "source_mutation_count": 0,
+  "status": "RUNTIME_JAVA_1_BLOCKED_SANDBOX_INCOMPATIBLE",
+  "temporary_verifier_edits_restored_before_live_execution": true,
+  "total_replay_seconds": 208.79459750000387,
+  "verification_date_kst": "2026-10-07",
+  "verification_receipt": {
+    "apply_authority": false,
+    "architecture": "amd64",
+    "artifact_inventory": [
+      {
+        "architecture": "amd64",
+        "cleanup_verified": true,
+        "image_declared_volumes": [],
+        "image_environment": [
+          "PATH=/home/appuser/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "LANG=C.UTF-8",
+          "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+          "PYTHON_VERSION=3.12.13",
+          "PYTHON_SHA256=c08bc65a81971c1dd5783182826503369466c7e67374d1646519adf05207b684",
+          "PYTHONDONTWRITEBYTECODE=1",
+          "PYTHONUNBUFFERED=1",
+          "WEB_HOST=0.0.0.0"
+        ],
+        "image_identity": "sha256:09361da47d33ad0d44f89947d5e99003e94594e885328cdb5cd7b1c515a1a089",
+        "image_size_bytes": 139358132,
+        "image_user": "appuser",
+        "os": "linux",
+        "reason": "no_executable_linux_amd64_java_javac_pair",
+        "repo_digests": [
+          "cattus-cattus-web@sha256:09361da47d33ad0d44f89947d5e99003e94594e885328cdb5cd7b1c515a1a089"
+        ],
+        "status": "local_java_toolchain_absent",
+        "toolchains": [],
+        "variant": ""
+      },
+      {
+        "architecture": "amd64",
+        "cleanup_verified": true,
+        "image_declared_volumes": [
+          "/var/lib/postgresql/data"
+        ],
+        "image_environment": [
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin",
+          "GOSU_VERSION=1.19",
+          "LANG=en_US.utf8",
+          "PG_MAJOR=16",
+          "PG_VERSION=16.14-1.pgdg12+1",
+          "PGDATA=/var/lib/postgresql/data"
+        ],
+        "image_identity": "sha256:1d533553fefe4f12e5d80c7b80622ba0c382abb5758856f52983d8789179f0fb",
+        "image_size_bytes": 156146536,
+        "image_user": "",
+        "os": "linux",
+        "reason": "image_declared_volumes_violate_frozen_no_mount_contract",
+        "repo_digests": [
+          "pgvector/pgvector@sha256:1d533553fefe4f12e5d80c7b80622ba0c382abb5758856f52983d8789179f0fb"
+        ],
+        "status": "local_image_mounts_ineligible",
+        "toolchains": [],
+        "variant": ""
+      },
+      {
+        "architecture": "amd64",
+        "cleanup_verified": true,
+        "image_declared_volumes": [],
+        "image_environment": [
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "image_identity": "sha256:4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90",
+        "image_size_bytes": 29744763,
+        "image_user": "",
+        "os": "linux",
+        "reason": "no_executable_linux_amd64_java_javac_pair",
+        "repo_digests": [
+          "ubuntu@sha256:4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90"
+        ],
+        "status": "local_java_toolchain_absent",
+        "toolchains": [],
+        "variant": ""
+      },
+      {
+        "architecture": "amd64",
+        "cleanup_verified": true,
+        "image_declared_volumes": [],
+        "image_environment": [
+          "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "LANG=C.UTF-8",
+          "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+          "PYTHON_VERSION=3.12.13",
+          "PYTHON_SHA256=c08bc65a81971c1dd5783182826503369466c7e67374d1646519adf05207b684"
+        ],
+        "image_identity": "sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+        "image_size_bytes": 43200635,
+        "image_user": "",
+        "os": "linux",
+        "reason": "no_executable_linux_amd64_java_javac_pair",
+        "repo_digests": [
+          "python@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de"
+        ],
+        "status": "local_java_toolchain_absent",
+        "toolchains": [],
+        "variant": ""
+      },
+      {
+        "architecture": "amd64",
+        "cleanup_verified": true,
+        "image_declared_volumes": [],
+        "image_environment": [
+          "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "LANG=C.UTF-8",
+          "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+          "PYTHON_VERSION=3.12.13",
+          "PYTHON_SHA256=c08bc65a81971c1dd5783182826503369466c7e67374d1646519adf05207b684"
+        ],
+        "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+        "image_size_bytes": 188948499,
+        "image_user": "65534:65534",
+        "os": "linux",
+        "reason": "exact_local_elf_toolchain_and_controller_present",
+        "repo_digests": [
+          "cattus-java26-offline@sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a"
+        ],
+        "status": "local_java_toolchain_present",
+        "toolchains": [
+          {
+            "controller_path": "/usr/local/bin/python",
+            "controller_sha256": "0e6475dfda68a9b2d93501449fc47593ca169010e8f4881577b97463fd0c1263",
+            "java_path": "/opt/temurin-26.0.2.1/bin/java",
+            "java_sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+            "javac_path": "/opt/temurin-26.0.2.1/bin/javac",
+            "javac_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023"
+          }
+        ],
+        "variant": ""
+      }
+    ],
+    "author_calls": 0,
+    "authority": "synthetic_java_infrastructure_measurement_only",
+    "bank_execution_count": 0,
+    "behavioral_scenario_count": 0,
+    "bounded_stderr": "",
+    "bounded_stdout": "",
+    "candidate_execution_count": 0,
+    "canonical_results": [],
+    "class_output": [],
+    "cleanup_result": "all_phase_resources_removed",
+    "compile_invocation_identity": "35691118b6126615aae22f5ccddb7dc991ced0d23d4c5df0837c320be4f8064b",
+    "compile_result": "not_executed",
+    "compiler_version": "",
+    "console_count": 0,
+    "discovery_complete": true,
+    "discovery_reason": "eligible_exact_local_java_toolchain_present",
+    "downloads": 0,
+    "expected_output": "JAVA_SANDBOX_OK",
+    "image_boundary_outcomes": [
+      {
+        "cleanup_verified": true,
+        "measured_facts": [
+          [
+            "capabilities_zero",
+            "true"
+          ],
+          [
+            "cleanup_control",
+            "{\"inspect_error\":\"error: no such object: <phase-container>\\n\",\"inspect_exit_code\":1,\"inspect_status\":\"sandbox_completed\",\"remove_exit_code\":0,\"remove_status\":\"sandbox_completed\"}"
+          ],
+          [
+            "environment",
+            "{\"GPG_KEY\":\"\",\"HOME\":\"/work\",\"HOSTNAME\":\"runtime-sandbox1\",\"LANG\":\"C.UTF-8\",\"PATH\":\"/usr/local/bin:/usr/bin:/bin\",\"PYTHON_SHA256\":\"\",\"PYTHON_VERSION\":\"\",\"SANDBOX_PUBLIC_SENTINEL\":\"phase-owned\"}"
+          ],
+          [
+            "external_read_denied",
+            "true"
+          ],
+          [
+            "external_write_denied",
+            "true"
+          ],
+          [
+            "host_secret_absent",
+            "true"
+          ],
+          [
+            "local_connect_denied",
+            "true"
+          ],
+          [
+            "manifest",
+            "[{\"path\":\"projection.txt\",\"sha256\":\"8dbe754d8c894788500505a0c4a0537f63cfb6439a9706853968474f5fabbd9b\",\"size_bytes\":45}]"
+          ],
+          [
+            "namespaces",
+            "[\"cgroup\",\"ipc\",\"mnt\",\"net\",\"pid\"]"
+          ],
+          [
+            "no_new_privileges",
+            "true"
+          ],
+          [
+            "pid_is_one",
+            "true"
+          ],
+          [
+            "root_write_denied",
+            "true"
+          ],
+          [
+            "socket_denials",
+            "{\"dns_udp\":true,\"ipv4_tcp\":true,\"ipv6_tcp\":true,\"unix_socket\":true}"
+          ],
+          [
+            "socketpair_denied",
+            "true"
+          ],
+          [
+            "termination_within_requested_deadline",
+            "true"
+          ],
+          [
+            "uid",
+            "65534"
+          ],
+          [
+            "workspace_write",
+            "true"
+          ]
+        ],
+        "passed_dimensions": [
+          "exact_source_and_classpath",
+          "fixed_executable_and_arguments",
+          "ephemeral_working_directory",
+          "candidate_filesystem_isolation",
+          "candidate_network_isolation",
+          "candidate_environment_isolation"
+        ],
+        "probe_id": "boundary",
+        "probe_sha256": "286f0d1a32c84d68ca8092454203a8a52fe89922058990db725449bc9c2256b6",
+        "status": "sandbox_completed",
+        "stderr_limit_bytes": 8192,
+        "stderr_size": 0,
+        "stdout_limit_bytes": 8192,
+        "stdout_size": 798,
+        "timeout_ms": 5000
+      },
+      {
+        "cleanup_verified": true,
+        "measured_facts": [
+          [
+            "child_alive",
+            "true"
+          ],
+          [
+            "child_spawned",
+            "true"
+          ],
+          [
+            "cleanup_control",
+            "{\"inspect_error\":\"error: no such object: <phase-container>\\n\",\"inspect_exit_code\":1,\"inspect_status\":\"sandbox_completed\",\"remove_exit_code\":0,\"remove_status\":\"sandbox_completed\"}"
+          ],
+          [
+            "pid_is_one",
+            "true"
+          ],
+          [
+            "same_cgroup",
+            "true"
+          ],
+          [
+            "same_namespaces",
+            "true"
+          ],
+          [
+            "termination_within_requested_deadline",
+            "true"
+          ]
+        ],
+        "passed_dimensions": [
+          "candidate_extra_process_prevention",
+          "all_child_process_cleanup"
+        ],
+        "probe_id": "descendant",
+        "probe_sha256": "286f0d1a32c84d68ca8092454203a8a52fe89922058990db725449bc9c2256b6",
+        "status": "sandbox_completed",
+        "stderr_limit_bytes": 8192,
+        "stderr_size": 0,
+        "stdout_limit_bytes": 8192,
+        "stdout_size": 111,
+        "timeout_ms": 5000
+      },
+      {
+        "cleanup_verified": true,
+        "measured_facts": [
+          [
+            "child_alive",
+            "true"
+          ],
+          [
+            "child_spawned",
+            "true"
+          ],
+          [
+            "cleanup_control",
+            "{\"inspect_error\":\"error: no such object: <phase-container>\\n\",\"inspect_exit_code\":1,\"inspect_status\":\"sandbox_completed\",\"remove_exit_code\":0,\"remove_status\":\"sandbox_completed\"}"
+          ],
+          [
+            "pid_is_one",
+            "true"
+          ],
+          [
+            "same_cgroup",
+            "true"
+          ],
+          [
+            "same_namespaces",
+            "true"
+          ],
+          [
+            "termination_within_requested_deadline",
+            "true"
+          ]
+        ],
+        "passed_dimensions": [
+          "hard_wall_clock_timeout",
+          "all_child_process_cleanup"
+        ],
+        "probe_id": "timeout",
+        "probe_sha256": "286f0d1a32c84d68ca8092454203a8a52fe89922058990db725449bc9c2256b6",
+        "status": "sandbox_timeout",
+        "stderr_limit_bytes": 8192,
+        "stderr_size": 0,
+        "stdout_limit_bytes": 8192,
+        "stdout_size": 111,
+        "timeout_ms": 10000
+      },
+      {
+        "cleanup_verified": true,
+        "measured_facts": [
+          [
+            "cleanup_control",
+            "{\"inspect_error\":\"error: no such object: <phase-container>\\n\",\"inspect_exit_code\":1,\"inspect_status\":\"sandbox_completed\",\"remove_exit_code\":0,\"remove_status\":\"sandbox_completed\"}"
+          ],
+          [
+            "termination_within_requested_deadline",
+            "true"
+          ]
+        ],
+        "passed_dimensions": [
+          "hard_stdout_stderr_bounds"
+        ],
+        "probe_id": "stdout",
+        "probe_sha256": "286f0d1a32c84d68ca8092454203a8a52fe89922058990db725449bc9c2256b6",
+        "status": "sandbox_output_limit_exceeded",
+        "stderr_limit_bytes": 8192,
+        "stderr_size": 0,
+        "stdout_limit_bytes": 8192,
+        "stdout_size": 8192,
+        "timeout_ms": 5000
+      },
+      {
+        "cleanup_verified": true,
+        "measured_facts": [
+          [
+            "cleanup_control",
+            "{\"inspect_error\":\"error: no such object: <phase-container>\\n\",\"inspect_exit_code\":1,\"inspect_status\":\"sandbox_completed\",\"remove_exit_code\":0,\"remove_status\":\"sandbox_completed\"}"
+          ],
+          [
+            "termination_within_requested_deadline",
+            "true"
+          ]
+        ],
+        "passed_dimensions": [
+          "hard_stdout_stderr_bounds"
+        ],
+        "probe_id": "stderr",
+        "probe_sha256": "286f0d1a32c84d68ca8092454203a8a52fe89922058990db725449bc9c2256b6",
+        "status": "sandbox_output_limit_exceeded",
+        "stderr_limit_bytes": 8192,
+        "stderr_size": 8192,
+        "stdout_limit_bytes": 8192,
+        "stdout_size": 0,
+        "timeout_ms": 5000
+      }
+    ],
+    "image_pulls": 0,
+    "installations": 0,
+    "java_artifact_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "java_executable_identity": "/opt/temurin-26.0.2.1/bin/java@sha256:a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+    "java_workload_launch_attempted": true,
+    "javac_executable_identity": "/opt/temurin-26.0.2.1/bin/javac@sha256:e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+    "model_calls": 0,
+    "os": "linux",
+    "phase_id": "RUNTIME.JAVA.1",
+    "reason": "sandbox_java_incompatible:sandbox_completed",
+    "reflection_count": 0,
+    "repository_traversals": 0,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "runtime_invocation_identity": "67873f1fd2b8f83d3c75bdfb8a5c615c4359efa85372872573f8995757738cab",
+    "runtime_result": "not_executed",
+    "runtime_version": "",
+    "sandbox_binding_authenticated": true,
+    "sandbox_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+    "sandbox_verification_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+    "schema_version": "runtime_java_1_v1",
+    "seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+    "source_mutation": 0,
+    "source_sha256": "3975c5e03edb79439d6146b7714a6d3c31af86ce42f05624cdf6c28f69b4e224",
+    "status": "RUNTIME_JAVA_1_BLOCKED_SANDBOX_INCOMPATIBLE",
+    "stderr_limit_bytes": 8192,
+    "stdout_limit_bytes": 8192,
+    "synthetic_java_execution_count": null,
+    "timeout_ms": 10000,
+    "toolchain_launch_count": null,
+    "verification_receipt_fingerprint": "6d9121d1f3e84b4ed47c704bbf674d70322b4035c9afaa3ff39e7c38f52ffab3"
+  },
+  "verifier_source_changed_for_execution": false,
+  "warnings": [
+    "Exact local artifact is present; the existing Java route is incompatible/incomplete under the unchanged frozen boundary because its output reader could not start a thread.",
+    "No specific denied syscall or JVM failure cause was diagnosed; seccomp/privilege/environment/resource limits were not changed.",
+    "Final controller facts were not emitted; per-stage timing and launch counts are unmeasured/unknown, never zero evidence.",
+    "One live Java attempt only; no repeat or alternate execution route after failure.",
+    "Docker/WSL costs remain. Resumed verification took 208.795 seconds including authentication, local byte inspection and the unchanged verifier; selected already-present image logical size is 188948499 bytes.",
+    "Previous report and its old blocked-toolchain result are retained as historical data under previous_phase_report; they do not describe current availability.",
+    "The existing descriptor and receipt are authenticated in process; exported JSON is report-only and grants no authority."
+  ]
+}

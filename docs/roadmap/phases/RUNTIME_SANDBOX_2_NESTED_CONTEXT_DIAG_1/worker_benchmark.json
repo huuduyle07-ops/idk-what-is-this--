@@ -1,0 +1,14 @@
+{
+  "arguments": [
+    "benchmarks/run_benchmarks.py",
+    "--check"
+  ],
+  "audit_guard": {
+    "allowed_pure_domain_children": 0,
+    "forbidden_process_attempts": 0,
+    "forbidden_socket_attempts": 0,
+    "forbidden_write_attempts": 0
+  },
+  "exit_code": 0,
+  "passed": true
+}

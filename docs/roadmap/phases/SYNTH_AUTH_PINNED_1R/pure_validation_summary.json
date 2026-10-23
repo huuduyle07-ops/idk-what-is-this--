@@ -1,0 +1,113 @@
+{
+  "audit_guard": {
+    "forbidden_process_attempts": 0,
+    "forbidden_socket_attempts": 0,
+    "forbidden_write_attempts": 0
+  },
+  "authored_whitespace_passed": true,
+  "benchmark_check_passed": true,
+  "external_output_only": true,
+  "focused_selections": {
+    "authorization": {
+      "audit_guard": {
+        "forbidden_process_attempts": 0,
+        "forbidden_socket_attempts": 0,
+        "forbidden_write_attempts": 0
+      },
+      "collected_test_count": 7,
+      "failed_test_count": 0,
+      "passed": true,
+      "passed_test_count": 7
+    },
+    "java": {
+      "audit_guard": {
+        "forbidden_process_attempts": 0,
+        "forbidden_socket_attempts": 0,
+        "forbidden_write_attempts": 0
+      },
+      "collected_test_count": 30,
+      "failed_test_count": 0,
+      "passed": true,
+      "passed_test_count": 30
+    },
+    "provider": {
+      "audit_guard": {
+        "forbidden_process_attempts": 0,
+        "forbidden_socket_attempts": 0,
+        "forbidden_write_attempts": 0
+      },
+      "collected_test_count": 6,
+      "failed_test_count": 0,
+      "passed": true,
+      "passed_test_count": 6
+    },
+    "reservation": {
+      "audit_guard": {
+        "forbidden_process_attempts": 0,
+        "forbidden_socket_attempts": 0,
+        "forbidden_write_attempts": 0
+      },
+      "collected_test_count": 45,
+      "failed_test_count": 0,
+      "passed": true,
+      "passed_test_count": 45
+    },
+    "sandbox": {
+      "audit_guard": {
+        "forbidden_process_attempts": 0,
+        "forbidden_socket_attempts": 0,
+        "forbidden_write_attempts": 0
+      },
+      "collected_test_count": 230,
+      "failed_test_count": 0,
+      "passed": true,
+      "passed_test_count": 230
+    }
+  },
+  "focused_test_count": 318,
+  "full_suite_run": false,
+  "in_memory_compilation_passed": true,
+  "live_provider_issuance": 0,
+  "mode": "summary",
+  "new_1r_observer_validation_owned_by_root": true,
+  "passed": true,
+  "registry_picker_reports_valid": true,
+  "registry_picker_test_baseline": {
+    "collected": 299,
+    "failed": 7,
+    "failure_ids": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "historical_failure_ids_preserved": true,
+    "passed": 292
+  },
+  "successful_operational_effects": 0,
+  "validation_source_sha256": "84e60800439ecab03cc7df2726955f03f84b6e5ab1bbf0b39c84a7caa4ecd81c"
+}

@@ -1,0 +1,650 @@
+{
+  "scenario": {
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "source_owner": "core.synthetic_runtime_authorization",
+    "source_accessor": "get_executor1r_decrement_3_source",
+    "source_kind": "phase_owned_synthetic_fixture",
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "source_size_bytes": 239,
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "class_name": "SyntheticStateBox",
+    "method_signature": "boolean SyntheticStateBox.decrement(int)",
+    "arguments": [
+      3
+    ],
+    "field": "SyntheticStateBox.value:int",
+    "source_regeneration_allowed": false,
+    "source_rewriting_allowed": false,
+    "alternative_implementation_allowed": false,
+    "expected_values_are_observed_evidence": false
+  },
+  "effect_classification": {
+    "in_memory_source_projection": {
+      "class": "PURE_DERIVATION",
+      "meaning": "Obtain the exact existing frozen byte literal in memory; no synthesis, transformation, newline conversion or filesystem write. Authenticate the original pinned authorization and its source identity before any materialization; compare full obtained bytes, size and SHA256 independently.",
+      "runtime_lease_consumed": false
+    },
+    "sandbox_materialization": {
+      "class": "PREPARATION_EFFECT",
+      "meaning": "Exclusive write and readback of exactly the authenticated 239 bytes at the single sandbox path. It mutates ephemeral preparation state, not the scenario object or repository.",
+      "runtime_lease_consumed": false
+    },
+    "javac_compilation": {
+      "class": "PREPARATION_EFFECT",
+      "meaning": "The exact bounded compiler transforms these bytes into an inert classfile; it does not load, initialize, instantiate or invoke SyntheticStateBox. Compiler JVM infrastructure activity is not scenario activation. Exact closed inputs and absence of processor/plugin/dependency inputs are mandatory.",
+      "runtime_lease_consumed": false
+    },
+    "JVM_startup": {
+      "class": "BEHAVIORAL_ACTIVATION_EFFECT",
+      "meaning": "Launching the scenario-executing JVM is the first authorized activation operation: its exact main may load, initialize and construct the scenario before a field read. Spend runtime and BEFORE permissions before this launch. This class applies to the scenario launch, not compiler JVM startup or an independently proved inert infrastructure JVM.",
+      "permitted_during_preparation": false
+    },
+    "class_loading": {
+      "class": "BEHAVIORAL_ACTIVATION_EFFECT",
+      "meaning": "Target class loading/linking is reserved to the activated consumer. Passive reading/hashing/parsing classfile bytes is preparation. Loading is distinct from initialization; neither is permitted by preparation authority.",
+      "intrinsic_semantics": "Noninitializing loading/linking alone need not execute this class's method or mutate its instance state. The classification is the conservative authority boundary for loading by the scenario consumer, whose full loader/harness is not yet frozen; it is not a claim that all JVM metadata loading is behavior.",
+      "permitted_during_preparation": false
+    },
+    "class_initialization": {
+      "class": "BEHAVIORAL_ACTIVATION_EFFECT",
+      "meaning": "The frozen source declares no static field initializer or static block. No arbitrary initialization is assumed safe; any changed source, injected class or unreviewed harness fails before activation.",
+      "permitted_during_preparation": false
+    },
+    "object_construction": {
+      "class": "BEHAVIORAL_EFFECT",
+      "meaning": "The implicit constructor initializes the instance field value to 10, before BEFORE observation. Only ordinary exact construction by the future reviewed harness is in scope; constructor reflection remains forbidden.",
+      "permitted_during_preparation": false
+    },
+    "BEFORE_reflection_read": {
+      "class": "BEHAVIORAL_EFFECT",
+      "meaning": "Exact role-specific value:int read of the constructed instance, after both runtime and BEFORE reflection lease commits. Consumed permission is not proof of a read.",
+      "permitted_during_preparation": false
+    }
+  },
+  "materialization": {
+    "destination": "/work/SyntheticStateBox.java",
+    "workspace_root": "/work",
+    "workspace_kind": "already-authorized container-local ephemeral tmpfs; never host repository or bind mount",
+    "initial_workspace": "empty, exclusively owned by one attempt; no image volume, host mount, shared writer, preexisting source/class or other Java input",
+    "maximum_materialized_source_files": 1,
+    "maximum_materialized_source_bytes": 239,
+    "directories_created": [
+      "/work/classes"
+    ],
+    "maximum_preparation_regular_files": 2,
+    "file_count_scope": "/work source/output workspace; /tmp is separately bounded by the exact SANDBOX.2 tmpfs policy and must contain no compiler input, exported artifact or retained file after teardown",
+    "allowed_preparation_regular_files": [
+      "/work/SyntheticStateBox.java",
+      "/work/classes/SyntheticStateBox.class"
+    ],
+    "harness_files_included": false,
+    "symlink_policy": "Allow only the independently verified expected /work tmpfs root mount; reject unexpected/subordinate mount crossings, symlinks, hardlink aliases and special files at destination/output and workspace path components. lstat/descriptor-relative no-follow checks, exclusive creation and single-link regular file readback; no path re-resolution race or shared writer.",
+    "path_policy": "No caller path; exact absolute POSIX allowlist. Reject NUL, backslash, dot/parent components, path aliases, traversal, unexpected entries and root escapes before any write.",
+    "overwrite_policy": "Never overwrite or truncate existing paths; binary exclusive creation only. Existing file/directory conflicts abort the attempt, including byte-identical files.",
+    "byte_policy": "Copy existing exact frozen bytes only, full size/hash and byte-for-byte readback; no encoding/newline conversion, regeneration, formatting or rewriting.",
+    "repository_source_write_authority": false,
+    "persistent_artifacts_allowed": false,
+    "export_source_or_class_to_host_allowed": false
+  },
+  "compiler": {
+    "path": "/opt/temurin-26.0.2.1/bin/javac",
+    "sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+    "image": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "sandbox_profile": "runtime_sandbox_2_v1",
+    "sandbox_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "historical_JAVA_1C_argv": [
+      "/opt/temurin-26.0.2.1/bin/javac",
+      "-J-Xms8m",
+      "-J-Xmx32m",
+      "-J-XX:ActiveProcessorCount=1",
+      "-J-XX:-UsePerfData",
+      "-d",
+      "/work/classes",
+      "/work/JavaSandboxProbe.java"
+    ],
+    "exact_scenario_argv": [
+      "/opt/temurin-26.0.2.1/bin/javac",
+      "-J-Xms8m",
+      "-J-Xmx32m",
+      "-J-XX:ActiveProcessorCount=1",
+      "-J-XX:-UsePerfData",
+      "-d",
+      "/work/classes",
+      "/work/SyntheticStateBox.java"
+    ],
+    "template_derivation": "Recover every flag and output path unchanged from JAVA.1C; explicitly freeze only the scenario source operand substitution as new scope. Historical invocation, controller and provider remain unchanged and cannot perform this operation.",
+    "shell": false,
+    "cwd": "/work",
+    "caller_flags_allowed": false,
+    "argument_files_allowed": false,
+    "arbitrary_classpath_allowed": false,
+    "maven_allowed": false,
+    "gradle_allowed": false,
+    "dependency_download_allowed": false,
+    "network_allowed": false,
+    "processor_plugin_inputs_allowed": false,
+    "input_closure": "Only the exact frozen source and immutable pinned JDK/image; no class/JAR/processor/service/config inputs in initially empty cwd or writable tmpfs, no source imports/annotations, no caller CLASSPATH/JDK_JAVAC_OPTIONS/JAVA_TOOL_OPTIONS/_JAVA_OPTIONS. Do not invent -proc:none or other flags.",
+    "max_attempts": 1,
+    "compiler_stdout_max_bytes": 2048,
+    "compiler_stderr_max_bytes": 2048,
+    "outer_stdout_max_bytes": 8192,
+    "outer_stderr_max_bytes": 8192,
+    "outer_timeout_ms": 10000,
+    "shared_controller_deadline_ms": 5000,
+    "output_directory": "/work/classes"
+  },
+  "sandbox": {
+    "network": "none",
+    "rootfs_readonly": true,
+    "host_mounts": [],
+    "image_declared_volumes_allowed": false,
+    "uid_gid": "65534:65534",
+    "cap_drop": [
+      "ALL"
+    ],
+    "no_new_privileges": true,
+    "pids_max": 128,
+    "memory_bytes": 134217728,
+    "nano_cpus": 1000000000,
+    "tmpfs": {
+      "/work": "rw,nosuid,nodev,size=32m,mode=1777",
+      "/tmp": "rw,nosuid,nodev,noexec,size=16m,mode=1777"
+    },
+    "environment": {
+      "PATH": "/usr/local/bin:/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "GPG_KEY": "",
+      "PYTHON_VERSION": "",
+      "PYTHON_SHA256": "",
+      "SANDBOX_PUBLIC_SENTINEL": "phase-owned",
+      "HOME": "/work",
+      "HOSTNAME": "runtime-sandbox1"
+    },
+    "environment_source": "Exact eight-variable core.candidate_runtime_sandbox._WORKLOAD_ENVIRONMENT, source-pinned in evidence_index.json; no caller environment extension.",
+    "remaining_checks": "Every unchanged SANDBOX.2 inspection/ladder/resource/namespace/cgroup/controller gate; same backend route/version, immutable image and authenticated actual workspace/container generation.",
+    "provider_proof_workspace_reusable": false,
+    "live_workspace_requirement": "Provider proof's successfully cleaned workspace is historical evidence, never the scenario workspace. A separate authorized live workspace must be authenticated and bound to the original provider graph by public evidence. This contract grants no sandbox/container issuance."
+  },
+  "compile_output": {
+    "expected_path": "/work/classes/SyntheticStateBox.class",
+    "expected_relative_class_set": [
+      "SyntheticStateBox.class"
+    ],
+    "maximum_class_files": 1,
+    "minimum_class_bytes": 1,
+    "maximum_class_bytes": 32768,
+    "bound_basis": "Adopt the frozen JAVA.1C 1..32768 single-class envelope; scenario class bytes/size/hash have not been measured.",
+    "predicted_class_sha256": null,
+    "manifest": "Full sorted no-follow workspace manifest: exact directory/file types, paths, sizes, SHA256 for source and class, no extra files, same source bytes before/after. Parse bounded classfile metadata as inert data to check internal class identity; never load it for verification.",
+    "unexpected_file_behavior": "COMPILE_OUTPUT_MISMATCH; publish no ready receipt, revoke preparation eligibility, tear down entire attempt workspace. No selective retention, new flags, retry or fallback.",
+    "success_requirements": [
+      "exit code exactly zero",
+      "bounded complete empty stdout/stderr and both EOFs, preserving JAVA.1C diagnostic expectations",
+      "compiler process fully reaped without timeout",
+      "exact authenticated source unchanged",
+      "exact single output set and byte bounds",
+      "signed output/source manifest and compiler/context measurements"
+    ],
+    "exit_zero_proves_source_identity": false,
+    "compile_success_proves_behavior_success": false
+  },
+  "preparation_receipt": {
+    "kind": "authenticated_evidence_not_capability",
+    "proposed_type": "PinnedSyntheticPreparationReceipt",
+    "owner": "core.synthetic_execution_preparation_pinned",
+    "schema": "synthetic_preparation_receipt_pinned_1_v1",
+    "single_receipt_with_distinct_source_and_compile_sections": true,
+    "runtime_permission": false,
+    "execution_permission": false,
+    "caller_boolean_accepted": false,
+    "minimum_signed_bindings": [
+      "owner/phase/schema/PID/receipt_id",
+      "original preparation authority id and spent attempt identity",
+      "original pinned authorization id/fingerprint/proof_context",
+      "original runtime lease id/stable fingerprint",
+      "exact scenario/source kind/hash/size/definition/invocation/field",
+      "retained authenticated provider graph and requirement",
+      "actual backend route/version/container/workspace generation/controller executable and controller-source identity",
+      "exact image/SANDBOX profile/policy/namespace/resource/environment evidence",
+      "source authentication and materialization readback hash/size/path",
+      "compiler path/hash and exact argv/cwd/environment",
+      "compile exit/complete bounded capture/reaped process evidence",
+      "full exact bounded source/class output manifest",
+      "harness scope exclusion and frozen renderer/helper identities",
+      "workspace live/artifact-integrity state; cleanup pending",
+      "domain-separated evidence digest/stable fingerprint"
+    ],
+    "harness_claim": "Scenario receipt does not prove a harness exists or has compiled. Its explicit exclusion prevents scenario output evidence from being misused as whole-executor readiness.",
+    "lifetime": "Same issuing host process, exact live attempt/container/workspace generation and unchanged original graph/artifacts. No wall-clock Boolean or timestamp alone establishes freshness. Timeout/abort/teardown, changed manifest, controller disconnect or terminal runtime state ends preactivation readiness.",
+    "reusable": "Read-only evidence may be revalidated repeatedly during one live attempt, including for final audit; it grants no repeat preparation or execution. Post-teardown authenticity may survive as evidence, readiness may not.",
+    "cleanup_state_at_success": "LIVE_EPHEMERAL_ARTIFACTS_CLEANUP_PENDING",
+    "cleanup_success_claimed_at_preparation_success": false,
+    "decision": "ACCEPTED_WITH_ADDITIVE_CLARIFICATION",
+    "may_prove_only": [
+      "exact source authentication",
+      "materialization and full readback",
+      "compiler identity",
+      "exact argv/cwd/environment",
+      "compile result",
+      "bounded output manifest with actual class hash",
+      "live workspace generation",
+      "cleanup pending"
+    ],
+    "context_bindings_are_additional_readiness_claims": false,
+    "may_claim_full_harness_readiness": false,
+    "may_claim_consumer_readiness": false,
+    "may_claim_behavior_success": false,
+    "alone_unlocks_runtime_consumption": false
+  },
+  "cleanup": {
+    "owner": "Proposed preparation owner owns attempt workspace lifecycle; future consumer borrows an exclusive artifact handoff; bound sandbox controller performs cleanup and independent absence observation.",
+    "on_preparation_failure": "No ready receipt. Kill/reap compiler children/process groups, close pipes/selectors and observe EOF, tear down entire workspace/container, independently verify absence. Failed cleanup is separately recorded and blocks further readiness; never silently claim success.",
+    "after_preparation_success": "Keep exact source/class in same ephemeral workspace only until consumer completion, abort, timeout or authorization/readiness loss. Receipt states live artifacts with cleanup pending; no premature removal or cleanup success claim.",
+    "after_behavior_or_abandonment": "Reap every child/process group, close captures, remove whole scenario container/workspace including /work and /tmp, independently verify absence and record separate cleanup evidence. Consumer failure spends activation and still requires cleanup.",
+    "persistent_artifacts": "No source, class, harness, workspace snapshot or raw byte dump survives final cleanup. Bounded source-free/class-free metadata reports, sizes, hashes, manifests and cleanup observations may survive as report-only audit evidence; no secrets or serialized restorable authority.",
+    "preparation_success_implies_cleanup_success": false,
+    "cleanup_failure_is_behavior_success": false,
+    "cleanup_authority_is_repository_write_authority": false
+  },
+  "authority_flags": {
+    "source_identity_authority_issued_by_this_phase": false,
+    "sandbox_materialization_authority": false,
+    "exact_sandbox_materialization_authority": false,
+    "scenario_compilation_authority": false,
+    "exact_scenario_compilation_authority": false,
+    "compilation_authority": false,
+    "runtime_activation_authority": false,
+    "runtime_authority": false,
+    "real_task_runtime_authority": false,
+    "repository_write_authority": false,
+    "repository_source_write_authority": false,
+    "repository_java_authority": false,
+    "apply_authority": false,
+    "network_authority": false,
+    "host_mount_authority": false,
+    "shell_authority": false,
+    "arbitrary_java_authority": false,
+    "arbitrary_command_authority": false,
+    "arbitrary_source_authority": false,
+    "arbitrary_class_authority": false,
+    "arbitrary_method_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "reflection_execution_authority": false,
+    "generic_reflection_authority": false,
+    "arbitrary_reflection_authority": false,
+    "constructor_reflection_authority": false,
+    "field_write_authority": false,
+    "private_method_authority": false,
+    "enumeration_authority": false,
+    "executor_authority": false,
+    "BANK_authority": false,
+    "preparation_authority": false,
+    "consumer_readiness_authority": false
+  },
+  "operational_effects": {
+    "Docker": 0,
+    "SANDBOX2": 0,
+    "JAVA1C": 0,
+    "provider_issuance": 0,
+    "pinned_auth_issuance": 0,
+    "runtime_lease_issuance": 0,
+    "reflection_admission_issuance": 0,
+    "reflection_lease_issuance": 0,
+    "preparation_authority_issuance": 0,
+    "capability_consumption": 0,
+    "capability_invalidation": 0,
+    "source_materialization": 0,
+    "filesystem_runtime_writes": 0,
+    "javac": 0,
+    "java": 0,
+    "class_loading": 0,
+    "reflection": 0,
+    "SyntheticStateBox": 0,
+    "BANK": 0,
+    "EXECUTOR_1R": 0,
+    "Apply": 0
+  },
+  "phase_id": "SYNTH.EXEC.PREP.PINNED.CONTRACT.CLOSE.1",
+  "schema_version": "synthetic_execution_preparation_pinned_contract_close_1_v1",
+  "artifact_kind": "additive_frozen_preparation_semantics_contract_only",
+  "completion_marker": "SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1_COMPLETE",
+  "decision_frozen": true,
+  "preparation_contract_complete": true,
+  "harness_contract_complete": false,
+  "preparation_contract_complete_implies_harness_contract_complete": false,
+  "implementation_authorized": false,
+  "owners_implemented": false,
+  "capabilities_issued": false,
+  "behavioral_activation_ready": false,
+  "runtime_consumption_ready": false,
+  "reason": "PROOF_UNRESOLVED",
+  "stop_after_contract_closure": true,
+  "closure_scope": {
+    "previous_proposal": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_1/contract.json",
+    "previous_outcome": "PREPARATION_REQUIRES_REQUIREMENT_EVOLUTION",
+    "revised_requirement": "docs/roadmap/phases/SYNTH_EXEC_ACTIVATION_BOUNDARY_REQ_1/requirement.json",
+    "requirement_outcome": "SYNTH_EXEC_ACTIVATION_BOUNDARY_REQ_1_COMPLETE",
+    "preparation_semantics_now_frozen": true,
+    "frozen_semantics_are_operational_authority": false,
+    "historical_artifacts_rewritten": false,
+    "additional_historical_claims_superseded": false,
+    "consumer_owner_or_runtime_integration_frozen": false,
+    "meaning": "The prior preparation proposals have been reviewed against the revised activation boundary and are now frozen preparation semantics. No owner, authority or operational effect exists."
+  },
+  "proposal_review": [
+    {
+      "item": 1,
+      "proposal": "in_memory_source_projection",
+      "classification": "PURE_DERIVATION",
+      "decision": "ACCEPTED_UNCHANGED",
+      "rationale": "Exact existing authenticated bytes are projected in memory without synthesis, rewriting or a filesystem effect."
+    },
+    {
+      "item": 2,
+      "proposal": "sandbox_materialization",
+      "classification": "PREPARATION_EFFECT",
+      "decision": "ACCEPTED_UNCHANGED",
+      "rationale": "The exclusive ephemeral source write and full readback change preparation state only; all original path/workspace controls remain binding."
+    },
+    {
+      "item": 3,
+      "proposal": "javac_compilation",
+      "classification": "PREPARATION_EFFECT",
+      "decision": "ACCEPTED_WITH_ADDITIVE_CLARIFICATION",
+      "rationale": "Compiler JVM infrastructure startup is distinct from scenario JVM dispatch. Only the exact closed source/JDK/image/environment inputs are accepted; no target loading, initialization, construction or invocation, processor/plugin/dependency inputs or extra flags are permitted. Source evidence contradicting this premise stops closure."
+    },
+    {
+      "item": 4,
+      "proposal": "JVM_startup",
+      "classification": "BEHAVIORAL_ACTIVATION_EFFECT",
+      "decision": "ACCEPTED_WITH_ADDITIVE_CLARIFICATION",
+      "rationale": "This denotes dispatch of the exact scenario-executing JVM under the completed activation-boundary requirement. It is no longer a proposed requirement revision and makes no universal classification of compiler or inert infrastructure JVM startup."
+    },
+    {
+      "item": 5,
+      "proposal": "target_loading_initialization_construction",
+      "classification": "AFTER_ACTIVATION_BOUNDARY",
+      "decision": "ACCEPTED_UNCHANGED",
+      "rationale": "Target loading/linking and initialization remain behavioral activation effects; ordinary construction is a behavioral effect. All occur after scenario JVM dispatch; inert class metadata inspection never loads the class."
+    },
+    {
+      "item": 6,
+      "proposal": "no_preparation_after_runtime_consumption",
+      "classification": "ORDERING_INVARIANT",
+      "decision": "ACCEPTED_UNCHANGED",
+      "rationale": "All preparation and full harness/consumer readiness evidence precede runtime consumption. Only mandatory authenticated permission checks/commits intervene before dispatch; no materialization, compilation, artifact repair or readiness acquisition after consumption."
+    }
+  ],
+  "activation_boundary": {
+    "operation": "dispatch exact scenario-executing JVM",
+    "classification": "BEHAVIORAL_ACTIVATION_EFFECT",
+    "conservative_authority_boundary": true,
+    "exact_first_harness_instruction_claimed": false,
+    "required_before_dispatch": [
+      "all capability/authentication gates",
+      "all preparation evidence",
+      "full harness readiness",
+      "consumer readiness",
+      "runtime lease ISSUED -> CONSUMED",
+      "BEFORE reflection lease ISSUED -> CONSUMED"
+    ],
+    "runtime_consumption_before_first_behavioral_activation": true,
+    "target_loading_linking_initialization_or_construction_before_dispatch_allowed": false,
+    "between_runtime_consumption_and_dispatch": "Only mandatory authenticated permission checks/commits may intervene, including the BEFORE reflection permission consumption. All preparation and full harness/consumer readiness must already be complete.",
+    "preparation_after_runtime_consumption_allowed": false,
+    "failed_check_after_runtime_consumption": "abort; no launch, refund, reopening or retry under the spent activation",
+    "launch_failure_after_runtime_consumption": "no refund",
+    "launch_authorized_by_this_requirement": false,
+    "generic_JVM_startup_classification": "No general classification is made for compiler JVMs or independently proved inert infrastructure JVMs. This requirement applies only to dispatch of the exact scenario-executing JVM."
+  },
+  "first_behavioral_effect": {
+    "operation": "dispatch exact scenario-executing JVM",
+    "classification": "BEHAVIORAL_ACTIVATION_EFFECT",
+    "requirement_evolution_required": false,
+    "resolved_by": "SYNTH.EXEC.ACTIVATION.BOUNDARY.REQ.1",
+    "first_known_source_level_mutable_state_effect": "ordinary construction initializing value = 10",
+    "first_exact_executable_harness_instruction": null,
+    "source_evidence_contradicts_compilation_classification": false,
+    "source_evidence_method": "Read and AST-evaluate the existing _SOURCE literal only; no owner import, executable Java check or source materialization.",
+    "contradiction_policy": "STOP; do not compile or run to resolve a contract contradiction; classify REQUIRES_NEW_REQUIREMENT or UNRESOLVED and withhold successful closure."
+  },
+  "ordering": {
+    "preparation_runtime_state": "ISSUED",
+    "both_reflection_admissions_and_leases_prepared_with_runtime": "ISSUED",
+    "preparation_requires_runtime_CONSUMED": false,
+    "preparation_after_runtime_consumption_allowed": false,
+    "sequence": [
+      {
+        "id": "capability_gates",
+        "operation": "authenticate original pinned auth/runtime/provider graph and all capability gates"
+      },
+      {
+        "id": "prepare_reflection",
+        "operation": "prepare distinct BEFORE and AFTER admissions and leases while runtime ISSUED"
+      },
+      {
+        "id": "source_authentication",
+        "operation": "authenticate exact frozen source, future narrow preparation authority and already-authorized live exclusive workspace generation"
+      },
+      {
+        "id": "source_projection",
+        "operation": "obtain exact existing source bytes in memory"
+      },
+      {
+        "id": "materialization",
+        "operation": "exclusively materialize exact source and authenticate full readback"
+      },
+      {
+        "id": "compilation",
+        "operation": "one exact bounded scenario compilation; authenticate source unchanged and bounded inert class output"
+      },
+      {
+        "id": "preparation_evidence",
+        "operation": "authenticate original preparation receipt and live workspace/artifact generation"
+      },
+      {
+        "id": "future_full_readiness",
+        "operation": "authenticate separately reviewed full harness and consumer readiness; presently unresolved"
+      },
+      {
+        "id": "handoff",
+        "operation": "complete all integrity, original graph, freshness and exclusive handoff checks while runtime ISSUED"
+      },
+      {
+        "id": "runtime_consume",
+        "operation": "consume runtime lease ISSUED -> CONSUMED"
+      },
+      {
+        "id": "before_permission_consume",
+        "operation": "authenticate and consume BEFORE reflection lease"
+      },
+      {
+        "id": "scenario_dispatch",
+        "operation": "dispatch exact scenario JVM"
+      },
+      {
+        "id": "target_activation",
+        "operation": "load/link/initialize target as required by future reviewed harness"
+      },
+      {
+        "id": "ordinary_construction",
+        "operation": "ordinary exact SyntheticStateBox construction"
+      },
+      {
+        "id": "before_read",
+        "operation": "BEFORE exact reflection read"
+      },
+      {
+        "id": "decrement",
+        "operation": "exact public decrement(3)"
+      },
+      {
+        "id": "after_permission_consume",
+        "operation": "authenticate and consume AFTER reflection lease"
+      },
+      {
+        "id": "after_read",
+        "operation": "AFTER exact reflection read"
+      },
+      {
+        "id": "cleanup",
+        "operation": "finish consumer; tear down entire workspace and independently verify absence"
+      }
+    ],
+    "between_runtime_consumption_and_dispatch": "Only mandatory authenticated permission checks/commits may intervene, including the BEFORE reflection permission consumption. All preparation and full harness/consumer readiness must already be complete.",
+    "launch_before_runtime_and_BEFORE_commits_allowed": false,
+    "refund_after_runtime_consumption_allowed": false,
+    "launch_failure_or_postcommit_check_failure": "Abort; no launch after failed checks, no refund, reopening, reissue or retry under spent activation.",
+    "AFTER_handoff": "AFTER read still requires its separately authenticated consumed permission. Exact staged harness/controller protocol remains unresolved and is not defined here.",
+    "future_order_is_current_execution_permission": false,
+    "cleanup_is_preparation": false,
+    "cleanup_clarification": "Mandatory teardown, child reaping and independent absence verification after completion or abort remain cleanup duties; they do not permit another preparation attempt after runtime consumption."
+  },
+  "preparation_authority": {
+    "decision": "ACCEPTED_WITH_ADDITIVE_CLARIFICATION",
+    "future_owner": "core.synthetic_execution_preparation_pinned",
+    "type": "PinnedSyntheticPreparationAuthority",
+    "schema": "synthetic_preparation_authority_pinned_1_v1",
+    "one_authority_two_noninterchangeable_facets": true,
+    "facets": [
+      "exact_sandbox_materialization_authority",
+      "exact_scenario_compilation_authority"
+    ],
+    "semantics": {
+      "source_identity_authority": "Existing unchanged pinned authorization public validator, transitively retaining its exact source/scenario and provider graph; source bytes alone are not authority.",
+      "sandbox_materialization_authority": "Proposed independent exact preparation owner; only a live original preparation authority's materialization facet, delegated to its bound already-authorized sandbox controller, may permit the single exclusive source write.",
+      "scenario_compilation_authority": "The same proposed owner, separately scoped compilation facet, permits one fixed compiler attempt after verified materialization. It is not inherited from pinned auth, runtime lease, reflection permissions, or JAVA.1C provider evidence.",
+      "runtime_activation_authority": "Existing exact pinned runtime lease only; prepare never consumes or expands it.",
+      "reflection_permission": "Existing exact pinned BEFORE/AFTER admissions and reflection leases only.",
+      "effect_evidence": "Authenticated observations after actual effects; neither capability possession, compilation nor terminal permission state is behavior success.",
+      "preparation_authority_design": "One narrow one-shot preparation authority plus one immutable success receipt. Two non-interchangeable operation facets bind one fixed materialize-then-compile attempt. No generic file or command API; no independent capability per field.",
+      "proposed_owner": "core.synthetic_execution_preparation_pinned",
+      "proposed_authority_type": "PinnedSyntheticPreparationAuthority",
+      "proposed_authority_schema": "synthetic_preparation_authority_pinned_1_v1",
+      "proposed_scope_fields": [
+        "exact_sandbox_materialization_authority",
+        "exact_scenario_compilation_authority"
+      ],
+      "authority_lifetime": "Issuing process and exact runtime ISSUED interval; one original authorization/runtime/workspace generation. Reserve each effect facet immediately before its attempted operation; failures spend the attempt and publish no success receipt. No reissue or refund for the same bound attempt.",
+      "authority_issuance_requires": [
+        "original publicly authenticated pinned auth/runtime graph",
+        "runtime ISSUED",
+        "live independently authorized SANDBOX.2 workspace and exact controller binding",
+        "all fixed source/compiler/image/path/template pins",
+        "no existing attempt tombstone for exact runtime/workspace generation"
+      ],
+      "provider_infrastructure_evidence_is_scenario_permission": false,
+      "all_authorities_distinct": true
+    },
+    "each_facet": {
+      "max_attempts": 1,
+      "reservation": "immediately before its exact effect",
+      "failure_spends_attempt": true,
+      "refund_allowed": false,
+      "reissue_allowed": false,
+      "exact_original_bindings": [
+        "pinned authorization",
+        "runtime lease",
+        "workspace/container generation",
+        "controller",
+        "provider graph"
+      ],
+      "runtime_state_required": "ISSUED"
+    },
+    "compilation_requires_verified_materialization": true,
+    "materialization_facet_can_compile": false,
+    "compilation_facet_can_materialize": false,
+    "generic_file_or_command_API_allowed": false,
+    "sandbox_or_provider_issuance_granted": false,
+    "future_implementation_or_lock_integration_preapproved": false,
+    "phase_issues_authority": false,
+    "clarification": "Freeze only future narrow preparation semantics. Existing auth/runtime/reflection or JAVA.1C evidence is never preparation permission, and this artifact issues no capability."
+  },
+  "preparation_evidence_authentication": {
+    "algorithm": "HMAC-SHA256 with independent secret for each proposed owner; no existing owner secret reuse",
+    "canonical_payload": "Exact primitive/nested types; sorted compact JSON, allow_nan=false, UTF-8; domain + NUL + role + NUL + canonical bytes",
+    "preparation_domain": "CATTUS:SYNTH.EXEC.PREP.PINNED.1:exact-preparation:v1",
+    "digest_is_authentication": false,
+    "JSON_exports_report_only": true,
+    "source_identity_not_equal_to_obtained_bytes": true,
+    "obtained_bytes_not_equal_to_materialization": true,
+    "materialization_not_equal_to_compilation": true,
+    "compilation_not_equal_to_runtime_behavior": true
+  },
+  "harness_boundary": {
+    "decision": "UNRESOLVED",
+    "preparation_closure_requires_harness_completion": false,
+    "full_harness": {
+      "source_bytes": null,
+      "source_sha256": null,
+      "source_size_bytes": null,
+      "main_class": null,
+      "scenario_JVM_argv": null,
+      "loader_controller_implementation": null,
+      "staged_BEFORE_AFTER_protocol_implementation": null,
+      "unresolved_fields": [
+        "source_bytes",
+        "source_sha256",
+        "source_size_bytes",
+        "main_class",
+        "scenario_JVM_argv",
+        "loader_controller_implementation",
+        "staged_BEFORE_AFTER_protocol_implementation"
+      ],
+      "full_executable_harness_frozen": false,
+      "reflection_helpers_establish_full_harness": false,
+      "earlier_exact_instruction_invented": false
+    },
+    "historical_renderer_identity": {
+      "renderer": "SYNTH.REFLECT.1.render_synthetic_read_only_reflection",
+      "renderer_phase": "SYNTH.REFLECT.1",
+      "renderer_schema": "synthetic_reflection_request_v1",
+      "before_helper_sha256": "c88aeea914c88ef17a335a184abe6d5b618a9c0c70a7121621ba67edd9919531",
+      "after_helper_sha256": "4d85951e886bfedabae50c7f64e8e0fa4985e8fa515e4edab9af0a355b10f4ea",
+      "full_executable_harness_source_frozen": false,
+      "full_executable_harness_sha256": null,
+      "renderer_helpers_are_complete_harness": false,
+      "readiness_requirement": "A separately reviewed consumer contract must pin full harness source bytes/hash/size, compiler/input/output manifests, main/JVM argv, controller protocol/source and exact executable identities; authenticate their original preparation evidence. No caller-selected hash or renderer fingerprint substitutes. No harness source/output is permitted by this scenario preparation authority.",
+      "missing_full_harness_blocks_activation": true,
+      "semantics_freeze_requires_fabricating_harness": false
+    },
+    "helpers_establish_full_harness": false,
+    "invented_harness_fields": [],
+    "scope": "No harness source, hash, main, JVM argv, loader/controller source or staged permission protocol is fabricated, frozen or implemented. Existing helper metadata is historical evidence only."
+  },
+  "consumer_readiness": {
+    "review_scope": "DEPENDENCY_SHAPE_ONLY",
+    "dependency_decision": "ACCEPTED_WITH_ADDITIVE_CLARIFICATION",
+    "final_owner_decision": "UNRESOLVED",
+    "preparation_receipt_may_be_one_future_input": true,
+    "preparation_receipt_alone_unlocks_runtime_consumption": false,
+    "separate_full_harness_and_consumer_review_required": true,
+    "final_owner_frozen": false,
+    "final_schema_frozen": false,
+    "final_public_API_frozen": false,
+    "runtime_lock_integration_frozen": false,
+    "implemented": false,
+    "runtime_consumption": "PROOF_UNRESOLVED",
+    "reason": "Full harness and authenticated consumer evidence remain separately unreviewed/unimplemented. Existing unconditional runtime readiness denial is unchanged."
+  },
+  "historical_preservation": {
+    "historical_bytes_preserved": true,
+    "old_JSON_rewritten": false,
+    "history_repinned": false,
+    "retroactive_mutation": false,
+    "old_requirement_globally_invalidated": false,
+    "preserve_existing_workspace_changes": true
+  },
+  "completion_rule": {
+    "success": "SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1_COMPLETE",
+    "further_evolution": "PREPARATION_CONTRACT_REQUIRES_FURTHER_EVOLUTION",
+    "unresolved": "CONTRACT_UNRESOLVED",
+    "all_six_proposals_must_be_accepted": true,
+    "source_contradiction_stops_closure": true,
+    "validation_and_preservation_required": true,
+    "stop_after_closure": true,
+    "next_action_authorized": null
+  },
+  "effect_counter_scope": "Scenario/provider/capability/runtime effects only. Authoring this additive documentation and guarded pure validation evidence does not delegate repository-write, shell or arbitrary-command authority to any runtime component."
+}

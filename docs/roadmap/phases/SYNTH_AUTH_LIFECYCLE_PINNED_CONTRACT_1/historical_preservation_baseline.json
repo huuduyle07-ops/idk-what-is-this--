@@ -1,0 +1,245 @@
+{
+  "audit_artifact_output": "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_CONTRACT_1/historical_preservation.json",
+  "binding_count_failures": 0,
+  "check_count": 23,
+  "checks": [
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 2246,
+      "drift": [],
+      "expected_binding_count": 2246,
+      "label": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1R/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 2246
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 355,
+      "drift": [],
+      "expected_binding_count": 355,
+      "label": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 355
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 355,
+      "drift": [],
+      "expected_binding_count": 355,
+      "label": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/historical_preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 355
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1,
+      "drift": [],
+      "expected_binding_count": 1,
+      "label": "PINNED.1R original source identity checksum",
+      "passed": true,
+      "unchanged_count": 1
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1,
+      "drift": [],
+      "expected_binding_count": 1,
+      "label": "Original prior baseline checksum: docs/roadmap/phases/SYNTH_AUTH_PINNED_1/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 1
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 355,
+      "drift": [],
+      "expected_binding_count": 355,
+      "label": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 355
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1,
+      "drift": [],
+      "expected_binding_count": 1,
+      "label": "Original prior baseline checksum: docs/roadmap/phases/RUNTIME_JAVA_1C_AUTH_DIAG_1/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 1
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1828,
+      "drift": [],
+      "expected_binding_count": 1828,
+      "label": "docs/roadmap/phases/RUNTIME_JAVA_1C_AUTH_DIAG_1/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 1828
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1,
+      "drift": [],
+      "expected_binding_count": 1,
+      "label": "Original prior baseline checksum: docs/roadmap/phases/RUNTIME_SANDBOX_2_PRELADDER_DIAG_1/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 1
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 2126,
+      "drift": [],
+      "expected_binding_count": 2126,
+      "label": "docs/roadmap/phases/RUNTIME_SANDBOX_2_PRELADDER_DIAG_1/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 2126
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1,
+      "drift": [],
+      "expected_binding_count": 1,
+      "label": "Original prior baseline checksum: docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 1
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 2185,
+      "drift": [],
+      "expected_binding_count": 2185,
+      "label": "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 2185
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 359,
+      "drift": [],
+      "expected_binding_count": 359,
+      "label": "PINNED.1R original expected source pins",
+      "passed": true,
+      "unchanged_count": 359
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 21,
+      "drift": [],
+      "expected_binding_count": 21,
+      "label": "PINNED.1R frozen live graph source subset",
+      "passed": true,
+      "unchanged_count": 21
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1,
+      "drift": [],
+      "expected_binding_count": 1,
+      "label": "PINNED.1 original frozen gate checksum",
+      "passed": true,
+      "unchanged_count": 1
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 359,
+      "drift": [],
+      "expected_binding_count": 359,
+      "label": "PINNED.1 original gate source pins",
+      "passed": true,
+      "unchanged_count": 359
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1,
+      "drift": [],
+      "expected_binding_count": 1,
+      "label": "Supplemental original gate checksum",
+      "passed": true,
+      "unchanged_count": 1
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 13,
+      "drift": [],
+      "expected_binding_count": 13,
+      "label": "Supplemental original gate source pins",
+      "passed": true,
+      "unchanged_count": 13
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1,
+      "drift": [],
+      "expected_binding_count": 1,
+      "label": "Additional provenance original pin: docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 1
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1,
+      "drift": [],
+      "expected_binding_count": 1,
+      "label": "Additional provenance original pin: docs/roadmap/phases/RUNTIME_JAVA_REQUIREMENT_PINNED_1/preservation_baseline.json",
+      "passed": true,
+      "unchanged_count": 1
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 10,
+      "drift": [],
+      "expected_binding_count": 10,
+      "label": "PINNED.1R original artifact manifest",
+      "passed": true,
+      "unchanged_count": 10
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1,
+      "drift": [],
+      "expected_binding_count": 1,
+      "label": "Historical original replay runner checksum",
+      "passed": true,
+      "unchanged_count": 1
+    },
+    {
+      "binding_count_matches": true,
+      "bindings_checked": 1,
+      "drift": [],
+      "expected_binding_count": 1,
+      "label": "Historical original blocked authorization report checksum",
+      "passed": true,
+      "unchanged_count": 1
+    }
+  ],
+  "drift_count": 0,
+  "error": null,
+  "expected_hash_origin": "Unchanged stored historical manifests and source-identity records only",
+  "historical_drift_repinned": false,
+  "historical_preservation_verified": true,
+  "operational_effect_counts": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR_1R": 0,
+    "JAVA1C": 0,
+    "PINNED1A_export": 0,
+    "SANDBOX2_issuance": 0,
+    "SyntheticStateBox": 0,
+    "authorization_issuance": 0,
+    "execution_lease_consumption": 0,
+    "execution_lease_issuance": 0,
+    "owner_imports": 0,
+    "provider_issuance": 0,
+    "reflection": 0,
+    "repository_runtime_writes": 0,
+    "tests_run": 0
+  },
+  "phase_id": "SYNTH.AUTH.LIFECYCLE.PINNED.CONTRACT.1",
+  "reproduce": "python -B docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_CONTRACT_1/check_preservation.py --mode after",
+  "result": "HISTORICAL_PRESERVATION_VERIFIED",
+  "reused_frozen_checker": "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1/check_historical_preservation.py",
+  "reused_frozen_checker_sha256": "72bab3aaa5e51d86855a2bd251462ebf9e2db691fd7d78390e879674f363849c",
+  "schema_version": "historical_preservation_audit_v1",
+  "scope_limit": "Historical stored-pin integrity only; the phase's separate 2263-file baseline is checked independently.",
+  "unique_current_files_hashed": 2257
+}

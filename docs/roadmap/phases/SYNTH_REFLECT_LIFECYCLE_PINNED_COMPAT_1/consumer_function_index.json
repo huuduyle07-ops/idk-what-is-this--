@@ -1,0 +1,814 @@
+{
+  "function_method_count": 29,
+  "records": [
+    {
+      "attributes_read_directly": [
+        "self.code",
+        "self.reason",
+        "super().__init__"
+      ],
+      "calls_directly": [
+        "super",
+        "super().__init__"
+      ],
+      "end_line": 60,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [],
+      "function": "SyntheticReflectionExecutionLeaseError.__init__",
+      "line": 57,
+      "old_auth_issuance_id_assumed_directly_or_transitively": false,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": false,
+      "original_live_upstream_objects_required_in_authentication_closure": false,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [],
+      "calls_directly": [
+        "SyntheticReflectionExecutionLeaseError"
+      ],
+      "end_line": 64,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [],
+      "function": "_fail",
+      "line": 63,
+      "old_auth_issuance_id_assumed_directly_or_transitively": false,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": false,
+      "original_live_upstream_objects_required_in_authentication_closure": false,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "json.dumps"
+      ],
+      "calls_directly": [
+        "json.dumps"
+      ],
+      "end_line": 68,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [],
+      "function": "_json",
+      "line": 67,
+      "old_auth_issuance_id_assumed_directly_or_transitively": false,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": false,
+      "original_live_upstream_objects_required_in_authentication_closure": false,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [],
+      "calls_directly": [
+        "all",
+        "len",
+        "type"
+      ],
+      "end_line": 73,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [],
+      "function": "_hex_id",
+      "line": 71,
+      "old_auth_issuance_id_assumed_directly_or_transitively": false,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": false,
+      "original_live_upstream_objects_required_in_authentication_closure": false,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "os.getpid"
+      ],
+      "calls_directly": [
+        "_fail",
+        "os.getpid",
+        "type"
+      ],
+      "end_line": 78,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [],
+      "function": "_local_process",
+      "line": 76,
+      "old_auth_issuance_id_assumed_directly_or_transitively": false,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": false,
+      "original_live_upstream_objects_required_in_authentication_closure": false,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [],
+      "calls_directly": [
+        "_local_process"
+      ],
+      "end_line": 83,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [],
+      "function": "_local_lock",
+      "line": 81,
+      "old_auth_issuance_id_assumed_directly_or_transitively": false,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": false,
+      "original_live_upstream_objects_required_in_authentication_closure": false,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [],
+      "calls_directly": [
+        "_fail",
+        "type"
+      ],
+      "end_line": 88,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [],
+      "function": "_role",
+      "line": 86,
+      "old_auth_issuance_id_assumed_directly_or_transitively": false,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": false,
+      "original_live_upstream_objects_required_in_authentication_closure": false,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "admission_owner.synthetic_reflection_admission_satisfies_executor",
+        "admission_owner.validate_synthetic_reflection_execution_admission",
+        "authorization.fingerprint",
+        "authorization.issuance_id",
+        "authorization_owner.executor1r_decrement_3_spec",
+        "authorization_owner.get_executor1r_decrement_3_source",
+        "authorization_owner.validate_synthetic_runtime_authorization",
+        "capability.declared_type",
+        "capability.definition_sha256",
+        "capability.member",
+        "capability.observation_role",
+        "capability.operation",
+        "capability.owner",
+        "capability.scenario_id",
+        "capability.source_sha256",
+        "request_owner.validate_synthetic_reflection_request",
+        "runtime.upstream_authorization_fingerprint",
+        "runtime.upstream_authorization_issuance_id",
+        "runtime_owner.validate_synthetic_runtime_execution_lease",
+        "type(error).__name__"
+      ],
+      "calls_directly": [
+        "_fail",
+        "_role",
+        "admission_owner.synthetic_reflection_admission_satisfies_executor",
+        "admission_owner.validate_synthetic_reflection_execution_admission",
+        "authorization_owner.executor1r_decrement_3_spec",
+        "authorization_owner.get_executor1r_decrement_3_source",
+        "authorization_owner.validate_synthetic_runtime_authorization",
+        "getattr",
+        "request_owner.validate_synthetic_reflection_request",
+        "runtime_owner.validate_synthetic_runtime_execution_lease",
+        "type"
+      ],
+      "end_line": 119,
+      "exact_imported_owners_called_directly": [
+        "core.synthetic_read_only_reflection",
+        "core.synthetic_reflection_execution_admission",
+        "core.synthetic_runtime_authorization",
+        "core.synthetic_runtime_authorization_lifecycle"
+      ],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "_authenticate_inputs",
+      "line": 91,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [
+        "admission_owner.validate_synthetic_reflection_execution_admission",
+        "authorization_owner.validate_synthetic_runtime_authorization",
+        "request_owner.validate_synthetic_reflection_request",
+        "runtime_owner.validate_synthetic_runtime_execution_lease"
+      ],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "self.runtime_execution_lease_id"
+      ],
+      "calls_directly": [],
+      "end_line": 168,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [],
+      "function": "SyntheticReflectionExecutionLease.scenario_execution_lease_id",
+      "line": 167,
+      "old_auth_issuance_id_assumed_directly_or_transitively": false,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": false,
+      "original_live_upstream_objects_required_in_authentication_closure": false,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "self.runtime_execution_lease_fingerprint"
+      ],
+      "calls_directly": [],
+      "end_line": 172,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [],
+      "function": "SyntheticReflectionExecutionLease.scenario_execution_lease_fingerprint",
+      "line": 171,
+      "old_auth_issuance_id_assumed_directly_or_transitively": false,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": false,
+      "original_live_upstream_objects_required_in_authentication_closure": false,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [],
+      "calls_directly": [
+        "synthetic_reflection_execution_lease_state"
+      ],
+      "end_line": 176,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "SyntheticReflectionExecutionLease.lifecycle_state",
+      "line": 175,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "record.projection_json",
+        "record.projection_json.encode",
+        "sha256(record.projection_json.encode('utf8')).hexdigest"
+      ],
+      "calls_directly": [
+        "_authenticated_record_locked",
+        "_local_lock",
+        "record.projection_json.encode",
+        "sha256",
+        "sha256(record.projection_json.encode('utf8')).hexdigest"
+      ],
+      "end_line": 182,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "SyntheticReflectionExecutionLease.fingerprint",
+      "line": 179,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "record.lifecycle_state",
+        "record.projection_json",
+        "record.projection_json.encode",
+        "sha256(record.projection_json.encode('utf8')).hexdigest"
+      ],
+      "calls_directly": [
+        "_authenticated_record_locked",
+        "_local_lock",
+        "_projection",
+        "record.projection_json.encode",
+        "sha256",
+        "sha256(record.projection_json.encode('utf8')).hexdigest"
+      ],
+      "end_line": 189,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "SyntheticReflectionExecutionLease.as_dict",
+      "line": 184,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "item.name"
+      ],
+      "calls_directly": [
+        "fields",
+        "getattr"
+      ],
+      "end_line": 206,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [],
+      "function": "_projection",
+      "line": 205,
+      "old_auth_issuance_id_assumed_directly_or_transitively": false,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": false,
+      "original_live_upstream_objects_required_in_authentication_closure": false,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "admission.admission_id",
+        "admission.fingerprint",
+        "authorization.fingerprint",
+        "authorization.issuance_id",
+        "request.fingerprint",
+        "request.issuance_id",
+        "runtime.fingerprint",
+        "runtime.lease_id"
+      ],
+      "calls_directly": [
+        "SyntheticReflectionExecutionLease"
+      ],
+      "end_line": 214,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "_unsigned_lease",
+      "line": 209,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "hmac.new",
+        "hmac.new(_SECRET, payload.encode('utf8'), 'sha256').hexdigest",
+        "payload.encode"
+      ],
+      "calls_directly": [
+        "_json",
+        "hmac.new",
+        "hmac.new(_SECRET, payload.encode('utf8'), 'sha256').hexdigest",
+        "payload.encode"
+      ],
+      "end_line": 219,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [],
+      "function": "_sign",
+      "line": 217,
+      "old_auth_issuance_id_assumed_directly_or_transitively": false,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": false,
+      "original_live_upstream_objects_required_in_authentication_closure": false,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "_ADMISSION_LEASES.get",
+        "_LEASES.get",
+        "expected.items",
+        "hmac.compare_digest",
+        "lease.lease_id",
+        "record.admission",
+        "record.admission.admission_id",
+        "record.authorization",
+        "record.lease_ref",
+        "record.lifecycle_state",
+        "record.observation_role",
+        "record.projection_json",
+        "record.request",
+        "record.runtime",
+        "record.signature"
+      ],
+      "calls_directly": [
+        "_ADMISSION_LEASES.get",
+        "_LEASES.get",
+        "_authenticate_inputs",
+        "_fail",
+        "_hex_id",
+        "_json",
+        "_local_process",
+        "_projection",
+        "_sign",
+        "_unsigned_lease",
+        "all",
+        "expected.items",
+        "getattr",
+        "hmac.compare_digest",
+        "record.lease_ref",
+        "type"
+      ],
+      "end_line": 248,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "_authenticated_record_locked",
+      "line": 222,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "record.admission",
+        "record.authorization",
+        "record.observation_role",
+        "record.request",
+        "record.runtime"
+      ],
+      "calls_directly": [
+        "_authenticated_record_locked",
+        "_fail",
+        "_role"
+      ],
+      "end_line": 258,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "_bound_record_locked",
+      "line": 251,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "required.lower",
+        "runtime_owner.synthetic_runtime_execution_lease_state",
+        "type(error).__name__"
+      ],
+      "calls_directly": [
+        "_fail",
+        "getattr",
+        "required.lower",
+        "runtime_owner.synthetic_runtime_execution_lease_state",
+        "type"
+      ],
+      "end_line": 267,
+      "exact_imported_owners_called_directly": [
+        "core.synthetic_runtime_authorization_lifecycle"
+      ],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease"
+      ],
+      "function": "_runtime_state",
+      "line": 261,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "admission.admission_id",
+        "secrets.token_hex"
+      ],
+      "calls_directly": [
+        "_LeaseRecord",
+        "_authenticate_inputs",
+        "_fail",
+        "_json",
+        "_local_lock",
+        "_projection",
+        "_runtime_state",
+        "_sign",
+        "_unsigned_lease",
+        "ref",
+        "secrets.token_hex"
+      ],
+      "end_line": 289,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "issue_synthetic_reflection_execution_lease",
+      "line": 270,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [],
+      "calls_directly": [
+        "_authenticated_record_locked",
+        "_local_lock"
+      ],
+      "end_line": 296,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "validate_synthetic_reflection_execution_lease",
+      "line": 292,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "_authenticated_record_locked(lease).lifecycle_state"
+      ],
+      "calls_directly": [
+        "_authenticated_record_locked",
+        "_local_lock"
+      ],
+      "end_line": 301,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "synthetic_reflection_execution_lease_state",
+      "line": 299,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "record.lifecycle_state"
+      ],
+      "calls_directly": [
+        "_bound_record_locked",
+        "_local_lock",
+        "_runtime_state"
+      ],
+      "end_line": 311,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "_compatible",
+      "line": 304,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [],
+      "calls_directly": [
+        "_compatible"
+      ],
+      "end_line": 317,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "synthetic_reflection_execution_lease_satisfies_executor",
+      "line": 314,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [],
+      "calls_directly": [
+        "_compatible"
+      ],
+      "end_line": 322,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "consumable_during_active_execution",
+      "line": 320,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "lease.lease_id",
+        "record.lifecycle_state",
+        "record.projection_json"
+      ],
+      "calls_directly": [
+        "_bound_record_locked",
+        "_fail",
+        "_local_lock",
+        "_runtime_state",
+        "_sign",
+        "replace"
+      ],
+      "end_line": 338,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "_transition",
+      "line": 325,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [],
+      "calls_directly": [
+        "_transition"
+      ],
+      "end_line": 344,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "consume_synthetic_reflection_execution_lease",
+      "line": 341,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [],
+      "calls_directly": [
+        "_transition"
+      ],
+      "end_line": 350,
+      "exact_imported_owners_called_directly": [],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "invalidate_synthetic_reflection_execution_lease",
+      "line": 347,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    },
+    {
+      "attributes_read_directly": [
+        "admission_owner.issue_synthetic_reflection_execution_admission",
+        "after.as_dict",
+        "after.lifecycle_state",
+        "after.runtime_execution_lease_fingerprint",
+        "after.runtime_execution_lease_id",
+        "authorization.as_dict",
+        "authorization.fingerprint",
+        "authorization.issuance_id",
+        "authorization_owner.executor1r_decrement_3_spec",
+        "authorization_owner.get_executor1r_decrement_3_source",
+        "authorization_owner.issue_synthetic_runtime_authorization",
+        "before.as_dict",
+        "before.lifecycle_state",
+        "before.runtime_execution_lease_fingerprint",
+        "before.runtime_execution_lease_id",
+        "error.code",
+        "handles.update",
+        "handles['after_admission'].as_dict",
+        "handles['after_request'].as_dict",
+        "handles['before_admission'].as_dict",
+        "handles['before_request'].as_dict",
+        "lease.lifecycle_state",
+        "request_owner.executor1r_after_request",
+        "request_owner.executor1r_before_request",
+        "runtime.as_dict",
+        "runtime.fingerprint",
+        "runtime.lease_id",
+        "runtime.lifecycle_state",
+        "runtime_owner.issue_synthetic_runtime_execution_lease"
+      ],
+      "calls_directly": [
+        "AssertionError",
+        "admission_owner.issue_synthetic_reflection_execution_admission",
+        "after.as_dict",
+        "authorization.as_dict",
+        "authorization_owner.executor1r_decrement_3_spec",
+        "authorization_owner.get_executor1r_decrement_3_source",
+        "authorization_owner.issue_synthetic_runtime_authorization",
+        "before.as_dict",
+        "factory",
+        "handles.update",
+        "handles['after_admission'].as_dict",
+        "handles['after_request'].as_dict",
+        "handles['before_admission'].as_dict",
+        "handles['before_request'].as_dict",
+        "issue_synthetic_reflection_execution_lease",
+        "list",
+        "runtime.as_dict",
+        "runtime_owner.issue_synthetic_runtime_execution_lease",
+        "synthetic_reflection_execution_lease_satisfies_executor",
+        "validate_synthetic_reflection_execution_lease"
+      ],
+      "end_line": 419,
+      "exact_imported_owners_called_directly": [
+        "core.synthetic_reflection_execution_admission",
+        "core.synthetic_runtime_authorization",
+        "core.synthetic_runtime_authorization_lifecycle"
+      ],
+      "expected_upstream_types_in_closure": [
+        "core.synthetic_runtime_authorization.SyntheticRuntimeAuthorization",
+        "core.synthetic_runtime_authorization_lifecycle.SyntheticRuntimeExecutionLease",
+        "core.synthetic_read_only_reflection.SyntheticReflectionRequest",
+        "core.synthetic_reflection_execution_admission.SyntheticReflectionExecutionAdmission"
+      ],
+      "function": "verify",
+      "line": 353,
+      "old_auth_issuance_id_assumed_directly_or_transitively": true,
+      "old_runtime_exact_type_schema_assumed_directly_or_transitively": true,
+      "original_live_upstream_objects_required_in_authentication_closure": true,
+      "precise_direct_vs_transitive_and_field_meaning": "See corresponding function and I/P/H/B/S closure rows in reflection_lifecycle_trace.md.",
+      "public_validators_called_directly": [
+        "validate_synthetic_reflection_execution_lease"
+      ],
+      "source": "core/synthetic_reflection_execution_lifecycle.py"
+    }
+  ],
+  "report_only": true,
+  "source_sha256": "c2b85e845f79332b83f3c17e754ba290db739e9c19378317fed16c6402e686ba"
+}

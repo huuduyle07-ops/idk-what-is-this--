@@ -1,0 +1,1220 @@
+{
+  "additional_truthful_records_cannot_reduce_bound": true,
+  "all_existing_residuals_nonnegative": true,
+  "class_size_occurrences": [
+    {
+      "difference_expression": "D_class-5",
+      "difference_interval": [
+        -4,
+        0
+      ],
+      "frozen_profile_width": 5,
+      "in_historical_residual": false,
+      "legal_width_set": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "path": "/result/class_metadata/size_bytes",
+      "symbol": "class_size_digits"
+    },
+    {
+      "difference_expression": "D_class-5",
+      "difference_interval": [
+        -4,
+        0
+      ],
+      "frozen_profile_width": 5,
+      "in_historical_residual": false,
+      "legal_width_set": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "path": "/result/workspace_state/work_manifest/2/size_bytes",
+      "symbol": "class_size_digits"
+    }
+  ],
+  "class_width_table": [
+    {
+      "actual_class_size_selected": false,
+      "attainable_equality_claimed": false,
+      "class_decimal_width": 1,
+      "class_width_adjustment": -8,
+      "lower_physical_subtotal": 8821,
+      "proven_excess_lower_bound": 629,
+      "semantic_lower_subtotal": 8813
+    },
+    {
+      "actual_class_size_selected": false,
+      "attainable_equality_claimed": false,
+      "class_decimal_width": 2,
+      "class_width_adjustment": -6,
+      "lower_physical_subtotal": 8823,
+      "proven_excess_lower_bound": 631,
+      "semantic_lower_subtotal": 8815
+    },
+    {
+      "actual_class_size_selected": false,
+      "attainable_equality_claimed": false,
+      "class_decimal_width": 3,
+      "class_width_adjustment": -4,
+      "lower_physical_subtotal": 8825,
+      "proven_excess_lower_bound": 633,
+      "semantic_lower_subtotal": 8817
+    },
+    {
+      "actual_class_size_selected": false,
+      "attainable_equality_claimed": false,
+      "class_decimal_width": 4,
+      "class_width_adjustment": -2,
+      "lower_physical_subtotal": 8827,
+      "proven_excess_lower_bound": 635,
+      "semantic_lower_subtotal": 8819
+    },
+    {
+      "actual_class_size_selected": false,
+      "attainable_equality_claimed": false,
+      "class_decimal_width": 5,
+      "class_width_adjustment": 0,
+      "lower_physical_subtotal": 8829,
+      "proven_excess_lower_bound": 637,
+      "semantic_lower_subtotal": 8821
+    }
+  ],
+  "every_symbolic_leaf_accounted_for": true,
+  "existing_residual_leaf_count": 88,
+  "no_concrete_identity_or_class_values_instantiated": true,
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.TRANSPORT.CANDIDATE_A.CLOSE.1R",
+  "response_audit": [
+    {
+      "all_existing_residuals_nonnegative": true,
+      "class_adjusted_subtotals": [
+        3567,
+        3567,
+        3567,
+        3567,
+        3567
+      ],
+      "exact_width_leaves": [
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "container",
+          "path": "/container_identity",
+          "symbol": "container_identity"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "generation",
+          "path": "/controller_generation",
+          "symbol": "controller_generation"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/operation_id",
+          "symbol": "operation_id.materialize"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/request_id",
+          "symbol": "request_id.materialize"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/result/preparation_attempt_id",
+          "symbol": "preparation_attempt_id"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "container",
+          "path": "/result/workspace_state/container_identity",
+          "symbol": "container_identity"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "generation",
+          "path": "/result/workspace_state/controller_generation",
+          "symbol": "controller_generation"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/result/workspace_state/controller_identity",
+          "symbol": "controller_identity"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "fixed_digest",
+          "path": "/result/workspace_state/observation_challenge",
+          "symbol": "post_challenge.materialized"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "generation",
+          "path": "/result/workspace_state/process_exclusivity_observation/controller_generation",
+          "symbol": "controller_generation"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/result/workspace_state/process_exclusivity_observation/exclusive_owner_relation_id",
+          "symbol": "exclusive_owner_relation_id"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "kernel_namespace",
+          "path": "/result/workspace_state/process_exclusivity_observation/namespace_identity",
+          "symbol": "process_namespace_identity"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "kernel_cgroup",
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/cgroup_identity",
+          "symbol": "cgroup"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/accounted_original_relation_id",
+          "symbol": "exclusive_owner_relation_id"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "fixed_digest",
+          "path": "/result/workspace_state/stable_fingerprint",
+          "symbol": "stable_fingerprint"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/result/workspace_state/workspace_capability_id",
+          "symbol": "workspace_capability_id"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "generation",
+          "path": "/result/workspace_state/workspace_generation",
+          "symbol": "workspace_generation"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/workspace_capability_id",
+          "symbol": "workspace_capability_id"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "generation",
+          "path": "/workspace_generation",
+          "symbol": "workspace_generation"
+        }
+      ],
+      "operation": "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+      "residual_count": 39,
+      "residuals": [
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[issuing_pid]-1",
+          "family": "issuing_pid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/issuing_pid",
+          "symbol": "issuing_pid"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount./tmp]-3",
+          "family": "kernel_mount",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/mount_identity",
+          "symbol": "mount./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount_namespace_generation]-3",
+          "family": "kernel_namespace",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/namespace_generation",
+          "symbol": "mount_namespace_generation"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root./tmp]-3",
+          "family": "kernel_root",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/root_identity",
+          "symbol": "root./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_gid./tmp]-1",
+          "family": "root_uid_gid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/root_metadata/gid",
+          "symbol": "root_gid./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_links./tmp]-1",
+          "family": "link_count",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/root_metadata/link_count",
+          "symbol": "root_links./tmp"
+        },
+        {
+          "basis": "Frozen full st_mode includes required regular-file/directory type bits.",
+          "expression": "Q_actual[root_mode./tmp]-5",
+          "family": "mode",
+          "lower_width": 5,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/root_metadata/mode",
+          "symbol": "root_mode./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_uid./tmp]-1",
+          "family": "root_uid_gid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/root_metadata/uid",
+          "symbol": "root_uid./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount./work]-3",
+          "family": "kernel_mount",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/mount_identity",
+          "symbol": "mount./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount_namespace_generation]-3",
+          "family": "kernel_namespace",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/namespace_generation",
+          "symbol": "mount_namespace_generation"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root./work]-3",
+          "family": "kernel_root",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/root_identity",
+          "symbol": "root./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_gid./work]-1",
+          "family": "root_uid_gid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/root_metadata/gid",
+          "symbol": "root_gid./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_links./work]-1",
+          "family": "link_count",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/root_metadata/link_count",
+          "symbol": "root_links./work"
+        },
+        {
+          "basis": "Frozen full st_mode includes required regular-file/directory type bits.",
+          "expression": "Q_actual[root_mode./work]-5",
+          "family": "mode",
+          "lower_width": 5,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/root_metadata/mode",
+          "symbol": "root_mode./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_uid./work]-1",
+          "family": "root_uid_gid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/root_metadata/uid",
+          "symbol": "root_uid./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[post_sequence.materialized]-1",
+          "family": "sequence",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/observation_sequence",
+          "symbol": "post_sequence.materialized"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[controller_process_identity]-3",
+          "family": "kernel_process",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/controller_process_identity",
+          "symbol": "controller_process_identity"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.cgroup]-12",
+          "family": "kernel_namespace",
+          "lower_width": 12,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/cgroup",
+          "symbol": "namespace.cgroup"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.ipc]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/ipc",
+          "symbol": "namespace.ipc"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.mnt]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/mnt",
+          "symbol": "namespace.mnt"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.net]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/net",
+          "symbol": "namespace.net"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.pid]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/pid",
+          "symbol": "namespace.pid"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.user]-10",
+          "family": "kernel_namespace",
+          "lower_width": 10,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/user",
+          "symbol": "namespace.user"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.uts]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/uts",
+          "symbol": "namespace.uts"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[controller_parent_pid]-1",
+          "family": "pid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/parent_pid",
+          "symbol": "controller_parent_pid"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[controller_pid]-1",
+          "family": "pid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/pid",
+          "symbol": "controller_pid"
+        },
+        {
+          "basis": "Frozen start-tick grammar is a nonempty quoted canonical decimal string.",
+          "expression": "Q_actual[controller_start]-3",
+          "family": "kernel_start",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/start_identity",
+          "symbol": "controller_start"
+        },
+        {
+          "basis": "Frozen start-tick grammar is a nonempty quoted canonical decimal string.",
+          "expression": "Q_actual[task_start]-3",
+          "family": "kernel_start",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/tasks/0/start_identity",
+          "symbol": "task_start"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[controller_tid]-1",
+          "family": "pid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/tasks/0/tid",
+          "symbol": "controller_tid"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[access./tmp]-3",
+          "family": "kernel_descriptor",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/handles/0/descriptor_identity",
+          "symbol": "access./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount./tmp]-3",
+          "family": "kernel_mount",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/handles/0/mount_identity",
+          "symbol": "mount./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[access./work]-3",
+          "family": "kernel_descriptor",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/handles/1/descriptor_identity",
+          "symbol": "access./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount./work]-3",
+          "family": "kernel_mount",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/handles/1/mount_identity",
+          "symbol": "mount./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[controller_process_identity]-3",
+          "family": "kernel_process",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/process_identity",
+          "symbol": "controller_process_identity"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[writer_task_identity]-3",
+          "family": "kernel_process",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/task_identity",
+          "symbol": "writer_task_identity"
+        },
+        {
+          "basis": "Frozen full st_mode includes required regular-file/directory type bits.",
+          "expression": "Q_actual[mode./work/SyntheticStateBox.java]-5",
+          "family": "mode",
+          "lower_width": 5,
+          "nonnegative": true,
+          "path": "/result/workspace_state/work_manifest/0/mode",
+          "symbol": "mode./work/SyntheticStateBox.java"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[links./work/classes]-1",
+          "family": "link_count",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/work_manifest/1/link_count",
+          "symbol": "links./work/classes"
+        },
+        {
+          "basis": "Frozen full st_mode includes required regular-file/directory type bits.",
+          "expression": "Q_actual[mode./work/classes]-5",
+          "family": "mode",
+          "lower_width": 5,
+          "nonnegative": true,
+          "path": "/result/workspace_state/work_manifest/1/mode",
+          "symbol": "mode./work/classes"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[sequence.materialize]-1",
+          "family": "sequence",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/sequence",
+          "symbol": "sequence.materialize"
+        }
+      ],
+      "retained_profile_subtotal": 3567,
+      "scalar_variation_coverage": "Existing nonnegative residuals plus the explicit class-width correction; retained lower topology only."
+    },
+    {
+      "all_existing_residuals_nonnegative": true,
+      "class_adjusted_subtotals": [
+        5246,
+        5248,
+        5250,
+        5252,
+        5254
+      ],
+      "exact_width_leaves": [
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "container",
+          "path": "/container_identity",
+          "symbol": "container_identity"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "generation",
+          "path": "/controller_generation",
+          "symbol": "controller_generation"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/operation_id",
+          "symbol": "operation_id.compile"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/request_id",
+          "symbol": "request_id.compile"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/result/capture_and_reap/deadline_identity",
+          "symbol": "deadline_identity"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "fixed_digest",
+          "path": "/result/class_metadata/sha256",
+          "symbol": "class_sha256"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "kernel_cgroup",
+          "path": "/result/compiler_identity/cgroup_identity",
+          "symbol": "cgroup"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/result/preparation_attempt_id",
+          "symbol": "preparation_attempt_id"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "container",
+          "path": "/result/workspace_state/container_identity",
+          "symbol": "container_identity"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "generation",
+          "path": "/result/workspace_state/controller_generation",
+          "symbol": "controller_generation"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/result/workspace_state/controller_identity",
+          "symbol": "controller_identity"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "fixed_digest",
+          "path": "/result/workspace_state/observation_challenge",
+          "symbol": "post_challenge.prepared"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "generation",
+          "path": "/result/workspace_state/process_exclusivity_observation/controller_generation",
+          "symbol": "controller_generation"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/result/workspace_state/process_exclusivity_observation/exclusive_owner_relation_id",
+          "symbol": "exclusive_owner_relation_id"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "kernel_namespace",
+          "path": "/result/workspace_state/process_exclusivity_observation/namespace_identity",
+          "symbol": "process_namespace_identity"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "kernel_cgroup",
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/cgroup_identity",
+          "symbol": "cgroup"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/accounted_original_relation_id",
+          "symbol": "exclusive_owner_relation_id"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "fixed_digest",
+          "path": "/result/workspace_state/stable_fingerprint",
+          "symbol": "stable_fingerprint"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "fixed_digest",
+          "path": "/result/workspace_state/work_manifest/2/sha256",
+          "symbol": "class_sha256"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/result/workspace_state/workspace_capability_id",
+          "symbol": "workspace_capability_id"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "generation",
+          "path": "/result/workspace_state/workspace_generation",
+          "symbol": "workspace_generation"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 19,
+          "family": "future_owner",
+          "path": "/workspace_capability_id",
+          "symbol": "workspace_capability_id"
+        },
+        {
+          "basis": "Frozen owner encoding, fixed digest width, settled equality projection, or Candidate-A-specific 64-hex identity/generation.",
+          "exact_canonical_width": 66,
+          "family": "generation",
+          "path": "/workspace_generation",
+          "symbol": "workspace_generation"
+        }
+      ],
+      "operation": "COMPILE_EXACT_SCENARIO",
+      "residual_count": 49,
+      "residuals": [
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[compiler_child_pid]-1",
+          "family": "pid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/capture_and_reap/child_pid",
+          "symbol": "compiler_child_pid"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[compiler_group]-3",
+          "family": "kernel_group",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/capture_and_reap/process_group_identity",
+          "symbol": "compiler_group"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.cgroup]-12",
+          "family": "kernel_namespace",
+          "lower_width": 12,
+          "nonnegative": true,
+          "path": "/result/compiler_identity/namespaces/cgroup",
+          "symbol": "namespace.cgroup"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.ipc]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/compiler_identity/namespaces/ipc",
+          "symbol": "namespace.ipc"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.mnt]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/compiler_identity/namespaces/mnt",
+          "symbol": "namespace.mnt"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.net]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/compiler_identity/namespaces/net",
+          "symbol": "namespace.net"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.pid]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/compiler_identity/namespaces/pid",
+          "symbol": "namespace.pid"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.user]-10",
+          "family": "kernel_namespace",
+          "lower_width": 10,
+          "nonnegative": true,
+          "path": "/result/compiler_identity/namespaces/user",
+          "symbol": "namespace.user"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.uts]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/compiler_identity/namespaces/uts",
+          "symbol": "namespace.uts"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[issuing_pid]-1",
+          "family": "issuing_pid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/issuing_pid",
+          "symbol": "issuing_pid"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount./tmp]-3",
+          "family": "kernel_mount",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/mount_identity",
+          "symbol": "mount./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount_namespace_generation]-3",
+          "family": "kernel_namespace",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/namespace_generation",
+          "symbol": "mount_namespace_generation"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root./tmp]-3",
+          "family": "kernel_root",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/root_identity",
+          "symbol": "root./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_gid./tmp]-1",
+          "family": "root_uid_gid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/root_metadata/gid",
+          "symbol": "root_gid./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_links./tmp]-1",
+          "family": "link_count",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/root_metadata/link_count",
+          "symbol": "root_links./tmp"
+        },
+        {
+          "basis": "Frozen full st_mode includes required regular-file/directory type bits.",
+          "expression": "Q_actual[root_mode./tmp]-5",
+          "family": "mode",
+          "lower_width": 5,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/root_metadata/mode",
+          "symbol": "root_mode./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_uid./tmp]-1",
+          "family": "root_uid_gid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/0/root_metadata/uid",
+          "symbol": "root_uid./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount./work]-3",
+          "family": "kernel_mount",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/mount_identity",
+          "symbol": "mount./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount_namespace_generation]-3",
+          "family": "kernel_namespace",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/namespace_generation",
+          "symbol": "mount_namespace_generation"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root./work]-3",
+          "family": "kernel_root",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/root_identity",
+          "symbol": "root./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_gid./work]-1",
+          "family": "root_uid_gid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/root_metadata/gid",
+          "symbol": "root_gid./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_links./work]-1",
+          "family": "link_count",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/root_metadata/link_count",
+          "symbol": "root_links./work"
+        },
+        {
+          "basis": "Frozen full st_mode includes required regular-file/directory type bits.",
+          "expression": "Q_actual[root_mode./work]-5",
+          "family": "mode",
+          "lower_width": 5,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/root_metadata/mode",
+          "symbol": "root_mode./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[root_uid./work]-1",
+          "family": "root_uid_gid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/mounts/1/root_metadata/uid",
+          "symbol": "root_uid./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[post_sequence.prepared]-1",
+          "family": "sequence",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/observation_sequence",
+          "symbol": "post_sequence.prepared"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[controller_process_identity]-3",
+          "family": "kernel_process",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/controller_process_identity",
+          "symbol": "controller_process_identity"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.cgroup]-12",
+          "family": "kernel_namespace",
+          "lower_width": 12,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/cgroup",
+          "symbol": "namespace.cgroup"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.ipc]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/ipc",
+          "symbol": "namespace.ipc"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.mnt]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/mnt",
+          "symbol": "namespace.mnt"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.net]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/net",
+          "symbol": "namespace.net"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.pid]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/pid",
+          "symbol": "namespace.pid"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.user]-10",
+          "family": "kernel_namespace",
+          "lower_width": 10,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/user",
+          "symbol": "namespace.user"
+        },
+        {
+          "basis": "Frozen raw namespace grammar: quoted kind:[canonical unsigned decimal], at least one digit.",
+          "expression": "Q_actual[namespace.uts]-9",
+          "family": "kernel_namespace",
+          "lower_width": 9,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/namespaces/uts",
+          "symbol": "namespace.uts"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[controller_parent_pid]-1",
+          "family": "pid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/parent_pid",
+          "symbol": "controller_parent_pid"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[controller_pid]-1",
+          "family": "pid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/pid",
+          "symbol": "controller_pid"
+        },
+        {
+          "basis": "Frozen start-tick grammar is a nonempty quoted canonical decimal string.",
+          "expression": "Q_actual[controller_start]-3",
+          "family": "kernel_start",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/start_identity",
+          "symbol": "controller_start"
+        },
+        {
+          "basis": "Frozen start-tick grammar is a nonempty quoted canonical decimal string.",
+          "expression": "Q_actual[task_start]-3",
+          "family": "kernel_start",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/tasks/0/start_identity",
+          "symbol": "task_start"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[controller_tid]-1",
+          "family": "pid",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/processes/0/tasks/0/tid",
+          "symbol": "controller_tid"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[access./tmp]-3",
+          "family": "kernel_descriptor",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/handles/0/descriptor_identity",
+          "symbol": "access./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount./tmp]-3",
+          "family": "kernel_mount",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/handles/0/mount_identity",
+          "symbol": "mount./tmp"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[access./work]-3",
+          "family": "kernel_descriptor",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/handles/1/descriptor_identity",
+          "symbol": "access./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[mount./work]-3",
+          "family": "kernel_mount",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/handles/1/mount_identity",
+          "symbol": "mount./work"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[controller_process_identity]-3",
+          "family": "kernel_process",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/process_identity",
+          "symbol": "controller_process_identity"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[writer_task_identity]-3",
+          "family": "kernel_process",
+          "lower_width": 3,
+          "nonnegative": true,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/task_identity",
+          "symbol": "writer_task_identity"
+        },
+        {
+          "basis": "Frozen full st_mode includes required regular-file/directory type bits.",
+          "expression": "Q_actual[mode./work/SyntheticStateBox.java]-5",
+          "family": "mode",
+          "lower_width": 5,
+          "nonnegative": true,
+          "path": "/result/workspace_state/work_manifest/0/mode",
+          "symbol": "mode./work/SyntheticStateBox.java"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[links./work/classes]-1",
+          "family": "link_count",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/result/workspace_state/work_manifest/1/link_count",
+          "symbol": "links./work/classes"
+        },
+        {
+          "basis": "Frozen full st_mode includes required regular-file/directory type bits.",
+          "expression": "Q_actual[mode./work/classes]-5",
+          "family": "mode",
+          "lower_width": 5,
+          "nonnegative": true,
+          "path": "/result/workspace_state/work_manifest/1/mode",
+          "symbol": "mode./work/classes"
+        },
+        {
+          "basis": "Frozen full st_mode includes required regular-file/directory type bits.",
+          "expression": "Q_actual[mode./work/classes/SyntheticStateBox.class]-5",
+          "family": "mode",
+          "lower_width": 5,
+          "nonnegative": true,
+          "path": "/result/workspace_state/work_manifest/2/mode",
+          "symbol": "mode./work/classes/SyntheticStateBox.class"
+        },
+        {
+          "basis": "Unchanged schema lower width: nonempty generic ID string or canonical integer.",
+          "expression": "Q_actual[sequence.compile]-1",
+          "family": "sequence",
+          "lower_width": 1,
+          "nonnegative": true,
+          "path": "/sequence",
+          "symbol": "sequence.compile"
+        }
+      ],
+      "retained_profile_subtotal": 5254,
+      "scalar_variation_coverage": "Existing nonnegative residuals plus the explicit class-width correction; retained lower topology only."
+    }
+  ],
+  "retained_physical_subtotal_before_class_correction": 8829,
+  "retained_semantic_subtotal": 8821,
+  "writer_lower_topology_complete": false
+}

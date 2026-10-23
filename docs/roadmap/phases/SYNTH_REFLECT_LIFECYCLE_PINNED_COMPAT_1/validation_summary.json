@@ -1,0 +1,141 @@
+{
+  "all_operational_effects_zero": true,
+  "benchmark": {
+    "all_operational_effects_zero": true,
+    "audit_guard": {
+      "capability_or_transition_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "process_attempts": 0,
+      "repository_write_attempts": 0
+    },
+    "exit_code": 0
+  },
+  "focused": {
+    "all_operational_effects_zero": true,
+    "audit_guard": {
+      "capability_or_transition_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "process_attempts": 0,
+      "repository_write_attempts": 0
+    },
+    "collected": 23,
+    "exit_code": 0,
+    "failed": [],
+    "passed": 23
+  },
+  "frozen": {
+    "all_operational_effects_zero": true,
+    "audit_guard": {
+      "capability_or_transition_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "process_attempts": 0,
+      "repository_write_attempts": 0
+    },
+    "collected": 68,
+    "exit_code": 0,
+    "failed": [],
+    "passed": 68
+  },
+  "frozen_initial_selection": {
+    "audit_guard": {
+      "capability_or_transition_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "process_attempts": 0,
+      "repository_write_attempts": 0
+    },
+    "failed": [],
+    "passed": 78,
+    "reason_final_selection_narrowed": "Avoid legacy unregistered old negative-data construction; final selection uses source-only old compatibility nodes."
+  },
+  "full_suite_claimed": false,
+  "git_diff_check": {
+    "command": "git diff --check",
+    "exit_code": 0,
+    "output_artifact": "git_diff_check.txt",
+    "scope": "existing tracked worktree diff; new audit artifacts separately checked for whitespace"
+  },
+  "historical_preservation": {
+    "baseline_file_count": 26572,
+    "changed": [],
+    "historical_bytes_preserved": true,
+    "missing": [],
+    "unexpected_additions": []
+  },
+  "issuance_dependent_tests_excluded": true,
+  "registry_picker": {
+    "after_failures": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "after_passed": 292,
+    "baseline_failures": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "baseline_passed": 292,
+    "unchanged": true
+  },
+  "static_validation": {
+    "bytecode_written": false,
+    "in_memory_compile_errors": [],
+    "json_errors": [],
+    "passed": true,
+    "whitespace_errors": []
+  }
+}

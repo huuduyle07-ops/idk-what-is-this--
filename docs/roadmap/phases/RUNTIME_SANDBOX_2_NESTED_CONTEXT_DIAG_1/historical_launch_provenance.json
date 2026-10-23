@@ -1,0 +1,188 @@
+{
+  "phase_id": "RUNTIME.SANDBOX.2.NESTED.CONTEXT.DIAG.1",
+  "scope": "Read-only selective recovery of the original blocked authorization launch; no historical replay performed.",
+  "historical_runner": {
+    "path": "scripts/replay_synth_auth_pinned1.py",
+    "sha256": "73ac65320825f3f32726526bcb5f2aa492887ef496b06d086932903b47cfc440",
+    "retained_gate_source": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/pure_preoperational_gates.json",
+    "retained_gate_lines": [
+      1228,
+      1229,
+      1230
+    ],
+    "retained_gate_sha256": "73ac65320825f3f32726526bcb5f2aa492887ef496b06d086932903b47cfc440",
+    "current_bytes_match_retained_gate": true,
+    "tempdir_assignment_line": 61,
+    "public_issuance_call_line": 65,
+    "tempdir_restoration_line": 102
+  },
+  "recovered_records": [
+    {
+      "source_path": "C:/Users/Admin/.codex/sessions/2026/10/10/rollout-2026-10-10T09-34-55-01a1233b-cec2-7d21-9888-07f39ba0629c.jsonl",
+      "source_line": 1,
+      "record_sha256": "afe6831c3e51d250ca8c87cc0fb52be3b98159a71017270e1944f04a515f95cb",
+      "record_digest_method": "SHA256 of UTF-8 JSONL source line excluding line terminator",
+      "timestamp_utc": "2026-10-10T00:35:21.459Z",
+      "record_type": "session_meta",
+      "recovered_fields": {
+        "cwd_as_recorded": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S",
+        "cwd_normalized_for_display": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S"
+      }
+    },
+    {
+      "source_path": "C:/Users/Admin/.codex/sessions/2026/10/10/rollout-2026-10-10T09-34-55-01a1233b-cec2-7d21-9888-07f39ba0629c.jsonl",
+      "source_line": 649,
+      "record_sha256": "f02959190d1c554da97b8851cc45f605809c01def3c4a93f19175a35a32edfdd",
+      "record_digest_method": "SHA256 of UTF-8 JSONL source line excluding line terminator",
+      "timestamp_utc": "2026-10-10T01:17:33.309Z",
+      "record_type": "turn_context",
+      "recovered_fields": {
+        "cwd_as_recorded": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S",
+        "cwd_normalized_for_display": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S",
+        "approval_policy": "on-request",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "writable_roots": [
+            "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\10\\01a1233b-cec2-7d21-9888-07f39ba0629c"
+          ],
+          "network_access": false,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        }
+      }
+    },
+    {
+      "source_path": "C:/Users/Admin/.codex/sessions/2026/10/10/rollout-2026-10-10T09-34-55-01a1233b-cec2-7d21-9888-07f39ba0629c.jsonl",
+      "source_line": 959,
+      "record_sha256": "276d4ca0512fba2ee8432a0fa2fa1927a5aa47b053d405e4c4987773857408d9",
+      "record_digest_method": "SHA256 of UTF-8 JSONL source line excluding line terminator",
+      "timestamp_utc": "2026-10-10T01:29:23.101Z",
+      "record_type": "response_item",
+      "recovered_fields": {
+        "tool_name": "exec",
+        "call_id": "call_20bdbd571bf64a728028e976a40c26a7",
+        "exact_tool_call_source": "text(await tools.exec_command({cmd:\"python -B scripts/replay_synth_auth_pinned1.py\",sandbox_permissions:\"require_escalated\",justification:\"Allow the single authorized SYNTH.AUTH.PINNED.1 issuance to access Docker for the frozen provider infrastructure checks after all pure gates have passed?\",prefix_rule:[\"python\",\"-B\",\"scripts/replay_synth_auth_pinned1.py\"],yield_time_ms:10000,max_output_tokens:2000}));\n",
+        "exact_launch_arguments": {
+          "cmd": "python -B scripts/replay_synth_auth_pinned1.py",
+          "sandbox_permissions": "require_escalated",
+          "justification": "Allow the single authorized SYNTH.AUTH.PINNED.1 issuance to access Docker for the frozen provider infrastructure checks after all pure gates have passed?",
+          "prefix_rule": [
+            "python",
+            "-B",
+            "scripts/replay_synth_auth_pinned1.py"
+          ],
+          "yield_time_ms": 10000,
+          "max_output_tokens": 2000
+        },
+        "workdir_argument_present": false,
+        "environment_assignments_present": false,
+        "python_wrapper_present": false
+      }
+    },
+    {
+      "source_path": "C:/Users/Admin/.codex/sessions/2026/10/10/rollout-2026-10-10T09-34-55-01a1233b-cec2-7d21-9888-07f39ba0629c.jsonl",
+      "source_line": 961,
+      "record_sha256": "a5a51f12d28e2aa0bf219bbe1dfdea0df48a591473944dc2675a58aa3dc3d20b",
+      "record_digest_method": "SHA256 of UTF-8 JSONL source line excluding line terminator",
+      "timestamp_utc": "2026-10-10T01:29:38.875Z",
+      "record_type": "response_item",
+      "recovered_fields": {
+        "call_id": "call_20bdbd571bf64a728028e976a40c26a7",
+        "output_blocks": [
+          {
+            "type": "input_text",
+            "text": "Script completed\nWall time 15.8 seconds\nOutput:\n"
+          },
+          {
+            "type": "input_text",
+            "text": "{\"chunk_id\":\"0e8592\",\"wall_time_seconds\":10.0108445,\"session_id\":34373,\"original_token_count\":0,\"output\":\"\"}"
+          }
+        ],
+        "subprocess_result": {
+          "chunk_id": "0e8592",
+          "wall_time_seconds": 10.0108445,
+          "session_id": 34373,
+          "original_token_count": 0,
+          "output": ""
+        }
+      }
+    },
+    {
+      "source_path": "C:/Users/Admin/.codex/sessions/2026/10/10/rollout-2026-10-10T09-34-55-01a1233b-cec2-7d21-9888-07f39ba0629c.jsonl",
+      "source_line": 1003,
+      "record_sha256": "1e297739d80a0af06af1fa156decfac6e7acf6465a771d4e4cf4b54da2b1f6dd",
+      "record_digest_method": "SHA256 of UTF-8 JSONL source line excluding line terminator",
+      "timestamp_utc": "2026-10-10T01:31:17.675Z",
+      "record_type": "response_item",
+      "recovered_fields": {
+        "call_id": "call_9e00821028f142d589def34928d851c1",
+        "output_blocks": [
+          {
+            "type": "input_text",
+            "text": "Script completed\nWall time 24.4 seconds\nOutput:\n"
+          },
+          {
+            "type": "input_text",
+            "text": "{\"chunk_id\":\"92c59e\",\"wall_time_seconds\":24.3786114,\"exit_code\":1,\"original_token_count\":140,\"output\":\"{\\r\\n  \\\"status\\\": \\\"SYNTH_AUTH_PINNED_1_BLOCKED\\\",\\r\\n  \\\"reason\\\": \\\"authorization_prerequisite_failed:pinned_provider_incomplete: fresh_java1c_failed:not_authenticated\\\",\\r\\n  \\\"output\\\": \\\"C:\\\\\\\\Users\\\\\\\\Admin\\\\\\\\Documents\\\\\\\\Code\\\\\\\\J.A.R.V.I.S\\\\\\\\districts\\\\\\\\C.A.T.T.U.S\\\\\\\\docs\\\\\\\\roadmap\\\\\\\\phases\\\\\\\\SYNTH_AUTH_PINNED_1\\\\\\\\SYNTH_AUTH_PINNED_1_LOCAL.json\\\",\\r\\n  \\\"synthetic_scenario_authorized\\\": false,\\r\\n  \\\"runtime_execution_authority\\\": false,\\r\\n  \\\"execution_lease_issued\\\": false,\\r\\n  \\\"SyntheticStateBox_executed\\\": false,\\r\\n  \\\"negative_controls\\\": 0,\\r\\n  \\\"all_negative_controls_rejected\\\": false\\r\\n}\\r\\n\"}"
+          }
+        ],
+        "subprocess_result": {
+          "chunk_id": "92c59e",
+          "wall_time_seconds": 24.3786114,
+          "exit_code": 1,
+          "original_token_count": 140,
+          "output": "{\r\n  \"status\": \"SYNTH_AUTH_PINNED_1_BLOCKED\",\r\n  \"reason\": \"authorization_prerequisite_failed:pinned_provider_incomplete: fresh_java1c_failed:not_authenticated\",\r\n  \"output\": \"C:\\\\Users\\\\Admin\\\\Documents\\\\Code\\\\J.A.R.V.I.S\\\\districts\\\\C.A.T.T.U.S\\\\docs\\\\roadmap\\\\phases\\\\SYNTH_AUTH_PINNED_1\\\\SYNTH_AUTH_PINNED_1_LOCAL.json\",\r\n  \"synthetic_scenario_authorized\": false,\r\n  \"runtime_execution_authority\": false,\r\n  \"execution_lease_issued\": false,\r\n  \"SyntheticStateBox_executed\": false,\r\n  \"negative_controls\": 0,\r\n  \"all_negative_controls_rejected\": false\r\n}\r\n"
+        },
+        "report_summary": {
+          "status": "SYNTH_AUTH_PINNED_1_BLOCKED",
+          "reason": "authorization_prerequisite_failed:pinned_provider_incomplete: fresh_java1c_failed:not_authenticated",
+          "output": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_AUTH_PINNED_1\\SYNTH_AUTH_PINNED_1_LOCAL.json",
+          "synthetic_scenario_authorized": false,
+          "runtime_execution_authority": false,
+          "execution_lease_issued": false,
+          "SyntheticStateBox_executed": false,
+          "negative_controls": 0,
+          "all_negative_controls_rejected": false
+        }
+      }
+    }
+  ],
+  "historical_cwd": {
+    "value": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S",
+    "basis": "Original session_meta and latest preceding turn_context cwd; launch omitted workdir, so exec used turn cwd. Historical Python source does not call chdir.",
+    "source_lines": [
+      1,
+      649,
+      959
+    ]
+  },
+  "deductions": [
+    "The sole live attempt launched a fresh Python process directly; phase-local pytest validation wrappers were not the live launcher.",
+    "The command supplied no TMP, TEMP, TMPDIR, PYTHONPATH, PYTHONHOME, DOCKER_HOST or DOCKER_CONFIG overlay.",
+    "The actual launch requested require_escalated; historical pure worker filesystem or network denial cannot be assumed to govern this process.",
+    "The runner override of tempfile.tempdir remained active throughout issuance, including JAVA1C -> SANDBOX2.",
+    "The completion output identifies the retained blocked SYNTH_AUTH_PINNED_1 attempt without recovering the lost nested SANDBOX2 report."
+  ],
+  "limitations": [
+    "Inherited historical environment values, the initial tempfile.tempdir value and exact initial tempfile.gettempdir() were not recorded.",
+    "Direct launch does not prove absence of inherited Python startup customization, native audit hooks, concurrent mutations or external filesystem/socket policies.",
+    "The JSONL is outside repository history and is cited by selective source-record hashes; no complete rollout is copied.",
+    "The tool reports shell exit_code=1 while current frozen runner returns 2 for blocked status; no Python-level exit interpretation is inferred from that shell wrapper observation.",
+    "Original SANDBOX2 parsed image metadata, first pre-ladder exception, workspace state and stage list remain unretained."
+  ],
+  "historical_files_modified": false,
+  "operational_effects": {
+    "Docker": 0,
+    "SANDBOX2_issuance": 0,
+    "JAVA1C": 0,
+    "PINNED1A_export": 0,
+    "PINNED1B": 0,
+    "PINNED1C": 0,
+    "SYNTH_retry": 0,
+    "SyntheticStateBox": 0,
+    "reflection": 0,
+    "BANK": 0,
+    "EXECUTOR_1R": 0,
+    "Apply": 0
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "added_outside_new_phase": [],
+  "after_file_count": 26991,
+  "allowed_additions_outside_phase": [],
+  "baseline_file_count": 26991,
+  "changed": [],
+  "deleted": [],
+  "historical_preservation_passed": true,
+  "scope": "entire non-cache workspace including root/config/web and frozen history"
+}

@@ -1,0 +1,27 @@
+{
+  "Docker_controls_during_verification": 0,
+  "JAVA1C_invoked": false,
+  "SYNTH_retried": false,
+  "all_capture_bytes_verified": true,
+  "cleanup_evidence_distinguished": true,
+  "historical_byte_preservation": {
+    "changed_or_missing": [],
+    "historical_file_count": 2126,
+    "passed": true,
+    "unexpected_new_files_outside_phase": []
+  },
+  "live_owner_invocations_during_verification": 0,
+  "original_report_pair_consistency": true,
+  "passed": true,
+  "remaining_containers": [],
+  "sole_operational_issuance": true,
+  "source_json_whitespace_diff_checks": {
+    "authored_text_files_checked": 39,
+    "bytecode_emission": false,
+    "failures": [],
+    "git_diff_check_exit_code": 0,
+    "new_json_files_parsed": 29,
+    "new_python_sources_compiled_in_memory": 4,
+    "passed": true
+  }
+}

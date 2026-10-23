@@ -1,0 +1,151 @@
+{
+  "schema": "synthetic_preparation_budget_lifecycle_audit_1_v1",
+  "audit_kind": "PURE_FROZEN_SOURCE_AUDIT",
+  "scope_conclusion": "AGGREGATE_BUDGET_SCOPE_UNRESOLVED",
+  "scope_conclusion_basis": "The materialization-origin attempt and cumulative per-stream cap are frozen, but no frozen endpoint allocates the mandatory fresh post-mutation readiness observation, later handoff traffic, or terminal cleanup traffic to that attempt. A universally included lower bound may still prove an excess independently; this audit does not infer a favorable endpoint.",
+  "mandatory_pre_readiness_sequence": [
+    "Authenticate a new live exclusive preparation-empty workspace using complete current empty observation.",
+    "MATERIALIZE_EXACT_SCENARIO_SOURCE request and complete response, including full materialized workspace_state and exact source readback evidence.",
+    "COMPILE_EXACT_SCENARIO request and complete response, including full prepared workspace_state, compiler identity, complete zero-output capture/reap evidence and class metadata.",
+    "Preparation owner authenticates its original same-attempt materialization/compilation receipt; mutation COMPLETE is not owner readiness.",
+    "A new owner-issued OBSERVE_* challenge and complete current prepared-state response is required before readiness or handoff; mutation poststate cannot replace it. The frozen text does not uniquely require the specific OBSERVE_PREPARED_ARTIFACTS tag rather than a qualifying OBSERVE_CURRENT_WORKSPACE."
+  ],
+  "receipt_and_readiness": {
+    "fresh_prepared_observation_before_initial_receipt": "NOT_REQUIRED_BY_EXPLICIT_FROZEN_TEXT; OBSERVE_PREPARED_ARTIFACTS itself takes the original preparation_receipt_id and presupposes prepared-artifacts-present from the preparation owner.",
+    "fresh_observation_before_workspace_readiness": "MANDATORY",
+    "fresh_observation_before_handoff_readiness": "MANDATORY",
+    "mutation_poststate_is_readiness_observation": false,
+    "prepared_snapshot_before_compiler_reaping": "FORBIDDEN for a successful compile response: compilation postconditions and cross-field predicates require fully reaped compiler, complete capture/EOF and no remaining compiler/target process.",
+    "extra_fresh_observation_before_compilation": "The frozen coordination text requires fresh exact-generation current state before effect, but does not enumerate another distinct OBSERVE_CURRENT_WORKSPACE frame between the two mutations. The unaccepted candidate strengthens its BEFORE_READINESS_OR_EFFECT wording. Do not assert that an additional frame is absent or mandatory without resolving this source-to-wire allocation."
+  },
+  "operation_inventory": [
+    {
+      "operation": "OBSERVE_EMPTY_WORKSPACE",
+      "lifecycle_requirement": "MANDATORY initial current empty-state evidence before materialization eligibility",
+      "cap_classification": "UNRESOLVED_SCOPE",
+      "reason": "The 5000ms attempt deadline begins at materialization admission, so an earlier empty observation precedes that deadline. The cumulative byte cap is described as all attempt frames, without independently defining whether initial eligibility traffic belongs to byte-accounted preparation. A deadline origin alone is insufficient to exclude bytes from the cumulative cap.",
+      "evidence": ["controller_empty", "workspace_initial", "controller_budget"]
+    },
+    {
+      "operation": "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+      "lifecycle_requirement": "MANDATORY",
+      "cap_classification": "MANDATORY_INSIDE_PREPARATION_CAP",
+      "reason": "This is the materialization-origin preparation mutation and has bounds_profile=preparation_attempt.",
+      "evidence": ["controller_materialize", "controller_budget"]
+    },
+    {
+      "operation": "materialization response.workspace_state",
+      "lifecycle_requirement": "MANDATORY complete post-observation embedded in materialization response",
+      "cap_classification": "MANDATORY_INSIDE_PREPARATION_CAP",
+      "reason": "result_materialize has required workspace_state, not an optional projection/digest reference. Its bytes are part of the counted response once, not an additional independent response frame.",
+      "evidence": ["schema_materialize_result", "schema_exact_records", "schema_poststate"]
+    },
+    {
+      "operation": "COMPILE_EXACT_SCENARIO",
+      "lifecycle_requirement": "MANDATORY",
+      "cap_classification": "MANDATORY_INSIDE_PREPARATION_CAP",
+      "reason": "Compilation shares the original attempt budget and has bounds_profile=preparation_attempt.",
+      "evidence": ["controller_compile", "controller_budget"]
+    },
+    {
+      "operation": "compilation response.workspace_state",
+      "lifecycle_requirement": "MANDATORY complete post-observation embedded in compilation response",
+      "cap_classification": "MANDATORY_INSIDE_PREPARATION_CAP",
+      "reason": "result_compile requires full workspace_state plus compiler_identity, capture_and_reap and class_metadata; no digest-only replacement or missing nullable fields is allowed.",
+      "evidence": ["schema_compile_result", "schema_exact_records", "schema_compile_success"]
+    },
+    {
+      "operation": "OBSERVE_PREPARED_ARTIFACTS",
+      "lifecycle_requirement": "A fresh complete prepared-state OBSERVE_* is mandatory before readiness/handoff; exact tag allocation is not uniquely specified",
+      "cap_classification": "UNRESOLVED_SCOPE",
+      "reason": "The operation presupposes the original receipt, whereas new challenged readiness observation is required after mutation. No attempt endpoint states whether this post-receipt readiness exchange is in-attempt or retained-lifetime traffic. It must not silently be excluded to make a budget fit.",
+      "evidence": ["controller_prepared", "schema_poststate", "workspace_receipt_readiness", "transport_budget_blocker"]
+    },
+    {
+      "operation": "OBSERVE_CURRENT_WORKSPACE",
+      "lifecycle_requirement": "OPTIONAL extra current observations; may also implement the mandatory new prepared-state OBSERVE_* requirement",
+      "cap_classification": "UNRESOLVED_SCOPE",
+      "reason": "The operation permits complete stage-appropriate exact manifests. The frozen text does not give a wire-level minimal operation sequence or uniquely map owner fresh-state checks into this tag. If an observation is in-attempt its complete response is counted; it receives no reset.",
+      "evidence": ["controller_current", "schema_poststate", "controller_coordination", "controller_budget"]
+    },
+    {
+      "operation": "PREPARE_EXCLUSIVE_HANDOFF",
+      "lifecycle_requirement": "OPTIONAL later exclusive consumer handoff; not required for preparation eligibility itself",
+      "cap_classification": "UNRESOLVED_SCOPE",
+      "reason": "Lifecycle ordering explicitly calls consumer handoff optional. Its separate observation profile and later position do not independently define its byte-cap allocation. It requires separate consumer authority and currently leaves activation PROOF_UNRESOLVED.",
+      "evidence": ["workspace_ordering", "controller_handoff", "workspace_handoff"]
+    },
+    {
+      "operation": "BEGIN_CLEANUP",
+      "lifecycle_requirement": "MANDATORY monotonic cleanup duty eventually; not a successful pre-readiness step",
+      "cap_classification": "UNRESOLVED_SCOPE",
+      "reason": "Cleanup has its own bounds profile and preempts active preparation, including failure. Frozen text does not allocate every early-abort versus terminal-retention cleanup frame to the preparation aggregate. Candidate session reserve is not an exemption from the original cap.",
+      "evidence": ["controller_cleanup_begin", "controller_cleanup_split", "prep_cleanup", "prep_cleanup_distinction", "transport_budget"]
+    },
+    {
+      "operation": "CLEANUP_AND_REPORT",
+      "lifecycle_requirement": "MANDATORY eventual cleanup/evidence duty; not a successful pre-readiness step",
+      "cap_classification": "UNRESOLVED_SCOPE",
+      "reason": "The operation completes the same cleanup duty, with independent teardown/absence evidence and no restored readiness. Neither the separate cleanup invocation bound nor retained-session budget freezes an exclusion from the preparation byte cap.",
+      "evidence": ["controller_cleanup_report", "controller_cleanup_split", "prep_cleanup", "prep_cleanup_distinction", "transport_budget"]
+    }
+  ],
+  "direction_accounting": {
+    "transport_independent": {
+      "semantic_requests": "Canonical request payload byte lengths must be reported independently. Mapping to process stdin/stdout is a transport choice.",
+      "semantic_responses": "Canonical complete response byte lengths include all required structured evidence, including full duplicated workspace_state records and capture metadata.",
+      "outer_capture_cap": "Frozen outer stdout and outer stderr are separately capped at 8192 each over the preparation attempt; the cap is not a sum of request+response traffic.",
+      "framing": "No wire prefix has finally been selected. Semantic payload lower bounds exclude hypothetical framing."
+    },
+    "reviewed_candidate_A_only": {
+      "controller_stdin_request_channel": "Host-to-controller request payload + exactly four u32be header bytes per request frame. Requests are not controller stdout/stderr. Whole frame<=8192; retained session<=65536 per direction and <=64 requests. These candidate limits are not final transport selection.",
+      "controller_stdout_response_channel": "Only controller response frames; response payload + exactly four u32be header bytes per response frame. Count every in-attempt response frame once toward outer stdout cumulative<=8192.",
+      "controller_stderr": "Empty on successful lifecycle: zero counted bytes.",
+      "child_compiler_stdout": "Separate child pipe with 2048-byte ceiling and exact successful observed_bytes=0. Its capture metadata is serialized in response and counted there. Do not add zero raw child bytes a second time.",
+      "child_compiler_stderr": "Separate child pipe with 2048-byte ceiling and exact successful observed_bytes=0. Its capture metadata is serialized in response and counted there. Do not add zero raw child bytes a second time.",
+      "wire_header_double_count_rule": "Four bytes per actual request or response frame in its own direction. Do not add request framing to controller stdout or sum bidirectional traffic into a per-stream cap."
+    },
+    "evidence": ["controller_budget", "schema_capture_cap", "transport_framing", "transport_budget", "schema_compile_success"]
+  },
+  "frozen_endpoint_gap": {
+    "start": "The deadline explicitly starts at materialization admission; byte accounting refers to attempt frames and materialize/compile/observation without a standalone membership definition.",
+    "end": null,
+    "missing_rule": "No frozen rule says the attempt byte-accounting scope ends at successful COMPILE response, preparation receipt, new challenged prepared-state observation, handoff reservation, or cleanup completion.",
+    "no_favorable_exclusion": true,
+    "requirement_evolution_authorized": false,
+    "transport_selected": false,
+    "budget_blocker_removed_by_scope_audit": false
+  },
+  "evidence": {
+    "controller_budget": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json", "pointer": "/bounds/attempt_budget_scope", "line": 486, "quote": "One monotonic 5000ms deadline starts at materialization admission and includes materialize, compile, in-attempt observations and intervening time; never reset per operation. Outer preparation attempt hard timeout 10000ms. Total outer stdout/stderr each <=8192 over all attempt frames, not 8192 per unlimited frame. Retained lifetime is not this attempt budget and confers no indefinite readiness."},
+    "controller_empty": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json", "pointer": "/operations/0/postconditions", "line": 206, "quote": "one complete current snapshot; /work and /tmp empty; /work/classes absent"},
+    "controller_current": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json", "pointer": "/operations/1/postconditions/0", "line": 234, "quote": "complete current snapshot of stage-appropriate exact manifest"},
+    "controller_prepared": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json", "pointer": "/operations/2", "line": 248, "quotes": ["prepared-artifacts-present from preparation owner", "compiler fully reaped; captures closed and EOF", "fresh complete source/class manifest matches original same-attempt receipt"], "related_lines": [252, 270], "receipt_input_pointer": "/operations/2/input_projection/preparation_receipt_id", "receipt_input_line": 258},
+    "controller_materialize": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json", "pointer": "/operations/3", "line": 302, "quotes": ["preparation_attempt", "exact authenticated existing 239 bytes; complete no-follow readback size/hash/bytes", "exact materialized manifest, no compilation"], "related_lines": [305, 306]},
+    "controller_compile": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json", "pointer": "/operations/4/postconditions", "line": 349, "quotes": ["one bounded javac only; fully reap; complete empty captures and both EOFs", "return preparation observations; preparation owner alone authenticates success receipt"], "related_lines": [352]},
+    "controller_handoff": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json", "pointer": "/operations/5/postconditions/2", "line": 392, "quote": "activation unavailable until separately reviewed consumer contract; currently PROOF_UNRESOLVED"},
+    "controller_cleanup_begin": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json", "pointer": "/operations/6", "line": 411, "quotes": ["cleanup", "deny new work; cancel active mutation/handoff; no success readiness"], "related_lines": [415]},
+    "controller_cleanup_report": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json", "pointer": "/operations/7", "line": 435, "quotes": ["cleanup", "complete bounded composite cleanup evidence; /work and /tmp generation gone"], "related_lines": [439]},
+    "controller_cleanup_split": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json", "pointer": "/minimum_operation_review/cleanup_split", "line": 460, "quote": "BEGIN_CLEANUP must preempt without waiting for active effect completion; CLEANUP_AND_REPORT completes bounded teardown/evidence. Both belong to one monotonic cleanup duty."},
+    "controller_coordination": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json", "pointer": "/coordination/sequence", "line": 768, "quotes": ["workspace owner authenticates original retained graph and fresh exact-generation current state", "post-observe complete same-generation state/captures/reaping under fence; owning boundary authenticates evidence"], "related_lines": [774]},
+    "schema_materialize_result": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json", "pointer": "/definitions/result_materialize", "line": 840, "required_field_line": 843, "all_fields_required_line": 860, "quote": "workspace_state"},
+    "schema_compile_result": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json", "pointer": "/definitions/result_compile", "line": 862, "required_field_line": 865, "all_fields_required_line": 872, "quote": "workspace_state"},
+    "schema_exact_records": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json", "pointer": "/cross_field_rules/0", "line": 1022, "quote": "Exact primitive types including enum values: bool is never int. All records reject duplicate/missing/extra keys recursively; arrays are complete, unique and bounded, never prefix samples."},
+    "schema_poststate": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json", "pointer": "/cross_field_rules/1", "line": 1023, "quote": "Request/response IDs, purpose=operation, all generations and owner sequence/challenge match exact original relation. Challenge non-null exactly for three observation tags. Mutation poststate uses a separate single-use owner-issued post-observation challenge/sequence prebound in its spent admission; it is operation-bound source evidence only, never a current-readiness response. Owner consumes that reference once and requires a new OBSERVE_* challenge before readiness or handoff."},
+    "schema_compile_success": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json", "pointer": "/cross_field_rules/5", "line": 1027, "quote": "Compilation result exit=0, timed_out=false, reaped/group_terminated/selectors_closed=true, each stream observed_bytes=0, overflow=false,eof/closed=true and exact empty-content hashes; no raw captures/source/class bytes in messages."},
+    "schema_capture_cap": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json", "pointer": "/cross_field_rules/10", "line": 1032, "quote": "All frames <=8192 bytes; preparation total outer stream captures remain <=8192 each over whole attempt. Larger/incomplete evidence fails typed incomplete and cleanup duty continues. No generic string command, path, argv, environment or arbitrary map."},
+    "workspace_initial": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json", "pointer": "/initial_workspace/ready_predicate", "line": 310, "quote": "live AND exclusive AND preparation-empty AND not invalid AND not cleanup-started; exact current provider/policy/controller/container generation bindings authenticated"},
+    "workspace_ordering": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json", "pointer": "/lifecycle/ordering", "line": 418, "quote": "optional exclusive separately authorized consumer handoff"},
+    "workspace_handoff": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json", "pointer": "/lifecycle/handoff", "line": 429, "quote": "Requires exact original workspace, original preparation receipt/attempt and artifact digest, retained controller and same generation, plus separately reviewed consumer authority. Pending handoff is not harness completeness. Failure/disconnect rejects handoff and triggers cleanup; no export or copy to another generation."},
+    "workspace_receipt_readiness": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json", "pointer": "/preparation_interaction/receipt_readiness", "line": 459, "quote": "Preparation receipt is evidence, not workspace capability. Require original live workspace and fresh artifact integrity at handoff; after cleanup/invalidity the receipt remains historical only and never crosses generations."},
+    "prep_cleanup": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json", "pointer": "/cleanup/after_preparation_success", "line": 243, "quote": "Keep exact source/class in same ephemeral workspace only until consumer completion, abort, timeout or authorization/readiness loss. Receipt states live artifacts with cleanup pending; no premature removal or cleanup success claim."},
+    "prep_cleanup_distinction": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json", "pointer": "/ordering/cleanup_is_preparation", "line": 501, "value": false, "related_pointer": "/ordering/cleanup_clarification", "related_line": 502, "quote": "Mandatory teardown, child reaping and independent absence verification after completion or abort remain cleanup duties; they do not permit another preparation attempt after runtime consumption."},
+    "prep_fixed_attempt": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json", "pointer": "/preparation_authority/semantics/preparation_authority_design", "line": 521, "quote": "One narrow one-shot preparation authority plus one immutable success receipt. Two non-interchangeable operation facets bind one fixed materialize-then-compile attempt. No generic file or command API; no independent capability per field."},
+    "transport_framing": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/selection.json", "pointer": "/wire", "line": 211, "status": "REVIEWED_CANDIDATE_PROFILE_NOT_FINAL_SELECTION", "quotes": ["unsigned 32-bit big-endian binary, exactly four octets", "canonical JSON payload octets only"], "related_lines": [216, 217]},
+    "transport_budget": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/selection.json", "pointer": "/wire/stream_budgets", "line": 236, "quote": "No logging on controller stdout; controller stderr empty on success. Child streams separate. Keep <=8192 captured bytes per outer stream cumulatively over whole preparation attempt, INCLUDING wire headers; no reset at materialize/compile/observation boundaries. Also cap entire retained session at 65536 outer bytes per direction and 64 requests, including cleanup. Reserve two request slots for BEGIN_CLEANUP and CLEANUP_AND_REPORT plus bounded cleanup/error response budget before ordinary admission. If complete evidence or cumulative budget cannot fit, fail closed and use independent outer teardown; no truncation or success. Separate session budget never relaxes preparation budget."},
+    "transport_budget_blocker": {"path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/selection.json", "pointer": "/selection_blockers/1/required_resolution", "line": 458, "quote": "Demonstrate canonical complete materialize/compile/required observation responses with truthful kernel/writer/mount identities and explicit frozen attempt boundaries within unchanged aggregate cap. Do not silently exclude required observations, truncate state, invent aliases or reset cap. If impossible, separately evolve requirement; no semantic change in this phase."}
+  },
+  "operational_effects": 0,
+  "all_authority_flags": false,
+  "historical_files_edited": false
+}

@@ -1,0 +1,75 @@
+{
+  "adapter_implemented": false,
+  "audit_only": true,
+  "authentication_domain_equal": false,
+  "authorization_epoch_equal": false,
+  "consumer_classification_artifact": "lifecycle_trace.md",
+  "exact_comparison_artifact": "authorization_comparison.md",
+  "execution_lease_issued": false,
+  "existing_lifecycle_source_changed": false,
+  "historical_preservation_artifact": "historical_preservation.json",
+  "implementation_api_reusable": false,
+  "lease_shape_for_future_owner_decided": false,
+  "lifecycle": {
+    "owner": "core.synthetic_runtime_authorization_lifecycle",
+    "phase": "SYNTH.AUTH.LIFECYCLE.1",
+    "schema": "synthetic_runtime_execution_lease_v1"
+  },
+  "lifecycle_independently_checks_provider": false,
+  "live_registry_seeded": false,
+  "old_authorization": {
+    "owner": "core.synthetic_runtime_authorization",
+    "phase": "SYNTH.AUTH.1",
+    "schema": "synthetic_runtime_authorization_v1"
+  },
+  "old_provider_dependency": "transitive old-auth validation plus preserved JAVA.1 future activation policy",
+  "old_provider_requirement": [
+    "RUNTIME.JAVA.1",
+    "runtime_java_1_v1"
+  ],
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR_1R": 0,
+    "JAVA1C": 0,
+    "PINNED1A_export": 0,
+    "SANDBOX2_issuance": 0,
+    "SyntheticStateBox": 0,
+    "authorization_issuance": 0,
+    "execution_lease_consumption": 0,
+    "execution_lease_invalidation": 0,
+    "execution_lease_issuance": 0,
+    "live_authorization_attempts": 0,
+    "provider_infrastructure": 0,
+    "provider_issuance": 0,
+    "reflection": 0,
+    "repository_runtime_writes": 0
+  },
+  "phase_id": "SYNTH.AUTH.LIFECYCLE.PINNED.COMPAT.1",
+  "pinned_auth_source_changed": false,
+  "pinned_authorization": {
+    "owner": "core.synthetic_runtime_authorization_pinned",
+    "phase": "SYNTH.AUTH.PINNED.1",
+    "schema": "synthetic_runtime_authorization_pinned_1_v1"
+  },
+  "pinned_provider_proof": [
+    "RUNTIME.JAVA.PINNED.1C",
+    "runtime_java_pinned_provider_1c_v1"
+  ],
+  "pinned_provider_requirement": [
+    "RUNTIME.JAVA.PINNED.1",
+    "runtime_java_pinned_1_v1"
+  ],
+  "provider_requirement_equal": false,
+  "public_validators_weakened": false,
+  "recommended_next_slice": "Define truthful additive pinned authorization-to-lease owner binding; preserve frozen owners, one-shot semantics and history; separately audit reflection acceptance before any execution.",
+  "reflection_compatibility_claimed": false,
+  "reflection_dependency_artifact": "reflection_dependencies.md",
+  "result": "LIFECYCLE_PINNED_REQUIRES_ADDITIVE_ADAPTER",
+  "scenario_identity_equal": true,
+  "state_machine_semantics_reusable": true,
+  "stop_after_compatibility_conclusion": true,
+  "validation_artifact": "validation_summary.json",
+  "validation_passed_with_preserved_baseline_failures": true
+}

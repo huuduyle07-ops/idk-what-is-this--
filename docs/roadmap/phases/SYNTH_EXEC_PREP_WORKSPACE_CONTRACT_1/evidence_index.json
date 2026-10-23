@@ -1,0 +1,972 @@
+{
+  "method": "source/JSON/AST only; no operational imports or live remeasurement",
+  "sources": [
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+      "sha256": "e6e25d5ac912a07b35dffab148e8b3dc209aa124429920f374c46f7fd1386192",
+      "bytes": 37431,
+      "anchors": [
+        {
+          "line": 25,
+          "text": "\"meaning\": \"Obtain the exact existing frozen byte literal in memory; no synthesis, transformation, newline conversion or filesystem write. Authenticate the original pinned authorization and its source identity before any materialization; co"
+        },
+        {
+          "line": 28,
+          "text": "\"sandbox_materialization\": {"
+        },
+        {
+          "line": 65,
+          "text": "\"materialization\": {"
+        },
+        {
+          "line": 210,
+          "text": "\"source authentication and materialization readback hash/size/path\","
+        },
+        {
+          "line": 215,
+          "text": "\"workspace live/artifact-integrity state; cleanup pending\","
+        },
+        {
+          "line": 221,
+          "text": "\"cleanup_state_at_success\": \"LIVE_EPHEMERAL_ARTIFACTS_CLEANUP_PENDING\","
+        },
+        {
+          "line": 222,
+          "text": "\"cleanup_success_claimed_at_preparation_success\": false,"
+        },
+        {
+          "line": 226,
+          "text": "\"materialization and full readback\","
+        },
+        {
+          "line": 232,
+          "text": "\"cleanup pending\""
+        },
+        {
+          "line": 240,
+          "text": "\"cleanup\": {"
+        },
+        {
+          "line": 241,
+          "text": "\"owner\": \"Proposed preparation owner owns attempt workspace lifecycle; future consumer borrows an exclusive artifact handoff; bound sandbox controller performs cleanup and independent absence observation.\","
+        },
+        {
+          "line": 242,
+          "text": "\"on_preparation_failure\": \"No ready receipt. Kill/reap compiler children/process groups, close pipes/selectors and observe EOF, tear down entire workspace/container, independently verify absence. Failed cleanup is separately recorded and bl"
+        },
+        {
+          "line": 243,
+          "text": "\"after_preparation_success\": \"Keep exact source/class in same ephemeral workspace only until consumer completion, abort, timeout or authorization/readiness loss. Receipt states live artifacts with cleanup pending; no premature removal or cl"
+        },
+        {
+          "line": 244,
+          "text": "\"after_behavior_or_abandonment\": \"Reap every child/process group, close captures, remove whole scenario container/workspace including /work and /tmp, independently verify absence and record separate cleanup evidence. Consumer failure spends"
+        },
+        {
+          "line": 245,
+          "text": "\"persistent_artifacts\": \"No source, class, harness, workspace snapshot or raw byte dump survives final cleanup. Bounded source-free/class-free metadata reports, sizes, hashes, manifests and cleanup observations may survive as report-only au"
+        },
+        {
+          "line": 246,
+          "text": "\"preparation_success_implies_cleanup_success\": false,"
+        },
+        {
+          "line": 247,
+          "text": "\"cleanup_failure_is_behavior_success\": false,"
+        },
+        {
+          "line": 248,
+          "text": "\"cleanup_authority_is_repository_write_authority\": false"
+        },
+        {
+          "line": 252,
+          "text": "\"sandbox_materialization_authority\": false,"
+        },
+        {
+          "line": 253,
+          "text": "\"exact_sandbox_materialization_authority\": false,"
+        },
+        {
+          "line": 282,
+          "text": "\"preparation_authority\": false,"
+        },
+        {
+          "line": 294,
+          "text": "\"preparation_authority_issuance\": 0,"
+        },
+        {
+          "line": 297,
+          "text": "\"source_materialization\": 0,"
+        },
+        {
+          "line": 345,
+          "text": "\"proposal\": \"sandbox_materialization\","
+        },
+        {
+          "line": 376,
+          "text": "\"rationale\": \"All preparation and full harness/consumer readiness evidence precede runtime consumption. Only mandatory authenticated permission checks/commits intervene before dispatch; no materialization, compilation, artifact repair or re"
+        },
+        {
+          "line": 409,
+          "text": "\"source_evidence_method\": \"Read and AST-evaluate the existing _SOURCE literal only; no owner import, executable Java check or source materialization.\","
+        },
+        {
+          "line": 435,
+          "text": "\"id\": \"materialization\","
+        },
+        {
+          "line": 491,
+          "text": "\"id\": \"cleanup\","
+        },
+        {
+          "line": 501,
+          "text": "\"cleanup_is_preparation\": false,"
+        },
+        {
+          "line": 502,
+          "text": "\"cleanup_clarification\": \"Mandatory teardown, child reaping and independent absence verification after completion or abort remain cleanup duties; they do not permit another preparation attempt after runtime consumption.\""
+        },
+        {
+          "line": 504,
+          "text": "\"preparation_authority\": {"
+        },
+        {
+          "line": 508,
+          "text": "\"schema\": \"synthetic_preparation_authority_pinned_1_v1\","
+        },
+        {
+          "line": 511,
+          "text": "\"exact_sandbox_materialization_authority\","
+        },
+        {
+          "line": 516,
+          "text": "\"sandbox_materialization_authority\": \"Proposed independent exact preparation owner; only a live original preparation authority's materialization facet, delegated to its bound already-authorized sandbox controller, may permit the single excl"
+        },
+        {
+          "line": 517,
+          "text": "\"scenario_compilation_authority\": \"The same proposed owner, separately scoped compilation facet, permits one fixed compiler attempt after verified materialization. It is not inherited from pinned auth, runtime lease, reflection permissions,"
+        },
+        {
+          "line": 521,
+          "text": "\"preparation_authority_design\": \"One narrow one-shot preparation authority plus one immutable success receipt. Two non-interchangeable operation facets bind one fixed materialize-then-compile attempt. No generic file or command API; no inde"
+        },
+        {
+          "line": 524,
+          "text": "\"proposed_authority_schema\": \"synthetic_preparation_authority_pinned_1_v1\","
+        },
+        {
+          "line": 526,
+          "text": "\"exact_sandbox_materialization_authority\","
+        },
+        {
+          "line": 555,
+          "text": "\"compilation_requires_verified_materialization\": true,"
+        },
+        {
+          "line": 556,
+          "text": "\"materialization_facet_can_compile\": false,"
+        },
+        {
+          "line": 571,
+          "text": "\"obtained_bytes_not_equal_to_materialization\": true,"
+        },
+        {
+          "line": 572,
+          "text": "\"materialization_not_equal_to_compilation\": true,"
+        },
+        {
+          "line": 575,
+          "text": "\"harness_boundary\": {"
+        }
+      ],
+      "AST_definitions": []
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_ACTIVATION_BOUNDARY_REQ_1/requirement.json",
+      "sha256": "1b6345aaa90dbc2d5089c6c555108b34213f5b631086f6c6d69b5ffc8cfca894",
+      "bytes": 13573,
+      "anchors": [
+        {
+          "line": 3,
+          "text": "\"schema_version\": \"synthetic_execution_activation_boundary_requirement_1_v1\","
+        },
+        {
+          "line": 47,
+          "text": "\"activation_boundary\": {"
+        }
+      ],
+      "AST_definitions": []
+    },
+    {
+      "path": "core/candidate_runtime_sandbox.py",
+      "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "bytes": 34833,
+      "anchors": [
+        {
+          "line": 48,
+          "text": "_WORKLOAD_ENVIRONMENT = {'PATH': '/usr/local/bin:/usr/bin:/bin', 'LANG': 'C.UTF-8',"
+        },
+        {
+          "line": 412,
+          "text": "def _safe_configuration(config, image_id, probe_id='boundary'):"
+        },
+        {
+          "line": 414,
+          "text": "return _safe_configuration_facts(config, image_id, probe_id)"
+        },
+        {
+          "line": 419,
+          "text": "def _safe_configuration_facts(config, image_id, probe_id):"
+        },
+        {
+          "line": 435,
+          "text": "and len(settings.get('Env', [])) == len(_WORKLOAD_ENVIRONMENT)"
+        },
+        {
+          "line": 436,
+          "text": "and dict(item.split('=', 1) for item in settings.get('Env', [])) == _WORKLOAD_ENVIRONMENT"
+        },
+        {
+          "line": 463,
+          "text": "if (facts.get('host_secret_absent') is True and facts.get('environment') == _WORKLOAD_ENVIRONMENT):"
+        },
+        {
+          "line": 483,
+          "text": "def _invoke_probe(prefix, backend, spec, profile, sentinel, port, timings):"
+        },
+        {
+          "line": 500,
+          "text": "*(token for key, value in _WORKLOAD_ENVIRONMENT.items() for token in ('--env', key + '=' + value)),"
+        },
+        {
+          "line": 507,
+          "text": "if not _safe_configuration(config, backend.image_identity, spec.argv[0]):"
+        },
+        {
+          "line": 587,
+          "text": "capture, facts, cleanup = _invoke_probe(prefix, backend, spec, profile, sentinel, port, measured)"
+        }
+      ],
+      "AST_definitions": [
+        {
+          "name": "validate_sandbox_verification_receipt",
+          "line": 254,
+          "end_line": 257
+        },
+        {
+          "name": "validate_sandbox_descriptor",
+          "line": 260,
+          "end_line": 266
+        },
+        {
+          "name": "_invoke_probe",
+          "line": 483,
+          "end_line": 550
+        }
+      ]
+    },
+    {
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "bytes": 22400,
+      "anchors": [
+        {
+          "line": 25,
+          "text": "CLONE_BLOCKED = 'RUNTIME_SANDBOX_2_BLOCKED_LEGACY_CLONE_POLICY'"
+        },
+        {
+          "line": 31,
+          "text": "BASELINE_POLICY_SHA256 = recovery.SECCOMP_HASH"
+        },
+        {
+          "line": 34,
+          "text": "POLICY = deepcopy(baseline._SECCOMP)"
+        },
+        {
+          "line": 35,
+          "text": "POLICY['syscalls'][0]['names'].remove('clone3')"
+        },
+        {
+          "line": 36,
+          "text": "POLICY['syscalls'].append({'names': ['clone3'], 'action': 'SCMP_ACT_ERRNO', 'errnoRet': 38})"
+        },
+        {
+          "line": 37,
+          "text": "POLICY_BYTES = baseline._json(POLICY).encode()"
+        },
+        {
+          "line": 38,
+          "text": "POLICY_SHA256 = sha256(POLICY_BYTES).hexdigest()"
+        },
+        {
+          "line": 39,
+          "text": "POLICY_PATH = Path(__file__).resolve().parents[1] / 'docs/roadmap/RUNTIME_SANDBOX_2_SECCOMP.json'"
+        },
+        {
+          "line": 49,
+          "text": "'baseline_sha256': BASELINE_POLICY_SHA256, 'candidate_sha256': POLICY_SHA256,"
+        },
+        {
+          "line": 59,
+          "text": "if baseline._hash(baseline._SECCOMP) != BASELINE_POLICY_SHA256:"
+        },
+        {
+          "line": 65,
+          "text": "or sha256(raw).hexdigest() != POLICY_SHA256):"
+        },
+        {
+          "line": 90,
+          "text": "seccomp_policy_sha256: str = field(default=POLICY_SHA256, init=False)"
+        },
+        {
+          "line": 91,
+          "text": "baseline_seccomp_policy_sha256: str = field(default=BASELINE_POLICY_SHA256, init=False)"
+        },
+        {
+          "line": 118,
+          "text": "seccomp_policy_sha256: str = field(default=POLICY_SHA256, init=False)"
+        },
+        {
+          "line": 143,
+          "text": "def validate_descriptor(descriptor, receipt):"
+        },
+        {
+          "line": 167,
+          "text": "validate_descriptor(descriptor, receipt)"
+        },
+        {
+          "line": 171,
+          "text": "def safe_configuration(config, mode):"
+        },
+        {
+          "line": 178,
+          "text": "{'no-new-privileges=true', 'seccomp=' + POLICY_BYTES.decode()}): return False"
+        },
+        {
+          "line": 182,
+          "text": "return baseline._safe_configuration(normalized, IMAGE)"
+        },
+        {
+          "line": 281,
+          "text": "or not safe_configuration(json.loads(observed.stdout), mode)):"
+        },
+        {
+          "line": 319,
+          "text": "**dict.fromkeys(AUTHORITIES, False), 'policy_sha256': POLICY_SHA256,"
+        },
+        {
+          "line": 328,
+          "text": "validate_policy_bytes(POLICY_PATH.read_bytes())"
+        },
+        {
+          "line": 337,
+          "text": "profile.write_bytes(POLICY_BYTES)"
+        }
+      ],
+      "AST_definitions": [
+        {
+          "name": "validate_policy_bytes",
+          "line": 58,
+          "end_line": 67
+        },
+        {
+          "name": "validate_receipt",
+          "line": 136,
+          "end_line": 140
+        },
+        {
+          "name": "validate_descriptor",
+          "line": 143,
+          "end_line": 151
+        }
+      ]
+    },
+    {
+      "path": "core/sandbox_backend_binding.py",
+      "sha256": "202cd1190494beaaf24874ac798b89a8eac276fa8361b496663a573770cdf1ed",
+      "bytes": 26216,
+      "anchors": [
+        {
+          "line": 30,
+          "text": "BINDING_SEMANTICS = 'original_java1_route_and_server_version_v1'"
+        },
+        {
+          "line": 89,
+          "text": "binding_semantics: str = field(default=BINDING_SEMANTICS, init=False)"
+        },
+        {
+          "line": 154,
+          "text": "or attachment.binding_semantics != BINDING_SEMANTICS"
+        },
+        {
+          "line": 179,
+          "text": "def validate_sandbox_backend_binding(attachment, sandbox_descriptor, sandbox_receipt):"
+        },
+        {
+          "line": 202,
+          "text": "validate_sandbox_backend_binding(attachment, record[1], record[2])"
+        },
+        {
+          "line": 273,
+          "text": "'binding_semantics': BINDING_SEMANTICS, 'measurement_method_id': METHOD_ID,"
+        },
+        {
+          "line": 347,
+          "text": "validate_sandbox_backend_binding(attachment, descriptor, receipt)"
+        },
+        {
+          "line": 395,
+          "text": "validate_sandbox_backend_binding(candidate, sd, sr)"
+        },
+        {
+          "line": 451,
+          "text": "validate_sandbox_backend_binding(attachment, descriptor, receipt)"
+        }
+      ],
+      "AST_definitions": [
+        {
+          "name": "validate_sandbox_backend_binding",
+          "line": 179,
+          "end_line": 190
+        }
+      ]
+    },
+    {
+      "path": "core/runtime_java_pinned_provider.py",
+      "sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+      "bytes": 42111,
+      "anchors": [
+        {
+          "line": 39,
+          "text": "CONTROLLER_RESOLVED = \"/usr/local/bin/python3.12\""
+        },
+        {
+          "line": 40,
+          "text": "CONTROLLER_SHA256 = \"0e6475dfda68a9b2d93501449fc47593ca169010e8f4881577b97463fd0c1263\""
+        },
+        {
+          "line": 354,
+          "text": "raise PinnedProviderBlocked(BACKEND_MISMATCH, \"actual_runtime_pair_backend_bridge_mismatch\")"
+        },
+        {
+          "line": 367,
+          "text": "or controller.resolved_path != CONTROLLER_RESOLVED or controller.sha256 != CONTROLLER_SHA256"
+        },
+        {
+          "line": 409,
+          "text": "\"cross_pair_bridge_result\": True, \"cross_pair_fingerprint_equality_required\": False,"
+        },
+        {
+          "line": 458,
+          "text": "def validate_runtime_attachment(attachment, pinned_receipt, bind_attachment, bind_sd, bind_sr,"
+        },
+        {
+          "line": 473,
+          "text": "def validate_pinned_java_exact_provider(receipt, pinned_receipt, bind_attachment, bind_sd, bind_sr,"
+        },
+        {
+          "line": 483,
+          "text": "validate_runtime_attachment(attachment, *objects[:9])"
+        },
+        {
+          "line": 490,
+          "text": "evidence = {**json.loads(attachment.evidence_json), \"runtime_bridge_evidence_fingerprint\": attachment.fingerprint,"
+        },
+        {
+          "line": 570,
+          "text": "validate_runtime_attachment(attachment, *upstreams)"
+        },
+        {
+          "line": 571,
+          "text": "evidence = {**evidence, \"runtime_bridge_evidence_fingerprint\": attachment.fingerprint,"
+        },
+        {
+          "line": 581,
+          "text": "validate_pinned_java_exact_provider(receipt, *upstreams, attachment)"
+        },
+        {
+          "line": 634,
+          "text": "validate_pinned_java_exact_provider(receipt, *values)"
+        },
+        {
+          "line": 639,
+          "text": "validate_pinned_java_exact_provider(candidate, *objects)"
+        },
+        {
+          "line": 686,
+          "text": "validate_pinned_java_exact_provider(receipt, *values)"
+        }
+      ],
+      "AST_definitions": [
+        {
+          "name": "validate_runtime_attachment",
+          "line": 458,
+          "end_line": 470
+        },
+        {
+          "name": "validate_pinned_java_exact_provider",
+          "line": 473,
+          "end_line": 494
+        }
+      ]
+    },
+    {
+      "path": "core/runtime_java_pinned_requirement.py",
+      "sha256": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1",
+      "bytes": 22597,
+      "anchors": [
+        {
+          "line": 31,
+          "text": "\"Authenticate that the runtime controller is that same measured executable in that same immutable image.\","
+        },
+        {
+          "line": 32,
+          "text": "\"Bind controller source identity and frozen JAVA.1C invocation to the runtime evidence digest.\","
+        },
+        {
+          "line": 33,
+          "text": "\"JAVA.1C currently lacks a controller binary identity field; an additive authenticated measurement attachment is required.\","
+        },
+        {
+          "line": 34,
+          "text": "\"No stable fixed controller digest is established for requirement pinning; historical report hashes cannot supply it.\","
+        },
+        {
+          "line": 71,
+          "text": "(\"controller_identity\", \"Exact /usr/local/bin/python plus owner-authenticated measured executable/runtime identity; presence is insufficient.\"),"
+        },
+        {
+          "line": 77,
+          "text": "(\"no_inspection_execution\", \"Inspect a stopped phase-owned container; no container start, java, javac or controller execution during inspection.\"),"
+        },
+        {
+          "line": 91,
+          "text": "(\"invocation\", \"Fresh RUNTIME.JAVA.1C/runtime_java_1c_v1 fixed source, javac/JVM argv, main/classpath and controller source; no caller command/flags/source.\"),"
+        },
+        {
+          "line": 95,
+          "text": "(\"containment\", \"Private PID/cgroup; IPC none; all seven measured namespaces; identical child/controller namespace and cgroup boundaries before/after.\"),"
+        },
+        {
+          "line": 97,
+          "text": "(\"controller_threads\", \"One Python and OS controller thread before/after; zero Thread.start attempts; frozen selector capture.\"),"
+        },
+        {
+          "line": 98,
+          "text": "(\"capture\", \"10000 ms outer timeout, 5000 ms abort/shared controller deadline; independent bounded pipes/EOF; outer stdout/stderr 8192 each, version/runtime 1024 each, compiler 2048 each.\"),"
+        },
+        {
+          "line": 115,
+          "text": "\"controller_path\", \"controller_resolved_path\", \"controller_measured_sha256\","
+        },
+        {
+          "line": 116,
+          "text": "\"controller_runtime_identity_evidence_fingerprint\", \"controller_source_identity\","
+        },
+        {
+          "line": 133,
+          "text": "(\"controller_path\", \"controller_path\"),"
+        },
+        {
+          "line": 134,
+          "text": "(\"controller_resolved_path\", \"controller_resolved_path\"),"
+        },
+        {
+          "line": 135,
+          "text": "(\"controller_measured_sha256\", \"controller_measured_sha256\"),"
+        },
+        {
+          "line": 162,
+          "text": "(\"controller_path\", \"controller_path\"),"
+        },
+        {
+          "line": 163,
+          "text": "(\"controller_resolved_path\", \"controller_resolved_path\"),"
+        },
+        {
+          "line": 164,
+          "text": "(\"controller_measured_sha256\", \"controller_measured_sha256\"),"
+        },
+        {
+          "line": 165,
+          "text": "), \"Future provider attachment authenticates inspection fingerprint, backend binding, runtime descriptor/receipt/digest and controller runtime measurement together. Frozen JAVA.1C lacks these cross-owner/controller fields; no implicit link "
+        },
+        {
+          "line": 194,
+          "text": "\"Original BIND.1 means fixed local-docker route plus exact Linux Server.Version before/after equality only; daemon instance identity, continuity and ABA resistance are not established or claimed.\","
+        },
+        {
+          "line": 205,
+          "text": "NegativeOutcome(\"PINNED_CONTROLLER_MISMATCH\", \"Controller path/bytes/authenticity/runtime linkage missing or mismatched\", \"Required controller identity unproven, including unresolved provider-proof obligations.\"),"
+        },
+        {
+          "line": 230,
+          "text": "controller: ControllerRequirement = ControllerRequirement()"
+        },
+        {
+          "line": 251,
+          "text": "\"provider_javac_identity\", \"provider_controller_identity\", \"target_inspection_evidence\","
+        }
+      ],
+      "AST_definitions": []
+    },
+    {
+      "path": "core/runtime_java_pinned_backend_target_binding.py",
+      "sha256": "94c95d674c0b43cde5811762998d13a65c3eee71c442cf05ff8699e02ec59da9",
+      "bytes": 34173,
+      "anchors": [
+        {
+          "line": 189,
+          "text": "backend.validate_sandbox_backend_binding(attachment, descriptor, sandbox_receipt)"
+        },
+        {
+          "line": 190,
+          "text": "target.validate_target_inspection_receipt(inspection)"
+        },
+        {
+          "line": 274,
+          "text": "return validate_pinned_backend_target_binding(signed, *upstreams)"
+        },
+        {
+          "line": 277,
+          "text": "def validate_pinned_backend_target_binding(receipt, bind_attachment, sandbox_descriptor,"
+        },
+        {
+          "line": 373,
+          "text": "backend.validate_sandbox_backend_binding(attachment, descriptor, sandbox_receipt)"
+        },
+        {
+          "line": 387,
+          "text": "validate_pinned_backend_target_binding(receipt, attachment, descriptor, sandbox_receipt, inspection)"
+        },
+        {
+          "line": 494,
+          "text": "validate_pinned_backend_target_binding(candidate, *supplied)"
+        },
+        {
+          "line": 560,
+          "text": "validate_pinned_backend_target_binding(receipt, *upstreams)"
+        }
+      ],
+      "AST_definitions": [
+        {
+          "name": "validate_pinned_backend_target_binding",
+          "line": 277,
+          "end_line": 309
+        }
+      ]
+    },
+    {
+      "path": "core/runtime_java_pinned_target_inspection.py",
+      "sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59",
+      "bytes": 28903,
+      "anchors": [
+        {
+          "line": 141,
+          "text": "def validate_target_inspection_receipt(receipt):"
+        },
+        {
+          "line": 199,
+          "text": "return validate_target_inspection_receipt(signed)"
+        }
+      ],
+      "AST_definitions": [
+        {
+          "name": "validate_target_inspection_receipt",
+          "line": 141,
+          "end_line": 156
+        },
+        {
+          "name": "_controller_source_identity",
+          "line": 382,
+          "end_line": 385
+        }
+      ]
+    },
+    {
+      "path": "core/sandboxed_java_positive_probe.py",
+      "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+      "bytes": 7358,
+      "anchors": [
+        {
+          "line": 81,
+          "text": "def execute():"
+        },
+        {
+          "line": 96,
+          "text": "os.mkdir('/work/classes')"
+        },
+        {
+          "line": 108,
+          "text": "if not run('java', RUNTIME_ARGV, 1024): return"
+        },
+        {
+          "line": 121,
+          "text": "def source():"
+        }
+      ],
+      "AST_definitions": [
+        {
+          "name": "source",
+          "line": 121,
+          "end_line": 126
+        }
+      ]
+    },
+    {
+      "path": "core/sandboxed_java_positive_continuation.py",
+      "sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+      "bytes": 28167,
+      "anchors": [
+        {
+          "line": 283,
+          "text": "def validate_descriptor(descriptor, receipt):"
+        },
+        {
+          "line": 305,
+          "text": "def _invoke(prefix, profile):"
+        },
+        {
+          "line": 339,
+          "text": "def cleanup_control(*args):"
+        },
+        {
+          "line": 342,
+          "text": "return baseline._Capture('cleanup_control_failed', None, b'', b'', False)"
+        },
+        {
+          "line": 343,
+          "text": "cleanup_control('kill', name)"
+        },
+        {
+          "line": 344,
+          "text": "removed = cleanup_control('rm', '--force', '--volumes', name)"
+        },
+        {
+          "line": 345,
+          "text": "absent = cleanup_control('inspect', name, '--format', '{{.State.Running}}')"
+        }
+      ],
+      "AST_definitions": [
+        {
+          "name": "validate_receipt",
+          "line": 277,
+          "end_line": 280
+        },
+        {
+          "name": "validate_descriptor",
+          "line": 283,
+          "end_line": 291
+        },
+        {
+          "name": "_invoke",
+          "line": 305,
+          "end_line": 349
+        }
+      ]
+    },
+    {
+      "path": "core/synthetic_runtime_authorization_pinned.py",
+      "sha256": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c",
+      "bytes": 24720,
+      "anchors": [
+        {
+          "line": 145,
+          "text": "def _authenticate_provider(outcome):"
+        },
+        {
+          "line": 261,
+          "text": "def validate_pinned_synthetic_runtime_authorization(authorization, *, provider_outcome=None):"
+        },
+        {
+          "line": 274,
+          "text": "root, objects, provider = _authenticate_provider(record[\"provider_outcome\"])"
+        },
+        {
+          "line": 335,
+          "text": "root, objects, provider = _authenticate_provider(outcome)"
+        }
+      ],
+      "AST_definitions": [
+        {
+          "name": "validate_pinned_synthetic_runtime_authorization",
+          "line": 261,
+          "end_line": 288
+        }
+      ]
+    },
+    {
+      "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+      "sha256": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4",
+      "bytes": 25692,
+      "anchors": [
+        {
+          "line": 36,
+          "text": "\"ACTIVATION_PRECONDITION_UNSATISFIED\", \"PROOF_UNRESOLVED\","
+        },
+        {
+          "line": 119,
+          "text": "\"unresolved_dependency_error\": \"PROOF_UNRESOLVED\","
+        },
+        {
+          "line": 146,
+          "text": "category = \"PROOF_UNRESOLVED\""
+        },
+        {
+          "line": 435,
+          "text": "_fail(\"PROOF_UNRESOLVED\", \"owner lease identifier unavailable\")"
+        },
+        {
+          "line": 439,
+          "text": "_fail(\"PROOF_UNRESOLVED\", \"owner lease identifier unavailable\")"
+        },
+        {
+          "line": 448,
+          "text": "def validate_pinned_synthetic_runtime_execution_lease(lease, authorization=None):"
+        },
+        {
+          "line": 454,
+          "text": "def pinned_synthetic_runtime_execution_lease_state(lease, authorization=None):"
+        },
+        {
+          "line": 459,
+          "text": "def check_pinned_synthetic_runtime_execution_lease_preconditions(lease, authorization):"
+        },
+        {
+          "line": 463,
+          "text": "reason = {ISSUED: \"PROOF_UNRESOLVED\", CONSUMED: \"LEASE_ALREADY_CONSUMED\","
+        },
+        {
+          "line": 471,
+          "text": "_fail(\"PROOF_UNRESOLVED\", \"separately reviewed pinned consumer/source/compile contract required\")"
+        }
+      ],
+      "AST_definitions": [
+        {
+          "name": "validate_pinned_synthetic_runtime_execution_lease",
+          "line": 448,
+          "end_line": 451
+        },
+        {
+          "name": "pinned_synthetic_runtime_execution_lease_state",
+          "line": 454,
+          "end_line": 456
+        },
+        {
+          "name": "check_pinned_synthetic_runtime_execution_lease_preconditions",
+          "line": 459,
+          "end_line": 466
+        }
+      ]
+    },
+    {
+      "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/RUNTIME_JAVA_PINNED_1C_RETRY_LOCAL.json",
+      "sha256": "e10f0514b4646a37adbb6d6a44e29b106205c559dedaa697d728241036ab0656",
+      "bytes": 353313,
+      "anchors": [
+        {
+          "line": 604,
+          "text": "\"controller_source_identity\": ["
+        },
+        {
+          "line": 614,
+          "text": "\"source_sha256\","
+        },
+        {
+          "line": 618,
+          "text": "\"source_size_bytes\","
+        },
+        {
+          "line": 821,
+          "text": "\"inspection_controller_source_identity\": ["
+        },
+        {
+          "line": 831,
+          "text": "\"source_sha256\","
+        },
+        {
+          "line": 835,
+          "text": "\"source_size_bytes\","
+        },
+        {
+          "line": 2652,
+          "text": "\"source_sha256\": \"3975c5e03edb79439d6146b7714a6d3c31af86ce42f05624cdf6c28f69b4e224\","
+        },
+        {
+          "line": 2653,
+          "text": "\"source_size_bytes\": 129,"
+        },
+        {
+          "line": 3997,
+          "text": "\"source_sha256\": \"3975c5e03edb79439d6146b7714a6d3c31af86ce42f05624cdf6c28f69b4e224\","
+        },
+        {
+          "line": 4046,
+          "text": "\"evidence_json\": \"{\\\"archive_ancestor_metadata_complete\\\":false,\\\"bind_attachment_fingerprint\\\":\\\"71cce302bb56e5ef007fa09d7d3d3340688ba5e424c4ea00164f4185acc4be9b\\\",\\\"bind_attachment_id\\\":\\\"25e9727dca49256e05d774936cd5087cb4e339d9e26549766b"
+        },
+        {
+          "line": 4110,
+          "text": "\"controller_source_identity\": {"
+        },
+        {
+          "line": 4113,
+          "text": "\"source_sha256\": \"4f81640e2f01bc1f7a1a833beb269a9d1df51088b69cf24c8369fb6683f11a58\","
+        },
+        {
+          "line": 4114,
+          "text": "\"source_size_bytes\": \"13037\""
+        },
+        {
+          "line": 4198,
+          "text": "\"evidence_json\": \"{\\\"archive_ancestor_metadata_complete\\\":false,\\\"bind_attachment_fingerprint\\\":\\\"71cce302bb56e5ef007fa09d7d3d3340688ba5e424c4ea00164f4185acc4be9b\\\",\\\"bind_attachment_id\\\":\\\"25e9727dca49256e05d774936cd5087cb4e339d9e26549766b"
+        },
+        {
+          "line": 4262,
+          "text": "\"controller_source_identity\": {"
+        },
+        {
+          "line": 4265,
+          "text": "\"source_sha256\": \"4f81640e2f01bc1f7a1a833beb269a9d1df51088b69cf24c8369fb6683f11a58\","
+        },
+        {
+          "line": 4266,
+          "text": "\"source_size_bytes\": \"13037\""
+        },
+        {
+          "line": 4406,
+          "text": "\"controller_source_identity\": {"
+        },
+        {
+          "line": 4409,
+          "text": "\"source_sha256\": \"4f81640e2f01bc1f7a1a833beb269a9d1df51088b69cf24c8369fb6683f11a58\","
+        },
+        {
+          "line": 4410,
+          "text": "\"source_size_bytes\": \"13037\""
+        },
+        {
+          "line": 6489,
+          "text": "\"import base64, hashlib, json, stat, sys, threading\\nimport os, selectors, signal, subprocess, time\\ndef capture_process(argv, limit, *, deadline, on_start=None):\\n    \\\"\\\"\\\"Read two nonblocking pipes with one thread and bounded working mem"
+        },
+        {
+          "line": 6893,
+          "text": "\"graph_controller_source_identity\": true,"
+        },
+        {
+          "line": 6961,
+          "text": "\"changed_controller_source_identity\": true,"
+        },
+        {
+          "line": 7003,
+          "text": "\"current_provider_source_sha256\": \"bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa\","
+        },
+        {
+          "line": 7013,
+          "text": "\"corrected_provider_source_sha256\": \"bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa\""
+        }
+      ],
+      "AST_definitions": []
+    }
+  ],
+  "historical_metadata_is_current_liveness": false
+}

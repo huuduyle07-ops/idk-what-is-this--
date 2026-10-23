@@ -1,0 +1,127 @@
+{
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+  "artifact_kind": "independent_read_only_semantic_security_review",
+  "reviewed_file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_IDENTITY_ENCODING_CONTRACT_1/contract.json",
+  "reviewed_snapshot_sha256": "a461f49bcc3b18426490028ee1aaf11a371d7ea1f9bc2bc5afc07dd72fa02265",
+  "review_status": "PASS_NO_SECURITY_OR_SEMANTIC_BLOCKER",
+  "blocking_findings": [],
+  "review_method": "Read JSON and historical contract/source text only; resolve source aliases and JSON property paths without importing owner modules or issuing live objects.",
+  "checks": [
+    {
+      "name": "family_prefixed_nonwrapping_sequence",
+      "result": "PASS",
+      "evidence": "Eight distinct prefixes w,c,x,a,t,r,o,d with exact 16-digit lowercase hex suffix, positive 63-bit range and excluded zero have an injective 17-ASCII-byte representation. Prefix/domain validation and shared atomic reservation semantics prevent lexical class aliasing; original-object and HMAC checks remain the authentication barrier."
+    },
+    {
+      "name": "all_classes_exactly_17_bytes",
+      "result": "PASS_AS_EXPLICIT_AVAILABILITY_POLICY",
+      "evidence": "Classes retain different semantic roles and aliased fields do not allocate new values. Common retained-history capacity can be chosen consistently for all classes; the contract explicitly calls it a bounded availability policy and claims zero entropy requirement. The historical positive_int maximum is a legitimate selected finite ceiling but is not an independently established mandatory ID cardinality."
+    },
+    {
+      "name": "copy_json_reconstruction_and_wrapper",
+      "result": "PASS",
+      "evidence": "Contract requires exact expected type, exact retained original object, private owner registry, retained upstream graph, immutable canonical bindings, HMAC and current eligibility; JSON/ID equality only correlates an authenticated exchange. No ID-only resolution path may grant authority."
+    },
+    {
+      "name": "pid_fork_restart_and_reload",
+      "result": "PASS",
+      "evidence": "PID is explicitly insufficient by itself. Fork invalidates inherited originals and lock/allocator use before issuance; restart may repeat text only in a disjoint new incarnation with new secrets/empty registry. Reload, registry replacement and secret rotation must retain namespace continuity or fail closed rather than restart counters."
+    },
+    {
+      "name": "collision_terminal_and_tombstone",
+      "result": "PASS",
+      "evidence": "Reservation/increment/collision check is linearizable; failure burns reservations. Reservation rejects preexisting reserved/live/terminal/tombstoned keys before claiming a fresh value. Registration may then publish only that issuer's own newly created reservation exactly once; foreign reservations and published/terminal/tombstoned values are rejected. This phase distinction avoids rejecting the issuer's legitimate reservation while preventing takeover or reuse. Histories survive operational object collection and terminal state; terminal evidence cannot reopen readiness."
+    },
+    {
+      "name": "controller_attempt_deadline_and_nullable_scope",
+      "result": "PASS",
+      "evidence": "Controller scalar is narrowed to original owner-object reference while source/protocol/generation bindings remain separate. Attempt is permanent materialize-to-compile relation with no refund/reopen. Deadline identifies an immutable monotonic deadline relation rather than a clock value. Borrower/handoff remain minimum-path null with nonnull encodings unestablished. Kernel/process/generation serialization and Candidate A selection remain out of scope."
+    },
+    {
+      "name": "schema_and_authority_preservation",
+      "result": "PASS",
+      "evidence": "The additive grammar fits unchanged generic nonempty <=256-byte string semantics. Challenge unpredictability, HMAC secrets, stable fingerprints, existing owner implementations, schema, transport selection and 8192-byte cap are preserved. Contract grants no effect or authority."
+    }
+  ],
+  "authority_anchor_resolution": [
+    {
+      "anchor": "C:/authority_separation/scalar_admission_id_is_authority",
+      "source": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "exists": true,
+      "actual_value": false,
+      "source_line": 163
+    },
+    {
+      "anchor": "C:/framing/primitive_rules/id",
+      "source": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "exists": true,
+      "actual_value": "exact str, nonempty, <=256 UTF-8 bytes, no NUL; reference only to authenticated original relation, never restore authority from string",
+      "source_line": 891
+    },
+    {
+      "anchor": "W:/exact_live_object",
+      "source": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+      "exists": true,
+      "source_line": 113,
+      "relevant_facts": ["exact_type_required=true", "original_registry_object_identity_required=true", "issuing_pid_required=true", "strong_original_graph_retention_required=true", "scalar_projection_sufficient=false"]
+    },
+    {
+      "anchor": "W:/authentication",
+      "source": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+      "exists": true,
+      "source_line": 157,
+      "relevant_facts": ["algorithm=HMAC-SHA256", "independent_secret=true", "registry retains original object/graph and permanent terminal tombstones", "constant-time HMAC and retained canonical byte comparison", "terminal_evidence_grants_readiness=false"]
+    }
+  ],
+  "additional_anchor_resolution": [
+    {
+      "anchor": "C:/framing/primitive_rules/positive_int",
+      "exists": true,
+      "actual_value": "exact int in 1..9223372036854775807; bool rejected; no wrap/reuse",
+      "source_line": 892
+    },
+    {
+      "anchor": "C:/identity/must_bind",
+      "exists": true,
+      "source_line": 127,
+      "evidence": "Retains source/executable/protocol, original host/workspace relation, actual container, controller incarnation/generation, workspace generation, endpoints, bootstrap, limits and cleanup bindings."
+    },
+    {
+      "anchor": "S:/definitions/id",
+      "exists": true,
+      "evidence": "Frozen message schema id definition is type=str, min_utf8_bytes=1, max_utf8_bytes=256 and NUL_allowed=false; additive 17-byte ASCII grammar fits it."
+    }
+  ],
+  "nonblocking_clarifications": [],
+  "resolved_clarifications": [
+    {
+      "id": "REVIEW-C1",
+      "location": "authority_basis.required_conjunction[0]",
+      "previous_text": "exact built-in expected type, rejecting wrappers and subclasses",
+      "reason": "Owner/relation objects are expected custom types. Built-in scalar type checks and exact owner-class checks are both required, so the current wording could be misread as allowing only built-in owner object types.",
+      "resolution": "Final contract says exact expected owner/relation object type, and exact built-in scalar types; reject wrappers and subclasses."
+    },
+    {
+      "id": "REVIEW-C2",
+      "location": "encoding.capacity_rationale",
+      "reason": "Historical positive_int constrains existing numeric sequence values, while historical ID schema permits generic strings. The chosen 63-bit ID allocation ceiling is defensible as a new bounded availability policy; it is not semantically required by that historical positive_int bound.",
+      "resolution": "Final capacity rationale explicitly chooses 63 bits as this phase's bounded availability policy, distinguishes historical sequence limits from generic ID strings, and accepts that 32-bit handles can also be security-correct with exhaustion."
+    }
+  ],
+  "allocation_coordination_separation": "Final generation_semantics.allocation_is_not_coordination explicitly limits the reservation ledger to name uniqueness; it does not bridge owner stores, hold existing private locks, authenticate admissions, spend facets or establish effect transactions. This preserves the pure identity-contract scope.",
+  "final_collision_wording_review": {
+    "result": "PASS",
+    "location": "generation_semantics.collision_handling",
+    "evidence": "Independently reread the amended reservation versus registration predicates. A fresh issuer reservation is not rejected merely because it exists at publication; the publication exception is limited to its creator, its newly reserved key and one publication. Failure/cancellation remains burned. No other namespace, authority, replay, lifetime or encoding rule changes.",
+    "focused_assertion_source": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_IDENTITY_ENCODING_CONTRACT_1/tests/test_identity_contract.py:151-153",
+    "test_source_observed": true,
+    "tests_executed_by_reviewer": false
+  },
+  "scope_limit": "This is contract coherence/security review, not implementation validation, a transport design, full budget proof, owner issuance test or claim that operational readiness exists.",
+  "contract_edited_by_reviewer": false,
+  "existing_sources_edited_by_reviewer": false,
+  "owner_import_count": 0,
+  "live_owner_issuance_count": 0,
+  "operational_effect_count": 0,
+  "authority_granted": false
+}

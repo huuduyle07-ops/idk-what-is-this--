@@ -1,0 +1,10 @@
+{
+  "mode": "benchmark_check",
+  "exit_code": 0,
+  "real_effect_attempts": [
+    "socket.bind"
+  ],
+  "denied_attempts": {},
+  "elapsed_seconds": 10.817,
+  "scope": "Pure host maintenance and fabricated in-memory fixture evidence only; no operational provider discovery, Docker/Java, runtime authorization, leases, executor, or apply."
+}

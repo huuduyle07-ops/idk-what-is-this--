@@ -1,0 +1,17 @@
+Failed to find real location of C:\Python314\python.exe
+........................................................................ [ 12%]
+........................................................................ [ 25%]
+........................................................................ [ 38%]
+........................................................................ [ 51%]
+........................................................................ [ 64%]
+........................................................................ [ 77%]
+........................................................................ [ 90%]
+...................................................                      [100%]
+============================== warnings summary ===============================
+..\..\..\..\..\AppData\Roaming\Python\Python314\site-packages\google\genai\types.py:42
+  C:\Users\Admin\AppData\Roaming\Python\Python314\site-packages\google\genai\types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+555 passed, 1 warning in 57.87s
+PURE_AUDIT_FINAL_RESULT {"exit": 0, "collected": 555, "passed": 555, "failed": 0, "real_effect_attempts": []}

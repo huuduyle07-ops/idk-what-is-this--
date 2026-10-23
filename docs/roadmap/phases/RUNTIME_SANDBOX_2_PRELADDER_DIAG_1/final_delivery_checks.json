@@ -1,0 +1,20 @@
+{
+  "additional_Docker_controls": 0,
+  "additional_operational_issuances": 0,
+  "checks": {
+    "authored_text_files_checked": 40,
+    "bytecode_emission": false,
+    "failures": [],
+    "git_diff_check_exit_code": 0,
+    "new_json_files_parsed": 30,
+    "new_python_sources_compiled_in_memory": 4,
+    "passed": true
+  },
+  "passed": true,
+  "preservation": {
+    "changed_or_missing": [],
+    "historical_file_count": 2126,
+    "passed": true,
+    "unexpected_new_files_outside_phase": []
+  }
+}

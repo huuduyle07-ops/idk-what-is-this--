@@ -1,0 +1,504 @@
+{
+  "phase_id": "OOP.INTENT.CONTINUE.1",
+  "fixture_kind": "synthetic_answer_records_only",
+  "real_waiting_answer_consumed": false,
+  "cases": {
+    "complete": {
+      "stored_answer": {
+        "gap_id": "0a4a2a2db565289603b7e341b8cfad9392921408b4734d7d7cfd6024a2aff2f1",
+        "task_fingerprint": "7cc7818739d1ed51a792d3c6b6e6256b575704335f6872cef1c1848f09d8af1b",
+        "repository_id": "complete-4cec91b446508d2983ae2ca0fd4a1d56",
+        "class_identity": "BankAccount",
+        "source_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+        "evidence_fingerprint": "91aa5c982de09013349cd70a3db1c46c3316994ec10623dae38ea2958c7d9f32",
+        "text": "For this exercise, let SavingAccount own a simple password in memory.\nIt does not need to persist across runs.\nVerify it when a savings operation is requested.\n\nsavingBalance should receive money transferred from the inherited balance,\nand interest should apply only to savingBalance.",
+        "answer_fingerprint": "2f5d36ce3cb5489a3db7ab11fe9beef8291304b18bb336843e5c8a91d786ea8e",
+        "provenance": "human_provided_semantic_evidence"
+      },
+      "session_events": [
+        "waiting_for_clarification",
+        "clarification_supplied",
+        "clarification_supplied_pending_projection",
+        "clarification_projected"
+      ],
+      "session_count": 1,
+      "retry_idempotent": true,
+      "continuation": {
+        "answer_fingerprint": "2f5d36ce3cb5489a3db7ab11fe9beef8291304b18bb336843e5c8a91d786ea8e",
+        "answer_record_fingerprint": "460fa5c2ccfa863174acab216985286535f3c366143a86bf9aec7caf69f39e1b",
+        "authority": "read_only",
+        "auto_apply": false,
+        "class_identity": "BankAccount",
+        "conflicts": [],
+        "continuation_fingerprint": "45feb076807609fc9d27211a4dc8f0b84df6bc77f26347762a178688dafe94b8",
+        "execution_authorized": false,
+        "not_resolved_by_continuation": [],
+        "parent_design_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+        "parent_gap_id": "0a4a2a2db565289603b7e341b8cfad9392921408b4734d7d7cfd6024a2aff2f1",
+        "provenance": "explicit_human",
+        "remaining_dimensions": [],
+        "repair_scope_authority": false,
+        "repository_id": "complete-4cec91b446508d2983ae2ca0fd4a1d56",
+        "resolved_dimensions": [
+          "credential_ownership",
+          "credential_source",
+          "credential_persistence",
+          "credential_verification_mechanism",
+          "verification_lifecycle",
+          "savings_funding_semantics",
+          "savings_interest_semantics"
+        ],
+        "schema_version": "oop_intent_continue_1_v1",
+        "source_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+        "source_path": "bank.java",
+        "status": "clarification_projected",
+        "task_contract_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "typed_answer_commitments": [
+          {
+            "answer_fingerprint": "2f5d36ce3cb5489a3db7ab11fe9beef8291304b18bb336843e5c8a91d786ea8e",
+            "dimension": "credential_ownership",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 68,
+              "source_start": 0,
+              "source_text": "For this exercise, let SavingAccount own a simple password in memory"
+            },
+            "provenance": "explicit_human",
+            "value": "SavingAccount"
+          },
+          {
+            "answer_fingerprint": "2f5d36ce3cb5489a3db7ab11fe9beef8291304b18bb336843e5c8a91d786ea8e",
+            "dimension": "credential_source",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 68,
+              "source_start": 0,
+              "source_text": "For this exercise, let SavingAccount own a simple password in memory"
+            },
+            "provenance": "explicit_human",
+            "value": "simple_password"
+          },
+          {
+            "answer_fingerprint": "2f5d36ce3cb5489a3db7ab11fe9beef8291304b18bb336843e5c8a91d786ea8e",
+            "dimension": "credential_verification_mechanism",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 68,
+              "source_start": 0,
+              "source_text": "For this exercise, let SavingAccount own a simple password in memory"
+            },
+            "provenance": "explicit_human",
+            "value": "semantic_password_check"
+          },
+          {
+            "answer_fingerprint": "2f5d36ce3cb5489a3db7ab11fe9beef8291304b18bb336843e5c8a91d786ea8e",
+            "dimension": "credential_persistence",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 68,
+              "source_start": 0,
+              "source_text": "For this exercise, let SavingAccount own a simple password in memory"
+            },
+            "provenance": "explicit_human",
+            "value": "in_memory_only"
+          },
+          {
+            "answer_fingerprint": "2f5d36ce3cb5489a3db7ab11fe9beef8291304b18bb336843e5c8a91d786ea8e",
+            "dimension": "verification_lifecycle",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 158,
+              "source_start": 111,
+              "source_text": "Verify it when a savings operation is requested"
+            },
+            "provenance": "explicit_human",
+            "value": "operation_gated"
+          },
+          {
+            "answer_fingerprint": "2f5d36ce3cb5489a3db7ab11fe9beef8291304b18bb336843e5c8a91d786ea8e",
+            "dimension": "savings_funding_semantics",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 234,
+              "source_start": 161,
+              "source_text": "savingBalance should receive money transferred from the inherited balance"
+            },
+            "provenance": "explicit_human",
+            "value": "transfer_from_inherited_balance"
+          },
+          {
+            "answer_fingerprint": "2f5d36ce3cb5489a3db7ab11fe9beef8291304b18bb336843e5c8a91d786ea8e",
+            "dimension": "savings_interest_semantics",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 283,
+              "source_start": 236,
+              "source_text": "and interest should apply only to savingBalance"
+            },
+            "provenance": "explicit_human",
+            "value": "interest_applies_to_saving_balance"
+          }
+        ],
+        "write_authority": false
+      },
+      "base_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+      "effective_fingerprint": "7115549ac38e7c208480b7a97e2c14dea48b16421472f6608e8d27e3bc766f7b",
+      "detection_status": "no_gap",
+      "remaining_dimensions": [],
+      "question": null,
+      "gap_count": 0,
+      "first_remaining_blocker": "SCOPE_EXPANSION_REQUIRED",
+      "exact_source_unchanged": true,
+      "current_context_unchanged": true,
+      "no_saving_account_file": true,
+      "scope_expansion": false
+    },
+    "auth_only": {
+      "stored_answer": {
+        "gap_id": "a10bbbc99982084d23ad090453ccd3390a0d8e2ab0bb4580ac65b5d373248576",
+        "task_fingerprint": "7cc7818739d1ed51a792d3c6b6e6256b575704335f6872cef1c1848f09d8af1b",
+        "repository_id": "auth-only-46f74d150d281fef72d39b445a13dd6a",
+        "class_identity": "BankAccount",
+        "source_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+        "evidence_fingerprint": "11609525f82b41dae738c6489ffce4f86df39b8dfdbf3dcb7e813b0084781e82",
+        "text": "For this exercise, let SavingAccount own a simple password in memory.\nIt does not need to persist across runs.\nVerify it when a savings operation is requested.",
+        "answer_fingerprint": "b8d6d569311743988af284f5d1596318be7e26f6e0cc8d31de6658d1b3de2ddb",
+        "provenance": "human_provided_semantic_evidence"
+      },
+      "session_events": [
+        "waiting_for_clarification",
+        "clarification_supplied",
+        "clarification_supplied_pending_projection",
+        "clarification_projected"
+      ],
+      "session_count": 1,
+      "retry_idempotent": true,
+      "continuation": {
+        "answer_fingerprint": "b8d6d569311743988af284f5d1596318be7e26f6e0cc8d31de6658d1b3de2ddb",
+        "answer_record_fingerprint": "4cc88e6fc2068adb15b7876862971335a6d8866d60facb74e7715369d7ff1331",
+        "authority": "read_only",
+        "auto_apply": false,
+        "class_identity": "BankAccount",
+        "conflicts": [],
+        "continuation_fingerprint": "aacc1ff15706d7adf3185fe30d28e18dd62d14cee1d6518850c6223f79b05ab7",
+        "execution_authorized": false,
+        "not_resolved_by_continuation": [],
+        "parent_design_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+        "parent_gap_id": "a10bbbc99982084d23ad090453ccd3390a0d8e2ab0bb4580ac65b5d373248576",
+        "provenance": "explicit_human",
+        "remaining_dimensions": [
+          "savings_funding_semantics",
+          "savings_interest_semantics"
+        ],
+        "repair_scope_authority": false,
+        "repository_id": "auth-only-46f74d150d281fef72d39b445a13dd6a",
+        "resolved_dimensions": [
+          "credential_ownership",
+          "credential_source",
+          "credential_persistence",
+          "credential_verification_mechanism",
+          "verification_lifecycle"
+        ],
+        "schema_version": "oop_intent_continue_1_v1",
+        "source_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+        "source_path": "bank.java",
+        "status": "clarification_projected",
+        "task_contract_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "typed_answer_commitments": [
+          {
+            "answer_fingerprint": "b8d6d569311743988af284f5d1596318be7e26f6e0cc8d31de6658d1b3de2ddb",
+            "dimension": "credential_ownership",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 68,
+              "source_start": 0,
+              "source_text": "For this exercise, let SavingAccount own a simple password in memory"
+            },
+            "provenance": "explicit_human",
+            "value": "SavingAccount"
+          },
+          {
+            "answer_fingerprint": "b8d6d569311743988af284f5d1596318be7e26f6e0cc8d31de6658d1b3de2ddb",
+            "dimension": "credential_source",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 68,
+              "source_start": 0,
+              "source_text": "For this exercise, let SavingAccount own a simple password in memory"
+            },
+            "provenance": "explicit_human",
+            "value": "simple_password"
+          },
+          {
+            "answer_fingerprint": "b8d6d569311743988af284f5d1596318be7e26f6e0cc8d31de6658d1b3de2ddb",
+            "dimension": "credential_verification_mechanism",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 68,
+              "source_start": 0,
+              "source_text": "For this exercise, let SavingAccount own a simple password in memory"
+            },
+            "provenance": "explicit_human",
+            "value": "semantic_password_check"
+          },
+          {
+            "answer_fingerprint": "b8d6d569311743988af284f5d1596318be7e26f6e0cc8d31de6658d1b3de2ddb",
+            "dimension": "credential_persistence",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 68,
+              "source_start": 0,
+              "source_text": "For this exercise, let SavingAccount own a simple password in memory"
+            },
+            "provenance": "explicit_human",
+            "value": "in_memory_only"
+          },
+          {
+            "answer_fingerprint": "b8d6d569311743988af284f5d1596318be7e26f6e0cc8d31de6658d1b3de2ddb",
+            "dimension": "verification_lifecycle",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 158,
+              "source_start": 111,
+              "source_text": "Verify it when a savings operation is requested"
+            },
+            "provenance": "explicit_human",
+            "value": "operation_gated"
+          }
+        ],
+        "write_authority": false
+      },
+      "base_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+      "effective_fingerprint": "1addfbaaafa984e574dce1fff127dc9b7afdc4e5ab5b300c2a5f233c50fbe7d5",
+      "detection_status": "clarification_required",
+      "remaining_dimensions": [
+        "savings_funding_semantics",
+        "savings_interest_semantics"
+      ],
+      "question": "You've already specified that SavingAccount extends BankAccount, savingBalance belongs only to SavingAccount, and savings functionality requires successful password verification. For this exercise, how should the remaining savings behavior work? Please specify how savingBalance is funded and whether saving behavior applies interest to it.",
+      "gap_count": 1,
+      "first_remaining_blocker": "human_clarification_required",
+      "exact_source_unchanged": true,
+      "current_context_unchanged": true,
+      "no_saving_account_file": true,
+      "scope_expansion": false
+    },
+    "savings_only": {
+      "stored_answer": {
+        "gap_id": "ba20a9edb12f31fd07fbc7208288ffa3b994a511a372331d943b4f82ac3b4dd7",
+        "task_fingerprint": "7cc7818739d1ed51a792d3c6b6e6256b575704335f6872cef1c1848f09d8af1b",
+        "repository_id": "savings-only-6379d9a8d12d9b10f34cbf41001e06f5",
+        "class_identity": "BankAccount",
+        "source_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+        "evidence_fingerprint": "5640ad1cd582db087f867d63c074b659a82cf34ddd6fcf7fdcb06ec9f11696c6",
+        "text": "savingBalance should receive money transferred from the inherited balance,\nand interest should apply only to savingBalance.",
+        "answer_fingerprint": "4be180bd56ca8efa637a1ab8bd39766a51d9e1460e864a95f7c565d593f1677a",
+        "provenance": "human_provided_semantic_evidence"
+      },
+      "session_events": [
+        "waiting_for_clarification",
+        "clarification_supplied",
+        "clarification_supplied_pending_projection",
+        "clarification_projected"
+      ],
+      "session_count": 1,
+      "retry_idempotent": true,
+      "continuation": {
+        "answer_fingerprint": "4be180bd56ca8efa637a1ab8bd39766a51d9e1460e864a95f7c565d593f1677a",
+        "answer_record_fingerprint": "92b0ff0d006407289a6e825c8ff40f65cae026235b2300aa3902252ba4a41987",
+        "authority": "read_only",
+        "auto_apply": false,
+        "class_identity": "BankAccount",
+        "conflicts": [],
+        "continuation_fingerprint": "e34ce1fe712bb4b04f20a279033b0c988d7972b8670e3d754d231711709fac04",
+        "execution_authorized": false,
+        "not_resolved_by_continuation": [],
+        "parent_design_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+        "parent_gap_id": "ba20a9edb12f31fd07fbc7208288ffa3b994a511a372331d943b4f82ac3b4dd7",
+        "provenance": "explicit_human",
+        "remaining_dimensions": [
+          "credential_ownership",
+          "credential_source",
+          "credential_persistence",
+          "credential_verification_mechanism",
+          "verification_lifecycle"
+        ],
+        "repair_scope_authority": false,
+        "repository_id": "savings-only-6379d9a8d12d9b10f34cbf41001e06f5",
+        "resolved_dimensions": [
+          "savings_funding_semantics",
+          "savings_interest_semantics"
+        ],
+        "schema_version": "oop_intent_continue_1_v1",
+        "source_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+        "source_path": "bank.java",
+        "status": "clarification_projected",
+        "task_contract_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "typed_answer_commitments": [
+          {
+            "answer_fingerprint": "4be180bd56ca8efa637a1ab8bd39766a51d9e1460e864a95f7c565d593f1677a",
+            "dimension": "savings_funding_semantics",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 73,
+              "source_start": 0,
+              "source_text": "savingBalance should receive money transferred from the inherited balance"
+            },
+            "provenance": "explicit_human",
+            "value": "transfer_from_inherited_balance"
+          },
+          {
+            "answer_fingerprint": "4be180bd56ca8efa637a1ab8bd39766a51d9e1460e864a95f7c565d593f1677a",
+            "dimension": "savings_interest_semantics",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 122,
+              "source_start": 75,
+              "source_text": "and interest should apply only to savingBalance"
+            },
+            "provenance": "explicit_human",
+            "value": "interest_applies_to_saving_balance"
+          }
+        ],
+        "write_authority": false
+      },
+      "base_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+      "effective_fingerprint": "8ec082848431b2a966119d4086e5b9433224fde906ae3cfb269f31872df584fb",
+      "detection_status": "clarification_required",
+      "remaining_dimensions": [
+        "credential_ownership",
+        "credential_source",
+        "credential_persistence",
+        "credential_verification_mechanism",
+        "verification_lifecycle"
+      ],
+      "question": "You've already specified that SavingAccount extends BankAccount, savingBalance belongs only to SavingAccount, and savings functionality requires successful password verification. For this exercise, how should the remaining verification contract work? Please specify the credential owner/source, whether it persists, how it is verified, whether verification gates each savings operation or a broader lifecycle.",
+      "gap_count": 1,
+      "first_remaining_blocker": "human_clarification_required",
+      "exact_source_unchanged": true,
+      "current_context_unchanged": true,
+      "no_saving_account_file": true,
+      "scope_expansion": false
+    },
+    "persistent_auth": {
+      "stored_answer": {
+        "gap_id": "060cceb9d19f7e7ab8aa92d29d8cde0daf07e081b0311134a76d581919b8e226",
+        "task_fingerprint": "7cc7818739d1ed51a792d3c6b6e6256b575704335f6872cef1c1848f09d8af1b",
+        "repository_id": "persistent-auth-021b03d04249c2c3c37ee119f1820c96",
+        "class_identity": "BankAccount",
+        "source_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+        "evidence_fingerprint": "26fe3ef5b06e6e7c03801392384acb4503bcaf13ff80eb2b1d36a235eef94c00",
+        "text": "Credentials must persist across runs.",
+        "answer_fingerprint": "8431e381be62b47a28e15d927f7ef4e44ab628776dc9cebacc379b6640cf53b6",
+        "provenance": "human_provided_semantic_evidence"
+      },
+      "session_events": [
+        "waiting_for_clarification",
+        "clarification_supplied",
+        "clarification_supplied_pending_projection",
+        "clarification_projected"
+      ],
+      "session_count": 1,
+      "retry_idempotent": true,
+      "continuation": {
+        "answer_fingerprint": "8431e381be62b47a28e15d927f7ef4e44ab628776dc9cebacc379b6640cf53b6",
+        "answer_record_fingerprint": "12deaedf1bd58e1e53bb8354d7ef4796cd648af58a7eb68b9e727229fac6d052",
+        "authority": "read_only",
+        "auto_apply": false,
+        "class_identity": "BankAccount",
+        "conflicts": [],
+        "continuation_fingerprint": "7c56f84f45b45c080452a6904ae0ab5c22983bf905d2a3c4aa2a570f7adb06e4",
+        "execution_authorized": false,
+        "not_resolved_by_continuation": [],
+        "parent_design_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+        "parent_gap_id": "060cceb9d19f7e7ab8aa92d29d8cde0daf07e081b0311134a76d581919b8e226",
+        "provenance": "explicit_human",
+        "remaining_dimensions": [
+          "credential_ownership",
+          "credential_source",
+          "credential_verification_mechanism",
+          "verification_lifecycle",
+          "savings_funding_semantics",
+          "savings_interest_semantics"
+        ],
+        "repair_scope_authority": false,
+        "repository_id": "persistent-auth-021b03d04249c2c3c37ee119f1820c96",
+        "resolved_dimensions": [
+          "credential_persistence"
+        ],
+        "schema_version": "oop_intent_continue_1_v1",
+        "source_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+        "source_path": "bank.java",
+        "status": "clarification_projected",
+        "task_contract_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "typed_answer_commitments": [
+          {
+            "answer_fingerprint": "8431e381be62b47a28e15d927f7ef4e44ab628776dc9cebacc379b6640cf53b6",
+            "dimension": "credential_persistence",
+            "evidence": {
+              "provenance": "explicit_human",
+              "source_end": 36,
+              "source_start": 0,
+              "source_text": "Credentials must persist across runs"
+            },
+            "provenance": "explicit_human",
+            "value": "persists_across_runs"
+          }
+        ],
+        "write_authority": false
+      },
+      "base_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+      "effective_fingerprint": "371aaf82ca2261b964334d2c4c529d4333868f82d4b54730272f4d293b9b7970",
+      "detection_status": "clarification_required",
+      "remaining_dimensions": [
+        "credential_ownership",
+        "credential_source",
+        "credential_verification_mechanism",
+        "verification_lifecycle",
+        "savings_funding_semantics",
+        "savings_interest_semantics"
+      ],
+      "question": "You've already specified that SavingAccount extends BankAccount, savingBalance belongs only to SavingAccount, and savings functionality requires successful password verification. For this exercise, how should the remaining verification and savings behavior work? Please specify who owns or supplies the credential, how it is verified, what operation or lifecycle verification gates, how savingBalance is funded, how interest applies.",
+      "gap_count": 1,
+      "first_remaining_blocker": "human_clarification_required",
+      "exact_source_unchanged": true,
+      "current_context_unchanged": true,
+      "no_saving_account_file": true,
+      "scope_expansion": false
+    }
+  },
+  "performance": {
+    "samples": 120,
+    "provider_latency": "not_applicable",
+    "answer_extraction_seconds": {
+      "median_ms": 0.2282,
+      "max_ms": 1.0032
+    },
+    "continuation_construction_seconds": {
+      "median_ms": 0.44325,
+      "max_ms": 1.7962
+    },
+    "effective_projection_seconds": {
+      "median_ms": 1.4386,
+      "max_ms": 3.9656
+    },
+    "detection_reentry_seconds": {
+      "median_ms": 14.6596,
+      "max_ms": 40.4132
+    },
+    "total_seconds": {
+      "median_ms": 22.77275,
+      "max_ms": 60.3097
+    }
+  },
+  "authority": {
+    "write_authority": false,
+    "execution_authorized": false,
+    "auto_apply": false,
+    "repair_scope_authority": false
+  },
+  "author_calls": 0,
+  "model_calls": 0,
+  "repository_traversals": 0,
+  "candidate": null
+}

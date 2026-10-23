@@ -1,0 +1,25 @@
+{
+  "phase_id": "PATCH.AUTHOR.STRUCTURAL.1",
+  "reversals": [
+    {
+      "path": "docs/roadmap/phase_registry.json",
+      "entry_sha256": "c2138bc4fdd22a910c2edee47df7d8caf1e612b9b3a592b2878d8064bddcec8a",
+      "post_sha256": "73df0a94f778e5dc016832e559e01a1cced852999ecf825296d0358e2a441bc7"
+    },
+    {
+      "path": "tests/test_phase_registry.py",
+      "entry_sha256": "fd64c55bcc9cf7ca0f3b04fe5050fa3265024aeebd96b39b8e5120d8b9aebcac",
+      "post_sha256": "305c1e1e61cb5e725123b350ad902e1ecb7f7d4d8b8d32a03b6219ec560eca59"
+    },
+    {
+      "path": "tests/test_phase_picker.py",
+      "entry_sha256": "feef6d87dc0f7589e9ca95ec50e9bca879298e6e975c4adfdbc36ed63dc4e33e",
+      "post_sha256": "6a0d23d33a59375a67a25259eb775bbea656292edbd7913dced5790309690fd4"
+    },
+    {
+      "path": "tests/_patch_scope_admit1_maintenance.py",
+      "entry_sha256": "9c0add811f40b331288fdf0ca319a0801aeabbb92539ad2719b1cb69102036a2",
+      "post_sha256": "f9c5a93e3929d6f556de27a99139f4638c24cc10eb06a4c5adacd30ba30e15a6"
+    }
+  ]
+}

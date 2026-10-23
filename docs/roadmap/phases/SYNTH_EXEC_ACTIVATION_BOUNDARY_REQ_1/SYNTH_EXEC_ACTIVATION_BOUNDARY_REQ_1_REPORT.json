@@ -1,0 +1,282 @@
+{
+  "artifact_sha256": {
+    "benchmark.json": "44cfbc3042777b3ccc6091ba1852ddbebcb701d5ec5d36c369655bfd216f128b",
+    "compatibility_review.json": "a27d8eb0789627b7198e6eeb302734397a9bfb3fc55bc72f94520fe6c38178ac",
+    "finalize_report.py": "6ebf088f112cb23226a120a0481f8acb1afc89a8a180888cb4a923930431a2ec",
+    "focused.json": "b1992d7ce7d81b543c1d3cf2c16f5d8c6c26e96013cdd9101fd678cab70671ca",
+    "git_diff_check.json": "703033cf833293c1214c42eb19261a46ac98ebc9b841a74f413b869d121ab75e",
+    "preservation_after.json": "01b0b7b42cdd357106c6d14158ac1f576335b7a0201a9ded13b6a95c5517f390",
+    "preservation_baseline.json": "01b0b7b42cdd357106c6d14158ac1f576335b7a0201a9ded13b6a95c5517f390",
+    "preservation_comparison.json": "cc18a108458c5dc8389d4d8e74bc4b32c7a21329241348adf046dc9fb9bb869b",
+    "registry_after.json": "e9d0e004b0b05d6e8f427985e698cf70b6bb1922c346a511b0c4dc2293440e68",
+    "registry_baseline.json": "4bc66c02f748993ad161fdc0c5427196e2d26a2797b100e1726187de382c4d85",
+    "registry_comparison.json": "135756d1ad250bcf9de2c4523085be7e5baa199b760feafee34741f8f412e7e2",
+    "requirement.json": "1b6345aaa90dbc2d5089c6c555108b34213f5b631086f6c6d69b5ffc8cfca894",
+    "static_validation.json": "aa116c020ef039497fcca1c606d2f2f1bc115c7b14f01a70d010ab287caf8251",
+    "test_requirement.py": "344a01be6c85c5f3eed7675430b52cb1f0fbd6ee0faed69c60c8fee735627516",
+    "validate_pure.py": "8dc67dab7170e7258adc9d323c65a59e02957601901d764f7fbeb96ed00c2bc0",
+    "validation_summary.json": "7b78a09d0def7f2afb3a434f01d4499f82370e7d1c47b48ceb53f0e57540ad53"
+  },
+  "authority_flags": {
+    "BANK_authority": false,
+    "apply_authority": false,
+    "arbitrary_class_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "arbitrary_command_authority": false,
+    "arbitrary_java_authority": false,
+    "arbitrary_method_authority": false,
+    "arbitrary_reflection_authority": false,
+    "arbitrary_source_authority": false,
+    "compilation_authority": false,
+    "constructor_reflection_authority": false,
+    "enumeration_authority": false,
+    "exact_sandbox_materialization_authority": false,
+    "exact_scenario_compilation_authority": false,
+    "executor_authority": false,
+    "field_write_authority": false,
+    "generic_reflection_authority": false,
+    "host_mount_authority": false,
+    "network_authority": false,
+    "preparation_authority": false,
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_execution_authority": false,
+    "repository_java_authority": false,
+    "repository_source_write_authority": false,
+    "repository_write_authority": false,
+    "runtime_activation_authority": false,
+    "runtime_authority": false,
+    "sandbox_materialization_authority": false,
+    "scenario_compilation_authority": false,
+    "shell_authority": false,
+    "source_identity_authority_issued_by_this_phase": false
+  },
+  "behavioral_activation_ready": false,
+  "compatibility_evidence": "compatibility_review.json",
+  "decision_frozen": true,
+  "historical_contract_identity": {
+    "bytes": 43231,
+    "kind": "file",
+    "path": "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json",
+    "sha256": "45f8201fd15adffe41b75859bfcd0458881ab2b50edd13641a1f69be5b13ec97"
+  },
+  "historical_owner_authorities": "Existing narrow permission matrices are preserved byte-for-byte. All false flags in this artifact describe authority newly granted by this requirement phase; no historical narrow permission is removed or widened.",
+  "implementation_authorized": false,
+  "meaning": "The first-effect requirement has been truthfully evolved for the exact pinned synthetic scenario. Historical bytes are preserved. Scenario JVM dispatch is the conservative activation boundary; no operational authority is granted.",
+  "next_step": "A small additive preparation-contract closure review must confirm compatibility of proposed materialization, compile and readiness rules with the revised activation boundary before any preparation implementation.",
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR_1R": 0,
+    "JAVA1C": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "auth_issuance": 0,
+    "capability_invalidation": 0,
+    "class_loading": 0,
+    "filesystem_runtime_write": 0,
+    "java": 0,
+    "javac": 0,
+    "preparation_authority_issuance": 0,
+    "provider_issuance": 0,
+    "reflection": 0,
+    "reflection_admission_issuance": 0,
+    "reflection_lease_consumption": 0,
+    "reflection_lease_issuance": 0,
+    "runtime_lease_consumption": 0,
+    "runtime_lease_issuance": 0,
+    "source_materialization": 0
+  },
+  "reason": "PROOF_UNRESOLVED",
+  "requirement_id": "SYNTH.EXEC.ACTIVATION.BOUNDARY.REQ.1",
+  "stop": true,
+  "supersession": {
+    "all_other_historical_claims_superseded": false,
+    "effective_downstream_interpretation": "Use dispatch of the exact scenario-executing JVM as the conservative behavioral activation boundary, after all preparation evidence, full harness readiness, consumer readiness, runtime lease consumption and BEFORE reflection permission consumption. BEFORE exact read remains a behavioral effect and keeps its original position relative to permission, invocation and AFTER observation.",
+    "exact_superseded_key": "first_behavior_boundary.first_behavioral_effect",
+    "exact_superseded_value": "BEFORE exact read",
+    "historical_bytes_preserved": true,
+    "historical_status": "frozen historical requirement superseded by measured semantic evidence within this exact scope",
+    "new_requirement_id": "SYNTH.EXEC.ACTIVATION.BOUNDARY.REQ.1",
+    "reason": "The exact frozen source contains private int value = 10; ordinary instance construction initializes mutable scenario state before a BEFORE read can observe it. The full executable harness is not frozen, so no earlier exact harness instruction can be asserted.",
+    "retroactive_mutation": false,
+    "scope": "pinned synthetic.EXECUTOR.1R.decrement_3 execution epoch only",
+    "superseded_historical_artifact_path": "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json"
+  },
+  "typed_result": "SYNTH_EXEC_ACTIVATION_BOUNDARY_REQ_1_COMPLETE",
+  "validation": {
+    "all_actual_operational_effects_zero": true,
+    "audit_guards": {
+      "benchmark": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "focused": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "registry_after": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "registry_baseline": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      }
+    },
+    "benchmark": {
+      "benchmark_cases_checked": 54,
+      "benchmark_errors": 0,
+      "exit_code": 0
+    },
+    "checks": {
+      "PREP_proposals_remain_non_operational": true,
+      "all_evidence_uses_current_validator": true,
+      "all_new_authority_flags_false": true,
+      "all_operational_effects_exact_zero": true,
+      "all_operational_guard_counters_zero": true,
+      "behavioral_readiness_still_unresolved": true,
+      "benchmark_check_passed": true,
+      "compatibility_requires_no_changes": true,
+      "focused_passed": true,
+      "full_harness_unresolved": true,
+      "git_diff_check_passed": true,
+      "historical_preservation_passed": true,
+      "in_memory_compilation_JSON_whitespace_passed": true,
+      "one_exact_scoped_supersession": true,
+      "registry_picker_unchanged": true,
+      "registry_pytest_exit_codes_explained_by_node_failures": true
+    },
+    "focused": {
+      "collected": 12,
+      "counting_method": "unique passed node IDs; raw report count also includes unittest subtests",
+      "failed": [],
+      "passed_count": 12,
+      "passed_report_count_including_subtests": 1530,
+      "skipped": []
+    },
+    "full_issuance_dependent_suites_run": false,
+    "git_diff_check": {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "executed_outside_operational_guard": true,
+      "exit_code": 0,
+      "operational_command_invoked": false,
+      "source_validation_only": true
+    },
+    "historical_preservation": {
+      "added_outside_new_phase": [],
+      "after_file_count": 26732,
+      "allowed_additions_outside_phase": [],
+      "baseline_file_count": 26732,
+      "changed": [],
+      "deleted": [],
+      "historical_preservation_passed": true,
+      "scope": "entire non-cache workspace including root/config/web and frozen history"
+    },
+    "host_tooling_scope": "Python pure validation and git diff --check only; no scenario/runtime shell authority",
+    "operational_owner_modules_imported": [],
+    "registry_baseline_failure_policy": "Exact existing failed nodes, passed/skipped nodes and registry/picker projections must match. Existing failures are disclosed and never repaired by this phase.",
+    "registry_picker": {
+      "after_collected": 299,
+      "after_failed": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "after_passed": 292,
+      "baseline_collected": 299,
+      "baseline_failed": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "baseline_passed": 292,
+      "existing_failures_preserved": true,
+      "old_files_not_modified_to_repair_baseline": true,
+      "registry_and_picker_projections_identical": true,
+      "unchanged": true
+    },
+    "requirement_id": "SYNTH.EXEC.ACTIVATION.BOUNDARY.REQ.1",
+    "static": {
+      "compiled_count": 1316,
+      "errors": [],
+      "json_count": 14,
+      "passed": true,
+      "whitespace_errors": []
+    },
+    "typed_result": "SYNTH_EXEC_ACTIVATION_BOUNDARY_REQ_1_COMPLETE",
+    "validation_passed": true,
+    "writes_scope": "new additive requirement phase documentation, tests, evidence and validation scratch only"
+  }
+}

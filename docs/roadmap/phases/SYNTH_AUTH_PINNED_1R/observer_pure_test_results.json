@@ -1,0 +1,11 @@
+{
+  "errors": [],
+  "failures": [],
+  "forbidden_effects_attempted": [],
+  "no_live_owner_issuance": true,
+  "no_subprocess_or_socket_creation": true,
+  "passed": true,
+  "runner_sha256": "7dea3b744a62531d90da5f471a12a48b32932a3c926ab2d88196ea1bc2e2a20c",
+  "test_file_sha256": "9e63cb9467f780002ed25a726effbeacd96281ce19eac44646e8aa176a5d6828",
+  "tests_run": 17
+}

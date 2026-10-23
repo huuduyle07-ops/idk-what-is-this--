@@ -1,0 +1,279 @@
+{
+  "phase_id": "RUNTIME.JAVA.PINNED.1C",
+  "attempt_number": 2,
+  "retry_of_attempt_number": 1,
+  "provider_schema": "runtime_java_pinned_provider_1c_v1",
+  "pure_gates_ready": true,
+  "checks": {
+    "reviewed_corrected_provider_source_unchanged": true,
+    "focused_corrected_provider_passed": true,
+    "explicit_independent_config_paths_and_controls_passed": true,
+    "frozen_semantic_regressions_passed_with_only_known_drift": true,
+    "known_bookkeeping_failure_identity_unchanged": true,
+    "registry_picker_baseline_failures_unchanged": true,
+    "pure_validation_no_operational_effects": true,
+    "pure_validation_temporary_workspaces_removed": true,
+    "benchmark_check_passed": true,
+    "in_memory_compilation_passed": true,
+    "JSON_and_authored_whitespace_passed": true,
+    "git_diff_check_passed": true,
+    "historical_bytes_preserved": true
+  },
+  "source_bindings": [
+    {
+      "path": "core/candidate_runtime_sandbox.py",
+      "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "size_bytes": 34833
+    },
+    {
+      "path": "core/candidate_runtime_sandbox_probe.py",
+      "sha256": "aa090e85f34a75c429fc98a20b562e6ebc2b7261d400b08fd7758da4994f4b6c",
+      "size_bytes": 3646
+    },
+    {
+      "path": "core/context_search_runtime.py",
+      "sha256": "bdde72a2acf92fedb36d1b5c27f1253f564eedabc4d6ff85ec7756a375a5c201",
+      "size_bytes": 6166
+    },
+    {
+      "path": "core/direct_context_runtime.py",
+      "sha256": "d8a60a989c13bf01b88b4dd5c700306efdcb7af6f09f6538b00a7a236e5b0dee",
+      "size_bytes": 41794
+    },
+    {
+      "path": "core/java_runtime_compatibility.py",
+      "sha256": "f0a30c1f8ef90bfcab523ac0b99ce72095985ce583c64a438e36f1aebcbcca35",
+      "size_bytes": 14440
+    },
+    {
+      "path": "core/java_single_thread_capture.py",
+      "sha256": "4ac691b2919b3e778a98c044fb166fd9804b102cdd651995eb8689839ac438fb",
+      "size_bytes": 6312
+    },
+    {
+      "path": "core/runtime_diagnostic_authorization.py",
+      "sha256": "cb9c0ed3cf9ae7cadd10d2de9fb6170a991ae75b8f2ea9da643262aaf80ea085",
+      "size_bytes": 39370
+    },
+    {
+      "path": "core/runtime_environment.py",
+      "sha256": "b6abe6e21e2dfc6f57701549d00005ee47448b3e6086245399800df345a7b820",
+      "size_bytes": 4357
+    },
+    {
+      "path": "core/runtime_java_controller_diagnostic.py",
+      "sha256": "6cdb16c2bb24b565bd8caa52555d85bf956402823ba73a3bc9f62942e86d3099",
+      "size_bytes": 9524
+    },
+    {
+      "path": "core/runtime_java_controller_diagnostic_probe.py",
+      "sha256": "c931f9bce83ca2ea4df4a1c974ade833c513d9de14bc46ceae1b4f149302c538",
+      "size_bytes": 7859
+    },
+    {
+      "path": "core/runtime_java_pinned_backend_target_binding.py",
+      "sha256": "94c95d674c0b43cde5811762998d13a65c3eee71c442cf05ff8699e02ec59da9",
+      "size_bytes": 34173
+    },
+    {
+      "path": "core/runtime_java_pinned_provider.py",
+      "sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+      "size_bytes": 42111
+    },
+    {
+      "path": "core/runtime_java_pinned_requirement.py",
+      "sha256": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1",
+      "size_bytes": 22597
+    },
+    {
+      "path": "core/runtime_java_pinned_target_archive.py",
+      "sha256": "d8693eabcfc2c8290cd0a4318a4edcce2d11b94a28ed8f8eddd82360b84afe2b",
+      "size_bytes": 13725
+    },
+    {
+      "path": "core/runtime_java_pinned_target_inspection.py",
+      "sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59",
+      "size_bytes": 28903
+    },
+    {
+      "path": "core/sandbox_backend_binding.py",
+      "sha256": "202cd1190494beaaf24874ac798b89a8eac276fa8361b496663a573770cdf1ed",
+      "size_bytes": 26216
+    },
+    {
+      "path": "core/sandboxed_java_capture_recovery.py",
+      "sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861",
+      "size_bytes": 12218
+    },
+    {
+      "path": "core/sandboxed_java_discovery_continuation.py",
+      "sha256": "e035f04ee7d03ff7c53e252069da463fdcc67873478a2158bee4672d354ba1ac",
+      "size_bytes": 20766
+    },
+    {
+      "path": "core/sandboxed_java_positive_continuation.py",
+      "sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+      "size_bytes": 28167
+    },
+    {
+      "path": "core/sandboxed_java_positive_probe.py",
+      "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+      "size_bytes": 7358
+    },
+    {
+      "path": "core/sandboxed_java_single_thread_probe.py",
+      "sha256": "7bb2bceac444c80f6b2c75b335731d61b73dfff58b1b0ca72ac85f027e635716",
+      "size_bytes": 5764
+    },
+    {
+      "path": "core/sandboxed_java_toolchain.py",
+      "sha256": "ed96e56a875535d4cafaa107721ee6eafd5c0c1b0f8d14f59f4ad728f00288c9",
+      "size_bytes": 28868
+    },
+    {
+      "path": "core/sandboxed_java_toolchain_discovery.py",
+      "sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff",
+      "size_bytes": 21386
+    },
+    {
+      "path": "core/sandboxed_java_toolchain_probe.py",
+      "sha256": "58e791ed6ac7c99a41386345ce8d392ca74cb8f574a8207fe1c85afa335ec606",
+      "size_bytes": 5690
+    },
+    {
+      "path": "core/synthetic_runtime_authorization.py",
+      "sha256": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88",
+      "size_bytes": 14991
+    },
+    {
+      "path": "core/synthetic_runtime_authorization_lifecycle.py",
+      "sha256": "dc7cc307a17c63cf65eea0e898015140806ca98e2614c391423c50adfd0e6029",
+      "size_bytes": 15627
+    },
+    {
+      "path": "core/test_runtime_operations_branch_checkpoint.py",
+      "sha256": "d90673fccbccd141d2eb3ae07efec3c0107eefc0e2b06af93d9cfa9b290c74fe",
+      "size_bytes": 44259
+    },
+    {
+      "path": "core/test_suite_runtime_profile_audit.py",
+      "sha256": "d17d6b8483fd8e75f3be5961f6dc38a7ce3b5005b7eaa73def90bbb01401594a",
+      "size_bytes": 23650
+    },
+    {
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "size_bytes": 22400
+    },
+    {
+      "path": "core/thread_compatible_runtime_sandbox_probe.py",
+      "sha256": "be45d3a0106186d84a0464234f701140df6e90e99107477af358886cf5568075",
+      "size_bytes": 7784
+    },
+    {
+      "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/check_preoperational_gates.py",
+      "sha256": "90f54da8d3a0bef4b13a385c456e24010a11a2964b049208dd939dd262dda2cb",
+      "size_bytes": 6212
+    },
+    {
+      "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/finalize_validation.py",
+      "sha256": "84f8d86019573808fb0f68bd834c5206a48c89f92a605ab846a326b14d840ce5",
+      "size_bytes": 9676
+    },
+    {
+      "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/pure_validation.py",
+      "sha256": "2c97a3b5a9cde42969abcb9e39fd669ef03d2181690f1e90aaa76c721e0bb4d2",
+      "size_bytes": 7050
+    },
+    {
+      "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C/check_validation.py",
+      "sha256": "6881c79da58b57880e5692fb599098f7cf871a3c56027f8e79f1173e90b3df9c",
+      "size_bytes": 14064
+    },
+    {
+      "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C/pure_validation.py",
+      "sha256": "ec5c82468df4739e391c1642bfbd53dab9f60608cdce8d5093df02e0e9b94f9f",
+      "size_bytes": 9810
+    },
+    {
+      "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/authentication_controls.py",
+      "sha256": "653182cd9a3b9cad5368ec76aa40c016cef40f5427a229cd7ec8855f43f79975",
+      "size_bytes": 15655
+    },
+    {
+      "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/check_validation.py",
+      "sha256": "24a39407aff1dd76e0bf418da35bc50a93ee846f5d76c507989e3145c944863b",
+      "size_bytes": 10717
+    },
+    {
+      "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/preservation.py",
+      "sha256": "7bc754500bf014d48e148356c3d92c9a945b00736dba314276a3608aca02fb96",
+      "size_bytes": 9688
+    },
+    {
+      "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/pure_validation.py",
+      "sha256": "4c6a033e9160c2729f8d3d33e6fc79d27cae162c97be57eacfb4e3940f32fa52",
+      "size_bytes": 12186
+    },
+    {
+      "path": "scripts/replay_runtime_java_pinned1b.py",
+      "sha256": "3480fdec3677ebc9091293adb7db47c5b946f0ae79219c915719ef152c2188dd",
+      "size_bytes": 3963
+    },
+    {
+      "path": "scripts/replay_runtime_java_pinned1c.py",
+      "sha256": "2f6c748332ae10941cbf0526c07102c5036a927934a2329355ce43cef3cfb7aa",
+      "size_bytes": 3903
+    },
+    {
+      "path": "scripts/replay_runtime_java_pinned1c_retry.py",
+      "sha256": "d4b83b89630a08f06063c9a8a4a31c08028bd2e110527927456cdbb8bdf8bc22",
+      "size_bytes": 10454
+    },
+    {
+      "path": "tests/test_runtime_java_pinned_backend_target_binding.py",
+      "sha256": "691566165526d3f00c70e35100f3df7a33fe28697fb44a86d7ca77c9de26ae91",
+      "size_bytes": 27976
+    },
+    {
+      "path": "tests/test_runtime_java_pinned_provider.py",
+      "sha256": "7de854e88a604fe9e67a84a4ae1640dda3fcfb0e3e0c42c1c9682fc17a5f3367",
+      "size_bytes": 27543
+    },
+    {
+      "path": "tests/test_runtime_java_pinned_provider_retry.py",
+      "sha256": "6adf10e2c62ce26d691618ad99c8032677204823a41b66e86bf3dad2aa10f531",
+      "size_bytes": 10265
+    }
+  ],
+  "validation_bindings": [
+    {
+      "path": "focused_validation.json",
+      "sha256": "4f5066021d05ceeccc356379cc3d4158328d6977485b9d416ddd5e05f920f810"
+    },
+    {
+      "path": "config_path_validation.json",
+      "sha256": "2e98fed0022a3462c2f3b35804485f0ec426f2fb3233a9c44d8b49e1cf70febe"
+    },
+    {
+      "path": "frozen_validation.json",
+      "sha256": "002bbfbe7496ffd02bcc2aac27359049bcd329276a31940fc1acf2cfa4ba3d99"
+    },
+    {
+      "path": "registry_baseline.json",
+      "sha256": "758d23adf558bc073215c2be44eca2a2add1030a4f8c2178867c129882161778"
+    },
+    {
+      "path": "benchmark_check.json",
+      "sha256": "cd531046af878622c6c942b40072ba419e8c0be3a2001434792581ff5d79139b"
+    },
+    {
+      "path": "preservation_baseline.json",
+      "sha256": "2d5f44883000049b41122fd71b774acc98c0a59165c8590fa6cf2dff9b281243"
+    },
+    {
+      "path": "validation_summary.json",
+      "sha256": "84f3f037969e847a3b59592bb639b0d7c7be8537871ceeed8ae109429a9d9271"
+    }
+  ]
+}

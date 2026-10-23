@@ -1,0 +1,1204 @@
+{
+  "artifact_kind": "pure_additive_future_owner_relation_identity_contract",
+  "authority_basis": {
+    "anchors": [
+      "C:/authority_separation/scalar_admission_id_is_authority",
+      "C:/framing/primitive_rules/id",
+      "W:/exact_live_object",
+      "W:/authentication"
+    ],
+    "opaque_meaning": "Consumers compare exact bytes; decoding a counter or predicting the next value grants no permission.",
+    "required_conjunction": [
+      "exact expected owner/relation object type, and exact built-in scalar types; reject wrappers and subclasses",
+      "exact original retained process-local object, not a reconstructed equal object",
+      "owner-specific original registry entry and retained upstream graph",
+      "issuing PID and current original process incarnation with independent process-local owner secret",
+      "constant-time valid domain/role-separated HMAC over exact originally retained canonical bindings",
+      "matching immutable stable fingerprint where required, separately from current state authenticity",
+      "current generations, observation, admission, local fence, eligibility and permanent one-shot/tombstone checks"
+    ],
+    "scalar_is_authentication_proof": false,
+    "scalar_is_bearer_credential": false,
+    "scalar_role": "non-secret opaque local lookup, correlation and uniqueness handle",
+    "scoped_bearer_ids_found": [],
+    "threat_model_limit": "A malicious caller may know or guess all IDs and supply copied values/objects. Arbitrary execution that can mutate private registries, steal secrets or bypass validators is outside the owner abstraction; handles do not provide memory isolation.",
+    "trust_boundary_rule": "No scoped scalar crosses a boundary as a bearer capability under the frozen contracts. If an implementation accepts ID-only lookup as permission, this encoding is inapplicable: stop unresolved and require a separately reviewed capability/authentication contract before effects. Making the handle longer does not repair an ID-only authority path.",
+    "wire_rule": "JSON scalars may correlate an already authenticated retained exchange. Neither a wire ID nor JSON reconstruction creates a registry entry or original object. A controller must obtain separately authenticated admission through its future authenticated original channel; the scalar admission ID alone never suffices."
+  },
+  "authority_flags": {
+    "capability_issuance": false,
+    "controller_implementation": false,
+    "identity_generator_implementation": false,
+    "owner_implementation": false,
+    "repin": false,
+    "runtime_activation": false,
+    "scenario_compilation": false,
+    "schema_change": false,
+    "source_materialization": false,
+    "transport_selection": false,
+    "workspace_issuance": false
+  },
+  "budget_scope": "one materialize -> compile preparation EFFECT attempt",
+  "budget_width_substitution": {
+    "authority_flags": {
+      "capability_issuance": false,
+      "controller_implementation": false,
+      "identity_generator_implementation": false,
+      "owner_implementation": false,
+      "repin": false,
+      "runtime_activation": false,
+      "scenario_compilation": false,
+      "schema_change": false,
+      "source_materialization": false,
+      "transport_selection": false,
+      "workspace_issuance": false
+    },
+    "candidate_A_selected": false,
+    "cap_bytes": 8192,
+    "conditional_candidate_A_framed_total_bytes": 8340,
+    "conditional_candidate_A_framing_bytes": 8,
+    "conditional_response_payload_bytes": 8332,
+    "exact_execution_witness": false,
+    "excess_bytes": 148,
+    "family_ledger": [
+      {
+        "accepted_content_width_bytes": 17,
+        "compile_occurrences": 2,
+        "delta_from_one_byte_relaxation_bytes": 64,
+        "identity_family": "workspace_capability_id",
+        "materialize_occurrences": 2,
+        "paths_in_each_response": [
+          "/workspace_capability_id",
+          "/result/workspace_state/workspace_capability_id"
+        ],
+        "total_occurrences": 4
+      },
+      {
+        "accepted_content_width_bytes": 17,
+        "compile_occurrences": 1,
+        "delta_from_one_byte_relaxation_bytes": 32,
+        "identity_family": "controller_identity",
+        "materialize_occurrences": 1,
+        "paths_in_each_response": [
+          "/result/workspace_state/controller_identity"
+        ],
+        "total_occurrences": 2
+      },
+      {
+        "accepted_content_width_bytes": 17,
+        "compile_occurrences": 1,
+        "delta_from_one_byte_relaxation_bytes": 32,
+        "identity_family": "exclusive_owner_relation_id",
+        "materialize_occurrences": 1,
+        "paths_in_each_response": [
+          "/result/workspace_state/process_exclusivity_observation/exclusive_owner_relation_id"
+        ],
+        "total_occurrences": 2
+      },
+      {
+        "accepted_content_width_bytes": 17,
+        "alias_rule": "This field reuses the authenticated original exclusive owner relation identity; it is not a separately generated ID.",
+        "compile_occurrences": 1,
+        "delta_from_one_byte_relaxation_bytes": 32,
+        "identity_family": "writer.accounted_original_relation_id",
+        "materialize_occurrences": 1,
+        "paths_in_each_response": [
+          "/result/workspace_state/process_exclusivity_observation/writers/0/accounted_original_relation_id"
+        ],
+        "symbolic_identity_alias": "exclusive_owner_relation_id",
+        "total_occurrences": 2
+      },
+      {
+        "absence_rule": "Present once in each effect request and absent from the complete successful response envelope and result.",
+        "accepted_content_width_bytes": 17,
+        "compile_occurrences": 0,
+        "delta_from_one_byte_relaxation_bytes": 0,
+        "identity_family": "admission_relation_id",
+        "materialize_occurrences": 0,
+        "paths_in_each_response": [],
+        "request_occurrences": 2,
+        "total_occurrences": 0
+      },
+      {
+        "accepted_content_width_bytes": 17,
+        "compile_occurrences": 1,
+        "delta_from_one_byte_relaxation_bytes": 32,
+        "identity_family": "preparation_attempt_id",
+        "materialize_occurrences": 1,
+        "paths_in_each_response": [
+          "/result/preparation_attempt_id"
+        ],
+        "total_occurrences": 2
+      },
+      {
+        "accepted_content_width_bytes": 17,
+        "compile_occurrences": 1,
+        "delta_from_one_byte_relaxation_bytes": 32,
+        "distinct_exchange_symbols": [
+          "request_id.materialize",
+          "request_id.compile"
+        ],
+        "identity_family": "request_id",
+        "materialize_occurrences": 1,
+        "paths_in_each_response": [
+          "/request_id"
+        ],
+        "total_occurrences": 2
+      },
+      {
+        "accepted_content_width_bytes": 17,
+        "compile_occurrences": 1,
+        "delta_from_one_byte_relaxation_bytes": 32,
+        "distinct_exchange_symbols": [
+          "operation_id.materialize",
+          "operation_id.compile"
+        ],
+        "identity_family": "operation_id",
+        "materialize_occurrences": 1,
+        "paths_in_each_response": [
+          "/operation_id"
+        ],
+        "total_occurrences": 2
+      },
+      {
+        "accepted_content_width_bytes": 17,
+        "compile_occurrences": 1,
+        "delta_from_one_byte_relaxation_bytes": 16,
+        "identity_family": "deadline_identity",
+        "materialize_occurrences": 0,
+        "paths_in_compile_response": [
+          "/result/capture_and_reap/deadline_identity"
+        ],
+        "total_occurrences": 1
+      },
+      {
+        "budget_delta_bytes": 0,
+        "identity_family": "process.admitted_operation_id",
+        "nonnull_content_width_bytes": 17,
+        "nonnull_occurrences_in_budget_reference": 0,
+        "null_occurrences_per_response": 1,
+        "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/processes/0/admitted_operation_id"
+      },
+      {
+        "budget_delta_bytes": 0,
+        "identity_family": "writer_handle.admitted_operation_id",
+        "nonnull_content_width_bytes": 17,
+        "nonnull_occurrences_in_budget_reference": 0,
+        "null_occurrences_per_response": 2,
+        "paths_in_each_response": [
+          "/result/workspace_state/process_exclusivity_observation/writers/0/handles/0/admitted_operation_id",
+          "/result/workspace_state/process_exclusivity_observation/writers/0/handles/1/admitted_operation_id"
+        ]
+      },
+      {
+        "budget_delta_bytes": 0,
+        "identity_family": "active_operation_id",
+        "nonnull_content_width_bytes": 17,
+        "nonnull_occurrences_in_budget_reference": 0,
+        "null_occurrences_per_response": 1,
+        "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/active_operation_id"
+      },
+      {
+        "budget_delta_bytes": 0,
+        "identity_family": "authorized_borrower_relation_id",
+        "nonnull_encoding_selected": false,
+        "null_occurrences_per_response": 1,
+        "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/authorized_borrower_relation_id"
+      },
+      {
+        "budget_delta_bytes": 0,
+        "identity_family": "handoff_identity",
+        "nonnull_encoding_selected": false,
+        "null_occurrences_per_response": 1,
+        "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/handoff_identity"
+      }
+    ],
+    "historical_proof_rerun": false,
+    "kernel_widths": "Previous unresolved lower placeholders unchanged; no new observation or serializer.",
+    "operational_effects": {
+      "Docker": 0,
+      "capability_issuance": 0,
+      "controller_execution": 0,
+      "identity_generation": 0,
+      "java": 0,
+      "javac": 0,
+      "live_kernel_inspection": 0,
+      "network": 0,
+      "owner_import": 0,
+      "source_materialization": 0
+    },
+    "other_widths": "All non-owner terms, writer topology, maximum class decimal width and Candidate-A-only generation/container/framing assumptions unchanged.",
+    "overall_budget_feasibility": "UNRESOLVED",
+    "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+    "remaining_margin_bytes": -148,
+    "request_bytes_added_to_stdout": 0,
+    "responses": [
+      {
+        "baseline_payload_bytes": 3251,
+        "conditional_payload_bytes": 3379,
+        "delta_bytes": 128,
+        "operation": "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "owner_occurrences": 8,
+        "substitutions": [
+          {
+            "delta_bytes": 16,
+            "family": "operation_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/operation_id",
+            "symbol": "operation_id.materialize"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "request_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/request_id",
+            "symbol": "request_id.materialize"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "preparation_attempt_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/result/preparation_attempt_id",
+            "symbol": "preparation_attempt_id"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "controller_identity",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/result/workspace_state/controller_identity",
+            "symbol": "controller_identity"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "exclusive_owner_relation_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/result/workspace_state/process_exclusivity_observation/exclusive_owner_relation_id",
+            "symbol": "exclusive_owner_relation_id"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "exclusive_owner_relation_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/result/workspace_state/process_exclusivity_observation/writers/0/accounted_original_relation_id",
+            "symbol": "exclusive_owner_relation_id"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "workspace_capability_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/result/workspace_state/workspace_capability_id",
+            "symbol": "workspace_capability_id"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "workspace_capability_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/workspace_capability_id",
+            "symbol": "workspace_capability_id"
+          }
+        ]
+      },
+      {
+        "baseline_payload_bytes": 4809,
+        "conditional_payload_bytes": 4953,
+        "delta_bytes": 144,
+        "operation": "COMPILE_EXACT_SCENARIO",
+        "owner_occurrences": 9,
+        "substitutions": [
+          {
+            "delta_bytes": 16,
+            "family": "operation_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/operation_id",
+            "symbol": "operation_id.compile"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "request_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/request_id",
+            "symbol": "request_id.compile"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "deadline_identity",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/result/capture_and_reap/deadline_identity",
+            "symbol": "deadline_identity"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "preparation_attempt_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/result/preparation_attempt_id",
+            "symbol": "preparation_attempt_id"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "controller_identity",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/result/workspace_state/controller_identity",
+            "symbol": "controller_identity"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "exclusive_owner_relation_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/result/workspace_state/process_exclusivity_observation/exclusive_owner_relation_id",
+            "symbol": "exclusive_owner_relation_id"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "exclusive_owner_relation_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/result/workspace_state/process_exclusivity_observation/writers/0/accounted_original_relation_id",
+            "symbol": "exclusive_owner_relation_id"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "workspace_capability_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/result/workspace_state/workspace_capability_id",
+            "symbol": "workspace_capability_id"
+          },
+          {
+            "delta_bytes": 16,
+            "family": "workspace_capability_id",
+            "new_content_bytes": 17,
+            "old_content_bytes": 1,
+            "path": "/workspace_capability_id",
+            "symbol": "workspace_capability_id"
+          }
+        ]
+      }
+    ],
+    "result_kind": "CONDITIONAL_OWNER_WIDTH_CONSEQUENCE_ONLY",
+    "source_ledger": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1R/budget_witness.json",
+    "source_ledger_sha256": "33a3a8d9484e4d61991959dfb733e30db2e2b87ca0f436e22269d8515812d6fe",
+    "source_profile": "candidate_A_writer_lower_widths_class_5_digits",
+    "typed_result": "OWNER_ENCODING_ALONE_EXCEEDS_8192_FOR_CANDIDATE_A"
+  },
+  "candidate_A_selected": false,
+  "cap_bytes": 8192,
+  "classification_only": [
+    {
+      "class": "UNESTABLISHED_BORROWER_RELATION",
+      "field": "authorized_borrower_relation_id",
+      "minimum_path_json_bytes": 4,
+      "minimum_path_value": null,
+      "nonnull_encoding_frozen": false,
+      "reason": "No borrower or consumer authenticator exists on the minimum preparation path. Required nullable key remains null; nonnull requires a later contract."
+    },
+    {
+      "class": "UNESTABLISHED_HANDOFF_RELATION",
+      "field": "handoff_identity",
+      "minimum_path_json_bytes": 4,
+      "minimum_path_value": null,
+      "nonnull_encoding_frozen": false,
+      "reason": "No handoff occurs on the minimum preparation path. Required nullable key remains null; no placeholder or encoding is invented."
+    }
+  ],
+  "contract_frozen": true,
+  "controller_identity_separation": {
+    "controller_identity": "Exact original controller owner-object reference only; its authenticated record must still bind every original C:/identity/must_bind fact.",
+    "forbidden_overloads": [
+      "source SHA256",
+      "protocol string",
+      "module name",
+      "PID",
+      "controller_generation",
+      "container_identity",
+      "workspace_generation"
+    ],
+    "incarnation": "Separate controller_generation and original process/channel binding; kernel/process serialization remains unresolved. No controller generation encoder is selected here.",
+    "stable_implementation_identity": "Separate exact source bytes/hash/size, executable and interpreter identity, reviewed protocol ID/schema, image, bootstrap, closed environment and policy. No source implementation is supplied or repinned."
+  },
+  "created_at": "2026-10-19",
+  "digest_separation": {
+    "HMAC": "separate unchanged cryptographic record authenticator under independent owner secret/domain/role",
+    "ID": "public scalar lookup/correlation/uniqueness handle",
+    "capability": "exact original process-local object plus owner validation and current eligibility, never the scalar spelling",
+    "stable_fingerprint": "separate unchanged 64-lowercase-hex authenticated immutable identity digest; neither registry authority nor current readiness"
+  },
+  "encoding": {
+    "additive_grammar": "These predicates constrain future values of existing generic id fields only; S:/definitions/id remains unchanged. Prefix, suffix range and exact field domain must all validate. No issued historical ID is re-encoded.",
+    "alphabet": "prefix from wcxatrod followed only by 0123456789abcdef",
+    "canonical_case": "lowercase only; reject uppercase rather than normalize",
+    "canonical_quoted_json_bytes": 19,
+    "capacity_rationale": "All classes independently retain histories across an otherwise unbounded process-incarnation lifetime; no audited class has a smaller universal count bound. This phase chooses a 63-bit nonwrapping allocation capacity consistent with C:/framing/primitive_rules/positive_int; that historical rule constrains message sequences, not the existing generic ID strings, and does not mandate this choice. This is a bounded availability policy, not a cryptographic minimum. Equal widths reflect the independently shared retention/capacity obligation, not a demand that semantic classes match or a byte-fit objective. Both 32-bit and 63-bit handles can be security-correct with explicit exhaustion; a smaller bound has no independent class-specific evidence here. Full SHA256 would add authentication responsibilities these scalars do not have.",
+    "entropy_bits_required": 0,
+    "exact_content_bytes": 17,
+    "excluded_value": "sixteen zero suffix digits",
+    "general_regex": "[wcxatrod][0-7][0-9a-f]{15}",
+    "generation_method": "Owner-reserved positive monotonic integer, represented as exactly sixteen lowercase zero-padded hexadecimal digits following the field-family prefix. This is a specification only; no generator is supplied.",
+    "maximum_content_bytes": 17,
+    "minimum_content_bytes": 17,
+    "primitive_name": "family-prefixed positive process-incarnation sequence handle",
+    "secret": false,
+    "semantic_range": [
+      1,
+      9223372036854775807
+    ],
+    "sequence_bits": 63,
+    "serialization": "exact built-in str, ASCII, one canonical JSON string under the frozen encoding; no padding changes, escapes, whitespace, signs, separators or alternate spellings",
+    "suffix_hex_digits": 16
+  },
+  "existing_owner_comparison": {
+    "audit_method": "Read source text only. Existing owner modules were not imported, instantiated, issued, consumed, invalidated or executed.",
+    "audit_status": "EXISTING_OWNER_CONVENTIONS_AUDITED",
+    "authority_granted": false,
+    "common_existing_encoding": {
+      "alphabet": "0123456789abcdef",
+      "canonical_case": "lowercase",
+      "encoding_is_authentication": false,
+      "exact_ascii_bytes": 64,
+      "generator": "secrets.token_hex(32)",
+      "historical_convention_is_required_for_future_handles": false,
+      "random_bits_requested": 256,
+      "reason": "The scalar selects a private registry entry; validation independently requires the original typed object, current owner process, authenticated retained graph and HMAC. A copied scalar is insufficient."
+    },
+    "future_preparation_implication": {
+      "conditions": [
+        "Every authority-bearing operation authenticates the exact original typed owner/relation object in its private owner registry, current process and authenticated immutable graph before lookup results can confer authority.",
+        "Domain/PID/owner binding and current lifecycle state remain HMAC-authenticated; stable fingerprint and HMAC remain separate from the scalar.",
+        "Freshness/collision/reuse checks cover active records and permanent tombstones, with atomic allocation/publication under a private owner lock.",
+        "No string-only endpoint may acquire an original authoritative object or bypass the admission relation merely by presenting an ID.",
+        "A process restart/fork cannot reuse prior authoritative objects; scalar equality outside the retained namespace has no authority meaning.",
+        "Any future bearer boundary is a different security model and must not inherit this non-secret-handle conclusion without explicit requirement evolution."
+      ],
+      "finite_counter_model": "Semantically permissible if namespace, atomic increment, no rollback/reset/wrap, fail-closed exhaustion, permanent tombstones and process/owner separation are frozen. A counter's guessability does not defeat exact-original-object/HMAC checks. No generator is implemented here.",
+      "non_secret_opaque_scalar_permitted": true,
+      "scalar_unpredictability_required_by_audited_authentication_model": false
+    },
+    "historical_sources_modified": false,
+    "live_owner_issuance_count": 0,
+    "operational_effect_count": 0,
+    "owners": [
+      {
+        "authentication_reference": "core/synthetic_runtime_authorization.py:294-313",
+        "collision_handling": "No explicit retry before assigning the weak registry key.",
+        "family": "authorization_ids",
+        "generator_reference": "core/synthetic_runtime_authorization.py:286",
+        "ids": [
+          "issuance_id"
+        ],
+        "registry_kind": "WeakValueDictionary",
+        "registry_reference": "core/synthetic_runtime_authorization.py:288",
+        "sha256": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88",
+        "source": "core/synthetic_runtime_authorization.py",
+        "tombstone": "No standalone authorization tombstone; lifecycle owns permanent one-shot issuance accounting.",
+        "variant": "legacy"
+      },
+      {
+        "authentication_reference": "core/synthetic_runtime_authorization_pinned.py:261-288",
+        "collision_handling": "No explicit retry before assigning the authorization registry key; no scalar collision-reuse rule should be inherited from this omission.",
+        "family": "authorization_ids",
+        "generator_reference": "core/synthetic_runtime_authorization_pinned.py:336-337",
+        "ids": [
+          "authorization_id",
+          "proof_context_id"
+        ],
+        "registry_kind": "Strong original-object record retaining the original provider graph",
+        "registry_reference": "core/synthetic_runtime_authorization_pinned.py:340-344",
+        "sha256": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c",
+        "source": "core/synthetic_runtime_authorization_pinned.py",
+        "tombstone": "No authorization terminal state; pinned lifecycle supplies permanent issuance tombstone.",
+        "variant": "pinned"
+      },
+      {
+        "authentication_reference": "core/synthetic_runtime_authorization_lifecycle.py:185-208",
+        "collision_handling": "Retry against all retained lease IDs while holding owner lock.",
+        "family": "runtime_lease_ids",
+        "generator_reference": "core/synthetic_runtime_authorization_lifecycle.py:219-221",
+        "ids": [
+          "lease_id"
+        ],
+        "registry_kind": "Lease records contain a weakref to the exact lease and retain authorization; permanent authorization-to-lease map",
+        "sha256": "dc7cc307a17c63cf65eea0e898015140806ca98e2614c391423c50adfd0e6029",
+        "source": "core/synthetic_runtime_authorization_lifecycle.py",
+        "tombstone": "Authorization-to-lease map and lease records remain after terminal state; terminal state is HMAC authenticated.",
+        "variant": "legacy"
+      },
+      {
+        "authentication_reference": "core/synthetic_runtime_authorization_pinned_lifecycle.py:383-422",
+        "collision_handling": "Validate lowercase hex and retry against retained lease registry under owner lock; one publication at line 444.",
+        "family": "runtime_lease_ids",
+        "generator_reference": "core/synthetic_runtime_authorization_pinned_lifecycle.py:433-439",
+        "ids": [
+          "lease_id"
+        ],
+        "registry_kind": "Atomic owner-store replacement; exact lease weakref and strongly retained upstream authorization",
+        "sha256": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4",
+        "source": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+        "tombstone": "Permanent owner/phase/schema/PID/authorization-ID key at lines 240-242 and 430-432; maps retained at terminal transition lines 480-486. Consume currently fails closed at separate consumer-readiness gate.",
+        "variant": "pinned"
+      },
+      {
+        "authentication_reference": "core/runtime_java_pinned_provider.py:445-488",
+        "collision_handling": "No explicit retry at context/receipt insertion.",
+        "family": "provider_ids",
+        "generator_reference": "core/runtime_java_pinned_provider.py:507,564,575",
+        "ids": [
+          "proof_context_identity",
+          "RuntimeProviderAttachment.receipt_id",
+          "PinnedJavaExactProviderReceipt.receipt_id"
+        ],
+        "registry_kind": "Strong original objects in separate attachment and provider registries; proof context in attempt registry",
+        "sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+        "source": "core/runtime_java_pinned_provider.py",
+        "tombstone": "Fresh attempt PID and exact receipt retained at lines 480-482; this is proof provenance, not a scalar bearer capability or generic lifecycle permission.",
+        "variant": "pinned_exact_provider_and_runtime_attachment"
+      },
+      {
+        "authentication_reference": "core/synthetic_reflection_execution_admission.py:189-215",
+        "collision_handling": "Retry against currently retained weak admissions.",
+        "family": "reflection_admission_ids",
+        "generator_reference": "core/synthetic_reflection_execution_admission.py:294-296",
+        "ids": [
+          "admission_id"
+        ],
+        "registry_kind": "WeakValueDictionary requiring exact original admission",
+        "sha256": "ae6d60d7ef418cff366317ad4507d0f2de93f2aa9d188e8e12d453c66ed77b19",
+        "source": "core/synthetic_reflection_execution_admission.py",
+        "tombstone": "No admission-owned permanent slot; legacy reflection lifecycle keeps permanent admission-to-lease accounting.",
+        "variant": "legacy"
+      },
+      {
+        "authentication_reference": "core/synthetic_reflection_execution_admission_pinned.py:457-478",
+        "collision_handling": "Validate lowercase hex and retry against retained admission IDs under lock; atomic publication at line 504.",
+        "family": "reflection_admission_ids",
+        "generator_reference": "core/synthetic_reflection_execution_admission_pinned.py:490-496",
+        "ids": [
+          "admission_id"
+        ],
+        "registry_kind": "Exact admission weakref; strongly retained authorization/runtime/request and immutable canonical projection",
+        "sha256": "974075ac1827b4013e1e8a2b236ea278e19c8be138e378bed3b70613f590aaa0",
+        "source": "core/synthetic_reflection_execution_admission_pinned.py",
+        "tombstone": "Permanent runtime/role slot at lines 291-297 and 487-500. Admission is immutable; current runtime eligibility is checked separately.",
+        "variant": "pinned"
+      },
+      {
+        "authentication_reference": "core/synthetic_reflection_execution_lifecycle.py:222-265",
+        "collision_handling": "Retry against retained leases while owner lock is held.",
+        "family": "reflection_lease_ids",
+        "generator_reference": "core/synthetic_reflection_execution_lifecycle.py:276-278",
+        "ids": [
+          "lease_id"
+        ],
+        "registry_kind": "Exact lease weakref with retained upstreams and permanent admission-to-lease map",
+        "sha256": "c2b85e845f79332b83f3c17e754ba290db739e9c19378317fed16c6402e686ba",
+        "source": "core/synthetic_reflection_execution_lifecycle.py",
+        "tombstone": "Permanent map is created at lines 287-288; signed current state updated at line 337.",
+        "variant": "legacy"
+      },
+      {
+        "authentication_reference": "core/synthetic_reflection_execution_lifecycle_pinned.py:536-563",
+        "collision_handling": "Validate lowercase hex and retry against retained IDs under lock; atomic publication at line 589.",
+        "family": "reflection_lease_ids",
+        "generator_reference": "core/synthetic_reflection_execution_lifecycle_pinned.py:574-580",
+        "ids": [
+          "lease_id"
+        ],
+        "registry_kind": "Exact lease weakref, retained original admission/authorization/runtime/request, permanent admission-to-lease map",
+        "sha256": "c88d743d5820cdeb4877c4311470b745d1f8abf97a53dd4db8f93e4b1c155057",
+        "source": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+        "tombstone": "Original admission is strongly retained forever; one-shot key at lines 340-343, rejection lines 571-573; terminal map preserved and state re-signed at lines 645-659.",
+        "variant": "pinned"
+      }
+    ],
+    "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+    "security_distinctions": {
+      "exact_original_object": "Prevents same-process reconstructed dataclass, JSON/copy, wrapper and subclass substitutions even when every scalar is copied.",
+      "hmac": "Separate HMAC-SHA256 authentication with owner-local 32-byte secret, independent of scalar-ID entropy.",
+      "pid": "Rejects live foreign process and fork inheritance. PID alone does not handle PID reuse; fresh process secret, empty registry and impossibility of original-object continuity provide that boundary.",
+      "scalar_id": "Registry lookup/correlation key. Existing source does not authenticate solely from scalar possession.",
+      "stable_fingerprint": "Separate 64-lowercase-hex SHA256 digest of domain-separated immutable projection. Detects projection mismatch only when checked through authenticated owner provenance; not a secret or bearer credential.",
+      "tombstone": "Prevents duplicate issuance/reopening independently of ID encoding. A digest or long random ID does not by itself prevent stale replay."
+    },
+    "supporting_reflection_request_convention": {
+      "authentication_reference": "core/synthetic_read_only_reflection.py:164-185",
+      "exact_ascii_bytes": 64,
+      "field": "issuance_id",
+      "future_request_id_equivalence_assumed": false,
+      "generator_reference": "core/synthetic_read_only_reflection.py:193",
+      "sha256": "d24422b68c0eae96890a7e63a177ebc8adcbd64300bf7cfb42d3ada041a5d5bc",
+      "source": "core/synthetic_read_only_reflection.py"
+    }
+  },
+  "generation_semantics": {
+    "allocation_is_not_coordination": "The abstract reservation ledger concerns name uniqueness only. It does not hold existing private owner locks, bridge owner stores, authenticate an admission, spend a facet or establish a cross-owner effect transaction. Concrete synchronization remains a future implementation obligation.",
+    "caller_control": "Only the authenticated issuing owner reserves a new value; callers may echo an already bound value but cannot select, register, overwrite or alias it. Parse/equality checks use exact strings without coercion.",
+    "collision_handling": "At reservation, reject any existing reserved, active, terminal or tombstoned key before claiming it. Registration may publish only that issuer's own newly created reservation, once; reject a foreign reservation or an already published/terminal/tombstoned ID. An unexpected collision or missing namespace continuity is an invariant failure: no overwrite, no retry with the same value, no alias, no dispatch; invalidate affected eligibility and retain burned values.",
+    "domain_separation": "Prefix validation rejects class substitution before lookup. A prefix is not an HMAC domain: independent existing owner secret/domain/role separation and exact original graph comparisons remain mandatory for cross-owner substitution within the same class.",
+    "fork_boundary": "PID mismatch invalidates all inherited originals and allocator state before validation or issuance. A forked child may not continue an inherited namespace or lock; it needs a new empty process-incarnation namespace and independently initialized owner secrets through a future reviewed initialization path. No such path is implemented here.",
+    "lifetime": "Reservation histories and permanent terminal tombstones last to process-incarnation termination, independently of whether the original operational object remains live. Strong originals/graph remain as required by their owning contracts.",
+    "namespace": "One retained allocation namespace per future issuer process incarnation, shared across every instance of the participating future owner domains; never one resetting counter per owner object.",
+    "random_alternatives": "No scoped scalar requires unpredictability. Random or cryptographic random allocation is not the accepted primitive for these future fields; the frozen historical random conventions remain untouched. Observation challenges and independent HMAC secrets retain their stronger existing requirements.",
+    "reload_boundary": "Module reload, registry recreation, allocator replacement or secret rotation cannot reset counters while any namespace originals/tombstones can be recognized. Retain namespace continuity or fail closed for new issuance and old eligibility. No rehydration from serialized IDs.",
+    "reservation": "A single abstract monotonic reservation ledger assigns a fresh integer across all participating families and owners. Family prefix selects semantic domain; exact owner module/phase/schema/role and original relation are additionally authenticated. Independent owner instances may not start their own overlapping namespace.",
+    "restart_boundary": "A fresh process incarnation may repeat printable strings only in a disjoint new namespace with new secrets and empty original-object registry. Old objects, JSON and HMACs cannot be imported or reattached. PID equality alone never permits continuity, including after PID reuse.",
+    "reuse_forbidden": true,
+    "terminal": "Terminal records may authenticate historical evidence but cannot restore readiness. Never remove a tombstone to free a scalar; no namespace recycling after registry cleanup.",
+    "thread_safety": "Reservation, increment and issued/tombstoned collision check are one linearizable critical section. No assumption about the GIL. Owner registration may follow, but any reserved value stays burned on failure, exception or cancellation.",
+    "wrap": "Never wrap, truncate, modulo, saturate or restart; reject allocation before exceeding 9223372036854775807. Exhaustion withdraws new issuance, not cleanup of retained originals."
+  },
+  "historical_budget_result": "BUDGET_WITNESS_UNRESOLVED",
+  "historical_contracts_modified": false,
+  "historical_identity_subresult": "BUDGET_WITNESS_IDENTITY_ENCODING_UNRESOLVED",
+  "identity_classes": [
+    {
+      "class": "WORKSPACE_OBJECT_REFERENCE",
+      "fields": [
+        "workspace_capability_id"
+      ],
+      "lifetime": "One original workspace relation through terminal evidence and permanent namespace tombstone.",
+      "prefix": "w",
+      "regex": "w[0-7][0-9a-f]{15}",
+      "role": "Lookup exact original workspace capability object; spelling alone conveys no workspace or preparation permission."
+    },
+    {
+      "class": "CONTROLLER_OBJECT_REFERENCE",
+      "fields": [
+        "controller_identity"
+      ],
+      "lifetime": "One original controller object; never reassigned to a replacement controller.",
+      "prefix": "c",
+      "regex": "c[0-7][0-9a-f]{15}",
+      "role": "Lookup exact retained controller owner-object relation whose authenticated record binds source, protocol, original workspace and incarnation facts."
+    },
+    {
+      "class": "EXCLUSIVE_OWNER_RELATION_REFERENCE",
+      "fields": [
+        "exclusive_owner_relation_id",
+        "writer.accounted_original_relation_id"
+      ],
+      "lifetime": "One exact original exclusive relation. Minimum-path accounted controller writer uses the same exclusive_owner_relation_id. Other writer relations require their own truthful authenticated original mapping; unresolved borrower/handoff encodings are not fabricated.",
+      "prefix": "x",
+      "regex": "x[0-7][0-9a-f]{15}",
+      "role": "Lookup authenticated original exclusive-owner/writer accounting relation. Writer field is an alias of an actual retained original relation, never a new ID minted for observation."
+    },
+    {
+      "class": "SINGLE_OPERATION_ADMISSION_REFERENCE",
+      "fields": [
+        "admission_relation_id"
+      ],
+      "lifetime": "One admitted operation, permanently spent/rejected/terminal thereafter; no replay or refund.",
+      "prefix": "a",
+      "regex": "a[0-7][0-9a-f]{15}",
+      "role": "Lookup separately authenticated owner admission bound to exact originals, purpose/tag, attempt, request, operation, generations, observation and fence; scalar is explicitly not authority."
+    },
+    {
+      "class": "PERMANENT_PREPARATION_ATTEMPT_REFERENCE",
+      "fields": [
+        "preparation_attempt_id"
+      ],
+      "lifetime": "One attempt forever in retained namespace history; no reuse, reopen, refund or new attempt under old value.",
+      "prefix": "t",
+      "regex": "t[0-7][0-9a-f]{15}",
+      "role": "Bind the one permanent materialize -> compile attempt and its original spent facets, same workspace/controller and failure history."
+    },
+    {
+      "class": "SINGLE_REQUEST_CORRELATION",
+      "fields": [
+        "request_id"
+      ],
+      "lifetime": "One exchange; duplicates or lost replies do not authorize redispatch. A permitted cleanup re-observation requires a fresh request.",
+      "prefix": "r",
+      "regex": "r[0-7][0-9a-f]{15}",
+      "role": "Owner-generated unique request correlation key; exact request/response equality plus owner admission/replay history rejects aliasing."
+    },
+    {
+      "class": "SINGLE_OPERATION_CORRELATION",
+      "fields": [
+        "operation_id",
+        "process.admitted_operation_id",
+        "writer_handle.admitted_operation_id",
+        "active_operation_id"
+      ],
+      "lifetime": "One original operation; no mutation retry after response loss; fresh operation cannot reuse request/admission IDs.",
+      "prefix": "o",
+      "regex": "o[0-7][0-9a-f]{15}",
+      "role": "Owner-generated unique admitted operation identity. Nonnull inventory/active references copy the exact bound operation_id and do not allocate new values."
+    },
+    {
+      "class": "AUTHENTICATED_DEADLINE_RELATION_REFERENCE",
+      "fields": [
+        "deadline_identity"
+      ],
+      "lifetime": "Original attempt budget relation never reset, extended or replaced to refund time; terminal record remains tombstoned.",
+      "prefix": "d",
+      "regex": "d[0-7][0-9a-f]{15}",
+      "role": "Lookup one authenticated immutable monotonic deadline relation shared by this attempt from materialization through compile; not a timestamp, clock reading or wall-clock authenticity claim."
+    }
+  ],
+  "independent_budget_report_review": {
+    "all_reported_corrections_verified_resolved": true,
+    "arithmetic_review": {
+      "admission_id_response_occurrences": 0,
+      "candidate_A_only_response_framing_bytes": 8,
+      "compile_bytes": 4953,
+      "compile_owner_occurrences": 9,
+      "conditional_framed_total_bytes": 8340,
+      "excess_bytes": 148,
+      "historical_32_and_64_byte_sensitivity_totals_reproduced": [
+        8595,
+        9139
+      ],
+      "materialize_bytes": 3379,
+      "materialize_owner_occurrences": 8,
+      "new_quoted_bytes": 19,
+      "null_fields_remain_null": true,
+      "old_quoted_bytes": 3,
+      "owner_content_bytes": 17,
+      "passed": true,
+      "payload_sum_bytes": 8332,
+      "per_occurrence_delta_bytes": 16,
+      "request_bytes_added_to_stdout": 0,
+      "writer_accounting_id_reuses_exclusive_owner_symbol": true
+    },
+    "artifact_kind": "independent_source_only_budget_projection_and_report_review",
+    "conditionality_review": {
+      "attainable_execution_witness_claimed": false,
+      "candidate_A_selected": false,
+      "candidate_specific_container_generation_framing_unchanged": true,
+      "historical_proof_rerun": false,
+      "kernel_identity_widths_unchanged": true,
+      "overall_budget_feasibility_remains_unresolved": true,
+      "passed": true
+    },
+    "final_generated_report_review": {
+      "all_eight_class_grammars_and_aliases_match_contract": true,
+      "authority_flags_all_false": true,
+      "benchmark_cases": 54,
+      "collision_handling_matches_current_contract_verbatim": true,
+      "conditional_budget_table_matches_independent_audit": true,
+      "contract_review_hash_assertion_present": true,
+      "focused_tests": "154/154",
+      "generation_boolean_reuse_forbidden_renders_as_true": true,
+      "historically_preserved_file_count": 26991,
+      "new_blockers_found": [],
+      "operational_effect_counts_all_zero": true,
+      "passed": true,
+      "registry_collected": 299,
+      "registry_passed": 292,
+      "reservation_and_publication_distinction_verified": "Reservation rejects an already occupied key before claiming it; publication may consume only that issuer's own new reservation once. Foreign, already published, terminal and tombstoned IDs remain rejected, and failed reservations remain burned.",
+      "security_property_matrix_matches_contract": true,
+      "source_legend_present_and_matches_contract": true,
+      "unchanged_preexisting_failures": 7,
+      "validation_counts_match_summary": true
+    },
+    "finalizer_trailing_whitespace_count": 0,
+    "findings_reported_to_root": [
+      {
+        "file": "finalize_artifacts.py",
+        "finding": "The line ending in the quoted text issuance/transition/ has trailing source whitespace; the finalizer's own whitespace check rejects it.",
+        "id": "REVIEW_1",
+        "kind": "authored_trailing_whitespace",
+        "original_line": 175,
+        "requested_resolution": "Remove trailing whitespace before finalization.",
+        "severity": "validation_blocker",
+        "status": "RESOLVED",
+        "verified_resolution": "The current finalizer and generated REPORT.md have no lines with trailing whitespace."
+      },
+      {
+        "file": "finalize_artifacts.py",
+        "finding": "Budget report prose groups kernel/mode lower placeholders together with fixed Candidate-A container/generation/framing assumptions, then describes them all as unresolved lower placeholders.",
+        "id": "REVIEW_2",
+        "kind": "scope_wording",
+        "requested_resolution": "Describe unresolved kernel/mode placeholders separately from unchanged Candidate-A conditional fixed assumptions.",
+        "severity": "clarity",
+        "status": "RESOLVED",
+        "verified_resolution": "The finalizer and generated report separately state that kernel/mode lower placeholders remain and that writer topology plus Candidate-A fixed assumptions remain unchanged."
+      },
+      {
+        "file": "finalize_artifacts.py",
+        "finding": "The unqualified sentence Unpredictability would not protect ID-only authorization is overbroad beyond this non-bearer contract, because unpredictable bearer credentials can provide guessing resistance.",
+        "id": "REVIEW_3",
+        "kind": "authentication_wording",
+        "requested_resolution": "Scope this statement to these public handles and the frozen original-object/authenticated-owner requirements.",
+        "severity": "clarity",
+        "status": "RESOLVED",
+        "verified_resolution": "The finalizer and generated report scope the restriction to these non-secret handles and require the frozen original-object/authenticated-owner conjunction."
+      }
+    ],
+    "generated_report_trailing_whitespace_count": 0,
+    "historical_proof_executed": false,
+    "owner_imports_or_issuance": false,
+    "pending_blockers": [],
+    "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+    "review_status": "PASS_ALL_REPORTED_CORRECTIONS_RESOLVED_NO_PENDING_BLOCKERS",
+    "reviewed_contract_sha256": "a461f49bcc3b18426490028ee1aaf11a371d7ea1f9bc2bc5afc07dd72fa02265",
+    "reviewed_finalizer_sha256": "fb545d62431e1d0269728bea6a77463f0e192202ec072bdf81c9eefe1eb37f5d",
+    "reviewed_generated_report_sha256": "f22758d4ada376bac8a34350edca08e17550f887fcd698b47b62bef8b91a338f",
+    "reviewed_sources": [
+      "budget_projection.py",
+      "finalize_artifacts.py",
+      "budget_projection.json",
+      "budget_ledger_audit.json",
+      "contract.json",
+      "REPORT.md",
+      "validation_summary.json"
+    ],
+    "scope": "Read-only source/contract/JSON review. No historical proof execution, runtime activity, owner implementation, identity generator, or authority changes."
+  },
+  "independent_contract_review": {
+    "additional_anchor_resolution": [
+      {
+        "actual_value": "exact int in 1..9223372036854775807; bool rejected; no wrap/reuse",
+        "anchor": "C:/framing/primitive_rules/positive_int",
+        "exists": true,
+        "source_line": 892
+      },
+      {
+        "anchor": "C:/identity/must_bind",
+        "evidence": "Retains source/executable/protocol, original host/workspace relation, actual container, controller incarnation/generation, workspace generation, endpoints, bootstrap, limits and cleanup bindings.",
+        "exists": true,
+        "source_line": 127
+      },
+      {
+        "anchor": "S:/definitions/id",
+        "evidence": "Frozen message schema id definition is type=str, min_utf8_bytes=1, max_utf8_bytes=256 and NUL_allowed=false; additive 17-byte ASCII grammar fits it.",
+        "exists": true
+      }
+    ],
+    "allocation_coordination_separation": "Final generation_semantics.allocation_is_not_coordination explicitly limits the reservation ledger to name uniqueness; it does not bridge owner stores, hold existing private locks, authenticate admissions, spend facets or establish effect transactions. This preserves the pure identity-contract scope.",
+    "artifact_kind": "independent_read_only_semantic_security_review",
+    "authority_anchor_resolution": [
+      {
+        "actual_value": false,
+        "anchor": "C:/authority_separation/scalar_admission_id_is_authority",
+        "exists": true,
+        "source": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+        "source_line": 163
+      },
+      {
+        "actual_value": "exact str, nonempty, <=256 UTF-8 bytes, no NUL; reference only to authenticated original relation, never restore authority from string",
+        "anchor": "C:/framing/primitive_rules/id",
+        "exists": true,
+        "source": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+        "source_line": 891
+      },
+      {
+        "anchor": "W:/exact_live_object",
+        "exists": true,
+        "relevant_facts": [
+          "exact_type_required=true",
+          "original_registry_object_identity_required=true",
+          "issuing_pid_required=true",
+          "strong_original_graph_retention_required=true",
+          "scalar_projection_sufficient=false"
+        ],
+        "source": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+        "source_line": 113
+      },
+      {
+        "anchor": "W:/authentication",
+        "exists": true,
+        "relevant_facts": [
+          "algorithm=HMAC-SHA256",
+          "independent_secret=true",
+          "registry retains original object/graph and permanent terminal tombstones",
+          "constant-time HMAC and retained canonical byte comparison",
+          "terminal_evidence_grants_readiness=false"
+        ],
+        "source": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+        "source_line": 157
+      }
+    ],
+    "authority_granted": false,
+    "blocking_findings": [],
+    "checks": [
+      {
+        "evidence": "Eight distinct prefixes w,c,x,a,t,r,o,d with exact 16-digit lowercase hex suffix, positive 63-bit range and excluded zero have an injective 17-ASCII-byte representation. Prefix/domain validation and shared atomic reservation semantics prevent lexical class aliasing; original-object and HMAC checks remain the authentication barrier.",
+        "name": "family_prefixed_nonwrapping_sequence",
+        "result": "PASS"
+      },
+      {
+        "evidence": "Classes retain different semantic roles and aliased fields do not allocate new values. Common retained-history capacity can be chosen consistently for all classes; the contract explicitly calls it a bounded availability policy and claims zero entropy requirement. The historical positive_int maximum is a legitimate selected finite ceiling but is not an independently established mandatory ID cardinality.",
+        "name": "all_classes_exactly_17_bytes",
+        "result": "PASS_AS_EXPLICIT_AVAILABILITY_POLICY"
+      },
+      {
+        "evidence": "Contract requires exact expected type, exact retained original object, private owner registry, retained upstream graph, immutable canonical bindings, HMAC and current eligibility; JSON/ID equality only correlates an authenticated exchange. No ID-only resolution path may grant authority.",
+        "name": "copy_json_reconstruction_and_wrapper",
+        "result": "PASS"
+      },
+      {
+        "evidence": "PID is explicitly insufficient by itself. Fork invalidates inherited originals and lock/allocator use before issuance; restart may repeat text only in a disjoint new incarnation with new secrets/empty registry. Reload, registry replacement and secret rotation must retain namespace continuity or fail closed rather than restart counters.",
+        "name": "pid_fork_restart_and_reload",
+        "result": "PASS"
+      },
+      {
+        "evidence": "Reservation/increment/collision check is linearizable; failure burns reservations. Reservation rejects preexisting reserved/live/terminal/tombstoned keys before claiming a fresh value. Registration may then publish only that issuer's own newly created reservation exactly once; foreign reservations and published/terminal/tombstoned values are rejected. This phase distinction avoids rejecting the issuer's legitimate reservation while preventing takeover or reuse. Histories survive operational object collection and terminal state; terminal evidence cannot reopen readiness.",
+        "name": "collision_terminal_and_tombstone",
+        "result": "PASS"
+      },
+      {
+        "evidence": "Controller scalar is narrowed to original owner-object reference while source/protocol/generation bindings remain separate. Attempt is permanent materialize-to-compile relation with no refund/reopen. Deadline identifies an immutable monotonic deadline relation rather than a clock value. Borrower/handoff remain minimum-path null with nonnull encodings unestablished. Kernel/process/generation serialization and Candidate A selection remain out of scope.",
+        "name": "controller_attempt_deadline_and_nullable_scope",
+        "result": "PASS"
+      },
+      {
+        "evidence": "The additive grammar fits unchanged generic nonempty <=256-byte string semantics. Challenge unpredictability, HMAC secrets, stable fingerprints, existing owner implementations, schema, transport selection and 8192-byte cap are preserved. Contract grants no effect or authority.",
+        "name": "schema_and_authority_preservation",
+        "result": "PASS"
+      }
+    ],
+    "contract_edited_by_reviewer": false,
+    "existing_sources_edited_by_reviewer": false,
+    "final_collision_wording_review": {
+      "evidence": "Independently reread the amended reservation versus registration predicates. A fresh issuer reservation is not rejected merely because it exists at publication; the publication exception is limited to its creator, its newly reserved key and one publication. Failure/cancellation remains burned. No other namespace, authority, replay, lifetime or encoding rule changes.",
+      "focused_assertion_source": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_IDENTITY_ENCODING_CONTRACT_1/tests/test_identity_contract.py:151-153",
+      "location": "generation_semantics.collision_handling",
+      "result": "PASS",
+      "test_source_observed": true,
+      "tests_executed_by_reviewer": false
+    },
+    "live_owner_issuance_count": 0,
+    "nonblocking_clarifications": [],
+    "operational_effect_count": 0,
+    "owner_import_count": 0,
+    "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+    "resolved_clarifications": [
+      {
+        "id": "REVIEW-C1",
+        "location": "authority_basis.required_conjunction[0]",
+        "previous_text": "exact built-in expected type, rejecting wrappers and subclasses",
+        "reason": "Owner/relation objects are expected custom types. Built-in scalar type checks and exact owner-class checks are both required, so the current wording could be misread as allowing only built-in owner object types.",
+        "resolution": "Final contract says exact expected owner/relation object type, and exact built-in scalar types; reject wrappers and subclasses."
+      },
+      {
+        "id": "REVIEW-C2",
+        "location": "encoding.capacity_rationale",
+        "reason": "Historical positive_int constrains existing numeric sequence values, while historical ID schema permits generic strings. The chosen 63-bit ID allocation ceiling is defensible as a new bounded availability policy; it is not semantically required by that historical positive_int bound.",
+        "resolution": "Final capacity rationale explicitly chooses 63 bits as this phase's bounded availability policy, distinguishes historical sequence limits from generic ID strings, and accepts that 32-bit handles can also be security-correct with exhaustion."
+      }
+    ],
+    "review_method": "Read JSON and historical contract/source text only; resolve source aliases and JSON property paths without importing owner modules or issuing live objects.",
+    "review_status": "PASS_NO_SECURITY_OR_SEMANTIC_BLOCKER",
+    "reviewed_file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_IDENTITY_ENCODING_CONTRACT_1/contract.json",
+    "reviewed_snapshot_sha256": "a461f49bcc3b18426490028ee1aaf11a371d7ea1f9bc2bc5afc07dd72fa02265",
+    "scope_limit": "This is contract coherence/security review, not implementation validation, a transport design, full budget proof, owner issuance test or claim that operational readiness exists."
+  },
+  "nullable_operation_references": {
+    "fields": [
+      "process.admitted_operation_id",
+      "writer_handle.admitted_operation_id",
+      "active_operation_id"
+    ],
+    "minimum_success_poststate": "Truthfully null after materialization/compile is quiescent and compiler fully reaped. Preserve all mandatory nullable keys. Nonnull values use exact existing o-domain operation ID; do not choose null to save bytes.",
+    "nonnull_content_bytes": 17,
+    "null_json_bytes": 4
+  },
+  "operational_effects": {
+    "Docker": 0,
+    "capability_issuance": 0,
+    "controller_execution": 0,
+    "identity_generation": 0,
+    "java": 0,
+    "javac": 0,
+    "live_kernel_inspection": 0,
+    "network": 0,
+    "owner_import": 0,
+    "source_materialization": 0
+  },
+  "out_of_scope": [
+    "container_identity",
+    "workspace_generation",
+    "controller_generation",
+    "mount_identity",
+    "namespace_generation",
+    "root_identity",
+    "process/kernel identity",
+    "cgroup identity",
+    "start identity",
+    "process group identity",
+    "descriptor identity",
+    "transport/framing selection",
+    "backend-generation continuity and cleanup blocker"
+  ],
+  "overall_budget_feasibility": "UNRESOLVED",
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+  "requirement_evolution_required": false,
+  "result_meaning": "Future process-local scalar handle semantics and bounded text grammar are frozen. No owner, generator, authentication protocol, transport or operational witness is implemented.",
+  "schema_modified": false,
+  "schema_version": "synthetic_preparation_identity_encoding_contract_1_v1",
+  "security_property_matrix": [
+    {
+      "encoding": "Injective fixed-width positive integer representation with disjoint family prefixes; encoding alone cannot ensure allocation uniqueness.",
+      "enforcement": [
+        "linearizable nonwrapping reservation",
+        "collision check against reserved/live/terminal/tombstone ledger",
+        "no overwrite or reuse"
+      ],
+      "threat": "accidental collision"
+    },
+    {
+      "encoding": "Predictable by design; no protection or secrecy claim.",
+      "enforcement": [
+        "exact original object/type",
+        "owner registry",
+        "authenticated bound admission and HMAC",
+        "current eligibility/fence"
+      ],
+      "threat": "malicious caller guessing another live ID"
+    },
+    {
+      "encoding": "Never-reused spelling disambiguates history but is not freshness.",
+      "enforcement": [
+        "permanent spent/terminal/tombstone records",
+        "current observation sequence/challenge",
+        "generations and local fence",
+        "no mutation rerun on lost response"
+      ],
+      "threat": "replay of stale ID"
+    },
+    {
+      "encoding": "Process-local namespace may repeat text; spelling is not a portable capability.",
+      "enforcement": [
+        "issuing PID",
+        "original process incarnation and independent owner secret",
+        "exact original process-local registry/object",
+        "no reconstruction or fork inheritance acceptance"
+      ],
+      "threat": "cross-process copy"
+    },
+    {
+      "encoding": "Family prefix rejects mismatched classes; same class does not identify the issuer cryptographically.",
+      "enforcement": [
+        "process-incarnation reservation ledger",
+        "owner/module/phase/schema/domain/role authenticated binding",
+        "exact original upstream graph and registry"
+      ],
+      "threat": "cross-owner substitution"
+    },
+    {
+      "encoding": "Copies validate lexically; no authority claim.",
+      "enforcement": [
+        "exact type",
+        "registry original is supplied object",
+        "retained canonical payload and HMAC",
+        "original upstream graph"
+      ],
+      "threat": "same-process forged dataclass with copied scalar IDs"
+    },
+    {
+      "encoding": "No PID encoded; no cross-incarnation uniqueness claim.",
+      "enforcement": [
+        "new process-local independent secret",
+        "no old registry/object restore",
+        "original process-incarnation checks; PID equality alone insufficient"
+      ],
+      "threat": "PID reuse"
+    },
+    {
+      "encoding": "Nonwrapping namespace must persist across registry replacement.",
+      "enforcement": [
+        "permanent terminal history",
+        "no re-registration/reopen",
+        "fail closed on lost namespace continuity"
+      ],
+      "threat": "registry reuse after terminal state"
+    },
+    {
+      "encoding": "Reuse is forbidden for the whole process-incarnation namespace.",
+      "enforcement": [
+        "burned reservation retained",
+        "tombstones never recycled",
+        "exhaustion rejects issuance"
+      ],
+      "threat": "ID reuse after tombstone"
+    },
+    {
+      "encoding": "ASCII canonical text may be serialized as data only.",
+      "enforcement": [
+        "no restore/import API",
+        "exact original object and original registry",
+        "authenticated retained relation rather than deserialized fields"
+      ],
+      "threat": "serialization/reconstruction"
+    },
+    {
+      "encoding": "Identical bytes are valid correlation data.",
+      "enforcement": [
+        "no authority from JSON",
+        "authenticated retained exchange and original owner admission",
+        "exact original objects remain required"
+      ],
+      "threat": "JSON copy"
+    },
+    {
+      "encoding": "No effect; scalar spelling does not certify object type.",
+      "enforcement": [
+        "exact type comparison rather than isinstance",
+        "registry object identity"
+      ],
+      "threat": "wrapper/subclass"
+    },
+    {
+      "encoding": "IDs do not hash their contents.",
+      "enforcement": [
+        "unchanged stable fingerprint of immutable bindings",
+        "HMAC and retained canonical bytes",
+        "current mutable state authenticated separately"
+      ],
+      "threat": "immutable-binding substitution"
+    }
+  ],
+  "sources": {
+    "B": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1R/budget_witness.json",
+    "C": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+    "P": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+    "S": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+    "W": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json"
+  },
+  "stop_after_contract": true,
+  "typed_result": "SYNTH_EXEC_PREP_CONTROLLER_IDENTITY_ENCODING_CONTRACT_1_COMPLETE",
+  "validation": {
+    "all_authority_flags_false": true,
+    "all_operational_effects_zero": true,
+    "all_required_checks_passed": true,
+    "benchmark_checked": 54,
+    "benchmark_errors": 0,
+    "compiled_in_memory": 1377,
+    "created_at": "2026-10-19",
+    "finalizer_blocked_actions": [],
+    "finalizer_guard": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "focused_collected": 154,
+    "focused_passed": 154,
+    "git_diff_check_passed": true,
+    "historical_budget_proof_rerun": false,
+    "historical_files_preserved": 26991,
+    "historical_preservation_passed": true,
+    "no_owner_or_identity_generator_implemented": true,
+    "registry_baseline_vs_after_identical": true,
+    "registry_collected": 299,
+    "registry_existing_failures": 7,
+    "registry_passed": 292,
+    "typed_result": "SYNTH_EXEC_PREP_CONTROLLER_IDENTITY_ENCODING_CONTRACT_1_COMPLETE",
+    "validator_sha256": "ea967e2918d679d4bd091edd392c878a0d3f64a1ba35421c81d78b6b77568b91"
+  }
+}

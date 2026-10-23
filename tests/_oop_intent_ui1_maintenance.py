@@ -16,7 +16,9 @@ def _between(data: bytes, start: bytes, end: bytes) -> bytes:
 
 
 def before_oop_intent_ui1(relative: str, content: bytes) -> bytes:
-    data = content
+    from tests._oop_intent_design1_maintenance import before_oop_intent_design1
+
+    data = before_oop_intent_design1(relative, content)
     if relative == "web/app.py":
         data = _between(data, b'        from web.oop_intent_adapter import admit_oop_review_wait\n',
                         b'        evidence_block = (')

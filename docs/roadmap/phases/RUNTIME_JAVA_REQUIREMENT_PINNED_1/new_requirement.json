@@ -1,0 +1,33 @@
+{
+  "mode": "new_requirement",
+  "exit_code": 0,
+  "collected": 64,
+  "passed": 64,
+  "skipped": 0,
+  "failures": [],
+  "suites": {
+    "tests/test_runtime_java_requirement_pinned1.py": {
+      "passed": 64,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "test_files": [
+    "tests/test_runtime_java_requirement_pinned1.py"
+  ],
+  "pytest_arguments": [
+    "--basetemp=tmp_tests",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_REQUIREMENT_PINNED_1\\validation_temp_new_requirement_72eae0567a464452a0b5de3abd1e0b0b\\pytest",
+    "tests/test_runtime_java_requirement_pinned1.py"
+  ],
+  "real_effect_attempts": [
+    "socket.bind"
+  ],
+  "denied_attempts": {},
+  "registry_projection_plugin_used": false,
+  "elapsed_seconds": 6.425,
+  "scope": "Pure host maintenance and fabricated in-memory fixture evidence only; no operational provider discovery, Docker/Java, runtime authorization, leases, executor, or apply."
+}

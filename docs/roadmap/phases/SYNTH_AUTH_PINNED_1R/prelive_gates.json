@@ -1,0 +1,400 @@
+{
+  "all_false_authorities": {
+    "BANK_authority": false,
+    "apply_authority": false,
+    "arbitrary_class_authority": false,
+    "arbitrary_command_authority": false,
+    "arbitrary_java_authority": false,
+    "arbitrary_method_authority": false,
+    "arbitrary_source_authority": false,
+    "execution_lease_authority": false,
+    "executor_authority": false,
+    "host_mount_authority": false,
+    "network_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_execution_authority": false,
+    "repository_java_authority": false,
+    "repository_write_authority": false,
+    "runtime_execution_authority": false,
+    "shell_authority": false
+  },
+  "checks": {
+    "JSON_whitespace": true,
+    "benchmark_check": true,
+    "focused_pure_tests": true,
+    "frozen_source_identity": true,
+    "git_diff_check": true,
+    "historical_preservation": true,
+    "in_memory_compilation": true,
+    "observer_pure_tests": true,
+    "registry_picker_baseline": true
+  },
+  "expected_code_bindings": {
+    "auth": {
+      "code_sha256": "74e73f2cea1c6273d9abcfc9bbcbea66d0516c6db91c3f5f85cd025c7f59c0c2",
+      "function": "issue_pinned_synthetic_runtime_authorization",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\synthetic_runtime_authorization_pinned.py",
+      "source_sha256": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c"
+    },
+    "bind": {
+      "code_sha256": "707cb09b770bf2746bb8f8d434c26afcf7f74718df5ba7fc71efef758aeb2968",
+      "function": "_run",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandbox_backend_binding.py",
+      "source_sha256": "202cd1190494beaaf24874ac798b89a8eac276fa8361b496663a573770cdf1ed"
+    },
+    "control": {
+      "code_sha256": "91179eb6aae145763f2c5fe0b6fdf725c71b6e89c066999d1c1c34992d8943e0",
+      "function": "_bounded_process",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\candidate_runtime_sandbox.py",
+      "source_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913"
+    },
+    "export": {
+      "code_sha256": "a56f9843e0b1aa62a1399422de1c29a1c5cb3ba0e91b394f22501e15ab877bb4",
+      "function": "_export_target",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\runtime_java_pinned_target_inspection.py",
+      "source_sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59"
+    },
+    "export_read": {
+      "code_sha256": "7dd26f34d3a2fccaf4223655a6f8d28538bcce9f452046ad7119f1941d0f7e7b",
+      "function": "_CountedPipe.read",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\runtime_java_pinned_target_inspection.py",
+      "source_sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59"
+    },
+    "java_invoke": {
+      "code_sha256": "9ac4140eae368917130ad95401a014b8a8d2295d2f9fa1093d282e329c417c28",
+      "function": "_invoke",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+      "source_sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f"
+    },
+    "java_verify": {
+      "code_sha256": "37287f5920929a5b0320e2f11e659ec5f8271d4212c56e5fcbfab3ff949485bb",
+      "function": "verify",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+      "source_sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f"
+    },
+    "obtain": {
+      "code_sha256": "cf16f31d3b9a137af0cad132f6804f83a1c7fd25aa8c9b56c86502201089d753",
+      "function": "_obtain_live_sandbox2",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+      "source_sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f"
+    },
+    "pair": {
+      "code_sha256": "c8f90283178511b64bc2ff804a791bc44988c04d7dd27d7e9d66e8f12a3ef2c3",
+      "function": "_evidence_pair",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+      "source_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45"
+    },
+    "pinned1a": {
+      "code_sha256": "765cdaa7f6c005b78532fe042995dd9e77f9f77f00d09f0e197a92da65c0b420",
+      "function": "inspect_target",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\runtime_java_pinned_target_inspection.py",
+      "source_sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59"
+    },
+    "pinned1b": {
+      "code_sha256": "ff577f8b74252ebb6d730c7201f33c84d3301c54eee646a4846e8191b111b5cf",
+      "function": "issue_pinned_backend_target_binding",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\runtime_java_pinned_backend_target_binding.py",
+      "source_sha256": "94c95d674c0b43cde5811762998d13a65c3eee71c442cf05ff8699e02ec59da9"
+    },
+    "prefix": {
+      "code_sha256": "3af510c65308036b4fcb7b60b0955d5d806796cf8cd4730201146fb852cf5965",
+      "function": "_docker_prefix",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\candidate_runtime_sandbox.py",
+      "source_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913"
+    },
+    "provider": {
+      "code_sha256": "3b6ea1509b8e5fa243aa4f7e4bc7ce068963fc1dfaa082587b8890f5869d348d",
+      "function": "issue_pinned_java_exact_provider",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\runtime_java_pinned_provider.py",
+      "source_sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa"
+    },
+    "replay": {
+      "code_sha256": "25b6494fa920e52c6ac03a5dc8f32d5b3e9dc890e2b6506c7fa178894ca1370c",
+      "function": "replay",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+      "source_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45"
+    },
+    "sb_descriptor": {
+      "code_sha256": "46d856067bdcd3ec92ba36f39206cab1b0eb385441e5dd3c9c83882040cdd34e",
+      "function": "validate_descriptor",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+      "source_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45"
+    },
+    "sb_invoke": {
+      "code_sha256": "47a8edfb7e96143facb747deede1e172c07e1c1722dfb2d964ba8af05c462ede",
+      "function": "invoke",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+      "source_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45"
+    },
+    "sb_receipt": {
+      "code_sha256": "41613717c2e592b8b3fc107a7b8cbfb4f354d1a62622b291fe09ea8e00ab8af5",
+      "function": "validate_receipt",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+      "source_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45"
+    },
+    "semantic": {
+      "code_sha256": "e1232966d442787dbed0803639635a117727de28beb7a75d30cc19204c6e1115",
+      "function": "authenticate_sandbox2",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+      "source_sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f"
+    },
+    "sign": {
+      "code_sha256": "7f779373da8d336353900297b140feb06802735418d7db5ed18a4c69565e88f1",
+      "function": "_sign",
+      "source_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+      "source_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45"
+    },
+    "socket": {
+      "code_sha256": "8e6956d9e89f3cc4607d56a45971e4df68e97921fb4b0b4e1d82e2fc1df6d3f6",
+      "function": "socket.__init__",
+      "source_file": "C:\\Python314\\Lib\\socket.py",
+      "source_sha256": "cbe54d58421e90d7dcae9a18045db90d987bccc56f87ed0fc22ea718784157c2"
+    }
+  },
+  "focused_pure_tests": {
+    "audit_guard": {
+      "forbidden_process_attempts": 0,
+      "forbidden_socket_attempts": 0,
+      "forbidden_write_attempts": 0
+    },
+    "authored_whitespace_passed": true,
+    "benchmark_check_passed": true,
+    "external_output_only": true,
+    "focused_selections": {
+      "authorization": {
+        "audit_guard": {
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "collected_test_count": 7,
+        "failed_test_count": 0,
+        "passed": true,
+        "passed_test_count": 7
+      },
+      "java": {
+        "audit_guard": {
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "collected_test_count": 30,
+        "failed_test_count": 0,
+        "passed": true,
+        "passed_test_count": 30
+      },
+      "provider": {
+        "audit_guard": {
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "collected_test_count": 6,
+        "failed_test_count": 0,
+        "passed": true,
+        "passed_test_count": 6
+      },
+      "reservation": {
+        "audit_guard": {
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "collected_test_count": 45,
+        "failed_test_count": 0,
+        "passed": true,
+        "passed_test_count": 45
+      },
+      "sandbox": {
+        "audit_guard": {
+          "forbidden_process_attempts": 0,
+          "forbidden_socket_attempts": 0,
+          "forbidden_write_attempts": 0
+        },
+        "collected_test_count": 230,
+        "failed_test_count": 0,
+        "passed": true,
+        "passed_test_count": 230
+      }
+    },
+    "focused_test_count": 318,
+    "full_suite_run": false,
+    "in_memory_compilation_passed": true,
+    "live_provider_issuance": 0,
+    "mode": "summary",
+    "new_1r_observer_validation_owned_by_root": true,
+    "passed": true,
+    "registry_picker_reports_valid": true,
+    "registry_picker_test_baseline": {
+      "collected": 299,
+      "failed": 7,
+      "failure_ids": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "historical_failure_ids_preserved": true,
+      "passed": 292
+    },
+    "successful_operational_effects": 0,
+    "validation_source_sha256": "84e60800439ecab03cc7df2726955f03f84b6e5ab1bbf0b39c84a7caa4ecd81c"
+  },
+  "full_suite_run": false,
+  "historical_preservation": {
+    "changed_or_missing": [],
+    "frozen_source_bindings_checked": 359,
+    "frozen_source_drift": [],
+    "historical_file_count": 2246,
+    "live_owner_invocations": 0,
+    "original_blocked_attempt_preserved": true,
+    "passed": true,
+    "phase_id": "SYNTH.AUTH.PINNED.1R",
+    "prior_historical_baseline_integrity": [
+      {
+        "baseline_path": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/preservation_baseline.json",
+        "baseline_sha256": "064a95cadd8e31fe6ec89362447731153225d2278a7ca8ba8d9155cdb2e5c7bf",
+        "bindings_checked": 355,
+        "drift": [],
+        "passed": true
+      },
+      {
+        "baseline_path": "docs/roadmap/phases/RUNTIME_JAVA_1C_AUTH_DIAG_1/preservation_baseline.json",
+        "baseline_sha256": "3634d191c71543d564acb27f1df3a505b80358fe27d1c6b93d72549ca7b5a9f0",
+        "bindings_checked": 1828,
+        "drift": [],
+        "passed": true
+      },
+      {
+        "baseline_path": "docs/roadmap/phases/RUNTIME_SANDBOX_2_PRELADDER_DIAG_1/preservation_baseline.json",
+        "baseline_sha256": "83227b1637319ae442bef273c9e2efcefbc64ca6a2a27c3252aa0f969831aa57",
+        "bindings_checked": 2126,
+        "drift": [],
+        "passed": true
+      },
+      {
+        "baseline_path": "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/preservation_baseline.json",
+        "baseline_sha256": "52edfb503e98ef0b5ab857ae65e6d0d245a89b0be4b441bf3f8cc6ff2f806a43",
+        "bindings_checked": 2185,
+        "drift": [],
+        "passed": true
+      }
+    ],
+    "provider_effects": 0,
+    "repository_writes": 0,
+    "source_identity_unchanged": true,
+    "unexpected_new_files_outside_retry_phase": [],
+    "verifier_unchanged": true
+  },
+  "live_attempts": 0,
+  "live_provider_effects": 0,
+  "new_observer_pure_tests": {
+    "errors": [],
+    "failures": [],
+    "forbidden_effects_attempted": [],
+    "no_live_owner_issuance": true,
+    "no_subprocess_or_socket_creation": true,
+    "passed": true,
+    "runner_sha256": "7dea3b744a62531d90da5f471a12a48b32932a3c926ab2d88196ea1bc2e2a20c",
+    "test_file_sha256": "9e63cb9467f780002ed25a726effbeacd96281ce19eac44646e8aa176a5d6828",
+    "tests_run": 17
+  },
+  "passed": true,
+  "phase_id": "SYNTH.AUTH.PINNED.1R",
+  "repository_source_writes": 0,
+  "runner_sha256": "7dea3b744a62531d90da5f471a12a48b32932a3c926ab2d88196ea1bc2e2a20c",
+  "validation_bindings": [
+    {
+      "path": "observer_pure_test_results.json",
+      "sha256": "5df90f993f39741ee0ca064ae7a6618d0492ed9090796af8f22a3373a9828a8e"
+    },
+    {
+      "path": "observer_tests.py",
+      "sha256": "9e63cb9467f780002ed25a726effbeacd96281ce19eac44646e8aa176a5d6828"
+    },
+    {
+      "path": "validation/worker_summary.json",
+      "sha256": "e09ae620526de2f48eba7501dc18074ce414f59277153d33575adb7866774d6e"
+    },
+    {
+      "path": "validation/validation.py",
+      "sha256": "84e60800439ecab03cc7df2726955f03f84b6e5ab1bbf0b39c84a7caa4ecd81c"
+    },
+    {
+      "path": "identity/source_identity.json",
+      "sha256": "3672ffdf2c0d8fc5928a90d1e358f5c798b9af7810381f087f28d36e2259d709"
+    },
+    {
+      "path": "identity/preservation_baseline.json",
+      "sha256": "339f1573f969245ff23981c4ed1a4b68382390e30d0e84af2d2566aa00d8c086"
+    },
+    {
+      "path": "identity/verify_identity.py",
+      "sha256": "ccde0a64230f671332b40cd58bc2ca72172b4bb017f1cf5bb6690374a02e8f49"
+    },
+    {
+      "path": "prelive_preservation.json",
+      "sha256": "03480794a53158ca6314f839911154c4e6c405dac9d26c0bc690857dd09a2398"
+    },
+    {
+      "path": "prelive_static_checks.json",
+      "sha256": "6171eb642ab4fc1b47d6be4d065520bf077fd849ef094b165922343ca79be37e"
+    },
+    {
+      "path": "validation/worker_authorization.json",
+      "sha256": "5fd8668c24524a3bca8b8f1caf1ee1e24c8fd2047ab54754fa3389ba129189f6"
+    },
+    {
+      "path": "validation/worker_benchmark.json",
+      "sha256": "e872d11a5c1800ae19d42ef45b8a907b71617624c3f5ba0f4fc19727e10795f1"
+    },
+    {
+      "path": "validation/worker_java.json",
+      "sha256": "6e432f222914919a6f6cf82897d2f11b8706c3b0737e48d67d7eb70faf7aa34b"
+    },
+    {
+      "path": "validation/worker_provider.json",
+      "sha256": "9a74e2fe3663ae4dea659640a3b1f5fab365489e5d88432a6802406c45a7d3e6"
+    },
+    {
+      "path": "validation/worker_registry-before.json",
+      "sha256": "7d8150453caede217b7f7d710b67f6f3dde40f0dd7c672d31e00f8e63ca78141"
+    },
+    {
+      "path": "validation/worker_reports-before.json",
+      "sha256": "f2bba10ba088c7e01e627cceb587013d33f446bec15533ec6a5c820471ac1eba"
+    },
+    {
+      "path": "validation/worker_reservation.json",
+      "sha256": "b386976c05b0a69fe414bbd039ac84c4491637040c0d0433cd8f2a6f07423a7c"
+    },
+    {
+      "path": "validation/worker_sandbox.json",
+      "sha256": "ca0941d6fa0c4fd908c7857aa3e32ce8790c56275741645774ee60218ec3d608"
+    }
+  ]
+}

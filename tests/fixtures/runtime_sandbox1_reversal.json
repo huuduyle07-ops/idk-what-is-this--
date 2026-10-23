@@ -1,0 +1,30 @@
+{
+  "phase_id": "RUNTIME.SANDBOX.1",
+  "reversals": [
+    {
+      "path": "core/phase_registry.py",
+      "entry_sha256": "d987d0e646e9fd0dbb2715928abf801b7f9f91b84fac5c22bd9b030e82118a57",
+      "post_sha256": "c79dff3b6f311de61ec001ecbe5c22f2d340a8d75afaab1d50effaf03e0bcd60"
+    },
+    {
+      "path": "docs/roadmap/phase_registry.json",
+      "entry_sha256": "a9b557bfc9fe33a8e1ef421a5da3675bc852073b870f8c845e075844deddc999",
+      "post_sha256": "33334b0eed9cf0bfc55bf7484abff0766ff5d9e2afff705cd4e65b4a01c8c87a"
+    },
+    {
+      "path": "tests/test_phase_registry.py",
+      "entry_sha256": "25be3e1a3dc053805c7fde59b4589998b57e6171a2beb91c97e0396f2a1b6dd7",
+      "post_sha256": "374ef5b5f98c134bd6a42d2441f1147908343bbf7e2c2e3f8c961c8f778cfe8f"
+    },
+    {
+      "path": "tests/test_phase_picker.py",
+      "entry_sha256": "53d2c7dc65d4608162a4bc936d5e257c7ea9ff1f76db181227345849346b09d0",
+      "post_sha256": "7fb2a316cf26cbf31b0a18a5d09dafd368d0a1b4c7b2e2b6f5e8b85f88f09836"
+    },
+    {
+      "path": "tests/_patch_candidate_behavior_executor1_maintenance.py",
+      "entry_sha256": "2fe0b9cb0583c87c566e4b42850553dbcdd1d8c1864d4a64aa7b3f7bc5a66adb",
+      "post_sha256": "f51c291c48626e8b8ea1b156512d1b199622f058fafef3bad1eefdf4a1beb522"
+    }
+  ]
+}

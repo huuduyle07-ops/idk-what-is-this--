@@ -1,0 +1,701 @@
+{
+  "schema_version": 1,
+  "purpose": "Exact layout-only edits for historical source verification; not operational authorization.",
+  "files": [
+    {
+      "previous": "core/behavioral_diagnostic_executor_lifecycle_retry.py",
+      "current": "core/behavioral_diagnostic_executor_lifecycle_retry.py",
+      "before_sha256": "e3c68db9c9484b8a4d421ec5f4458679a91a5a5f84ddfd75916e5caf31a8ccc0",
+      "after_sha256": "c9a91412f70d768353041441e32d51884c57f40c6b2ce82da6af247cfd2b7721",
+      "edits": [
+        {
+          "after_start": 9,
+          "after_end": 14,
+          "before": "from core import synthetic_runtime_authorization as authorization\nfrom core import synthetic_runtime_authorization_lifecycle as runtime\nfrom core import synthetic_read_only_reflection as reflection\nfrom core import synthetic_reflection_execution_admission as admission\nfrom core import synthetic_reflection_execution_lifecycle as reflection_lifecycle\n",
+          "after": "from core.runtime.synthetic import synthetic_runtime_authorization as authorization\nfrom core.runtime.synthetic import synthetic_runtime_authorization_lifecycle as runtime\nfrom core.runtime.synthetic import synthetic_read_only_reflection as reflection\nfrom core.runtime.synthetic import synthetic_reflection_execution_admission as admission\nfrom core.runtime.synthetic import synthetic_reflection_execution_lifecycle as reflection_lifecycle\n"
+        }
+      ]
+    },
+    {
+      "previous": "core/behavioral_diagnostic_executor_retry.py",
+      "current": "core/behavioral_diagnostic_executor_retry.py",
+      "before_sha256": "faa6431a840c74baae5c98dc7e9485d05435d02e9915964cfb2b08c0db85e53d",
+      "after_sha256": "903bd5cd576e72bfd83b32740355f13e3200e2f7872c2a05bb3c1bd84276a6e4",
+      "edits": [
+        {
+          "after_start": 8,
+          "after_end": 11,
+          "before": "from core import synthetic_read_only_reflection as reflection\nfrom core import synthetic_reflection_execution_admission as admission\nfrom core import synthetic_runtime_authorization as authorization\n",
+          "after": "from core.runtime.synthetic import synthetic_read_only_reflection as reflection\nfrom core.runtime.synthetic import synthetic_reflection_execution_admission as admission\nfrom core.runtime.synthetic import synthetic_runtime_authorization as authorization\n"
+        }
+      ]
+    },
+    {
+      "previous": "core/synthetic_read_only_reflection.py",
+      "current": "core/runtime/synthetic/synthetic_read_only_reflection.py",
+      "before_sha256": "d24422b68c0eae96890a7e63a177ebc8adcbd64300bf7cfb42d3ada041a5d5bc",
+      "after_sha256": "ae01c3356a3709592ad717c44bb1ac97bc1d638cd9d428447bc674cf49e157a3",
+      "edits": [
+        {
+          "after_start": 16,
+          "after_end": 17,
+          "before": "from core import synthetic_runtime_authorization as authorization_owner\n",
+          "after": "from core.runtime.synthetic import synthetic_runtime_authorization as authorization_owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "core/synthetic_reflection_execution_admission.py",
+      "current": "core/runtime/synthetic/synthetic_reflection_execution_admission.py",
+      "before_sha256": "ae6d60d7ef418cff366317ad4507d0f2de93f2aa9d188e8e12d453c66ed77b19",
+      "after_sha256": "c1616ee6b02c3374449382c53d87d378b7137f4ecacef21a3007448925e910df",
+      "edits": [
+        {
+          "after_start": 18,
+          "after_end": 20,
+          "before": "from core import synthetic_read_only_reflection as reflection_owner\nfrom core import synthetic_runtime_authorization as authorization_owner\n",
+          "after": "from core.runtime.synthetic import synthetic_read_only_reflection as reflection_owner\nfrom core.runtime.synthetic import synthetic_runtime_authorization as authorization_owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "core/synthetic_reflection_execution_admission_pinned.py",
+      "current": "core/runtime/synthetic/synthetic_reflection_execution_admission_pinned.py",
+      "before_sha256": "974075ac1827b4013e1e8a2b236ea278e19c8be138e378bed3b70613f590aaa0",
+      "after_sha256": "0cbee0dedfbf6a83a81886dbf66a1fa80db443fc10552968696d206df7b1a5fc",
+      "edits": [
+        {
+          "after_start": 19,
+          "after_end": 22,
+          "before": "from core import synthetic_read_only_reflection as reflection_owner\nfrom core import synthetic_runtime_authorization_pinned as authorization_owner\nfrom core import synthetic_runtime_authorization_pinned_lifecycle as runtime_owner\n",
+          "after": "from core.runtime.synthetic import synthetic_read_only_reflection as reflection_owner\nfrom core.runtime.synthetic import synthetic_runtime_authorization_pinned as authorization_owner\nfrom core.runtime.synthetic import synthetic_runtime_authorization_pinned_lifecycle as runtime_owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "core/synthetic_reflection_execution_lifecycle.py",
+      "current": "core/runtime/synthetic/synthetic_reflection_execution_lifecycle.py",
+      "before_sha256": "c2b85e845f79332b83f3c17e754ba290db739e9c19378317fed16c6402e686ba",
+      "after_sha256": "1e1e1f306bcd4b5291bead4b28393168ae8fdd8018554f5a31cbbfcdd3cfeb3b",
+      "edits": [
+        {
+          "after_start": 18,
+          "after_end": 22,
+          "before": "from core import synthetic_runtime_authorization as authorization_owner\nfrom core import synthetic_runtime_authorization_lifecycle as runtime_owner\nfrom core import synthetic_read_only_reflection as request_owner\nfrom core import synthetic_reflection_execution_admission as admission_owner\n",
+          "after": "from core.runtime.synthetic import synthetic_runtime_authorization as authorization_owner\nfrom core.runtime.synthetic import synthetic_runtime_authorization_lifecycle as runtime_owner\nfrom core.runtime.synthetic import synthetic_read_only_reflection as request_owner\nfrom core.runtime.synthetic import synthetic_reflection_execution_admission as admission_owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+      "current": "core/runtime/synthetic/synthetic_reflection_execution_lifecycle_pinned.py",
+      "before_sha256": "c88d743d5820cdeb4877c4311470b745d1f8abf97a53dd4db8f93e4b1c155057",
+      "after_sha256": "51a3e94e958684b8afa72ab4e359ec7d07e7ed8c46596520832c7795050b6cb5",
+      "edits": [
+        {
+          "after_start": 20,
+          "after_end": 24,
+          "before": "from core import synthetic_read_only_reflection as reflection_owner\nfrom core import synthetic_reflection_execution_admission_pinned as admission_owner\nfrom core import synthetic_runtime_authorization_pinned as authorization_owner\nfrom core import synthetic_runtime_authorization_pinned_lifecycle as runtime_owner\n",
+          "after": "from core.runtime.synthetic import synthetic_read_only_reflection as reflection_owner\nfrom core.runtime.synthetic import synthetic_reflection_execution_admission_pinned as admission_owner\nfrom core.runtime.synthetic import synthetic_runtime_authorization_pinned as authorization_owner\nfrom core.runtime.synthetic import synthetic_runtime_authorization_pinned_lifecycle as runtime_owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "core/synthetic_runtime_authorization_lifecycle.py",
+      "current": "core/runtime/synthetic/synthetic_runtime_authorization_lifecycle.py",
+      "before_sha256": "dc7cc307a17c63cf65eea0e898015140806ca98e2614c391423c50adfd0e6029",
+      "after_sha256": "54baeb92e71fdde70ee55e17e4608217abff57203d41778ff836e36df3812740",
+      "edits": [
+        {
+          "after_start": 22,
+          "after_end": 23,
+          "before": "from core import synthetic_runtime_authorization as authorization_owner\n",
+          "after": "from core.runtime.synthetic import synthetic_runtime_authorization as authorization_owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "core/synthetic_runtime_authorization_pinned.py",
+      "current": "core/runtime/synthetic/synthetic_runtime_authorization_pinned.py",
+      "before_sha256": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c",
+      "after_sha256": "9b2af9fc204ea19aa60c197bdfeb950e78ca0a8226990661b2139bee607aa2bc",
+      "edits": [
+        {
+          "after_start": 22,
+          "after_end": 23,
+          "before": "from core import synthetic_runtime_authorization as frozen_scenario\n",
+          "after": "from core.runtime.synthetic import synthetic_runtime_authorization as frozen_scenario\n"
+        }
+      ]
+    },
+    {
+      "previous": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+      "current": "core/runtime/synthetic/synthetic_runtime_authorization_pinned_lifecycle.py",
+      "before_sha256": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4",
+      "after_sha256": "342e45ab5c5bea7ce7661cbff3dcd17cc44bf18c5866da130e6dcf3abeb5c173",
+      "edits": [
+        {
+          "after_start": 19,
+          "after_end": 20,
+          "before": "from core import synthetic_runtime_authorization_pinned as authorization_owner\n",
+          "after": "from core.runtime.synthetic import synthetic_runtime_authorization_pinned as authorization_owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "scripts/replay_synth_auth1.py",
+      "current": "scripts/replay_synth_auth1.py",
+      "before_sha256": "54e52b978f25d4d3057998287a2dd9b4169c93a20a6acd35f5d087259edb3a38",
+      "after_sha256": "50274493b2429ab64c1550ae2860a0fc09e70b89b8f856cc0760e26e9b6ffc03",
+      "edits": [
+        {
+          "after_start": 14,
+          "after_end": 15,
+          "before": "        from core.synthetic_runtime_authorization import verify\n",
+          "after": "        from core.runtime.synthetic.synthetic_runtime_authorization import verify\n"
+        }
+      ]
+    },
+    {
+      "previous": "scripts/replay_synth_auth_lifecycle1.py",
+      "current": "scripts/replay_synth_auth_lifecycle1.py",
+      "before_sha256": "3c54073fcb309b32aafc406cf817098bca7ea2fdfb12bcfd8e52d34395c33254",
+      "after_sha256": "a912aea722fa5bea962336acaa505290b77e7011a033675a70d65417f6e5f5a3",
+      "edits": [
+        {
+          "after_start": 14,
+          "after_end": 15,
+          "before": "            from core import synthetic_runtime_authorization_lifecycle as owner\n",
+          "after": "            from core.runtime.synthetic import synthetic_runtime_authorization_lifecycle as owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "scripts/replay_synth_auth_pinned1.py",
+      "current": "scripts/replay_synth_auth_pinned1.py",
+      "before_sha256": "73ac65320825f3f32726526bcb5f2aa492887ef496b06d086932903b47cfc440",
+      "after_sha256": "695db5f458e1d23251b7a386dfd706d4a9e28c801574f6ee007bd5b3eff4db4e",
+      "edits": [
+        {
+          "after_start": 11,
+          "after_end": 13,
+          "before": "",
+          "after": "\nfrom scripts.source_layout import source_path, read_preorganization_source\n"
+        },
+        {
+          "after_start": 28,
+          "after_end": 29,
+          "before": "        if sha256((ROOT / row[\"path\"]).read_bytes()).hexdigest() != row[\"sha256\"]:\n",
+          "after": "        if sha256(source_path(row[\"path\"], root=ROOT).read_bytes()).hexdigest() != row[\"sha256\"]:\n"
+        },
+        {
+          "after_start": 35,
+          "after_end": 37,
+          "before": "        path = ROOT / row[\"path\"]\n        if not path.is_file() or sha256(path.read_bytes()).hexdigest() != row[\"sha256\"]:\n",
+          "after": "        path = source_path(row[\"path\"], root=ROOT)\n        if not path.is_file() or sha256(read_preorganization_source(row[\"path\"], root=ROOT)).hexdigest() != row[\"sha256\"]:\n"
+        },
+        {
+          "after_start": 63,
+          "after_end": 64,
+          "before": "            from core import synthetic_runtime_authorization_pinned as owner\n",
+          "after": "            from core.runtime.synthetic import synthetic_runtime_authorization_pinned as owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "scripts/replay_synth_reflect1.py",
+      "current": "scripts/replay_synth_reflect1.py",
+      "before_sha256": "074d4597c1ef965db3a38a870f4ff333585d423dbe8ca8922ce2d5d4b91a8d9d",
+      "after_sha256": "1a59d5fd9c2aed9b20b5349ffcc55eaa5343b5be0723cd15e1ef7c53a9916ec2",
+      "edits": [
+        {
+          "after_start": 12,
+          "after_end": 13,
+          "before": "        from core.synthetic_read_only_reflection import verify\n",
+          "after": "        from core.runtime.synthetic.synthetic_read_only_reflection import verify\n"
+        }
+      ]
+    },
+    {
+      "previous": "scripts/replay_synth_reflect_admit1.py",
+      "current": "scripts/replay_synth_reflect_admit1.py",
+      "before_sha256": "427f9b98a3916ac104578f48139a7234d398ca541ba8ba3b5bfa0ae77e527e82",
+      "after_sha256": "202ffcb192306aff0a45793d812d271c8c70a671ea9fb6e12992db1f745cb113",
+      "edits": [
+        {
+          "after_start": 16,
+          "after_end": 17,
+          "before": "        from core.synthetic_reflection_execution_admission import verify\n",
+          "after": "        from core.runtime.synthetic.synthetic_reflection_execution_admission import verify\n"
+        }
+      ]
+    },
+    {
+      "previous": "scripts/replay_synth_reflect_lifecycle1.py",
+      "current": "scripts/replay_synth_reflect_lifecycle1.py",
+      "before_sha256": "e4137205ba4d1baca494c68e13c1af9f745043bdc31972d0544f3e059005fa2b",
+      "after_sha256": "63d9c429766e56918e9aa70990845ba40eaa7e225eb63ab6dc5c46a87d6455e6",
+      "edits": [
+        {
+          "after_start": 14,
+          "after_end": 15,
+          "before": "            from core import synthetic_reflection_execution_lifecycle as owner\n",
+          "after": "            from core.runtime.synthetic import synthetic_reflection_execution_lifecycle as owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_patch_candidate_behavior_executor1r_retry.py",
+      "current": "tests/test_patch_candidate_behavior_executor1r_retry.py",
+      "before_sha256": "8eef6bfdb7281b59312b86a30140e2155bc51c26f519a42af2ddef3b70e512ca",
+      "after_sha256": "a5cdf51c26eddbe189b2dc38ff6eed4e8b3eed496c9171a8bcb237c0f2bd6a44",
+      "edits": [
+        {
+          "after_start": 9,
+          "after_end": 12,
+          "before": "from core import synthetic_read_only_reflection as reflection\nfrom core import synthetic_reflection_execution_admission as admission\nfrom core import synthetic_runtime_authorization as authorization\n",
+          "after": "from core.runtime.synthetic import synthetic_read_only_reflection as reflection\nfrom core.runtime.synthetic import synthetic_reflection_execution_admission as admission\nfrom core.runtime.synthetic import synthetic_runtime_authorization as authorization\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_runtime_java_compat1.py",
+      "current": "tests/test_runtime_java_compat1.py",
+      "before_sha256": "7b6cf5aa66886da3db278c4266d9eaf601415fa447fcbe64b90fea0f71d5821e",
+      "after_sha256": "6e6f7fa067dc6954a1c29bf36ae0baacea4b7eeb299d556d50b2dfc0f6516268",
+      "edits": [
+        {
+          "after_start": 18,
+          "after_end": 19,
+          "before": "    from core import synthetic_runtime_authorization as auth\n",
+          "after": "    from core.runtime.synthetic import synthetic_runtime_authorization as auth\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_runtime_java_discovery_contract1.py",
+      "current": "tests/test_runtime_java_discovery_contract1.py",
+      "before_sha256": "a425f35fa163b99dcf7e673d872b289b1142302c1fb720fc87d52dbb0bea80f5",
+      "after_sha256": "61127d3594cec69bd844b9eabeae0f1c1a4ffd3b255348d14deb8125de460ec8",
+      "edits": [
+        {
+          "after_start": 13,
+          "after_end": 14,
+          "before": "    from core import synthetic_runtime_authorization as auth\n",
+          "after": "    from core.runtime.synthetic import synthetic_runtime_authorization as auth\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_runtime_java_requirement_pinned1.py",
+      "current": "tests/test_runtime_java_requirement_pinned1.py",
+      "before_sha256": "9d786697c0d957ca72ad4212fc4c9db563bbdeb9d831b7e8e41fb586da4c28cd",
+      "after_sha256": "68f30d146b757f5c092d5ba4a6ed54b506919300c7d176c910083644d3ce04fc",
+      "edits": [
+        {
+          "after_start": 17,
+          "after_end": 18,
+          "before": "    from core import synthetic_runtime_authorization as auth\n",
+          "after": "    from core.runtime.synthetic import synthetic_runtime_authorization as auth\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_read_only_reflection.py",
+      "current": "tests/runtime/synthetic/test_synthetic_read_only_reflection.py",
+      "before_sha256": "6150d924bd8def1fa0063304c1db99740553b5be7ca41743dd5636cd2e30231f",
+      "after_sha256": "c6d5c04c1c1871455204f2e5f4c25d26a7eac4c2e9191a3ddf5e5556a220faca",
+      "edits": [
+        {
+          "after_start": 12,
+          "after_end": 14,
+          "before": "from core import synthetic_read_only_reflection as reflect\nfrom core import synthetic_runtime_authorization as auth_owner\n",
+          "after": "from core.runtime.synthetic import synthetic_read_only_reflection as reflect\nfrom core.runtime.synthetic import synthetic_runtime_authorization as auth_owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_reflection_execution_admission.py",
+      "current": "tests/runtime/synthetic/test_synthetic_reflection_execution_admission.py",
+      "before_sha256": "61b259895d190a4ddc2e560b45b7e83a73aac37613de77ea6fa21f7c23d80745",
+      "after_sha256": "9ce28968e82e654934e5e9628f462ea6523f65b4860a89e33f1c09e6366fc662",
+      "edits": [
+        {
+          "after_start": 8,
+          "after_end": 11,
+          "before": "from core import synthetic_read_only_reflection as reflection\nfrom core import synthetic_reflection_execution_admission as admission_owner\nfrom core import synthetic_runtime_authorization as authorization\n",
+          "after": "from core.runtime.synthetic import synthetic_read_only_reflection as reflection\nfrom core.runtime.synthetic import synthetic_reflection_execution_admission as admission_owner\nfrom core.runtime.synthetic import synthetic_runtime_authorization as authorization\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_reflection_execution_admission_pinned.py",
+      "current": "tests/runtime/synthetic/test_synthetic_reflection_execution_admission_pinned.py",
+      "before_sha256": "273cc6b81f7d79277fe89d249931863f70d8d7d6a3ce9c1e4a1ea3dead95d4da",
+      "after_sha256": "367227a59e81491da68338836a4711651bcbec316b8d8863ec9382b70f9c400c",
+      "edits": [
+        {
+          "after_start": 31,
+          "after_end": 38,
+          "before": "    from core import synthetic_read_only_reflection as production_request\n    from core import synthetic_runtime_authorization as old_authorization\n    from core import synthetic_runtime_authorization_lifecycle as old_runtime\n    from core import synthetic_reflection_execution_admission as old_admission\n    from core import synthetic_reflection_execution_lifecycle as old_reflection\n    from core import synthetic_runtime_authorization_pinned as production_auth\n    from core import synthetic_runtime_authorization_pinned_lifecycle as production_runtime\n",
+          "after": "    from core.runtime.synthetic import synthetic_read_only_reflection as production_request\n    from core.runtime.synthetic import synthetic_runtime_authorization as old_authorization\n    from core.runtime.synthetic import synthetic_runtime_authorization_lifecycle as old_runtime\n    from core.runtime.synthetic import synthetic_reflection_execution_admission as old_admission\n    from core.runtime.synthetic import synthetic_reflection_execution_lifecycle as old_reflection\n    from core.runtime.synthetic import synthetic_runtime_authorization_pinned as production_auth\n    from core.runtime.synthetic import synthetic_runtime_authorization_pinned_lifecycle as production_runtime\n"
+        },
+        {
+          "after_start": 40,
+          "after_end": 45,
+          "before": "ROOT = Path(__file__).resolve().parents[1]\nOWNER_PATH = ROOT / \"core/synthetic_reflection_execution_admission_pinned.py\"\nREQUEST_PATH = ROOT / \"core/synthetic_read_only_reflection.py\"\nAUTH_PATH = ROOT / \"core/synthetic_runtime_authorization_pinned.py\"\nRUNTIME_PATH = ROOT / \"core/synthetic_runtime_authorization_pinned_lifecycle.py\"\n",
+          "after": "ROOT = Path(__file__).resolve().parents[3]\nOWNER_PATH = ROOT / \"core/runtime/synthetic/synthetic_reflection_execution_admission_pinned.py\"\nREQUEST_PATH = ROOT / \"core/runtime/synthetic/synthetic_read_only_reflection.py\"\nAUTH_PATH = ROOT / \"core/runtime/synthetic/synthetic_runtime_authorization_pinned.py\"\nRUNTIME_PATH = ROOT / \"core/runtime/synthetic/synthetic_runtime_authorization_pinned_lifecycle.py\"\n"
+        },
+        {
+          "after_start": 74,
+          "after_end": 76,
+          "before": "        ROOT / \"core/synthetic_reflection_execution_admission.py\",\n        ROOT / \"core/synthetic_reflection_execution_lifecycle.py\")\n",
+          "after": "        ROOT / \"core/runtime/synthetic/synthetic_reflection_execution_admission.py\",\n        ROOT / \"core/runtime/synthetic/synthetic_reflection_execution_lifecycle.py\")\n"
+        },
+        {
+          "after_start": 79,
+          "after_end": 80,
+          "before": "            \"core.synthetic_reflection_execution_admission_pinned\")\n",
+          "after": "            \"core.runtime.synthetic.synthetic_reflection_execution_admission_pinned\")\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_reflection_execution_lifecycle.py",
+      "current": "tests/runtime/synthetic/test_synthetic_reflection_execution_lifecycle.py",
+      "before_sha256": "3f9cdd5c457c18651049c1f885877d395f767cf2d74505dc5548ff3d9e815b79",
+      "after_sha256": "b61c5966cd7f68ea1e131c27c51a68305c23bb920de9a78f4d43555c3d3380b0",
+      "edits": [
+        {
+          "after_start": 16,
+          "after_end": 17,
+          "before": "    from core import synthetic_reflection_execution_lifecycle as owner\n",
+          "after": "    from core.runtime.synthetic import synthetic_reflection_execution_lifecycle as owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_reflection_execution_lifecycle_pinned.py",
+      "current": "tests/runtime/synthetic/test_synthetic_reflection_execution_lifecycle_pinned.py",
+      "before_sha256": "82714e7beb22b4ebec50305a6617e59075ca6fd28b83ab0f80d9dc14547d67b5",
+      "after_sha256": "174bd981d96fea7d8fcc6af13f8a21ba050ae874c6a5daa64ed5f4ac96eb87a0",
+      "edits": [
+        {
+          "after_start": 96,
+          "after_end": 104,
+          "before": "    from core import synthetic_read_only_reflection as production_request\n    from core import synthetic_runtime_authorization as old_authorization\n    from core import synthetic_runtime_authorization_lifecycle as old_runtime\n    from core import synthetic_reflection_execution_admission as old_admission\n    from core import synthetic_reflection_execution_lifecycle as old_reflection\n    from core import synthetic_runtime_authorization_pinned as production_auth\n    from core import synthetic_runtime_authorization_pinned_lifecycle as production_runtime\n    from core import synthetic_reflection_execution_admission_pinned as production_admission\n",
+          "after": "    from core.runtime.synthetic import synthetic_read_only_reflection as production_request\n    from core.runtime.synthetic import synthetic_runtime_authorization as old_authorization\n    from core.runtime.synthetic import synthetic_runtime_authorization_lifecycle as old_runtime\n    from core.runtime.synthetic import synthetic_reflection_execution_admission as old_admission\n    from core.runtime.synthetic import synthetic_reflection_execution_lifecycle as old_reflection\n    from core.runtime.synthetic import synthetic_runtime_authorization_pinned as production_auth\n    from core.runtime.synthetic import synthetic_runtime_authorization_pinned_lifecycle as production_runtime\n    from core.runtime.synthetic import synthetic_reflection_execution_admission_pinned as production_admission\n"
+        },
+        {
+          "after_start": 106,
+          "after_end": 112,
+          "before": "ROOT = Path(__file__).resolve().parents[1]\nOWNER_PATH = ROOT / \"core/synthetic_reflection_execution_lifecycle_pinned.py\"\nREQUEST_PATH = ROOT / \"core/synthetic_read_only_reflection.py\"\nAUTH_PATH = ROOT / \"core/synthetic_runtime_authorization_pinned.py\"\nRUNTIME_PATH = ROOT / \"core/synthetic_runtime_authorization_pinned_lifecycle.py\"\nADMISSION_PATH = ROOT / \"core/synthetic_reflection_execution_admission_pinned.py\"\n",
+          "after": "ROOT = Path(__file__).resolve().parents[3]\nOWNER_PATH = ROOT / \"core/runtime/synthetic/synthetic_reflection_execution_lifecycle_pinned.py\"\nREQUEST_PATH = ROOT / \"core/runtime/synthetic/synthetic_read_only_reflection.py\"\nAUTH_PATH = ROOT / \"core/runtime/synthetic/synthetic_runtime_authorization_pinned.py\"\nRUNTIME_PATH = ROOT / \"core/runtime/synthetic/synthetic_runtime_authorization_pinned_lifecycle.py\"\nADMISSION_PATH = ROOT / \"core/runtime/synthetic/synthetic_reflection_execution_admission_pinned.py\"\n"
+        },
+        {
+          "after_start": 155,
+          "after_end": 157,
+          "before": "        ROOT / \"core/synthetic_reflection_execution_admission.py\",\n        ROOT / \"core/synthetic_reflection_execution_lifecycle.py\")\n",
+          "after": "        ROOT / \"core/runtime/synthetic/synthetic_reflection_execution_admission.py\",\n        ROOT / \"core/runtime/synthetic/synthetic_reflection_execution_lifecycle.py\")\n"
+        },
+        {
+          "after_start": 160,
+          "after_end": 161,
+          "before": "            \"core.synthetic_reflection_execution_lifecycle_pinned\")\n",
+          "after": "            \"core.runtime.synthetic.synthetic_reflection_execution_lifecycle_pinned\")\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_reflection_lifecycle_pinned_compat.py",
+      "current": "tests/runtime/synthetic/test_synthetic_reflection_lifecycle_pinned_compat.py",
+      "before_sha256": "86489cd4eef9c5fa2015382be733dc719460cf126c7a18f5caba47d29b5f843f",
+      "after_sha256": "8388b39c345a509b910b7f3918d9bc2bfa984eccfaa05dbf28d6845687cc647c",
+      "edits": [
+        {
+          "after_start": 22,
+          "after_end": 29,
+          "before": "    from core import synthetic_runtime_authorization as old_auth\n    from core import synthetic_runtime_authorization_lifecycle as old_runtime\n    from core import synthetic_runtime_authorization_pinned as pinned_auth\n    from core import synthetic_runtime_authorization_pinned_lifecycle as pinned_runtime\n    from core import synthetic_read_only_reflection as primitive\n    from core import synthetic_reflection_execution_admission as admission\n    from core import synthetic_reflection_execution_lifecycle as reflection\n",
+          "after": "    from core.runtime.synthetic import synthetic_runtime_authorization as old_auth\n    from core.runtime.synthetic import synthetic_runtime_authorization_lifecycle as old_runtime\n    from core.runtime.synthetic import synthetic_runtime_authorization_pinned as pinned_auth\n    from core.runtime.synthetic import synthetic_runtime_authorization_pinned_lifecycle as pinned_runtime\n    from core.runtime.synthetic import synthetic_read_only_reflection as primitive\n    from core.runtime.synthetic import synthetic_reflection_execution_admission as admission\n    from core.runtime.synthetic import synthetic_reflection_execution_lifecycle as reflection\n"
+        },
+        {
+          "after_start": 31,
+          "after_end": 32,
+          "before": "ROOT = Path(__file__).resolve().parents[1]\n",
+          "after": "ROOT = Path(__file__).resolve().parents[3]\n"
+        },
+        {
+          "after_start": 343,
+          "after_end": 344,
+          "before": "    tree = ast.parse((ROOT / \"tests/test_synthetic_runtime_authorization_pinned_lifecycle.py\").read_text(encoding=\"utf-8\"))\n",
+          "after": "    tree = ast.parse((ROOT / \"tests/runtime/synthetic/test_synthetic_runtime_authorization_pinned_lifecycle.py\").read_text(encoding=\"utf-8\"))\n"
+        },
+        {
+          "after_start": 347,
+          "after_end": 348,
+          "before": "    frozen_test = ast.parse((ROOT / \"tests/test_synthetic_reflection_execution_lifecycle.py\").read_text(encoding=\"utf-8\"))\n",
+          "after": "    frozen_test = ast.parse((ROOT / \"tests/runtime/synthetic/test_synthetic_reflection_execution_lifecycle.py\").read_text(encoding=\"utf-8\"))\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_reflection_pinned_contract.py",
+      "current": "tests/runtime/synthetic/test_synthetic_reflection_pinned_contract.py",
+      "before_sha256": "810733a3232fbe4afa24b67d99fdf547bb46d0140021b92a90450d13eeb7d63c",
+      "after_sha256": "6dd8ec504132e63885279825b9e92b93c066288a6bf969e399724ee0ca862ad9",
+      "edits": [
+        {
+          "after_start": 15,
+          "after_end": 16,
+          "before": "",
+          "after": "from scripts.source_layout import previous_path, read_preorganization_source, source_path\n"
+        },
+        {
+          "after_start": 17,
+          "after_end": 19,
+          "before": "ROOT = Path(__file__).resolve().parents[1]\n",
+          "after": "\nROOT = Path(__file__).resolve().parents[3]\n"
+        },
+        {
+          "after_start": 23,
+          "after_end": 30,
+          "before": "PRIMITIVE = \"core/synthetic_read_only_reflection.py\"\nOLD_AUTH = \"core/synthetic_runtime_authorization.py\"\nOLD_RUNTIME = \"core/synthetic_runtime_authorization_lifecycle.py\"\nPINNED_AUTH = \"core/synthetic_runtime_authorization_pinned.py\"\nPINNED_RUNTIME = \"core/synthetic_runtime_authorization_pinned_lifecycle.py\"\nOLD_ADMISSION = \"core/synthetic_reflection_execution_admission.py\"\nOLD_REFLECTION = \"core/synthetic_reflection_execution_lifecycle.py\"\n",
+          "after": "PRIMITIVE = \"core/runtime/synthetic/synthetic_read_only_reflection.py\"\nOLD_AUTH = \"core/runtime/synthetic/synthetic_runtime_authorization.py\"\nOLD_RUNTIME = \"core/runtime/synthetic/synthetic_runtime_authorization_lifecycle.py\"\nPINNED_AUTH = \"core/runtime/synthetic/synthetic_runtime_authorization_pinned.py\"\nPINNED_RUNTIME = \"core/runtime/synthetic/synthetic_runtime_authorization_pinned_lifecycle.py\"\nOLD_ADMISSION = \"core/runtime/synthetic/synthetic_reflection_execution_admission.py\"\nOLD_REFLECTION = \"core/runtime/synthetic/synthetic_reflection_execution_lifecycle.py\"\n"
+        },
+        {
+          "after_start": 75,
+          "after_end": 76,
+          "before": "    tree = _tree(\"tests/test_synthetic_reflection_pinned_contract.py\")\n",
+          "after": "    tree = _tree(\"tests/runtime/synthetic/test_synthetic_reflection_pinned_contract.py\")\n"
+        },
+        {
+          "after_start": 80,
+          "after_end": 81,
+          "before": "    assert roots == {\"__future__\", \"ast\", \"hashlib\", \"itertools\", \"json\", \"pathlib\", \"pytest\"}\n",
+          "after": "    assert roots == {\"__future__\", \"ast\", \"hashlib\", \"itertools\", \"json\", \"pathlib\", \"pytest\", \"scripts\"}\n"
+        },
+        {
+          "after_start": 102,
+          "after_end": 103,
+          "before": "        assert owner[\"owner_identity\"] != old_path.removesuffix(\".py\").replace(\"/\", \".\")\n",
+          "after": "        assert owner[\"owner_identity\"] != previous_path(old_path).removesuffix(\".py\").replace(\"/\", \".\")\n"
+        },
+        {
+          "after_start": 107,
+          "after_end": 108,
+          "before": "        assert not (ROOT / (owner[\"owner_identity\"].replace(\".\", \"/\") + \".py\")).exists()\n",
+          "after": "        assert not source_path(owner[\"owner_identity\"].replace(\".\", \"/\") + \".py\").exists()\n"
+        },
+        {
+          "after_start": 591,
+          "after_end": 592,
+          "before": "        \"tests/test_synthetic_reflection_lifecycle_pinned_compat.py\")\n",
+          "after": "        \"tests/runtime/synthetic/test_synthetic_reflection_lifecycle_pinned_compat.py\")\n"
+        },
+        {
+          "after_start": 593,
+          "after_end": 595,
+          "before": "        content = (ROOT / path).read_bytes()\n",
+          "after": "        content = read_preorganization_source(path)\n        path = previous_path(path)\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_runtime_authorization.py",
+      "current": "tests/runtime/synthetic/test_synthetic_runtime_authorization.py",
+      "before_sha256": "9109efb7e070dcb3928da6d64e97418a87f6ee856bd9e0230004034fd089bc8b",
+      "after_sha256": "a13c07c55d29dcf5acafe315d02ee5b225c08b2cd6012aa7d3b3ef664716ba10",
+      "edits": [
+        {
+          "after_start": 11,
+          "after_end": 12,
+          "before": "from core import synthetic_runtime_authorization as synth\n",
+          "after": "from core.runtime.synthetic import synthetic_runtime_authorization as synth\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_runtime_authorization_lifecycle.py",
+      "current": "tests/runtime/synthetic/test_synthetic_runtime_authorization_lifecycle.py",
+      "before_sha256": "52b006011ad3f7bf9a0d301b6cf9f6f3fc2f6d8cdaae42093b23f7521c9268c1",
+      "after_sha256": "ef3ad410c4f0ea5ca60d88111facff4a5d01116bc45da746cf00ea2d28f76e8a",
+      "edits": [
+        {
+          "after_start": 18,
+          "after_end": 20,
+          "before": "    from core import synthetic_runtime_authorization as upstream\n    from core import synthetic_runtime_authorization_lifecycle as owner\n",
+          "after": "    from core.runtime.synthetic import synthetic_runtime_authorization as upstream\n    from core.runtime.synthetic import synthetic_runtime_authorization_lifecycle as owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_runtime_authorization_lifecycle_pinned_compat.py",
+      "current": "tests/runtime/synthetic/test_synthetic_runtime_authorization_lifecycle_pinned_compat.py",
+      "before_sha256": "f3bec4a7c26ff1cad99913cf10198cdde7399372ac68ed6c9ad24c56fca7ef7e",
+      "after_sha256": "ecd791288c2920c925b1b928ac2f25e204c07505296682945f75bc1557518ab4",
+      "edits": [
+        {
+          "after_start": 19,
+          "after_end": 23,
+          "before": "    from core import synthetic_runtime_authorization as old\n    from core import synthetic_runtime_authorization_pinned as pinned\n    from core import synthetic_runtime_authorization_lifecycle as lifecycle\n    from core import synthetic_reflection_execution_lifecycle as reflection\n",
+          "after": "    from core.runtime.synthetic import synthetic_runtime_authorization as old\n    from core.runtime.synthetic import synthetic_runtime_authorization_pinned as pinned\n    from core.runtime.synthetic import synthetic_runtime_authorization_lifecycle as lifecycle\n    from core.runtime.synthetic import synthetic_reflection_execution_lifecycle as reflection\n"
+        },
+        {
+          "after_start": 25,
+          "after_end": 26,
+          "before": "ROOT = Path(__file__).resolve().parents[1]\n",
+          "after": "ROOT = Path(__file__).resolve().parents[3]\n"
+        },
+        {
+          "after_start": 183,
+          "after_end": 184,
+          "before": "    tree = ast.parse((ROOT / \"tests/test_synthetic_reflection_execution_lifecycle.py\").read_text(encoding=\"utf-8\"))\n",
+          "after": "    tree = ast.parse((ROOT / \"tests/runtime/synthetic/test_synthetic_reflection_execution_lifecycle.py\").read_text(encoding=\"utf-8\"))\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_runtime_authorization_lifecycle_pinned_contract.py",
+      "current": "tests/runtime/synthetic/test_synthetic_runtime_authorization_lifecycle_pinned_contract.py",
+      "before_sha256": "144a9251adaec2d0e0e2889fba90efe05ad8c6187a30cb2fee91a2f4067de503",
+      "after_sha256": "ba6ca73a9905a177f4f235a39035426b37c83266697438df43d2bdf060ab9536",
+      "edits": [
+        {
+          "after_start": 18,
+          "after_end": 20,
+          "before": "",
+          "after": "from scripts.source_layout import previous_path, read_preorganization_source, source_path\n\n"
+        },
+        {
+          "after_start": 21,
+          "after_end": 22,
+          "before": "from tests import test_synthetic_runtime_authorization_lifecycle_pinned_compat as compat\n",
+          "after": "from tests.runtime.synthetic import test_synthetic_runtime_authorization_lifecycle_pinned_compat as compat\n"
+        },
+        {
+          "after_start": 24,
+          "after_end": 25,
+          "before": "ROOT = Path(__file__).resolve().parents[1]\n",
+          "after": "ROOT = Path(__file__).resolve().parents[3]\n"
+        },
+        {
+          "after_start": 64,
+          "after_end": 65,
+          "before": "    assert not (ROOT / (owner[\"owner_identity\"].replace(\".\", \"/\") + \".py\")).exists()\n",
+          "after": "    assert not source_path(owner[\"owner_identity\"].replace(\".\", \"/\") + \".py\").exists()\n"
+        },
+        {
+          "after_start": 75,
+          "after_end": 76,
+          "before": "    assert upstream[\"mandatory_public_validator\"] == pinned.__name__ + \".validate_pinned_synthetic_runtime_authorization\"\n",
+          "after": "    assert upstream[\"mandatory_public_validator\"] == pinned.OWNER_ID + \".validate_pinned_synthetic_runtime_authorization\"\n"
+        },
+        {
+          "after_start": 122,
+          "after_end": 123,
+          "before": "    assert CONTRACT[\"scenario\"][\"source_owner\"] == old.__name__\n",
+          "after": "    assert CONTRACT[\"scenario\"][\"source_owner\"] == \"core.synthetic_runtime_authorization\"\n"
+        },
+        {
+          "after_start": 331,
+          "after_end": 332,
+          "before": "    admission = _function(\"core/synthetic_reflection_execution_admission.py\", \"_validate_upstream_pair\")\n",
+          "after": "    admission = _function(\"core/runtime/synthetic/synthetic_reflection_execution_admission.py\", \"_validate_upstream_pair\")\n"
+        },
+        {
+          "after_start": 351,
+          "after_end": 354,
+          "before": "    names = [\"core/synthetic_runtime_authorization.py\", \"core/synthetic_runtime_authorization_pinned.py\",\n        \"core/synthetic_runtime_authorization_lifecycle.py\", \"core/synthetic_read_only_reflection.py\",\n        \"core/synthetic_reflection_execution_admission.py\", \"core/synthetic_reflection_execution_lifecycle.py\",\n",
+          "after": "    names = [\"core/runtime/synthetic/synthetic_runtime_authorization.py\", \"core/runtime/synthetic/synthetic_runtime_authorization_pinned.py\",\n        \"core/runtime/synthetic/synthetic_runtime_authorization_lifecycle.py\", \"core/runtime/synthetic/synthetic_read_only_reflection.py\",\n        \"core/runtime/synthetic/synthetic_reflection_execution_admission.py\", \"core/runtime/synthetic/synthetic_reflection_execution_lifecycle.py\",\n"
+        },
+        {
+          "after_start": 357,
+          "after_end": 359,
+          "before": "        content = (ROOT / name).read_bytes()\n",
+          "after": "        content = read_preorganization_source(name)\n        name = previous_path(name)\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_runtime_authorization_pinned.py",
+      "current": "tests/runtime/synthetic/test_synthetic_runtime_authorization_pinned.py",
+      "before_sha256": "21d86d06d8210c0aba66ba173d222acc3bc70845d0271d554e8ec8420ae51657",
+      "after_sha256": "b70b9c9fad8cf9aaba32d09a2c54e14e3db45a8c1d20ff2bbd10db92c089e560",
+      "edits": [
+        {
+          "after_start": 20,
+          "after_end": 24,
+          "before": "    from core import synthetic_runtime_authorization_pinned as owner\n    from core import synthetic_runtime_authorization as historical\n    from core import synthetic_runtime_authorization_lifecycle as lifecycle\n    from core import synthetic_read_only_reflection as reflection\n",
+          "after": "    from core.runtime.synthetic import synthetic_runtime_authorization_pinned as owner\n    from core.runtime.synthetic import synthetic_runtime_authorization as historical\n    from core.runtime.synthetic import synthetic_runtime_authorization_lifecycle as lifecycle\n    from core.runtime.synthetic import synthetic_read_only_reflection as reflection\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_runtime_authorization_pinned_lifecycle.py",
+      "current": "tests/runtime/synthetic/test_synthetic_runtime_authorization_pinned_lifecycle.py",
+      "before_sha256": "fd5025dec5782363bacae14c48683dfd997cbc09789dbe0682fd16167920a30d",
+      "after_sha256": "a6ba572f1a6d6642ac63d3be01f759c19bc5044ad1112aa65ab6ae89898be12f",
+      "edits": [
+        {
+          "after_start": 28,
+          "after_end": 33,
+          "before": "    from core import synthetic_runtime_authorization as old_authorization\n    from core import synthetic_runtime_authorization_lifecycle as old_lifecycle\n    from core import synthetic_runtime_authorization_pinned as production_upstream\n    from core import synthetic_runtime_authorization_pinned_lifecycle as production_owner\n    from core import synthetic_reflection_execution_lifecycle as reflection\n",
+          "after": "    from core.runtime.synthetic import synthetic_runtime_authorization as old_authorization\n    from core.runtime.synthetic import synthetic_runtime_authorization_lifecycle as old_lifecycle\n    from core.runtime.synthetic import synthetic_runtime_authorization_pinned as production_upstream\n    from core.runtime.synthetic import synthetic_runtime_authorization_pinned_lifecycle as production_owner\n    from core.runtime.synthetic import synthetic_reflection_execution_lifecycle as reflection\n"
+        },
+        {
+          "after_start": 35,
+          "after_end": 38,
+          "before": "ROOT = Path(__file__).resolve().parents[1]\nOWNER_PATH = ROOT / \"core/synthetic_runtime_authorization_pinned_lifecycle.py\"\nUPSTREAM_PATH = ROOT / \"core/synthetic_runtime_authorization_pinned.py\"\n",
+          "after": "ROOT = Path(__file__).resolve().parents[3]\nOWNER_PATH = ROOT / \"core/runtime/synthetic/synthetic_runtime_authorization_pinned_lifecycle.py\"\nUPSTREAM_PATH = ROOT / \"core/runtime/synthetic/synthetic_runtime_authorization_pinned.py\"\n"
+        }
+      ]
+    },
+    {
+      "previous": "tests/test_synthetic_runtime_authorization_pinned_replay.py",
+      "current": "tests/runtime/synthetic/test_synthetic_runtime_authorization_pinned_replay.py",
+      "before_sha256": "910bb7f7f6ff245c0c8aa9742d90fabfda4338604920bd0684f95738bfa36538",
+      "after_sha256": "9c52ed36d444b2e919dfb18c945d89c3831931b7029791dcf76b67ba5f3c3661",
+      "edits": [
+        {
+          "after_start": 18,
+          "after_end": 19,
+          "before": "    from core import synthetic_runtime_authorization_pinned as owner\n",
+          "after": "    from core.runtime.synthetic import synthetic_runtime_authorization_pinned as owner\n"
+        }
+      ]
+    },
+    {
+      "previous": "core/synthetic_runtime_authorization.py",
+      "current": "core/runtime/synthetic/synthetic_runtime_authorization.py",
+      "before_sha256": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88",
+      "after_sha256": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88",
+      "edits": []
+    },
+    {
+      "previous": "scripts/replay_runtime_java_compat1.py",
+      "current": "scripts/replay_runtime_java_compat1.py",
+      "before_sha256": "f4374a9dfb9b1242e9c1c4929d23c2370b6c5f3ebb34ae04ac2c067a80d153de",
+      "after_sha256": "9006c7674fda9b929b60cd30d3429a94aa3520de5520f70da9e6a8b7bffe603f",
+      "edits": [
+        {
+          "after_start": 11,
+          "after_end": 13,
+          "before": "",
+          "after": "\nfrom scripts.source_layout import read_preorganization_source\n"
+        },
+        {
+          "after_start": 43,
+          "after_end": 45,
+          "before": "                    \"core.synthetic_runtime_authorization_lifecycle.consume_synthetic_runtime_execution_lease\",\n                    \"core.synthetic_reflection_execution_lifecycle.consume_synthetic_reflection_execution_lease\"):\n",
+          "after": "                    \"core.runtime.synthetic.synthetic_runtime_authorization_lifecycle.consume_synthetic_runtime_execution_lease\",\n                    \"core.runtime.synthetic.synthetic_reflection_execution_lifecycle.consume_synthetic_reflection_execution_lease\"):\n"
+        },
+        {
+          "after_start": 48,
+          "after_end": 49,
+          "before": "            observed = {name: sha256((ROOT / name).read_bytes()).hexdigest()\n",
+          "after": "            observed = {name: sha256(read_preorganization_source(name)).hexdigest()\n"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1020 @@
+{
+  "JAVA1C_source_changed": false,
+  "SANDBOX2_source_changed": false,
+  "SANDBOX2_status": "RUNTIME_SANDBOX_2_BLOCKED_UNRESOLVED",
+  "SYNTH_authorization_retried": false,
+  "all_authority_fields": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "host_mount_authority": false,
+    "network_authority": false,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "shell_available": false
+  },
+  "classification": "SEMANTIC_ELIGIBILITY_FAILURE",
+  "cleanup": {
+    "SANDBOX2_cleanup_verified": false,
+    "all_host_control_pipes_closed": true,
+    "all_host_controls_reaped": true,
+    "all_private_config_paths_absent": true,
+    "in_attempt_remaining_phase_containers": null,
+    "independent_final_cleanup_verified": true,
+    "independent_post_attempt_phase_container_observation": {
+      "count": 0,
+      "exit_code": 0,
+      "names": [],
+      "stderr": ""
+    },
+    "observer_restored": true,
+    "owner_cleanup_proof_status": "UNAVAILABLE_DOCKER_PIPE_PERMISSION_DENIED",
+    "owner_cleanup_verified": false,
+    "passed": true,
+    "post_observation_controls_reaped_and_pipes_closed": true,
+    "post_observation_private_config_paths_absent": true,
+    "private_config_paths": [
+      {
+        "absent_after": true,
+        "absent_at_generation": true,
+        "path": "C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{ec947724-d301-4a47-a8a5-da1d669e0072}\\AC\\Temp\\runtime-sandbox1-no-config-77e1b68c0512dc6390c795e87ff61ec4"
+      },
+      {
+        "absent_after": true,
+        "absent_at_generation": true,
+        "path": "C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{ec947724-d301-4a47-a8a5-da1d669e0072}\\AC\\Temp\\runtime-sandbox1-no-config-322dc8609942a6eb0833afad2a05401e"
+      }
+    ],
+    "remaining_phase_containers": 0,
+    "surviving_host_readers": 0,
+    "temporary_workspace_removed": true,
+    "temporary_workspaces": []
+  },
+  "cleanup_failure_separate_from_diagnosis": false,
+  "demonstrated_HMAC_failure": false,
+  "diagnostic_errors": [],
+  "diagnostic_execution_context_limit": {
+    "attribution": "The permitted standalone attempt was obstructed before SANDBOX.2 ladder creation. A separate read-only observation demonstrated Docker pipe permission denial in the restricted execution context; the host observation reached the exact expected image. The original control stderr was not retained, so the permission-denial attribution is corroborating follow-up evidence, not a verbatim in-attempt stderr measurement.",
+    "historical_limit": "The frozen nested attempt recorded successful exact-image inspection, unlike this restricted standalone attempt. Its SANDBOX.2 pre-ladder metadata/workspace/socket failure remains unresolved because its live report and pair were not retained. Do not attribute it to this new permission denial.",
+    "historical_nested_deeper_cause_established": false,
+    "observed_in_attempt_exact_image_inspect_exit_code": 1,
+    "original_control_stderr_retained": false,
+    "post_host_exact_image_metadata": {
+      "Architecture": "amd64",
+      "Id": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+      "Os": "linux",
+      "Volumes": null
+    },
+    "restricted_post_observation_error": "permission denied while trying to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine\n",
+    "second_standalone_owner_invocation": false,
+    "standalone_context": "Restricted tool process, with no preexisting profiler/tracer/monitoring."
+  },
+  "diagnostic_only": true,
+  "first_failed_SANDBOX2_stage": null,
+  "first_failing_predicate": "descriptor_status_complete",
+  "forbidden_owner_calls_observed": [],
+  "fresh_SANDBOX2_pair": {
+    "HMAC_results": {
+      "descriptor": true,
+      "receipt": true
+    },
+    "demonstrated_HMAC_failure": false,
+    "descriptor": {
+      "exact_type": "core.thread_compatible_runtime_sandbox.ThreadCompatibleSandboxDescriptor",
+      "issuing_pid_exposed": null,
+      "object_id_decimal": 1744924142656,
+      "object_id_hex": "0x19645956c40",
+      "signed_public_fields": {
+        "apply_authority": false,
+        "arbitrary_command_authority": false,
+        "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+        "eligible_for_java1_continuation": false,
+        "host_mount_authority": false,
+        "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+        "network_authority": false,
+        "phase_id": "RUNTIME.SANDBOX.2",
+        "relationship": "additive_epoch_preserving_SANDBOX_1_history",
+        "repository_write_authority": false,
+        "runtime_authority": false,
+        "sandbox_descriptor_fingerprint": "edd9ba704304d997dd2ab3db61c6761132de3a4c36e458c5d2df3dab1d949ba6",
+        "schema_version": "runtime_sandbox_2_v1",
+        "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+        "shell_available": false,
+        "status": "RUNTIME_SANDBOX_2_BLOCKED_UNRESOLVED",
+        "verification_receipt_fingerprint": "67aab975dd09eed2968975df1358c8f98188f17a2a0b8d323afc1d07b29b2d1b"
+      }
+    },
+    "observed_pid": 14420,
+    "public_validators": {
+      "JAVA1C_semantic_gate": {
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "result": "FAIL"
+      },
+      "descriptor_and_pair": {
+        "result": "PASS"
+      },
+      "receipt": {
+        "result": "PASS"
+      }
+    },
+    "receipt": {
+      "exact_type": "core.thread_compatible_runtime_sandbox.ThreadCompatibleSandboxReceipt",
+      "issuing_pid_exposed": null,
+      "object_id_decimal": 1744937358480,
+      "object_id_hex": "0x196465f1490",
+      "signed_public_fields": {
+        "apply_authority": false,
+        "arbitrary_command_authority": false,
+        "authority": "infrastructure_compatibility_measurement_only",
+        "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+        "baseline_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+        "baseline_seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+        "cleanup_verified": false,
+        "compatibility_classification": "blocked_no_java_capability",
+        "evidence_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "host_mount_authority": false,
+        "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+        "network_authority": false,
+        "phase_id": "RUNTIME.SANDBOX.2",
+        "repository_write_authority": false,
+        "runtime_authority": false,
+        "schema_version": "runtime_sandbox_2_v1",
+        "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+        "shell_available": false,
+        "stage_results": [],
+        "status": "RUNTIME_SANDBOX_2_BLOCKED_UNRESOLVED",
+        "verification_receipt_fingerprint": "67aab975dd09eed2968975df1358c8f98188f17a2a0b8d323afc1d07b29b2d1b"
+      }
+    },
+    "registry_membership": "NOT_APPLICABLE:no registry in frozen owner",
+    "semantic_eligibility": false
+  },
+  "historical_preservation": {
+    "changed_or_missing": [],
+    "files_checked": 1828,
+    "passed": true
+  },
+  "nested_context_sensitivity_implicated": false,
+  "nested_context_sensitivity_status": "NOT_ESTABLISHED; standalone was environment limited",
+  "not_reached_predicates": [
+    "receipt_status_complete",
+    "descriptor_java1_eligibility_is_true",
+    "receipt_java1_classification",
+    "receipt_cleanup_is_true",
+    "receipt_full_ladder_passed",
+    "descriptor_receipt_fingerprint_java1c",
+    "descriptor_receipt_policy_equal",
+    "receipt_policy_java1c",
+    "canonical_policy_sha_java1c",
+    "descriptor_image_java1c",
+    "receipt_image_java1c",
+    "all_authorities_false",
+    "live_descriptor_fingerprint",
+    "live_receipt_fingerprint",
+    "live_receipt_evidence_digest",
+    "live_cleanup_is_true"
+  ],
+  "observer_callback_errors": [],
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "BIND1": 0,
+    "Docker_controls": 3,
+    "EXECUTOR.1R": 0,
+    "JAVA1C_JVM_probe_count": 0,
+    "JAVA1C_compile_count": 0,
+    "JAVA1C_fixed_controller_containers": 0,
+    "PINNED1A_export": 0,
+    "SANDBOX2_fixed_probe_containers": 0,
+    "SANDBOX2_java_version_probes": 0,
+    "SANDBOX2_javac_version_probes": 0,
+    "SyntheticStateBox": 0,
+    "alternative_provider_inspection": 0,
+    "arbitrary_Java": 0,
+    "caller_shell": 0,
+    "generic_image_inventory": 0,
+    "host_mounts": 0,
+    "outbound_workload_network": 0,
+    "post_attempt_read_only_Docker_controls": 5,
+    "pure_fixture_Python_domain_children": 1,
+    "reflection": 0,
+    "reflection_lease_consumption": 0,
+    "repository_runtime_writes": 0,
+    "runtime_lease_consumption": 0,
+    "total_Docker_controls": 8
+  },
+  "original_owner_cleanup_proof_unavailable": true,
+  "owner_mutation_occurred": false,
+  "phase_id": "RUNTIME.JAVA.1C.AUTH.DIAG.1",
+  "post_observation_errors": {
+    "explanation": "The initial read-only host image output filter used a missing optional Volumes key. The corrected read-only filter used index and passed; both artifacts are retained.",
+    "host_format_corrected": "",
+    "host_initial_format": "template parsing error: template: :1:99: executing \"\" at <.Config.Volumes>: map has no entry for key \"Volumes\"\n",
+    "restricted": "permission denied while trying to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine\n"
+  },
+  "predicate_decomposition": {
+    "demonstrated_HMAC_failure": false,
+    "first_failing_predicate": "descriptor_status_complete",
+    "first_failure_error": "java1c_live_sandbox2_binding_rejected",
+    "hmac_results": {
+      "descriptor_hmac": "PASS",
+      "receipt_hmac": "PASS"
+    },
+    "not_reached_predicates": [
+      "receipt_status_complete",
+      "descriptor_java1_eligibility_is_true",
+      "receipt_java1_classification",
+      "receipt_cleanup_is_true",
+      "receipt_full_ladder_passed",
+      "descriptor_receipt_fingerprint_java1c",
+      "descriptor_receipt_policy_equal",
+      "receipt_policy_java1c",
+      "canonical_policy_sha_java1c",
+      "descriptor_image_java1c",
+      "receipt_image_java1c",
+      "all_authorities_false",
+      "live_descriptor_fingerprint",
+      "live_receipt_fingerprint",
+      "live_receipt_evidence_digest",
+      "live_cleanup_is_true"
+    ],
+    "ordered_predicates": [
+      {
+        "check_category": "type_identity",
+        "component": "sandbox2.validate_receipt",
+        "error": "sandbox2_receipt_unauthenticated",
+        "field_owner": "SANDBOX.2 receipt class",
+        "fields_inputs_consumed": [
+          "type(receipt)"
+        ],
+        "line": 137,
+        "predicate": "receipt_exact_type",
+        "rejection_expression": "type(receipt) is not ThreadCompatibleSandboxReceipt",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "state": "PASS"
+      },
+      {
+        "check_category": "HMAC_signature_process_local",
+        "component": "sandbox2.validate_receipt",
+        "error": "sandbox2_receipt_unauthenticated",
+        "field_owner": "SANDBOX.2 issuer",
+        "fields_inputs_consumed": [
+          "receipt._signature",
+          "_sign(receipt)"
+        ],
+        "line": 138,
+        "predicate": "receipt_hmac",
+        "rejection_expression": "not hmac.compare_digest(receipt._signature, _sign(receipt))",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "state": "PASS"
+      },
+      {
+        "check_category": "type_identity",
+        "component": "sandbox2.validate_descriptor",
+        "error": "sandbox2_descriptor_unauthenticated",
+        "field_owner": "SANDBOX.2 descriptor class",
+        "fields_inputs_consumed": [
+          "type(descriptor)"
+        ],
+        "line": 145,
+        "predicate": "descriptor_exact_type",
+        "rejection_expression": "type(descriptor) is not ThreadCompatibleSandboxDescriptor",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "state": "PASS"
+      },
+      {
+        "check_category": "HMAC_signature_process_local",
+        "component": "sandbox2.validate_descriptor",
+        "error": "sandbox2_descriptor_unauthenticated",
+        "field_owner": "SANDBOX.2 issuer",
+        "fields_inputs_consumed": [
+          "descriptor._signature",
+          "_sign(descriptor)"
+        ],
+        "line": 146,
+        "predicate": "descriptor_hmac",
+        "rejection_expression": "not hmac.compare_digest(descriptor._signature, _sign(descriptor))",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "state": "PASS"
+      },
+      {
+        "check_category": "receipt_fingerprint_binding",
+        "component": "sandbox2.validate_descriptor",
+        "error": "sandbox2_descriptor_unauthenticated",
+        "field_owner": "SANDBOX.2 pair",
+        "fields_inputs_consumed": [
+          "descriptor.verification_receipt_fingerprint",
+          "receipt.fingerprint"
+        ],
+        "line": 147,
+        "predicate": "descriptor_receipt_fingerprint",
+        "rejection_expression": "descriptor.verification_receipt_fingerprint != receipt.fingerprint",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "state": "PASS"
+      },
+      {
+        "check_category": "status_binding",
+        "component": "sandbox2.validate_descriptor",
+        "error": "sandbox2_descriptor_unauthenticated",
+        "field_owner": "SANDBOX.2 pair",
+        "fields_inputs_consumed": [
+          "descriptor.status",
+          "receipt.status"
+        ],
+        "line": 148,
+        "predicate": "descriptor_receipt_status",
+        "rejection_expression": "descriptor.status != receipt.status",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "state": "PASS"
+      },
+      {
+        "check_category": "semantic_eligibility_binding",
+        "component": "sandbox2.validate_descriptor",
+        "error": "sandbox2_descriptor_unauthenticated",
+        "field_owner": "SANDBOX.2 pair",
+        "fields_inputs_consumed": [
+          "descriptor.eligible_for_java1_continuation",
+          "receipt.status",
+          "sandbox2.COMPLETE"
+        ],
+        "line": 149,
+        "predicate": "descriptor_eligibility_equals_complete_status",
+        "rejection_expression": "descriptor.eligible_for_java1_continuation != (receipt.status == COMPLETE)",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "state": "PASS"
+      },
+      {
+        "check_category": "policy_SHA",
+        "component": "sandbox2.validate_policy_bytes",
+        "error": "historical_policy_identity_changed",
+        "field_owner": "SANDBOX.1 baseline and SANDBOX.2 pin",
+        "fields_inputs_consumed": [
+          "baseline._SECCOMP",
+          "BASELINE_POLICY_SHA256"
+        ],
+        "line": 59,
+        "predicate": "baseline_policy_identity",
+        "rejection_expression": "baseline._hash(baseline._SECCOMP) != BASELINE_POLICY_SHA256",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "state": "PASS"
+      },
+      {
+        "check_category": "type_identity",
+        "component": "sandbox2.validate_policy_bytes",
+        "error": "exact_sandbox2_canonical_policy_required",
+        "field_owner": "SANDBOX.2 canonical policy bytes",
+        "fields_inputs_consumed": [
+          "type(raw)"
+        ],
+        "line": 64,
+        "predicate": "canonical_policy_exact_type",
+        "rejection_expression": "type(raw) is not bytes",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "state": "PASS"
+      },
+      {
+        "check_category": "policy_bytes",
+        "component": "sandbox2.validate_policy_bytes",
+        "error": "exact_sandbox2_canonical_policy_required",
+        "field_owner": "SANDBOX.2 additive policy",
+        "fields_inputs_consumed": [
+          "raw",
+          "baseline._json(expected).encode()"
+        ],
+        "line": 64,
+        "predicate": "canonical_policy_bytes",
+        "rejection_expression": "raw != baseline._json(expected).encode()",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "state": "PASS"
+      },
+      {
+        "check_category": "policy_SHA",
+        "component": "sandbox2.validate_policy_bytes",
+        "error": "exact_sandbox2_canonical_policy_required",
+        "field_owner": "SANDBOX.2 additive policy",
+        "fields_inputs_consumed": [
+          "sha256(raw).hexdigest()",
+          "POLICY_SHA256"
+        ],
+        "line": 65,
+        "predicate": "canonical_policy_sha256",
+        "rejection_expression": "sha256(raw).hexdigest() != POLICY_SHA256",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "state": "PASS"
+      },
+      {
+        "check_category": "semantic_completion",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 descriptor; JAVA.1C acceptance",
+        "fields_inputs_consumed": [
+          "descriptor.status",
+          "sandbox2.COMPLETE"
+        ],
+        "line": 55,
+        "predicate": "descriptor_status_complete",
+        "rejection_expression": "descriptor.status != sandbox2.COMPLETE",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "FAIL"
+      },
+      {
+        "check_category": "semantic_completion",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 receipt; JAVA.1C acceptance",
+        "fields_inputs_consumed": [
+          "receipt.status",
+          "sandbox2.COMPLETE"
+        ],
+        "line": 55,
+        "predicate": "receipt_status_complete",
+        "rejection_expression": "receipt.status != sandbox2.COMPLETE",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "semantic_eligibility_exact_boolean",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 descriptor; JAVA.1C acceptance",
+        "fields_inputs_consumed": [
+          "descriptor.eligible_for_java1_continuation"
+        ],
+        "line": 56,
+        "predicate": "descriptor_java1_eligibility_is_true",
+        "rejection_expression": "descriptor.eligible_for_java1_continuation is not True",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "semantic_eligibility_classification",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 receipt; JAVA.1C acceptance",
+        "fields_inputs_consumed": [
+          "receipt.compatibility_classification"
+        ],
+        "line": 57,
+        "predicate": "receipt_java1_classification",
+        "rejection_expression": "receipt.compatibility_classification != 'eligible_for_JAVA_1_continuation_only'",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "cleanup_exact_boolean",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 receipt; JAVA.1C acceptance",
+        "fields_inputs_consumed": [
+          "receipt.cleanup_verified"
+        ],
+        "line": 58,
+        "predicate": "receipt_cleanup_is_true",
+        "rejection_expression": "receipt.cleanup_verified is not True",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "semantic_stage_results",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 fixed verification ladder",
+        "fields_inputs_consumed": [
+          "receipt.stage_results",
+          "sandbox2.LADDER",
+          "sandbox2.PASSED"
+        ],
+        "line": 59,
+        "predicate": "receipt_full_ladder_passed",
+        "rejection_expression": "receipt.stage_results != tuple(((m, sandbox2.PASSED) for m in sandbox2.LADDER))",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "receipt_fingerprint_binding",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 pair; JAVA.1C acceptance",
+        "fields_inputs_consumed": [
+          "descriptor.verification_receipt_fingerprint",
+          "receipt.fingerprint"
+        ],
+        "line": 60,
+        "predicate": "descriptor_receipt_fingerprint_java1c",
+        "rejection_expression": "descriptor.verification_receipt_fingerprint != receipt.fingerprint",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "policy_SHA_binding",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 pair",
+        "fields_inputs_consumed": [
+          "descriptor.seccomp_policy_sha256",
+          "receipt.seccomp_policy_sha256"
+        ],
+        "line": 61,
+        "predicate": "descriptor_receipt_policy_equal",
+        "rejection_expression": "descriptor.seccomp_policy_sha256 != receipt.seccomp_policy_sha256",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "policy_SHA",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 receipt and JAVA.1C pin",
+        "fields_inputs_consumed": [
+          "receipt.seccomp_policy_sha256",
+          "java1c.POLICY_SHA256"
+        ],
+        "line": 62,
+        "predicate": "receipt_policy_java1c",
+        "rejection_expression": "receipt.seccomp_policy_sha256 != POLICY_SHA256",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "policy_SHA",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 policy constant and JAVA.1C pin",
+        "fields_inputs_consumed": [
+          "sandbox2.POLICY_SHA256",
+          "java1c.POLICY_SHA256"
+        ],
+        "line": 63,
+        "predicate": "canonical_policy_sha_java1c",
+        "rejection_expression": "sandbox2.POLICY_SHA256 != POLICY_SHA256",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "image_identity",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 descriptor and JAVA.1C image pin",
+        "fields_inputs_consumed": [
+          "descriptor.image_identity",
+          "java1c.IMAGE"
+        ],
+        "line": 64,
+        "predicate": "descriptor_image_java1c",
+        "rejection_expression": "descriptor.image_identity != IMAGE",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "image_identity",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 receipt and JAVA.1C image pin",
+        "fields_inputs_consumed": [
+          "receipt.image_identity",
+          "java1c.IMAGE"
+        ],
+        "line": 64,
+        "predicate": "receipt_image_java1c",
+        "rejection_expression": "receipt.image_identity != IMAGE",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "authority_exact_false",
+        "component": "java1c.authenticate_sandbox2",
+        "error": "java1c_live_sandbox2_binding_rejected",
+        "field_owner": "SANDBOX.2 pair; JAVA.1C acceptance",
+        "fields_inputs_consumed": [
+          "descriptor/receipt.runtime_authority",
+          "descriptor/receipt.repository_write_authority",
+          "descriptor/receipt.apply_authority",
+          "descriptor/receipt.shell_available",
+          "descriptor/receipt.arbitrary_command_authority",
+          "descriptor/receipt.host_mount_authority",
+          "descriptor/receipt.network_authority"
+        ],
+        "line": 65,
+        "ordered_authority_subpredicates": [
+          {
+            "check_category": "authority_exact_false",
+            "field": "runtime_authority",
+            "field_owner": "SANDBOX.2 descriptor",
+            "object": "descriptor",
+            "rejection_expression": "descriptor.runtime_authority is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "repository_write_authority",
+            "field_owner": "SANDBOX.2 descriptor",
+            "object": "descriptor",
+            "rejection_expression": "descriptor.repository_write_authority is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "apply_authority",
+            "field_owner": "SANDBOX.2 descriptor",
+            "object": "descriptor",
+            "rejection_expression": "descriptor.apply_authority is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "shell_available",
+            "field_owner": "SANDBOX.2 descriptor",
+            "object": "descriptor",
+            "rejection_expression": "descriptor.shell_available is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "arbitrary_command_authority",
+            "field_owner": "SANDBOX.2 descriptor",
+            "object": "descriptor",
+            "rejection_expression": "descriptor.arbitrary_command_authority is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "host_mount_authority",
+            "field_owner": "SANDBOX.2 descriptor",
+            "object": "descriptor",
+            "rejection_expression": "descriptor.host_mount_authority is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "network_authority",
+            "field_owner": "SANDBOX.2 descriptor",
+            "object": "descriptor",
+            "rejection_expression": "descriptor.network_authority is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "runtime_authority",
+            "field_owner": "SANDBOX.2 receipt",
+            "object": "receipt",
+            "rejection_expression": "receipt.runtime_authority is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "repository_write_authority",
+            "field_owner": "SANDBOX.2 receipt",
+            "object": "receipt",
+            "rejection_expression": "receipt.repository_write_authority is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "apply_authority",
+            "field_owner": "SANDBOX.2 receipt",
+            "object": "receipt",
+            "rejection_expression": "receipt.apply_authority is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "shell_available",
+            "field_owner": "SANDBOX.2 receipt",
+            "object": "receipt",
+            "rejection_expression": "receipt.shell_available is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "arbitrary_command_authority",
+            "field_owner": "SANDBOX.2 receipt",
+            "object": "receipt",
+            "rejection_expression": "receipt.arbitrary_command_authority is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "host_mount_authority",
+            "field_owner": "SANDBOX.2 receipt",
+            "object": "receipt",
+            "rejection_expression": "receipt.host_mount_authority is not False"
+          },
+          {
+            "check_category": "authority_exact_false",
+            "field": "network_authority",
+            "field_owner": "SANDBOX.2 receipt",
+            "object": "receipt",
+            "rejection_expression": "receipt.network_authority is not False"
+          }
+        ],
+        "predicate": "all_authorities_false",
+        "rejection_expression": "any((getattr(value, key) is not False for value in (descriptor, receipt) for key in sandbox2.AUTHORITIES))",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "descriptor_fingerprint",
+        "component": "java1c._obtain_live_sandbox2",
+        "error": "java1c_live_sandbox2_fingerprint_mismatch",
+        "field_owner": "SANDBOX.2 replay report and reconstructed issuer descriptor",
+        "fields_inputs_consumed": [
+          "live['descriptor']['sandbox_descriptor_fingerprint']",
+          "descriptor.fingerprint"
+        ],
+        "line": 79,
+        "predicate": "live_descriptor_fingerprint",
+        "rejection_expression": "live['descriptor']['sandbox_descriptor_fingerprint'] != descriptor.fingerprint",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "receipt_fingerprint",
+        "component": "java1c._obtain_live_sandbox2",
+        "error": "java1c_live_sandbox2_fingerprint_mismatch",
+        "field_owner": "SANDBOX.2 replay report and reconstructed issuer receipt",
+        "fields_inputs_consumed": [
+          "live['verification_receipt']['verification_receipt_fingerprint']",
+          "receipt.fingerprint"
+        ],
+        "line": 80,
+        "predicate": "live_receipt_fingerprint",
+        "rejection_expression": "live['verification_receipt']['verification_receipt_fingerprint'] != receipt.fingerprint",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "evidence_digest",
+        "component": "java1c._obtain_live_sandbox2",
+        "error": "java1c_live_sandbox2_fingerprint_mismatch",
+        "field_owner": "SANDBOX.2 measured stages and issuer receipt",
+        "fields_inputs_consumed": [
+          "receipt.evidence_sha256",
+          "baseline._hash(live['stages'])"
+        ],
+        "line": 81,
+        "predicate": "live_receipt_evidence_digest",
+        "rejection_expression": "receipt.evidence_sha256 != baseline._hash(live['stages'])",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      },
+      {
+        "check_category": "cleanup_exact_boolean",
+        "component": "java1c._obtain_live_sandbox2",
+        "error": "java1c_live_sandbox2_fingerprint_mismatch",
+        "field_owner": "SANDBOX.2 replay report",
+        "fields_inputs_consumed": [
+          "live['cleanup_verified']"
+        ],
+        "line": 82,
+        "predicate": "live_cleanup_is_true",
+        "rejection_expression": "live['cleanup_verified'] is not True",
+        "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "state": "NOT_REACHED"
+      }
+    ],
+    "passed": false,
+    "public_validations": {
+      "java1c_authenticate_sandbox2": {
+        "error": "ValueError: java1c_live_sandbox2_binding_rejected",
+        "state": "FAIL"
+      },
+      "sandbox_descriptor": {
+        "error": null,
+        "original_arguments_returned": true,
+        "state": "PASS"
+      },
+      "sandbox_policy": {
+        "error": null,
+        "original_arguments_returned": false,
+        "state": "PASS"
+      },
+      "sandbox_receipt": {
+        "error": null,
+        "original_arguments_returned": true,
+        "state": "PASS"
+      }
+    }
+  },
+  "process_state_after": {
+    "authentication_domain": {
+      "algorithm": "HMAC-SHA256",
+      "identity_class": "bytes",
+      "key_material_exported": false,
+      "lifetime": "module import in this interpreter",
+      "owner": "core.thread_compatible_runtime_sandbox"
+    },
+    "current_pid": 14420,
+    "instrumentation": {
+      "monitoring_0": false,
+      "monitoring_1": false,
+      "monitoring_2": false,
+      "monitoring_3": false,
+      "monitoring_4": false,
+      "monitoring_5": false,
+      "sys_profile": false,
+      "sys_trace": false,
+      "thread_profile": false,
+      "thread_trace": false
+    },
+    "owner_entry_points": {
+      "core.candidate_runtime_sandbox._bounded_process": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\candidate_runtime_sandbox.py",
+        "code_id": 1744916320912,
+        "function_id": 1744922740336,
+        "qualified_name": "_bounded_process"
+      },
+      "core.candidate_runtime_sandbox._docker_prefix": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\candidate_runtime_sandbox.py",
+        "code_id": 1744916282208,
+        "function_id": 1744922742272,
+        "qualified_name": "_docker_prefix"
+      },
+      "core.sandboxed_java_positive_continuation.authenticate_sandbox2": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "code_id": 1744917939728,
+        "function_id": 1744923699056,
+        "qualified_name": "authenticate_sandbox2"
+      },
+      "core.sandboxed_java_positive_continuation.validate_descriptor": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "code_id": 1744916961280,
+        "function_id": 1744923700464,
+        "qualified_name": "validate_descriptor"
+      },
+      "core.sandboxed_java_positive_continuation.validate_receipt": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "code_id": 1744920980016,
+        "function_id": 1744923700288,
+        "qualified_name": "validate_receipt"
+      },
+      "core.sandboxed_java_positive_continuation.verify": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "code_id": 1744889317952,
+        "function_id": 1744923656256,
+        "qualified_name": "verify"
+      },
+      "core.thread_compatible_runtime_sandbox.replay": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "code_id": 1744916863920,
+        "function_id": 1744923698528,
+        "qualified_name": "replay"
+      },
+      "core.thread_compatible_runtime_sandbox.validate_descriptor": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "code_id": 1744916950912,
+        "function_id": 1744923695536,
+        "qualified_name": "validate_descriptor"
+      },
+      "core.thread_compatible_runtime_sandbox.validate_receipt": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "code_id": 1744920981936,
+        "function_id": 1744923693248,
+        "qualified_name": "validate_receipt"
+      }
+    },
+    "owner_modules": {
+      "core.candidate_runtime_sandbox": {
+        "file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\candidate_runtime_sandbox.py",
+        "module_id": 1744920879216
+      },
+      "core.sandboxed_java_positive_continuation": {
+        "file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "module_id": 1744922548624
+      },
+      "core.thread_compatible_runtime_sandbox": {
+        "file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "module_id": 1744922808128
+      }
+    },
+    "registry": {
+      "identities": null,
+      "present": false,
+      "public_membership_api": false,
+      "reason": "Frozen SANDBOX.2 has no live pair registry.",
+      "size": null
+    },
+    "tempfile_tempdir_global": "C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{ec947724-d301-4a47-a8a5-da1d669e0072}\\AC\\Temp"
+  },
+  "process_state_before": {
+    "authentication_domain": {
+      "algorithm": "HMAC-SHA256",
+      "identity_class": "bytes",
+      "key_material_exported": false,
+      "lifetime": "module import in this interpreter",
+      "owner": "core.thread_compatible_runtime_sandbox"
+    },
+    "current_pid": 14420,
+    "instrumentation": {
+      "monitoring_0": false,
+      "monitoring_1": false,
+      "monitoring_2": false,
+      "monitoring_3": false,
+      "monitoring_4": false,
+      "monitoring_5": false,
+      "sys_profile": false,
+      "sys_trace": false,
+      "thread_profile": false,
+      "thread_trace": false
+    },
+    "owner_entry_points": {
+      "core.candidate_runtime_sandbox._bounded_process": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\candidate_runtime_sandbox.py",
+        "code_id": 1744916320912,
+        "function_id": 1744922740336,
+        "qualified_name": "_bounded_process"
+      },
+      "core.candidate_runtime_sandbox._docker_prefix": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\candidate_runtime_sandbox.py",
+        "code_id": 1744916282208,
+        "function_id": 1744922742272,
+        "qualified_name": "_docker_prefix"
+      },
+      "core.sandboxed_java_positive_continuation.authenticate_sandbox2": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "code_id": 1744917939728,
+        "function_id": 1744923699056,
+        "qualified_name": "authenticate_sandbox2"
+      },
+      "core.sandboxed_java_positive_continuation.validate_descriptor": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "code_id": 1744916961280,
+        "function_id": 1744923700464,
+        "qualified_name": "validate_descriptor"
+      },
+      "core.sandboxed_java_positive_continuation.validate_receipt": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "code_id": 1744920980016,
+        "function_id": 1744923700288,
+        "qualified_name": "validate_receipt"
+      },
+      "core.sandboxed_java_positive_continuation.verify": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "code_id": 1744889317952,
+        "function_id": 1744923656256,
+        "qualified_name": "verify"
+      },
+      "core.thread_compatible_runtime_sandbox.replay": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "code_id": 1744916863920,
+        "function_id": 1744923698528,
+        "qualified_name": "replay"
+      },
+      "core.thread_compatible_runtime_sandbox.validate_descriptor": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "code_id": 1744916950912,
+        "function_id": 1744923695536,
+        "qualified_name": "validate_descriptor"
+      },
+      "core.thread_compatible_runtime_sandbox.validate_receipt": {
+        "code_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "code_id": 1744920981936,
+        "function_id": 1744923693248,
+        "qualified_name": "validate_receipt"
+      }
+    },
+    "owner_modules": {
+      "core.candidate_runtime_sandbox": {
+        "file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\candidate_runtime_sandbox.py",
+        "module_id": 1744920879216
+      },
+      "core.sandboxed_java_positive_continuation": {
+        "file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py",
+        "module_id": 1744922548624
+      },
+      "core.thread_compatible_runtime_sandbox": {
+        "file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py",
+        "module_id": 1744922808128
+      }
+    },
+    "registry": {
+      "identities": null,
+      "present": false,
+      "public_membership_api": false,
+      "reason": "Frozen SANDBOX.2 has no live pair registry.",
+      "size": null
+    },
+    "tempfile_tempdir_global": null
+  },
+  "provider_root_issued": false,
+  "standalone_JAVA1C_passed": false,
+  "standalone_JAVA1C_status": "RUNTIME_JAVA_1C_BLOCKED_AUTHENTICATION",
+  "standalone_invocations": 1,
+  "status": "JAVA1C_AUTH_DIAG_COMPLETE_WITH_FINDING",
+  "stop_after_diagnosis": true,
+  "underlying_standalone_failure": {
+    "error": "ValueError: exact_local_java_image_required",
+    "exact_image_control_exit_code": 1,
+    "explanation": "SANDBOX.2 still issued signed blocked infrastructure evidence after its image gate failed. JAVA.1C authenticated that evidence, then rejected its blocked status at its first semantic predicate.",
+    "failure_before_SANDBOX2_pair_issuance": false,
+    "owner": "core.thread_compatible_runtime_sandbox.replay",
+    "stages": [],
+    "verification_ladder_started": false
+  },
+  "validation_summary": {
+    "all_frozen_rejection_terms_covered": true,
+    "authority_subpredicates": 14,
+    "exact_rejection_terms": 28,
+    "final_artifact_checks": {
+      "artifact": "validation_summary.json",
+      "passed": true
+    },
+    "historical_bytes_preserved": true,
+    "live_observer_restored": true,
+    "observer_self_checks_passed": true,
+    "owner_functions_and_code_identities_unchanged": true,
+    "pure_Docker_effects": 0,
+    "pure_Java_effects": 0,
+    "pure_fixture_cases": 57,
+    "pure_fixture_matrix_passed": true,
+    "remaining_containers_independently_verified_zero": true,
+    "single_live_attempt_only": true
+  },
+  "zero_effect_counter_basis": "Frozen source hashes, standalone call graph, original Docker argv observations, shell=False controls, and zero observed forbidden owner calls; these are infrastructure observations, not a claim of OS-wide event tracing."
+}

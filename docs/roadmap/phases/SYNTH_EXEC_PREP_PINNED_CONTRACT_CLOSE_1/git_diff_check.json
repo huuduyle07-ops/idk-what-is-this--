@@ -1,0 +1,11 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "executed_outside_operational_guard": true,
+  "exit_code": 0,
+  "operational_command_invoked": false,
+  "source_validation_only": true
+}

@@ -1,0 +1,25 @@
+{
+  "suite": "tests/test_synthetic_runtime_authorization_pinned_replay.py",
+  "initial": {
+    "passed": 44,
+    "failed": 1,
+    "warnings": 1,
+    "elapsed_seconds": 50.22,
+    "resolved_defect": "Replay dropped matrix defaults before negative-control exception."
+  },
+  "final": {
+    "passed": 45,
+    "failed": 0,
+    "warnings": 1,
+    "elapsed_seconds": 13.9,
+    "exit_code": 0
+  },
+  "command": "python -B -m pytest -q tests/test_synthetic_runtime_authorization_pinned_replay.py -p no:cacheprovider --basetemp .tmp/task_synth_auth_pinned1_validation/replay_tmp_20261010_b79455db7db24185bb15f4f1d19e647c",
+  "test_source_sha256": "910bb7f7f6ff245c0c8aa9742d90fabfda4338604920bd0684f95738bfa36538",
+  "replay_source_sha256": "73ac65320825f3f32726526bcb5f2aa492887ef496b06d086932903b47cfc440",
+  "public_issuers_and_matrices_stubbed": true,
+  "no_live_provider_issuance": true,
+  "runtime_and_network_effect_guard_passed": true,
+  "initial_log": "pinned_replay_initial.log",
+  "final_log": "pinned_replay_final.log"
+}

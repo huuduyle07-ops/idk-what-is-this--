@@ -1,0 +1,11 @@
+{
+  "before_after_checks_identical": true,
+  "cached_diff_check_exit_code": 0,
+  "diff_check_exit_code": 0,
+  "fixed_read_only_commands_only": true,
+  "original_dirty_status_preserved": true,
+  "passed": true,
+  "stash_reset_clean_used": false,
+  "target_runtime_process_probe": false,
+  "whitespace_configuration": "blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol"
+}

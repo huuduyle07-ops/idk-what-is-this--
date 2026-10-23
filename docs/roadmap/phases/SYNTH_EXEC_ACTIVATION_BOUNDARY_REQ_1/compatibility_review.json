@@ -1,0 +1,348 @@
+{
+  "requirement_id": "SYNTH.EXEC.ACTIVATION.BOUNDARY.REQ.1",
+  "artifact_kind": "static_compatibility_review_report_only",
+  "static_source_contract_review_only": true,
+  "method": "Read exact historical JSON and Python AST/source without importing owners or executing scenario operations. Whole-file hashes and exact line anchors preserve the reviewed evidence.",
+  "requires_owner_or_api_changes": false,
+  "operational_authority_granted": false,
+  "reviewed_sources": {
+    "core/synthetic_runtime_authorization.py": {
+      "sha256": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88",
+      "size_bytes": 14991
+    },
+    "core/synthetic_runtime_authorization_pinned_lifecycle.py": {
+      "sha256": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4",
+      "size_bytes": 25692
+    },
+    "core/synthetic_reflection_execution_admission_pinned.py": {
+      "sha256": "974075ac1827b4013e1e8a2b236ea278e19c8be138e378bed3b70613f590aaa0",
+      "size_bytes": 29405
+    },
+    "core/synthetic_reflection_execution_lifecycle_pinned.py": {
+      "sha256": "c88d743d5820cdeb4877c4311470b745d1f8abf97a53dd4db8f93e4b1c155057",
+      "size_bytes": 37770
+    },
+    "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json": {
+      "sha256": "45f8201fd15adffe41b75859bfcd0458881ab2b50edd13641a1f69be5b13ec97",
+      "size_bytes": 43231
+    },
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_1/contract.json": {
+      "sha256": "435aa8fa0221cd777c2ba5c41ec723a2ed2a2c74dbb2d42594ba5934fd7741b3",
+      "size_bytes": 35427
+    }
+  },
+  "components": {
+    "PinnedSyntheticRuntimeExecutionLease_state_machine": {
+      "requires_change": false,
+      "rationale": "Dispatch is a downstream conservative boundary. Existing ISSUED to CONSUMED or INVALIDATED transitions and fail-closed consumer proof remain unchanged.",
+      "evidence": [
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 27,
+          "end_line": 30,
+          "text": "ISSUED, CONSUMED, INVALIDATED = \"ISSUED\", \"CONSUMED\", \"INVALIDATED\"\nSCENARIO_PHASE_ID = \"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R\"\nSOURCE_KIND = \"phase_owned_synthetic_fixture\"\nACTIVATION_POLICY_ID = \"SYNTH.AUTH.LIFECYCLE.PINNED.1:exact-decrement-3-activation:v1\""
+        },
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 459,
+          "end_line": 492,
+          "text": "def check_pinned_synthetic_runtime_execution_lease_preconditions(lease, authorization):\n    \"\"\"Authenticated report-only snapshot; never a reservation or consumer token.\"\"\"\n    with _local_lock(lease):\n        record = _authenticated_record_locked(lease, authorization, require_authorization=True)\n        reason = {ISSUED: \"PROOF_UNRESOLVED\", CONSUMED: \"LEASE_ALREADY_CONSUMED\",\n            INVALIDATED: \"LEASE_INVALIDATED\"}[record.lifecycle_state]\n        return PinnedSyntheticRuntimeExecutionLeaseReadiness(\n            record.lifecycle_state == ISSUED, False, record.lifecycle_state, reason)\n\n\ndef _consumer_readiness():\n    # No evidence owner/API/classification exists. No caller or test-only bypass.\n    _fail(\"PROOF_UNRESOLVED\", \"separately reviewed pinned consumer/source/compile contract required\")\n\n\ndef _transition(lease, authorization, target):\n    global _STORE\n    with _local_lock(lease):\n        record = _authenticated_record_locked(lease, authorization, require_authorization=target == CONSUMED)\n        if type(target) is not str or target not in (CONSUMED, INVALIDATED):\n            _fail(\"LEASE_UNAUTHENTICATED\", \"unsupported terminal transition\")\n        if record.lifecycle_state != ISSUED:\n            _fail(\"LEASE_ALREADY_CONSUMED\" if record.lifecycle_state == CONSUMED else \"LEASE_INVALIDATED\")\n        if target == CONSUMED:\n            _consumer_readiness()\n        updated_record = replace(record, lifecycle_state=target, signature=_sign(record.projection_json, target))\n        updated = _OwnerStore(_STORE.authorization_leases, {**_STORE.leases, lease.lease_id: updated_record})\n        _STORE = updated  # The only terminal publication/linearization point.\n        return lease\n\n\ndef consume_pinned_synthetic_runtime_execution_lease(lease, authorization):\n    \"\"\"Fail closed until a separately reviewed consumer contract is implemented.\"\"\"\n    return _transition(lease, authorization, CONSUMED)"
+        }
+      ]
+    },
+    "PinnedSyntheticReflectionExecutionAdmission": {
+      "requires_change": false,
+      "rationale": "Admission is immutable exact preparation evidence with no consumption state machine; adding downstream dispatch does not alter its original authenticated runtime/role binding or ISSUED issuance eligibility.",
+      "evidence": [
+        {
+          "path": "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json",
+          "start_line": 215,
+          "end_line": 221,
+          "text": "    \"exact_original_bindings_retained_outside_scalar_payload\": true,\n    \"authenticated_runtime_state_at_issuance\": \"ISSUED\",\n    \"admission_issuance_is_behavior\": false,\n    \"admission_has_no_consumption_state_machine\": true,\n    \"fixed_admission_fingerprint_mutates_with_runtime_state\": false,\n    \"runtime_state_gate_is_additive_to_old_admission\": true,\n    \"runtime_state_at_issuance_is_current_state_substitute\": false"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_admission_pinned.py",
+          "start_line": 482,
+          "end_line": 512,
+          "text": "def issue_pinned_synthetic_reflection_execution_admission(authorization, runtime, request, role):\n    \"\"\"Prepare one permanent exact read role while runtime authenticates ISSUED.\"\"\"\n    global _STORE\n    with _local_lock(authorization, runtime, request):\n        graph = _authenticate_graph(authorization, runtime, request, role, require_issued=True)\n        key = _one_shot_key(authorization, runtime, role)\n        if key in _STORE.admission_slots:\n            _fail(\"DUPLICATE_REFLECTION_ADMISSION\", \"permanent runtime/role slot already issued\")\n        admission_id = secrets.token_hex(32)\n        if not _hex_id(admission_id):\n            _fail(\"PROOF_UNRESOLVED\", \"owner admission identifier unavailable\")\n        while admission_id in _STORE.admissions:\n            admission_id = secrets.token_hex(32)\n            if not _hex_id(admission_id):\n                _fail(\"PROOF_UNRESOLVED\", \"owner admission identifier unavailable\")\n        admission = _new_admission(authorization, runtime, request, role, graph, admission_id)\n        projection_json = _canonical(_projection(admission))\n        record = _AdmissionRecord(authorization, runtime, request, ref(admission), projection_json, _sign(projection_json))\n        updated = _OwnerStore({**_STORE.admission_slots, key: admission_id}, {**_STORE.admissions, admission_id: record})\n        # Final public authenticated eligibility point; no upstream private lock.\n        if _runtime_state(runtime, authorization) != ISSUED:\n            _fail(\"PINNED_RUNTIME_STATE_MISMATCH\", \"runtime changed before admission publication\")\n        _STORE = updated  # The only publication/linearization point.\n        return admission\n\n\ndef validate_pinned_synthetic_reflection_execution_admission(admission, authorization=None, runtime=None, request=None, role=None):\n    \"\"\"Authenticate all retained originals, including after runtime termination.\"\"\"\n    with _local_lock(admission, authorization, runtime, request):\n        _authenticated_record_locked(admission, authorization, runtime, request, role)\n        return admission"
+        }
+      ]
+    },
+    "PinnedSyntheticReflectionExecutionLease_state_machine": {
+      "requires_change": false,
+      "rationale": "Reflection consumption still requires authenticated runtime CONSUMED. Only ISSUED permits one terminal transition; spending permission does not perform the read.",
+      "evidence": [
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 30,
+          "end_line": 32,
+          "text": "ISSUED, CONSUMED, INVALIDATED = \"ISSUED\", \"CONSUMED\", \"INVALIDATED\"\nBEFORE, AFTER = \"BEFORE\", \"AFTER\"\nBEFORE_ROLE, AFTER_ROLE = \"exact_private_state_before\", \"exact_private_state_after\""
+        },
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 645,
+          "end_line": 672,
+          "text": "def _transition(lease, admission, authorization, runtime, request, role, target):\n    global _STORE\n    with _local_lock(lease, admission, authorization, runtime, request):\n        record, runtime_state = _authenticated_record_locked(\n            lease, admission, authorization, runtime, request, role)\n        if type(target) is not str or target not in (CONSUMED, INVALIDATED):\n            _fail(\"REFLECTION_LEASE_UNAUTHENTICATED\", \"unsupported terminal transition\")\n        if record.lifecycle_state != ISSUED:\n            _fail(\"REFLECTION_LEASE_ALREADY_CONSUMED\" if record.lifecycle_state == CONSUMED\n                else \"REFLECTION_LEASE_INVALIDATED\", \"reflection terminal state cannot transition\")\n        if target == CONSUMED and runtime_state != CONSUMED:\n            _fail(\"PINNED_RUNTIME_STATE_MISMATCH\", \"reflection consume requires authenticated runtime CONSUMED\")\n        updated_record = replace(record, lifecycle_state=target, signature=_sign(record.projection_json, target))\n        updated = _OwnerStore(_STORE.admission_leases, {**_STORE.leases, lease.lease_id: updated_record})\n        _STORE = updated  # The only terminal publication/linearization point.\n        return lease\n\n\ndef consume_pinned_synthetic_reflection_execution_lease(\n        lease, admission=None, authorization=None, runtime=None, request=None, role=None):\n    \"\"\"Spend exact permission only after runtime consumption; performs no read.\"\"\"\n    return _transition(lease, admission, authorization, runtime, request, role, CONSUMED)\n\n\ndef invalidate_pinned_synthetic_reflection_execution_lease(\n        lease, admission=None, authorization=None, runtime=None, request=None, role=None):\n    \"\"\"Permanently abandon ISSUED permission in any authentic runtime state.\"\"\"\n    return _transition(lease, admission, authorization, runtime, request, role, INVALIDATED)"
+        },
+        {
+          "path": "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json",
+          "start_line": 250,
+          "end_line": 286,
+          "text": "  \"state_machine\": {\n    \"states\": [\n      \"ISSUED\",\n      \"CONSUMED\",\n      \"INVALIDATED\"\n    ],\n    \"initial_state\": \"ISSUED\",\n    \"transitions\": [\n      [\n        \"ISSUED\",\n        \"CONSUMED\"\n      ],\n      [\n        \"ISSUED\",\n        \"INVALIDATED\"\n      ]\n    ],\n    \"terminal_states\": [\n      \"CONSUMED\",\n      \"INVALIDATED\"\n    ],\n    \"maximum_leases_per_admission\": 1,\n    \"maximum_terminal_commits_per_lease\": 1,\n    \"roles_independent\": true,\n    \"separate_admission_and_lease_for_each_role\": true,\n    \"one_shot_lease_key\": [\n      \"admission_owner_phase_schema_PID\",\n      \"original_admission_id\"\n    ],\n    \"permanent_admission_and_lease_tombstones\": true,\n    \"tombstone_lifetime\": \"issuing owner process lifetime\",\n    \"refund_allowed\": false,\n    \"reissue_allowed\": false,\n    \"collection_reopens_issuance\": false,\n    \"new_semantic_state\": null,\n    \"stable_lease_fingerprint_includes_mutable_current_state\": false,\n    \"current_state_authenticated_in_separate_signed_record\": true,"
+        }
+      ]
+    },
+    "one_shot_semantics": {
+      "requires_change": false,
+      "rationale": "Runtime authorization, runtime/role admission and admission/lease issuance remain permanent one-shot bindings. No refund, reopening or reissue is introduced.",
+      "evidence": [
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 425,
+          "end_line": 444,
+          "text": "def issue_pinned_synthetic_runtime_execution_lease(authorization):\n    \"\"\"One permanent issuance per publicly authenticated original authorization.\"\"\"\n    global _STORE\n    with _local_lock(authorization):\n        original = _authenticate_authorization(authorization)\n        key = _one_shot_key(original)\n        if key in _STORE.authorization_leases:\n            _fail(\"DUPLICATE_LEASE_ISSUANCE\", \"authorization already has a permanent lease tombstone\")\n        lease_id = secrets.token_hex(32)\n        if not _hex_id(lease_id):\n            _fail(\"PROOF_UNRESOLVED\", \"owner lease identifier unavailable\")\n        while lease_id in _STORE.leases:\n            lease_id = secrets.token_hex(32)\n            if not _hex_id(lease_id):\n                _fail(\"PROOF_UNRESOLVED\", \"owner lease identifier unavailable\")\n        lease = _unsigned_lease(original, lease_id)\n        projection_json = _canonical(_projection(lease))\n        record = _LeaseRecord(original, ref(lease), projection_json, ISSUED, _sign(projection_json, ISSUED))\n        updated = _OwnerStore({**_STORE.authorization_leases, key: lease_id}, {**_STORE.leases, lease_id: record})\n        _STORE = updated  # The only issuance publication/linearization point."
+        },
+        {
+          "path": "core/synthetic_reflection_execution_admission_pinned.py",
+          "start_line": 485,
+          "end_line": 489,
+          "text": "    with _local_lock(authorization, runtime, request):\n        graph = _authenticate_graph(authorization, runtime, request, role, require_issued=True)\n        key = _one_shot_key(authorization, runtime, role)\n        if key in _STORE.admission_slots:\n            _fail(\"DUPLICATE_REFLECTION_ADMISSION\", \"permanent runtime/role slot already issued\")"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 569,
+          "end_line": 573,
+          "text": "    with _local_lock(admission, authorization, runtime, request):\n        _, graph = _authenticate_graph(admission, authorization, runtime, request, role, require_issued=True)\n        key = _one_shot_key(admission)\n        if key in _STORE.admission_leases:\n            _fail(\"DUPLICATE_REFLECTION_LEASE\", \"admission already has a permanent lease tombstone\")"
+        },
+        {
+          "path": "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json",
+          "start_line": 242,
+          "end_line": 248,
+          "text": "    \"request_identity_signed_and_retained_separately\": true,\n    \"fresh_same_role_request_reopens_issuance\": false,\n    \"permanent_tombstones\": true,\n    \"tombstone_lifetime\": \"issuing owner process lifetime\",\n    \"collection_reopens_issuance\": false,\n    \"refund_allowed\": false,\n    \"reissue_allowed\": false"
+        }
+      ]
+    },
+    "terminal_tombstones": {
+      "requires_change": false,
+      "rationale": "Terminal record replacements preserve permanent issuance maps; terminal states cannot transition, and collection does not reopen issuance.",
+      "evidence": [
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 474,
+          "end_line": 486,
+          "text": "def _transition(lease, authorization, target):\n    global _STORE\n    with _local_lock(lease):\n        record = _authenticated_record_locked(lease, authorization, require_authorization=target == CONSUMED)\n        if type(target) is not str or target not in (CONSUMED, INVALIDATED):\n            _fail(\"LEASE_UNAUTHENTICATED\", \"unsupported terminal transition\")\n        if record.lifecycle_state != ISSUED:\n            _fail(\"LEASE_ALREADY_CONSUMED\" if record.lifecycle_state == CONSUMED else \"LEASE_INVALIDATED\")\n        if target == CONSUMED:\n            _consumer_readiness()\n        updated_record = replace(record, lifecycle_state=target, signature=_sign(record.projection_json, target))\n        updated = _OwnerStore(_STORE.authorization_leases, {**_STORE.leases, lease.lease_id: updated_record})\n        _STORE = updated  # The only terminal publication/linearization point."
+        },
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 645,
+          "end_line": 659,
+          "text": "def _transition(lease, admission, authorization, runtime, request, role, target):\n    global _STORE\n    with _local_lock(lease, admission, authorization, runtime, request):\n        record, runtime_state = _authenticated_record_locked(\n            lease, admission, authorization, runtime, request, role)\n        if type(target) is not str or target not in (CONSUMED, INVALIDATED):\n            _fail(\"REFLECTION_LEASE_UNAUTHENTICATED\", \"unsupported terminal transition\")\n        if record.lifecycle_state != ISSUED:\n            _fail(\"REFLECTION_LEASE_ALREADY_CONSUMED\" if record.lifecycle_state == CONSUMED\n                else \"REFLECTION_LEASE_INVALIDATED\", \"reflection terminal state cannot transition\")\n        if target == CONSUMED and runtime_state != CONSUMED:\n            _fail(\"PINNED_RUNTIME_STATE_MISMATCH\", \"reflection consume requires authenticated runtime CONSUMED\")\n        updated_record = replace(record, lifecycle_state=target, signature=_sign(record.projection_json, target))\n        updated = _OwnerStore(_STORE.admission_leases, {**_STORE.leases, lease.lease_id: updated_record})\n        _STORE = updated  # The only terminal publication/linearization point."
+        },
+        {
+          "path": "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json",
+          "start_line": 279,
+          "end_line": 286,
+          "text": "    \"permanent_admission_and_lease_tombstones\": true,\n    \"tombstone_lifetime\": \"issuing owner process lifetime\",\n    \"refund_allowed\": false,\n    \"reissue_allowed\": false,\n    \"collection_reopens_issuance\": false,\n    \"new_semantic_state\": null,\n    \"stable_lease_fingerprint_includes_mutable_current_state\": false,\n    \"current_state_authenticated_in_separate_signed_record\": true,"
+        },
+        {
+          "path": "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json",
+          "start_line": 494,
+          "end_line": 497,
+          "text": "    \"runtime_CONSUMED_terminal_once_authenticated\": true,\n    \"admission_lease_issuance_never_consumes_upstreams\": true,\n    \"owner_store_records_retain_upstreams_strongly_and_capability_identity_weakly\": true,\n    \"collected_capability_identity_cannot_be_reconstructed_from_tombstone\": true"
+        }
+      ]
+    },
+    "public_validators": {
+      "requires_change": false,
+      "rationale": "The same original public validator signatures and exact retained object requirements remain; moving semantic placement adds no API or cross-owner private access.",
+      "evidence": [
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 448,
+          "end_line": 456,
+          "text": "def validate_pinned_synthetic_runtime_execution_lease(lease, authorization=None):\n    with _local_lock(lease):\n        _authenticated_record_locked(lease, authorization)\n        return lease\n\n\ndef pinned_synthetic_runtime_execution_lease_state(lease, authorization=None):\n    with _local_lock(lease):\n        return _authenticated_record_locked(lease, authorization).lifecycle_state"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_admission_pinned.py",
+          "start_line": 169,
+          "end_line": 181,
+          "text": "def _public_validate(value, exact_class, validator, boundary, **kwargs):\n    category = {\"request\": \"REFLECTION_REQUEST_UNAUTHENTICATED\",\n        \"authorization\": \"PINNED_AUTH_UNAUTHENTICATED\",\n        \"runtime\": \"PINNED_RUNTIME_LEASE_UNAUTHENTICATED\"}[boundary]\n    if type(value) is not exact_class:\n        _fail(category, \"exact original typed upstream required\")\n    try:\n        validated = validator(value, **kwargs)\n    except Exception as error:\n        _upstream_failure(error, boundary)\n    if validated is not value:\n        _fail(category, \"public validator must return the same original object\")\n    return validated"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_admission_pinned.py",
+          "start_line": 508,
+          "end_line": 512,
+          "text": "def validate_pinned_synthetic_reflection_execution_admission(admission, authorization=None, runtime=None, request=None, role=None):\n    \"\"\"Authenticate all retained originals, including after runtime termination.\"\"\"\n    with _local_lock(admission, authorization, runtime, request):\n        _authenticated_record_locked(admission, authorization, runtime, request, role)\n        return admission"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 187,
+          "end_line": 199,
+          "text": "def _public_validate(value, exact_class, validator, boundary, **kwargs):\n    category = {\"admission\": \"REFLECTION_ADMISSION_UNAUTHENTICATED\",\n        \"request\": \"REFLECTION_REQUEST_UNAUTHENTICATED\", \"authorization\": \"PINNED_AUTH_UNAUTHENTICATED\",\n        \"runtime\": \"PINNED_RUNTIME_LEASE_UNAUTHENTICATED\"}[boundary]\n    if type(value) is not exact_class:\n        _fail(category, \"exact original typed upstream required\")\n    try:\n        original = validator(value, **kwargs)\n    except Exception as error:\n        _upstream_failure(error, boundary)\n    if original is not value:\n        _fail(category, \"public validator must return the same original object\")\n    return original"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 297,
+          "end_line": 312,
+          "text": "    # The first admission check authenticates before any one-shot key is derived.\n    _public_validate(admission, admission_owner.PinnedSyntheticReflectionExecutionAdmission,\n        admission_owner.validate_pinned_synthetic_reflection_execution_admission, \"admission\")\n    _public_validate(request, reflection_owner.SyntheticReflectionRequest,\n        reflection_owner.validate_synthetic_reflection_request, \"request\")\n    _public_validate(authorization, authorization_owner.PinnedSyntheticRuntimeAuthorization,\n        authorization_owner.validate_pinned_synthetic_runtime_authorization, \"authorization\")\n    _public_validate(runtime, runtime_owner.PinnedSyntheticRuntimeExecutionLease,\n        runtime_owner.validate_pinned_synthetic_runtime_execution_lease, \"runtime\", authorization=authorization)\n    state = _runtime_state(runtime, authorization)\n    if require_issued and state != ISSUED:\n        _fail(\"PINNED_RUNTIME_STATE_MISMATCH\", \"both reflection lease roles require runtime ISSUED\")\n    _verify_scope(admission, authorization, runtime, request, role)\n    # Only the unchanged public admission owner can authenticate retained identity.\n    _public_validate(admission, admission_owner.PinnedSyntheticReflectionExecutionAdmission,\n        admission_owner.validate_pinned_synthetic_reflection_execution_admission, \"admission\","
+        },
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 593,
+          "end_line": 598,
+          "text": "def validate_pinned_synthetic_reflection_execution_lease(\n        lease, admission=None, authorization=None, runtime=None, request=None, role=None):\n    \"\"\"Authenticate all originals and current state, including terminal evidence.\"\"\"\n    with _local_lock(lease, admission, authorization, runtime, request):\n        _authenticated_record_locked(lease, admission, authorization, runtime, request, role)\n        return lease"
+        }
+      ]
+    },
+    "HMAC_domains": {
+      "requires_change": false,
+      "rationale": "Unchanged separate domain strings, NUL-delimited role framing, immutable projections and current-state record HMACs continue to authenticate the same evidence. No new domain or repinning is necessary.",
+      "evidence": [
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 38,
+          "end_line": 38,
+          "text": "_DOMAIN = b\"CATTUS:SYNTH.AUTH.LIFECYCLE.PINNED.1:exact-execution-lease:v1\""
+        },
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 88,
+          "end_line": 92,
+          "text": "def _framed(value, role):\n    if type(role) is not str or role not in (\n            \"activation-policy\", \"lease-evidence\", \"lease-fingerprint\", \"lease-record-hmac\"):\n        raise ValueError(\"unknown lifecycle authentication role\")\n    return _DOMAIN + b\"\\x00\" + role.encode(\"utf-8\") + b\"\\x00\" + _canonical(value).encode(\"utf-8\")"
+        },
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 359,
+          "end_line": 361,
+          "text": "def _sign(projection_json, state):\n    return hmac.new(_SECRET, _framed({\"immutable_issuance_projection\": projection_json,\n        \"current_state\": state}, \"lease-record-hmac\"), \"sha256\").hexdigest()"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_admission_pinned.py",
+          "start_line": 52,
+          "end_line": 52,
+          "text": "_DOMAIN = b\"CATTUS:SYNTH.REFLECT.ADMIT.PINNED.1:exact-reflection-admission:v1\""
+        },
+        {
+          "path": "core/synthetic_reflection_execution_admission_pinned.py",
+          "start_line": 94,
+          "end_line": 107,
+          "text": "def _framed(value, role):\n    if type(role) is not str or role not in (\n            \"renderer-evidence\", \"admission-evidence\", \"admission-fingerprint\", \"admission-record-hmac\"):\n        raise ValueError(\"unknown admission authentication role\")\n    return _DOMAIN + b\"\\x00\" + role.encode(\"utf-8\") + b\"\\x00\" + _canonical(value).encode(\"utf-8\")\n\n\ndef _digest(value, role):\n    return sha256(_framed(value, role)).hexdigest()\n\n\ndef _sign(projection_json):\n    return hmac.new(_SECRET, _framed({\"immutable_admission_projection\": projection_json},\n        \"admission-record-hmac\"), \"sha256\").hexdigest()"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 66,
+          "end_line": 66,
+          "text": "_DOMAIN = b\"CATTUS:SYNTH.REFLECT.LIFECYCLE.PINNED.1:exact-reflection-lease:v1\""
+        },
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 111,
+          "end_line": 124,
+          "text": "def _framed(value, role):\n    if type(role) is not str or role not in (\n            \"lease-evidence\", \"lease-fingerprint\", \"lease-record-hmac\"):\n        raise ValueError(\"unknown pinned reflection lifecycle authentication role\")\n    return _DOMAIN + b\"\\x00\" + role.encode(\"utf-8\") + b\"\\x00\" + _canonical(value).encode(\"utf-8\")\n\n\ndef _digest(value, role):\n    return sha256(_framed(value, role)).hexdigest()\n\n\ndef _sign(projection_json, state):\n    return hmac.new(_SECRET, _framed({\"immutable_issuance_projection\": projection_json,\n        \"current_state\": state}, \"lease-record-hmac\"), \"sha256\").hexdigest()"
+        }
+      ]
+    },
+    "authority_matrices": {
+      "requires_change": false,
+      "rationale": "Every existing false authority field remains enforced by exact dataclass projections. Historical narrow exact-role read permission remains historical; this requirement grants no authority. Readiness stays false.",
+      "evidence": [
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 42,
+          "end_line": 49,
+          "text": "_FALSE_AUTHORITY = (\n    \"runtime_authority\", \"real_task_runtime_authority\", \"repository_write_authority\",\n    \"apply_authority\", \"network_authority\", \"host_mount_authority\", \"shell_authority\",\n    \"arbitrary_java_authority\", \"arbitrary_class_authority\", \"arbitrary_method_authority\",\n    \"arbitrary_source_authority\", \"repository_java_authority\", \"arbitrary_command_authority\",\n    \"executor_authority\", \"BANK_authority\", \"reflection_execution_authority\",\n    \"compilation_authority\",\n)"
+        },
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 337,
+          "end_line": 352,
+          "text": "def _projection(lease):\n    projection = {}\n    for item in fields(PinnedSyntheticRuntimeExecutionLease):\n        value = getattr(lease, item.name, None)\n        if item.name == \"scenario\":\n            value = _scenario_projection(value)\n        elif item.name == \"provider\":\n            value = _provider_projection(value)\n        elif item.name == \"issuing_pid\":\n            if type(value) is not int or value != _ISSUER_PID:\n                _fail(\"LEASE_UNAUTHENTICATED\", \"exact issuing PID required\")\n        elif item.name in _FALSE_AUTHORITY or item.name in (\n                \"lease_issued\", \"one_shot_exact_synthetic_activation_capability\"):\n            expected = item.name not in _FALSE_AUTHORITY\n            if type(value) is not bool or value is not expected:\n                _fail(\"LEASE_UNAUTHENTICATED\", \"immutable authority matrix required\")"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_admission_pinned.py",
+          "start_line": 427,
+          "end_line": 431,
+          "text": "        elif descriptor.name in _FALSE_AUTHORITY or descriptor.name in (\n                \"exact_role_read_only_permission\", \"admission_can_prepare_lease_only\", \"behavioral_activation_ready\"):\n            expected = descriptor.name in (\"exact_role_read_only_permission\", \"admission_can_prepare_lease_only\")\n            if type(value) is not bool or value is not expected:\n                _fail(\"REFLECTION_SCOPE_MISMATCH\", \"immutable exact authority matrix required\")"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 453,
+          "end_line": 461,
+          "text": "class PinnedSyntheticReflectionExecutionLeaseReadiness:\n    local_ready: bool\n    reflection_active_ready: bool\n    current_state: str\n    runtime_current_state: str\n    readiness_reason: str\n    reason: str = field(default=\"PROOF_UNRESOLVED\", init=False)\n    behavioral_activation_ready: bool = field(default=False, init=False)\n    report_only: bool = field(default=True, init=False)"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 501,
+          "end_line": 508,
+          "text": "        elif descriptor.name in _FALSE_AUTHORITY or descriptor.name in (\n                \"lease_issued\", \"exact_role_read_only_permission\", \"one_shot_exact_role_read_only_permission\",\n                \"consumption_proves_reflection_read\", \"runtime_consumption_proves_invocation\",\n                \"behavioral_activation_ready\"):\n            expected = descriptor.name in (\n                \"lease_issued\", \"exact_role_read_only_permission\", \"one_shot_exact_role_read_only_permission\")\n            if type(value) is not bool or value is not expected:\n                _fail(\"REFLECTION_SCOPE_MISMATCH\", \"exact immutable authority and evidence matrix required\")"
+        },
+        {
+          "path": "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json",
+          "start_line": 513,
+          "end_line": 540,
+          "text": "  \"authority\": {\n    \"exact_role_read_only_permission\": true,\n    \"admission_can_prepare_lease_only\": true,\n    \"lease_consumption_performs_read\": false,\n    \"field\": \"SyntheticStateBox.value:int\",\n    \"operation\": \"read_exact_bound_field\",\n    \"false_in_all_states\": [\n      \"runtime_authority\",\n      \"real_task_runtime_authority\",\n      \"repository_write_authority\",\n      \"apply_authority\",\n      \"network_authority\",\n      \"host_mount_authority\",\n      \"shell_authority\",\n      \"arbitrary_java_authority\",\n      \"arbitrary_reflection_authority\",\n      \"arbitrary_class_authority\",\n      \"arbitrary_method_authority\",\n      \"private_method_authority\",\n      \"field_write_authority\",\n      \"enumeration_authority\",\n      \"executor_authority\",\n      \"BANK_authority\",\n      \"compilation_authority\"\n    ],\n    \"compilation_authority\": false,\n    \"consumption_widens_scope\": false,\n    \"provider_proof_is_permission\": false"
+        }
+      ]
+    },
+    "activation_policy_identity_or_digest": {
+      "requires_change": false,
+      "rationale": "The exact activation policy delegates unresolved source, harness and consumer evidence to later reviewed contracts. It contains no exact BEFORE-read-first instruction. Keep policy identity and digest unchanged; add dispatch/load/initialization/construction only to the new downstream normative sequence while preserving old relative order.",
+      "evidence": [
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 30,
+          "end_line": 30,
+          "text": "ACTIVATION_POLICY_ID = \"SYNTH.AUTH.LIFECYCLE.PINNED.1:exact-decrement-3-activation:v1\""
+        },
+        {
+          "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+          "start_line": 99,
+          "end_line": 123,
+          "text": "def _activation_policy():\n    # Exact frozen contract projection; no consumer token or compilation placement.\n    return {\n        \"identity\": ACTIVATION_POLICY_ID,\n        \"identity_and_canonical_policy_digest_bound_in_lease\": True,\n        \"old_consumption_policy_unchanged\": True,\n        \"valid_original_pinned_authorization_required\": True,\n        \"retained_authenticated_provider_graph_required\": True,\n        \"requirement_profile\": \"RUNTIME.JAVA.PINNED.1\",\n        \"requirement_schema\": \"runtime_java_pinned_1_v1\",\n        \"runtime_sandbox_profile\": \"runtime_sandbox_2_v1\",\n        \"runtime_sandbox_policy_sha256\": \"5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75\",\n        \"immutable_target_identity_source\": \"validated_original_authorization.provider.target_image_identity == core.runtime_java_pinned_requirement.REQUIREMENT.image_identity\",\n        \"provider_checks_via_mandatory_upstream_public_validator\": True,\n        \"additional_runtime_readiness_evidence_owner\": None,\n        \"invented_runtime_readiness_token_allowed\": False,\n        \"lease_local_preconditions\": [\"original authenticated lease\", \"exact original pinned authorization\", \"ISSUED\", \"authenticated scenario and provider projections\", \"exact activation policy identity and digest\"],\n        \"behavioral_activation_prerequisites\": [\"all consumer capability/authentication gates resolved by separately reviewed pinned consumer contract\", \"exact source/harness readiness authenticated by that consumer\", \"source projection and scenario compilation classification resolved before any authorized preparation\", \"repeat lease-local preconditions atomically at consumption\"],\n        \"lease_local_ready_implies_behavioral_ready\": False,\n        \"behavioral_readiness_established_by_this_phase\": False,\n        \"unresolved_dependency_error\": \"PROOF_UNRESOLVED\",\n    }\n\n\nACTIVATION_POLICY_DIGEST = _digest(_activation_policy(), \"activation-policy\")"
+        },
+        {
+          "path": "core/synthetic_reflection_execution_lifecycle_pinned.py",
+          "start_line": 44,
+          "end_line": 55,
+          "text": "# Normative downstream ordering only. This permission owner performs no step.\nEXECUTOR_SEQUENCE = (\n    \"all capability/authentication gates\", \"source/harness ready\",\n    \"consume pinned runtime lease\", \"consume BEFORE reflection lease\",\n    \"perform BEFORE exact reflection read\", \"invoke exact public decrement(3)\",\n    \"consume AFTER reflection lease\", \"perform AFTER exact reflection read\",\n)\nRUNTIME_STATE_RULE = (\n    \"issuance and preexecution readiness require the exact runtime lease ISSUED; \"\n    \"active readiness and reflection consumption require the exact runtime lease CONSUMED; \"\n    \"invalidation and terminal evidence require any authentic runtime state\"\n)"
+        },
+        {
+          "path": "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json",
+          "start_line": 377,
+          "end_line": 400,
+          "text": "  \"ordering\": [\n    \"authenticate all capability gates\",\n    \"source/harness ready\",\n    \"consume pinned runtime lease\",\n    \"consume BEFORE reflection lease\",\n    \"perform BEFORE read\",\n    \"invoke public decrement(3)\",\n    \"consume AFTER reflection lease\",\n    \"perform AFTER read\"\n  ],\n  \"first_behavior_boundary\": {\n    \"runtime_commit\": \"ISSUED -> CONSUMED immediately before the first behavioral effect after all authenticated consumer gates\",\n    \"first_behavioral_effect\": \"BEFORE exact read\",\n    \"before_reflection_consumption_is_permission_state_mutation\": true,\n    \"before_reflection_consumption_is_behavioral_read\": false,\n    \"runtime_consumption_precedes_before_permission_and_read\": true,\n    \"runtime_consumption_after_before_read_allowed\": false,\n    \"reflection_owner_performs_reads\": false,\n    \"reflection_owner_invokes_method\": false,\n    \"executor_responsible_for_order_and_effect_evidence\": true,\n    \"consumed_reflection_means\": \"one exact role permission consumed; does not prove a field read occurred\",\n    \"consumed_runtime_means\": \"runtime activation permission consumed; does not prove BEFORE read, invocation or AFTER read\",\n    \"failure_after_commit_refunds\": false,\n    \"already_consumed_runtime_reachable_by_this_contract\": false"
+        }
+      ]
+    }
+  },
+  "semantic_counterexample": {
+    "historical_key": "first_behavior_boundary.first_behavioral_effect",
+    "historical_value": "BEFORE exact read",
+    "exact_source_counterexample": "private int value = 10;",
+    "first_known_source_level_mutable_state_effect": "ordinary construction initializing value = 10",
+    "evidence": [
+      {
+        "path": "core/synthetic_runtime_authorization.py",
+        "start_line": 34,
+        "end_line": 47,
+        "text": "# Copied exact phase-owned bytes, not imported through the BANK lineage or any\n# runtime owner. No file, class, harness, compiler or JVM is created here.\n_SOURCE = (b\"final class SyntheticStateBox {\\n\"\n    b\"    private int value = 10;\\n\\n\"\n    b\"    public boolean decrement(int amount) {\\n\"\n    b\"        if (amount <= 0 || amount > value) {\\n\"\n    b\"            return false;\\n\"\n    b\"        }\\n\"\n    b\"        value -= amount;\\n\"\n    b\"        return true;\\n\"\n    b\"    }\\n\"\n    b\"}\\n\")\nSOURCE_SIZE_BYTES = 239\n_DEFINITION_SHA256 = \"e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d\""
+      },
+      {
+        "path": "docs/roadmap/phases/SYNTH_REFLECT_PINNED_CONTRACT_1/contract.json",
+        "start_line": 387,
+        "end_line": 400,
+        "text": "  \"first_behavior_boundary\": {\n    \"runtime_commit\": \"ISSUED -> CONSUMED immediately before the first behavioral effect after all authenticated consumer gates\",\n    \"first_behavioral_effect\": \"BEFORE exact read\",\n    \"before_reflection_consumption_is_permission_state_mutation\": true,\n    \"before_reflection_consumption_is_behavioral_read\": false,\n    \"runtime_consumption_precedes_before_permission_and_read\": true,\n    \"runtime_consumption_after_before_read_allowed\": false,\n    \"reflection_owner_performs_reads\": false,\n    \"reflection_owner_invokes_method\": false,\n    \"executor_responsible_for_order_and_effect_evidence\": true,\n    \"consumed_reflection_means\": \"one exact role permission consumed; does not prove a field read occurred\",\n    \"consumed_runtime_means\": \"runtime activation permission consumed; does not prove BEFORE read, invocation or AFTER read\",\n    \"failure_after_commit_refunds\": false,\n    \"already_consumed_runtime_reachable_by_this_contract\": false"
+      }
+    ],
+    "necessarily_first_executable_harness_effect": false,
+    "earlier_exact_harness_instruction_claimed": false,
+    "every_JVM_launch_claimed_behavioral": false
+  },
+  "limits_and_remaining_reviews": [
+    "Full executable harness bytes/hash/size, main class, scenario JVM argv, loader/controller and staged BEFORE/AFTER protocol remain unresolved.",
+    "Behavioral activation readiness remains false with PROOF_UNRESOLVED. Runtime consumption cannot succeed through this requirement.",
+    "PREP materialization/compile/readiness proposals remain non-operational; a separate small preparation-contract closure review is required before implementation.",
+    "This static compatibility conclusion does not preapprove future preparation, consumer, harness, lock or runtime integration implementation."
+  ],
+  "conclusion": "Semantic requirement placement only. Exact scenario JVM dispatch is the conservative activation boundary; historical bytes, permission ordering, one-shot terminal semantics, validators, HMAC domains, authority matrices and activation policy pins remain unchanged."
+}

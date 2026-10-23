@@ -1,0 +1,68 @@
+{
+  "schema_version": "synthetic_runtime_execution_lease_pinned_1a_source_review_v1",
+  "review_kind": "independent_read_only_source_review",
+  "review_date": "2026-10-13",
+  "status": "NO_CONTRACT_BLOCKER_FOUND",
+  "reviewed_source": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+  "reviewed_source_sha256": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4",
+  "normative_contract": "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_CONTRACT_1/contract.json",
+  "findings": [],
+  "review_scope": {
+    "source_inspection_only": true,
+    "operational_tests_performed": false,
+    "authorization_issued": false,
+    "provider_issued": false,
+    "execution_lease_issued": false,
+    "lease_consumed": false,
+    "behavior_executed": false
+  },
+  "confirmed_by_source": [
+    "Distinct exact owner, type and schema; independent secret, owner lock, maps and record types",
+    "Mandatory unchanged public pinned validator must return the exact original upstream",
+    "Every valid lease operation reauthenticates the retained upstream and recomputes scenario, provider and policy projections under the owner lock",
+    "All fifteen frozen public provider projection fields are bound; no caller provider or private upstream registry access",
+    "Wrong process rejection precedes owner lock acquisition",
+    "Strict primitive and nested types reject equality aliases before canonical JSON serialization",
+    "Copy-on-write store replacement installs permanent issuance key and signed lease record at one publication point",
+    "Strong original upstream retention and weak live lease identity preserve permanent authorization tombstones after collection",
+    "Stable issuance fingerprint excludes mutable current state; current state is separately HMAC-authenticated",
+    "Only ISSUED, CONSUMED and INVALIDATED exist, with terminal transition replacement after all checks and signing",
+    "Consumption has no caller readiness override and fails closed with PROOF_UNRESOLVED",
+    "Invalidation does not require consumer readiness, and preserves the permanent issuance key",
+    "Authentic terminal state inspection remains available while retained upstream authenticates; readiness flags are false for terminal states",
+    "Authentication, scope, provider provenance and unresolved proof retain distinct typed categories; public ERROR_CODES enumerates all eleven frozen categories without introducing a consumer gate",
+    "All seventeen frozen broad authority flags remain false, including compilation; reflection acceptance is not claimed"
+  ],
+  "one_shot_key": {
+    "source": "exact original authorization returned by the mandatory public validator",
+    "fields": [
+      "authorization.owner_identity",
+      "authorization.phase_id",
+      "authorization.schema_version",
+      "authorization.issuing_pid",
+      "authorization.authorization_id"
+    ],
+    "normative_explanation": "The frozen contract document at lines 123-125 explicitly says the five-field tuple is from the original pinned authorization. These are upstream identities."
+  },
+  "authentication": {
+    "domain": "CATTUS:SYNTH.AUTH.LIFECYCLE.PINNED.1:exact-execution-lease:v1",
+    "framing": "domain + NUL + role + NUL + UTF-8 canonical JSON",
+    "canonical_json": "sorted keys, compact separators, allow_nan=false; exact primitive and nested types",
+    "public_digest_algorithm": "SHA256",
+    "public_digest_roles": ["activation-policy", "lease-evidence", "lease-fingerprint"],
+    "private_record_authentication_algorithm": "HMAC-SHA256",
+    "private_record_role": "lease-record-hmac",
+    "private_record_binding": "immutable issuance projection including public digests and authenticated current state",
+    "explanation": "Public role-framed digests are deterministic projection identifiers. They do not independently authenticate capability. Independent secret HMAC, exact live lease identity and mandatory original upstream validation provide authentication."
+  },
+  "resolved_advisory": {
+    "issue": "Validate generated lease ID shape before publishing any issuance record",
+    "resolution": "Generated and collision-retried IDs now require exact lowercase 64-character hexadecimal strings; malformed generation raises PROOF_UNRESOLVED before publication"
+  },
+  "historical_stage_assertion": {
+    "test": "tests/test_synthetic_runtime_authorization_lifecycle_pinned_contract.py::test_contract_is_additive_and_has_no_owner_implementation_or_registry_entry",
+    "observation": "One assertion expects the future owner module to be absent. This describes the historical contract-freeze stage and cannot remain true in the implementation tree.",
+    "semantic_conflict": false,
+    "reporting_requirement": "Preserve frozen bytes and disclose historical-view validation or current-tree failure; do not represent a patched existence view as an unmodified current-tree pass"
+  }
+}

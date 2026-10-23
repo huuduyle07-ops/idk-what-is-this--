@@ -582,7 +582,13 @@ def test_seed_registry_has_expected_phases():
     assert "CTX.OOP.1A" in ids
     assert "CTX.OOP.1C" in ids
     assert "OOP.INTENT.UI.1" in ids
-    assert len(data["phases"]) == 205
+    assert "OOP.INTENT.DESIGN.1" in ids
+    assert "OOP.INTENT.DETECT.2" in ids
+    assert "OOP.INTENT.CONTINUE.1" in ids
+    assert "PATCH.SCOPE.EXPAND.1" in ids
+    assert "PATCH.SCOPE.RECHECK.1" in ids
+    assert "PATCH.SCOPE.REFRESH.1" in ids
+    assert len(data["phases"]) == 224
 
 
 def test_input_understanding_phase_is_registered_and_inert():
@@ -2112,6 +2118,10 @@ def test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call
         "PATCH.AUTHOR.LIVE.1",
         # CONTROL.BOOTSTRAP.1 joined on 2026-09-18 with one bootstrap authoring call per fresh request.
         "CONTROL.BOOTSTRAP.1",
+        # PLAN.1 exposes one already-authorized planner call and no author call.
+        "PATCH.SCOPE.PLAN.1",
+        # AUTHOR.STRUCTURAL.1 permits one injected read-only author call.
+        "PATCH.AUTHOR.STRUCTURAL.1",
     }
     others = [
         item for item in phases if item["phase_id"] not in declared_model_call_phases
@@ -2262,7 +2272,7 @@ def test_seed_registry_summary_counts():
         "INPUT": 4,
         "SYNTHESIS": 1,
             "CHECK": 9,
-            "CONTROL": 23,
+            "CONTROL": 42,
             "WAITER": 5,
         "WORKER": 5,
         "MIRROR": 15,
@@ -3928,3 +3938,479 @@ def test_repository_specificity_entry_ordering_is_registered_as_live_ordering_fi
         "RETRIEVE.LIVE.4.CLOSE",
     ):
         assert forbidden_phase not in ids
+
+
+# PATCH.SCOPE.EXPAND.1 bookkeeping boundary.
+def test_structural_scope_expansion_phase_is_bounded_proposal_only():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [item for item in data["phases"]
+              if item["phase_id"] == "PATCH.SCOPE.EXPAND.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["model_calls_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["merge_allowed"] is False
+    assert phase["human_approval_required"] is True
+    assert "core/structural_scope_expansion.py" in phase["allowed_files"]
+    assert "tests/test_patch_scope_expand1.py" in phase["allowed_files"]
+    assert {"OOP.INTENT.DESIGN.1", "OOP.INTENT.DETECT.2",
+            "OOP.INTENT.CONTINUE.1", "PATCH.BASIS.SCOPE.1",
+            "PATCH.AUTHOR.SCOPE.1", "PATCH.AUTHOR.SPAN.1"} <= set(
+                phase["prerequisites"])
+    assert {"core/repair_scope.py", "core/authoring_repair_scope.py",
+            "core/candidate_replacement_span.py", "bank.java",
+            "SavingAccount.java", "agents/", "patching/"} <= set(
+                phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    notes = " ".join(phase["notes"])
+    for required in ("scope_authority=proposal_only", "write_authority=false",
+                     "execution_authorized=false", "candidate=null",
+                     "no admission/approval seam", "source layout",
+                     "no author/model call", "repository traversal"):
+        assert required in notes, required
+# End PATCH.SCOPE.EXPAND.1 bookkeeping boundary.
+
+
+# PATCH.SCOPE.RECHECK.1 bookkeeping boundary.
+def test_scope_discovered_semantic_recheck_is_bounded_patch_oop_bridge():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [item for item in data["phases"]
+              if item["phase_id"] == "PATCH.SCOPE.RECHECK.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["model_calls_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["merge_allowed"] is False
+    assert {"PATCH.SCOPE.EXPAND.1", "OOP.INTENT.DESIGN.1", "OOP.INTENT.DETECT.2",
+            "OOP.INTENT.CONTINUE.1", "OOP.INTENT.UI.1"} <= set(phase["prerequisites"])
+    assert "core/scope_semantic_recheck.py" in phase["allowed_files"]
+    assert {"core/repair_scope.py", "core/authoring_repair_scope.py",
+            "core/candidate_replacement_span.py", "bank.java", "SavingAccount.java",
+            "MainApp.java", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    notes = " ".join(phase["notes"])
+    for required in ("scope_authority=proposal_only", "write_authority=false",
+                     "execution_authorized=false", "candidate=null", "OOPIntentGap",
+                     "implementation_only", "human_owned_material_semantics",
+                     "scope refresh required", "no author/model call", "repository traversal"):
+        assert required in notes, required
+# End PATCH.SCOPE.RECHECK.1 bookkeeping boundary.
+
+
+# PATCH.SCOPE.REFRESH.1 bookkeeping boundary.
+def test_semantic_scope_refresh_is_new_proposal_only_control_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [item for item in data["phases"]
+              if item["phase_id"] == "PATCH.SCOPE.REFRESH.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL"
+    assert phase["status"] == "complete"
+    assert phase["automation_level"] == "LOCAL_1_PREPARE"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["model_calls_allowed"] is False
+    assert phase["network_allowed"] is False
+    assert phase["merge_allowed"] is False
+    assert phase["human_approval_required"] is True
+    assert {"PATCH.SCOPE.EXPAND.1", "PATCH.SCOPE.RECHECK.1",
+            "OOP.INTENT.DETECT.2", "OOP.INTENT.CONTINUE.1"} <= set(
+                phase["prerequisites"])
+    assert "core/structural_scope_refresh.py" in phase["allowed_files"]
+    assert "tests/test_patch_scope_refresh1.py" in phase["allowed_files"]
+    assert {"core/repair_scope.py", "core/authoring_repair_scope.py",
+            "bank.java", "SavingAccount.java", "MainApp.java",
+            "patching/", "agents/", "web/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    notes = " ".join(phase["notes"]).lower()
+    for required in ("p0 is reconstructed", "new immutable", "proposal_only",
+                     "write_authority=false", "candidate=null", "no source edit",
+                     "repository traversal"):
+        assert required in notes, required
+# End PATCH.SCOPE.REFRESH.1 bookkeeping boundary.
+
+
+# PATCH.SCOPE.APPROVE.1 bookkeeping boundary.
+def test_scope_approval_phase_is_evidence_only_control_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = next(p for p in data["phases"] if p["phase_id"] == "PATCH.SCOPE.APPROVE.1")
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["model_calls_allowed"] is phase["network_allowed"] is phase["merge_allowed"] is False
+    assert phase["human_approval_required"] is True
+    assert "PATCH.SCOPE.REFRESH.1" in phase["prerequisites"]
+    assert "core/structural_scope_approval.py" in phase["allowed_files"]
+    assert "bank.java" in phase["forbidden_files"]
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("explicit_human", "proposal_only", "candidate=null", "MAY_REQUIRE_EXISTING_API_CHANGE", "idempotent", "GET is read-only"):
+        assert term in " ".join(phase["notes"])
+# End PATCH.SCOPE.APPROVE.1 bookkeeping boundary.
+
+
+# PATCH.SCOPE.PLAN.1 bookkeeping boundary.
+def test_plan_phase_is_read_only_planner_harness_boundary():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [p for p in data["phases"] if p["phase_id"] == "PATCH.SCOPE.PLAN.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["budget_tier"] == "strong_model_requires_approval"
+    assert phase["model_calls_allowed"] is phase["human_approval_required"] is True
+    assert phase["network_allowed"] is phase["merge_allowed"] is False
+    assert "PATCH.SCOPE.APPROVE.1" in phase["prerequisites"]
+    assert "core/structural_implementation_plan.py" in phase["allowed_files"]
+    assert {"bank.java", "SavingAccount.java", "MainApp.java", "core/repair_scope.py",
+            "core/authoring_repair_scope.py", "web/", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("read_only_plan", "subset/equal-to", "MAY", "file_creation_authority=false",
+                 "zero RepairScope/AuthoringRepairScope delta", "candidate=null", "SCOPE_ADMISSION_NOT_IMPLEMENTED"):
+        assert term in " ".join(phase["notes"])
+# End PATCH.SCOPE.PLAN.1 bookkeeping boundary.
+
+
+# PATCH.SCOPE.ADMIT.1 bookkeeping boundary.
+def test_admit_phase_is_deterministic_candidate_only_control_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [p for p in data["phases"] if p["phase_id"] == "PATCH.SCOPE.ADMIT.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["model_calls_allowed"] is phase["network_allowed"] is phase["merge_allowed"] is False
+    assert phase["human_approval_required"] is True
+    assert "PATCH.SCOPE.PLAN.1" in phase["prerequisites"]
+    assert "core/structural_scope_admission.py" in phase["allowed_files"]
+    assert {"bank.java", "SavingAccount.java", "MainApp.java", "core/repair_scope.py",
+            "core/authoring_repair_scope.py", "web/", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("candidate_authoring_only", "subset/equal-to", "Unused MAY", "write_authority=false",
+                 "zero RepairScope/AuthoringRepairScope delta", "candidate=null", "author calls=0"):
+        assert term in " ".join(phase["notes"])
+# End PATCH.SCOPE.ADMIT.1 bookkeeping boundary.
+
+
+# PATCH.AUTHOR.STRUCTURAL.1 bookkeeping boundary.
+def test_structural_author_phase_is_candidate_only_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    phase = next(p for p in data["phases"] if p["phase_id"] == "PATCH.AUTHOR.STRUCTURAL.1")
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["model_calls_allowed"] is phase["human_approval_required"] is True
+    assert phase["budget_tier"] == "strong_model_requires_approval"
+    assert phase["network_allowed"] is phase["merge_allowed"] is False
+    assert "PATCH.SCOPE.ADMIT.1" in phase["prerequisites"]
+    assert "core/structural_patch_author.py" in phase["allowed_files"]
+    assert {"bank.java", "SavingAccount.java", "MainApp.java", "core/repair_scope.py",
+            "core/authoring_repair_scope.py", "web/", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("candidate_only", "READ-ONLY SUPPORT", "unused MAY", "one-shot", "no real BANK.2",
+                 "write_authority=false", "STRUCTURAL_CANDIDATE_MATERIALIZATION_NOT_IMPLEMENTED"):
+        assert term in " ".join(phase["notes"])
+# End PATCH.AUTHOR.STRUCTURAL.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.MATERIALIZE.1 bookkeeping boundary.
+def test_structural_candidate_materialization_is_virtual_only_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [p for p in data["phases"] if p["phase_id"] == "PATCH.CANDIDATE.MATERIALIZE.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["budget_tier"] == "local_only"
+    assert phase["human_approval_required"] is True
+    assert phase["network_allowed"] is phase["merge_allowed"] is phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert "PATCH.AUTHOR.STRUCTURAL.1" in phase["prerequisites"]
+    assert "core/structural_candidate_materialization.py" in phase["allowed_files"]
+    assert {"bank.java", "SavingAccount.java", "MainApp.java", "core/structural_patch_author.py",
+            "core/structural_java.py", "core/structural_scope_admission.py", "core/repair_scope.py",
+            "core/authoring_repair_scope.py", "web/", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("virtual_post_state_only", "write_authority=false", "Source mutation=0",
+                 "model calls=0", "author calls=0", "repository traversal=0", "Harness-owned",
+                 "before_sha256=null", "PLAN/admitted", "No candidate repair", "display-only",
+                 "validate_materialized_structural_candidate", "synthetic frozen AUTHOR",
+                 "STRUCTURAL_CANDIDATE_VALIDATION_NOT_IMPLEMENTED"):
+        assert term in " ".join(phase["notes"])
+# End PATCH.CANDIDATE.MATERIALIZE.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.VALIDATE.1A bookkeeping boundary.
+def test_structural_candidate_compile_validation_is_diagnostic_only_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [p for p in data["phases"] if p["phase_id"] == "PATCH.CANDIDATE.VALIDATE.1A"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["budget_tier"] == "local_only" and phase["requires_sandbox"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["network_allowed"] is phase["merge_allowed"] is phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert {"PATCH.CANDIDATE.MATERIALIZE.1", "PATCH.AUTHOR.STRUCTURAL.1",
+            "PATCH.SCOPE.ADMIT.1", "PREFLIGHT.REQUEST.1"} <= set(phase["prerequisites"])
+    assert "core/structural_compile_validation.py" in phase["allowed_files"]
+    assert {"bank.java", "SavingAccount.java", "SavingAccountBehaviorTest.java", "MainApp.java",
+            "core/structural_candidate_materialization.py", "core/structural_patch_author.py",
+            "core/structural_java.py", "web/", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("diagnostic_evidence_only", "write_authority=false", "shell=false", "after_bytes",
+                 "SHA-256", "read_only_compile_dependency", "Compile failure != permission to repair",
+                 "no real BANK.2", "validate_structural_compile_receipt", "repository traversal=0",
+                 "STRUCTURAL_CANDIDATE_BEHAVIORAL_VALIDATION_NOT_IMPLEMENTED"):
+        assert term in " ".join(phase["notes"])
+# End PATCH.CANDIDATE.VALIDATE.1A bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.BEHAVIOR.SPEC.1 bookkeeping boundary.
+def test_behavioral_specification_is_oracle_only_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [p for p in data["phases"] if p["phase_id"] == "PATCH.CANDIDATE.BEHAVIOR.SPEC.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["budget_tier"] == "local_only" and phase["requires_sandbox"] is False
+    assert phase["human_approval_required"] is True
+    assert phase["network_allowed"] is phase["merge_allowed"] is phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert {"PATCH.CANDIDATE.VALIDATE.1A", "PATCH.CANDIDATE.MATERIALIZE.1",
+            "PATCH.AUTHOR.STRUCTURAL.1", "PATCH.SCOPE.ADMIT.1", "PATCH.SCOPE.PLAN.1"} <= set(phase["prerequisites"])
+    assert "core/behavioral_validation_specification.py" in phase["allowed_files"]
+    assert {"bank.java", "SavingAccount.java", "SavingAccountBehaviorTest.java", "MainApp.java",
+            "core/structural_compile_validation.py", "core/structural_candidate_materialization.py",
+            "core/structural_patch_author.py", "core/structural_java.py", "web/", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("behavioral_oracle_only", "test_write_authority=false", "execution_authorized=false",
+                 "write_authority=false", "apply_authority=false", "compile_success=true",
+                 "behavior_spec_stale", "implementation_contract", "observation_evidence_missing",
+                 "execution_harness_constraint", "Actual javac invocations=0", "java execution=0",
+                 "model calls=0", "author calls=0", "repository traversal=0",
+                 "STRUCTURAL_CANDIDATE_BEHAVIORAL_EXECUTION_PLANNING_NOT_IMPLEMENTED"):
+        assert term in " ".join(phase["notes"])
+# End PATCH.CANDIDATE.BEHAVIOR.SPEC.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1 bookkeeping boundary.
+def test_behavioral_execution_plan_is_bounded_capability_incomplete_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [p for p in data["phases"] if p["phase_id"] == "PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["budget_tier"] == "local_only" and phase["requires_sandbox"] is False
+    assert phase["human_approval_required"] is True
+    assert phase["network_allowed"] is phase["merge_allowed"] is phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert {"PATCH.CANDIDATE.BEHAVIOR.SPEC.1", "PATCH.CANDIDATE.VALIDATE.1A",
+            "PATCH.CANDIDATE.MATERIALIZE.1", "PATCH.AUTHOR.STRUCTURAL.1",
+            "PATCH.SCOPE.ADMIT.1", "PATCH.SCOPE.PLAN.1", "PREFLIGHT.REQUEST.1"} <= set(phase["prerequisites"])
+    assert "core/behavioral_evidence_execution_plan.py" in phase["allowed_files"]
+    assert {"bank.java", "SavingAccount.java", "SavingAccountBehaviorTest.java", "MainApp.java",
+            "core/behavioral_validation_specification.py", "core/structural_compile_validation.py",
+            "core/structural_candidate_materialization.py", "core/structural_patch_author.py",
+            "core/structural_java.py", "web/", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("COMPLETE_WITH_WARNINGS / FROZEN", "behavioral_execution_plan_only",
+                 "validate_behavioral_validation_specification", "compile_success=true", "execution_plan_stale",
+                 "java_execution_authorized=false", "reflection_authorized=false", "console_authorized=false",
+                 "test_write_authority=false", "write_authority=false", "apply_authority=false",
+                 "read_only_reflection", "deterministic_console_input", "redirected stdin",
+                 "execution_capability_incomplete", "execution_ready", "ephemeral diagnostic harness",
+                 "diagnostic_fixture", "implementation_fixture", "implementation_contract",
+                 "validate_behavioral_evidence_execution_plan", "Actual javac invocations=0", "Java execution=0",
+                 "model calls=0", "author calls=0", "repository traversal=0",
+                 "STRUCTURAL_CANDIDATE_BEHAVIORAL_EXECUTION_NOT_IMPLEMENTED"):
+        assert term in " ".join(phase["notes"])
+# End PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.BEHAVIOR.REFLECT.1 bookkeeping boundary.
+def test_read_only_reflection_is_bounded_diagnostic_capability_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [p for p in data["phases"] if p["phase_id"] == "PATCH.CANDIDATE.BEHAVIOR.REFLECT.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["budget_tier"] == "local_only" and phase["requires_sandbox"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["network_allowed"] is phase["merge_allowed"] is phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert "PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1" in phase["prerequisites"]
+    assert {"core/read_only_reflection.py", "core/read_only_reflection_java.py"} <= set(phase["allowed_files"])
+    assert {"bank.java", "SavingAccount.java", "SavingAccountBehaviorTest.java", "MainApp.java",
+            "core/behavioral_evidence_execution_plan.py", "core/behavioral_validation_specification.py",
+            "core/structural_java.py", "web/", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("read_exact_bound_field", "ReadOnlyReflectionRequest", "ReadOnlyReflectionObservation",
+                 "validate_read_only_reflection_request", "validate_read_only_reflection_observation",
+                 "available_but_not_execution_admitted", "product_mutation_authority=false",
+                 "source_write_authority=false", "reflection_write_authority=false",
+                 "private_method_invocation_authority=false", "arbitrary_member_discovery_authority=false",
+                 "BANK_behavioral_java_execution_count=0", "deterministic_console_input remains unavailable",
+                 "model calls=0", "author calls=0", "repository traversal=0"):
+        assert term in " ".join(phase["notes"])
+# End PATCH.CANDIDATE.BEHAVIOR.REFLECT.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.BEHAVIOR.EXEC.ADMIT.1 bookkeeping boundary.
+def test_behavioral_execution_admission_is_bounded_authority_classification_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [p for p in data["phases"] if p["phase_id"] == "PATCH.CANDIDATE.BEHAVIOR.EXEC.ADMIT.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["budget_tier"] == "local_only" and phase["requires_sandbox"] is False
+    assert phase["human_approval_required"] is True
+    assert phase["network_allowed"] is phase["merge_allowed"] is phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert {"PATCH.CANDIDATE.BEHAVIOR.REFLECT.1", "PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1",
+            "PATCH.CANDIDATE.BEHAVIOR.SPEC.1", "PATCH.CANDIDATE.VALIDATE.1A",
+            "PATCH.CANDIDATE.MATERIALIZE.1", "PREFLIGHT.REQUEST.1"} <= set(phase["prerequisites"])
+    assert "core/behavioral_execution_admission.py" in phase["allowed_files"]
+    assert {"bank.java", "SavingAccount.java", "SavingAccountBehaviorTest.java", "MainApp.java",
+            "core/behavioral_evidence_execution_plan.py", "core/behavioral_validation_specification.py",
+            "core/read_only_reflection.py", "core/read_only_reflection_java.py",
+            "web/", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("COMPLETE_WITH_WARNINGS / FROZEN", "BehavioralExecutionAdmission",
+                 "diagnostic_behavioral_execution_only", "validate_behavioral_evidence_execution_plan",
+                 "read_exact_bound_field", "available_but_not_execution_admitted",
+                 "diagnostic_execution_authority_missing", "blocked_authority",
+                 "blocked_missing_capability", "static_not_executed", "Partial evidence coverage is valid",
+                 "process-local authenticated adapter receipt", "admission_stale",
+                 "runtime_executor_capability_missing", "network capability=false",
+                 "product_write_authority=false", "repository_write_authority=false",
+                 "apply_authority=false", "test_write_authority=false",
+                 "reflection_write_authority=false", "console_authorized=false",
+                 "diagnostic_harness_generation_authorized=false", "java_execution_authorized=false",
+                 "Java execution=0", "reflection execution=0", "console/PTY opened=0",
+                 "Actual javac invocations=0", "model calls=0", "author calls=0", "repository traversal=0"):
+        assert term in " ".join(phase["notes"])
+# End PATCH.CANDIDATE.BEHAVIOR.EXEC.ADMIT.1 bookkeeping boundary.
+
+
+# PREFLIGHT.RUNTIME.1 bookkeeping boundary.
+def test_runtime_diagnostic_authorization_is_exact_bounded_policy_history():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [p for p in data["phases"] if p["phase_id"] == "PREFLIGHT.RUNTIME.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["budget_tier"] == "local_only" and phase["requires_sandbox"] is False
+    assert phase["human_approval_required"] is True
+    assert phase["network_allowed"] is phase["merge_allowed"] is phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert {"PATCH.CANDIDATE.BEHAVIOR.EXEC.ADMIT.1", "PATCH.CANDIDATE.BEHAVIOR.REFLECT.1",
+            "PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1", "PATCH.CANDIDATE.BEHAVIOR.SPEC.1",
+            "PREFLIGHT.REQUEST.1", "ACQUIRE.1"} <= set(phase["prerequisites"])
+    assert {"core/runtime_diagnostic_authorization.py", "tests/_preflight_runtime1_guard.py"} <= set(phase["allowed_files"])
+    assert {"bank.java", "SavingAccount.java", "SavingAccountBehaviorTest.java", "MainApp.java",
+            "core/behavioral_execution_admission.py", "core/behavioral_evidence_execution_plan.py",
+            "core/behavioral_validation_specification.py", "core/read_only_reflection.py",
+            "core/read_only_reflection_java.py", "web/", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("RuntimeDiagnosticAuthorization", "bounded_runtime_diagnostic_only",
+                 "Evidence requirement != execution authority", "capability availability != authorization",
+                 "authorization != executor availability", "no implied human consent",
+                 "validate_runtime_diagnostic_authorization", "read_exact_bound_field",
+                 "diagnostic_execution_authority_missing", "authorized_but_executor_unavailable",
+                 "runtime_executor_capability_missing", "deterministic_console_input",
+                 "repository_write_authority=false", "product_write_authority=false",
+                 "reflection_write_authority=false", "test_write_authority=false", "apply_authority=false",
+                 "Java execution=0", "reflection execution=0", "compiler execution=0",
+                 "Prior EXEC.ADMIT.1 disclosed synthetic verification breach"):
+        assert term in " ".join(phase["notes"])
+# End PREFLIGHT.RUNTIME.1 bookkeeping boundary.
+
+
+# PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1 bookkeeping boundary.
+def test_behavioral_runtime_executor_remains_blocked_without_required_isolation():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [p for p in data["phases"] if p["phase_id"] == "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert phase["title"] == "Bounded Ephemeral Java Diagnostic Executor"
+    assert phase["track"] == "CONTROL" and phase["status"] == "active"
+    assert phase["risk_level"] == "blocked" and phase["budget_tier"] == "local_only"
+    assert phase["requires_sandbox"] is True
+    assert phase["human_approval_required"] is True
+    assert phase["network_allowed"] is phase["merge_allowed"] is phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert {"PREFLIGHT.RUNTIME.1", "PATCH.CANDIDATE.BEHAVIOR.EXEC.ADMIT.1",
+            "PATCH.CANDIDATE.BEHAVIOR.REFLECT.1", "PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1",
+            "PATCH.CANDIDATE.BEHAVIOR.SPEC.1", "PATCH.CANDIDATE.VALIDATE.1A",
+            "PATCH.CANDIDATE.MATERIALIZE.1", "PATCH.AUTHOR.STRUCTURAL.1",
+            "EXEC.APPROVAL.LIVE.1"} <= set(phase["prerequisites"])
+    assert "core/behavioral_diagnostic_executor.py" in phase["allowed_files"]
+    assert {"bank.java", "SavingAccount.java", "SavingAccountBehaviorTest.java", "MainApp.java",
+            "core/runtime_diagnostic_authorization.py", "core/behavioral_execution_admission.py",
+            "core/behavioral_evidence_execution_plan.py", "core/behavioral_validation_specification.py",
+            "core/read_only_reflection.py", "core/read_only_reflection_java.py",
+            "core/structural_compile_validation.py", "core/structural_candidate_materialization.py",
+            "core/structural_patch_author.py", "core/human_apply_authorization.py",
+            "web/", "agents/", "patching/"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("runtime_executor_capability_incomplete", "runtime_executor_available=false",
+                 "RuntimeDiagnosticEffectBoundary", "mandatory_enforcement",
+                 "filesystem_isolation_unavailable", "network_isolation_unavailable",
+                 "environment_isolation_unavailable", "child_process_isolation_unavailable",
+                 "validate_runtime_diagnostic_authorization", "BehavioralDiagnosticExecutionReceipt",
+                 "validate_behavioral_diagnostic_execution_receipt", "diagnostic_runtime_evidence_only",
+                 "executor_authorization_missing", "diagnostic_execution_authority_missing",
+                 "deterministic_console_input", "execution_completed=false", "process-local",
+                 "no oracle", "write_authority=false", "apply_authority=false", "Java execution=0",
+                 "compiler execution=0", "harness generation=0", "repository traversal=0",
+                 "model calls=0", "author calls=0", "Historical hashes remain frozen"):
+        assert term in " ".join(phase["notes"])
+# End PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1 bookkeeping boundary.
+
+
+# RUNTIME.SANDBOX.1 bookkeeping boundary.
+def test_runtime_sandbox_is_measured_complete_without_executor_or_authority_widening():
+    data = load_phase_registry(str(_SEED_PATH))
+    phases = [p for p in data["phases"] if p["phase_id"] == "RUNTIME.SANDBOX.1"]
+    assert len(phases) == 1
+    phase = phases[0]
+    assert "RUNTIME" in PHASE_ID_PREFIXES
+    assert phase["title"] == "Verified OS-Enforced Candidate Runtime Isolation Adapter"
+    assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+    assert phase["risk_level"] == "medium" and phase["budget_tier"] == "local_only"
+    assert phase["requires_sandbox"] is phase["human_approval_required"] is True
+    assert phase["network_allowed"] is phase["merge_allowed"] is phase["model_calls_allowed"] is False
+    assert phase["writes_real_repo"] is False
+    assert set(phase["prerequisites"]) == {
+        "PREFLIGHT.RUNTIME.1", "PATCH.CANDIDATE.BEHAVIOR.EXEC.ADMIT.1",
+        "PATCH.CANDIDATE.BEHAVIOR.REFLECT.1", "PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1",
+        "PATCH.CANDIDATE.BEHAVIOR.SPEC.1", "PATCH.CANDIDATE.VALIDATE.1A",
+        "PATCH.CANDIDATE.MATERIALIZE.1", "PATCH.AUTHOR.STRUCTURAL.1"}
+    assert {"core/candidate_runtime_sandbox.py", "core/candidate_runtime_sandbox_probe.py",
+            "tests/test_runtime_sandbox1.py", "scripts/replay_runtime_sandbox1.py",
+            "docs/roadmap/RUNTIME_SANDBOX_1.md", "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json",
+            "tests/_runtime_sandbox1_maintenance.py", "tests/fixtures/runtime_sandbox1_reversal.json"} <= set(phase["allowed_files"])
+    assert {"core/behavioral_diagnostic_executor.py", "core/runtime_diagnostic_authorization.py",
+            "core/read_only_reflection.py", "bank.java", "SavingAccount.java",
+            "SavingAccountBehaviorTest.java", "MainApp.java", "web/", "agents/", "patching/",
+            "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json"} <= set(phase["forbidden_files"])
+    assert not set(phase["allowed_files"]) & set(phase["forbidden_files"])
+    for term in ("CandidateRuntimeSandboxAdapter", "CandidateRuntimeSandboxDescriptor",
+                 "CandidateRuntimeSandboxVerificationReceipt", "CandidateRuntimeSandboxExecutionSpec",
+                 "backend_available=true", "backend_verified=true", "sandbox_verified=true",
+                 "SANDBOX CAPABILITY != RUNTIME AUTHORITY", "SANDBOX CAPABILITY != EXECUTOR",
+                 "actual adversarial local execution", "report-only", "two repetitions",
+                 "shell_available=false", "arbitrary_command_authority=false",
+                 "repository_write_authority=false", "apply_authority=false",
+                 "RUNTIME_SANDBOX_1_COMPLETE_WITH_WARNINGS", "sandbox_output_limit_exceeded",
+                 "sandbox_backend_unavailable", "RUNTIME_SANDBOX_1_BLOCKED_BACKEND_UNAVAILABLE",
+                 "sandbox_satisfies_executor_boundary", "all eleven mandatory",
+                 "BANK execution=0", "behavioral scenario execution=0", "Java candidate execution=0",
+                 "model calls=0", "author calls=0", "repository traversal=0",
+                 "no resource-exhaustion enforcement claim", "Historical hashes remain frozen",
+                 "executor_refresh_and_exact_java_runtime_integration_not_in_this_phase"):
+        assert term in " ".join(phase["notes"])
+    executor = next(p for p in data["phases"] if p["phase_id"] == "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1")
+    assert executor["status"] == "active" and executor["risk_level"] == "blocked"
+# End RUNTIME.SANDBOX.1 bookkeeping boundary.

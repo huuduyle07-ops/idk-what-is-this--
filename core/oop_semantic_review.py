@@ -70,6 +70,11 @@ class OOPIntentGap:
     evidence_refs: tuple[str, ...]
     source_fingerprint: str
     task_fingerprint: str
+    subdimensions: tuple[str, ...] = ()
+    unresolved_dimension_refs: tuple[str, ...] = ()
+    design_fingerprint: str = ""
+    task_contract_fingerprint: str = ""
+    repository_id: str = ""
     owner: str = "human"
     status: str = "clarification_required"
 
@@ -79,6 +84,28 @@ class OOPIntentGap:
                 or len({item.effect for item in self.alternatives}) < 2
                 or not 1 <= len(self.evidence_refs) <= MAX_REFS):
             raise ValueError("invalid_oop_intent_gap")
+        future_fields = (self.design_fingerprint, self.task_contract_fingerprint,
+                         self.repository_id)
+        if self.subdimensions:
+            allowed = {
+                "credential_ownership", "credential_source", "credential_persistence",
+                "credential_verification_mechanism", "verification_lifecycle",
+                "savings_funding_semantics", "savings_interest_semantics",
+            }
+            if (self.dimension != "future_design_contract"
+                    or len(self.subdimensions) != len(set(self.subdimensions))
+                    or not set(self.subdimensions) <= allowed
+                    or len(self.unresolved_dimension_refs) != len(self.subdimensions)
+                    or len(set(self.unresolved_dimension_refs)) != len(self.unresolved_dimension_refs)
+                    or any(not item.startswith("unresolved_dimension:")
+                           or len(item) != len("unresolved_dimension:") + 64
+                           for item in self.unresolved_dimension_refs)
+                    or any(not isinstance(value, str) or not value for value in future_fields)
+                    or any(len(value) != 64 or any(char not in "0123456789abcdef" for char in value)
+                           for value in future_fields[:2])):
+                raise ValueError("invalid_future_design_oop_intent_gap")
+        elif self.unresolved_dimension_refs or any(future_fields):
+            raise ValueError("future-design bindings require typed subdimensions")
 
 
 @dataclass(frozen=True, slots=True)

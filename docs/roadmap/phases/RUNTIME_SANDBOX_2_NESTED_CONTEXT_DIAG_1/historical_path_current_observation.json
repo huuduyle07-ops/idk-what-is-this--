@@ -1,0 +1,215 @@
+{
+  "phase_id": "RUNTIME.SANDBOX.2.NESTED.CONTEXT.DIAG.1",
+  "observed_at_utc": "2026-10-10T14:49:52.351Z",
+  "scope": "Current read-only path/ACL metadata and current Python standard-library source observations; not a historical permissions snapshot.",
+  "path_observation": {
+    "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_AUTH_PINNED_1",
+    "present": true,
+    "is_directory": true,
+    "attributes": "Directory",
+    "is_reparse_point": false,
+    "link_type": null,
+    "link_target": null,
+    "creation_time_utc": "2026-10-10T00:45:31.0409328Z",
+    "last_write_time_utc": "2026-10-10T01:34:44.1378607Z",
+    "current_subdirectories": [],
+    "write_probe_performed": false,
+    "historical_directory_written_by_this_audit": false,
+    "ancestor_link_metadata_inspected": false
+  },
+  "acl_observation": {
+    "owner": "LAPTOP-UFO8SCOQ\\Admin",
+    "are_access_rules_protected": false,
+    "access_rules": [
+      {
+        "identity": "S-1-5-21-2814232165-3468629376-2401445129-369785651",
+        "access_control_type": "Allow",
+        "file_system_rights": "Modify, Synchronize",
+        "inherited": true,
+        "inheritance_flags": "ContainerInherit, ObjectInherit",
+        "propagation_flags": "None"
+      },
+      {
+        "identity": "LAPTOP-UFO8SCOQ\\CodexSandboxUsers",
+        "access_control_type": "Allow",
+        "file_system_rights": "Modify, Synchronize",
+        "inherited": true,
+        "inheritance_flags": "ContainerInherit, ObjectInherit",
+        "propagation_flags": "None"
+      },
+      {
+        "identity": "S-1-5-21-3205784864-2226312090-745101749-349416012",
+        "access_control_type": "Allow",
+        "file_system_rights": "Modify, Synchronize",
+        "inherited": true,
+        "inheritance_flags": "ContainerInherit, ObjectInherit",
+        "propagation_flags": "None"
+      },
+      {
+        "identity": "S-1-5-21-580817965-1684596837-1558349657-3314426404",
+        "access_control_type": "Allow",
+        "file_system_rights": "Modify, Synchronize",
+        "inherited": true,
+        "inheritance_flags": "ContainerInherit, ObjectInherit",
+        "propagation_flags": "None"
+      },
+      {
+        "identity": "S-1-5-21-3224554970-3388937232-3405948303-2277503130",
+        "access_control_type": "Allow",
+        "file_system_rights": "Modify, Synchronize",
+        "inherited": true,
+        "inheritance_flags": "ContainerInherit, ObjectInherit",
+        "propagation_flags": "None"
+      },
+      {
+        "identity": "NT AUTHORITY\\SYSTEM",
+        "access_control_type": "Allow",
+        "file_system_rights": "FullControl",
+        "inherited": true,
+        "inheritance_flags": "ContainerInherit, ObjectInherit",
+        "propagation_flags": "None"
+      },
+      {
+        "identity": "BUILTIN\\Administrators",
+        "access_control_type": "Allow",
+        "file_system_rights": "FullControl",
+        "inherited": true,
+        "inheritance_flags": "ContainerInherit, ObjectInherit",
+        "propagation_flags": "None"
+      },
+      {
+        "identity": "LAPTOP-UFO8SCOQ\\Admin",
+        "access_control_type": "Allow",
+        "file_system_rights": "FullControl",
+        "inherited": true,
+        "inheritance_flags": "ContainerInherit, ObjectInherit",
+        "propagation_flags": "None"
+      }
+    ],
+    "deny_rules_present": false,
+    "interpretation": "Current access rules include Modify for CodexSandboxUsers and FullControl for Admin; these are not a historical write test or proof of historical process permissions."
+  },
+  "standard_library_observation": {
+    "path": "C:/Python314/Lib/tempfile.py",
+    "sha256": "8c6b485b1936ce7e5968073f9a76fa5cf50dcf14e4f63f670d4850165fa6c76d",
+    "version_basis": "Python314 directory name; current source read only, interpreter not executed for this artifact.",
+    "historical_standard_library_hash_recovered": false,
+    "semantics": [
+      {
+        "start_line": 115,
+        "end_line": 130,
+        "meaning": "With dir=None, tempfile selects gettempdir() or gettempdirb().",
+        "source_excerpt": "def _sanitize_params(prefix, suffix, dir):\n    \"\"\"Common parameter processing for most APIs in this module.\"\"\"\n    output_type = _infer_return_type(prefix, suffix, dir)\n    if suffix is None:\n        suffix = output_type()\n    if prefix is None:\n        if output_type is str:\n            prefix = template\n        else:\n            prefix = _os.fsencode(template)\n    if dir is None:\n        if output_type is str:\n            dir = gettempdir()\n        else:\n            dir = gettempdirb()\n    return prefix, suffix, dir, output_type"
+      },
+      {
+        "start_line": 157,
+        "end_line": 182,
+        "meaning": "Environment candidate precedence TMPDIR, TEMP, TMP is considered only when discovering the default root; current directory is a last resort.",
+        "source_excerpt": "def _candidate_tempdir_list():\n    \"\"\"Generate a list of candidate temporary directories which\n    _get_default_tempdir will try.\"\"\"\n\n    dirlist = []\n\n    # First, try the environment.\n    for envname in 'TMPDIR', 'TEMP', 'TMP':\n        dirname = _os.getenv(envname)\n        if dirname: dirlist.append(dirname)\n\n    # Failing that, try OS-specific locations.\n    if _os.name == 'nt':\n        dirlist.extend([ _os.path.expanduser(r'~\\AppData\\Local\\Temp'),\n                         _os.path.expandvars(r'%SYSTEMROOT%\\Temp'),\n                         r'c:\\temp', r'c:\\tmp', r'\\temp', r'\\tmp' ])\n    else:\n        dirlist.extend([ '/tmp', '/var/tmp', '/usr/tmp' ])\n\n    # As a last resort, the current directory.\n    try:\n        dirlist.append(_os.getcwd())\n    except (AttributeError, OSError):\n        dirlist.append(_os.curdir)\n\n    return dirlist"
+      },
+      {
+        "start_line": 296,
+        "end_line": 316,
+        "meaning": "An explicitly assigned tempfile.tempdir is returned without default-root discovery or an environment lookup.",
+        "source_excerpt": "tempdir = None\n\ndef _gettempdir():\n    \"\"\"Private accessor for tempfile.tempdir.\"\"\"\n    global tempdir\n    if tempdir is None:\n        _once_lock.acquire()\n        try:\n            if tempdir is None:\n                tempdir = _get_default_tempdir()\n        finally:\n            _once_lock.release()\n    return tempdir\n\ndef gettempdir():\n    \"\"\"Returns tempfile.tempdir as str.\"\"\"\n    return _os.fsdecode(_gettempdir())\n\ndef gettempdirb():\n    \"\"\"Returns tempfile.tempdir as bytes.\"\"\"\n    return _os.fsencode(_gettempdir())"
+      },
+      {
+        "start_line": 370,
+        "end_line": 381,
+        "meaning": "mkdtemp joins the selected root and generated prefix, audits tempfile.mkdtemp, then calls os.mkdir.",
+        "source_excerpt": "    prefix, suffix, dir, output_type = _sanitize_params(prefix, suffix, dir)\n\n    names = _get_candidate_names()\n    if output_type is bytes:\n        names = map(_os.fsencode, names)\n\n    for seq in range(TMP_MAX):\n        name = next(names)\n        file = _os.path.join(dir, prefix + name + suffix)\n        _sys.audit(\"tempfile.mkdtemp\", file)\n        try:\n            _os.mkdir(file, 0o700)"
+      },
+      {
+        "start_line": 905,
+        "end_line": 913,
+        "meaning": "TemporaryDirectory delegates to mkdtemp(suffix, prefix, dir).",
+        "source_excerpt": "    def __init__(self, suffix=None, prefix=None, dir=None,\n                 ignore_cleanup_errors=False, *, delete=True):\n        self.name = mkdtemp(suffix, prefix, dir)\n        self._ignore_cleanup_errors = ignore_cleanup_errors\n        self._delete = delete\n        self._finalizer = _weakref.finalize(\n            self, self._cleanup, self.name,\n            warn_message=\"Implicitly cleaning up {!r}\".format(self),\n            ignore_errors=self._ignore_cleanup_errors, delete=self._delete)"
+      }
+    ]
+  },
+  "frozen_source_semantic_connection": {
+    "explicit_global_override": {
+      "path": "scripts/replay_synth_auth_pinned1.py",
+      "assignment_line": 61,
+      "public_issuance_line": 65,
+      "restoration_line": 102,
+      "root": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1",
+      "active_at_JAVA1C_SANDBOX2": true
+    },
+    "private_config": {
+      "path": "core/candidate_runtime_sandbox.py",
+      "start_line": 363,
+      "gettempdir_line": 371,
+      "return_line": 372,
+      "historical_argv_source": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/SYNTH_AUTH_PINNED_1_LOCAL.json",
+      "historical_argv_lines": [
+        2675,
+        2678,
+        2689,
+        2690
+      ],
+      "image_inspect_exit_code": 0
+    },
+    "workspace": {
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "temporary_directory_line": 335,
+      "call": "tempfile.TemporaryDirectory(prefix='runtime-sandbox2-')",
+      "dir_argument_present": false,
+      "same_global_root_governs_config_and_workspace": true
+    },
+    "earlier_same_process_control": {
+      "source": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/SYNTH_AUTH_PINNED_1_LOCAL.json",
+      "cleanup_lines": [
+        223,
+        224,
+        225,
+        226,
+        227
+      ],
+      "complete_pair_lines": [
+        243,
+        244,
+        261
+      ],
+      "effect_lines": [
+        1594,
+        1595,
+        1596,
+        1597,
+        1598,
+        1599,
+        1600
+      ],
+      "container_create_attempts": 11,
+      "container_start_attempts": 11,
+      "exact_image_inspect_calls": 1,
+      "meaning": "Earlier BIND SANDBOX2 succeeded while the same outer tempfile.tempdir override remained active; root locality alone is not an established mechanism for the later JAVA1C pre-create failure."
+    }
+  },
+  "temp_root_causality_classification": "OBSERVED_NONCAUSAL_DIFFERENCE",
+  "exact_historical_root_cause_established": false,
+  "limitations": [
+    "Current existence, attributes and ACL do not reconstruct historical permissions, audit guards, write-denial policy, transient locks or concurrent cleanup.",
+    "No write probe was performed in the historical phase directory.",
+    "The absence of a reparse point at the phase directory does not inspect symlinks or junctions in its ancestors.",
+    "Original inherited TMP, TEMP, TMPDIR and initial tempfile.tempdir were not retained; the source override bypasses environment selection at the relevant boundary.",
+    "The current standard-library source demonstrates current tempfile semantics; the historical Python executable path, build identity and standard-library hash were not captured by the live launch.",
+    "The earlier same-process success rejects root locality as a sufficient causal explanation, but cannot exclude a later transient path/socket condition.",
+    "The original nested SANDBOX2 report and exact first failure remain lost; no source modification or remediation is justified from these observations."
+  ],
+  "historical_files_modified": false,
+  "operational_effects": {
+    "Docker": 0,
+    "SANDBOX2_issuance": 0,
+    "JAVA1C": 0,
+    "PINNED1A_export": 0,
+    "PINNED1B": 0,
+    "PINNED1C": 0,
+    "SYNTH_retry": 0,
+    "SyntheticStateBox": 0,
+    "reflection": 0,
+    "BANK": 0,
+    "EXECUTOR_1R": 0,
+    "Apply": 0
+  }
+}

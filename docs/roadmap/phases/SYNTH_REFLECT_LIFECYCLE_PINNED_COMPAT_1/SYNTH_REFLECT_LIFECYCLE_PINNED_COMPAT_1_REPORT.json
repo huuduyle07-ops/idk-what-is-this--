@@ -1,0 +1,311 @@
+{
+  "adapter_implemented": false,
+  "admission_dependency_map": {
+    "accepts_provider_object": false,
+    "accepts_runtime_execution_lease": false,
+    "artifact": "primitive_admission_trace.md",
+    "binds_old_auth_id_and_fingerprint": true,
+    "binds_original_request_id_and_fingerprint": true,
+    "binds_renderer_identity_and_fingerprint": true,
+    "binds_scenario_source_definition_field_role": true,
+    "concept": "REQUIRES_ADDITIVE_BINDING",
+    "consume_api_exists": false,
+    "independently_validates_runtime_provider": false,
+    "old_issuance_id_binding": "core/synthetic_reflection_execution_admission.py:290",
+    "old_runtime_requirement_dependency": "inherited through exact old authorization/spec validation; JAVA.1 and SANDBOX.2",
+    "public_implementation": "OLD_AUTH_SPECIFIC",
+    "public_validator_call": "core/synthetic_reflection_execution_admission.py:224",
+    "single_effect_lifecycle_owner": "core.synthetic_reflection_execution_lifecycle"
+  },
+  "audit_date": "2026-10-13",
+  "audited_source_sha256": {
+    "core/synthetic_read_only_reflection.py": "d24422b68c0eae96890a7e63a177ebc8adcbd64300bf7cfb42d3ada041a5d5bc",
+    "core/synthetic_reflection_execution_admission.py": "ae6d60d7ef418cff366317ad4507d0f2de93f2aa9d188e8e12d453c66ed77b19",
+    "core/synthetic_reflection_execution_lifecycle.py": "c2b85e845f79332b83f3c17e754ba290db739e9c19378317fed16c6402e686ba",
+    "core/synthetic_runtime_authorization.py": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88",
+    "core/synthetic_runtime_authorization_lifecycle.py": "dc7cc307a17c63cf65eea0e898015140806ca98e2614c391423c50adfd0e6029",
+    "core/synthetic_runtime_authorization_pinned.py": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c",
+    "core/synthetic_runtime_authorization_pinned_lifecycle.py": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4"
+  },
+  "before_after_ordering": {
+    "compatible_with_pinned_first_behavior_boundary": true,
+    "consumed_state_proves_read_or_invocation": false,
+    "read_invocation_order_enforced_by_lease_owner": false,
+    "read_invocation_order_is_executor_obligation": true,
+    "runtime_consumption_after_first_read_required": false,
+    "sequence": [
+      "all capability/authentication gates",
+      "source/harness ready",
+      "consume scenario runtime lease",
+      "consume BEFORE reflection lease",
+      "perform BEFORE exact reflection read",
+      "invoke exact public decrement(3)",
+      "consume AFTER reflection lease",
+      "perform AFTER exact reflection read"
+    ]
+  },
+  "behavioral_readiness": "PROOF_UNRESOLVED",
+  "frozen_domains": [
+    {
+      "identity": "issuance_id",
+      "original_live_object_required": true,
+      "owner": "core.synthetic_runtime_authorization",
+      "phase": "SYNTH.AUTH.1",
+      "schema": "synthetic_runtime_authorization_v1",
+      "type": "SyntheticRuntimeAuthorization",
+      "validator": "validate_synthetic_runtime_authorization"
+    },
+    {
+      "identity": "lease_id",
+      "original_live_object_required": true,
+      "owner": "core.synthetic_runtime_authorization_lifecycle",
+      "phase": "SYNTH.AUTH.LIFECYCLE.1",
+      "schema": "synthetic_runtime_execution_lease_v1",
+      "state_api": "synthetic_runtime_execution_lease_state",
+      "type": "SyntheticRuntimeExecutionLease",
+      "validator": "validate_synthetic_runtime_execution_lease"
+    },
+    {
+      "original_live_object_required": true,
+      "owner": "core.synthetic_read_only_reflection",
+      "phase": "SYNTH.REFLECT.1",
+      "schema": "synthetic_reflection_request_v1",
+      "type": "SyntheticReflectionRequest",
+      "validator": "validate_synthetic_reflection_request"
+    },
+    {
+      "original_live_object_required": true,
+      "owner": "core.synthetic_reflection_execution_admission",
+      "phase": "SYNTH.REFLECT.ADMIT.1",
+      "schema": "synthetic_reflection_execution_admission_v1",
+      "type": "SyntheticReflectionExecutionAdmission",
+      "validator": "validate_synthetic_reflection_execution_admission"
+    },
+    {
+      "original_live_object_required": true,
+      "owner": "core.synthetic_reflection_execution_lifecycle",
+      "phase": "SYNTH.REFLECT.LIFECYCLE.1",
+      "schema": "synthetic_reflection_execution_lease_v1",
+      "type": "SyntheticReflectionExecutionLease",
+      "validator": "validate_synthetic_reflection_execution_lease"
+    }
+  ],
+  "frozen_implementation_accepts_pinned_authentication_domain": false,
+  "full_frozen_suite_run_claimed": false,
+  "historical_preservation_artifact": "preservation_check.json",
+  "minimum_future_pinned_reflection_inputs": [
+    "exact original pinned authorization, unchanged public authentication and retained provider graph",
+    "exact original pinned runtime lease bound by identity to the supplied original authorization",
+    "exact pinned owner/phase/schema/PID and lease ID/authenticated stable fingerprint",
+    "authorization ID/authenticated fingerprint/proof context",
+    "authenticated current runtime state through pinned public state API",
+    "authenticated scenario/source/definition/invocation/field and BEFORE or AFTER role/read operation",
+    "original independent request identity and truthful pinned admission binding",
+    "independent one-shot reflection effect identity/state and permanent admission binding",
+    "additional direct provider provenance only if a separately established independent reflection requirement needs it"
+  ],
+  "new_capability_schema_frozen": false,
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR_1R": 0,
+    "JAVA1C": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "lease_consumption": 0,
+    "lease_invalidation": 0,
+    "pinned_authorization_issuance": 0,
+    "pinned_execution_lease_issuance": 0,
+    "provider_issuance": 0,
+    "reflection_admission_issuance": 0,
+    "reflection_lease_issuance": 0,
+    "reflection_read": 0,
+    "repository_runtime_writes": 0
+  },
+  "phase_id": "SYNTH.REFLECT.LIFECYCLE.PINNED.COMPAT.1",
+  "pinned_domains": [
+    {
+      "identity": "authorization_id",
+      "original_live_object_required": true,
+      "owner": "core.synthetic_runtime_authorization_pinned",
+      "phase": "SYNTH.AUTH.PINNED.1",
+      "retained_original_provider_graph_reauthenticated": true,
+      "schema": "synthetic_runtime_authorization_pinned_1_v1",
+      "type": "PinnedSyntheticRuntimeAuthorization",
+      "validator": "validate_pinned_synthetic_runtime_authorization"
+    },
+    {
+      "current_consume_fails_closed": true,
+      "identity": "lease_id",
+      "implementation_status": "SYNTH_AUTH_LIFECYCLE_PINNED_1A_COMPLETE",
+      "original_live_object_required": true,
+      "owner": "core.synthetic_runtime_authorization_pinned_lifecycle",
+      "phase": "SYNTH.AUTH.LIFECYCLE.PINNED.1",
+      "schema": "synthetic_runtime_execution_lease_pinned_1_v1",
+      "state_api": "pinned_synthetic_runtime_execution_lease_state",
+      "type": "PinnedSyntheticRuntimeExecutionLease",
+      "validator": "validate_pinned_synthetic_runtime_execution_lease"
+    }
+  ],
+  "pinned_lifecycle_source_changed": false,
+  "primitive_dependency_map": {
+    "artifact": "primitive_admission_trace.md",
+    "authorization_compatibility_api": "OLD_AUTH_SPECIFIC",
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "exact_field": "SyntheticStateBox.value:int",
+    "observation_data_validation_proves_read": false,
+    "old_exact_class_gate": "core/synthetic_read_only_reflection.py:209",
+    "old_public_validator_call": "core/synthetic_read_only_reflection.py:216",
+    "read_semantics": "REUSABLE_UNCHANGED",
+    "renderer_produces_text_only": true,
+    "request_renderer_takes_authorization_or_lease": false,
+    "source": "core/synthetic_read_only_reflection.py:207",
+    "source_kind": "phase_owned_synthetic_fixture",
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "source_size_bytes": 239
+  },
+  "prohibited_bridges_used": [],
+  "recommended_next_slice": "Contract-only review of additive pinned reflection admission/lifecycle boundary using unchanged original pinned authentication and unchanged state/order semantics; keep source/compile classification separate and operational readiness fail-closed.",
+  "reflection_acceptance_claimed": false,
+  "reflection_lifecycle_consumer_trace": {
+    "artifact": "reflection_lifecycle_trace.md",
+    "function_index_artifact": "consumer_function_index.json",
+    "function_method_count": 29,
+    "imports_old_auth_owner_at": 19,
+    "imports_old_runtime_owner_at": 20,
+    "matching_fields_establish_type_compatibility": false,
+    "old_auth_issuance_id_binding_at": 117,
+    "old_auth_validator_call_at": 95,
+    "old_authenticated_runtime_state_call_at": 263,
+    "old_runtime_validator_call_at": 97,
+    "original_lease_and_all_upstream_objects_required": true,
+    "source": "core/synthetic_reflection_execution_lifecycle.py"
+  },
+  "reflection_source_changed": false,
+  "repin_stash_reset_clean_performed": false,
+  "report_only": true,
+  "runtime_lease_comparison": {
+    "artifact": "reflection_lifecycle_trace.md",
+    "old_id_projection": "upstream_authorization_issuance_id / upstream_authorization_fingerprint",
+    "old_scope_shape": "top-level scenario/source/invocation plus retained authenticated old auth/spec",
+    "pinned_id_projection": "authorization_id / authorization_fingerprint / authorization_proof_context_id",
+    "pinned_scope_shape": "nested authenticated scenario/provider plus phase/source kind and activation policy",
+    "properties_covered": [
+      "owner_identity",
+      "phase",
+      "schema",
+      "exact_class",
+      "lease_id",
+      "stable_fingerprint",
+      "issuing_pid",
+      "authenticated_state_api",
+      "scenario_phase_id",
+      "scenario_id",
+      "source_kind",
+      "source_hash",
+      "source_size",
+      "definition",
+      "method_invocation",
+      "observation_field",
+      "upstream_authorization_identity",
+      "upstream_authorization_fingerprint",
+      "proof_context",
+      "provider_projection",
+      "authority_matrix",
+      "live_object_semantics",
+      "copy_JSON_rejection"
+    ],
+    "provider_requirement_profile_old": "RUNTIME.JAVA.1",
+    "provider_requirement_profile_pinned": "RUNTIME.JAVA.PINNED.1",
+    "same_exact_scenario_is_not_same_authentication_domain": true,
+    "separate_classes_registries_secrets_and_domains": true
+  },
+  "source_compile_observations": {
+    "compilation_authority_granted": false,
+    "contract_changed": false,
+    "materialization_position": "UNRESOLVED_DOWNSTREAM_DEPENDENCY",
+    "primitive_and_admission_source_identity_and_renderer_text_are_in_memory": true,
+    "scenario_compilation_position": "UNRESOLVED_DOWNSTREAM_DEPENDENCY",
+    "source_harness_readiness_precedes_consumption": true
+  },
+  "state_order_semantic_reuse_matrix": [
+    {
+      "classification": "REUSABLE_UNCHANGED",
+      "rule": "both-role issuance requires authenticated runtime ISSUED"
+    },
+    {
+      "classification": "REUSABLE_UNCHANGED",
+      "rule": "both-role preexecution readiness requires reflection ISSUED and runtime ISSUED"
+    },
+    {
+      "classification": "REUSABLE_UNCHANGED",
+      "rule": "both-role active readiness/consume requires reflection ISSUED and runtime CONSUMED"
+    },
+    {
+      "classification": "REUSABLE_UNCHANGED",
+      "rule": "terminal evidence authenticates without granting readiness"
+    },
+    {
+      "classification": "REUSABLE_UNCHANGED",
+      "rule": "reflection invalidation requires reflection ISSUED but no specific authentic runtime state"
+    },
+    {
+      "classification": "REUSABLE_UNCHANGED",
+      "rule": "one permanent reflection lease per admission; no refund/reissue"
+    },
+    {
+      "classification": "REQUIRES_ADDITIVE_BINDING",
+      "rule": "exact original runtime/auth/source/field/role identity binding"
+    },
+    {
+      "classification": "OLD_RUNTIME_SPECIFIC",
+      "rule": "old runtime class/schema/state API"
+    },
+    {
+      "classification": "OLD_AUTH_SPECIFIC",
+      "rule": "old auth owner/type/validator/issuance_id"
+    },
+    {
+      "classification": "REQUIRES_ADDITIVE_BINDING",
+      "rule": "old auth requirement versus pinned provider provenance"
+    },
+    {
+      "classification": "REUSABLE_UNCHANGED",
+      "rule": "runtime consume before BEFORE read; invocation before AFTER read"
+    },
+    {
+      "classification": "REUSABLE_UNCHANGED",
+      "rule": "source/harness ready before runtime consume"
+    },
+    {
+      "classification": "UNRESOLVED",
+      "rule": "materialization and scenario compilation classification/placement"
+    }
+  ],
+  "state_order_semantics_reusable": true,
+  "stop_after_compatibility_conclusion": true,
+  "timezone": "Asia/Seoul",
+  "typed_outcome": "REFLECTION_PINNED_REQUIRES_ADDITIVE_ADAPTER",
+  "validation": {
+    "all_operational_effects_zero": true,
+    "benchmark_checked": 54,
+    "benchmark_errors": 0,
+    "focused_audit_passed": 23,
+    "frozen_safe_passed": 68,
+    "git_diff_check_exit_code": 0,
+    "historical_bytes_preserved": true,
+    "in_memory_compilation_JSON_whitespace_passed": true,
+    "preexisting_files_preserved": 26572,
+    "registry_picker_after_passed": 292,
+    "registry_picker_baseline_passed": 292,
+    "registry_picker_unchanged": true,
+    "unchanged_existing_registry_picker_failure_count": 7
+  },
+  "validation_summary_artifact": "validation_summary.json",
+  "zero_issuance_limitations": [
+    "Frozen reflection lifecycle positive tests issue old auth/runtime/request/admission/reflection handles, so use source/AST and inert pinned rejection instead.",
+    "Most pinned 1A tests issue/transition isolated leases, so final selection runs its no-issuer static source test plus focused pinned source/authentication checks.",
+    "Frozen initial selection used legacy unregistered old negative-data projections; retain initial artifacts and narrow final selection to source-only nodes without old construction. No capabilities, registries or effects were created."
+  ]
+}

@@ -1,0 +1,657 @@
+{
+  "executed_outside_operational_guard": true,
+  "existing_whitespace_unchanged": true,
+  "exit_code": 0,
+  "git_index_modified": false,
+  "new_phase_whitespace_policy": "Git default blank-at-eol/blank-at-eof/space-before-tab checks with cr-at-eol for Windows CRLF terminators; actual trailing spaces remain errors",
+  "operational_command_invoked": false,
+  "passed": true,
+  "phase_checks": [
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\author.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/author.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\author.txt"
+      ],
+      "exit_code": 0,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/author.txt",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\benchmark.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/benchmark.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\benchmark.txt"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/benchmark.txt",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\contract.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\evidence_index.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/evidence_index.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\finalize_report.py"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/finalize_report.py",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\focused.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/focused.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\focused.txt"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/focused.txt",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\git_diff_baseline.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/git_diff_baseline.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\git_diff_check.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/git_diff_check.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\git_diff_check.txt"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/git_diff_check.txt",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\message_schema.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\preservation_after.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/preservation_after.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\preservation_baseline.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/preservation_baseline.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\preservation_comparison.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/preservation_comparison.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\README.md"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/README.md",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\registry_after.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/registry_after.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\registry_after.txt"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/registry_after.txt",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\registry_baseline.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/registry_baseline.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\registry_baseline.txt"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/registry_baseline.txt",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\registry_comparison.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/registry_comparison.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\report.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/report.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\report.txt"
+      ],
+      "exit_code": 0,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/report.txt",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\static_validation.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/static_validation.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1_REPORT.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1_REPORT.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1_REPORT.md"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1_REPORT.md",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\test_contract.py"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/test_contract.py",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validate_pure.py"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/validate_pure.py",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_summary.json"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/validation_summary.json",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "core.autocrlf=false",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--no-index",
+        "--check",
+        "--",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\validation_tmp\\git_diff\\empty",
+        "docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1\\write_contract.py"
+      ],
+      "exit_code": 1,
+      "file": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/write_contract.py",
+      "passed": true,
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "phase_files_checked_without_index_mutation": 31,
+  "phase_whitespace_passed": true,
+  "source_validation_only": true,
+  "tracked_checks": [
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stderr": "warning: in the working copy of 'core/explicit_evidence.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/input_understanding.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/live_task_shape.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/oop_intent_session.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/oop_semantic_review.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/phase_registry.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/requirement_preservation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/semantic_waiter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/semantic_waiter_adapter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/task_contract.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/roadmap/phase_registry.json', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'main.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/_oop_intent_ui1_maintenance.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_input_understanding.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_phase_picker.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_phase_registry.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/app.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/oop_intent_adapter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/runner.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/session_presentation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/templates/index.html', LF will be replaced by CRLF the next time Git touches it\n",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--cached",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": ""
+    }
+  ]
+}

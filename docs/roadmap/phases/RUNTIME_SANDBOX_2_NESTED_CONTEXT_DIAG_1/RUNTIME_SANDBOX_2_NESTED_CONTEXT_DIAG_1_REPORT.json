@@ -1,0 +1,1404 @@
+{
+  "JAVA1C_source_changed": false,
+  "SANDBOX2_source_changed": false,
+  "SYNTH_retried": false,
+  "active_at_SANDBOX2_matrix": [
+    {
+      "active_at_SANDBOX2": true,
+      "affected_steps": [
+        "private_config_path_derivation",
+        "TemporaryDirectory",
+        "policy_and_sentinel_writes"
+      ],
+      "basis": "Observed root difference is not itself a demonstrated denial. Earlier retained SANDBOX2 completed all 11 stages in this same lexical override. An unconditional root-wide denial is excluded; later state/ACL changes are unrecorded.",
+      "classification": "OBSERVED_NONCAUSAL_DIFFERENCE",
+      "historical_causality_proven": false,
+      "id": "phase_local_temp_root",
+      "lifetime": "Whole authorization/provider call; restored only in outer finally after JAVA1C returns",
+      "owner": "scripts/replay_synth_auth_pinned1.py",
+      "restored_before_SANDBOX2": false,
+      "sources": [
+        {
+          "end_line": 65,
+          "path": "scripts/replay_synth_auth_pinned1.py",
+          "start_line": 49
+        },
+        {
+          "end_line": 102,
+          "path": "scripts/replay_synth_auth_pinned1.py",
+          "start_line": 101
+        },
+        {
+          "end_line": 372,
+          "path": "core/candidate_runtime_sandbox.py",
+          "start_line": 363
+        },
+        {
+          "end_line": 338,
+          "path": "core/thread_compatible_runtime_sandbox.py",
+          "start_line": 335
+        }
+      ]
+    },
+    {
+      "active_at_SANDBOX2": true,
+      "affected_steps": [
+        "Python_return_events",
+        "bounded_process_return_accounting"
+      ],
+      "basis": "Exact observer reads returns/locals and appends private accounting; contains no audit registration, socket/write/process rejection or owner replacement. Same frozen observer existed in successful PINNED1C retry. Timing effects cannot be reconstructed.",
+      "classification": "OBSERVED_NONCAUSAL_DIFFERENCE",
+      "historical_causality_proven": false,
+      "id": "provider_return_frame_profiler",
+      "lifetime": "sys.setprofile(observer) around runtime.verify(), including JAVA1C and SANDBOX2",
+      "owner": "core/runtime_java_pinned_provider.py",
+      "restored_before_SANDBOX2": false,
+      "sources": [
+        {
+          "end_line": 297,
+          "path": "core/runtime_java_pinned_provider.py",
+          "start_line": 246
+        },
+        {
+          "end_line": 537,
+          "path": "core/runtime_java_pinned_provider.py",
+          "start_line": 505
+        }
+      ]
+    },
+    {
+      "active_at_SANDBOX2": false,
+      "affected_steps": [
+        "earlier_upstream_bounded_process_and_SANDBOX2_only"
+      ],
+      "basis": "Lexical with scope exited before fresh JAVA1C; no persistent function assignment follows.",
+      "classification": "NOT_ACTIVE_AT_FAILURE_BOUNDARY",
+      "id": "PINNED1B_transport_and_replay_observers",
+      "lifetime": "patch.object only around upstream backend binding; exits before target inspection and provider JAVA1C call",
+      "owner": "core/runtime_java_pinned_backend_target_binding.py",
+      "restored_before_SANDBOX2": true,
+      "sources": [
+        {
+          "end_line": 373,
+          "path": "core/runtime_java_pinned_backend_target_binding.py",
+          "start_line": 347
+        },
+        {
+          "end_line": 537,
+          "path": "core/runtime_java_pinned_provider.py",
+          "start_line": 523
+        }
+      ]
+    },
+    {
+      "active_at_SANDBOX2": false,
+      "affected_steps": [
+        "earlier_upstream_transport_only"
+      ],
+      "basis": "Upstream BIND returns before PINNED1B and provider runtime snapshot.",
+      "classification": "NOT_ACTIVE_AT_FAILURE_BOUNDARY",
+      "id": "BIND_transport_observer",
+      "lifetime": "Scoped transport patch during upstream BIND replay",
+      "owner": "core/sandbox_backend_binding.py",
+      "restored_before_SANDBOX2": true,
+      "sources": [
+        {
+          "end_line": 362,
+          "path": "core/sandbox_backend_binding.py",
+          "start_line": 290
+        }
+      ]
+    },
+    {
+      "active_at_SANDBOX2": false,
+      "affected_steps": [],
+      "basis": "Exact blocked runner does not import or enter this context manager.",
+      "classification": "NOT_ACTIVE_AT_FAILURE_BOUNDARY",
+      "id": "successful_retry_private_config_tracer",
+      "lifetime": "Different successful retry runner only; not entered by blocked SYNTH runner",
+      "owner": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/authentication_controls.py",
+      "restored_before_SANDBOX2": null,
+      "sources": [
+        {
+          "end_line": 65,
+          "path": "scripts/replay_runtime_java_pinned1c_retry.py",
+          "start_line": 53
+        },
+        {
+          "end_line": 65,
+          "path": "scripts/replay_synth_auth_pinned1.py",
+          "start_line": 60
+        },
+        {
+          "end_line": 69,
+          "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/authentication_controls.py",
+          "start_line": 27
+        }
+      ]
+    },
+    {
+      "active_at_SANDBOX2": false,
+      "affected_steps": [],
+      "basis": "Recovered original launch invokes python -B scripts/replay_synth_auth_pinned1.py directly. Audit hooks in other Python validation workers are not inherited by this fresh process. No exact live-path registration exists; possible startup/native policy is separately unretained.",
+      "classification": "NOT_ACTIVE_AT_FAILURE_BOUNDARY",
+      "id": "validation_only_audit_guards",
+      "lifetime": "Separate pure validation worker processes; direct live launch starts a fresh Python interpreter",
+      "owner": "retained validation workers and tests",
+      "restored_before_SANDBOX2": null,
+      "sources": [
+        {
+          "end_line": 169,
+          "path": "docs/roadmap/phases/RUNTIME_SANDBOX_2_PRELADDER_DIAG_1/validation.py",
+          "start_line": 114
+        }
+      ]
+    },
+    {
+      "active_at_SANDBOX2": true,
+      "affected_steps": [
+        "module_resolution",
+        "implicit_bytecode_output"
+      ],
+      "basis": "Workspace import root and bytecode suppression do not reject explicit workspace writes or sockets; source bindings match. -B is also used by the successful diagnostic.",
+      "classification": "OBSERVED_NONCAUSAL_DIFFERENCE",
+      "id": "runner_import_path_and_bytecode_flag",
+      "lifetime": "Entire fresh process",
+      "owner": "scripts/replay_synth_auth_pinned1.py",
+      "restored_before_SANDBOX2": false,
+      "sources": [
+        {
+          "end_line": 11,
+          "path": "scripts/replay_synth_auth_pinned1.py",
+          "start_line": 10
+        }
+      ]
+    },
+    {
+      "active_at_SANDBOX2": false,
+      "affected_steps": [],
+      "basis": "PID/HMAC/authority/object mutation controls are later success-only functions; no entry before historical failed SANDBOX2.",
+      "classification": "NOT_ACTIVE_AT_FAILURE_BOUNDARY",
+      "id": "negative_authentication_controls",
+      "lifetime": "After successful authorization only; branch skipped in blocked attempt",
+      "owner": "provider and SYNTH negative matrices",
+      "restored_before_SANDBOX2": null,
+      "sources": [
+        {
+          "end_line": 92,
+          "path": "scripts/replay_synth_auth_pinned1.py",
+          "start_line": 69
+        },
+        {
+          "end_line": 656,
+          "path": "core/runtime_java_pinned_provider.py",
+          "start_line": 656
+        },
+        {
+          "end_line": 411,
+          "path": "core/synthetic_runtime_authorization_pinned.py",
+          "start_line": 400
+        },
+        {
+          "end_line": 525,
+          "path": "core/runtime_java_pinned_backend_target_binding.py",
+          "start_line": 525
+        },
+        {
+          "end_line": 417,
+          "path": "core/sandbox_backend_binding.py",
+          "start_line": 417
+        }
+      ]
+    },
+    {
+      "active_at_SANDBOX2": false,
+      "affected_steps": [],
+      "basis": "Imported helper is not entered by the historical PINNED1C->JAVA1C live call path; JAVA1B replay is not run.",
+      "classification": "NOT_ACTIVE_AT_FAILURE_BOUNDARY",
+      "id": "JAVA1B_recovered_controller_binding",
+      "lifetime": "Scoped JAVA1B replay context replaces JAVA_PROBE_SOURCE/_invoke_java and restores in finally",
+      "owner": "core/sandboxed_java_capture_recovery.py",
+      "restored_before_SANDBOX2": null,
+      "sources": [
+        {
+          "end_line": 149,
+          "path": "core/sandboxed_java_capture_recovery.py",
+          "start_line": 134
+        },
+        {
+          "end_line": 191,
+          "path": "core/sandboxed_java_capture_recovery.py",
+          "start_line": 191
+        }
+      ]
+    },
+    {
+      "active_at_SANDBOX2": true,
+      "affected_steps": [],
+      "basis": "SANDBOX2 pre-ladder code does not consume provider registries. Their source bindings match retained gates; historical dynamic values/function identities were not retained. No surviving replacement is prescribed by the live source.",
+      "classification": "OBSERVED_NONCAUSAL_DIFFERENCE",
+      "id": "provider_registry_globals",
+      "lifetime": "Process-local attempts/origins and authenticated upstream registries persist",
+      "owner": "core.runtime_java_pinned_provider and upstream owners",
+      "restored_before_SANDBOX2": false,
+      "sources": [
+        {
+          "end_line": 44,
+          "path": "core/runtime_java_pinned_provider.py",
+          "start_line": 42
+        },
+        {
+          "end_line": 529,
+          "path": "core/runtime_java_pinned_provider.py",
+          "start_line": 507
+        },
+        {
+          "end_line": 344,
+          "path": "core/thread_compatible_runtime_sandbox.py",
+          "start_line": 317
+        },
+        {
+          "end_line": 39,
+          "path": "core/runtime_java_pinned_backend_target_binding.py",
+          "start_line": 34
+        },
+        {
+          "end_line": 273,
+          "path": "core/runtime_java_pinned_backend_target_binding.py",
+          "start_line": 249
+        },
+        {
+          "end_line": 334,
+          "path": "core/runtime_java_pinned_backend_target_binding.py",
+          "start_line": 334
+        },
+        {
+          "end_line": 46,
+          "path": "core/sandbox_backend_binding.py",
+          "start_line": 43
+        },
+        {
+          "end_line": 346,
+          "path": "core/sandbox_backend_binding.py",
+          "start_line": 346
+        },
+        {
+          "end_line": 198,
+          "path": "core/runtime_java_pinned_target_inspection.py",
+          "start_line": 198
+        }
+      ]
+    },
+    {
+      "active_at_SANDBOX2": null,
+      "affected_steps": [
+        "metadata_parse",
+        "workspace_creation_and_writes",
+        "TCP_UDP_socket_setup"
+      ],
+      "basis": "Original nested SANDBOX2 report/pair, startup/native policies, socket policy, env snapshot, and first failed statement were not retained. Direct original launch and cwd are recovered separately.",
+      "classification": "INSUFFICIENT_EVIDENCE",
+      "id": "unretained_parent_or_late_host_state",
+      "lifetime": "Unknown",
+      "owner": "historical caller/harness/OS",
+      "restored_before_SANDBOX2": null,
+      "sources": [
+        {
+          "end_line": 65,
+          "path": "scripts/replay_synth_auth_pinned1.py",
+          "start_line": 42
+        }
+      ]
+    }
+  ],
+  "all_available_live_graph_gate_hashes_match": true,
+  "current_path_observation": {
+    "artifact": "historical_path_current_observation.json",
+    "current_only_not_historical_permission_proof": true,
+    "read_only_observation_retained": true
+  },
+  "environment_overlays": {
+    "Docker_child": {
+      "description": "Same minimal env for image inspect and subsequent controls; TMP/TEMP/TMPDIR and Docker env/context variables are not inherited into child.",
+      "keys": [
+        "SystemRoot_if_present",
+        "WINDIR_if_present",
+        "CATTUS_SANDBOX_HOST_ONLY"
+      ],
+      "source": {
+        "end_line": 303,
+        "path": "core/candidate_runtime_sandbox.py",
+        "start_line": 294
+      }
+    },
+    "historical_full_environment": "NOT_RETAINED",
+    "live_runner_overlays": []
+  },
+  "exact_historical_root_cause_established": false,
+  "final_delivery_source_checks": {
+    "authored_text_files_checked": 36,
+    "bytecode_emission": false,
+    "failures": [],
+    "git_diff_check_exit_code": 0,
+    "new_json_files_parsed": 26,
+    "new_python_sources_compiled_in_memory": 4,
+    "passed": true
+  },
+  "frozen_source_in_memory_compilation": {
+    "bytecode_emission": false,
+    "compiled_source_count": 21,
+    "imports_or_execution": false,
+    "passed": true,
+    "sources": [
+      "core/candidate_runtime_sandbox.py",
+      "core/candidate_runtime_sandbox_probe.py",
+      "core/java_single_thread_capture.py",
+      "core/runtime_java_pinned_backend_target_binding.py",
+      "core/runtime_java_pinned_provider.py",
+      "core/runtime_java_pinned_requirement.py",
+      "core/runtime_java_pinned_target_archive.py",
+      "core/runtime_java_pinned_target_inspection.py",
+      "core/sandbox_backend_binding.py",
+      "core/sandboxed_java_capture_recovery.py",
+      "core/sandboxed_java_positive_continuation.py",
+      "core/sandboxed_java_positive_probe.py",
+      "core/sandboxed_java_single_thread_probe.py",
+      "core/sandboxed_java_toolchain.py",
+      "core/sandboxed_java_toolchain_discovery.py",
+      "core/sandboxed_java_toolchain_probe.py",
+      "core/synthetic_runtime_authorization.py",
+      "core/synthetic_runtime_authorization_pinned.py",
+      "core/thread_compatible_runtime_sandbox.py",
+      "core/thread_compatible_runtime_sandbox_probe.py",
+      "scripts/replay_synth_auth_pinned1.py"
+    ]
+  },
+  "historical_audit_hooks": {
+    "pure_validation_worker_hooks_inherited_into_live_process": false,
+    "registration_on_retained_live_path": [],
+    "startup_or_native_hooks": "NOT_RETAINED",
+    "unconditional_socket_ban_for_whole_attempt_excluded": true,
+    "unconditional_subprocess_ban_excluded": true
+  },
+  "historical_cwd": {
+    "effect": "Config/workspace roots are absolute; Docker binary is absolute. Parent cwd can affect PATH resolution but image inspect already succeeded.",
+    "evidence": "historical_launch_provenance.json: original session_meta/turn_context plus direct launch without workdir override",
+    "runner_chdir": false,
+    "validation_cwd_is_not_live_cwd_proof": true,
+    "value": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S"
+  },
+  "historical_failure_summary": {
+    "JAVA1C_error": "ValueError: java1c_live_sandbox2_binding_rejected",
+    "JAVA1C_status": "RUNTIME_JAVA_1C_BLOCKED_AUTHENTICATION",
+    "SYNTH_reason": "authorization_prerequisite_failed:pinned_provider_incomplete: fresh_java1c_failed:not_authenticated",
+    "SYNTH_status": "SYNTH_AUTH_PINNED_1_BLOCKED",
+    "failed_period_container_creates": 0,
+    "failed_period_container_starts": 0,
+    "generic_not_authenticated_demonstrates_HMAC_failure": false,
+    "provider_reason": "fresh_java1c_failed:not_authenticated",
+    "provider_status": "PINNED_RUNTIME_EVIDENCE_MISMATCH"
+  },
+  "historical_instrumentation": {
+    "preexisting_sys_profile": "Required None by provider guards; reaching JAVA1C demonstrates gates returned",
+    "sys_monitoring": "NOT_RETAINED; no mutation in blocked live graph",
+    "sys_profile": "Exact provider return-frame observer active",
+    "sys_trace": "NOT_RETAINED; no setter in blocked live graph",
+    "threading_profile": "NOT_RETAINED; no setter in blocked live graph",
+    "threading_trace": "NOT_RETAINED; no setter in blocked live graph"
+  },
+  "historical_module_globals": {
+    "candidate_runtime_sandbox_functions": "Scoped observer restored before JAVA1C",
+    "environment_mapping_mutations": [],
+    "historical_dynamic_function_identities": "NOT_RETAINED",
+    "provider_registries": "Persist but unused by SANDBOX2 pre-ladder",
+    "tempfile_tempdir": "Override survives boundary",
+    "thread_compatible_runtime_sandbox_replay": "Scoped observer restored before JAVA1C"
+  },
+  "historical_process_guards": {
+    "Popen_run_which_patches_on_live_path": [],
+    "image_inspect_allowed": true,
+    "later_SANDBOX2_ps_allowed": true,
+    "pre_create_process_after_image": "No additional subprocess until ladder; workspace/socket work occurs first",
+    "scoped_bounded_process_observers": "Exited before JAVA1C"
+  },
+  "historical_runner": {
+    "matches_historical_gate": true,
+    "path": "scripts/replay_synth_auth_pinned1.py",
+    "retained_gate_sha256": "73ac65320825f3f32726526bcb5f2aa492887ef496b06d086932903b47cfc440",
+    "sha256": "73ac65320825f3f32726526bcb5f2aa492887ef496b06d086932903b47cfc440",
+    "size_bytes": 7323
+  },
+  "historical_socket_guards": {
+    "current_sockets_attempted": 0,
+    "exact_rule_active_at_boundary_proven": false,
+    "historical_later_setup_outcome": "NOT_RETAINED",
+    "live_graph_socket_patches_found": [],
+    "required_operations": [
+      "socket.socket()",
+      "socket.socket(AF_INET, SOCK_DGRAM)",
+      "TCP bind 127.0.0.1:0",
+      "TCP listen(1)",
+      "UDP bind 127.0.0.1:selected_port"
+    ]
+  },
+  "historical_source_identities": [
+    {
+      "matches_historical_gate": true,
+      "path": "core/candidate_runtime_sandbox.py",
+      "retained_gate_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "size_bytes": 34833
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/candidate_runtime_sandbox_probe.py",
+      "retained_gate_sha256": "aa090e85f34a75c429fc98a20b562e6ebc2b7261d400b08fd7758da4994f4b6c",
+      "sha256": "aa090e85f34a75c429fc98a20b562e6ebc2b7261d400b08fd7758da4994f4b6c",
+      "size_bytes": 3646
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/java_single_thread_capture.py",
+      "retained_gate_sha256": "4ac691b2919b3e778a98c044fb166fd9804b102cdd651995eb8689839ac438fb",
+      "sha256": "4ac691b2919b3e778a98c044fb166fd9804b102cdd651995eb8689839ac438fb",
+      "size_bytes": 6312
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/runtime_java_pinned_backend_target_binding.py",
+      "retained_gate_sha256": "94c95d674c0b43cde5811762998d13a65c3eee71c442cf05ff8699e02ec59da9",
+      "sha256": "94c95d674c0b43cde5811762998d13a65c3eee71c442cf05ff8699e02ec59da9",
+      "size_bytes": 34173
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/runtime_java_pinned_provider.py",
+      "retained_gate_sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+      "sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+      "size_bytes": 42111
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/runtime_java_pinned_requirement.py",
+      "retained_gate_sha256": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1",
+      "sha256": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1",
+      "size_bytes": 22597
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/runtime_java_pinned_target_archive.py",
+      "retained_gate_sha256": "d8693eabcfc2c8290cd0a4318a4edcce2d11b94a28ed8f8eddd82360b84afe2b",
+      "sha256": "d8693eabcfc2c8290cd0a4318a4edcce2d11b94a28ed8f8eddd82360b84afe2b",
+      "size_bytes": 13725
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/runtime_java_pinned_target_inspection.py",
+      "retained_gate_sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59",
+      "sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59",
+      "size_bytes": 28903
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/sandbox_backend_binding.py",
+      "retained_gate_sha256": "202cd1190494beaaf24874ac798b89a8eac276fa8361b496663a573770cdf1ed",
+      "sha256": "202cd1190494beaaf24874ac798b89a8eac276fa8361b496663a573770cdf1ed",
+      "size_bytes": 26216
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/sandboxed_java_capture_recovery.py",
+      "retained_gate_sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861",
+      "sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861",
+      "size_bytes": 12218
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/sandboxed_java_positive_continuation.py",
+      "retained_gate_sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+      "sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+      "size_bytes": 28167
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/sandboxed_java_positive_probe.py",
+      "retained_gate_sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+      "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+      "size_bytes": 7358
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/sandboxed_java_single_thread_probe.py",
+      "retained_gate_sha256": "7bb2bceac444c80f6b2c75b335731d61b73dfff58b1b0ca72ac85f027e635716",
+      "sha256": "7bb2bceac444c80f6b2c75b335731d61b73dfff58b1b0ca72ac85f027e635716",
+      "size_bytes": 5764
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/sandboxed_java_toolchain.py",
+      "retained_gate_sha256": "ed96e56a875535d4cafaa107721ee6eafd5c0c1b0f8d14f59f4ad728f00288c9",
+      "sha256": "ed96e56a875535d4cafaa107721ee6eafd5c0c1b0f8d14f59f4ad728f00288c9",
+      "size_bytes": 28868
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/sandboxed_java_toolchain_discovery.py",
+      "retained_gate_sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff",
+      "sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff",
+      "size_bytes": 21386
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/sandboxed_java_toolchain_probe.py",
+      "retained_gate_sha256": "58e791ed6ac7c99a41386345ce8d392ca74cb8f574a8207fe1c85afa335ec606",
+      "sha256": "58e791ed6ac7c99a41386345ce8d392ca74cb8f574a8207fe1c85afa335ec606",
+      "size_bytes": 5690
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/synthetic_runtime_authorization.py",
+      "retained_gate_sha256": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88",
+      "sha256": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88",
+      "size_bytes": 14991
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/synthetic_runtime_authorization_pinned.py",
+      "retained_gate_sha256": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c",
+      "sha256": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c",
+      "size_bytes": 24720
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "retained_gate_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "size_bytes": 22400
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "core/thread_compatible_runtime_sandbox_probe.py",
+      "retained_gate_sha256": "be45d3a0106186d84a0464234f701140df6e90e99107477af358886cf5568075",
+      "sha256": "be45d3a0106186d84a0464234f701140df6e90e99107477af358886cf5568075",
+      "size_bytes": 7784
+    },
+    {
+      "matches_historical_gate": true,
+      "path": "scripts/replay_synth_auth_pinned1.py",
+      "retained_gate_sha256": "73ac65320825f3f32726526bcb5f2aa492887ef496b06d086932903b47cfc440",
+      "sha256": "73ac65320825f3f32726526bcb5f2aa492887ef496b06d086932903b47cfc440",
+      "size_bytes": 7323
+    }
+  ],
+  "historical_temp_state": {
+    "TEMP": "NOT_RETAINED",
+    "TMP": "NOT_RETAINED",
+    "TMPDIR": "NOT_RETAINED",
+    "explicit_override_owner": {
+      "end_line": 61,
+      "path": "scripts/replay_synth_auth_pinned1.py",
+      "start_line": 61
+    },
+    "lexical_phase_context": "Whole issuer call; temp root itself is not a TemporaryDirectory context",
+    "previous_tempfile.tempdir": "NOT_RETAINED",
+    "pytest_basetemp_in_live_runner": "No pytest invocation; pytest.ini is validation-only",
+    "restoration": {
+      "end_line": 102,
+      "path": "scripts/replay_synth_auth_pinned1.py",
+      "start_line": 102
+    },
+    "tempfile.gettempdir_at_boundary": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_AUTH_PINNED_1",
+    "tempfile.tempdir_at_boundary": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_AUTH_PINNED_1"
+  },
+  "historical_truth": "historical nested root cause unresolved",
+  "missing_historical_evidence": [
+    "nested_SANDBOX2_report_descriptor_receipt",
+    "parsed_image_metadata",
+    "private_config_absence_at_boundary",
+    "workspace_setup",
+    "host_socket_setup",
+    "first_pre_ladder_failure",
+    "owner_cleanup_details",
+    "stage_list",
+    "parent_process_context"
+  ],
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR.1R": 0,
+    "JAVA1C": 0,
+    "PINNED1A_export": 0,
+    "PINNED1B": 0,
+    "PINNED1C": 0,
+    "SANDBOX2_issuance": 0,
+    "SYNTH_retry": 0,
+    "SyntheticStateBox": 0,
+    "execution_leases": 0,
+    "provider_root": 0,
+    "reflection": 0
+  },
+  "partial_broad_validation_attempt_artifacts": [
+    "broad_contract_timeout.json"
+  ],
+  "phase_id": "RUNTIME.SANDBOX.2.NESTED.CONTEXT.DIAG.1",
+  "preservation": {
+    "changed_or_missing": [],
+    "historical_file_count": 2185,
+    "passed": true,
+    "prior_historical_pin_integrity": {
+      "historical_drift_not_repinned": true,
+      "passed": true,
+      "prior_pin_sets": [
+        {
+          "changed_or_missing": [],
+          "historical_pins_checked": 1828,
+          "passed": true,
+          "prior_phase": "RUNTIME_JAVA_1C_AUTH_DIAG_1"
+        },
+        {
+          "changed_or_missing": [],
+          "historical_pins_checked": 2126,
+          "passed": true,
+          "prior_phase": "RUNTIME_SANDBOX_2_PRELADDER_DIAG_1"
+        }
+      ]
+    },
+    "unexpected_new_files_outside_phase": []
+  },
+  "profiler_pure_controls": [
+    {
+      "historical_causality_proven": false,
+      "owner_invocations": 0,
+      "passed": true,
+      "profile_active_at_stub_boundary": true,
+      "profiler_restored_by_exact_helper": true,
+      "socket_operations": 0,
+      "stub_controls_observed": 1
+    },
+    {
+      "expected_stub_exception_propagated": true,
+      "historical_causality_proven": false,
+      "owner_invocations": 0,
+      "passed": true,
+      "profile_active_at_stub_boundary": false,
+      "profiler_restored_by_exact_helper": true,
+      "socket_operations": 0
+    }
+  ],
+  "provenance_artifacts": {
+    "historical_launch_provenance.json": {
+      "historical_files_modified": false,
+      "sha256": "c59dcd1e57ad064314e87b96e3aab6a809fc201d15a5cff3d53ddc929541d519"
+    },
+    "historical_path_current_observation.json": {
+      "historical_files_modified": false,
+      "sha256": "df65cf5827e31d0ff71d673d87f6abe83fce6a3c0f059510b19d828de3819781"
+    }
+  },
+  "pure_reproducer": {
+    "TMP_TEMP_TMPDIR_unchanged": true,
+    "config_root": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\scratch\\temp_root_control",
+    "exact_workspace_file_writes_succeeded": true,
+    "historical_causality_proven": false,
+    "historical_folder_used": false,
+    "override_statement": {
+      "end_line": 61,
+      "path": "scripts/replay_synth_auth_pinned1.py",
+      "start_line": 61
+    },
+    "owner_invocations": 0,
+    "passed": true,
+    "socket_operations": 0,
+    "tempfile_state_restored": true,
+    "workspace": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\scratch\\temp_root_control\\runtime-sandbox2-d5yse9wc",
+    "workspace_parent_equals_config_root": true,
+    "workspace_removed": true,
+    "workspace_subtree": {
+      "end_line": 364,
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "start_line": 335
+    }
+  },
+  "pure_validation_audit_guard": {
+    "allowed_pure_domain_children": 0,
+    "forbidden_process_attempts": 0,
+    "forbidden_socket_attempts": 0,
+    "forbidden_write_attempts": 0
+  },
+  "recommended_next_slice": {
+    "action": "One separately authorized instrumented fresh SYNTH.AUTH.PINNED.1 authorization retry",
+    "design": "Bind exact owner source hashes; observe exact code objects without owner replacement; retain every outcome including failures; restore instrumentation; avoid secrets, frames and capability persistence; stop at authorization boundary.",
+    "execute_in_this_phase": false,
+    "retain": [
+      "original fresh SANDBOX2 full report",
+      "original pair observed and authenticated in issuing process; exported pair remains report only",
+      "parsed image metadata and private config absence",
+      "ordered pre-ladder entries/completions/exceptions including first failed statement",
+      "tempdir/gettempdir/TMP/TEMP/TMPDIR/cwd at boundary",
+      "workspace/symlink/ACL and socket outcomes",
+      "system/thread profile/trace/monitoring and guard ownership",
+      "owner cleanup and remaining container evidence"
+    ]
+  },
+  "recovered_launch": {
+    "Python_validation_worker_hooks_inherited": false,
+    "direct_command": "python -B scripts/replay_synth_auth_pinned1.py",
+    "launch_and_completion_records_verified": true,
+    "provenance": "historical_launch_provenance.json",
+    "startup_environment_and_native_policy_retained": false
+  },
+  "remediation_implemented": false,
+  "separate_strict_resolution_probe": {
+    "artifact": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/workspace_strict_resolution_sandbox_probe.json",
+    "basis": "Separate restricted metadata probe is not the direct host live attempt; SANDBOX2 post-image setup does not use strict workspace resolution. It cannot establish a historical write/socket denial.",
+    "classification": "INSUFFICIENT_EVIDENCE"
+  },
+  "socket_differential": "Earlier same-attempt sockets succeeded; no active denying rule identified at later boundary. Conditional startup/native policy or OS failure remains unmeasured. No unrelated validation audit rule is promoted to a candidate.",
+  "status": "UNRESOLVED",
+  "subprocess_differential": {
+    "global_processes_forbidden_theory": "EXCLUDED by successful exact image inspect and cleanup ps",
+    "historical_controls": [
+      {
+        "argv": [
+          "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.EXE",
+          "--config",
+          "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_AUTH_PINNED_1\\runtime-sandbox1-no-config-6aa987a7cbcf867fb80a70c836efd104",
+          "--host",
+          "npipe:////./pipe/dockerDesktopLinuxEngine",
+          "image",
+          "inspect",
+          "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+          "--format",
+          "{{json .}}"
+        ],
+        "command": "image",
+        "completed": true,
+        "control_reaped_and_pipes_closed": true,
+        "exit_code": 0,
+        "scope": "JAVA1C_SANDBOX2_infrastructure"
+      },
+      {
+        "argv": [
+          "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.EXE",
+          "--config",
+          "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_AUTH_PINNED_1\\runtime-sandbox1-no-config-6aa987a7cbcf867fb80a70c836efd104",
+          "--host",
+          "npipe:////./pipe/dockerDesktopLinuxEngine",
+          "ps",
+          "-a",
+          "--format",
+          "{{.Names}}",
+          "--filter",
+          "name=runtime-sandbox2-"
+        ],
+        "command": "ps",
+        "completed": true,
+        "control_reaped_and_pipes_closed": true,
+        "exit_code": 0,
+        "scope": "JAVA1C_SANDBOX2_infrastructure"
+      },
+      {
+        "argv": [
+          "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.EXE",
+          "--config",
+          "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_AUTH_PINNED_1\\runtime-sandbox1-no-config-7d56cd463b162647351c14cd27cd39bc",
+          "--host",
+          "npipe:////./pipe/dockerDesktopLinuxEngine",
+          "ps",
+          "-a",
+          "--format",
+          "{{.Names}}",
+          "--filter",
+          "name=runtime-java1c-",
+          "--filter",
+          "name=runtime-sandbox2-"
+        ],
+        "command": "ps",
+        "completed": true,
+        "control_reaped_and_pipes_closed": true,
+        "exit_code": 0,
+        "scope": "JAVA1C_controls"
+      }
+    ],
+    "source_observer_does_not_reject_processes": true
+  },
+  "temp_root_differential": {
+    "current_readonly_path_observation_artifact": "historical_path_current_observation.json",
+    "earlier_same_attempt_SANDBOX2": {
+      "cleanup_verified": true,
+      "stage_count": 11,
+      "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+      "workspace_removed": true
+    },
+    "historical_config_path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_AUTH_PINNED_1\\runtime-sandbox1-no-config-6aa987a7cbcf867fb80a70c836efd104",
+    "historical_presence_and_writes": "Output reservation and earlier successful workspace prove presence and writable operations earlier in same call; later ACL/path state is unknown",
+    "historical_symlink_ACL_write_denial_cleanup": "No retained boundary snapshot; no source code cleans phase root before JAVA1C",
+    "same_root_governs_TemporaryDirectory": true,
+    "standalone_control_count": 75,
+    "standalone_private_config_roots": [
+      "C:\\Users\\Admin\\AppData\\Local\\Temp"
+    ],
+    "successful_standalone_control_artifact": "docs/roadmap/phases/RUNTIME_SANDBOX_2_PRELADDER_DIAG_1/observed_controls.json"
+  },
+  "validation_passed": true,
+  "validation_summary": {
+    "all_output_confined_to_new_phase": true,
+    "checks": {
+      "auth-artifacts": {
+        "exit_code": 0,
+        "frozen_historical_pins_rechecked_before_reuse": true,
+        "passed": true,
+        "reused_unchanged_passing_worker": true,
+        "stderr_retained": "auth-artifacts.stderr.txt",
+        "stdout_retained": "auth-artifacts.stdout.txt",
+        "worker_result": {
+          "Docker_controls": 0,
+          "JSON_artifacts_parsed": 16,
+          "Java_effects": 0,
+          "all_historical_assertions_executed": true,
+          "audit_guard": {
+            "allowed_pure_domain_children": 0,
+            "forbidden_process_attempts": 0,
+            "forbidden_socket_attempts": 0,
+            "forbidden_write_attempts": 0
+          },
+          "authored_whitespace_passed": true,
+          "captured_original_stdout": "{\"passed\": true, \"historical_files_preserved\": 1828, \"diagnostic_python_sources_compiled_in_memory\": 6, \"JSON_artifacts_parsed\": 16, \"markdown_links_checked\": 18, \"authored_whitespace_passed\": true, \"live_owner_invocations\": 0, \"Docker_controls\": 0, \"Java_effects\": 0, \"evidence_consistency_passed\": true, \"single_effectful_call_site_and_exclusive_marker\": true}\n",
+          "diagnostic_python_sources_compiled_in_memory": 6,
+          "evidence_consistency_passed": true,
+          "historical_files_preserved": 1828,
+          "live_owner_invocations": 0,
+          "markdown_links_checked": 18,
+          "original_frozen_source_sha256": "8c764d5f98ba297f8d335f796442e3f9f1d13c14589fb5a6ccaaba77dbf616f6",
+          "passed": true,
+          "removed_statement_source_line": 105,
+          "single_effectful_call_site_and_exclusive_marker": true,
+          "sole_final_historical_write_removed_in_memory": true
+        }
+      },
+      "auth-matrix": {
+        "exit_code": 0,
+        "frozen_historical_pins_rechecked_before_reuse": true,
+        "passed": true,
+        "reused_unchanged_passing_worker": true,
+        "stderr_retained": "auth-matrix.stderr.txt",
+        "stdout_retained": "auth-matrix.stdout.txt",
+        "worker_result": {
+          "audit_guard": {
+            "allowed_pure_domain_children": 1,
+            "forbidden_process_attempts": 0,
+            "forbidden_socket_attempts": 0,
+            "forbidden_write_attempts": 0
+          },
+          "case_count": 57,
+          "effect_counts": {
+            "caller_shell": 0,
+            "docker": 0,
+            "forbidden_attempts": 0,
+            "java": 0,
+            "other_process": 0,
+            "python_domain_child": 1,
+            "socket": 0
+          },
+          "original_child_command_preserved": true,
+          "original_frozen_source_sha256": "e0455b4eb9b5328bf1484dad08a6f57733e93d9e54bc10e84154ba2e7993bab6",
+          "output_only_rebound_to_new_phase": true,
+          "passed": true
+        }
+      },
+      "benchmark": {
+        "command": [
+          "C:\\Python314\\python.exe",
+          "-S",
+          "-B",
+          "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+          "worker",
+          "benchmark"
+        ],
+        "exit_code": 0,
+        "passed": true,
+        "stderr_retained": "benchmark.stderr.txt",
+        "stdout_retained": "benchmark.stdout.txt",
+        "worker_result": {
+          "arguments": [
+            "benchmarks/run_benchmarks.py",
+            "--check"
+          ],
+          "audit_guard": {
+            "allowed_pure_domain_children": 0,
+            "forbidden_process_attempts": 0,
+            "forbidden_socket_attempts": 0,
+            "forbidden_write_attempts": 0
+          },
+          "exit_code": 0,
+          "passed": true
+        }
+      },
+      "context-audit": {
+        "command": [
+          "C:\\Python314\\python.exe",
+          "-B",
+          "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+          "worker",
+          "context-audit"
+        ],
+        "exit_code": 0,
+        "passed": true,
+        "stderr_retained": "context-audit.stderr.txt",
+        "stdout_retained": "context-audit.stdout.txt",
+        "worker_result": {
+          "args": [
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "-o",
+            "addopts=",
+            "-o",
+            "log_file=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-log-context-audit.txt",
+            "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-basetemp-context-audit-11828",
+            "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\test_context_audit.py"
+          ],
+          "audit_guard": {
+            "allowed_pure_domain_children": 0,
+            "forbidden_process_attempts": 0,
+            "forbidden_socket_attempts": 0,
+            "forbidden_write_attempts": 0
+          },
+          "collected_test_count": 11,
+          "collected_test_ids": [
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_does_not_install_denial_or_mutate_owner_functions",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_is_active_at_stub_boundary_and_restored[False]",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_is_active_at_stub_boundary_and_restored[True]",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_runner_is_bound_to_historical_gates",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_missing_boundary_evidence_fails_closed_without_promoting_differences",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_outcome_distinguishes_capability_from_historical_proof",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_reproducer_refuses_historical_root_before_any_write",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_runner_override_lexically_contains_issuer_and_restores_afterward",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_same_attempt_success_excludes_unconditional_temp_socket_process_denial",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_same_temp_state_selects_config_and_exact_workspace_without_historical_writes",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_upstream_wrappers_exit_before_runtime_snapshot"
+          ],
+          "controlled_fixture_owner_frames_permitted": false,
+          "coverage_selection": "complete selected frozen suites",
+          "exit_code": 0,
+          "failed_test_count": 0,
+          "failed_test_ids": [],
+          "live_owner_issuance": 0,
+          "passed": true,
+          "passed_test_count": 11,
+          "passed_test_ids": [
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_does_not_install_denial_or_mutate_owner_functions",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_is_active_at_stub_boundary_and_restored[False]",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_profiler_is_active_at_stub_boundary_and_restored[True]",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_exact_runner_is_bound_to_historical_gates",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_missing_boundary_evidence_fails_closed_without_promoting_differences",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_outcome_distinguishes_capability_from_historical_proof",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_reproducer_refuses_historical_root_before_any_write",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_runner_override_lexically_contains_issuer_and_restores_afterward",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_same_attempt_success_excludes_unconditional_temp_socket_process_denial",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_same_temp_state_selects_config_and_exact_workspace_without_historical_writes",
+            "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/test_context_audit.py::test_upstream_wrappers_exit_before_runtime_snapshot"
+          ],
+          "skipped_test_ids": [],
+          "successful_operational_effects": 0,
+          "temporary_root_confined_to_new_phase": true
+        }
+      },
+      "context-contracts": {
+        "command": [
+          "C:\\Python314\\python.exe",
+          "-B",
+          "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+          "worker",
+          "context-contracts"
+        ],
+        "exit_code": 0,
+        "negative_scope_coverage": "Selected original negative_authentication_matrix validates report/JSON/constructor/copy/subclass rejection, every scenario/auth/provider field, HMAC/process domains, original upstream relation and exact source scope under inert fixtures.",
+        "passed": true,
+        "selected_test_ids": [
+          "tests/test_runtime_java_pinned_provider.py::test_existing_docker_configuration_path_cannot_replace_frozen_empty_configuration",
+          "tests/test_runtime_java_pinned_provider.py::test_frozen_fresh_empty_docker_config_paths_do_not_change_backend_identity",
+          "tests/test_runtime_java_pinned_provider.py::test_issuer_accepts_no_caller_source_route_or_evidence",
+          "tests/test_runtime_java_pinned_provider.py::test_observer_restores_profiler_even_when_public_owner_raises",
+          "tests/test_runtime_java_pinned_provider.py::test_prior_profiler_blocks_before_any_upstream_effect",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_issuance_and_validation_add_no_lifecycle_or_reflection_effects",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_missing_exact_frozen_source_stops_before_provider_issuance",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_negative_matrix_is_reversible_and_performs_no_additional_provider_effects",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_new_epoch_uses_exact_historical_source_and_scenario",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_provider_failure_closes_before_scenario_authorization",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_public_issuer_accepts_no_free_form_inputs",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_report_separates_provider_infrastructure_from_zero_synthetic_effects",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_scope_is_authorization_only_and_public_objects_are_immutable",
+          "tests/test_synthetic_runtime_authorization_pinned.py::test_validation_calls_public_provider_validator_even_after_issuance",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_all_bound_pure_gates_accept_without_issuance",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-authored_whitespace_and_JSON_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-benchmark_check_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-focused_authorization_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-frozen_semantic_regressions_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-git_diff_check_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-historical_bytes_preserved]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-in_memory_compilation_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-known_bookkeeping_drift_preserved]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-pure_validation_no_operational_effects]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[false-registry_picker_no_new_failures]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-authored_whitespace_and_JSON_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-benchmark_check_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-focused_authorization_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-frozen_semantic_regressions_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-git_diff_check_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-historical_bytes_preserved]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-in_memory_compilation_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-known_bookkeeping_drift_preserved]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-pure_validation_no_operational_effects]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[integer_alias-registry_picker_no_new_failures]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-authored_whitespace_and_JSON_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-benchmark_check_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-focused_authorization_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-frozen_semantic_regressions_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-git_diff_check_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-historical_bytes_preserved]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-in_memory_compilation_passed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-known_bookkeeping_drift_preserved]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-pure_validation_no_operational_effects]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_every_named_boolean_gate_is_required[missing-registry_picker_no_new_failures]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_exception_after_reservation_records_blocker_and_restores_tempdir",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_exception_in_negative_controls_preserves_effect_ledger_and_withdraws_authorization",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_exclusive_report_reservation_prevents_second_issuance",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_failed_negative_matrix_withdraws_scope_without_consuming_provider[authorization]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_failed_negative_matrix_withdraws_scope_without_consuming_provider[provider]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_gate_identity_readiness_and_nonempty_bindings_are_required[phase_id-SYNTH.AUTH.1]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_gate_identity_readiness_and_nonempty_bindings_are_required[pure_gates_ready-1]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_gate_identity_readiness_and_nonempty_bindings_are_required[pure_gates_ready-False]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_gate_identity_readiness_and_nonempty_bindings_are_required[source_bindings-value3]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_gate_identity_readiness_and_nonempty_bindings_are_required[validation_bindings-value4]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_replay_rejects_arguments_before_gates_or_issuance",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_source_validation_and_preservation_drift_stop_before_reservation[historical-historical_bytes_changed]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_source_validation_and_preservation_drift_stop_before_reservation[source-source_changed_after_gates]",
+          "tests/test_synthetic_runtime_authorization_pinned_replay.py::test_source_validation_and_preservation_drift_stop_before_reservation[validation-validation_changed_after_gates]"
+        ],
+        "selection_manifest": "worker_context-contracts-collect.json",
+        "selection_verified_by_guarded_collection_without_execution_rerun": true,
+        "stderr_retained": "context-contracts.stderr.txt",
+        "stdout_retained": "context-contracts.stdout.txt",
+        "worker_result": {
+          "args": [
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "-o",
+            "addopts=",
+            "-o",
+            "log_file=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-log-context-contracts.txt",
+            "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-basetemp-context-contracts-30520",
+            "tests/test_runtime_java_pinned_provider.py::test_issuer_accepts_no_caller_source_route_or_evidence",
+            "tests/test_runtime_java_pinned_provider.py::test_prior_profiler_blocks_before_any_upstream_effect",
+            "tests/test_runtime_java_pinned_provider.py::test_observer_restores_profiler_even_when_public_owner_raises",
+            "tests/test_runtime_java_pinned_provider.py::test_frozen_fresh_empty_docker_config_paths_do_not_change_backend_identity",
+            "tests/test_runtime_java_pinned_provider.py::test_existing_docker_configuration_path_cannot_replace_frozen_empty_configuration",
+            "tests/test_synthetic_runtime_authorization_pinned.py::test_new_epoch_uses_exact_historical_source_and_scenario",
+            "tests/test_synthetic_runtime_authorization_pinned.py::test_scope_is_authorization_only_and_public_objects_are_immutable",
+            "tests/test_synthetic_runtime_authorization_pinned.py::test_public_issuer_accepts_no_free_form_inputs",
+            "tests/test_synthetic_runtime_authorization_pinned.py::test_provider_failure_closes_before_scenario_authorization",
+            "tests/test_synthetic_runtime_authorization_pinned.py::test_missing_exact_frozen_source_stops_before_provider_issuance",
+            "tests/test_synthetic_runtime_authorization_pinned.py::test_validation_calls_public_provider_validator_even_after_issuance",
+            "tests/test_synthetic_runtime_authorization_pinned.py::test_report_separates_provider_infrastructure_from_zero_synthetic_effects",
+            "tests/test_synthetic_runtime_authorization_pinned.py::test_negative_matrix_is_reversible_and_performs_no_additional_provider_effects",
+            "tests/test_synthetic_runtime_authorization_pinned.py::test_issuance_and_validation_add_no_lifecycle_or_reflection_effects",
+            "tests/test_synthetic_runtime_authorization_pinned_replay.py"
+          ],
+          "audit_guard": {
+            "allowed_pure_domain_children": 0,
+            "forbidden_process_attempts": 0,
+            "forbidden_socket_attempts": 0,
+            "forbidden_write_attempts": 0
+          },
+          "collected_test_count": 59,
+          "controlled_fixture_owner_frames_permitted": true,
+          "coverage_selection": "five frozen PINNED1C context/config helpers, nine SYNTH pure contract tests, complete stubbed replay suite",
+          "exit_code": 0,
+          "failed_test_count": 0,
+          "failed_test_ids": [],
+          "live_owner_issuance": 0,
+          "passed": true,
+          "passed_test_count": 59,
+          "skipped_test_ids": [],
+          "successful_operational_effects": 0,
+          "temporary_root_confined_to_new_phase": true
+        }
+      },
+      "context-report": {
+        "command": [
+          "C:\\Python314\\python.exe",
+          "-B",
+          "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+          "worker",
+          "context-report"
+        ],
+        "exit_code": 0,
+        "passed": true,
+        "stderr_retained": "context-report.stderr.txt",
+        "stdout_retained": "context-report.stdout.txt",
+        "worker_result": {
+          "audit_guard": {
+            "allowed_pure_domain_children": 0,
+            "forbidden_process_attempts": 0,
+            "forbidden_socket_attempts": 0,
+            "forbidden_write_attempts": 0
+          },
+          "context_audit_source_sha256": "c288c7922764e40c4bd7f12b6fe85e3c49864d2d7c6bb3328352fb9ee5cca4dd",
+          "exact_historical_root_cause_established": false,
+          "operational_effects": {
+            "Apply": 0,
+            "BANK": 0,
+            "Docker": 0,
+            "EXECUTOR.1R": 0,
+            "JAVA1C": 0,
+            "PINNED1A_export": 0,
+            "PINNED1B": 0,
+            "PINNED1C": 0,
+            "SANDBOX2_issuance": 0,
+            "SYNTH_retry": 0,
+            "SyntheticStateBox": 0,
+            "execution_leases": 0,
+            "provider_root": 0,
+            "reflection": 0
+          },
+          "passed": true,
+          "profiler_pure_controls_passed": true,
+          "pure_reproducer_passed": true,
+          "status": "UNRESOLVED"
+        }
+      },
+      "historical-blocked": {
+        "command": [
+          "C:\\Python314\\python.exe",
+          "-B",
+          "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+          "worker",
+          "historical-blocked"
+        ],
+        "exit_code": 0,
+        "passed": true,
+        "stderr_retained": "historical-blocked.stderr.txt",
+        "stdout_retained": "historical-blocked.stdout.txt",
+        "worker_result": {
+          "audit_guard": {
+            "allowed_pure_domain_children": 0,
+            "forbidden_process_attempts": 0,
+            "forbidden_socket_attempts": 0,
+            "forbidden_write_attempts": 0
+          },
+          "historical_bytes_unchanged": true,
+          "historical_live_attempts_unchanged": 1,
+          "historical_reason": "authorization_prerequisite_failed:pinned_provider_incomplete: fresh_java1c_failed:not_authenticated",
+          "historical_status": "SYNTH_AUTH_PINNED_1_BLOCKED",
+          "new_live_attempts": 0,
+          "passed": true,
+          "sha256": "fb4b952a606b6d3e3a2ae6dc3d2893f1c24c8cbee5b7708b01e8f0b67a08c8b4",
+          "source": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/SYNTH_AUTH_PINNED_1_LOCAL.json"
+        }
+      },
+      "historical_byte_preservation": {
+        "changed_or_missing": [],
+        "historical_file_count": 2185,
+        "passed": true,
+        "prior_historical_pin_integrity": {
+          "historical_drift_not_repinned": true,
+          "passed": true,
+          "prior_pin_sets": [
+            {
+              "changed_or_missing": [],
+              "historical_pins_checked": 1828,
+              "passed": true,
+              "prior_phase": "RUNTIME_JAVA_1C_AUTH_DIAG_1"
+            },
+            {
+              "changed_or_missing": [],
+              "historical_pins_checked": 2126,
+              "passed": true,
+              "prior_phase": "RUNTIME_SANDBOX_2_PRELADDER_DIAG_1"
+            }
+          ]
+        },
+        "unexpected_new_files_outside_phase": []
+      },
+      "pytest": {
+        "exit_code": 0,
+        "frozen_historical_pins_rechecked_before_reuse": true,
+        "passed": true,
+        "reused_unchanged_passing_worker": true,
+        "stderr_retained": "pytest.stderr.txt",
+        "stdout_retained": "pytest.stdout.txt",
+        "worker_result": {
+          "args": [
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "-o",
+            "addopts=",
+            "-o",
+            "log_file=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-log-sandbox2.txt",
+            "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-basetemp-sandbox2-25504",
+            "tests/test_runtime_sandbox2.py",
+            "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\test_classifier.py"
+          ],
+          "audit_guard": {
+            "allowed_pure_domain_children": 0,
+            "forbidden_process_attempts": 0,
+            "forbidden_socket_attempts": 0,
+            "forbidden_write_attempts": 0
+          },
+          "collected_test_count": 230,
+          "controlled_fixture_owner_frames_permitted": true,
+          "exit_code": 0,
+          "failed_test_count": 0,
+          "failed_test_ids": [],
+          "live_owner_issuance": 0,
+          "passed": true,
+          "passed_test_count": 230,
+          "skipped_test_ids": [],
+          "successful_operational_effects": 0,
+          "temporary_root_confined_to_new_phase": true
+        }
+      },
+      "registry_picker_baseline_vs_after": {
+        "passed": true,
+        "picker_equal": true,
+        "registry_equal": true
+      },
+      "registry_picker_pure_test_baseline_vs_after": {
+        "after": {
+          "collected_test_count": 299,
+          "exit_code": 1,
+          "failed_test_count": 7,
+          "failed_test_ids": [
+            {
+              "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+              "when": "call"
+            }
+          ],
+          "passed_test_count": 292,
+          "skipped_test_ids": []
+        },
+        "after_retained": "worker_registry-picker-after.json",
+        "audit_guards_no_effect_attempts": true,
+        "baseline": {
+          "collected_test_count": 299,
+          "exit_code": 1,
+          "failed_test_count": 7,
+          "failed_test_ids": [
+            {
+              "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+              "when": "call"
+            },
+            {
+              "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+              "when": "call"
+            }
+          ],
+          "passed_test_count": 292,
+          "skipped_test_ids": []
+        },
+        "baseline_retained": "registry_picker_pure_test_baseline.json",
+        "passed": true,
+        "same_failure_ids_and_outcome_counts": true,
+        "unchanged_historical_failures_preserved": true
+      },
+      "source_json_whitespace_diff_checks": {
+        "authored_text_files_checked": 34,
+        "bytecode_emission": false,
+        "failures": [],
+        "git_diff_check_exit_code": 0,
+        "new_json_files_parsed": 26,
+        "new_python_sources_compiled_in_memory": 4,
+        "passed": true
+      }
+    },
+    "controlled_fixture_frames_are_not_live_operational_issuance": true,
+    "final_context_source_refreshed_without_broad_rerun": true,
+    "operational_effects": {
+      "Apply": 0,
+      "BANK": 0,
+      "Docker": 0,
+      "EXECUTOR1R": 0,
+      "JAVA1C": 0,
+      "PINNED1A_export": 0,
+      "PINNED1B": 0,
+      "PINNED1C": 0,
+      "SANDBOX2_issuance": 0,
+      "SYNTH_retry": 0,
+      "SyntheticStateBox": 0,
+      "reflection": 0
+    },
+    "passed": true,
+    "phase_id": "RUNTIME.SANDBOX.2.NESTED.CONTEXT.DIAG.1",
+    "validation_Docker_controls": 0,
+    "validation_Java_effects": 0,
+    "validation_live_owner_invocations": 0,
+    "validation_scope_limit": {
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+        "worker",
+        "context-contracts"
+      ],
+      "completed_summary_available": false,
+      "final_scope": "five frozen PINNED1C context/config helpers, nine SYNTH pure contract cases, complete stubbed replay suite",
+      "historical_pin_changes": false,
+      "initial_combined_broad_fixture_worker": "context-contracts",
+      "limitation": "Exhaustive combined provider/authorization fixture suites did not complete in the bounded worker; focused requested context/contract coverage is run to completion separately.",
+      "outcome": "TIMEOUT",
+      "reason": "subprocess.TimeoutExpired after 300 seconds",
+      "subprocess_run_timeout_cleanup": "worker killed and reaped by subprocess.run timeout handling; worker guard allowed no child processes",
+      "successful_operational_effects_prevented_by_worker_audit_guard": true,
+      "timed_out_worker_final_attempt_counters": "UNAVAILABLE_NO_COMPLETED_SUMMARY",
+      "timeout_seconds": 300
+    }
+  }
+}

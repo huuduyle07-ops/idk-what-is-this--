@@ -1,0 +1,20 @@
+{
+  "checks": {
+    "exact_domain": true,
+    "exact_phase": true,
+    "exact_schema": true,
+    "exact_status": true,
+    "exact_type": true,
+    "focused_measurements_match": true,
+    "focused_passed": true,
+    "no_full_frozen_suite_claim": true,
+    "no_lifecycle_or_operational_admission": true,
+    "operational_effects_exact_zero": true,
+    "owner_source_hash_matches": true,
+    "readiness_unresolved": true,
+    "request_decision_A_preserved": true
+  },
+  "owner_modules_imported": false,
+  "passed": true,
+  "report": "SYNTH_REFLECT_ADMIT_PINNED_1A_REPORT.json"
+}

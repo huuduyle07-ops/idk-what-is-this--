@@ -1,0 +1,51 @@
+{
+  "phase_id": "SYNTH.AUTH.PINNED.1",
+  "test_file": "tests/test_synthetic_runtime_authorization_pinned.py",
+  "initial_run": {
+    "command": "python -m pytest -q -p no:cacheprovider tests/test_synthetic_runtime_authorization_pinned.py",
+    "exit_code": 1,
+    "passed": 138,
+    "failed": 1,
+    "warnings": 1,
+    "duration_seconds": 184.35,
+    "failure_test": "test_authorization_report_is_report_only_and_never_exports_hmac",
+    "failure_reason": "The test substring assertion for _signature also matched the required method_signature key.",
+    "correction": "New test now checks the exact JSON key \"_signature\"; no production fix was required.",
+    "terminal_summary": "focused_initial_summary.txt",
+    "full_raw_transcript_preserved": false,
+    "negative_matrix_passed": true
+  },
+  "targeted_rerun": {
+    "command": "python -m pytest -q -p no:cacheprovider tests/test_synthetic_runtime_authorization_pinned.py -k 'report_is_report_only or missing_exact_frozen_source or scope_is_authorization_only or fresh_issuance_reauthenticates'",
+    "exit_code": 0,
+    "passed": 4,
+    "deselected": 136,
+    "warnings": 1,
+    "duration_seconds": 9.58,
+    "terminal_summary": "focused_targeted.txt",
+    "coverage": [
+      "Corrected exact HMAC JSON key assertion",
+      "New frozen-source recovery failure before provider issuance",
+      "Updated authorization registry isolation fixture",
+      "Scope immutability and authority denials",
+      "Exact retained provider graph and repeated public validator calls"
+    ]
+  },
+  "current_source_matrix_rerun": {
+    "command": "python -m pytest -q -p no:cacheprovider tests/test_synthetic_runtime_authorization_pinned.py -k negative_matrix_is_reversible",
+    "exit_code": 0,
+    "passed": 1,
+    "deselected": 139,
+    "warnings": 1,
+    "duration_seconds": 11.68,
+    "raw_terminal_log": "focused_current_matrix.txt",
+    "reason": "Authorization-owner negative-matrix source changed after the initial test process imported it; this rerun covered the current source."
+  },
+  "effective_focused_cases": 140,
+  "all_effective_focused_cases_passed": true,
+  "coverage_accounting": "The initial 138 passing cases plus the corrected failed case and the newly added frozen-source recovery case cover all 140 current cases. The latest negative-matrix implementation was rerun separately and passed.",
+  "effect_guards": "Actual unchanged public provider issuers used only controlled virtual transports under strict no_runtime_effects guards.",
+  "live_provider_attempts": 0,
+  "synthetic_scenario_executions": 0,
+  "historical_files_modified": false
+}

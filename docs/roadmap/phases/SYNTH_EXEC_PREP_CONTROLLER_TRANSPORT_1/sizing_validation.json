@@ -1,0 +1,13 @@
+{
+  "blocked_effects": [],
+  "mode": "pure_schema_sizing",
+  "operational_guard_counters": {
+    "capability_or_transition_attempts": 0,
+    "capability_owner_import_attempts": 0,
+    "execution_or_verification_attempts": 0,
+    "network_attempts": 0,
+    "outside_phase_write_attempts": 0,
+    "process_attempts": 0
+  },
+  "passed": true
+}

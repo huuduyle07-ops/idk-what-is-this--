@@ -1,0 +1,1329 @@
+{
+  "method": "source/JSON/AST only; no owner import or operation",
+  "sources": [
+    {
+      "path": "core/candidate_runtime_sandbox.py",
+      "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "bytes": 34833,
+      "anchors": [
+        {
+          "line": 69,
+          "end_line": 70,
+          "name": "_json",
+          "text": "def _json(value):"
+        },
+        {
+          "line": 73,
+          "end_line": 74,
+          "name": "_hash",
+          "text": "def _hash(value):"
+        },
+        {
+          "line": 77,
+          "end_line": 78,
+          "name": "_sign",
+          "text": "def _sign(value):"
+        },
+        {
+          "line": 81,
+          "end_line": 85,
+          "name": "CandidateRuntimeSandboxError",
+          "text": "class CandidateRuntimeSandboxError(ValueError):"
+        },
+        {
+          "line": 89,
+          "end_line": 97,
+          "name": "ExactSandboxInput",
+          "text": "class ExactSandboxInput:"
+        },
+        {
+          "line": 101,
+          "end_line": 122,
+          "name": "CandidateRuntimeSandboxExecutionSpec",
+          "text": "class CandidateRuntimeSandboxExecutionSpec:"
+        },
+        {
+          "line": 125,
+          "end_line": 128,
+          "name": "synthetic_probe_spec",
+          "text": "def synthetic_probe_spec(probe_id):"
+        },
+        {
+          "line": 132,
+          "end_line": 140,
+          "name": "SandboxBackendObservation",
+          "text": "class SandboxBackendObservation:"
+        },
+        {
+          "line": 144,
+          "end_line": 156,
+          "name": "SandboxProbeOutcome",
+          "text": "class SandboxProbeOutcome:"
+        },
+        {
+          "line": 160,
+          "end_line": 194,
+          "name": "CandidateRuntimeSandboxVerificationReceipt",
+          "text": "class CandidateRuntimeSandboxVerificationReceipt:"
+        },
+        {
+          "line": 198,
+          "end_line": 246,
+          "name": "CandidateRuntimeSandboxDescriptor",
+          "text": "class CandidateRuntimeSandboxDescriptor:"
+        },
+        {
+          "line": 249,
+          "end_line": 251,
+          "name": "_authentic",
+          "text": "def _authentic(value, kind):"
+        },
+        {
+          "line": 254,
+          "end_line": 257,
+          "name": "validate_sandbox_verification_receipt",
+          "text": "def validate_sandbox_verification_receipt(receipt):"
+        },
+        {
+          "line": 260,
+          "end_line": 266,
+          "name": "validate_sandbox_descriptor",
+          "text": "def validate_sandbox_descriptor(descriptor, receipt):"
+        },
+        {
+          "line": 269,
+          "end_line": 275,
+          "name": "sandbox_satisfies_executor_boundary",
+          "text": "def sandbox_satisfies_executor_boundary(descriptor, executor_required_boundary=MANDATORY_REQUIREMENTS):"
+        },
+        {
+          "line": 279,
+          "end_line": 287,
+          "name": "_Capture",
+          "text": "class _Capture:"
+        },
+        {
+          "line": 290,
+          "end_line": 354,
+          "name": "_bounded_process",
+          "text": "def _bounded_process(argv, *, input_bytes=b'', timeout_ms=5000,"
+        },
+        {
+          "line": 357,
+          "end_line": 360,
+          "name": "_local_endpoint",
+          "text": "def _local_endpoint():"
+        },
+        {
+          "line": 363,
+          "end_line": 372,
+          "name": "_docker_prefix",
+          "text": "def _docker_prefix():"
+        },
+        {
+          "line": 375,
+          "end_line": 409,
+          "name": "discover_local_sandbox_backend",
+          "text": "def discover_local_sandbox_backend(*, timings=None):"
+        },
+        {
+          "line": 412,
+          "end_line": 416,
+          "name": "_safe_configuration",
+          "text": "def _safe_configuration(config, image_id, probe_id='boundary'):"
+        },
+        {
+          "line": 419,
+          "end_line": 439,
+          "name": "_safe_configuration_facts",
+          "text": "def _safe_configuration_facts(config, image_id, probe_id):"
+        },
+        {
+          "line": 442,
+          "end_line": 480,
+          "name": "_facts_passed",
+          "text": "def _facts_passed(probe, capture, facts, cleanup, host_unchanged, endpoint_quiet):"
+        },
+        {
+          "line": 483,
+          "end_line": 550,
+          "name": "_invoke_probe",
+          "text": "def _invoke_probe(prefix, backend, spec, profile, sentinel, port, timings):"
+        },
+        {
+          "line": 553,
+          "end_line": 561,
+          "name": "_descriptor",
+          "text": "def _descriptor(receipt):"
+        },
+        {
+          "line": 564,
+          "end_line": 646,
+          "name": "verify_candidate_runtime_sandbox",
+          "text": "def verify_candidate_runtime_sandbox(*, timings=None, diagnostics=None):"
+        },
+        {
+          "line": 650,
+          "end_line": 658,
+          "name": "CandidateRuntimeSandboxAdapter",
+          "text": "class CandidateRuntimeSandboxAdapter:"
+        },
+        {
+          "line": 661,
+          "end_line": 665,
+          "name": "get_verified_candidate_runtime_sandbox",
+          "text": "def get_verified_candidate_runtime_sandbox(descriptor=None, receipt=None):"
+        }
+      ]
+    },
+    {
+      "path": "core/runtime_java_pinned_backend_target_binding.py",
+      "sha256": "94c95d674c0b43cde5811762998d13a65c3eee71c442cf05ff8699e02ec59da9",
+      "bytes": 34173,
+      "anchors": [
+        {
+          "line": 56,
+          "end_line": 60,
+          "name": "PinnedBindingBlocked",
+          "text": "class PinnedBindingBlocked(ValueError):"
+        },
+        {
+          "line": 63,
+          "end_line": 64,
+          "name": "_canonical",
+          "text": "def _canonical(value):"
+        },
+        {
+          "line": 67,
+          "end_line": 68,
+          "name": "_digest",
+          "text": "def _digest(value, role=b\"evidence\"):"
+        },
+        {
+          "line": 71,
+          "end_line": 74,
+          "name": "_payload",
+          "text": "def _payload(value):"
+        },
+        {
+          "line": 77,
+          "end_line": 80,
+          "name": "_evidence_payload",
+          "text": "def _evidence_payload(value):"
+        },
+        {
+          "line": 83,
+          "end_line": 84,
+          "name": "_sign",
+          "text": "def _sign(value):"
+        },
+        {
+          "line": 88,
+          "end_line": 153,
+          "name": "PinnedJavaBackendTargetBindingReceipt",
+          "text": "class PinnedJavaBackendTargetBindingReceipt:"
+        },
+        {
+          "line": 157,
+          "end_line": 168,
+          "name": "BackendTargetBindingOutcome",
+          "text": "class BackendTargetBindingOutcome:"
+        },
+        {
+          "line": 171,
+          "end_line": 218,
+          "name": "_authenticate_upstreams",
+          "text": "def _authenticate_upstreams(attachment, descriptor, sandbox_receipt, inspection):"
+        },
+        {
+          "line": 221,
+          "end_line": 242,
+          "name": "_upstream_values",
+          "text": "def _upstream_values(attachment, descriptor, sandbox_receipt, inspection):"
+        },
+        {
+          "line": 245,
+          "end_line": 256,
+          "name": "_retain_fresh_upstreams",
+          "text": "def _retain_fresh_upstreams(context, attachment, descriptor, sandbox_receipt, inspection):"
+        },
+        {
+          "line": 259,
+          "end_line": 274,
+          "name": "_issue_receipt",
+          "text": "def _issue_receipt(context, attachment, descriptor, sandbox_receipt, inspection):"
+        },
+        {
+          "line": 277,
+          "end_line": 309,
+          "name": "validate_pinned_backend_target_binding",
+          "text": "def validate_pinned_backend_target_binding(receipt, bind_attachment, sandbox_descriptor,"
+        },
+        {
+          "line": 312,
+          "end_line": 323,
+          "name": "_effects",
+          "text": "def _effects(calls):"
+        },
+        {
+          "line": 326,
+          "end_line": 480,
+          "name": "issue_pinned_backend_target_binding",
+          "text": "def issue_pinned_backend_target_binding():"
+        },
+        {
+          "line": 483,
+          "end_line": 561,
+          "name": "negative_authentication_matrix",
+          "text": "def negative_authentication_matrix(outcome):"
+        }
+      ]
+    },
+    {
+      "path": "core/runtime_java_pinned_provider.py",
+      "sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+      "bytes": 42111,
+      "anchors": [
+        {
+          "line": 58,
+          "end_line": 61,
+          "name": "PinnedProviderBlocked",
+          "text": "class PinnedProviderBlocked(ValueError):"
+        },
+        {
+          "line": 64,
+          "end_line": 65,
+          "name": "_canonical",
+          "text": "def _canonical(value):"
+        },
+        {
+          "line": 68,
+          "end_line": 69,
+          "name": "_digest",
+          "text": "def _digest(value, role=\"evidence\"):"
+        },
+        {
+          "line": 72,
+          "end_line": 75,
+          "name": "_payload",
+          "text": "def _payload(value):"
+        },
+        {
+          "line": 78,
+          "end_line": 80,
+          "name": "_sign",
+          "text": "def _sign(value):"
+        },
+        {
+          "line": 83,
+          "end_line": 86,
+          "name": "_evidence_digest",
+          "text": "def _evidence_digest(value, role):"
+        },
+        {
+          "line": 90,
+          "end_line": 126,
+          "name": "RuntimeProviderAttachment",
+          "text": "class RuntimeProviderAttachment:"
+        },
+        {
+          "line": 130,
+          "end_line": 168,
+          "name": "PinnedJavaExactProviderReceipt",
+          "text": "class PinnedJavaExactProviderReceipt:"
+        },
+        {
+          "line": 172,
+          "end_line": 185,
+          "name": "ExactProviderOutcome",
+          "text": "class ExactProviderOutcome:"
+        },
+        {
+          "line": 188,
+          "end_line": 192,
+          "name": "_pinned_objects",
+          "text": "def _pinned_objects(value):"
+        },
+        {
+          "line": 195,
+          "end_line": 204,
+          "name": "_authenticate_pinned",
+          "text": "def _authenticate_pinned(objects):"
+        },
+        {
+          "line": 207,
+          "end_line": 212,
+          "name": "_fixed_route",
+          "text": "def _fixed_route():"
+        },
+        {
+          "line": 215,
+          "end_line": 221,
+          "name": "_route_projection",
+          "text": "def _route_projection(prefix):"
+        },
+        {
+          "line": 224,
+          "end_line": 243,
+          "name": "_measure_backend",
+          "text": "def _measure_backend(prefix, endpoint, calls):"
+        },
+        {
+          "line": 246,
+          "end_line": 297,
+          "name": "_runtime_snapshot",
+          "text": "def _runtime_snapshot():"
+        },
+        {
+          "line": 300,
+          "end_line": 338,
+          "name": "_check_runtime",
+          "text": "def _check_runtime(objects, measurement):"
+        },
+        {
+          "line": 341,
+          "end_line": 442,
+          "name": "_runtime_evidence",
+          "text": "def _runtime_evidence(upstreams, measurement):"
+        },
+        {
+          "line": 445,
+          "end_line": 455,
+          "name": "_authenticate_owned",
+          "text": "def _authenticate_owned(value, expected_type, registry, role):"
+        },
+        {
+          "line": 458,
+          "end_line": 470,
+          "name": "validate_runtime_attachment",
+          "text": "def validate_runtime_attachment(attachment, pinned_receipt, bind_attachment, bind_sd, bind_sr,"
+        },
+        {
+          "line": 473,
+          "end_line": 494,
+          "name": "validate_pinned_java_exact_provider",
+          "text": "def validate_pinned_java_exact_provider(receipt, pinned_receipt, bind_attachment, bind_sd, bind_sr,"
+        },
+        {
+          "line": 497,
+          "end_line": 502,
+          "name": "_effects",
+          "text": "def _effects(controls):"
+        },
+        {
+          "line": 505,
+          "end_line": 622,
+          "name": "issue_pinned_java_exact_provider",
+          "text": "def issue_pinned_java_exact_provider():"
+        },
+        {
+          "line": 625,
+          "end_line": 627,
+          "name": "_outcome_objects",
+          "text": "def _outcome_objects(outcome):"
+        },
+        {
+          "line": 630,
+          "end_line": 687,
+          "name": "negative_authentication_matrix",
+          "text": "def negative_authentication_matrix(outcome):"
+        }
+      ]
+    },
+    {
+      "path": "core/runtime_java_pinned_requirement.py",
+      "sha256": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1",
+      "bytes": 22597,
+      "anchors": [
+        {
+          "line": 18,
+          "end_line": 20,
+          "name": "ExecutableIdentity",
+          "text": "class ExecutableIdentity:"
+        },
+        {
+          "line": 24,
+          "end_line": 35,
+          "name": "ControllerRequirement",
+          "text": "class ControllerRequirement:"
+        },
+        {
+          "line": 39,
+          "end_line": 44,
+          "name": "InspectionBounds",
+          "text": "class InspectionBounds:"
+        },
+        {
+          "line": 48,
+          "end_line": 52,
+          "name": "EvidenceEdge",
+          "text": "class EvidenceEdge:"
+        },
+        {
+          "line": 56,
+          "end_line": 62,
+          "name": "NegativeOutcome",
+          "text": "class NegativeOutcome:"
+        },
+        {
+          "line": 221,
+          "end_line": 290,
+          "name": "PinnedJavaRequirement",
+          "text": "class PinnedJavaRequirement:"
+        }
+      ]
+    },
+    {
+      "path": "core/runtime_java_pinned_target_inspection.py",
+      "sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59",
+      "bytes": 28903,
+      "anchors": [
+        {
+          "line": 52,
+          "end_line": 53,
+          "name": "_canonical",
+          "text": "def _canonical(value):"
+        },
+        {
+          "line": 56,
+          "end_line": 57,
+          "name": "_digest",
+          "text": "def _digest(value):"
+        },
+        {
+          "line": 60,
+          "end_line": 63,
+          "name": "_payload",
+          "text": "def _payload(value):"
+        },
+        {
+          "line": 66,
+          "end_line": 67,
+          "name": "_sign",
+          "text": "def _sign(value):"
+        },
+        {
+          "line": 71,
+          "end_line": 117,
+          "name": "PinnedJavaTargetInspectionReceipt",
+          "text": "class PinnedJavaTargetInspectionReceipt:"
+        },
+        {
+          "line": 121,
+          "end_line": 128,
+          "name": "TargetInspectionOutcome",
+          "text": "class TargetInspectionOutcome:"
+        },
+        {
+          "line": 132,
+          "end_line": 138,
+          "name": "ExportResult",
+          "text": "class ExportResult:"
+        },
+        {
+          "line": 141,
+          "end_line": 156,
+          "name": "validate_target_inspection_receipt",
+          "text": "def validate_target_inspection_receipt(receipt):"
+        },
+        {
+          "line": 159,
+          "end_line": 199,
+          "name": "_issue_receipt",
+          "text": "def _issue_receipt(values, evidence):"
+        },
+        {
+          "line": 202,
+          "end_line": 220,
+          "name": "_new_report",
+          "text": "def _new_report(context):"
+        },
+        {
+          "line": 223,
+          "end_line": 224,
+          "name": "_completed",
+          "text": "def _completed(capture):"
+        },
+        {
+          "line": 227,
+          "end_line": 245,
+          "name": "_control",
+          "text": "def _control(prefix, command, report):"
+        },
+        {
+          "line": 248,
+          "end_line": 249,
+          "name": "_fixed_route",
+          "text": "def _fixed_route():"
+        },
+        {
+          "line": 252,
+          "end_line": 253,
+          "name": "_make_workspace",
+          "text": "def _make_workspace():"
+        },
+        {
+          "line": 256,
+          "end_line": 262,
+          "name": "_write_profile",
+          "text": "def _write_profile(directory):"
+        },
+        {
+          "line": 265,
+          "end_line": 270,
+          "name": "_remove_workspace",
+          "text": "def _remove_workspace(workspace):"
+        },
+        {
+          "line": 273,
+          "end_line": 282,
+          "name": "_CountedPipe",
+          "text": "class _CountedPipe:"
+        },
+        {
+          "line": 285,
+          "end_line": 379,
+          "name": "_export_target",
+          "text": "def _export_target(prefix, name):"
+        },
+        {
+          "line": 382,
+          "end_line": 385,
+          "name": "_controller_source_identity",
+          "text": "def _controller_source_identity():"
+        },
+        {
+          "line": 388,
+          "end_line": 521,
+          "name": "inspect_target",
+          "text": "def inspect_target():"
+        }
+      ]
+    },
+    {
+      "path": "core/sandbox_backend_binding.py",
+      "sha256": "202cd1190494beaaf24874ac798b89a8eac276fa8361b496663a573770cdf1ed",
+      "bytes": 26216,
+      "anchors": [
+        {
+          "line": 49,
+          "end_line": 52,
+          "name": "BindingBlocked",
+          "text": "class BindingBlocked(ValueError):"
+        },
+        {
+          "line": 55,
+          "end_line": 58,
+          "name": "_payload",
+          "text": "def _payload(value):"
+        },
+        {
+          "line": 61,
+          "end_line": 62,
+          "name": "_projection",
+          "text": "def _projection(value):"
+        },
+        {
+          "line": 65,
+          "end_line": 66,
+          "name": "_sign",
+          "text": "def _sign(value):"
+        },
+        {
+          "line": 70,
+          "end_line": 118,
+          "name": "SandboxBackendBindingAttachment",
+          "text": "class SandboxBackendBindingAttachment:"
+        },
+        {
+          "line": 121,
+          "end_line": 135,
+          "name": "_authenticate_pair",
+          "text": "def _authenticate_pair(descriptor, receipt):"
+        },
+        {
+          "line": 138,
+          "end_line": 176,
+          "name": "_validate_attachment",
+          "text": "def _validate_attachment(attachment):"
+        },
+        {
+          "line": 179,
+          "end_line": 190,
+          "name": "validate_sandbox_backend_binding",
+          "text": "def validate_sandbox_backend_binding(attachment, sandbox_descriptor, sandbox_receipt):"
+        },
+        {
+          "line": 193,
+          "end_line": 208,
+          "name": "sandbox_backend_binding_satisfies_java1_discovery",
+          "text": "def sandbox_backend_binding_satisfies_java1_discovery("
+        },
+        {
+          "line": 211,
+          "end_line": 216,
+          "name": "_fixed_route",
+          "text": "def _fixed_route():"
+        },
+        {
+          "line": 219,
+          "end_line": 226,
+          "name": "_backend_witness",
+          "text": "def _backend_witness(raw, endpoint):"
+        },
+        {
+          "line": 229,
+          "end_line": 237,
+          "name": "_measure_backend",
+          "text": "def _measure_backend():"
+        },
+        {
+          "line": 240,
+          "end_line": 250,
+          "name": "_check_live_pair",
+          "text": "def _check_live_pair(descriptor, receipt, live):"
+        },
+        {
+          "line": 253,
+          "end_line": 264,
+          "name": "_effects",
+          "text": "def _effects(calls):"
+        },
+        {
+          "line": 267,
+          "end_line": 378,
+          "name": "_run",
+          "text": "def _run():"
+        },
+        {
+          "line": 381,
+          "end_line": 386,
+          "name": "issue_sandbox_backend_binding",
+          "text": "def issue_sandbox_backend_binding():"
+        },
+        {
+          "line": 389,
+          "end_line": 452,
+          "name": "_negative_matrix",
+          "text": "def _negative_matrix(attachment, descriptor, receipt):"
+        },
+        {
+          "line": 455,
+          "end_line": 469,
+          "name": "replay",
+          "text": "def replay():"
+        }
+      ]
+    },
+    {
+      "path": "core/sandboxed_java_positive_continuation.py",
+      "sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+      "bytes": 28167,
+      "anchors": [
+        {
+          "line": 41,
+          "end_line": 44,
+          "name": "_payload",
+          "text": "def _payload(value):"
+        },
+        {
+          "line": 47,
+          "end_line": 48,
+          "name": "_sign",
+          "text": "def _sign(value):"
+        },
+        {
+          "line": 51,
+          "end_line": 68,
+          "name": "authenticate_sandbox2",
+          "text": "def authenticate_sandbox2(descriptor, receipt):"
+        },
+        {
+          "line": 71,
+          "end_line": 84,
+          "name": "_obtain_live_sandbox2",
+          "text": "def _obtain_live_sandbox2():"
+        },
+        {
+          "line": 87,
+          "end_line": 100,
+          "name": "safe_configuration",
+          "text": "def safe_configuration(config):"
+        },
+        {
+          "line": 103,
+          "end_line": 104,
+          "name": "_bytes",
+          "text": "def _bytes(stage, stream):"
+        },
+        {
+          "line": 107,
+          "end_line": 120,
+          "name": "_progress",
+          "text": "def _progress(raw):"
+        },
+        {
+          "line": 123,
+          "end_line": 136,
+          "name": "_state_safe",
+          "text": "def _state_safe(state):"
+        },
+        {
+          "line": 139,
+          "end_line": 207,
+          "name": "evaluate",
+          "text": "def evaluate(capture, facts, container_cleanup):"
+        },
+        {
+          "line": 211,
+          "end_line": 246,
+          "name": "JavaContinuationReceipt",
+          "text": "class JavaContinuationReceipt:"
+        },
+        {
+          "line": 250,
+          "end_line": 274,
+          "name": "JavaContinuationDescriptor",
+          "text": "class JavaContinuationDescriptor:"
+        },
+        {
+          "line": 277,
+          "end_line": 280,
+          "name": "validate_receipt",
+          "text": "def validate_receipt(receipt):"
+        },
+        {
+          "line": 283,
+          "end_line": 291,
+          "name": "validate_descriptor",
+          "text": "def validate_descriptor(descriptor, receipt):"
+        },
+        {
+          "line": 294,
+          "end_line": 302,
+          "name": "java_toolchain_satisfies_executor_runtime",
+          "text": "def java_toolchain_satisfies_executor_runtime(descriptor, receipt, sandbox_descriptor, sandbox_receipt):"
+        },
+        {
+          "line": 305,
+          "end_line": 349,
+          "name": "_invoke",
+          "text": "def _invoke(prefix, profile):"
+        },
+        {
+          "line": 352,
+          "end_line": 462,
+          "name": "verify",
+          "text": "def verify():"
+        }
+      ]
+    },
+    {
+      "path": "core/sandboxed_java_positive_probe.py",
+      "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+      "bytes": 7358,
+      "anchors": [
+        {
+          "line": 121,
+          "end_line": 126,
+          "name": "source",
+          "text": "def source():"
+        }
+      ]
+    },
+    {
+      "path": "core/synthetic_runtime_authorization_pinned.py",
+      "sha256": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c",
+      "bytes": 24720,
+      "anchors": [
+        {
+          "line": 52,
+          "end_line": 55,
+          "name": "PinnedSyntheticAuthorizationError",
+          "text": "class PinnedSyntheticAuthorizationError(ValueError):"
+        },
+        {
+          "line": 58,
+          "end_line": 59,
+          "name": "_fail",
+          "text": "def _fail(code, reason=\"\"):"
+        },
+        {
+          "line": 62,
+          "end_line": 63,
+          "name": "_canonical",
+          "text": "def _canonical(value):"
+        },
+        {
+          "line": 66,
+          "end_line": 67,
+          "name": "_digest",
+          "text": "def _digest(value, role):"
+        },
+        {
+          "line": 70,
+          "end_line": 72,
+          "name": "_local_process",
+          "text": "def _local_process():"
+        },
+        {
+          "line": 76,
+          "end_line": 92,
+          "name": "PinnedSyntheticScenarioIdentity",
+          "text": "class PinnedSyntheticScenarioIdentity:"
+        },
+        {
+          "line": 95,
+          "end_line": 111,
+          "name": "_scenario_identity",
+          "text": "def _scenario_identity():"
+        },
+        {
+          "line": 115,
+          "end_line": 130,
+          "name": "PinnedSyntheticProviderIdentity",
+          "text": "class PinnedSyntheticProviderIdentity:"
+        },
+        {
+          "line": 133,
+          "end_line": 142,
+          "name": "_provider_objects",
+          "text": "def _provider_objects(outcome):"
+        },
+        {
+          "line": 145,
+          "end_line": 181,
+          "name": "_authenticate_provider",
+          "text": "def _authenticate_provider(outcome):"
+        },
+        {
+          "line": 185,
+          "end_line": 229,
+          "name": "PinnedSyntheticRuntimeAuthorization",
+          "text": "class PinnedSyntheticRuntimeAuthorization:"
+        },
+        {
+          "line": 232,
+          "end_line": 235,
+          "name": "_payload",
+          "text": "def _payload(authorization):"
+        },
+        {
+          "line": 238,
+          "end_line": 241,
+          "name": "_evidence_digest",
+          "text": "def _evidence_digest(authorization):"
+        },
+        {
+          "line": 244,
+          "end_line": 246,
+          "name": "_sign",
+          "text": "def _sign(authorization):"
+        },
+        {
+          "line": 249,
+          "end_line": 258,
+          "name": "_exact_shape",
+          "text": "def _exact_shape(value, template):"
+        },
+        {
+          "line": 261,
+          "end_line": 288,
+          "name": "validate_pinned_synthetic_runtime_authorization",
+          "text": "def validate_pinned_synthetic_runtime_authorization(authorization, *, provider_outcome=None):"
+        },
+        {
+          "line": 292,
+          "end_line": 300,
+          "name": "PinnedSyntheticAuthorizationOutcome",
+          "text": "class PinnedSyntheticAuthorizationOutcome:"
+        },
+        {
+          "line": 303,
+          "end_line": 366,
+          "name": "issue_pinned_synthetic_runtime_authorization",
+          "text": "def issue_pinned_synthetic_runtime_authorization():"
+        },
+        {
+          "line": 369,
+          "end_line": 445,
+          "name": "negative_authentication_matrix",
+          "text": "def negative_authentication_matrix(outcome):"
+        }
+      ]
+    },
+    {
+      "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+      "sha256": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4",
+      "bytes": 25692,
+      "anchors": [
+        {
+          "line": 58,
+          "end_line": 64,
+          "name": "PinnedSyntheticRuntimeExecutionLeaseError",
+          "text": "class PinnedSyntheticRuntimeExecutionLeaseError(ValueError):"
+        },
+        {
+          "line": 67,
+          "end_line": 68,
+          "name": "_fail",
+          "text": "def _fail(code, reason=\"\"):"
+        },
+        {
+          "line": 71,
+          "end_line": 85,
+          "name": "_canonical",
+          "text": "def _canonical(value):"
+        },
+        {
+          "line": 88,
+          "end_line": 92,
+          "name": "_framed",
+          "text": "def _framed(value, role):"
+        },
+        {
+          "line": 95,
+          "end_line": 96,
+          "name": "_digest",
+          "text": "def _digest(value, role):"
+        },
+        {
+          "line": 99,
+          "end_line": 120,
+          "name": "_activation_policy",
+          "text": "def _activation_policy():"
+        },
+        {
+          "line": 126,
+          "end_line": 127,
+          "name": "_hex_id",
+          "text": "def _hex_id(value):"
+        },
+        {
+          "line": 130,
+          "end_line": 140,
+          "name": "_local_lock",
+          "text": "def _local_lock(value=None):"
+        },
+        {
+          "line": 143,
+          "end_line": 161,
+          "name": "_upstream_failure",
+          "text": "def _upstream_failure(error):"
+        },
+        {
+          "line": 164,
+          "end_line": 186,
+          "name": "_scenario_projection",
+          "text": "def _scenario_projection(scenario):"
+        },
+        {
+          "line": 189,
+          "end_line": 205,
+          "name": "_provider_projection",
+          "text": "def _provider_projection(provider):"
+        },
+        {
+          "line": 208,
+          "end_line": 227,
+          "name": "_authenticate_authorization",
+          "text": "def _authenticate_authorization(authorization):"
+        },
+        {
+          "line": 230,
+          "end_line": 237,
+          "name": "_authorization_fingerprint",
+          "text": "def _authorization_fingerprint(authorization):"
+        },
+        {
+          "line": 240,
+          "end_line": 242,
+          "name": "_one_shot_key",
+          "text": "def _one_shot_key(authorization):"
+        },
+        {
+          "line": 245,
+          "end_line": 246,
+          "name": "_LocalLease",
+          "text": "class _LocalLease:"
+        },
+        {
+          "line": 250,
+          "end_line": 307,
+          "name": "PinnedSyntheticRuntimeExecutionLease",
+          "text": "class PinnedSyntheticRuntimeExecutionLease(_LocalLease):"
+        },
+        {
+          "line": 311,
+          "end_line": 316,
+          "name": "PinnedSyntheticRuntimeExecutionLeaseReadiness",
+          "text": "class PinnedSyntheticRuntimeExecutionLeaseReadiness:"
+        },
+        {
+          "line": 320,
+          "end_line": 325,
+          "name": "_LeaseRecord",
+          "text": "class _LeaseRecord:"
+        },
+        {
+          "line": 329,
+          "end_line": 331,
+          "name": "_OwnerStore",
+          "text": "class _OwnerStore:"
+        },
+        {
+          "line": 337,
+          "end_line": 356,
+          "name": "_projection",
+          "text": "def _projection(lease):"
+        },
+        {
+          "line": 359,
+          "end_line": 361,
+          "name": "_sign",
+          "text": "def _sign(projection_json, state):"
+        },
+        {
+          "line": 364,
+          "end_line": 380,
+          "name": "_unsigned_lease",
+          "text": "def _unsigned_lease(authorization, lease_id):"
+        },
+        {
+          "line": 383,
+          "end_line": 422,
+          "name": "_authenticated_record_locked",
+          "text": "def _authenticated_record_locked(lease, authorization=None, *, require_authorization=False):"
+        },
+        {
+          "line": 425,
+          "end_line": 445,
+          "name": "issue_pinned_synthetic_runtime_execution_lease",
+          "text": "def issue_pinned_synthetic_runtime_execution_lease(authorization):"
+        },
+        {
+          "line": 448,
+          "end_line": 451,
+          "name": "validate_pinned_synthetic_runtime_execution_lease",
+          "text": "def validate_pinned_synthetic_runtime_execution_lease(lease, authorization=None):"
+        },
+        {
+          "line": 454,
+          "end_line": 456,
+          "name": "pinned_synthetic_runtime_execution_lease_state",
+          "text": "def pinned_synthetic_runtime_execution_lease_state(lease, authorization=None):"
+        },
+        {
+          "line": 459,
+          "end_line": 466,
+          "name": "check_pinned_synthetic_runtime_execution_lease_preconditions",
+          "text": "def check_pinned_synthetic_runtime_execution_lease_preconditions(lease, authorization):"
+        },
+        {
+          "line": 469,
+          "end_line": 471,
+          "name": "_consumer_readiness",
+          "text": "def _consumer_readiness():"
+        },
+        {
+          "line": 474,
+          "end_line": 487,
+          "name": "_transition",
+          "text": "def _transition(lease, authorization, target):"
+        },
+        {
+          "line": 490,
+          "end_line": 492,
+          "name": "consume_pinned_synthetic_runtime_execution_lease",
+          "text": "def consume_pinned_synthetic_runtime_execution_lease(lease, authorization):"
+        },
+        {
+          "line": 495,
+          "end_line": 497,
+          "name": "invalidate_pinned_synthetic_runtime_execution_lease",
+          "text": "def invalidate_pinned_synthetic_runtime_execution_lease(lease, authorization=None):"
+        }
+      ]
+    },
+    {
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "bytes": 22400,
+      "anchors": [
+        {
+          "line": 47,
+          "end_line": 55,
+          "name": "policy_diff",
+          "text": "def policy_diff():"
+        },
+        {
+          "line": 58,
+          "end_line": 67,
+          "name": "validate_policy_bytes",
+          "text": "def validate_policy_bytes(raw):"
+        },
+        {
+          "line": 70,
+          "end_line": 73,
+          "name": "_payload",
+          "text": "def _payload(value):"
+        },
+        {
+          "line": 76,
+          "end_line": 77,
+          "name": "_sign",
+          "text": "def _sign(value):"
+        },
+        {
+          "line": 81,
+          "end_line": 107,
+          "name": "ThreadCompatibleSandboxReceipt",
+          "text": "class ThreadCompatibleSandboxReceipt:"
+        },
+        {
+          "line": 111,
+          "end_line": 133,
+          "name": "ThreadCompatibleSandboxDescriptor",
+          "text": "class ThreadCompatibleSandboxDescriptor:"
+        },
+        {
+          "line": 136,
+          "end_line": 140,
+          "name": "validate_receipt",
+          "text": "def validate_receipt(receipt):"
+        },
+        {
+          "line": 143,
+          "end_line": 151,
+          "name": "validate_descriptor",
+          "text": "def validate_descriptor(descriptor, receipt):"
+        },
+        {
+          "line": 154,
+          "end_line": 168,
+          "name": "_evidence_pair",
+          "text": "def _evidence_pair(result):"
+        },
+        {
+          "line": 171,
+          "end_line": 183,
+          "name": "safe_configuration",
+          "text": "def safe_configuration(config, mode):"
+        },
+        {
+          "line": 186,
+          "end_line": 190,
+          "name": "_state_safe",
+          "text": "def _state_safe(state):"
+        },
+        {
+          "line": 193,
+          "end_line": 253,
+          "name": "classify",
+          "text": "def classify(mode, capture, facts, cleanup, *, host_unchanged=True, endpoint_quiet=True):"
+        },
+        {
+          "line": 256,
+          "end_line": 314,
+          "name": "invoke",
+          "text": "def invoke(prefix, profile, mode, sentinel, port):"
+        },
+        {
+          "line": 317,
+          "end_line": 382,
+          "name": "replay",
+          "text": "def replay():"
+        }
+      ]
+    },
+    {
+      "path": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/RUNTIME_JAVA_PINNED_1C_RETRY_LOCAL.json",
+      "sha256": "e10f0514b4646a37adbb6d6a44e29b106205c559dedaa697d728241036ab0656",
+      "bytes": 353313,
+      "anchors": [
+        {
+          "line": 424,
+          "text": "      \"cleanup\": {"
+        },
+        {
+          "line": 2516,
+          "text": "    \"cleanup\": {"
+        },
+        {
+          "line": 4078,
+          "text": "      \"cleanup\": {"
+        },
+        {
+          "line": 4230,
+          "text": "      \"cleanup\": {"
+        },
+        {
+          "line": 4423,
+          "text": "  \"cleanup\": {"
+        }
+      ]
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_ACTIVATION_BOUNDARY_REQ_1/requirement.json",
+      "sha256": "1b6345aaa90dbc2d5089c6c555108b34213f5b631086f6c6d69b5ffc8cfca894",
+      "bytes": 13573,
+      "anchors": [
+        {
+          "line": 89,
+          "text": "    {\"id\": \"cleanup\", \"operation\": \"cleanup\"}"
+        }
+      ]
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+      "sha256": "e6e25d5ac912a07b35dffab148e8b3dc209aa124429920f374c46f7fd1386192",
+      "bytes": 37431,
+      "anchors": [
+        {
+          "line": 69,
+          "text": "    \"initial_workspace\": \"empty, exclusively owned by one attempt; no image volume, host mount, shared writer, preexisting source/class or other Java input\","
+        },
+        {
+          "line": 90,
+          "text": "  \"compiler\": {"
+        },
+        {
+          "line": 240,
+          "text": "  \"cleanup\": {"
+        },
+        {
+          "line": 491,
+          "text": "        \"id\": \"cleanup\","
+        }
+      ]
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+      "sha256": "259f3e60a9f33677a335cb6f309b5b89a4f60d7321a2dc623dff186fd98a692d",
+      "bytes": 44595,
+      "anchors": [
+        {
+          "line": 266,
+          "text": "  \"workspace_state_digest\": {"
+        },
+        {
+          "line": 309,
+          "text": "  \"initial_workspace\": {"
+        },
+        {
+          "line": 348,
+          "text": "  \"controller_boundary\": {"
+        },
+        {
+          "line": 461,
+          "text": "  \"atomicity_and_races\": {"
+        },
+        {
+          "line": 479,
+          "text": "  \"cleanup\": {"
+        }
+      ]
+    }
+  ],
+  "historical_metadata_is_current_liveness": false
+}

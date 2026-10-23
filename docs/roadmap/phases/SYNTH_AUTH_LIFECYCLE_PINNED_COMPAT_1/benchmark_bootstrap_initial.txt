@@ -1,0 +1,60 @@
+Traceback (most recent call last):
+  File "C:\Users\Admin\Documents\Code\J.A.R.V.I.S\districts\C.A.T.T.U.S\docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1\validate_pure_audit.py", line 134, in main
+    runpy.run_path(sys.argv[0], run_name="__main__")
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 294, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\Admin\Documents\Code\J.A.R.V.I.S\districts\C.A.T.T.U.S\benchmarks\run_benchmarks.py", line 37, in <module>
+    import truststore
+  File "C:\Users\Admin\AppData\Roaming\Python\Python314\site-packages\truststore\__init__.py", line 31, in <module>
+    from ._api import SSLContext, extract_from_ssl, inject_into_ssl  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Roaming\Python\Python314\site-packages\truststore\_api.py", line 19, in <module>
+    if platform.system() == "Windows":
+       ~~~~~~~~~~~~~~~^^
+  File "C:\Python314\Lib\platform.py", line 1090, in system
+    return uname().system
+           ~~~~~^^
+  File "C:\Python314\Lib\platform.py", line 1016, in uname
+    release, version, csd, ptype = win32_ver()
+                                   ~~~~~~~~~^^
+  File "C:\Python314\Lib\platform.py", line 467, in win32_ver
+    version, csd, ptype, is_client = _win32_ver(version, csd, ptype)
+                                     ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\platform.py", line 434, in _win32_ver
+    version = _syscmd_ver()[2]
+              ~~~~~~~~~~~^^
+  File "C:\Python314\Lib\platform.py", line 304, in _syscmd_ver
+    info = subprocess.check_output(cmd,
+                                   stdin=subprocess.DEVNULL,
+    ...<2 lines>...
+                                   encoding="locale",
+                                   shell=True)
+  File "C:\Python314\Lib\subprocess.py", line 473, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               **kwargs).stdout
+               ^^^^^^^^^
+  File "C:\Python314\Lib\subprocess.py", line 555, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\subprocess.py", line 1039, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\subprocess.py", line 1549, in _execute_child
+    sys.audit("subprocess.Popen", executable, args, cwd, env)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\Documents\Code\J.A.R.V.I.S\districts\C.A.T.T.U.S\docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1\validate_pure_audit.py", line 65, in hook
+    reject("process_attempts", event)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\Documents\Code\J.A.R.V.I.S\districts\C.A.T.T.U.S\docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1\validate_pure_audit.py", line 51, in reject
+    raise AssertionError("Pure compatibility audit denied: " + str(detail))
+AssertionError: Pure compatibility audit denied: subprocess.Popen

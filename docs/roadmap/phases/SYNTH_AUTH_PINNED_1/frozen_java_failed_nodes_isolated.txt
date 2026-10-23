@@ -1,0 +1,131 @@
+Failed to find real location of C:\Python314\python.exe
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+_ test_live_orchestration_stops_at_first_failed_gate_without_java_continuation[non_java] _
+
+capture_monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D229B77E10>
+stop_at = 'non_java'
+
+    @pytest.mark.parametrize('stop_at', ['non_java', 'javac_version'])
+    def test_live_orchestration_stops_at_first_failed_gate_without_java_continuation(capture_monkeypatch, stop_at):
+        monkeypatch = capture_monkeypatch
+        calls = []
+        descriptor = SimpleNamespace(fingerprint=recovery.SANDBOX_DESCRIPTOR)
+        receipt = SimpleNamespace(fingerprint=recovery.SANDBOX_RECEIPT, status='authenticated-test-only')
+        monkeypatch.setattr(recovery.sandbox, '_docker_prefix', lambda: ('fixed-local-docker',))
+        monkeypatch.setattr(recovery.sandbox, 'verify_candidate_runtime_sandbox', lambda: (descriptor, receipt))
+        monkeypatch.setattr(recovery.sandbox, 'validate_sandbox_descriptor', lambda *args: None)
+        monkeypatch.setattr(recovery.sandbox, 'get_verified_candidate_runtime_sandbox', lambda *args: object())
+    
+        def control(argv, **kwargs):
+            if 'image' in argv:
+                metadata = {'Id': recovery.IMAGE, 'Os': 'linux', 'Architecture': 'amd64', 'Config': {}}
+                return recovery.sandbox._Capture('sandbox_completed', 0, json.dumps(metadata).encode(), b'', False)
+            return recovery.sandbox._Capture('sandbox_completed', 0, b'', b'', False)
+    
+        def invoke(prefix, profile, mode):
+            calls.append(mode)
+            facts = stage_facts(mode, exit_code=1 if mode == stop_at else 0)
+            return outer_capture(), facts, True
+    
+        monkeypatch.setattr(recovery.sandbox, '_bounded_process', control)
+        monkeypatch.setattr(recovery, 'invoke_gate', invoke)
+        monkeypatch.setattr(recovery.java, 'verify_sandboxed_java_toolchain',
+            lambda *args, **kwargs: pytest.fail('continued after failed gate'))
+        result = recovery.replay()
+>       assert calls == (['non_java'] if stop_at == 'non_java' else ['non_java', 'javac_version'])
+E       AssertionError: assert [] == ['non_java']
+E         
+E         Right contains one more item: 'non_java'
+E         Use -v to get more diff
+
+tests\test_runtime_java1b.py:406: AssertionError
+_ test_live_orchestration_stops_at_first_failed_gate_without_java_continuation[javac_version] _
+
+capture_monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D22A090E90>
+stop_at = 'javac_version'
+
+    @pytest.mark.parametrize('stop_at', ['non_java', 'javac_version'])
+    def test_live_orchestration_stops_at_first_failed_gate_without_java_continuation(capture_monkeypatch, stop_at):
+        monkeypatch = capture_monkeypatch
+        calls = []
+        descriptor = SimpleNamespace(fingerprint=recovery.SANDBOX_DESCRIPTOR)
+        receipt = SimpleNamespace(fingerprint=recovery.SANDBOX_RECEIPT, status='authenticated-test-only')
+        monkeypatch.setattr(recovery.sandbox, '_docker_prefix', lambda: ('fixed-local-docker',))
+        monkeypatch.setattr(recovery.sandbox, 'verify_candidate_runtime_sandbox', lambda: (descriptor, receipt))
+        monkeypatch.setattr(recovery.sandbox, 'validate_sandbox_descriptor', lambda *args: None)
+        monkeypatch.setattr(recovery.sandbox, 'get_verified_candidate_runtime_sandbox', lambda *args: object())
+    
+        def control(argv, **kwargs):
+            if 'image' in argv:
+                metadata = {'Id': recovery.IMAGE, 'Os': 'linux', 'Architecture': 'amd64', 'Config': {}}
+                return recovery.sandbox._Capture('sandbox_completed', 0, json.dumps(metadata).encode(), b'', False)
+            return recovery.sandbox._Capture('sandbox_completed', 0, b'', b'', False)
+    
+        def invoke(prefix, profile, mode):
+            calls.append(mode)
+            facts = stage_facts(mode, exit_code=1 if mode == stop_at else 0)
+            return outer_capture(), facts, True
+    
+        monkeypatch.setattr(recovery.sandbox, '_bounded_process', control)
+        monkeypatch.setattr(recovery, 'invoke_gate', invoke)
+        monkeypatch.setattr(recovery.java, 'verify_sandboxed_java_toolchain',
+            lambda *args, **kwargs: pytest.fail('continued after failed gate'))
+        result = recovery.replay()
+>       assert calls == (['non_java'] if stop_at == 'non_java' else ['non_java', 'javac_version'])
+E       AssertionError: assert [] == ['non_java', 'javac_version']
+E         
+E         Right contains 2 more items, first extra item: 'non_java'
+E         Use -v to get more diff
+
+tests\test_runtime_java1b.py:406: AssertionError
+___ test_new_authenticated_pair_binds_fresh_sandbox_and_pure_compatibility ____
+
+safe_patch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D229ECF9B0>
+
+    def test_new_authenticated_pair_binds_fresh_sandbox_and_pure_compatibility(safe_patch):
+        sd, sr = stub_verification(safe_patch)
+        descriptor, receipt, report = owner.verify()
+>       assert owner.validate_descriptor(descriptor, receipt) is descriptor
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_runtime_java1c.py:241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+core\sandboxed_java_positive_continuation.py:284: in validate_descriptor
+    validate_receipt(receipt)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+receipt = None
+
+    def validate_receipt(receipt):
+        if type(receipt) is not JavaContinuationReceipt or not hmac.compare_digest(receipt._signature, _sign(receipt)):
+>           raise ValueError('java1c_receipt_unauthenticated')
+E           ValueError: java1c_receipt_unauthenticated
+
+core\sandboxed_java_positive_continuation.py:279: ValueError
+_ test_inconclusive_outer_timeout_reports_unknown_counts_and_unproven_child_cleanup _
+
+safe_patch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D22B2F8270>
+
+    def test_inconclusive_outer_timeout_reports_unknown_counts_and_unproven_child_cleanup(safe_patch):
+        stub_verification(safe_patch)
+        safe_patch.setattr(owner, '_invoke', lambda *args: (
+            capture(status='sandbox_timeout', exit_code=1, termination_within_deadline=False), {}, True, True))
+        descriptor, receipt, report = owner.verify()
+        assert descriptor is receipt is None and report['status'] == owner.CLEANUP_FAILURE
+>       assert report['compile_count'] is report['jvm_fixture_count'] is None
+E       assert 0 is None
+
+tests\test_runtime_java1c.py:284: AssertionError
+============================== warnings summary ===============================
+tests/test_runtime_java1b.py::test_live_orchestration_stops_at_first_failed_gate_without_java_continuation[non_java]
+  C:\Users\Admin\AppData\Roaming\Python\Python314\site-packages\google\genai\types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_runtime_java1b.py::test_live_orchestration_stops_at_first_failed_gate_without_java_continuation[non_java]
+FAILED tests/test_runtime_java1b.py::test_live_orchestration_stops_at_first_failed_gate_without_java_continuation[javac_version]
+FAILED tests/test_runtime_java1c.py::test_new_authenticated_pair_binds_fresh_sandbox_and_pure_compatibility
+FAILED tests/test_runtime_java1c.py::test_inconclusive_outer_timeout_reports_unknown_counts_and_unproven_child_cleanup
+4 failed, 1 warning in 25.73s

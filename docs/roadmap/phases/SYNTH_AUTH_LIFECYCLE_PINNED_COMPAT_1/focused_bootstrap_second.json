@@ -1,0 +1,36 @@
+{
+  "audit_guard": {
+    "live_verification_or_execution_attempts": 0,
+    "network_attempts": 0,
+    "owner_issuance_or_consumption_attempts": 0,
+    "process_attempts": 0,
+    "repository_write_attempts": 4
+  },
+  "blocked_actions": [
+    "os.mkdir:('C:\\\\Users\\\\Admin\\\\Documents\\\\Code\\\\J.A.R.V.I.S\\\\districts\\\\C.A.T.T.U.S\\\\storage', 511, -1)",
+    "os.mkdir:('C:\\\\Users\\\\Admin\\\\Documents\\\\Code\\\\J.A.R.V.I.S\\\\districts\\\\C.A.T.T.U.S\\\\storage', 511, -1)",
+    "os.mkdir:('C:\\\\Users\\\\Admin\\\\Documents\\\\Code\\\\J.A.R.V.I.S\\\\districts\\\\C.A.T.T.U.S\\\\storage', 511, -1)",
+    "os.mkdir:('C:\\\\Users\\\\Admin\\\\Documents\\\\Code\\\\J.A.R.V.I.S\\\\districts\\\\C.A.T.T.U.S\\\\storage', 511, -1)"
+  ],
+  "collected": 0,
+  "exit_code": 4,
+  "external_pytest_directory": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\11\\01a129dc-cfa1-7a23-ad79-f88b8e5fc686\\cattus-pinned-lifecycle-audit-5jfc28q1",
+  "failed": [],
+  "full_frozen_suites_run": false,
+  "live_registry_fixtures_seeded": false,
+  "mode": "focused",
+  "passed_count": 0,
+  "production_validators_patched": false,
+  "selected_nodes": [
+    "tests/test_synthetic_runtime_authorization_lifecycle_pinned_compat.py",
+    "tests/test_synthetic_runtime_authorization.py::test_supported_scenario_has_exact_non_bank_contract",
+    "tests/test_synthetic_runtime_authorization.py::test_contract_constructor_has_no_executable_text_extension",
+    "tests/test_synthetic_runtime_authorization.py::test_contract_and_nested_metadata_are_immutable",
+    "tests/test_synthetic_runtime_authorization_pinned.py::test_public_issuer_accepts_no_free_form_inputs",
+    "tests/test_synthetic_runtime_authorization_lifecycle.py::test_future_consumption_boundary_is_explicit_and_has_no_runtime_implementation",
+    "tests/test_patch_candidate_behavior_executor1r.py::test_exact_fixture_is_independent_and_bound_to_its_field_definition",
+    "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py::test_java_contract_audit_checks_exact_schema_and_policy_without_inventing_alias",
+    "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py::test_renaming_continuation_module_does_not_change_its_frozen_contract"
+  ],
+  "skipped": []
+}

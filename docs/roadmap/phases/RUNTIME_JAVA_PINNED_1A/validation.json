@@ -1,0 +1,1027 @@
+{
+  "phase_id": "RUNTIME.JAVA.PINNED.1A",
+  "focused_new_target_inspection_tests": {
+    "mode": "new_target_inspection",
+    "exit_code": 0,
+    "collected": 163,
+    "passed": 163,
+    "skipped": 0,
+    "failures": [],
+    "suites": {
+      "tests/test_runtime_java_pinned_target_inspection.py": {
+        "passed": 101,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_pinned_target_archive.py": {
+        "passed": 62,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    "test_files": [
+      "tests/test_runtime_java_pinned_target_inspection.py",
+      "tests/test_runtime_java_pinned_target_archive.py"
+    ],
+    "pytest_arguments": [
+      "--basetemp=tmp_tests",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_new_target_inspection_a5154e1091014ad7a5c401f53be965dd\\pytest",
+      "tests/test_runtime_java_pinned_target_inspection.py",
+      "tests/test_runtime_java_pinned_target_archive.py"
+    ],
+    "real_effect_attempts": [
+      "socket.bind"
+    ],
+    "denied_attempts": {},
+    "registry_projection_plugin_used": false,
+    "elapsed_seconds": 22.496,
+    "scope": "Pure host maintenance and fabricated in-memory fixture evidence only; this validation harness performs no live target inspection, Docker/Java, runtime authorization, leases, executor, or apply. Root separately owns one authorized exact-target live proof after pure gates."
+  },
+  "frozen_pure_baseline": {
+    "mode": "frozen_baseline",
+    "exit_code": 0,
+    "collected": 735,
+    "passed": 735,
+    "skipped": 0,
+    "failures": [],
+    "suites": {
+      "tests/test_runtime_java_requirement_pinned1.py": {
+        "passed": 64,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_discovery_contract1.py": {
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_discovery_diag1.py": {
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1.py": {
+        "passed": 91,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1_discovery.py": {
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1_governance.py": {
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_compat1.py": {
+        "passed": 67,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1d.py": {
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1d_retry.py": {
+        "passed": 27,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_sandbox_bind1.py": {
+        "passed": 129,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1c.py": {
+        "passed": 89,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_synthetic_runtime_authorization.py": {
+        "passed": 117,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_patch_candidate_behavior_executor1r.py": {
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_patch_candidate_behavior_executor1r_retry.py": {
+        "passed": 27,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py": {
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    "test_files": [
+      "tests/test_runtime_java_requirement_pinned1.py",
+      "tests/test_runtime_java_discovery_contract1.py",
+      "tests/test_runtime_java_discovery_diag1.py",
+      "tests/test_runtime_java1.py",
+      "tests/test_runtime_java1_discovery.py",
+      "tests/test_runtime_java1_governance.py",
+      "tests/test_runtime_java_compat1.py",
+      "tests/test_runtime_java1d.py",
+      "tests/test_runtime_java1d_retry.py",
+      "tests/test_runtime_sandbox_bind1.py",
+      "tests/test_runtime_java1c.py",
+      "tests/test_synthetic_runtime_authorization.py",
+      "tests/test_patch_candidate_behavior_executor1r.py",
+      "tests/test_patch_candidate_behavior_executor1r_retry.py",
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+    ],
+    "pytest_arguments": [
+      "--basetemp=tmp_tests",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_frozen_baseline_7460abec9ee34a38b163d65b4539b290\\pytest",
+      "tests/test_runtime_java_requirement_pinned1.py",
+      "tests/test_runtime_java_discovery_contract1.py",
+      "tests/test_runtime_java_discovery_diag1.py",
+      "tests/test_runtime_java1.py",
+      "tests/test_runtime_java1_discovery.py",
+      "tests/test_runtime_java1_governance.py",
+      "tests/test_runtime_java_compat1.py",
+      "tests/test_runtime_java1d.py",
+      "tests/test_runtime_java1d_retry.py",
+      "tests/test_runtime_sandbox_bind1.py",
+      "tests/test_runtime_java1c.py",
+      "tests/test_synthetic_runtime_authorization.py",
+      "tests/test_patch_candidate_behavior_executor1r.py",
+      "tests/test_patch_candidate_behavior_executor1r_retry.py",
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+    ],
+    "real_effect_attempts": [
+      "socket.bind"
+    ],
+    "denied_attempts": {},
+    "registry_projection_plugin_used": false,
+    "elapsed_seconds": 37.005,
+    "scope": "Pure host maintenance and fabricated in-memory fixture evidence only; this validation harness performs no live target inspection, Docker/Java, runtime authorization, leases, executor, or apply. Root separately owns one authorized exact-target live proof after pure gates."
+  },
+  "frozen_pure_after": {
+    "mode": "frozen_after",
+    "exit_code": 0,
+    "collected": 735,
+    "passed": 735,
+    "skipped": 0,
+    "failures": [],
+    "suites": {
+      "tests/test_runtime_java_requirement_pinned1.py": {
+        "passed": 64,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_discovery_contract1.py": {
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_discovery_diag1.py": {
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1.py": {
+        "passed": 91,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1_discovery.py": {
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1_governance.py": {
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java_compat1.py": {
+        "passed": 67,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1d.py": {
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1d_retry.py": {
+        "passed": 27,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_sandbox_bind1.py": {
+        "passed": 129,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_runtime_java1c.py": {
+        "passed": 89,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_synthetic_runtime_authorization.py": {
+        "passed": 117,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_patch_candidate_behavior_executor1r.py": {
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_patch_candidate_behavior_executor1r_retry.py": {
+        "passed": 27,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py": {
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    "test_files": [
+      "tests/test_runtime_java_requirement_pinned1.py",
+      "tests/test_runtime_java_discovery_contract1.py",
+      "tests/test_runtime_java_discovery_diag1.py",
+      "tests/test_runtime_java1.py",
+      "tests/test_runtime_java1_discovery.py",
+      "tests/test_runtime_java1_governance.py",
+      "tests/test_runtime_java_compat1.py",
+      "tests/test_runtime_java1d.py",
+      "tests/test_runtime_java1d_retry.py",
+      "tests/test_runtime_sandbox_bind1.py",
+      "tests/test_runtime_java1c.py",
+      "tests/test_synthetic_runtime_authorization.py",
+      "tests/test_patch_candidate_behavior_executor1r.py",
+      "tests/test_patch_candidate_behavior_executor1r_retry.py",
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+    ],
+    "pytest_arguments": [
+      "--basetemp=tmp_tests",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_frozen_after_4c5cc3a801804f298b28a3427e02758f\\pytest",
+      "tests/test_runtime_java_requirement_pinned1.py",
+      "tests/test_runtime_java_discovery_contract1.py",
+      "tests/test_runtime_java_discovery_diag1.py",
+      "tests/test_runtime_java1.py",
+      "tests/test_runtime_java1_discovery.py",
+      "tests/test_runtime_java1_governance.py",
+      "tests/test_runtime_java_compat1.py",
+      "tests/test_runtime_java1d.py",
+      "tests/test_runtime_java1d_retry.py",
+      "tests/test_runtime_sandbox_bind1.py",
+      "tests/test_runtime_java1c.py",
+      "tests/test_synthetic_runtime_authorization.py",
+      "tests/test_patch_candidate_behavior_executor1r.py",
+      "tests/test_patch_candidate_behavior_executor1r_retry.py",
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+    ],
+    "real_effect_attempts": [
+      "socket.bind"
+    ],
+    "denied_attempts": {},
+    "registry_projection_plugin_used": false,
+    "elapsed_seconds": 80.223,
+    "scope": "Pure host maintenance and fabricated in-memory fixture evidence only; this validation harness performs no live target inspection, Docker/Java, runtime authorization, leases, executor, or apply. Root separately owns one authorized exact-target live proof after pure gates."
+  },
+  "registry_picker_baseline": {
+    "mode": "registry_baseline",
+    "exit_code": 1,
+    "collected": 299,
+    "passed": 292,
+    "skipped": 0,
+    "failures": [
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_has_expected_phases():\n        data = load_phase_registry(str(_SEED_PATH))\n        ids = {p[\"phase_id\"] for p in data[\"phases\"]}\n        assert {\n            \"ROAD.1\", \"ROAD.2\", \"ROAD.3\", \"ROAD.4\", \"AUTO.2a\", \"AUTO.2b\", \"AUTO.2c\",\n            \"MODEL.1\", \"MODEL.2\", \"MODEL.3\", \"MODEL.N1\", \"MODEL.N2\", \"MODEL.N3\", \"MODEL.N4\", \"MODEL.N5\", \"MODEL.N6\", \"MODEL.N7\", \"MODEL.CLOSE\", \"EVAL.1\", \"EVAL.2\", \"EVAL.3\", \"EVAL.N1\", \"EVAL.N2\", \"EVAL.N3\", \"EVAL.N4\", \"EVAL.N5\", \"EVAL.N6\", \"EVAL.N7\", \"EVAL.CLOSE\", \"HUMAN.N1\", \"HUMAN.N2\", \"HUMAN.N3\", \"HUMAN.N4\", \"HUMAN.CLOSE\", \"ADOPT.MODEL.1\", \"ADOPT.MODEL.2\", \"ADOPT.MODEL.CLOSE\", \"CMD.1\", \"CMD.2\", \"CMD.3\", \"CMD.4\", \"CMD.N1\", \"CMD.N2\", \"CMD.N3\", \"CMD.N4\", \"CMD.N5\", \"CMD.N6\", \"CMD.CLOSE\",\n            \"HARDEN.1\", \"HARDEN.2\", \"HARDEN.3\", \"HARDEN.CLOSE\", \"HARDEN.N1\", \"HARDEN.N2\", \"HARDEN.N3\", \"HARDEN.N4\", \"HARDEN.PROGRESS.1\", \"OPS.TEST.1\", \"OPS.TEST.2\", \"OPS.TEST.3\", \"OPS.TEST.CLOSE\", \"UX.RUN.1\", \"UX.RUN.2\", \"UX.RUN.3\", \"UX.1\", \"UX.2\", \"UX.3\", \"UX.4\", \"UX.5\", \"UX.6\", \"UX.7\", \"UX.8\", \"UX.9\", \"UX.10\", \"UX.11\",\n            \"UX.CLOSE\", \"MIRROR.1\", \"MIRROR.2\", \"MIRROR.3\", \"MIRROR.4\", \"MIRROR.5\", \"MIRROR.6\", \"MIRROR.CLOSE\", \"MIRROR.7\", \"MIRROR.8\", \"MIRROR.9\", \"MIRROR.10\", \"MIRROR.11\", \"MIRROR.12\", \"MIRROR.CLOSE3\", \"MIRROR.13\",\n        } <= ids\n        assert {\"UX.RUN.CLOSE\", \"UX.LIVE.1\", \"UX.LIVE.2\", \"UX.LIVE.3\", \"UX.LIVE.4\", \"UX.LIVE.5\", \"UX.LIVE.6\", \"UX.LIVE.7\", \"UX.LIVE.8\", \"UX.LIVE.9\", \"UX.LIVE.10\", \"UX.LIVE.CLOSE\", \"DOGFOOD.1A\", \"DOGFOOD.1B\", \"VERIFY.TEST.1\"} <= ids\n        assert {\n            \"INDEX.1D.1\",\n            \"INDEX.1D.2A\",\n            \"INDEX.1D.2B\",\n            \"INDEX.1D.2C\",\n            \"INDEX.1D.3\",\n            \"INDEX.1E.0\",\n            \"INDEX.1E.1\",\n            \"INDEX.1E.2\",\n        } <= ids\n        assert {\n            \"CTX.SELECT.1\",\n            \"CTX.SEARCH.1\",\n            \"CTX.READ.1\",\n            \"CTX.PATCH.1\",\n            \"CTX.APPLY.0\",\n        } <= ids\n        assert {\"INPUT.1\", \"INPUT.2\", \"INPUT.3\"} <= ids\n        assert {\"WAITER.1\", \"WAITER.2\"} <= ids\n        assert {\"ACQUIRE.1\", \"ACQUIRE.2\", \"ACQUIRE.3\"} <= ids\n        assert {\"EVIDENCE.1\", \"EVIDENCE.2\"} <= ids\n        assert {\"CLAIM.1\"} <= ids\n        assert {\"SYNTHESIS.1\"} <= ids\n        assert {\"CHECK.1\", \"CHECK.2\"} <= ids\n        assert {\n            \"WORKER.DECL.1\",\n            \"WORKER.DECL.2A\",\n            \"WORKER.DECL.2A.1\",\n            \"WORKER.DECL.2A.2\",\n            \"WORKER.DECL.2B\",\n        } <= ids\n        assert \"CONTROL.SAFETY.LIVE.1\" in ids\n        assert \"WAITER.LIVE.1\" in ids\n        assert \"PATCH.BASIS.LIVE.1\" in ids\n        assert \"OPS.PATCH.2\" in ids\n        assert {\n            \"RETRIEVE.LIVE.1\",\n            \"RETRIEVE.LIVE.2\",\n            \"RETRIEVE.LIVE.3\",\n            \"RETRIEVE.LIVE.4\",\n        } <= ids\n        assert \"ANSWER.GROUND.LIVE.1\" in ids\n        assert \"DEFECT.PROBE.LIVE.1\" in ids\n        assert \"VALIDATE.ORACLE.LIVE.1\" in ids\n        assert \"EXEC.POLICY.LIVE.1\" in ids\n        assert \"EXEC.APPROVAL.LIVE.1\" in ids\n        assert \"ANSWER.GROUND.LIVE.2\" in ids\n        assert \"CONTROL.LOCALIZE.LIVE.2\" in ids\n        assert \"REPAIR.INTENT.1\" in ids\n        assert \"REPAIR.INTENT.ADMIT.1\" in ids\n        assert \"REPAIR.INTENT.UI.1\" in ids\n        assert \"CTX.OOP.1A\" in ids\n        assert \"CTX.OOP.1C\" in ids\n        assert \"OOP.INTENT.UI.1\" in ids\n        assert \"OOP.INTENT.DESIGN.1\" in ids\n        assert \"OOP.INTENT.DETECT.2\" in ids\n        assert \"OOP.INTENT.CONTINUE.1\" in ids\n        assert \"PATCH.SCOPE.EXPAND.1\" in ids\n        assert \"PATCH.SCOPE.RECHECK.1\" in ids\n        assert \"PATCH.SCOPE.REFRESH.1\" in ids\n>       assert len(data[\"phases\"]) == 224\nE       AssertionError: assert 225 == 224\nE        +  where 225 = len([{'phase_id': 'ROAD.1', 'title': 'Machine-Readable Phase Registry', 'track': 'ROAD', 'status': 'complete', ...}, {'pha...ase_id': 'MODEL.1', 'title': 'C.A.T.T.U.S Artifact Dataset Builder', 'track': 'MODEL', 'status': 'complete', ...}, ...])\n\ntests\\test_phase_registry.py:591: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call():\n        \"\"\"It spends provider calls, and the registry says so in the only way it can.\n    \n        ``model_calls_allowed`` is the registry's vocabulary for provider traffic and\n        is legal only under the approval budget tier, so a dogfood phase must carry\n        both.  ``network_allowed`` stays false because ROAD.1 rejects true outright;\n        that flag is not this phase claiming it made no requests.\n        \"\"\"\n        data = load_phase_registry(str(_SEED_PATH))\n        phases = data[\"phases\"]\n        by_id = {phase[\"phase_id\"]: phase for phase in phases}\n        phase = by_id[\"WORKER.DECL.2A.2\"]\n    \n        assert phase[\"model_calls_allowed\"] is True\n        assert phase[\"budget_tier\"] == \"strong_model_requires_approval\"\n        assert phase[\"requires_sandbox\"] is True\n        # ROAD.1 forbids raw network access for every managed phase, this one included.\n        assert phase[\"network_allowed\"] is False\n        assert not validate_phase_registry(data)[\"errors\"]\n    \n        # And it really is the first.  The set of phases allowed to spend provider\n        # calls is enumerated here, deliberately: a phase that wants provider\n        # traffic has to be added to this literal and to pay the approval price\n        # below, so it cannot arrive quietly.  PATCH.AUTHOR.LIVE.1 joined on\n        # 2026-09-09 with a hard cap of one verification-guided revision per run.\n        declared_model_call_phases = {\n            \"WORKER.DECL.2A.2\",\n            \"WORKER.DECL.2B\",\n            \"PATCH.AUTHOR.LIVE.1\",\n            # CONTROL.BOOTSTRAP.1 joined on 2026-09-18 with one bootstrap authoring call per fresh request.\n            \"CONTROL.BOOTSTRAP.1\",\n            # PLAN.1 exposes one already-authorized planner call and no author call.\n            \"PATCH.SCOPE.PLAN.1\",\n            # AUTHOR.STRUCTURAL.1 permits one injected read-only author call.\n            \"PATCH.AUTHOR.STRUCTURAL.1\",\n        }\n        others = [\n            item for item in phases if item[\"phase_id\"] not in declared_model_call_phases\n        ]\n        assert all(item[\"model_calls_allowed\"] is False for item in others)\n>       assert all(item[\"budget_tier\"] == \"local_only\" for item in others)\nE       assert False\nE        +  where False = all(<generator object test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call.<locals>.<genexpr> at 0x000001613CE37C60>)\n\ntests\\test_phase_registry.py:2130: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_is_conservative():\n        \"\"\"No phase merges or reaches the network, and none writes speculatively.\n    \n        A phase may declare model calls, but only by paying the registry's price for\n        them: the approval budget tier, which routes it to human approval and out of\n        the safe-to-prepare bucket.  A phase cannot quietly grant itself provider\n        traffic under ``local_only``.\n    \n        ``writes_real_repo`` is the same shape of price.  It is not forbidden - a\n        live production fix such as OPS.PATCH.1 genuinely edits shipped runtime\n        code, and recording that as observation-only would make the registry lie -\n        but it is only ever true for shipped history that already went through\n        human approval and still may not merge itself.  That is the rule the\n        registry validator enforces at ``core/phase_registry.py``; this asserts the\n        seed actually obeys it, so no *proposed* or *active* phase can hold write\n        authority over the real worktree.\n        \"\"\"\n        data = load_phase_registry(str(_SEED_PATH))\n        for phase in data[\"phases\"]:\n            assert phase[\"automation_level\"] != \"AUTO_4_AUTO_MERGE\"\n            assert phase[\"merge_allowed\"] is False\n            assert phase[\"network_allowed\"] is False\n            if phase[\"writes_real_repo\"]:\n                assert phase[\"status\"] == \"complete\", phase[\"phase_id\"]\n                assert phase[\"human_approval_required\"] is True, phase[\"phase_id\"]\n                assert phase[\"merge_allowed\"] is False, phase[\"phase_id\"]\n            if phase[\"model_calls_allowed\"]:\n                assert phase[\"budget_tier\"] == \"strong_model_requires_approval\", (\n                    phase[\"phase_id\"]\n                )\n                assert phase[\"human_approval_required\"] is True, phase[\"phase_id\"]\n            else:\n>               assert phase[\"budget_tier\"] == \"local_only\", phase[\"phase_id\"]\nE               AssertionError: RUNTIME.JAVA.1\nE               assert 'blocked' == 'local_only'\nE                 \nE                 - local_only\nE                 + blocked\n\ntests\\test_phase_registry.py:2249: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_summary_counts():\n        data = load_phase_registry(str(_SEED_PATH))\n        report = summarize_phase_registry(data, report_id=\"r\", created_at=\"t\")\n>       assert report[\"counts_by_track\"] == {\n            \"ADOPT\": 3,\n            \"AUTO\": 3,\n            \"CMD\": 11,\n            \"CTX\": 5,\n            \"DOGFOOD\": 2,\n            \"VERIFY\": 1,\n            \"EVAL\": 11,\n            \"HARDEN\": 16,\n            \"HUMAN\": 5,\n            # RETRIEVE.LIVE.* is an ID namespace inside INDEX, not a new track.\n            \"INDEX\": 12,\n            \"ACQUIRE\": 3,\n            \"CLAIM\": 1,\n            \"EVIDENCE\": 2,\n            \"INPUT\": 4,\n            \"SYNTHESIS\": 1,\n                \"CHECK\": 9,\n                \"CONTROL\": 42,\n                \"WAITER\": 5,\n            \"WORKER\": 5,\n            \"MIRROR\": 15,\n            \"MODEL\": 11,\n            \"OPS\": 22,\n            \"ROAD\": 4,\n                \"UX\": 31,\n        }\nE       AssertionError: assert {'ACQUIRE': 3...HECK': 9, ...} == {'ADOPT': 3, ...'CTX': 5, ...}\nE         \nE         Omitting 23 identical items, use -vv to show\nE         Differing items:\nE         {'CONTROL': 43} != {'CONTROL': 42}\nE         Use -v to get more diff\n\ntests\\test_phase_registry.py:2257: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_produces_expected_buckets():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        report = _report(data, report_id=\"r\", created_at=\"t\", registry_path=str(_SEED_PATH))\n        assert report[\"registry_valid\"] is True\n>       assert report[\"bucket_counts\"] == {\n            \"safe_to_prepare\": 3,\n            \"sandbox_required\": 1,\n            \"human_approval_required\": 0,\n            \"blocked\": 1,\n            \"deferred_or_parked\": 0,\n            \"complete_or_history\": 219,\n        }\nE       AssertionError: assert {'safe_to_pre...cked': 2, ...} == {'safe_to_pre...cked': 1, ...}\nE         \nE         Omitting 5 identical items, use -vv to show\nE         Differing items:\nE         {'blocked': 2} != {'blocked': 1}\nE         Use -v to get more diff\n\ntests\\test_phase_picker.py:557: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        phase = {p[\"phase_id\"]: p for p in data[\"phases\"]}[\"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1\"]\n        report = _report(data, report_id=\"r\", created_at=\"t\")\n        assert phase[\"track\"] == \"CONTROL\" and phase[\"status\"] == \"active\"\n        assert phase[\"risk_level\"] == \"blocked\" and phase[\"budget_tier\"] == \"local_only\"\n        blocked = [p for p in report[\"blocked\"] if p[\"phase_id\"] == phase[\"phase_id\"]]\n        assert len(blocked) == 1\n        assert \"risk_level is blocked\" in blocked[0][\"reasons\"]\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"safe_to_prepare\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"complete_or_history\"]}\n>       assert report[\"bucket_counts\"][\"blocked\"] == 1\nE       assert 2 == 1\n\ntests\\test_phase_picker.py:1634: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_verified_runtime_sandbox_is_history_and_executor_stays_blocked():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        phase = {p[\"phase_id\"]: p for p in data[\"phases\"]}[\"RUNTIME.SANDBOX.1\"]\n        report = _report(data, report_id=\"r\", created_at=\"t\")\n        assert report[\"registry_valid\"] is True\n        assert phase[\"track\"] == \"CONTROL\" and phase[\"status\"] == \"complete\"\n        assert phase[\"risk_level\"] == \"medium\" and phase[\"budget_tier\"] == \"local_only\"\n        assert phase[\"phase_id\"] in {p[\"phase_id\"] for p in report[\"complete_or_history\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"safe_to_prepare\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"sandbox_required\"]}\n>       assert {p[\"phase_id\"] for p in report[\"blocked\"]} == {\"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1\"}\nE       AssertionError: assert {'PATCH.CANDI...NTIME.JAVA.1'} == {'PATCH.CANDI...R.EXECUTOR.1'}\nE         \nE         Extra items in the left set:\nE         'RUNTIME.JAVA.1'\nE         Use -v to get more diff\n\ntests\\test_phase_picker.py:1651: AssertionError"
+      }
+    ],
+    "suites": {
+      "tests/test_phase_registry.py": {
+        "passed": 179,
+        "failed": 4,
+        "skipped": 0
+      },
+      "tests/test_phase_picker.py": {
+        "passed": 113,
+        "failed": 3,
+        "skipped": 0
+      }
+    },
+    "test_files": [
+      "tests/test_phase_registry.py",
+      "tests/test_phase_picker.py"
+    ],
+    "pytest_arguments": [
+      "--basetemp=tmp_tests",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_registry_baseline_de39a802670441ddaa0d1d209f49a4c1\\pytest",
+      "tests/test_phase_registry.py",
+      "tests/test_phase_picker.py"
+    ],
+    "real_effect_attempts": [
+      "socket.bind"
+    ],
+    "denied_attempts": {},
+    "registry_projection_plugin_used": false,
+    "elapsed_seconds": 29.563,
+    "scope": "Pure host maintenance and fabricated in-memory fixture evidence only; this validation harness performs no live target inspection, Docker/Java, runtime authorization, leases, executor, or apply. Root separately owns one authorized exact-target live proof after pure gates."
+  },
+  "registry_picker_after": {
+    "mode": "registry_after",
+    "exit_code": 1,
+    "collected": 299,
+    "passed": 292,
+    "skipped": 0,
+    "failures": [
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_has_expected_phases():\n        data = load_phase_registry(str(_SEED_PATH))\n        ids = {p[\"phase_id\"] for p in data[\"phases\"]}\n        assert {\n            \"ROAD.1\", \"ROAD.2\", \"ROAD.3\", \"ROAD.4\", \"AUTO.2a\", \"AUTO.2b\", \"AUTO.2c\",\n            \"MODEL.1\", \"MODEL.2\", \"MODEL.3\", \"MODEL.N1\", \"MODEL.N2\", \"MODEL.N3\", \"MODEL.N4\", \"MODEL.N5\", \"MODEL.N6\", \"MODEL.N7\", \"MODEL.CLOSE\", \"EVAL.1\", \"EVAL.2\", \"EVAL.3\", \"EVAL.N1\", \"EVAL.N2\", \"EVAL.N3\", \"EVAL.N4\", \"EVAL.N5\", \"EVAL.N6\", \"EVAL.N7\", \"EVAL.CLOSE\", \"HUMAN.N1\", \"HUMAN.N2\", \"HUMAN.N3\", \"HUMAN.N4\", \"HUMAN.CLOSE\", \"ADOPT.MODEL.1\", \"ADOPT.MODEL.2\", \"ADOPT.MODEL.CLOSE\", \"CMD.1\", \"CMD.2\", \"CMD.3\", \"CMD.4\", \"CMD.N1\", \"CMD.N2\", \"CMD.N3\", \"CMD.N4\", \"CMD.N5\", \"CMD.N6\", \"CMD.CLOSE\",\n            \"HARDEN.1\", \"HARDEN.2\", \"HARDEN.3\", \"HARDEN.CLOSE\", \"HARDEN.N1\", \"HARDEN.N2\", \"HARDEN.N3\", \"HARDEN.N4\", \"HARDEN.PROGRESS.1\", \"OPS.TEST.1\", \"OPS.TEST.2\", \"OPS.TEST.3\", \"OPS.TEST.CLOSE\", \"UX.RUN.1\", \"UX.RUN.2\", \"UX.RUN.3\", \"UX.1\", \"UX.2\", \"UX.3\", \"UX.4\", \"UX.5\", \"UX.6\", \"UX.7\", \"UX.8\", \"UX.9\", \"UX.10\", \"UX.11\",\n            \"UX.CLOSE\", \"MIRROR.1\", \"MIRROR.2\", \"MIRROR.3\", \"MIRROR.4\", \"MIRROR.5\", \"MIRROR.6\", \"MIRROR.CLOSE\", \"MIRROR.7\", \"MIRROR.8\", \"MIRROR.9\", \"MIRROR.10\", \"MIRROR.11\", \"MIRROR.12\", \"MIRROR.CLOSE3\", \"MIRROR.13\",\n        } <= ids\n        assert {\"UX.RUN.CLOSE\", \"UX.LIVE.1\", \"UX.LIVE.2\", \"UX.LIVE.3\", \"UX.LIVE.4\", \"UX.LIVE.5\", \"UX.LIVE.6\", \"UX.LIVE.7\", \"UX.LIVE.8\", \"UX.LIVE.9\", \"UX.LIVE.10\", \"UX.LIVE.CLOSE\", \"DOGFOOD.1A\", \"DOGFOOD.1B\", \"VERIFY.TEST.1\"} <= ids\n        assert {\n            \"INDEX.1D.1\",\n            \"INDEX.1D.2A\",\n            \"INDEX.1D.2B\",\n            \"INDEX.1D.2C\",\n            \"INDEX.1D.3\",\n            \"INDEX.1E.0\",\n            \"INDEX.1E.1\",\n            \"INDEX.1E.2\",\n        } <= ids\n        assert {\n            \"CTX.SELECT.1\",\n            \"CTX.SEARCH.1\",\n            \"CTX.READ.1\",\n            \"CTX.PATCH.1\",\n            \"CTX.APPLY.0\",\n        } <= ids\n        assert {\"INPUT.1\", \"INPUT.2\", \"INPUT.3\"} <= ids\n        assert {\"WAITER.1\", \"WAITER.2\"} <= ids\n        assert {\"ACQUIRE.1\", \"ACQUIRE.2\", \"ACQUIRE.3\"} <= ids\n        assert {\"EVIDENCE.1\", \"EVIDENCE.2\"} <= ids\n        assert {\"CLAIM.1\"} <= ids\n        assert {\"SYNTHESIS.1\"} <= ids\n        assert {\"CHECK.1\", \"CHECK.2\"} <= ids\n        assert {\n            \"WORKER.DECL.1\",\n            \"WORKER.DECL.2A\",\n            \"WORKER.DECL.2A.1\",\n            \"WORKER.DECL.2A.2\",\n            \"WORKER.DECL.2B\",\n        } <= ids\n        assert \"CONTROL.SAFETY.LIVE.1\" in ids\n        assert \"WAITER.LIVE.1\" in ids\n        assert \"PATCH.BASIS.LIVE.1\" in ids\n        assert \"OPS.PATCH.2\" in ids\n        assert {\n            \"RETRIEVE.LIVE.1\",\n            \"RETRIEVE.LIVE.2\",\n            \"RETRIEVE.LIVE.3\",\n            \"RETRIEVE.LIVE.4\",\n        } <= ids\n        assert \"ANSWER.GROUND.LIVE.1\" in ids\n        assert \"DEFECT.PROBE.LIVE.1\" in ids\n        assert \"VALIDATE.ORACLE.LIVE.1\" in ids\n        assert \"EXEC.POLICY.LIVE.1\" in ids\n        assert \"EXEC.APPROVAL.LIVE.1\" in ids\n        assert \"ANSWER.GROUND.LIVE.2\" in ids\n        assert \"CONTROL.LOCALIZE.LIVE.2\" in ids\n        assert \"REPAIR.INTENT.1\" in ids\n        assert \"REPAIR.INTENT.ADMIT.1\" in ids\n        assert \"REPAIR.INTENT.UI.1\" in ids\n        assert \"CTX.OOP.1A\" in ids\n        assert \"CTX.OOP.1C\" in ids\n        assert \"OOP.INTENT.UI.1\" in ids\n        assert \"OOP.INTENT.DESIGN.1\" in ids\n        assert \"OOP.INTENT.DETECT.2\" in ids\n        assert \"OOP.INTENT.CONTINUE.1\" in ids\n        assert \"PATCH.SCOPE.EXPAND.1\" in ids\n        assert \"PATCH.SCOPE.RECHECK.1\" in ids\n        assert \"PATCH.SCOPE.REFRESH.1\" in ids\n>       assert len(data[\"phases\"]) == 224\nE       AssertionError: assert 225 == 224\nE        +  where 225 = len([{'phase_id': 'ROAD.1', 'title': 'Machine-Readable Phase Registry', 'track': 'ROAD', 'status': 'complete', ...}, {'pha...ase_id': 'MODEL.1', 'title': 'C.A.T.T.U.S Artifact Dataset Builder', 'track': 'MODEL', 'status': 'complete', ...}, ...])\n\ntests\\test_phase_registry.py:591: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call():\n        \"\"\"It spends provider calls, and the registry says so in the only way it can.\n    \n        ``model_calls_allowed`` is the registry's vocabulary for provider traffic and\n        is legal only under the approval budget tier, so a dogfood phase must carry\n        both.  ``network_allowed`` stays false because ROAD.1 rejects true outright;\n        that flag is not this phase claiming it made no requests.\n        \"\"\"\n        data = load_phase_registry(str(_SEED_PATH))\n        phases = data[\"phases\"]\n        by_id = {phase[\"phase_id\"]: phase for phase in phases}\n        phase = by_id[\"WORKER.DECL.2A.2\"]\n    \n        assert phase[\"model_calls_allowed\"] is True\n        assert phase[\"budget_tier\"] == \"strong_model_requires_approval\"\n        assert phase[\"requires_sandbox\"] is True\n        # ROAD.1 forbids raw network access for every managed phase, this one included.\n        assert phase[\"network_allowed\"] is False\n        assert not validate_phase_registry(data)[\"errors\"]\n    \n        # And it really is the first.  The set of phases allowed to spend provider\n        # calls is enumerated here, deliberately: a phase that wants provider\n        # traffic has to be added to this literal and to pay the approval price\n        # below, so it cannot arrive quietly.  PATCH.AUTHOR.LIVE.1 joined on\n        # 2026-09-09 with a hard cap of one verification-guided revision per run.\n        declared_model_call_phases = {\n            \"WORKER.DECL.2A.2\",\n            \"WORKER.DECL.2B\",\n            \"PATCH.AUTHOR.LIVE.1\",\n            # CONTROL.BOOTSTRAP.1 joined on 2026-09-18 with one bootstrap authoring call per fresh request.\n            \"CONTROL.BOOTSTRAP.1\",\n            # PLAN.1 exposes one already-authorized planner call and no author call.\n            \"PATCH.SCOPE.PLAN.1\",\n            # AUTHOR.STRUCTURAL.1 permits one injected read-only author call.\n            \"PATCH.AUTHOR.STRUCTURAL.1\",\n        }\n        others = [\n            item for item in phases if item[\"phase_id\"] not in declared_model_call_phases\n        ]\n        assert all(item[\"model_calls_allowed\"] is False for item in others)\n>       assert all(item[\"budget_tier\"] == \"local_only\" for item in others)\nE       assert False\nE        +  where False = all(<generator object test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call.<locals>.<genexpr> at 0x00000172E43E79F0>)\n\ntests\\test_phase_registry.py:2130: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_is_conservative():\n        \"\"\"No phase merges or reaches the network, and none writes speculatively.\n    \n        A phase may declare model calls, but only by paying the registry's price for\n        them: the approval budget tier, which routes it to human approval and out of\n        the safe-to-prepare bucket.  A phase cannot quietly grant itself provider\n        traffic under ``local_only``.\n    \n        ``writes_real_repo`` is the same shape of price.  It is not forbidden - a\n        live production fix such as OPS.PATCH.1 genuinely edits shipped runtime\n        code, and recording that as observation-only would make the registry lie -\n        but it is only ever true for shipped history that already went through\n        human approval and still may not merge itself.  That is the rule the\n        registry validator enforces at ``core/phase_registry.py``; this asserts the\n        seed actually obeys it, so no *proposed* or *active* phase can hold write\n        authority over the real worktree.\n        \"\"\"\n        data = load_phase_registry(str(_SEED_PATH))\n        for phase in data[\"phases\"]:\n            assert phase[\"automation_level\"] != \"AUTO_4_AUTO_MERGE\"\n            assert phase[\"merge_allowed\"] is False\n            assert phase[\"network_allowed\"] is False\n            if phase[\"writes_real_repo\"]:\n                assert phase[\"status\"] == \"complete\", phase[\"phase_id\"]\n                assert phase[\"human_approval_required\"] is True, phase[\"phase_id\"]\n                assert phase[\"merge_allowed\"] is False, phase[\"phase_id\"]\n            if phase[\"model_calls_allowed\"]:\n                assert phase[\"budget_tier\"] == \"strong_model_requires_approval\", (\n                    phase[\"phase_id\"]\n                )\n                assert phase[\"human_approval_required\"] is True, phase[\"phase_id\"]\n            else:\n>               assert phase[\"budget_tier\"] == \"local_only\", phase[\"phase_id\"]\nE               AssertionError: RUNTIME.JAVA.1\nE               assert 'blocked' == 'local_only'\nE                 \nE                 - local_only\nE                 + blocked\n\ntests\\test_phase_registry.py:2249: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_summary_counts():\n        data = load_phase_registry(str(_SEED_PATH))\n        report = summarize_phase_registry(data, report_id=\"r\", created_at=\"t\")\n>       assert report[\"counts_by_track\"] == {\n            \"ADOPT\": 3,\n            \"AUTO\": 3,\n            \"CMD\": 11,\n            \"CTX\": 5,\n            \"DOGFOOD\": 2,\n            \"VERIFY\": 1,\n            \"EVAL\": 11,\n            \"HARDEN\": 16,\n            \"HUMAN\": 5,\n            # RETRIEVE.LIVE.* is an ID namespace inside INDEX, not a new track.\n            \"INDEX\": 12,\n            \"ACQUIRE\": 3,\n            \"CLAIM\": 1,\n            \"EVIDENCE\": 2,\n            \"INPUT\": 4,\n            \"SYNTHESIS\": 1,\n                \"CHECK\": 9,\n                \"CONTROL\": 42,\n                \"WAITER\": 5,\n            \"WORKER\": 5,\n            \"MIRROR\": 15,\n            \"MODEL\": 11,\n            \"OPS\": 22,\n            \"ROAD\": 4,\n                \"UX\": 31,\n        }\nE       AssertionError: assert {'ACQUIRE': 3...HECK': 9, ...} == {'ADOPT': 3, ...'CTX': 5, ...}\nE         \nE         Omitting 23 identical items, use -vv to show\nE         Differing items:\nE         {'CONTROL': 43} != {'CONTROL': 42}\nE         Use -v to get more diff\n\ntests\\test_phase_registry.py:2257: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_seed_registry_produces_expected_buckets():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        report = _report(data, report_id=\"r\", created_at=\"t\", registry_path=str(_SEED_PATH))\n        assert report[\"registry_valid\"] is True\n>       assert report[\"bucket_counts\"] == {\n            \"safe_to_prepare\": 3,\n            \"sandbox_required\": 1,\n            \"human_approval_required\": 0,\n            \"blocked\": 1,\n            \"deferred_or_parked\": 0,\n            \"complete_or_history\": 219,\n        }\nE       AssertionError: assert {'safe_to_pre...cked': 2, ...} == {'safe_to_pre...cked': 1, ...}\nE         \nE         Omitting 5 identical items, use -vv to show\nE         Differing items:\nE         {'blocked': 2} != {'blocked': 1}\nE         Use -v to get more diff\n\ntests\\test_phase_picker.py:557: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        phase = {p[\"phase_id\"]: p for p in data[\"phases\"]}[\"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1\"]\n        report = _report(data, report_id=\"r\", created_at=\"t\")\n        assert phase[\"track\"] == \"CONTROL\" and phase[\"status\"] == \"active\"\n        assert phase[\"risk_level\"] == \"blocked\" and phase[\"budget_tier\"] == \"local_only\"\n        blocked = [p for p in report[\"blocked\"] if p[\"phase_id\"] == phase[\"phase_id\"]]\n        assert len(blocked) == 1\n        assert \"risk_level is blocked\" in blocked[0][\"reasons\"]\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"safe_to_prepare\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"complete_or_history\"]}\n>       assert report[\"bucket_counts\"][\"blocked\"] == 1\nE       assert 2 == 1\n\ntests\\test_phase_picker.py:1634: AssertionError"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call",
+        "outcome": "failed",
+        "detail": "def test_verified_runtime_sandbox_is_history_and_executor_stays_blocked():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        phase = {p[\"phase_id\"]: p for p in data[\"phases\"]}[\"RUNTIME.SANDBOX.1\"]\n        report = _report(data, report_id=\"r\", created_at=\"t\")\n        assert report[\"registry_valid\"] is True\n        assert phase[\"track\"] == \"CONTROL\" and phase[\"status\"] == \"complete\"\n        assert phase[\"risk_level\"] == \"medium\" and phase[\"budget_tier\"] == \"local_only\"\n        assert phase[\"phase_id\"] in {p[\"phase_id\"] for p in report[\"complete_or_history\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"safe_to_prepare\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"sandbox_required\"]}\n>       assert {p[\"phase_id\"] for p in report[\"blocked\"]} == {\"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1\"}\nE       AssertionError: assert {'PATCH.CANDI...NTIME.JAVA.1'} == {'PATCH.CANDI...R.EXECUTOR.1'}\nE         \nE         Extra items in the left set:\nE         'RUNTIME.JAVA.1'\nE         Use -v to get more diff\n\ntests\\test_phase_picker.py:1651: AssertionError"
+      }
+    ],
+    "suites": {
+      "tests/test_phase_registry.py": {
+        "passed": 179,
+        "failed": 4,
+        "skipped": 0
+      },
+      "tests/test_phase_picker.py": {
+        "passed": 113,
+        "failed": 3,
+        "skipped": 0
+      }
+    },
+    "test_files": [
+      "tests/test_phase_registry.py",
+      "tests/test_phase_picker.py"
+    ],
+    "pytest_arguments": [
+      "--basetemp=tmp_tests",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_registry_after_1ee7d03375114d3ba0d6c98a10fe4aad\\pytest",
+      "tests/test_phase_registry.py",
+      "tests/test_phase_picker.py"
+    ],
+    "real_effect_attempts": [
+      "socket.bind"
+    ],
+    "denied_attempts": {},
+    "registry_projection_plugin_used": false,
+    "elapsed_seconds": 67.088,
+    "scope": "Pure host maintenance and fabricated in-memory fixture evidence only; this validation harness performs no live target inspection, Docker/Java, runtime authorization, leases, executor, or apply. Root separately owns one authorized exact-target live proof after pure gates."
+  },
+  "baseline_vs_after": {
+    "registry_picker_failure_ids_unchanged": true,
+    "registry_picker_new_failures": [],
+    "frozen_pure_failure_ids_unchanged": true,
+    "frozen_pure_new_failures": [],
+    "historical_sources_rewritten": false,
+    "historical_repins": false
+  },
+  "benchmark_structure_check": {
+    "mode": "benchmark_check",
+    "exit_code": 0,
+    "real_effect_attempts": [
+      "socket.bind"
+    ],
+    "denied_attempts": {},
+    "elapsed_seconds": 6.649,
+    "scope": "Pure host maintenance and fabricated in-memory fixture evidence only; this validation harness performs no live target inspection, Docker/Java, runtime authorization, leases, executor, or apply. Root separately owns one authorized exact-target live proof after pure gates."
+  },
+  "pure_preoperational_gates": {
+    "phase_id": "RUNTIME.JAVA.PINNED.1A",
+    "pure_gates_ready": true,
+    "checks": {
+      "focused_new_target_tests_passed": true,
+      "frozen_pure_regressions_passed": true,
+      "benchmark_structure_check_passed": true,
+      "registry_picker_has_no_new_failures": true,
+      "safety_code_compiles_in_memory": true,
+      "authored_whitespace_passed": true,
+      "git_diff_check_passed": true
+    },
+    "focused_tests_passed": 163,
+    "frozen_tests_passed": 735,
+    "in_memory_compilation": {
+      "files": [
+        {
+          "path": "core/runtime_java_pinned_target_inspection.py",
+          "sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59",
+          "size_bytes": 28903
+        },
+        {
+          "path": "core/runtime_java_pinned_target_archive.py",
+          "sha256": "d8693eabcfc2c8290cd0a4318a4edcce2d11b94a28ed8f8eddd82360b84afe2b",
+          "size_bytes": 13725
+        },
+        {
+          "path": "scripts/replay_runtime_java_pinned1a.py",
+          "sha256": "286232723d8f3d42597fdfc9c2b7a219f655a4b44b099a1ec7afe9adebfb3bd1",
+          "size_bytes": 5704
+        },
+        {
+          "path": "tests/test_runtime_java_pinned_target_inspection.py",
+          "sha256": "f0afd4229bb241f893aaf3b1f16d49914ba734e76ff15eae2e98fe0a82386c33",
+          "size_bytes": 23918
+        },
+        {
+          "path": "tests/test_runtime_java_pinned_target_archive.py",
+          "sha256": "faf07a98ef6b051f0c15e8a314981b921ca13b11a228fdda2358585139dcd833",
+          "size_bytes": 20785
+        },
+        {
+          "path": "core/runtime_java_pinned_requirement.py",
+          "sha256": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1",
+          "size_bytes": 22597
+        },
+        {
+          "path": "core/sandboxed_java_toolchain_discovery.py",
+          "sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff",
+          "size_bytes": 21386
+        },
+        {
+          "path": "core/candidate_runtime_sandbox.py",
+          "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+          "size_bytes": 34833
+        },
+        {
+          "path": "core/sandboxed_java_positive_probe.py",
+          "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+          "size_bytes": 7358
+        }
+      ],
+      "errors": [],
+      "code_executed": false
+    },
+    "preoperational_artifact_whitespace": {
+      "checked_files": [
+        "core/runtime_java_pinned_target_inspection.py",
+        "core/runtime_java_pinned_target_archive.py",
+        "scripts/replay_runtime_java_pinned1a.py",
+        "tests/test_runtime_java_pinned_target_inspection.py",
+        "tests/test_runtime_java_pinned_target_archive.py",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/benchmark_check.json",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/check_preoperational_gates.py",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/finalize_validation.py",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/frozen_after.json",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/frozen_baseline.json",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/git_diff_check.json",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/new_target_inspection.json",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/preoperational_artifact_checks.json",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/preservation_baseline.json",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/pure_preoperational_gates.json",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/README.md",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/registry_after.json",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/registry_baseline.json",
+        "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/validate_pure_phase.py"
+      ],
+      "issues": [],
+      "passed": true
+    },
+    "operational_calls_performed_by_this_gate": 0,
+    "note": "Gate only records pure test, benchmark and compile results. Root owns the separately authorized single exact-target operational proof; no inspection, Docker or execution occurs here."
+  },
+  "separate_root_owned_live_proof_artifact": "RUNTIME_JAVA_PINNED_1A_LOCAL.json",
+  "benchmark_bootstrap_observations": null,
+  "in_memory_python_compilation": {
+    "files": [
+      "benchmarks/run_benchmarks.py",
+      "core/behavioral_diagnostic_executor.py",
+      "core/behavioral_diagnostic_executor_lifecycle_retry.py",
+      "core/behavioral_diagnostic_executor_refresh.py",
+      "core/behavioral_diagnostic_executor_retry.py",
+      "core/java_class_semantic_context.py",
+      "core/java_repair_intent_ambiguity.py",
+      "core/java_runtime_compatibility.py",
+      "core/java_single_thread_capture.py",
+      "core/runtime_java_pinned_target_archive.py",
+      "core/runtime_java_pinned_target_inspection.py",
+      "core/sandbox_backend_binding.py",
+      "core/sandboxed_java_capture_recovery.py",
+      "core/sandboxed_java_discovery_continuation.py",
+      "core/sandboxed_java_positive_continuation.py",
+      "core/sandboxed_java_positive_probe.py",
+      "core/sandboxed_java_single_thread_probe.py",
+      "core/sandboxed_java_toolchain.py",
+      "core/sandboxed_java_toolchain_discovery.py",
+      "core/sandboxed_java_toolchain_probe.py",
+      "core/synthetic_runtime_authorization.py",
+      "core/synthetic_runtime_authorization_lifecycle.py",
+      "core/thread_compatible_runtime_sandbox.py",
+      "core/thread_compatible_runtime_sandbox_probe.py",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/check_preoperational_gates.py",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/finalize_validation.py",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/validate_pure_phase.py",
+      "scripts/measure_runtime_java_discovery_diag1.py",
+      "scripts/replay_runtime_java_pinned1a.py",
+      "tests/test_patch_candidate_behavior_executor1r.py",
+      "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py",
+      "tests/test_patch_candidate_behavior_executor1r_retry.py",
+      "tests/test_runtime_java1.py",
+      "tests/test_runtime_java1_discovery.py",
+      "tests/test_runtime_java1_governance.py",
+      "tests/test_runtime_java1c.py",
+      "tests/test_runtime_java1d.py",
+      "tests/test_runtime_java1d_retry.py",
+      "tests/test_runtime_java_compat1.py",
+      "tests/test_runtime_java_discovery_contract1.py",
+      "tests/test_runtime_java_discovery_diag1.py",
+      "tests/test_runtime_java_pinned_target_archive.py",
+      "tests/test_runtime_java_pinned_target_inspection.py",
+      "tests/test_runtime_java_requirement_pinned1.py",
+      "tests/test_runtime_sandbox_bind1.py",
+      "tests/test_synthetic_runtime_authorization.py"
+    ],
+    "errors": [],
+    "passed": true,
+    "code_executed": false
+  },
+  "git_diff_check": {
+    "exit_code": 0,
+    "output": "warning: in the working copy of 'core/explicit_evidence.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/input_understanding.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/live_task_shape.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/oop_intent_session.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/oop_semantic_review.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/phase_registry.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/requirement_preservation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/semantic_waiter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/semantic_waiter_adapter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/task_contract.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/roadmap/phase_registry.json', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'main.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/_oop_intent_ui1_maintenance.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_input_understanding.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_phase_picker.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_phase_registry.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/app.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/oop_intent_adapter.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/runner.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/session_presentation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'web/templates/index.html', LF will be replaced by CRLF the next time Git touches it",
+    "scope": "Final entire current working tree; explicit authored-file whitespace separately checks new untracked additions."
+  },
+  "authored_artifact_whitespace": {
+    "checked_files": [
+      "core/runtime_java_pinned_target_archive.py",
+      "core/runtime_java_pinned_target_inspection.py",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/README.md",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/RUNTIME_JAVA_PINNED_1A_LOCAL.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/RUNTIME_JAVA_PINNED_1A_REPORT.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/benchmark_check.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/check_preoperational_gates.py",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/final_artifact_checks.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/finalize_validation.py",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/frozen_after.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/frozen_baseline.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/git_diff_check.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/new_target_inspection.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/preoperational_artifact_checks.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/preservation.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/preservation_baseline.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/pure_preoperational_gates.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/registry_after.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/registry_baseline.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/validate_pure_phase.py",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/validation.json",
+      "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/validation_temp_cleanup.json",
+      "scripts/replay_runtime_java_pinned1a.py",
+      "tests/test_runtime_java_pinned_target_archive.py",
+      "tests/test_runtime_java_pinned_target_inspection.py"
+    ],
+    "issues": [],
+    "passed": true,
+    "raw_diagnostic_logs_reformatted": false
+  },
+  "authored_json_parse": {
+    "errors": [],
+    "passed": true
+  },
+  "historical_preservation": {
+    "artifact": "preservation.json",
+    "files_checked": 1931,
+    "changed": [],
+    "missing": [],
+    "unexpected_new_paths": [],
+    "historical_repins": false,
+    "prior_drift_retained": true
+  },
+  "denied_dependency_bootstrap_attempts": {
+    "frozen_baseline": {
+      "audit_denied": [
+        "socket.bind"
+      ],
+      "guard_denied": {}
+    },
+    "frozen_after": {
+      "audit_denied": [
+        "socket.bind"
+      ],
+      "guard_denied": {}
+    },
+    "registry_baseline": {
+      "audit_denied": [
+        "socket.bind"
+      ],
+      "guard_denied": {}
+    },
+    "registry_after": {
+      "audit_denied": [
+        "socket.bind"
+      ],
+      "guard_denied": {}
+    },
+    "new_target_inspection": {
+      "audit_denied": [
+        "socket.bind"
+      ],
+      "guard_denied": {}
+    },
+    "benchmark_check": {
+      "audit_denied": [
+        "socket.bind"
+      ],
+      "guard_denied": {}
+    }
+  },
+  "successful_pure_validation_operational_effect_counts": {
+    "Docker": 0,
+    "containers": 0,
+    "exports": 0,
+    "Java": 0,
+    "javac": 0,
+    "compile": 0,
+    "network": 0,
+    "shell": 0,
+    "host mounts": 0,
+    "source projection": 0,
+    "runtime lease consumption": 0,
+    "reflection lease consumption": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0
+  },
+  "effect_scope": "Pure-validation operational runtime effects are zero. Root separately owns the single authorized live target proof after pure gates; its Docker/control/export measurements belong to that operational report. Host repository reads, Python/pytest validation and artifact/temp writes are maintenance. Frozen regression fixtures fabricate development-only in-memory authority records; they issue no operational capability. Attempted dependency bootstrap process/network probes were denied before any successful effect and are recorded separately.",
+  "final_artifact_checks": {
+    "phase_id": "RUNTIME.JAVA.PINNED.1A",
+    "checks": {
+      "report_copies_all_local_fields_exactly": true,
+      "report_local_artifact_sha256_matches": true,
+      "compiled_safety_sources_unchanged_after_pure_gate_and_live_proof": true,
+      "all_46_python_files_compile_in_memory": true,
+      "final_authored_whitespace_passed": true,
+      "final_json_parse_passed": true,
+      "git_diff_check_passed": true,
+      "live_target_proof_completed": true,
+      "only_single_stopped_target_container_and_single_export": true,
+      "all_prohibited_operational_effects_zero": true,
+      "all_cleanup_verified_with_zero_remaining_containers": true,
+      "all_11_negative_authentication_controls_rejected": true,
+      "receipt_authenticated_before_and_after_negative_controls": true,
+      "no_global_inventory_backend_runtime_or_provider_proof_claims": true,
+      "validation_fixture_trees_removed": true
+    },
+    "passed": true,
+    "source_hash_mismatches": [],
+    "compilation_errors": [],
+    "whitespace_issues": [],
+    "json_errors": [],
+    "forbidden_nonzero_effects": {},
+    "historical_hash_scan_repeated": false,
+    "local_artifact_sha256": "b779d8c11f9797c2e1f4cbd324cf77f50f344af7ee5e1d8b7fa076d94a1a7585",
+    "new_source_paths": [
+      "core/runtime_java_pinned_target_inspection.py",
+      "core/runtime_java_pinned_target_archive.py",
+      "scripts/replay_runtime_java_pinned1a.py",
+      "tests/test_runtime_java_pinned_target_inspection.py",
+      "tests/test_runtime_java_pinned_target_archive.py"
+    ],
+    "remaining_validation_fixture_directories": []
+  },
+  "phase_local_temporary_fixture_cleanup": {
+    "scope": "Only new phase-local validation_temp_* trees; historical temporary directories and live operational artifacts untouched.",
+    "removed_trees": [
+      {
+        "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_frozen_after_4c5cc3a801804f298b28a3427e02758f",
+        "verified_exact_phase_child": true,
+        "name_matched": true,
+        "removed": true
+      },
+      {
+        "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_frozen_baseline_7460abec9ee34a38b163d65b4539b290",
+        "verified_exact_phase_child": true,
+        "name_matched": true,
+        "removed": true
+      },
+      {
+        "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_new_target_inspection_7f72457bc27e4526a7f027db08059bfa",
+        "verified_exact_phase_child": true,
+        "name_matched": true,
+        "removed": true
+      },
+      {
+        "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_new_target_inspection_a5154e1091014ad7a5c401f53be965dd",
+        "verified_exact_phase_child": true,
+        "name_matched": true,
+        "removed": true
+      },
+      {
+        "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_registry_after_1ee7d03375114d3ba0d6c98a10fe4aad",
+        "verified_exact_phase_child": true,
+        "name_matched": true,
+        "removed": true
+      },
+      {
+        "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_registry_baseline_de39a802670441ddaa0d1d209f49a4c1",
+        "verified_exact_phase_child": true,
+        "name_matched": true,
+        "removed": true
+      }
+    ],
+    "count": 6
+  },
+  "root_owned_single_live_target_proof": {
+    "artifact": "RUNTIME_JAVA_PINNED_1A_LOCAL.json",
+    "artifact_sha256": "b779d8c11f9797c2e1f4cbd324cf77f50f344af7ee5e1d8b7fa076d94a1a7585",
+    "status": "RUNTIME_JAVA_PINNED_1A_COMPLETE",
+    "reason": "complete_bounded_target_archive_inspected",
+    "export_timeout_ms": 30000,
+    "export_elapsed_ms": 15927.051999955438,
+    "archive_bytes": 443077120,
+    "archive_entries": 6057,
+    "operational_effect_counts": {
+      "docker_control_calls": 6,
+      "docker_export_calls": 1,
+      "inspection_containers_created": 1,
+      "container_starts": 0,
+      "Java": 0,
+      "javac": 0,
+      "controller_workload_executions": 0,
+      "Java_compilations": 0,
+      "source_projections": 0,
+      "network": 0,
+      "shell": 0,
+      "host_mounts": 0,
+      "pulls": 0,
+      "builds": 0,
+      "generic_image_inventory_calls": 0,
+      "alternative_image_inspections": 0,
+      "runtime_lease_consumption": 0,
+      "reflection_lease_consumption": 0,
+      "BANK": 0,
+      "EXECUTOR.1R": 0,
+      "Apply": 0,
+      "JAVA.1C_invocations": 0
+    },
+    "cleanup": {
+      "export_child_reaped": true,
+      "export_pipes_closed": true,
+      "deadline_supervisor_stopped": true,
+      "stderr_reader_stopped": true,
+      "control_children_reaped_and_pipes_closed": true,
+      "stopped_container_removed": true,
+      "known_container_absence_verified": true,
+      "temporary_profile_removed": true,
+      "temporary_workspace_removed": true,
+      "remaining_phase_containers": 0
+    },
+    "receipt_authentication_before_negative_controls": true,
+    "receipt_authentication_after_negative_controls": true,
+    "negative_controls": [
+      {
+        "control": "copy",
+        "rejected": true,
+        "reason": "pinned_target_live_original_object_required"
+      },
+      {
+        "control": "deepcopy",
+        "rejected": true,
+        "reason": "pinned_target_live_original_object_required"
+      },
+      {
+        "control": "dataclasses_replace",
+        "rejected": true,
+        "reason": "pinned_target_live_original_object_required"
+      },
+      {
+        "control": "JSON_projection",
+        "rejected": true,
+        "reason": "pinned_target_original_typed_receipt_required"
+      },
+      {
+        "control": "JSON_reconstruction",
+        "rejected": true,
+        "reason": "pinned_target_live_original_object_required"
+      },
+      {
+        "control": "subclass",
+        "rejected": true,
+        "reason": "pinned_target_original_typed_receipt_required"
+      },
+      {
+        "control": "wrapper",
+        "rejected": true,
+        "reason": "pinned_target_original_typed_receipt_required"
+      },
+      {
+        "control": "wrong_process",
+        "rejected": true,
+        "reason": "pinned_target_issuing_process_required"
+      },
+      {
+        "control": "wrong_HMAC",
+        "rejected": true,
+        "reason": "pinned_target_signature_or_evidence_changed"
+      },
+      {
+        "control": "changed_backend",
+        "rejected": true,
+        "reason": "pinned_target_signature_or_evidence_changed"
+      },
+      {
+        "control": "changed_evidence_digest",
+        "rejected": true,
+        "reason": "pinned_target_signature_or_evidence_changed"
+      }
+    ],
+    "report_only": true,
+    "live_issuing_process_exited": true,
+    "scope": "Root performed exactly one authorized exact-target inspection. Validation actor performed no live operations. Exported receipt JSON is report-only and cannot recreate live process-local authenticity or authority."
+  },
+  "validation_summary": {
+    "focused_target_tests": {
+      "passed": 163,
+      "failed": 0,
+      "owner": 101,
+      "archive": 62
+    },
+    "frozen_pure_regressions": {
+      "passed": 735,
+      "failed": 0
+    },
+    "registry_picker_baseline_vs_after": {
+      "collected": 299,
+      "passed": 292,
+      "preexisting_failures": 7,
+      "failure_ids_unchanged": true,
+      "new_failures": [],
+      "failure_ids": [
+        "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "tests/test_phase_registry.py::test_seed_registry_summary_counts"
+      ]
+    },
+    "benchmark_structure_check": {
+      "exit_code": 0,
+      "scenarios": 54,
+      "errors": 0
+    },
+    "in_memory_python_compilation": {
+      "files": 46,
+      "errors": []
+    },
+    "git_diff_check_exit_code": 0,
+    "authored_whitespace_passed": true,
+    "authored_JSON_passed": true,
+    "pure_validation_effects": {
+      "Docker": 0,
+      "containers": 0,
+      "exports": 0,
+      "Java": 0,
+      "javac": 0,
+      "compile": 0,
+      "network": 0,
+      "shell": 0,
+      "host mounts": 0,
+      "source projection": 0,
+      "runtime lease consumption": 0,
+      "reflection lease consumption": 0,
+      "BANK": 0,
+      "EXECUTOR.1R": 0,
+      "Apply": 0
+    },
+    "denied_dependency_bootstrap_attempts": {
+      "frozen_baseline": {
+        "audit_denied": [
+          "socket.bind"
+        ],
+        "guard_denied": {}
+      },
+      "frozen_after": {
+        "audit_denied": [
+          "socket.bind"
+        ],
+        "guard_denied": {}
+      },
+      "registry_baseline": {
+        "audit_denied": [
+          "socket.bind"
+        ],
+        "guard_denied": {}
+      },
+      "registry_after": {
+        "audit_denied": [
+          "socket.bind"
+        ],
+        "guard_denied": {}
+      },
+      "new_target_inspection": {
+        "audit_denied": [
+          "socket.bind"
+        ],
+        "guard_denied": {}
+      },
+      "benchmark_check": {
+        "audit_denied": [
+          "socket.bind"
+        ],
+        "guard_denied": {}
+      }
+    },
+    "details_artifact": "validation.json",
+    "preoperational_gate_artifact": "pure_preoperational_gates.json"
+  },
+  "validation_state": "COMPLETE_WITH_UNCHANGED_PREEXISTING_REGISTRY_PICKER_FAILURES"
+}

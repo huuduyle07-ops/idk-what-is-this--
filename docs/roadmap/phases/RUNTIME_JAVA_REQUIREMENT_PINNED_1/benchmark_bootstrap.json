@@ -1,0 +1,12 @@
+{
+  "initial_benchmark_structure_check": {
+    "completed": false,
+    "reason": "truststore import requested platform.system, which fell back to Windows shell ver metadata; no_runtime_effects denied subprocess.check_output before process creation",
+    "successful_processes": 0,
+    "source_changes": false
+  },
+  "harness_adjustment": {
+    "description": "Populate platform uname cache from sys.getwindowsversion and process environment before guarded imports. No process, network or runtime effect. Frozen source untouched.",
+    "first_adjustment_error": "Python 3.14 uname_result has five constructor fields; corrected harness constructor arity. No check ran during that failed harness startup."
+  }
+}

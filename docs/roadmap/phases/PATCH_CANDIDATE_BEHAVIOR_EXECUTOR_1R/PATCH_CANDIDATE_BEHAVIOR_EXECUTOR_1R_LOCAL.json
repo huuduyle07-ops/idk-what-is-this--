@@ -1,0 +1,663 @@
+{
+  "all_129_frozen_files_byte_identical": true,
+  "allowed_runtime_operations": [],
+  "bank_oracle_reduced": false,
+  "blocked_receipt": {
+    "apply_actions": 0,
+    "apply_authority": false,
+    "author_calls": 0,
+    "bank_execution_count": 0,
+    "blocked_receipt_fingerprint": "0c54e95754114b67fa6f5acc8a878592adb573ff74508cf5fb9cc79f6725c418",
+    "compatibility_findings": [
+      [
+        "independent_scenario_family",
+        "execution_plan_oracle_drift",
+        "execution_plan_oracle_drift: closed scenario family required"
+      ],
+      [
+        "source_without_reconstructed_parents",
+        "authorization_invalid",
+        "authorization_invalid: exact typed frozen parents required"
+      ],
+      [
+        "integer_reflection_request",
+        "reflection_invalid",
+        "reflection_invalid: exact typed numeric field and closed observation role required"
+      ],
+      [
+        "independent_owner_reflection",
+        "reflection_target_mismatch",
+        "reflection_target_mismatch: V1 accepts only the two exact planned private double balances"
+      ]
+    ],
+    "compile_count": 0,
+    "console_count": 0,
+    "execution_completed": false,
+    "jvm_execution_count": 0,
+    "model_calls": 0,
+    "operational_real_task_source": false,
+    "phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "positive_runtime_receipt_issued": false,
+    "real_behavioral_execution_count": 0,
+    "real_human_approval": false,
+    "real_runtime_authorizations_consumed": 0,
+    "real_session_consumed": false,
+    "reflection_execution_count": 0,
+    "repository_write_authority": false,
+    "repository_writes": 0,
+    "runtime_authority": false,
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "schema_version": "patch_candidate_behavior_executor_1r_v1",
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "status": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_BLOCKED_AUTHORIZATION",
+    "synthetic_authorization_issued": false,
+    "synthetic_behavioral_execution_count": 0,
+    "synthetic_runtime_authorizations_consumed": 0
+  },
+  "blocked_receipt_authenticated_in_issuing_process": true,
+  "cleanup_outcome": "not_required_no_runtime_resources_created",
+  "compile_stage": null,
+  "exported_json_is_report_only": true,
+  "fresh_capabilities_obtained": false,
+  "frozen_file_preservation": {
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/behavioral_diagnostic_executor.py": {
+      "after_sha256": "f9e071b040979431fabfee98d93883a3cd4f9f0460c77bd0994f539efb3a7272",
+      "before_sha256": "f9e071b040979431fabfee98d93883a3cd4f9f0460c77bd0994f539efb3a7272"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/behavioral_evidence_execution_plan.py": {
+      "after_sha256": "e537452ccd293f1c7438d87cd99e1b2a7acce76796f356d4edde3ab6e0c03b4c",
+      "before_sha256": "e537452ccd293f1c7438d87cd99e1b2a7acce76796f356d4edde3ab6e0c03b4c"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/behavioral_execution_admission.py": {
+      "after_sha256": "1e78633085e6f113687b5c8fa00e7df7d49e35bc38e88fafc431d60c095934b4",
+      "before_sha256": "1e78633085e6f113687b5c8fa00e7df7d49e35bc38e88fafc431d60c095934b4"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/behavioral_validation_specification.py": {
+      "after_sha256": "0f57c21c36edebab05a9cc1e0c5a6214262188a711b73b2a317420b3217db945",
+      "before_sha256": "0f57c21c36edebab05a9cc1e0c5a6214262188a711b73b2a317420b3217db945"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/candidate_runtime_sandbox.py": {
+      "after_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "before_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/candidate_runtime_sandbox_probe.py": {
+      "after_sha256": "aa090e85f34a75c429fc98a20b562e6ebc2b7261d400b08fd7758da4994f4b6c",
+      "before_sha256": "aa090e85f34a75c429fc98a20b562e6ebc2b7261d400b08fd7758da4994f4b6c"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/java_single_thread_capture.py": {
+      "after_sha256": "4ac691b2919b3e778a98c044fb166fd9804b102cdd651995eb8689839ac438fb",
+      "before_sha256": "4ac691b2919b3e778a98c044fb166fd9804b102cdd651995eb8689839ac438fb"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/read_only_reflection.py": {
+      "after_sha256": "94f002573e0c94d3e859ec8f20703c3ddf427e7a9eb324d061a5ed082af53a26",
+      "before_sha256": "94f002573e0c94d3e859ec8f20703c3ddf427e7a9eb324d061a5ed082af53a26"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/read_only_reflection_java.py": {
+      "after_sha256": "8f86fb70fe0afd8185064f6a6b7a07274aa74fef12b4750c1d372cce5003db8e",
+      "before_sha256": "8f86fb70fe0afd8185064f6a6b7a07274aa74fef12b4750c1d372cce5003db8e"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/runtime_diagnostic_authorization.py": {
+      "after_sha256": "cb9c0ed3cf9ae7cadd10d2de9fb6170a991ae75b8f2ea9da643262aaf80ea085",
+      "before_sha256": "cb9c0ed3cf9ae7cadd10d2de9fb6170a991ae75b8f2ea9da643262aaf80ea085"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/runtime_java_controller_diagnostic.py": {
+      "after_sha256": "6cdb16c2bb24b565bd8caa52555d85bf956402823ba73a3bc9f62942e86d3099",
+      "before_sha256": "6cdb16c2bb24b565bd8caa52555d85bf956402823ba73a3bc9f62942e86d3099"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/runtime_java_controller_diagnostic_probe.py": {
+      "after_sha256": "c931f9bce83ca2ea4df4a1c974ade833c513d9de14bc46ceae1b4f149302c538",
+      "before_sha256": "c931f9bce83ca2ea4df4a1c974ade833c513d9de14bc46ceae1b4f149302c538"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/sandboxed_java_capture_recovery.py": {
+      "after_sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861",
+      "before_sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/sandboxed_java_positive_continuation.py": {
+      "after_sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+      "before_sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/sandboxed_java_positive_probe.py": {
+      "after_sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+      "before_sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/sandboxed_java_single_thread_probe.py": {
+      "after_sha256": "7bb2bceac444c80f6b2c75b335731d61b73dfff58b1b0ca72ac85f027e635716",
+      "before_sha256": "7bb2bceac444c80f6b2c75b335731d61b73dfff58b1b0ca72ac85f027e635716"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/sandboxed_java_toolchain.py": {
+      "after_sha256": "ed96e56a875535d4cafaa107721ee6eafd5c0c1b0f8d14f59f4ad728f00288c9",
+      "before_sha256": "ed96e56a875535d4cafaa107721ee6eafd5c0c1b0f8d14f59f4ad728f00288c9"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/sandboxed_java_toolchain_discovery.py": {
+      "after_sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff",
+      "before_sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/sandboxed_java_toolchain_probe.py": {
+      "after_sha256": "58e791ed6ac7c99a41386345ce8d392ca74cb8f574a8207fe1c85afa335ec606",
+      "before_sha256": "58e791ed6ac7c99a41386345ce8d392ca74cb8f574a8207fe1c85afa335ec606"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/thread_compatible_runtime_sandbox.py": {
+      "after_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "before_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/core/thread_compatible_runtime_sandbox_probe.py": {
+      "after_sha256": "be45d3a0106186d84a0464234f701140df6e90e99107477af358886cf5568075",
+      "before_sha256": "be45d3a0106186d84a0464234f701140df6e90e99107477af358886cf5568075"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/OOP_INTENT_CONTINUE_1.md": {
+      "after_sha256": "aede3422c892e322e944e2389aacf983afb71f455ebd41d0c382674819844a53",
+      "before_sha256": "aede3422c892e322e944e2389aacf983afb71f455ebd41d0c382674819844a53"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/OOP_INTENT_CONTINUE_1_BANK2.json": {
+      "after_sha256": "f18938c42fe9a659cfab45e7aadda9f7d1ee8453783807c7c6c1755debfd2ecf",
+      "before_sha256": "f18938c42fe9a659cfab45e7aadda9f7d1ee8453783807c7c6c1755debfd2ecf"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/OOP_INTENT_DESIGN_1.md": {
+      "after_sha256": "ba0ad1f57623e5d18e8b1aa23ca4994cefc0a2c0214f32f06e8fcce972da1f0a",
+      "before_sha256": "ba0ad1f57623e5d18e8b1aa23ca4994cefc0a2c0214f32f06e8fcce972da1f0a"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/OOP_INTENT_DESIGN_1_BANK2.json": {
+      "after_sha256": "9d1b52888fd6c78d377b74df213b5ec354154f6ab808e8c456efe0991f5b65df",
+      "before_sha256": "9d1b52888fd6c78d377b74df213b5ec354154f6ab808e8c456efe0991f5b65df"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/OOP_INTENT_DETECT_2.md": {
+      "after_sha256": "c50f738ce8b49d8b1596c730f4ae20b0408ce977fb8ee2d68607bf6e489f42da",
+      "before_sha256": "c50f738ce8b49d8b1596c730f4ae20b0408ce977fb8ee2d68607bf6e489f42da"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/OOP_INTENT_DETECT_2_BANK2.json": {
+      "after_sha256": "bf2280ad9ab742dbf6fc7ab4b497e45ab6c779640c19c1e65d53cbf7a5531f9f",
+      "before_sha256": "bf2280ad9ab742dbf6fc7ab4b497e45ab6c779640c19c1e65d53cbf7a5531f9f"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1.md": {
+      "after_sha256": "e384fd8195aaf7da9999fb1539cc2f92f8243344ebe3a7e8932e3e6f6f77af4d",
+      "before_sha256": "e384fd8195aaf7da9999fb1539cc2f92f8243344ebe3a7e8932e3e6f6f77af4d"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1_BANK2.json": {
+      "after_sha256": "e303d4593784a17c4eb413f897207bc84cfdbc9bbb3ac017d9e6e9599388704b",
+      "before_sha256": "e303d4593784a17c4eb413f897207bc84cfdbc9bbb3ac017d9e6e9599388704b"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1.md": {
+      "after_sha256": "dbd6a7ee22e0de772c2b5db6511e36c8593dadf85095c7bf76341082e949a1c8",
+      "before_sha256": "dbd6a7ee22e0de772c2b5db6511e36c8593dadf85095c7bf76341082e949a1c8"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json": {
+      "after_sha256": "b56e2d883b08b7dc0040a69d851c9158e232869f07cfc4740e2ccc5b981a28b3",
+      "before_sha256": "b56e2d883b08b7dc0040a69d851c9158e232869f07cfc4740e2ccc5b981a28b3"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1.md": {
+      "after_sha256": "d91f2fb1780325d829ac279547031069b1cb8487670b92585a527843a804cc68",
+      "before_sha256": "d91f2fb1780325d829ac279547031069b1cb8487670b92585a527843a804cc68"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1_SYNTHETIC.json": {
+      "after_sha256": "0d20522bcfc97ce3e7eafc46f0c0c379d789b7a2e7d1af715b90f4d8e2142144",
+      "before_sha256": "0d20522bcfc97ce3e7eafc46f0c0c379d789b7a2e7d1af715b90f4d8e2142144"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1.md": {
+      "after_sha256": "3fdc89c9f28ff905d1d62b0eecebba04bb1cb948385488db2903832f524c7e8d",
+      "before_sha256": "3fdc89c9f28ff905d1d62b0eecebba04bb1cb948385488db2903832f524c7e8d"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1_SYNTHETIC.json": {
+      "after_sha256": "9186b0db11a82bd25825942f3cc84beee03af1f988dac3c5aa78413aea9cc89c",
+      "before_sha256": "9186b0db11a82bd25825942f3cc84beee03af1f988dac3c5aa78413aea9cc89c"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1.md": {
+      "after_sha256": "35a33bac51433eada7f8a3cb662e3b62d69327b084cd15a862ad0004c9f59ccf",
+      "before_sha256": "35a33bac51433eada7f8a3cb662e3b62d69327b084cd15a862ad0004c9f59ccf"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1_SYNTHETIC.json": {
+      "after_sha256": "50a2aaded089118162c9171bad8169fd66295a21939b3bd93bb108293efb8587",
+      "before_sha256": "50a2aaded089118162c9171bad8169fd66295a21939b3bd93bb108293efb8587"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1.md": {
+      "after_sha256": "9e297015a5b3f5bfd04c50a63d49ca97883eb7ce9a2a02857c36ae7c91b3d365",
+      "before_sha256": "9e297015a5b3f5bfd04c50a63d49ca97883eb7ce9a2a02857c36ae7c91b3d365"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1_SYNTHETIC.json": {
+      "after_sha256": "e980dea70f15560d5c702acc1ada16ebf06f3d081fde8be2cd261b74e968da36",
+      "before_sha256": "e980dea70f15560d5c702acc1ada16ebf06f3d081fde8be2cd261b74e968da36"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1.md": {
+      "after_sha256": "27fca3b625af35b1b7bb41921535b48f2a8724284c8343abb45c041d171a81ad",
+      "before_sha256": "27fca3b625af35b1b7bb41921535b48f2a8724284c8343abb45c041d171a81ad"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1_SYNTHETIC.json": {
+      "after_sha256": "7d57ef1d256f374bbb3cedc8443e13f282d9e4241e164f93fa926be7941ee18a",
+      "before_sha256": "7d57ef1d256f374bbb3cedc8443e13f282d9e4241e164f93fa926be7941ee18a"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A.md": {
+      "after_sha256": "41e74d3eb23b8b11f567c3c11851761933df2fcdba385acd5b84105e45f41b73",
+      "before_sha256": "41e74d3eb23b8b11f567c3c11851761933df2fcdba385acd5b84105e45f41b73"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A_SYNTHETIC.json": {
+      "after_sha256": "8e2c4905aca55ff8493231a878419fb380d7f4c0f4f3ad176c0bff5b2fe6e66b",
+      "before_sha256": "8e2c4905aca55ff8493231a878419fb380d7f4c0f4f3ad176c0bff5b2fe6e66b"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_ADMIT_1.md": {
+      "after_sha256": "debcf824cfc0d6f7d3a4e233123974c3e116454a8be2afe24faf97e7f846302d",
+      "before_sha256": "debcf824cfc0d6f7d3a4e233123974c3e116454a8be2afe24faf97e7f846302d"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_ADMIT_1_BANK2.json": {
+      "after_sha256": "97a7162d2a9f60f094a87907861382c9e6f3dea03514fe827a697b53c5dcd86d",
+      "before_sha256": "97a7162d2a9f60f094a87907861382c9e6f3dea03514fe827a697b53c5dcd86d"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_APPROVE_1.md": {
+      "after_sha256": "6e54bbb84c4392b37a3e62aae6ca15aa7321d139e5c920990402d1c96efa4364",
+      "before_sha256": "6e54bbb84c4392b37a3e62aae6ca15aa7321d139e5c920990402d1c96efa4364"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_APPROVE_1_BANK2.json": {
+      "after_sha256": "f994ac99169dd3a4097a743fb55c9d315282b775d0748c1457ce44d2feb44940",
+      "before_sha256": "f994ac99169dd3a4097a743fb55c9d315282b775d0748c1457ce44d2feb44940"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_EXPAND_1.md": {
+      "after_sha256": "efab981df0e1eb269eb8327edd508071124981c140662efc63922bb083c34809",
+      "before_sha256": "efab981df0e1eb269eb8327edd508071124981c140662efc63922bb083c34809"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_EXPAND_1_BANK2.json": {
+      "after_sha256": "84eebb66a2a78db75fe33798db5e1f45cceb5c5083c1a5fc886d3783603cd2d1",
+      "before_sha256": "84eebb66a2a78db75fe33798db5e1f45cceb5c5083c1a5fc886d3783603cd2d1"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_PLAN_1.md": {
+      "after_sha256": "024cf304403b77077fecb5cf8ee720d6ad1ec830dcddaf70c1a4bf178ce5f5f5",
+      "before_sha256": "024cf304403b77077fecb5cf8ee720d6ad1ec830dcddaf70c1a4bf178ce5f5f5"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_PLAN_1_BANK2.json": {
+      "after_sha256": "e44f8cafab6f8a5d0336f9344ac016e5abd7fb28c6803d439848ad831740350f",
+      "before_sha256": "e44f8cafab6f8a5d0336f9344ac016e5abd7fb28c6803d439848ad831740350f"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_RECHECK_1.md": {
+      "after_sha256": "bc2e557c06a0260e6918057aeddd56fed7593d6e6fee831499c6b75a7af0fac8",
+      "before_sha256": "bc2e557c06a0260e6918057aeddd56fed7593d6e6fee831499c6b75a7af0fac8"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_RECHECK_1_BANK2.json": {
+      "after_sha256": "7943a1b7416eb1e30d45067c0fb94133bd526507ca049a409b2bde0075aea329",
+      "before_sha256": "7943a1b7416eb1e30d45067c0fb94133bd526507ca049a409b2bde0075aea329"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_REFRESH_1.md": {
+      "after_sha256": "65cf74e02f846b45e240d54baade6469f96c08492db2009d83c5c36d72cdad0e",
+      "before_sha256": "65cf74e02f846b45e240d54baade6469f96c08492db2009d83c5c36d72cdad0e"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PATCH_SCOPE_REFRESH_1_BANK2.json": {
+      "after_sha256": "5c0ad90d00ec560eb1162f90e76b497f76717e8aecc41c89754d70cca7847bad",
+      "before_sha256": "5c0ad90d00ec560eb1162f90e76b497f76717e8aecc41c89754d70cca7847bad"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PREFLIGHT_RUNTIME_1.md": {
+      "after_sha256": "d43cb58cf3d636ff4059cec688876ba274d74a486a0b766e943be93a1e5bf6a1",
+      "before_sha256": "d43cb58cf3d636ff4059cec688876ba274d74a486a0b766e943be93a1e5bf6a1"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json": {
+      "after_sha256": "1bda26a4fc288cf35d8d73f203af7819423f681dfd0ba7dee4b53b4587f61124",
+      "before_sha256": "1bda26a4fc288cf35d8d73f203af7819423f681dfd0ba7dee4b53b4587f61124"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_JAVA_1.md": {
+      "after_sha256": "1ac641eaf21aeff69adc0dda3781a05e909bd1a05e8a0180d8c100b942a4c93c",
+      "before_sha256": "1ac641eaf21aeff69adc0dda3781a05e909bd1a05e8a0180d8c100b942a4c93c"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_JAVA_1A.md": {
+      "after_sha256": "7e26653896b37bbadeba9675429697fbfa6326391054f0e539c5097c938359c0",
+      "before_sha256": "7e26653896b37bbadeba9675429697fbfa6326391054f0e539c5097c938359c0"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_JAVA_1A_LOCAL.json": {
+      "after_sha256": "09f64408b71a8f0eebf161a2b312ae68c93f8d993cd5b1c2d400e6815520044b",
+      "before_sha256": "09f64408b71a8f0eebf161a2b312ae68c93f8d993cd5b1c2d400e6815520044b"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_JAVA_1B.md": {
+      "after_sha256": "5f789b7a036066b0023bb3dc4ede723bef3ccd526819646787c7701a2ade1429",
+      "before_sha256": "5f789b7a036066b0023bb3dc4ede723bef3ccd526819646787c7701a2ade1429"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_JAVA_1B_LOCAL.json": {
+      "after_sha256": "ffa611d74d91ed685ea690f1be4d1bd785c8ee66aebb7ff3c79488fcf83a9925",
+      "before_sha256": "ffa611d74d91ed685ea690f1be4d1bd785c8ee66aebb7ff3c79488fcf83a9925"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_JAVA_1C.md": {
+      "after_sha256": "fc6118e27c479ac863b06f374a1133acf4951f41884b8b547ec99699e6686166",
+      "before_sha256": "fc6118e27c479ac863b06f374a1133acf4951f41884b8b547ec99699e6686166"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_JAVA_1C_ATTEMPT1.json": {
+      "after_sha256": "60c3fcb1763b2b186e4f1d964aa699686976ba95e0d511ff214f47a6da32c433",
+      "before_sha256": "60c3fcb1763b2b186e4f1d964aa699686976ba95e0d511ff214f47a6da32c433"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_JAVA_1C_LOCAL.json": {
+      "after_sha256": "7deec9280b20410ea399a4c233f0ccd2fa1dd6517e402f87bfc47af7e036e822",
+      "before_sha256": "7deec9280b20410ea399a4c233f0ccd2fa1dd6517e402f87bfc47af7e036e822"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_JAVA_1_LOCAL.json": {
+      "after_sha256": "bf73f4b738e3fd094b0034db2bd3cc00342f3c451a4d77760fa00947c48b7ede",
+      "before_sha256": "bf73f4b738e3fd094b0034db2bd3cc00342f3c451a4d77760fa00947c48b7ede"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_SANDBOX_1.md": {
+      "after_sha256": "609f39639fa2cd99b691a4635123a466e1325d4aa18cb0026f166eb77d8d3068",
+      "before_sha256": "609f39639fa2cd99b691a4635123a466e1325d4aa18cb0026f166eb77d8d3068"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json": {
+      "after_sha256": "9ff682d3459795cc0ccbd712dad8485288238b20ccfa5cde22334d5ca907bb7f",
+      "before_sha256": "9ff682d3459795cc0ccbd712dad8485288238b20ccfa5cde22334d5ca907bb7f"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_SANDBOX_2.md": {
+      "after_sha256": "ee32a7e0456fd76e574918ea97a07929e63423e521766f699d010ecf27fe1609",
+      "before_sha256": "ee32a7e0456fd76e574918ea97a07929e63423e521766f699d010ecf27fe1609"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_SANDBOX_2_LOCAL.json": {
+      "after_sha256": "eb858a574bfa781b4a6537d720847a58d622e403e0e28e9f9a3def05284c8394",
+      "before_sha256": "eb858a574bfa781b4a6537d720847a58d622e403e0e28e9f9a3def05284c8394"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/RUNTIME_SANDBOX_2_SECCOMP.json": {
+      "after_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "before_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/phase_registry.json": {
+      "after_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+      "before_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/scripts/replay_runtime_java1.py": {
+      "after_sha256": "d3f66af04eb582b8ea1276b270174482d69b6c4084d1e3c774af61b87f7764e6",
+      "before_sha256": "d3f66af04eb582b8ea1276b270174482d69b6c4084d1e3c774af61b87f7764e6"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/scripts/replay_runtime_java1a.py": {
+      "after_sha256": "553f9a30f38ba8d8831b3e8266d9195af1f11b977d1ffd616bb591ed7f776322",
+      "before_sha256": "553f9a30f38ba8d8831b3e8266d9195af1f11b977d1ffd616bb591ed7f776322"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/scripts/replay_runtime_java1b.py": {
+      "after_sha256": "ae11ec3ea431e1cb7a8acedbe9ea78127fbf8cce15168f563d0179718d3a3491",
+      "before_sha256": "ae11ec3ea431e1cb7a8acedbe9ea78127fbf8cce15168f563d0179718d3a3491"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/scripts/replay_runtime_java1c.py": {
+      "after_sha256": "72e38777679dc9d3033c1a8737a31251837e047c06981a13e68de7507482ac8f",
+      "before_sha256": "72e38777679dc9d3033c1a8737a31251837e047c06981a13e68de7507482ac8f"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/scripts/replay_runtime_sandbox1.py": {
+      "after_sha256": "97f4545e3701c1dbe1c2fa6a22525590b05be0822d1a7bad3e74ecd125563c36",
+      "before_sha256": "97f4545e3701c1dbe1c2fa6a22525590b05be0822d1a7bad3e74ecd125563c36"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/scripts/replay_runtime_sandbox2.py": {
+      "after_sha256": "757edc9b1e57db62915d51701433c8d9308ce645d963a7b95b2d338a71c325f7",
+      "before_sha256": "757edc9b1e57db62915d51701433c8d9308ce645d963a7b95b2d338a71c325f7"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/_runtime_java1_frozen_regressions.py": {
+      "after_sha256": "ef4a5808bbba60ffc1b499b23fc20a373ca6544c6e6f5bca3658979818f45263",
+      "before_sha256": "ef4a5808bbba60ffc1b499b23fc20a373ca6544c6e6f5bca3658979818f45263"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/_runtime_java1_maintenance.py": {
+      "after_sha256": "fe10b42d3be22d3e60d9f102ec07a1e169f6c781913d425ab4a67fd0cc6443c5",
+      "before_sha256": "fe10b42d3be22d3e60d9f102ec07a1e169f6c781913d425ab4a67fd0cc6443c5"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/_runtime_sandbox1_maintenance.py": {
+      "after_sha256": "41e36924002812cd4a652f59f062ed51467f7f03b623968b14751db6d4d0fba7",
+      "before_sha256": "41e36924002812cd4a652f59f062ed51467f7f03b623968b14751db6d4d0fba7"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/2026-09-10-harness-remediation-reversal.json": {
+      "after_sha256": "dc9da134dcfedec5d352d6d0a48d172f04b90133447f8b3dffd40153cf9dc34d",
+      "before_sha256": "dc9da134dcfedec5d352d6d0a48d172f04b90133447f8b3dffd40153cf9dc34d"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/answer_coherence_live1_reversal.json": {
+      "after_sha256": "be529151b36babe61d4a0cbe42cb604f2440860aa598bb83b7c7570da9a7e9fb",
+      "before_sha256": "be529151b36babe61d4a0cbe42cb604f2440860aa598bb83b7c7570da9a7e9fb"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/auth_dream1_reversal.json": {
+      "after_sha256": "cc3aa6e964226bf5d340cb0b2226eae8234a5260c354acbf0d4c01832111af99",
+      "before_sha256": "cc3aa6e964226bf5d340cb0b2226eae8234a5260c354acbf0d4c01832111af99"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/auth_web1_reversal.json": {
+      "after_sha256": "47fdde7a65648affd735a4e91d275ef91552522261d1abc13c1a7ffc840ab17f",
+      "before_sha256": "47fdde7a65648affd735a4e91d275ef91552522261d1abc13c1a7ffc840ab17f"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/auth_web_read1_reversal.json": {
+      "after_sha256": "b767cb5cb294a32721474d0eb79a233b0307bc7c7f49359a77e746922e5825a2",
+      "before_sha256": "b767cb5cb294a32721474d0eb79a233b0307bc7c7f49359a77e746922e5825a2"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/control_bootstrap1_reversal.json": {
+      "after_sha256": "de6056655057546e7965763c607ff526ea6c4adf01ffead501633320ada86bcb",
+      "before_sha256": "de6056655057546e7965763c607ff526ea6c4adf01ffead501633320ada86bcb"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/control_fresh1_reversal.json": {
+      "after_sha256": "2e1b1814a51cdb28756685383a2a7ac89971b161c3a43d1b211734ef132e9870",
+      "before_sha256": "2e1b1814a51cdb28756685383a2a7ac89971b161c3a43d1b211734ef132e9870"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/data_rollback1_reversal.json": {
+      "after_sha256": "5e3fba30858a2ca1da0d8ca479e3b547c691454ddcdc4b03a161fd79b6e6513b",
+      "before_sha256": "5e3fba30858a2ca1da0d8ca479e3b547c691454ddcdc4b03a161fd79b6e6513b"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/data_undo1_reversal.json": {
+      "after_sha256": "d3fab768ad79fd2c6d2bb19973fe904324e867ca71ccfc45ce9ebaec1430f4bb",
+      "before_sha256": "d3fab768ad79fd2c6d2bb19973fe904324e867ca71ccfc45ce9ebaec1430f4bb"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/exec_plan1_reversal.json": {
+      "after_sha256": "b6688a08ca51018d73e7342884bacfa1b39b231e21057bdcda7aac614e315549",
+      "before_sha256": "b6688a08ca51018d73e7342884bacfa1b39b231e21057bdcda7aac614e315549"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/indent_runtime1_reversal.json": {
+      "after_sha256": "3836212cd444d10ea8408eab4376e22f07895c4ffebee6cb17c5f5d4b60e53df",
+      "before_sha256": "3836212cd444d10ea8408eab4376e22f07895c4ffebee6cb17c5f5d4b60e53df"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/indent_semantics1_reversal.json": {
+      "after_sha256": "6dd9321a129bd5cc21ac4563bc2b0af394892b78fd79bbeb09bb2c4b381e0309",
+      "before_sha256": "6dd9321a129bd5cc21ac4563bc2b0af394892b78fd79bbeb09bb2c4b381e0309"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/oop_intent_continue1_reversal.json": {
+      "after_sha256": "b9bd2bcef2d9dd521ed77f1324e458c20b8c0721a965c54002804005c2d93e25",
+      "before_sha256": "b9bd2bcef2d9dd521ed77f1324e458c20b8c0721a965c54002804005c2d93e25"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/oop_intent_design1_reversal.json": {
+      "after_sha256": "99466461902ac4d69bf8e689c446da90ccc91cdafa3ce5d847179b297ae7a240",
+      "before_sha256": "99466461902ac4d69bf8e689c446da90ccc91cdafa3ce5d847179b297ae7a240"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_author_live2_contract_reversal.json": {
+      "after_sha256": "ea7e15c9d67f489c709776464550d8e3f38483f9b7a56cd971ec71ac2f0e021e",
+      "before_sha256": "ea7e15c9d67f489c709776464550d8e3f38483f9b7a56cd971ec71ac2f0e021e"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_author_live3_reversal.json": {
+      "after_sha256": "04aa9d32a0c2275b35e7ff59ddb0259a31465441396df4b322042ae5ee0d4a36",
+      "before_sha256": "04aa9d32a0c2275b35e7ff59ddb0259a31465441396df4b322042ae5ee0d4a36"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_author_scope1_reversal.json": {
+      "after_sha256": "554f5d7d251316ca9da232e7f0d427b3be4f992c1b5e1c2c84a4ea2eb837b6f5",
+      "before_sha256": "554f5d7d251316ca9da232e7f0d427b3be4f992c1b5e1c2c84a4ea2eb837b6f5"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_author_span1_reversal.json": {
+      "after_sha256": "0e60be49f61a7b03a4ef4a9ce8d5686bd05616b0bdb855ecb813509a1ff4e93b",
+      "before_sha256": "0e60be49f61a7b03a4ef4a9ce8d5686bd05616b0bdb855ecb813509a1ff4e93b"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_author_structural1_reversal.json": {
+      "after_sha256": "a055e5a87713993d7147579ea68fe25625e0795b06fa66655e97c445bc3e5288",
+      "before_sha256": "a055e5a87713993d7147579ea68fe25625e0795b06fa66655e97c445bc3e5288"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_basis_target1_reversal.json": {
+      "after_sha256": "92194b1df64a19bfc44324d47fec460e8f6d3549e3cc25d9c49319734539c2c6",
+      "before_sha256": "92194b1df64a19bfc44324d47fec460e8f6d3549e3cc25d9c49319734539c2c6"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_candidate_behavior_exec_admit1_reversal.json": {
+      "after_sha256": "26ab99af5e0ea3f8f7d757dc6d6e9f8f72fc5f8bf496bb6e3e81193cb3d63469",
+      "before_sha256": "26ab99af5e0ea3f8f7d757dc6d6e9f8f72fc5f8bf496bb6e3e81193cb3d63469"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_candidate_behavior_exec_plan1_reversal.json": {
+      "after_sha256": "fdaacc080955dff1d42e852398a9392030981ebbd48f59df6d0d032555439d02",
+      "before_sha256": "fdaacc080955dff1d42e852398a9392030981ebbd48f59df6d0d032555439d02"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_candidate_behavior_executor1_reversal.json": {
+      "after_sha256": "429295d7b064163a293afea47188292d2fd8dfbd867be966e6441b1ae9fd4538",
+      "before_sha256": "429295d7b064163a293afea47188292d2fd8dfbd867be966e6441b1ae9fd4538"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_candidate_behavior_reflect1_reversal.json": {
+      "after_sha256": "2634df72228d5bc9f1215624c38e1b7ff8cd51aa1bd5f78cde6aa8e0378d65ba",
+      "before_sha256": "2634df72228d5bc9f1215624c38e1b7ff8cd51aa1bd5f78cde6aa8e0378d65ba"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_candidate_behavior_spec1_reversal.json": {
+      "after_sha256": "d9d95a4c5d0d5c9873fdebb5ca62da0e1a44e26da03e66c8ea11b2d9782b1aa7",
+      "before_sha256": "d9d95a4c5d0d5c9873fdebb5ca62da0e1a44e26da03e66c8ea11b2d9782b1aa7"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_candidate_materialize1_reversal.json": {
+      "after_sha256": "c851b0d4a3969cd298ec800f30ea3f5208586eb64fafb0fea6d1fd91f3ae4821",
+      "before_sha256": "c851b0d4a3969cd298ec800f30ea3f5208586eb64fafb0fea6d1fd91f3ae4821"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_candidate_validate1a_reversal.json": {
+      "after_sha256": "e5254283eb8f1fb38d3a122edbd371ec24e1af159b75b36ad2fb4567da7c4a6a",
+      "before_sha256": "e5254283eb8f1fb38d3a122edbd371ec24e1af159b75b36ad2fb4567da7c4a6a"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_minimal_live2_safe_minimal_reversal.json": {
+      "after_sha256": "b19ea07841506efda4b822da685d3cb43641cdb514abf01bc7382782c8548d7c",
+      "before_sha256": "b19ea07841506efda4b822da685d3cb43641cdb514abf01bc7382782c8548d7c"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_minimal_live3_reversal.json": {
+      "after_sha256": "02a12c7db4a53d049e649eccf11540a28329bb5ae48e57f336c6f8c02ebc2c10",
+      "before_sha256": "02a12c7db4a53d049e649eccf11540a28329bb5ae48e57f336c6f8c02ebc2c10"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_scope_admit1_reversal.json": {
+      "after_sha256": "2f9a0786149613478554aeb255df7f8919b7ac8b296153348ef7a36b9dc3e178",
+      "before_sha256": "2f9a0786149613478554aeb255df7f8919b7ac8b296153348ef7a36b9dc3e178"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_scope_approve1_reversal.json": {
+      "after_sha256": "f1050a5fb75b6f7be85ebdaffc3f4631b501cb932d56fdcb088e9b88f5c8f815",
+      "before_sha256": "f1050a5fb75b6f7be85ebdaffc3f4631b501cb932d56fdcb088e9b88f5c8f815"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/patch_scope_plan1_reversal.json": {
+      "after_sha256": "081e178ecb781bc32d54616eb6f9076e8b6885c3bd1e62ca017d7a18686bfe0e",
+      "before_sha256": "081e178ecb781bc32d54616eb6f9076e8b6885c3bd1e62ca017d7a18686bfe0e"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/preflight_request1_reversal.json": {
+      "after_sha256": "9d6a868d4dc4b3de0e4d8c6c67eed614fcf2b256ea521618c304fb409fb1ec05",
+      "before_sha256": "9d6a868d4dc4b3de0e4d8c6c67eed614fcf2b256ea521618c304fb409fb1ec05"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/preflight_runtime1_reversal.json": {
+      "after_sha256": "c158a92a88cc9a7403d823e3ff5d45fccd6ef54cde5bdc703f834fb4983adf1a",
+      "before_sha256": "c158a92a88cc9a7403d823e3ff5d45fccd6ef54cde5bdc703f834fb4983adf1a"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/runtime_java1_reversal.json": {
+      "after_sha256": "18b41f3549c6c3dd73b141a8f15ab8aaa8a07e3efbd517fc408a953f65e9e135",
+      "before_sha256": "18b41f3549c6c3dd73b141a8f15ab8aaa8a07e3efbd517fc408a953f65e9e135"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/runtime_sandbox1_reversal.json": {
+      "after_sha256": "b93c55772993454a871cee0eb2baa232ef1c4979c347463e8ac8fef7b3d55c32",
+      "before_sha256": "b93c55772993454a871cee0eb2baa232ef1c4979c347463e8ac8fef7b3d55c32"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/sec_ui1_reversal.json": {
+      "after_sha256": "b9de3398d8a5691d918de8f875a8d539a10a65695938b00b0b20fb863b970771",
+      "before_sha256": "b9de3398d8a5691d918de8f875a8d539a10a65695938b00b0b20fb863b970771"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/ux_context1_reversal.json": {
+      "after_sha256": "877e9dbef5bb348a5cb76f04acd18a7dd21340d6828602eba4998347d3979245",
+      "before_sha256": "877e9dbef5bb348a5cb76f04acd18a7dd21340d6828602eba4998347d3979245"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/fixtures/ux_state1_reversal.json": {
+      "after_sha256": "f755fac120130c6f004982acfb95a83eb69e3286b210690eea4bec402d45d697",
+      "before_sha256": "f755fac120130c6f004982acfb95a83eb69e3286b210690eea4bec402d45d697"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/test_patch_candidate_behavior_reflect1.py": {
+      "after_sha256": "511014cf5c5c8c2a4556091d2c2f6dfbaed1d55802ccab74f61d3936f0c010ed",
+      "before_sha256": "511014cf5c5c8c2a4556091d2c2f6dfbaed1d55802ccab74f61d3936f0c010ed"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/test_runtime_java1.py": {
+      "after_sha256": "ab71e7ff6c983b508b9a06b67b525cef5aa1b14e75ddefa6875472fdd3264a2d",
+      "before_sha256": "ab71e7ff6c983b508b9a06b67b525cef5aa1b14e75ddefa6875472fdd3264a2d"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/test_runtime_java1_discovery.py": {
+      "after_sha256": "9ce83dea5c6b12dacd3b3b1148b962c5b18d7358321d744fcb1e53363f569f77",
+      "before_sha256": "9ce83dea5c6b12dacd3b3b1148b962c5b18d7358321d744fcb1e53363f569f77"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/test_runtime_java1_governance.py": {
+      "after_sha256": "04503cb9f337235923cedddc07b642f2c8f36369df8f2560beb2449a1c66205e",
+      "before_sha256": "04503cb9f337235923cedddc07b642f2c8f36369df8f2560beb2449a1c66205e"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/test_runtime_java1a.py": {
+      "after_sha256": "3f11fef0852db102966396ceb7c38de7f4b17587eedfd64b936031037a149d02",
+      "before_sha256": "3f11fef0852db102966396ceb7c38de7f4b17587eedfd64b936031037a149d02"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/test_runtime_java1b.py": {
+      "after_sha256": "d47dc1777d907a6400873e4c9aeba58320922dec3228b73a967c35e655baed37",
+      "before_sha256": "d47dc1777d907a6400873e4c9aeba58320922dec3228b73a967c35e655baed37"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/test_runtime_java1c.py": {
+      "after_sha256": "67a5b71e38550a671a20c7393f246d6740f8faed7de60d32ff87857e5ae2fe3a",
+      "before_sha256": "67a5b71e38550a671a20c7393f246d6740f8faed7de60d32ff87857e5ae2fe3a"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/test_runtime_sandbox1.py": {
+      "after_sha256": "1c20c787dca61ef83c01ec44ebecd6b6b509c41663af55af907a2922d8e62d29",
+      "before_sha256": "1c20c787dca61ef83c01ec44ebecd6b6b509c41663af55af907a2922d8e62d29"
+    },
+    "C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/tests/test_runtime_sandbox2.py": {
+      "after_sha256": "b492f70ae45d6c3e4e09173e24b7b1396cae75fa9885edf4c4ff00815202e08c",
+      "before_sha256": "b492f70ae45d6c3e4e09173e24b7b1396cae75fa9885edf4c4ff00815202e08c"
+    }
+  },
+  "harness_rendered": false,
+  "harness_sha256": null,
+  "historical_executor_relabelled": false,
+  "host_java_artifacts_created": 0,
+  "java1_authentication": "not_attempted_authorization_gate_blocked",
+  "measured_observations": null,
+  "new_implementation_sha256": {
+    "core/behavioral_diagnostic_executor_refresh.py": "ffb031b5693f3f0fcfefc92daa4f968e907a137ffd2c4a13e86a010f9630c157",
+    "scripts/replay_patch_candidate_behavior_executor1r.py": "c9e3fc6d417fa577645f89cecadd8be69595cc880ab49f1d226d3090c3360646",
+    "tests/test_patch_candidate_behavior_executor1r.py": "dc3d5b13b5f205bfa0d3343814252325133d153d0cbda6c25d116faba3e6774d"
+  },
+  "original_baseline_path_binding_count": 143,
+  "phase_containers_created": 0,
+  "phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+  "positive_runtime_receipt": null,
+  "protected_historical_file_count": 129,
+  "real_runtime_authority_available": false,
+  "reason": "existing_synthetic_issuer_cannot_reconstruct_independent_scenario",
+  "remaining_phase_containers": null,
+  "requested_binding": {
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "member": "value",
+    "operation": "read_exact_bound_field",
+    "owner": "SyntheticStateBox",
+    "phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "public_invocation": "decrement(3)",
+    "requested_after": 7,
+    "requested_before": 10,
+    "requested_return": true,
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "type": "int"
+  },
+  "runtime_stage": null,
+  "sandbox2_authentication": "not_attempted_authorization_gate_blocked",
+  "source_projected": false,
+  "status": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_BLOCKED_AUTHORIZATION",
+  "synthetic_authorization": null,
+  "validation": {
+    "benchmarks_check": {
+      "agent_calls": 0,
+      "cases": 54,
+      "errors": 0
+    },
+    "blocked_receipt_replay_and_source_binding": "passed",
+    "compileall": "passed",
+    "focused_tests": {
+      "failed": 0,
+      "passed": 12
+    },
+    "git_diff_check": "passed",
+    "historical_hash_recheck": {
+      "byte_identical": true,
+      "files": 129
+    },
+    "initial_extended_regression_attempt": {
+      "completed": false,
+      "counted_as_passed": false,
+      "failures_reported_before_interruption": 0,
+      "reason": "Interrupted to select relevant blocked-authority regressions after slow BANK-lineage reconstruction"
+    },
+    "live_runtime_verification": "not_attempted_mandatory_authorization_stop",
+    "new_file_whitespace_check": "passed_5_files",
+    "reflection_runtime_tests": "not_run_pure_exact_bound_regressions_selected",
+    "required_adjacent_regressions": {
+      "duration_seconds": 275.27,
+      "failed": 0,
+      "frozen_registry_projection": "tests._runtime_java1_frozen_regressions in memory only",
+      "includes_focused_tests": true,
+      "passed": 1006,
+      "scope": [
+        "full SANDBOX.1/2 and JAVA.1 discovery/governance/1A/1B/1C test modules",
+        "selected EXECUTOR.1 historical blocked and effect-denial regressions",
+        "selected PREFLIGHT.RUNTIME.1 real/synthetic authority separation regressions",
+        "selected pure REFLECT.1 exact-binding and native-double regressions",
+        "authority, Apply, single-file path and patch safety modules",
+        "registry and picker modules"
+      ],
+      "warning": "Existing google.genai _UnionGenericAlias deprecation for Python 3.17",
+      "warnings": 1
+    }
+  },
+  "verification_date_kst": "2026-10-08"
+}

@@ -1,0 +1,3230 @@
+{
+  "applies_patches": false,
+  "blocked": [
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "blocked",
+      "budget_tier": "blocked",
+      "phase_id": "RUNTIME.JAVA.1",
+      "reasons": [
+        "budget_tier is blocked"
+      ],
+      "recommended_next_step": "blocked_until_metadata_fixed",
+      "risk_level": "medium",
+      "status": "active",
+      "title": "Verified Java Toolchain Availability and Exact Sandboxed Execution Surface",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "blocked",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1",
+      "reasons": [
+        "risk_level is blocked"
+      ],
+      "recommended_next_step": "blocked_until_metadata_fixed",
+      "risk_level": "blocked",
+      "status": "active",
+      "title": "Bounded Ephemeral Java Diagnostic Executor",
+      "track": "CONTROL"
+    }
+  ],
+  "boundaries": {
+    "applies_patches": false,
+    "calls_models": false,
+    "classifies_metadata_only": true,
+    "contacts_remote_or_chat_or_automation": false,
+    "executes_phases": false,
+    "modifies_real_repo": false,
+    "pushes_merges_or_opens_pr": false,
+    "runs_validation_or_benchmarks": false
+  },
+  "bucket_counts": {
+    "blocked": 2,
+    "complete_or_history": 219,
+    "deferred_or_parked": 0,
+    "human_approval_required": 0,
+    "safe_to_prepare": 3,
+    "sandbox_required": 1
+  },
+  "complete_or_history": [
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ROAD.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Machine-Readable Phase Registry",
+      "track": "ROAD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ROAD.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Phase Picker / Night Candidate Report",
+      "track": "ROAD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ROAD.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Post-MODEL Checkpoint Audit",
+      "track": "ROAD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ROAD.4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Post-EVAL/CMD Checkpoint Audit",
+      "track": "ROAD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "AUTO.2a",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Telegram Evidence Summary Contract",
+      "track": "AUTO"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MODEL.CLOSE",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Model Role Planning Checkpoint",
+      "track": "MODEL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MODEL.N1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Model Role Registry / Tower Card Contract",
+      "track": "MODEL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MODEL.N2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Model Role Coverage Report",
+      "track": "MODEL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MODEL.N3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Model Role Gap Plan",
+      "track": "MODEL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MODEL.N4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Model Role Catalog Update Proposal",
+      "track": "MODEL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MODEL.N5",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Model Role Catalog Proposal Review",
+      "track": "MODEL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MODEL.N6",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Model Role Catalog Adoption Plan",
+      "track": "MODEL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MODEL.N7",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Model Role Catalog Adoption Readiness Check",
+      "track": "MODEL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVAL.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Live Benchmark Run Ledger",
+      "track": "EVAL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVAL.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Benchmark Report Compare / Single-Case Flake Evidence",
+      "track": "EVAL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVAL.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Flake Classification Report",
+      "track": "EVAL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVAL.CLOSE",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Evidence Quality Branch Checkpoint",
+      "track": "EVAL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVAL.N1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Evidence Quality Planning",
+      "track": "EVAL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVAL.N2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Evidence Quality Report Contract",
+      "track": "EVAL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVAL.N3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Evidence Quality Report Builder",
+      "track": "EVAL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVAL.N4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Evidence Quality Artifact Loader Plan",
+      "track": "EVAL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVAL.N5",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Evidence Quality Read-only UI Stub",
+      "track": "EVAL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVAL.N6",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Evidence Quality GET-only Artifact Loader",
+      "track": "EVAL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVAL.N7",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Evidence Quality Loader Readiness Check",
+      "track": "EVAL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HUMAN.CLOSE",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Human Authority Branch Checkpoint",
+      "track": "HUMAN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HUMAN.N1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Human Review Boundary Map",
+      "track": "HUMAN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HUMAN.N2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Human Approval Token / Confirmation Contract",
+      "track": "HUMAN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HUMAN.N3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Human Approval Token Dry-Run Validator",
+      "track": "HUMAN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HUMAN.N4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Human Approval Token Sample Catalog",
+      "track": "HUMAN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ADOPT.MODEL.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Human-Approved Model Role Catalog Adoption",
+      "track": "ADOPT"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ADOPT.MODEL.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Post-Adoption Role Coverage Recheck",
+      "track": "ADOPT"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ADOPT.MODEL.CLOSE",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Model Catalog Adoption Branch Checkpoint",
+      "track": "ADOPT"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CMD.CLOSE",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Commander Planning Branch Checkpoint",
+      "track": "CMD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CMD.N1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Boss Half-Life Fracture Plan",
+      "track": "CMD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CMD.N2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Manual Boss Fracture Report",
+      "track": "CMD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CMD.N3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Commander Fracture Tree Schema / Registry",
+      "track": "CMD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CMD.N4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Commander Preflight Contract",
+      "track": "CMD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CMD.N5",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Commander Manual Assignment Plan",
+      "track": "CMD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CMD.N6",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Commander Assignment Review Pack",
+      "track": "CMD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HARDEN.CLOSE",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Approval Enforcement Planning Branch Checkpoint",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HARDEN.N1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Approval Enforcement Readiness Audit",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HARDEN.N2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Approval Enforcement Attachment Plan",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HARDEN.N3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Approval Enforcement Dry-Run Gate Simulator",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HARDEN.N4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Approval Enforcement Operator Report",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HARDEN.PROGRESS.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Early Error Terminal Snapshot Coverage",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OPS.TEST.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Test Suite Runtime Profile Audit",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OPS.TEST.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Slow Test Timing Collector",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OPS.TEST.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Suite Split Manifest Plan",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OPS.TEST.CLOSE",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Test Runtime Operations Branch Checkpoint",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Operator Cockpit & Idea Intake Plan",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Run Timeline / Progress Surface",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Continue-from-Frame Contract",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Mixed Mode Intent Router Preview",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.5",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Goal Brief 4W1H Simplifier",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.6",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Evidence Card Layout",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.7",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Cockpit Navigation & Action Hierarchy Cleanup",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.8",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Cockpit Usability Checkpoint",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.9",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Unified Workbench Input Plan",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.10",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Unified Workbench Input Visual Integration",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.11",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Unified Workbench Behavior Preservation Check",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.CLOSE",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "UX Branch Freeze Checkpoint",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Run Progress Instrumentation Plan",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.LIVE.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Run Progress Snapshot Writer Plan",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.LIVE.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Run Progress Snapshot Writer Shadow Mode",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.LIVE.4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Narrow Multi-Stage Shadow Instrumentation",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.LIVE.5",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Current Run Snapshot Association",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.LIVE.6",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Manual Run Progress Refresh",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.LIVE.7",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Snapshot Freshness and Staleness Plan",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.LIVE.8",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Freshness Classification Implementation",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.LIVE.9",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Bounded Progress Polling Experiment Plan",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.LIVE.10",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Optional Default-Off Bounded Progress Polling",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.LIVE.CLOSE",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Live Run Progress Branch Checkpoint",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.RUN.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Run Progress / Operator Visibility",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.RUN.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Run Progress Snapshot Loader",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.RUN.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Run Progress UI Panel Stub",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.RUN.CLOSE",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Run Progress Visibility Branch Checkpoint",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "DOGFOOD.1A",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Live Progress Operator Evaluation Framework",
+      "track": "DOGFOOD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Mirror Tunnel Trace Contract",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Mirror Tunnel Derailment Score Report",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Claim-vs-Diff Mirror Check",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Real Run Trace Ingestion Plan",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.5",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Manual Trace Assembler",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.6",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Manual Trace Score Pipeline",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.7",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Shadow Live Trace Writer",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.8",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Live Trace Scoring Preview",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.9",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Live Trace Operator Report Panel Plan",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.10",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Operator Panel Read-only UI Stub",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.11",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Operator Panel Artifact Loader Preview",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.CLOSE",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Mirror Tunnel Branch Checkpoint",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.CLOSE3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Mirror Tunnel Live UI Readiness Checkpoint",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ACQUIRE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Bounded Evidence Acquisition Request Contract",
+      "track": "ACQUIRE"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ACQUIRE.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Bounded Candidate Eligibility & Selector Bridge",
+      "track": "ACQUIRE"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CHECK.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Post-Run Contract Reconciliation",
+      "track": "CHECK"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CHECK.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Post-Run Goal-Fidelity Verification Contract",
+      "track": "CHECK"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CLAIM.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Bounded Proposition Assessment Contract",
+      "track": "CLAIM"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CTX.OOP.1A",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Java Class Semantic Projection Core",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CTX.OOP.1B",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Bounded OOP Reasoning Context Attachment",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CTX.OOP.1C",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "OOP Semantic Review and Intent-Gap Contract",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CTX.SELECT.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Bounded Candidate Discovery & File Actionability Contract",
+      "track": "CTX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVIDENCE.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Evidence Set Coverage, Conflict & Independence Contract",
+      "track": "EVIDENCE"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INDEX.1D.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Dual Graph Lifecycle Contract",
+      "track": "INDEX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INPUT.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Lossless Task Contract & Semantic Waiter Boundary",
+      "track": "INPUT"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OOP.INTENT.DESIGN.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Explicit Future-Design Commitment Projection",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "SYNTHESIS.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Task-Shaped Claim Composition Contract",
+      "track": "SYNTHESIS"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "WAITER.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Deterministic Capability-Based Execution Router",
+      "track": "WAITER"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "WAITER.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Deterministic Evidence Requirement Contract",
+      "track": "WAITER"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "WORKER.DECL.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Native Worker Declaration Source Qualification & Wiring",
+      "track": "WORKER"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MODEL.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "C.A.T.T.U.S Artifact Dataset Builder",
+      "track": "MODEL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "SEC.UI.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Untrusted Evidence Active-Content Boundary",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "DEFECT.PROBE.LIVE.4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Depth-Variant Behavioral Discrimination Matrix",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "DEFECT.PROBE.LIVE.5",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Distribution-Skew Indentation Unit Discrimination",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INDENT.RUNTIME.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Language Context Transport & Repair Boundary",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INDENT.SEMANTICS.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Language-Aware Indentation Observation Contract",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "REPAIR.INTENT.UI.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Waiting Session Presentation Contract",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ANSWER.COHERENCE.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Candidate-Bound Final Response Provenance",
+      "track": "CHECK"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ANSWER.GROUND.LIVE.4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Structured Payload Non-Interference",
+      "track": "CHECK"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INPUT.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Progressive Intake Completion & Clarification Policy",
+      "track": "INPUT"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.AUTHOR.LIVE.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Self-Contained Authoring Contract Parity",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.AUTHOR.LIVE.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Concrete Counterexample Materialization and Truthful Authoring Scope",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXEC.ADMIT.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Partial Diagnostic Behavioral Execution Admission",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXEC.PLAN.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Bounded Behavioral Evidence Execution Planning",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.CANDIDATE.BEHAVIOR.REFLECT.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Exact Read-Only Reflection Diagnostic Capability",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.CANDIDATE.BEHAVIOR.SPEC.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Typed Behavioral Validation Specification",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.MINIMAL.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Exact No-Op Candidate Rejection",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.MINIMAL.LIVE.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Bounded Local Implementation Novelty",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.MINIMAL.LIVE.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Authoritative Bindings and Proven Immutable Result-Field Reads",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PREFLIGHT.RUNTIME.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "low",
+      "status": "complete",
+      "title": "Bounded Runtime Diagnostic Authorization Contract",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "AUTO.2b",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "GitHub Remote PR Safety Contract",
+      "track": "AUTO"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CMD.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Commander Run Contract",
+      "track": "CMD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CMD.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Task Decomposition Preview",
+      "track": "CMD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CMD.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Budget Governor Preview",
+      "track": "CMD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CMD.4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Commander Readiness / Stop Condition Report",
+      "track": "CMD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HARDEN.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Web Mutation Auth / CSRF Gate",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HARDEN.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Web Mutation Surface Audit",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "HARDEN.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Safe Validation / MCP Approval Enforcement Audit",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.12",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Mirror Tunnel Live Trace Demo Run / Readiness Check",
+      "track": "MIRROR"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CHECK.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Shadow Post-Run Reconciliation Wiring",
+      "track": "CHECK"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CHECK.LIVE.1B",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Independent Typed Worker Declaration Wiring",
+      "track": "CHECK"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INDEX.1E.0",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Delta Integration Preflight & Known-Failure Baseline",
+      "track": "INDEX"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "WORKER.DECL.2A",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Strict Structured Patch Response Envelope",
+      "track": "WORKER"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "WORKER.DECL.2A.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Strict Envelope Emission Adoption Experiment",
+      "track": "WORKER"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "complete_or_history",
+      "budget_tier": "strong_model_requires_approval",
+      "phase_id": "WORKER.DECL.2A.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Live Strict Envelope Adoption Dogfood",
+      "track": "WORKER"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "AUTO.2c",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "n8n Orchestration Dry Run",
+      "track": "AUTO"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MODEL.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Driver Classifier Baseline",
+      "track": "MODEL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "MODEL.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Lesson Graph Activation Dataset",
+      "track": "MODEL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "AUTH.DREAM.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Reviewed Candidate Exact Binding for Dream Apply",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "AUTH.WEB.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Same-Origin Request Integrity & Usable Local UI Authentication",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "AUTH.WEB.READ.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Trusted Host & Sensitive Read Boundary",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "DATA.ROLLBACK.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Verified Rollback Truthfulness & Recoverable Failure State",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "DATA.UNDO.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Repository-Scoped Backup Identity & Exact Undo Binding",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EXEC.PLAN.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Validate-Before-Mutate & Transaction Containment",
+      "track": "HARDEN"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CANDIDATE.VERIFY.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Read-Only Candidate Verification Before Human Review",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "DEFECT.FACT.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Typed Behavioral Expectation Handoff",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "DEFECT.PROBE.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Bounded Defect Reproduction Evidence",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "DEFECT.PROBE.LIVE.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Immutable Pre/Post Candidate Reproduction Closure",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "DEFECT.PROBE.LIVE.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Paired Defect-Fix & Behavior-Preservation Oracle",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EXEC.AUTH.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Execution Authorization & Outcome Telemetry Reconciliation",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EXEC.POLICY.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Evidence-Bounded Large-Repository Execution Eligibility",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OPS.PATCH.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Byte-Preserving Multi-File Apply & Rollback",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OPS.PATCH.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Explicit-Change Candidate Sandbox Validation",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OPS.VALIDATE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Real Repository Validation Recovery",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OPS.VALIDATE.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Timeout Truthfulness, Budget Exhaustion & Python Cache Freshness",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OPS.VALIDATE.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Bounded Targeted Repository Validation",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "VALIDATE.ORACLE.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Existing Check Role & Candidate-Oracle Conflict Classification",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OOP.INTENT.UI.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Durable OOP Clarification Session Adapter",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.CONTEXT.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Run / Repository Context Binding",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "UX.STATE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Repository / Run / Candidate State Ownership & Truthful Actions",
+      "track": "UX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ACQUIRE.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Bounded Content Acquisition & Source Receipt",
+      "track": "ACQUIRE"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ANALYSIS.EVIDENCE.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Role-Balanced Source Evidence Acquisition",
+      "track": "WAITER"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ANALYSIS.MULTIROOT.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Explicit Read-Only Multi-Repository Evidence Contract",
+      "track": "WAITER"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ANSWER.GROUND.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Repository Entity Claim Grounding & Evidence-Bounded Fallback",
+      "track": "CHECK"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ANSWER.GROUND.LIVE.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Bare Symbol & Qualified Member Claim Grounding",
+      "track": "CHECK"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "ANSWER.GROUND.LIVE.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Non-Destructive Evidence-Gap Remediation & Exact Path Boundaries",
+      "track": "CHECK"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "strong_model_requires_approval",
+      "phase_id": "CONTROL.BOOTSTRAP.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Explicit-Target Direct Context Bootstrap",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CONTROL.FRESH.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Explicit No-Prior-Run Context Contract",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CONTROL.LOCALIZE.LIVE.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Entry-Anchored Hypothesis Relevance",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CONTROL.SAFETY.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Localization Rank / Patch Authority Separation",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CTX.APPLY.0",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Direct Context Patch Safety Attachment",
+      "track": "CTX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CTX.PATCH.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Direct Context Patch Candidate Gate",
+      "track": "CTX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CTX.READ.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Bounded Direct File Read Runtime",
+      "track": "CTX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "CTX.SEARCH.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Bounded Lexical Search Runtime",
+      "track": "CTX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EVIDENCE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Acquired Source Verification & Evidence Promotion Contract",
+      "track": "EVIDENCE"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INDEX.1D.2A",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Canonical Repository Identity Primitive",
+      "track": "INDEX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INDEX.1D.2B",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Identity Confirmation & Architecture Epoch State",
+      "track": "INDEX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INDEX.1D.2C",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Honest Persistence Completion Contract",
+      "track": "INDEX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INDEX.1D.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Traversal Budget Closure",
+      "track": "INDEX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INPUT.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Semantic Waiter Model Adapter & Semantic Evaluation",
+      "track": "INPUT"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INPUT.PRESERVE.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Lossless Long-Obligation Transport",
+      "track": "INPUT"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OOP.INTENT.CONTINUE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Human Clarification Answer to Typed Design Continuation",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "OOP.INTENT.DETECT.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Missing Future-Design Contract Admission",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "strong_model_requires_approval",
+      "phase_id": "PATCH.AUTHOR.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Verification-Guided Single Revision",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.AUTHOR.SCOPE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Measured Repair-Set Authoring Scope",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.AUTHOR.SPAN.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Repair-Envelope Target / Replacement Alignment",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "strong_model_requires_approval",
+      "phase_id": "PATCH.AUTHOR.STRUCTURAL.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Admitted Structural Scope to Read-Only Multi-Target Candidate Authoring",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.BASIS.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Typed Patch Basis & Failure-Relevance Binding",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.BASIS.SCOPE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Measured Same-File Multi-Definition Repair Scope",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.BASIS.TARGET.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Structural Short-Identifier Target Source Grounding",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.CANDIDATE.MATERIALIZE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Structural Candidate to Immutable Virtual File-Set Materialization",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.CANDIDATE.VALIDATE.1A",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Virtual Java Compile Validation",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.SCOPE.ADMIT.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Deterministic Structural Plan to Concrete Authoring Scope Admission",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.SCOPE.APPROVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Human Structural Scope Ceiling Approval",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.SCOPE.EXPAND.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Evidence-Bound Structural Scope Expansion Proposal",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "strong_model_requires_approval",
+      "phase_id": "PATCH.SCOPE.PLAN.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Read-Only Implementation Plan Within Approved Structural Ceiling",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.SCOPE.RECHECK.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Scope-Discovered Semantic Recheck",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PATCH.SCOPE.REFRESH.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Semantically Revised Structural Scope Re-Proposal",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "PREFLIGHT.REQUEST.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Typed Diagnostic Evidence Request & Java Compile Adapter",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "REPAIR.INTENT.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Typed Semantic Ambiguity and User Clarification Handoff",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "REPAIR.INTENT.ADMIT.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Author Escalation Admission and Candidate Quarantine",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "REPAIR.INTENT.DETECT.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Harness-Owned State Ownership Ambiguity Admission",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "REPAIR.INTENT.GROUND.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "System-Owned Semantic Gap Source Anchors",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "RETRIEVE.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Candidate Population Hygiene & Symbol Eligibility",
+      "track": "INDEX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "RETRIEVE.LIVE.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Query-to-Symbol Entry Recall & Identifier Decomposition",
+      "track": "INDEX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "RETRIEVE.LIVE.3",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Production Query-Recall Path Unification",
+      "track": "INDEX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "RETRIEVE.LIVE.4",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Repository-Specificity Weighted Entry Ordering",
+      "track": "INDEX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "RUNTIME.SANDBOX.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Verified OS-Enforced Candidate Runtime Isolation Adapter",
+      "track": "CONTROL"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "WAITER.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "medium",
+      "status": "complete",
+      "title": "Live Task-Shape Routing & Change-Need Separation",
+      "track": "WAITER"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "EXEC.APPROVAL.LIVE.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "high",
+      "status": "complete",
+      "title": "Human Apply Binding, Freshness Revalidation & Authorization Handoff",
+      "track": "OPS"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INDEX.1E.1",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "high",
+      "status": "complete",
+      "title": "Manifest Load and Shadow Delta Plan Dispatch",
+      "track": "INDEX"
+    },
+    {
+      "automation_level": "LOCAL_1_PREPARE",
+      "bucket": "complete_or_history",
+      "budget_tier": "local_only",
+      "phase_id": "INDEX.1E.2",
+      "reasons": [
+        "status is complete (shipped history)"
+      ],
+      "recommended_next_step": "no_action_complete",
+      "risk_level": "high",
+      "status": "complete",
+      "title": "Verified No-Change Fast Path",
+      "track": "INDEX"
+    }
+  ],
+  "created_at": "2026-10-10T00:00:00+00:00",
+  "deferred_or_parked": [],
+  "errors": [],
+  "executes_phases": false,
+  "guardrail_note": "Phase Picker / Night Candidate Report is report-only: it reads the ROAD.1 phase registry and classifies phases into safe-candidate buckets. It does not choose and execute work, run phases, run validation or a benchmark check, call models, apply patches, write to the real repo, push, merge, open PRs, or contact a remote git host, chat app, or external automation. ROAD.2 only recommends; human approval is required before any phase is acted on.",
+  "human_approval_required": [],
+  "model_call_performed": false,
+  "phase_count": 225,
+  "registry_path": "docs/roadmap/phase_registry.json",
+  "registry_valid": true,
+  "report_id": "preladder-preservation",
+  "report_kind": "phase_picker_report",
+  "runs_validation_or_benchmarks": false,
+  "safe_to_prepare": [
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "safe_to_prepare",
+      "budget_tier": "local_only",
+      "phase_id": "DOGFOOD.1B",
+      "reasons": [
+        "status is proposed",
+        "automation_level LOCAL_0_OBSERVE is local",
+        "budget_tier is local_only",
+        "risk_level is low",
+        "no network, model calls, merge, or real-repo writes",
+        "allowed_files and validation are declared"
+      ],
+      "recommended_next_step": "prepare_worker_assignment",
+      "risk_level": "low",
+      "status": "proposed",
+      "title": "Real Operator Run Evaluation",
+      "track": "DOGFOOD"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "safe_to_prepare",
+      "budget_tier": "local_only",
+      "phase_id": "VERIFY.TEST.1",
+      "reasons": [
+        "status is proposed",
+        "automation_level LOCAL_0_OBSERVE is local",
+        "budget_tier is local_only",
+        "risk_level is low",
+        "no network, model calls, merge, or real-repo writes",
+        "allowed_files and validation are declared",
+        "prerequisites not yet complete: DOGFOOD.1B"
+      ],
+      "recommended_next_step": "complete_prerequisites",
+      "risk_level": "low",
+      "status": "proposed",
+      "title": "Test Design and TDD Planning",
+      "track": "VERIFY"
+    },
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "safe_to_prepare",
+      "budget_tier": "local_only",
+      "phase_id": "MIRROR.13",
+      "reasons": [
+        "status is proposed",
+        "automation_level LOCAL_0_OBSERVE is local",
+        "budget_tier is local_only",
+        "risk_level is low",
+        "no network, model calls, merge, or real-repo writes",
+        "allowed_files and validation are declared"
+      ],
+      "recommended_next_step": "prepare_worker_assignment",
+      "risk_level": "low",
+      "status": "proposed",
+      "title": "Live Trace Frame Capture Quality Plan",
+      "track": "MIRROR"
+    }
+  ],
+  "sandbox_required": [
+    {
+      "automation_level": "LOCAL_0_OBSERVE",
+      "bucket": "sandbox_required",
+      "budget_tier": "strong_model_requires_approval",
+      "phase_id": "WORKER.DECL.2B",
+      "reasons": [
+        "requires_sandbox is true",
+        "allowed_files include patch/sandbox-related paths"
+      ],
+      "recommended_next_step": "prepare_sandbox_trial_contract",
+      "risk_level": "medium",
+      "status": "active",
+      "title": "Pre-Execution Change Intent Channel",
+      "track": "WORKER"
+    }
+  ],
+  "top_recommendation": {
+    "automation_level": "LOCAL_0_OBSERVE",
+    "bucket": "safe_to_prepare",
+    "budget_tier": "local_only",
+    "phase_id": "DOGFOOD.1B",
+    "reasons": [
+      "status is proposed",
+      "automation_level LOCAL_0_OBSERVE is local",
+      "budget_tier is local_only",
+      "risk_level is low",
+      "no network, model calls, merge, or real-repo writes",
+      "allowed_files and validation are declared"
+    ],
+    "recommended_next_step": "prepare_worker_assignment",
+    "risk_level": "low",
+    "status": "proposed",
+    "title": "Real Operator Run Evaluation",
+    "track": "DOGFOOD"
+  },
+  "warnings": [],
+  "writes_real_repo": false
+}

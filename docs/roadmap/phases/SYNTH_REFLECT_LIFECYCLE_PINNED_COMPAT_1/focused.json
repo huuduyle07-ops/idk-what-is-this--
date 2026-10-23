@@ -1,0 +1,52 @@
+{
+  "all_operational_effects_zero": true,
+  "audit_guard": {
+    "capability_or_transition_attempts": 0,
+    "execution_or_verification_attempts": 0,
+    "network_attempts": 0,
+    "process_attempts": 0,
+    "repository_write_attempts": 0
+  },
+  "blocked_actions": [],
+  "bytecode_writes_disabled": true,
+  "collected": 23,
+  "exit_code": 0,
+  "external_scratch": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\13\\01a13412-9a2f-7620-b4e6-91221829dc02\\cattus-reflect-pinned-audit-wd7wtzis",
+  "failed": [],
+  "focused_test_sha256": "86489cd4eef9c5fa2015382be733dc719460cf126c7a18f5caba47d29b5f843f",
+  "full_issuance_dependent_suites_run": false,
+  "mode": "focused",
+  "passed_count": 23,
+  "passed_nodes": [
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_pinned_scenario_field_coincidence_preserves_separate_exact_domains",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_old_public_runtime_validator_rejects_inert_pinned_class_and_exports[exact_pinned]",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_old_public_runtime_validator_rejects_inert_pinned_class_and_exports[copy]",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_old_public_runtime_validator_rejects_inert_pinned_class_and_exports[deepcopy]",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_old_public_runtime_validator_rejects_inert_pinned_class_and_exports[JSON]",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_old_public_runtime_validator_rejects_inert_pinned_class_and_exports[namespace]",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_frozen_reflection_rejects_pinned_authorization_before_accepting_runtime[exact_private_state_before]",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_frozen_reflection_rejects_pinned_authorization_before_accepting_runtime[exact_private_state_after]",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_frozen_consumer_imports_public_exact_old_owner_validators",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_exact_old_runtime_type_gate_precedes_registry_and_live_identity_checks",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_frozen_admission_binds_old_auth_request_renderer_but_no_runtime_lease_or_provider",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_reflection_lease_projects_runtime_and_old_authorization_identity",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_reflection_validation_reauthenticates_live_upstreams_and_signed_current_state",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_runtime_state_is_authenticated_through_old_public_state_api",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_issuance_and_precheck_require_issued_runtime_for_both_roles",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_active_precheck_and_reflection_consumption_require_consumed_runtime_for_both_roles",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_before_after_sequence_preserves_pinned_first_behavior_boundary_and_compile_dependency",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_exact_read_primitive_literals_are_authorization_epoch_independent[_BEFORE_HELPER]",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_exact_read_primitive_literals_are_authorization_epoch_independent[_AFTER_HELPER]",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_positive_frozen_lifecycle_and_reflection_verifiers_are_outside_zero_issuance_scope",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_historical_executor_blocked_semantics_remain_source_only[behavioral_diagnostic_executor_refresh-existing_synthetic_issuer_cannot_reconstruct_independent_scenario]",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_historical_executor_blocked_semantics_remain_source_only[behavioral_diagnostic_executor_retry-frozen_synth_auth_1_has_no_public_consumption_contract]",
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py::test_historical_executor_blocked_semantics_remain_source_only[behavioral_diagnostic_executor_lifecycle_retry-java_profile_contract_mismatch]"
+  ],
+  "production_registries_seeded": false,
+  "production_validators_patched": false,
+  "selected_nodes": [
+    "tests/test_synthetic_reflection_lifecycle_pinned_compat.py"
+  ],
+  "skipped": [],
+  "validator_source_sha256": "79999f992f04031abf5a655b010be7ab1134ea3aa79ded9b702f8f6bb0032705"
+}

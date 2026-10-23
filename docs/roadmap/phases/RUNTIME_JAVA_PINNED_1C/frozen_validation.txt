@@ -1,0 +1,54 @@
+........................................................................ [  5%]
+........................................................................ [ 11%]
+........................................................................ [ 17%]
+........................................................................ [ 23%]
+........................................................................ [ 29%]
+........................................................................ [ 35%]
+........................................................................ [ 41%]
+........................................................................ [ 47%]
+........................................................................ [ 53%]
+........................................................................ [ 59%]
+........................................................................ [ 65%]
+........................................................................ [ 71%]
+..........F............................................................. [ 77%]
+........................................................................ [ 83%]
+........................................................................ [ 89%]
+........................................................................ [ 95%]
+.................................................                        [100%]
+================================== FAILURES ===================================
+__________ test_bookkeeping_reversal_preserves_exact_frozen_receipts __________
+
+    def test_bookkeeping_reversal_preserves_exact_frozen_receipts():
+        from tests._patch_candidate_behavior_executor1_maintenance import before_patch_candidate_behavior_executor1
+        root = Path(__file__).resolve().parents[1]
+        reversal = json.loads((root / "tests/fixtures/patch_candidate_behavior_executor1_reversal.json").read_text(encoding="utf-8"))
+        assert len(reversal["reversals"]) == 4
+        for record in reversal["reversals"]:
+            content = (root / record["path"]).read_bytes()
+>           assert sha256(before_patch_candidate_behavior_executor1(record["path"], content)).hexdigest() == record["entry_sha256"]
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_patch_candidate_behavior_executor1.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\_patch_candidate_behavior_executor1_maintenance.py:9: in before_patch_candidate_behavior_executor1
+    content = before_runtime_sandbox1(relative, content)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+relative = 'docs/roadmap/phase_registry.json'
+content = b'{\n  "schema_version": "1.0",\n  "updated_at": "2026-09-06T00:00:00+09:00",\n  "phases": [\n    {\n      "phase_id":... First remaining blocker: bounded Java controller thread startup under the frozen boundary."\n      ]\n    }\n  ]\n}\n'
+
+    def before_runtime_sandbox1(relative: str, content: bytes) -> bytes:
+        receipt = json.loads((Path(__file__).parent / "fixtures" /
+                              "runtime_sandbox1_reversal.json").read_text(encoding="utf-8"))
+        record = next((row for row in receipt["reversals"] if row["path"] == relative), None)
+        if record is None:
+            return content
+>       assert sha256(content).hexdigest() == record["post_sha256"], (relative, "unattributed runtime-sandbox change")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: ('docs/roadmap/phase_registry.json', 'unattributed runtime-sandbox change')
+
+tests\_runtime_sandbox1_maintenance.py:13: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts
+1 failed, 1200 passed in 713.65s (0:11:53)

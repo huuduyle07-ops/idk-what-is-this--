@@ -1,0 +1,221 @@
+{
+  "schema_version": "oop_intent_design1_reversal_v1",
+  "phase_id": "OOP.INTENT.DESIGN.1",
+  "reason": "Exact additive DESIGN.1 transport and input-purity-test reversal. Existing historical receipts remain unchanged. Hunks operate on normalized LF, then restore each pre-existing historical newline convention.",
+  "reversals": [
+    {
+      "path": "core/explicit_evidence.py",
+      "pre_normalized_sha256": "7ce5f4b86c0c4d527cbac8854aabeecda927f6d7bda1e784520a3633e98f758e",
+      "post_normalized_sha256": "0cebd29865721b4d39b7870e4d0439f160f6b4d86846bcfc5976d47cae67df5a",
+      "historical_sha256": "f8bb99fe5bcc6374e6460b03ede3c0e8d7bd7f54130b6ca4f012e797c19bea80",
+      "hunks": [
+        {
+          "pre": "from __future__ import annotations\n\nimport re\nfrom dataclasses import dataclass\nfrom typing import Any, Iterator\n\nfrom core.behavioral_expectation import (\n",
+          "post": "from __future__ import annotations\n\nimport re\nfrom dataclasses import dataclass, field\nfrom typing import Any, Iterator\n\nfrom core.behavioral_expectation import (\n"
+        },
+        {
+          "pre": "    BehavioralExpectation,\n    extract_behavioral_expectations,\n)\n\n\nPHASE_ID = \"INPUT.1\"\n",
+          "post": "    BehavioralExpectation,\n    extract_behavioral_expectations,\n)\nfrom core.explicit_design_evidence import DesignEvidence, extract_design_evidence\n\n\nPHASE_ID = \"INPUT.1\"\n"
+        },
+        {
+          "pre": "    #: here so no downstream consumer re-reads the user's sentence for them.\n    behavioral_expectations: tuple[BehavioralExpectation, ...] = ()\n    truncated_fields: tuple[str, ...] = ()\n\n    def is_empty(self) -> bool:\n        return not (\n",
+          "post": "    #: here so no downstream consumer re-reads the user's sentence for them.\n    behavioral_expectations: tuple[BehavioralExpectation, ...] = ()\n    truncated_fields: tuple[str, ...] = ()\n    #: OOP.INTENT.DESIGN.1 — additive typed literals, owned by this intake pass.\n    design_evidence: DesignEvidence = field(default_factory=DesignEvidence)\n\n    def is_empty(self) -> bool:\n        return not (\n"
+        },
+        {
+          "pre": "                item.as_dict() for item in self.behavioral_expectations\n            ],\n            \"truncated_fields\": list(self.truncated_fields),\n        }\n\n\n",
+          "post": "                item.as_dict() for item in self.behavioral_expectations\n            ],\n            \"truncated_fields\": list(self.truncated_fields),\n            **({\"design_evidence\": self.design_evidence.as_dict()}\n               if not self.design_evidence.is_empty() else {}),\n        }\n\n\n"
+        },
+        {
+          "pre": "        constraints=tuple(constraints),\n        behavioral_expectations=behavioral_expectations,\n        truncated_fields=tuple(dict.fromkeys(truncated)),\n    )\n",
+          "post": "        constraints=tuple(constraints),\n        behavioral_expectations=behavioral_expectations,\n        truncated_fields=tuple(dict.fromkeys(truncated)),\n        design_evidence=extract_design_evidence(raw_text),\n    )\n"
+        }
+      ],
+      "historical_newline": "CRLF"
+    },
+    {
+      "path": "core/semantic_waiter.py",
+      "pre_normalized_sha256": "314f611406f633ccad72b648a6d204506586df3b12c938a0c9651777bf2c084b",
+      "post_normalized_sha256": "36c45c0f797b2cbaa05a22731f959b8bebab9fa78447d636a4065a1f05299a3a",
+      "historical_sha256": "51125f4613c5b0fd1c946d3f8a940b864f42f016be577a68a29558bf23e7a2da",
+      "hunks": [
+        {
+          "pre": "from typing import Any, Protocol, runtime_checkable\n\nfrom core.behavioral_expectation import BehavioralExpectation\nfrom core.explicit_evidence import ExplicitEvidence\nfrom core.task_contract import (\n    MAX_SUBJECTS,\n",
+          "post": "from typing import Any, Protocol, runtime_checkable\n\nfrom core.behavioral_expectation import BehavioralExpectation\nfrom core.explicit_design_evidence import DesignEvidence\nfrom core.explicit_evidence import ExplicitEvidence\nfrom core.task_contract import (\n    MAX_SUBJECTS,\n"
+        },
+        {
+          "pre": "    missing_information: tuple[str, ...] = ()\n    execution_requirements: ExecutionRequirements = field(default_factory=ExecutionRequirements)\n    notes: tuple[str, ...] = ()\n\n    def subjects_by_value(self) -> dict[str, Subject]:\n        return {subject.value: subject for subject in self.subjects}\n",
+          "post": "    missing_information: tuple[str, ...] = ()\n    execution_requirements: ExecutionRequirements = field(default_factory=ExecutionRequirements)\n    notes: tuple[str, ...] = ()\n    #: OOP.INTENT.DESIGN.1 — intake-owned literals, never model-authored.\n    design_evidence: DesignEvidence = field(default_factory=DesignEvidence)\n\n    def subjects_by_value(self) -> dict[str, Subject]:\n        return {subject.value: subject for subject in self.subjects}\n"
+        },
+        {
+          "pre": "            \"missing_information\": list(self.missing_information),\n            \"execution_requirements\": self.execution_requirements.as_dict(),\n            \"notes\": list(self.notes),\n        }\n\n\n",
+          "post": "            \"missing_information\": list(self.missing_information),\n            \"execution_requirements\": self.execution_requirements.as_dict(),\n            \"notes\": list(self.notes),\n            **({\"design_evidence\": self.design_evidence.as_dict()}\n               if not self.design_evidence.is_empty() else {}),\n        }\n\n\n"
+        },
+        {
+          "pre": "            # DEFECT.FACT.LIVE.1 — promoted verbatim.  These are already typed\n            # and already user-sourced; there is nothing here left to interpret.\n            behavioral_expectations=explicit_evidence.behavioral_expectations,\n            execution_requirements=_execution_requirements(explicit_evidence),\n        )\n\n",
+          "post": "            # DEFECT.FACT.LIVE.1 — promoted verbatim.  These are already typed\n            # and already user-sourced; there is nothing here left to interpret.\n            behavioral_expectations=explicit_evidence.behavioral_expectations,\n            design_evidence=explicit_evidence.design_evidence,\n            execution_requirements=_execution_requirements(explicit_evidence),\n        )\n\n"
+        }
+      ],
+      "historical_newline": "CRLF"
+    },
+    {
+      "path": "core/semantic_waiter_adapter.py",
+      "pre_normalized_sha256": "ac184901d5825f2144ba87e9a512e255694254f54732340015b8cbd27c33e130",
+      "post_normalized_sha256": "10c1808f35bbc72e6353250d0648ca681f3d21c475941945df1365dbdd41318d",
+      "historical_sha256": "ac184901d5825f2144ba87e9a512e255694254f54732340015b8cbd27c33e130",
+      "hunks": [
+        {
+          "pre": "from __future__ import annotations\n\nimport json\nfrom typing import Any, Protocol, runtime_checkable\n\nfrom core.explicit_evidence import (\n",
+          "post": "from __future__ import annotations\n\nimport json\nfrom dataclasses import replace\nfrom typing import Any, Protocol, runtime_checkable\n\nfrom core.explicit_evidence import (\n"
+        },
+        {
+          "pre": "        explicit_evidence: ExplicitEvidence,\n    ) -> SemanticInterpretation:\n        \"\"\"First attempt: read the order and report what it means.\"\"\"\n        return parse_semantic_response(\n            self._complete(build_interpretation_request(raw_prompt, explicit_evidence))\n        )\n\n    def repair(\n        self,\n",
+          "post": "        explicit_evidence: ExplicitEvidence,\n    ) -> SemanticInterpretation:\n        \"\"\"First attempt: read the order and report what it means.\"\"\"\n        interpretation = parse_semantic_response(\n            self._complete(build_interpretation_request(raw_prompt, explicit_evidence))\n        )\n        # OOP.INTENT.DESIGN.1: these typed literals belong to intake, so model\n        # JSON cannot author or rewrite them.  Transport them beside its result\n        # without changing the model schema, prompt, or number of calls.\n        return replace(interpretation, design_evidence=explicit_evidence.design_evidence)\n\n    def repair(\n        self,\n"
+        },
+        {
+          "pre": "        Not part of the INPUT.1 protocol — the runner calls it directly, and\n        only once.\n        \"\"\"\n        return parse_semantic_response(\n            self._complete(build_repair_request(raw_prompt, explicit_evidence, preservation))\n        )\n\n\nclass ScriptedSemanticModelClient:\n",
+          "post": "        Not part of the INPUT.1 protocol — the runner calls it directly, and\n        only once.\n        \"\"\"\n        interpretation = parse_semantic_response(\n            self._complete(build_repair_request(raw_prompt, explicit_evidence, preservation))\n        )\n        return replace(interpretation, design_evidence=explicit_evidence.design_evidence)\n\n\nclass ScriptedSemanticModelClient:\n"
+        }
+      ],
+      "historical_newline": "LF"
+    },
+    {
+      "path": "core/live_task_shape.py",
+      "pre_normalized_sha256": "7610bda522f919547a7e06ae7ced10184885db45048d03baf8e26caaa09747af",
+      "post_normalized_sha256": "55e2e986198b8518b8723a2f5cbcd83f464f2341d4dff3e0363e450f936200e8",
+      "historical_sha256": "c9c9c2fd1f38a9016e97d2ed5ef41ae2a4770fb44e9f79d83597fe4131cfccb0",
+      "hunks": [
+        {
+          "pre": "            # behavioral claim is not one of them, and re-reading the prompt for\n            # it here would be the second semantic system this phase forbids.\n            behavioral_expectations=base.behavioral_expectations,\n            ambiguities=base.ambiguities,\n            missing_information=base.missing_information,\n            execution_requirements=ExecutionRequirements(\n",
+          "post": "            # behavioral claim is not one of them, and re-reading the prompt for\n            # it here would be the second semantic system this phase forbids.\n            behavioral_expectations=base.behavioral_expectations,\n            design_evidence=base.design_evidence,\n            ambiguities=base.ambiguities,\n            missing_information=base.missing_information,\n            execution_requirements=ExecutionRequirements(\n"
+        }
+      ],
+      "historical_newline": "mixed",
+      "historical_lf_lines": [
+        247,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        269,
+        270,
+        271,
+        272,
+        273,
+        274,
+        275,
+        276,
+        277,
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        364,
+        370,
+        372,
+        373,
+        374,
+        375,
+        376,
+        377,
+        378,
+        379,
+        380,
+        381,
+        382,
+        383,
+        384,
+        385,
+        386,
+        387,
+        388,
+        389,
+        390,
+        391,
+        392
+      ]
+    },
+    {
+      "path": "core/input_understanding.py",
+      "pre_normalized_sha256": "147f005f3fa94ddc30563093ce869ee96fc3db360dbec36b73dee9ee83ed6b68",
+      "post_normalized_sha256": "10346f4a7649fc755147ca5995e0e6f28cc16c41b297c1a1cfb83b81a73a1c66",
+      "historical_sha256": "c87c0f82a342447deeec4fff7e125f913698f709918f47c083ee782af6e3a1ce",
+      "hunks": [
+        {
+          "pre": "        requested_output=interpretation.requested_output,\n        constraints=interpretation.constraints,\n        behavioral_expectations=interpretation.behavioral_expectations,\n        ambiguities=interpretation.ambiguities,\n        missing_information=interpretation.missing_information,\n        execution_requirements=interpretation.execution_requirements,\n",
+          "post": "        requested_output=interpretation.requested_output,\n        constraints=interpretation.constraints,\n        behavioral_expectations=interpretation.behavioral_expectations,\n        design_evidence=interpretation.design_evidence,\n        ambiguities=interpretation.ambiguities,\n        missing_information=interpretation.missing_information,\n        execution_requirements=interpretation.execution_requirements,\n"
+        }
+      ],
+      "historical_newline": "CRLF"
+    },
+    {
+      "path": "core/task_contract.py",
+      "pre_normalized_sha256": "8a8e39eee081a3b8fb7b587410b4b97c1e49084ab3889e0c8fc5dbeb2da65eae",
+      "post_normalized_sha256": "9f366f3a5775da9e0d04e953289e7f20b08df0f490d1d909663f9e8cf6eca268",
+      "historical_sha256": "41b9a9c33a206f0b9ed54a25dd6faf0ba666097b382da7e2604d8513c24be5d6",
+      "hunks": [
+        {
+          "pre": "    MAX_BEHAVIORAL_EXPECTATIONS,\n    BehavioralExpectation,\n)\nfrom core.explicit_evidence import (\n    CONSTRAINT_KINDS,\n    FRAMEWORK_TYPES,\n",
+          "post": "    MAX_BEHAVIORAL_EXPECTATIONS,\n    BehavioralExpectation,\n)\nfrom core.explicit_design_evidence import DesignEvidence\nfrom core.explicit_evidence import (\n    CONSTRAINT_KINDS,\n    FRAMEWORK_TYPES,\n"
+        },
+        {
+          "pre": "    \"provenance\",\n    # DEFECT.FACT.LIVE.1 — one explicit \"should be X, is Y\" claim.\n    \"behavioral_expectation\",\n)\n\n# ── Bounds ────────────────────────────────────────────────────────────────────\n",
+          "post": "    \"provenance\",\n    # DEFECT.FACT.LIVE.1 — one explicit \"should be X, is Y\" claim.\n    \"behavioral_expectation\",\n    # OOP.INTENT.DESIGN.1 — exact additive design-evidence identity.\n    \"design_commitment\",\n)\n\n# ── Bounds ────────────────────────────────────────────────────────────────────\n"
+        },
+        {
+          "pre": "    notes: tuple[str, ...] = ()\n    routing_allowed: bool = False\n    schema_version: str = CONTRACT_SCHEMA_VERSION\n\n    def __post_init__(self) -> None:\n        _bounded_tuple(self.subjects, MAX_SUBJECTS, \"subjects\")\n        _bounded_tuple(self.relationships, MAX_RELATIONSHIPS, \"relationships\")\n        _bounded_tuple(self.constraints, MAX_CONSTRAINTS, \"constraints\")\n",
+          "post": "    notes: tuple[str, ...] = ()\n    routing_allowed: bool = False\n    schema_version: str = CONTRACT_SCHEMA_VERSION\n    design_evidence: DesignEvidence = field(default_factory=DesignEvidence)\n\n    def __post_init__(self) -> None:\n        if not isinstance(self.design_evidence, DesignEvidence):\n            raise TypeError(\"task design evidence must be a DesignEvidence\")\n        _bounded_tuple(self.subjects, MAX_SUBJECTS, \"subjects\")\n        _bounded_tuple(self.relationships, MAX_RELATIONSHIPS, \"relationships\")\n        _bounded_tuple(self.constraints, MAX_CONSTRAINTS, \"constraints\")\n"
+        },
+        {
+          "pre": "            \"routing_allowed\": self.routing_allowed,\n            \"notes\": list(self.notes),\n            \"guardrails\": _guardrails(),\n        }\n\n\n",
+          "post": "            \"routing_allowed\": self.routing_allowed,\n            \"notes\": list(self.notes),\n            \"guardrails\": _guardrails(),\n            **({\"design_evidence\": self.design_evidence.as_dict()}\n               if not self.design_evidence.is_empty() else {}),\n        }\n\n\n"
+        }
+      ],
+      "historical_newline": "CRLF"
+    },
+    {
+      "path": "core/requirement_preservation.py",
+      "pre_normalized_sha256": "7cfd1d0477eb9c9ab823fd19ab5b8fa65da83e53298a56bb7894980b1863a7f5",
+      "post_normalized_sha256": "206e31aec844b7d33288842bd2b6cf024c5b4e496c0662880af68e9ca4baf682",
+      "historical_sha256": "4ffdf425cbf1bb583beb02a2952ad5d6e2f32ed592cc4a3af2d433c3cf7e27d5",
+      "hunks": [
+        {
+          "pre": "from __future__ import annotations\n\nfrom core.explicit_evidence import ExplicitEvidence\nfrom core.semantic_waiter import SemanticInterpretation\nfrom core.task_contract import (\n    MAX_PRESERVATION_ITEMS,\n",
+          "post": "from __future__ import annotations\n\nfrom core.explicit_evidence import ExplicitEvidence\nfrom core.explicit_design_evidence import DESIGN_FIELDS\nfrom core.semantic_waiter import SemanticInterpretation\nfrom core.task_contract import (\n    MAX_PRESERVATION_ITEMS,\n"
+        },
+        {
+          "pre": "            )\n\n\ndef check_requirement_preservation(\n    evidence: ExplicitEvidence,\n    interpretation: SemanticInterpretation,\n",
+          "post": "            )\n\n\ndef _check_design_evidence(\n    evidence: ExplicitEvidence,\n    interpretation: SemanticInterpretation,\n    ledger: _Ledger,\n) -> None:\n    \"\"\"OOP.INTENT.DESIGN.1 — preserve complete typed records and provenance.\n\n    This compares intake artifacts, not prose or semantic guesses.  Every\n    source span, identifier, ordering, and provenance must remain unchanged.\n    \"\"\"\n    supplied = evidence.design_evidence\n    carried = interpretation.design_evidence\n    for name in DESIGN_FIELDS:\n        expected = getattr(supplied, name)\n        actual = getattr(carried, name)\n        if expected == actual:\n            if expected:\n                ledger.keep(\"design_commitment\", name)\n        else:\n            ledger.lose(\"design_commitment\", name,\n                        f\"explicit design {name} was dropped, rewritten, reordered or invented\")\n    if supplied.overflow or carried.overflow:\n        ledger.lose(\"design_commitment\", \"overflow\",\n                    \"explicit design evidence exceeded a supported bound; no complete projection is available\")\n    if supplied.unclassified_clauses_present != carried.unclassified_clauses_present:\n        ledger.lose(\"design_commitment\", \"coverage\",\n                    \"explicit design evidence coverage was rewritten\")\n\n\ndef check_requirement_preservation(\n    evidence: ExplicitEvidence,\n    interpretation: SemanticInterpretation,\n"
+        },
+        {
+          "pre": "    _check_framework(evidence, interpretation, ledger)\n    _check_constraints(evidence, interpretation, ledger)\n    _check_behavioral_expectations(evidence, interpretation, ledger)\n    _check_requested_output(evidence, interpretation, ledger)\n    _check_provenance(evidence, interpretation, ledger)\n\n",
+          "post": "    _check_framework(evidence, interpretation, ledger)\n    _check_constraints(evidence, interpretation, ledger)\n    _check_behavioral_expectations(evidence, interpretation, ledger)\n    _check_design_evidence(evidence, interpretation, ledger)\n    _check_requested_output(evidence, interpretation, ledger)\n    _check_provenance(evidence, interpretation, ledger)\n\n"
+        }
+      ],
+      "historical_newline": "CRLF"
+    },
+    {
+      "path": "tests/test_input_understanding.py",
+      "pre_normalized_sha256": "ac7f8bdad9ad2feee5c3e884f3d9c19276f2f970eb1124e10f81277238f1e505",
+      "post_normalized_sha256": "d0a3aaad37e28c65d060f742d59a92aaf4391135272fdfa1fe9c5eaa9a0f5056",
+      "historical_sha256": "ac7f8bdad9ad2feee5c3e884f3d9c19276f2f970eb1124e10f81277238f1e505",
+      "hunks": [
+        {
+          "pre": "    # and is consumed by the extractor above, so it lives under the same import,\n    # stdlib and provider-token rules the rest of INPUT.1 does.\n    \"behavioral_expectation\",\n)\n\n\n",
+          "post": "    # and is consumed by the extractor above, so it lives under the same import,\n    # stdlib and provider-token rules the rest of INPUT.1 does.\n    \"behavioral_expectation\",\n    # OOP.INTENT.DESIGN.1 adds bounded literal design evidence at intake and\n    # inherits the same purity and authority checks as the frozen boundary.\n    \"explicit_design_evidence\",\n)\n\n\n"
+        }
+      ],
+      "historical_newline": "LF"
+    }
+  ]
+}

@@ -1,0 +1,198 @@
+{
+  "author_calls": 0,
+  "authority_delta": 0,
+  "clarification_sessions_created": 0,
+  "implementation_defaults_selected": [],
+  "model_calls_added": 0,
+  "performance": {
+    "projection_max_ms": 0.63,
+    "projection_median_ms": 0.361,
+    "repetitions": 100
+  },
+  "phase_id": "OOP.INTENT.DESIGN.1",
+  "preservation": "passed",
+  "projection": {
+    "apply_authority": false,
+    "authority": "read_only",
+    "behavior_gates": [
+      {
+        "condition": "successful_password_verification",
+        "evidence": {
+          "provenance": "explicit_human",
+          "source_end": 227,
+          "source_start": 139,
+          "source_text": "Using the savings functionality should depend on the user\nentering the correct password."
+        },
+        "gated_behavior": "savings functionality",
+        "relationship_kind": "behavior_gate"
+      }
+    ],
+    "conflicts": [],
+    "current_source_status": "not_acquired_by_projection",
+    "evaluative": [],
+    "execution_authority": false,
+    "explicit_absences": [
+      {
+        "evidence": {
+          "provenance": "explicit_human",
+          "source_end": 299,
+          "source_start": 229,
+          "source_text": "The current code does not yet contain password/authentication support."
+        },
+        "relationship_kind": "explicit_absence",
+        "subject": "authentication_support"
+      }
+    ],
+    "overflow": [],
+    "phase_id": "OOP.INTENT.DESIGN.1",
+    "provenance_vocabulary": [
+      "explicit_human",
+      "current_source_fact",
+      "inferred_semantic_interpretation"
+    ],
+    "raw_request_fingerprint": "7cc7818739d1ed51a792d3c6b6e6256b575704335f6872cef1c1848f09d8af1b",
+    "reasons": [],
+    "relationships": [
+      {
+        "child": "SavingAccount",
+        "evidence": {
+          "provenance": "explicit_human",
+          "source_end": 34,
+          "source_start": 0,
+          "source_text": "SavingAccount extends BankAccount."
+        },
+        "parent": "BankAccount",
+        "relationship_kind": "inheritance"
+      }
+    ],
+    "repair_scope_authority": false,
+    "schema_version": "oop_intent_design_1_v1",
+    "semantic_interpretation_fingerprint": "218cf6f80bb73a9489a42e0a38220945b841d01e7991e137ed0c9c9aa4c4841f",
+    "state_commitments": [
+      {
+        "base_exclusion": "BankAccount",
+        "base_exclusion_provenance": "inferred_semantic_interpretation",
+        "basis": [
+          "explicit_human:6b61dbf210b729568e1fcb9f7acd263c3ddb08591649dc7cc3323ce303ba1f72"
+        ],
+        "evidence": {
+          "provenance": "explicit_human",
+          "source_end": 137,
+          "source_start": 36,
+          "source_text": "savingBalance should belong only to SavingAccount,\nbecause not every BankAccount needs savings state."
+        },
+        "owner": "SavingAccount",
+        "ownership_constraint": "subclass_only",
+        "relationship_kind": "state_ownership",
+        "state": "savingBalance",
+        "state_role": "savings_state"
+      }
+    ],
+    "status": "resolved",
+    "task_contract_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+    "temporal_scope": {
+      "behavior_gates": "desired_future_design",
+      "explicit_absences": "human_assertion_about_current_state",
+      "relationships": "desired_future_design",
+      "state_commitments": "desired_future_design"
+    },
+    "unresolved_dimensions": [
+      {
+        "basis": [
+          "explicit_human:aa264a0378c0dd9c108782f076aa07fc13407b069887420ea49076ece010c2e8"
+        ],
+        "dimension": "credential_ownership",
+        "provenance": "inferred_semantic_interpretation",
+        "status": "unspecified"
+      },
+      {
+        "basis": [
+          "explicit_human:aa264a0378c0dd9c108782f076aa07fc13407b069887420ea49076ece010c2e8"
+        ],
+        "dimension": "credential_source",
+        "provenance": "inferred_semantic_interpretation",
+        "status": "unspecified"
+      },
+      {
+        "basis": [
+          "explicit_human:aa264a0378c0dd9c108782f076aa07fc13407b069887420ea49076ece010c2e8"
+        ],
+        "dimension": "credential_persistence",
+        "provenance": "inferred_semantic_interpretation",
+        "status": "unspecified"
+      },
+      {
+        "basis": [
+          "explicit_human:aa264a0378c0dd9c108782f076aa07fc13407b069887420ea49076ece010c2e8"
+        ],
+        "dimension": "credential_verification_mechanism",
+        "provenance": "inferred_semantic_interpretation",
+        "status": "unspecified"
+      },
+      {
+        "basis": [
+          "explicit_human:aa264a0378c0dd9c108782f076aa07fc13407b069887420ea49076ece010c2e8"
+        ],
+        "dimension": "verification_failure_behavior",
+        "provenance": "inferred_semantic_interpretation",
+        "status": "unspecified"
+      },
+      {
+        "basis": [
+          "explicit_human:aa264a0378c0dd9c108782f076aa07fc13407b069887420ea49076ece010c2e8"
+        ],
+        "dimension": "verification_lifecycle",
+        "provenance": "inferred_semantic_interpretation",
+        "status": "unspecified"
+      },
+      {
+        "basis": [
+          "explicit_human:aa264a0378c0dd9c108782f076aa07fc13407b069887420ea49076ece010c2e8"
+        ],
+        "dimension": "account_identity",
+        "provenance": "inferred_semantic_interpretation",
+        "status": "unspecified"
+      },
+      {
+        "basis": [
+          "explicit_human:aa264a0378c0dd9c108782f076aa07fc13407b069887420ea49076ece010c2e8",
+          "explicit_human:1538df040afe40fae945fe443bd2c4099355dcddc43331dd082ede3392211ec5"
+        ],
+        "dimension": "savings_funding_semantics",
+        "provenance": "inferred_semantic_interpretation",
+        "status": "unspecified"
+      },
+      {
+        "basis": [
+          "explicit_human:aa264a0378c0dd9c108782f076aa07fc13407b069887420ea49076ece010c2e8",
+          "explicit_human:1538df040afe40fae945fe443bd2c4099355dcddc43331dd082ede3392211ec5"
+        ],
+        "dimension": "savings_interest_semantics",
+        "provenance": "inferred_semantic_interpretation",
+        "status": "unspecified"
+      },
+      {
+        "basis": [
+          "explicit_human:6b61dbf210b729568e1fcb9f7acd263c3ddb08591649dc7cc3323ce303ba1f72"
+        ],
+        "dimension": "source_layout",
+        "provenance": "inferred_semantic_interpretation",
+        "status": "unspecified"
+      },
+      {
+        "basis": [
+          "explicit_human:6b61dbf210b729568e1fcb9f7acd263c3ddb08591649dc7cc3323ce303ba1f72"
+        ],
+        "dimension": "subclass_creation_lifecycle",
+        "provenance": "inferred_semantic_interpretation",
+        "status": "unspecified"
+      }
+    ],
+    "write_authority": false
+  },
+  "projection_bytes": 4736,
+  "projection_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+  "repair_scope_delta": 0,
+  "repository_traversal_delta": 0,
+  "task": "SavingAccount extends BankAccount.\n\nsavingBalance should belong only to SavingAccount,\nbecause not every BankAccount needs savings state.\n\nUsing the savings functionality should depend on the user\nentering the correct password.\n\nThe current code does not yet contain password/authentication support."
+}

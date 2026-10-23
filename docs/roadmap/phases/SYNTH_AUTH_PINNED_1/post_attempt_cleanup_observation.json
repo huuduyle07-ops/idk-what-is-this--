@@ -1,0 +1,27 @@
+{
+  "observed_utc": "2026-10-10T01:33:03.628600+00:00",
+  "scope": "Read-only post-attempt observation of frozen provider phase prefixes, not an authenticated provider cleanup proof.",
+  "command": [
+    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.EXE",
+    "--host",
+    "npipe:////./pipe/dockerDesktopLinuxEngine",
+    "ps",
+    "-a",
+    "--format",
+    "{{.Names}}",
+    "--filter",
+    "name=runtime-java-pinned1a-",
+    "--filter",
+    "name=runtime-sandbox2-",
+    "--filter",
+    "name=runtime-java1c-"
+  ],
+  "exit_code": 0,
+  "remaining_phase_container_names": [],
+  "remaining_phase_container_count": 0,
+  "stderr": "",
+  "temporary_phase_directories_remaining": [],
+  "new_provider_or_authorization_attempts": 0,
+  "cleanup_actions_performed": 0,
+  "read_only_docker_control_calls": 1
+}

@@ -1,0 +1,20 @@
+{
+  "capability_objects_constructed": false,
+  "failed": [],
+  "operational_effects_zero": true,
+  "owner_modules_imported": false,
+  "passed": [
+    "old_request_payload_has_no_upstream_authorization_or_runtime_identity",
+    "old_renderer_authenticates_only_independent_original_request",
+    "old_auth_compatibility_keeps_unchanged_public_old_auth_validator",
+    "old_admission_authenticates_old_auth_and_original_request_publicly",
+    "old_admission_has_no_pinned_or_runtime_or_provider_bridge",
+    "old_admission_scope_preserves_invocation_observation_role_and_read_operation",
+    "old_reflection_original_record_and_signed_terminal_state_authentication",
+    "old_reflection_consumption_requires_consumed_runtime_but_invalidation_does_not",
+    "old_reflection_permanent_one_admission_one_lease_tombstones",
+    "pinned_runtime_keeps_false_behavioral_readiness_and_unresolved_consumer"
+  ],
+  "passed_count": 10,
+  "success": true
+}

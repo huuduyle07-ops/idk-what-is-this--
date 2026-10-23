@@ -1,0 +1,172 @@
+{
+  "admission": {
+    "alternatives": [
+      {
+        "description": "Use a simple in-memory credential for this exercise.",
+        "effect": "authentication_in_memory"
+      },
+      {
+        "description": "Use a credential contract that persists across runs without selecting storage technology.",
+        "effect": "authentication_persistent"
+      },
+      {
+        "description": "Transfer money from inherited balance into savingBalance.",
+        "effect": "transfer_from_inherited_balance"
+      },
+      {
+        "description": "Fund savingBalance independently from inherited balance.",
+        "effect": "independently_funded"
+      }
+    ],
+    "comparisons": [
+      {
+        "current": "the acquired context is BankAccount; it does not establish a repository-wide absence for SavingAccount",
+        "current_provenance": "current_source_fact",
+        "desired": "SavingAccount extends BankAccount",
+        "desired_provenance": "explicit_human",
+        "is_defect": false,
+        "kind": "inheritance_transition"
+      },
+      {
+        "current": "savingBalance is not declared on the acquired BankAccount context",
+        "current_provenance": "current_source_fact",
+        "desired": "savingBalance belongs only to SavingAccount",
+        "desired_provenance": "explicit_human",
+        "is_defect": false,
+        "kind": "state_transition"
+      },
+      {
+        "current": "the acquired class has no password-, credential-, authentication-, verification-, or login-named field, parameter, or callable",
+        "current_provenance": "current_source_fact",
+        "desired": "savings functionality requires successful password verification",
+        "desired_provenance": "explicit_human",
+        "is_defect": false,
+        "kind": "authentication_transition"
+      }
+    ],
+    "design_fingerprint": "b6ababfc8c3b78394ac1fb7af08aef67e19a5d7ecd53ff53852f84d04e48091d",
+    "dimension": "future_design_contract",
+    "dimension_assessments": {
+      "account_identity": {
+        "disposition": "irrelevant_to_current_transition",
+        "reason": "secondary_behavior_does_not_independently_block_this_transition"
+      },
+      "credential_ownership": {
+        "disposition": "human_owned_material",
+        "reason": "credential_model_changes_owned_state_persistence_and_gate_lifecycle"
+      },
+      "credential_persistence": {
+        "disposition": "human_owned_material",
+        "reason": "credential_model_changes_owned_state_persistence_and_gate_lifecycle"
+      },
+      "credential_source": {
+        "disposition": "human_owned_material",
+        "reason": "credential_model_changes_owned_state_persistence_and_gate_lifecycle"
+      },
+      "credential_verification_mechanism": {
+        "disposition": "human_owned_material",
+        "reason": "credential_model_changes_owned_state_persistence_and_gate_lifecycle"
+      },
+      "savings_funding_semantics": {
+        "disposition": "human_owned_material",
+        "reason": "savings_choices_change_balance_mutation_and_interest_state"
+      },
+      "savings_interest_semantics": {
+        "disposition": "human_owned_material",
+        "reason": "savings_choices_change_balance_mutation_and_interest_state"
+      },
+      "source_layout": {
+        "disposition": "deferred_implementation",
+        "reason": "source_layout_is_later_implementation_planning"
+      },
+      "subclass_creation_lifecycle": {
+        "disposition": "deferred_implementation",
+        "reason": "subclass_creation_is_later_implementation_planning"
+      },
+      "verification_failure_behavior": {
+        "disposition": "irrelevant_to_current_transition",
+        "reason": "secondary_behavior_does_not_independently_block_this_transition"
+      },
+      "verification_lifecycle": {
+        "disposition": "human_owned_material",
+        "reason": "credential_model_changes_owned_state_persistence_and_gate_lifecycle"
+      }
+    },
+    "evidence_ref_count": 8,
+    "gap_count": 1,
+    "question": "You've already specified that SavingAccount extends BankAccount, savingBalance belongs only to SavingAccount, and savings functionality requires successful password verification. For this exercise, how should the remaining verification and savings behavior work? Please specify who owns or supplies the credential, whether it persists, how it is verified, what operation or lifecycle verification gates, how savingBalance is funded, how interest applies.",
+    "repository_identity_bound": true,
+    "schema_version": "oop_intent_detect_2_v1",
+    "source_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+    "status": "clarification_required",
+    "subdimensions": [
+      "credential_ownership",
+      "credential_source",
+      "credential_persistence",
+      "credential_verification_mechanism",
+      "verification_lifecycle",
+      "savings_funding_semantics",
+      "savings_interest_semantics"
+    ],
+    "task_contract_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+    "unresolved_dimension_ref_count": 7
+  },
+  "durable_ui": {
+    "apply_available": false,
+    "candidate": null,
+    "clarification_answer": null,
+    "clarification_kind": "oop_intent",
+    "patch": "",
+    "patch_plan": null,
+    "session_count": 1,
+    "session_id_reused": true,
+    "status": "waiting_for_clarification"
+  },
+  "integrity": {
+    "bank_java_unchanged": true,
+    "control_unchanged": true,
+    "main_app_unchanged": true
+  },
+  "known_upstream_limit": "Frozen OOP.INTENT.DESIGN.1 does not type arbitrary raw complete or partial answer clauses; DETECT.2 rejects altered projection payloads and returns projection_bounded for those raw fixtures until a typed answer continuation exists.",
+  "ordering_and_authority": {
+    "author_calls": 0,
+    "auto_apply": false,
+    "execution_authorized": false,
+    "repair_scope_authority": false,
+    "repair_scope_present": false,
+    "scope_expansion": "deferred",
+    "write_authority": false
+  },
+  "performance": {
+    "current_vs_desired": {
+      "max_ms": 0.6692,
+      "median_ms": 0.33285
+    },
+    "gap_construction": {
+      "max_ms": 3.3081,
+      "median_ms": 1.13035
+    },
+    "materiality_classification": {
+      "max_ms": 0.2918,
+      "median_ms": 0.1525
+    },
+    "projection_validation": {
+      "max_ms": 3.6971,
+      "median_ms": 2.00545
+    },
+    "provider_latency": "not_applicable",
+    "repetitions": 100,
+    "total_detector": {
+      "max_ms": 6.7003,
+      "median_ms": 3.63675
+    }
+  },
+  "phase_id": "OOP.INTENT.DETECT.2",
+  "side_effects": {
+    "implementation_defaults_selected": [],
+    "model_calls": 0,
+    "repository_traversals": 0,
+    "storage_or_security_invention": false
+  },
+  "task": "SavingAccount extends BankAccount.\n\nsavingBalance should belong only to SavingAccount,\nbecause not every BankAccount needs savings state.\n\nUsing the savings functionality should depend on the user\nentering the correct password.\n\nThe current code does not yet contain password/authentication support."
+}

@@ -1,0 +1,16 @@
+{
+  "completed_utc": "2026-10-10T01:34:44.134932+00:00",
+  "post_issuance_checks_are_pure": true,
+  "historical_files_checked": 355,
+  "historical_files_preserved": 355,
+  "historical_drift": [],
+  "source_binding_drift": [],
+  "validation_binding_drift": [],
+  "in_memory_python_compilation_passed": true,
+  "compiled_python_files": 154,
+  "JSON_files_parsed": 21,
+  "authored_whitespace_failures": [],
+  "git_diff_check_exit_code": 0,
+  "git_diff_check_output": "",
+  "all_final_checks_passed": true
+}

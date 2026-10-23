@@ -1,0 +1,102 @@
+{
+  "HMAC_results": {
+    "descriptor": true,
+    "receipt": true
+  },
+  "descriptor": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+    "eligible_for_java1_continuation": true,
+    "host_mount_authority": false,
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "network_authority": false,
+    "phase_id": "RUNTIME.SANDBOX.2",
+    "relationship": "additive_epoch_preserving_SANDBOX_1_history",
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "sandbox_descriptor_fingerprint": "4cf6c8cb972c0a0b8c592cae686c2e2a132b30274f1feecc4825a9e808cbf85f",
+    "schema_version": "runtime_sandbox_2_v1",
+    "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "shell_available": false,
+    "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+    "verification_receipt_fingerprint": "9adda01b89ab9493cce28c1f02e988ae8aa31e70bc840a3df6a92f02bc6ba4c8"
+  },
+  "exact_descriptor_type": "core.thread_compatible_runtime_sandbox.ThreadCompatibleSandboxDescriptor",
+  "exact_receipt_type": "core.thread_compatible_runtime_sandbox.ThreadCompatibleSandboxReceipt",
+  "export_is_report_only": true,
+  "key_material_exported": false,
+  "original_descriptor_object_id": 1953354405792,
+  "original_receipt_object_id": 1953354877648,
+  "public_validators_passed": true,
+  "receipt": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "authority": "infrastructure_compatibility_measurement_only",
+    "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+    "baseline_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+    "baseline_seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+    "cleanup_verified": true,
+    "compatibility_classification": "eligible_for_JAVA_1_continuation_only",
+    "evidence_sha256": "6dd5671a4fa752db4eb839e3a504a26051357ed33d53dd8ce551bb043bbfb380",
+    "host_mount_authority": false,
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "network_authority": false,
+    "phase_id": "RUNTIME.SANDBOX.2",
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "schema_version": "runtime_sandbox_2_v1",
+    "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "shell_available": false,
+    "stage_results": [
+      [
+        "clone3",
+        "stage_passed"
+      ],
+      [
+        "pthread",
+        "stage_passed"
+      ],
+      [
+        "boundary",
+        "stage_passed"
+      ],
+      [
+        "descendant",
+        "stage_passed"
+      ],
+      [
+        "timeout",
+        "stage_passed"
+      ],
+      [
+        "stdout",
+        "stage_passed"
+      ],
+      [
+        "stderr",
+        "stage_passed"
+      ],
+      [
+        "tmp",
+        "stage_passed"
+      ],
+      [
+        "controller",
+        "stage_passed"
+      ],
+      [
+        "javac_version",
+        "stage_passed"
+      ],
+      [
+        "java_version",
+        "stage_passed"
+      ]
+    ],
+    "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+    "verification_receipt_fingerprint": "9adda01b89ab9493cce28c1f02e988ae8aa31e70bc840a3df6a92f02bc6ba4c8"
+  },
+  "semantic_eligibility": true,
+  "signatures_exported": false
+}

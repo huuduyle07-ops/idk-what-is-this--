@@ -1,0 +1,533 @@
+{
+  "MainApp_session_touched": false,
+  "apply_authority": false,
+  "author_calls": 0,
+  "execution_authorized": false,
+  "filesystem_file_creation_authority": false,
+  "first_remaining_blocker": "STRUCTURAL_CANDIDATE_MATERIALIZATION_NOT_IMPLEMENTED",
+  "fixture_kind": "synthetic_admissions_and_author_outputs",
+  "model_calls": 0,
+  "negative_cases": {
+    "authority_escalation": {
+      "author_calls": 0,
+      "candidate": null,
+      "model_calls": 0,
+      "status": "author_output_authority_escalation"
+    },
+    "candidate_plus_escalation": {
+      "author_calls": 0,
+      "candidate": null,
+      "model_calls": 0,
+      "status": "author_output_invalid"
+    },
+    "command_payload": {
+      "author_calls": 0,
+      "candidate": null,
+      "model_calls": 0,
+      "status": "author_output_invalid"
+    },
+    "extra_class": {
+      "author_calls": 0,
+      "candidate": null,
+      "model_calls": 0,
+      "status": "author_output_outside_admitted_scope"
+    },
+    "extra_field": {
+      "author_calls": 0,
+      "candidate": null,
+      "model_calls": 0,
+      "status": "author_output_outside_admitted_scope"
+    },
+    "extra_method": {
+      "author_calls": 0,
+      "candidate": null,
+      "model_calls": 0,
+      "status": "author_output_outside_admitted_scope"
+    },
+    "missing_debit": {
+      "author_calls": 0,
+      "candidate": null,
+      "model_calls": 0,
+      "status": "author_output_incomplete"
+    },
+    "occupied_new_path": {
+      "author_calls": 0,
+      "candidate": null,
+      "model_calls": 0,
+      "status": "admission_conflict_existing_path"
+    },
+    "semantic_drift_fee": {
+      "author_calls": 0,
+      "candidate": null,
+      "model_calls": 0,
+      "status": "author_output_semantic_drift"
+    },
+    "stale_source": {
+      "author_calls": 0,
+      "candidate": null,
+      "model_calls": 0,
+      "status": "reacquisition_required"
+    },
+    "wrong_path": {
+      "author_calls": 0,
+      "candidate": null,
+      "model_calls": 0,
+      "status": "author_output_outside_admitted_scope"
+    }
+  },
+  "phase_id": "PATCH.AUTHOR.STRUCTURAL.1",
+  "real_BANK2_approval_consumed": false,
+  "repetitions": 5,
+  "repository_traversals": 0,
+  "scenarios": {
+    "nested": {
+      "candidate": {
+        "admission_fingerprint": "5c7fd0bd211baae7ffc71343f658fb36e7d334b3c0e385e6a31fca4e22bdf904",
+        "apply_authority": false,
+        "approval_receipt_fingerprint": "bb267956a9d545131da44baff3ff928ba148946affe8dc585d84f08a3f1f7de1",
+        "approved_ceiling_fingerprint": "7f1ae333923af6e20c7abf408c8321e2fa4f504c56a87040a038b25f8af81fff",
+        "authoring_scope_delta": 0,
+        "authority": "candidate_only",
+        "candidate_fingerprint": "be707b04e6272f2513bfcf9da8541c355d7e52b05bfd792642bcfc21c0363897",
+        "effective_design_fingerprint": "f482c74547ef1d537341ec73ba40b28c696adbc007e206111d80c0d1fc299e11",
+        "execution_authorized": false,
+        "filesystem_file_creation_authority": false,
+        "filesystem_write_authority": false,
+        "implementation_plan_fingerprint": "6c0b8455744f662425f4c06278a5d9eb73fcdb365133e9254725d4f7eab018e8",
+        "new_path_absence_witnesses": [],
+        "operations": [
+          {
+            "definition_ids": [
+              "BankAccount::debitForSavings::method"
+            ],
+            "existing_declaration": null,
+            "operation": "insert_member",
+            "owner": "BankAccount",
+            "physical_target": "bank.java",
+            "removal_intent": false,
+            "source_text": "protected boolean debitForSavings(double amount) {\n  if (amount <= balance) { balance -= amount; return true; }\n  return false;\n}"
+          },
+          {
+            "definition_ids": [
+              "SavingAccount::SavingAccount::class",
+              "SavingAccount::SavingAccount::constructor",
+              "SavingAccount::accrueSavingsInterest::method",
+              "SavingAccount::password::field",
+              "SavingAccount::savingBalance::field",
+              "SavingAccount::transferToSavings::method",
+              "SavingAccount::verifySavingsPassword::method"
+            ],
+            "existing_declaration": null,
+            "operation": "insert_nested_class",
+            "owner": "BankAccount",
+            "physical_target": "bank.java",
+            "removal_intent": false,
+            "source_text": "public static class SavingAccount extends BankAccount {\n\n  private double savingBalance;\n  private String password;\n  public SavingAccount(double opening, String password) {\n    super(opening);\n    this.password = password;\n  }\n  private boolean verifySavingsPassword(String providedPassword) {\n    return password.equals(providedPassword);\n  }\n  public boolean transferToSavings(double amount, String providedPassword) {\n    if (!verifySavingsPassword(providedPassword)) return false;\n    if (!debitForSavings(amount)) return false;\n    savingBalance += amount;\n    return true;\n  }\n  public void accrueSavingsInterest(double rate) {\n    if (!verifySavingsPassword(System.console().readLine())) return;\n    savingBalance += savingBalance * rate;\n  }\n}\n"
+          }
+        ],
+        "p1_fingerprint": "1069ed917874372902144982d1175dd5faaf186290c5a19abc984c6a47028519",
+        "patch": "",
+        "phase_id": "PATCH.AUTHOR.STRUCTURAL.1",
+        "repair_scope_delta": 0,
+        "repository_evidence_fingerprint": "f6d44717e961aba23e4d739cc80ed0755a78d267fe7afec6e39216eb97ff7d1d",
+        "repository_id": "c-a-t-t-u-s-70868012c5a8c5a5e3d0caa91a5347a4",
+        "schema_version": "patch_author_structural_1_v1",
+        "source_bindings": [
+          [
+            "bank.java",
+            "BankAccount",
+            "fd5ad104044255a0dcb99419c96f475da00afbef2243b552aafab4dcbdfc4e71",
+            "e9227f4bc04b9dd74d16c1610fb0038b1fd0e02de6a8337e87448fe0ac79b7e5"
+          ]
+        ],
+        "status": "structural_patch_candidate",
+        "task_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "write_authority": false
+      },
+      "deterministic": true,
+      "performance": {
+        "admitted_scope_containment_seconds": {
+          "max_ms": 4.5974,
+          "median_ms": 3.3167
+        },
+        "author_context_projection_seconds": {
+          "max_ms": 3.9718,
+          "median_ms": 3.6776
+        },
+        "candidate_fingerprint_seconds": {
+          "max_ms": 6.5157,
+          "median_ms": 2.5571
+        },
+        "candidate_normalization_seconds": {
+          "max_ms": 0.3407,
+          "median_ms": 0.1249
+        },
+        "fresh_admission_validation_seconds": {
+          "max_ms": 710.994,
+          "median_ms": 645.487
+        },
+        "java_structural_parsing_seconds": {
+          "max_ms": 6.2288,
+          "median_ms": 2.7039
+        },
+        "provider_latency_seconds": {
+          "max_ms": 0.0,
+          "median_ms": 0.0
+        },
+        "total_deterministic_seconds": {
+          "max_ms": 732.4267,
+          "median_ms": 658.2367
+        }
+      }
+    },
+    "preserve_base_compatibility": {
+      "candidate": {
+        "admission_fingerprint": "2af46237c5b8e561f3262bf5d0f046541622d9d4f766a6fa334e1e4e6cc82a42",
+        "apply_authority": false,
+        "approval_receipt_fingerprint": "57eafed417f1257b26bb64725510966681106bfe1967f047fee6188f4ca629ac",
+        "approved_ceiling_fingerprint": "cb814fa7d25ce8c93db6920b127cdf6bb781ee7bbe839ac12c06e527d4031743",
+        "authoring_scope_delta": 0,
+        "authority": "candidate_only",
+        "candidate_fingerprint": "230ee706bfc8f3ad83e16484da8844852ebe05c5223bce9d9ed8fc4caa301162",
+        "effective_design_fingerprint": "bfb257436ca605311751ddfebb614b2db65bde95f1711ef87466455af3c734ac",
+        "execution_authorized": false,
+        "filesystem_file_creation_authority": false,
+        "filesystem_write_authority": false,
+        "implementation_plan_fingerprint": "d7d092d830f26ee40239eb5229955c7f7a8b583cdc0cf0b0f57d9680c05c9edd",
+        "new_path_absence_witnesses": [
+          {
+            "ancestors": [],
+            "path": "SavingAccount.java",
+            "resolved_relative_path": "SavingAccount.java",
+            "source_fingerprint": null,
+            "state": "absent"
+          }
+        ],
+        "operations": [
+          {
+            "definition_ids": [
+              "BankAccount::debitForSavings::method"
+            ],
+            "existing_declaration": null,
+            "operation": "insert_member",
+            "owner": "BankAccount",
+            "physical_target": "bank.java",
+            "removal_intent": false,
+            "source_text": "protected boolean debitForSavings(double amount) {\n  if (amount <= balance) { balance -= amount; return true; }\n  return false;\n}"
+          },
+          {
+            "definition_ids": [
+              "SavingAccount::SavingAccount::class",
+              "SavingAccount::SavingAccount::constructor",
+              "SavingAccount::accrueSavingsInterest::method",
+              "SavingAccount::password::field",
+              "SavingAccount::savingBalance::field",
+              "SavingAccount::transferToSavings::method",
+              "SavingAccount::verifySavingsPassword::method"
+            ],
+            "existing_declaration": null,
+            "operation": "draft_new_file",
+            "owner": "SavingAccount",
+            "physical_target": "SavingAccount.java",
+            "removal_intent": false,
+            "source_text": "public class SavingAccount extends BankAccount {\n\n  private double savingBalance;\n  private String password;\n  public SavingAccount(double opening, String password) {\n    super(opening);\n    this.password = password;\n  }\n  private boolean verifySavingsPassword(String providedPassword) {\n    return password.equals(providedPassword);\n  }\n  public boolean transferToSavings(double amount, String providedPassword) {\n    if (!verifySavingsPassword(providedPassword)) return false;\n    if (!debitForSavings(amount)) return false;\n    savingBalance += amount;\n    return true;\n  }\n  public void accrueSavingsInterest(double rate) {\n    if (!verifySavingsPassword(System.console().readLine())) return;\n    savingBalance += savingBalance * rate;\n  }\n}\n"
+          }
+        ],
+        "p1_fingerprint": "e7192376984ce37548f5214b321840df137d29ff2201e58d2e9466e592ad7395",
+        "patch": "",
+        "phase_id": "PATCH.AUTHOR.STRUCTURAL.1",
+        "repair_scope_delta": 0,
+        "repository_evidence_fingerprint": "2f46cb15b7598370973279ccf51c74bb02177f981c8857a7753f3c975962dfe4",
+        "repository_id": "c-a-t-t-u-s-70868012c5a8c5a5e3d0caa91a5347a4",
+        "schema_version": "patch_author_structural_1_v1",
+        "source_bindings": [
+          [
+            "bank.java",
+            "BankAccount",
+            "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+            "04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+          ]
+        ],
+        "status": "structural_patch_candidate",
+        "task_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "write_authority": false
+      },
+      "deterministic": true,
+      "performance": {
+        "admitted_scope_containment_seconds": {
+          "max_ms": 3.2042,
+          "median_ms": 2.8534
+        },
+        "author_context_projection_seconds": {
+          "max_ms": 3.7398,
+          "median_ms": 3.2125
+        },
+        "candidate_fingerprint_seconds": {
+          "max_ms": 2.5139,
+          "median_ms": 2.3229
+        },
+        "candidate_normalization_seconds": {
+          "max_ms": 0.1859,
+          "median_ms": 0.1338
+        },
+        "fresh_admission_validation_seconds": {
+          "max_ms": 731.6896,
+          "median_ms": 686.4713
+        },
+        "java_structural_parsing_seconds": {
+          "max_ms": 3.5173,
+          "median_ms": 2.7473
+        },
+        "provider_latency_seconds": {
+          "max_ms": 0.0,
+          "median_ms": 0.0
+        },
+        "total_deterministic_seconds": {
+          "max_ms": 743.6191,
+          "median_ms": 698.4712
+        }
+      }
+    },
+    "savings_only_on_subclass": {
+      "candidate": {
+        "admission_fingerprint": "30d7747e52c7af922c29f0b4c51b6b484626570e3ca615d53cef56b6dcfb70db",
+        "apply_authority": false,
+        "approval_receipt_fingerprint": "f6dfb1a28e95261104cd236247050156ac9eae6f7ad9ddd7f247b44f19c2449f",
+        "approved_ceiling_fingerprint": "909a3f1838126e165c363e2924040d526f54432a337ad4035b89bf8d5533768d",
+        "authoring_scope_delta": 0,
+        "authority": "candidate_only",
+        "candidate_fingerprint": "70eb16a0ffa9b4fd5f6fa0a1568f2e3d49e97f66fb6ba451daeebb1b1c8973a5",
+        "effective_design_fingerprint": "d14d3bf6b6c4e0303dc717e613a77b874ffbee140d5f04767fd99c2135e4e4b3",
+        "execution_authorized": false,
+        "filesystem_file_creation_authority": false,
+        "filesystem_write_authority": false,
+        "implementation_plan_fingerprint": "39c63eefa93867c9083833a5881d4e84dc3c13ac27fb6c0e287aba300b866c55",
+        "new_path_absence_witnesses": [
+          {
+            "ancestors": [],
+            "path": "SavingAccount.java",
+            "resolved_relative_path": "SavingAccount.java",
+            "source_fingerprint": null,
+            "state": "absent"
+          }
+        ],
+        "operations": [
+          {
+            "definition_ids": [
+              "BankAccount::debitForSavings::method"
+            ],
+            "existing_declaration": null,
+            "operation": "insert_member",
+            "owner": "BankAccount",
+            "physical_target": "bank.java",
+            "removal_intent": false,
+            "source_text": "protected boolean debitForSavings(double amount) {\n  if (amount <= balance) { balance -= amount; return true; }\n  return false;\n}"
+          },
+          {
+            "definition_ids": [
+              "BankAccount::saving::method"
+            ],
+            "existing_declaration": {
+              "context_fingerprint": "04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51",
+              "declaration_fingerprint": "42669aae621021df99ed7b754a42dc1075f31cd757fde8c3f40bbfb958dc4b5c",
+              "file": "bank.java",
+              "kind": "method",
+              "member_span": [
+                6,
+                6
+              ],
+              "name": "saving",
+              "owner": "BankAccount",
+              "source_fingerprint": "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c"
+            },
+            "operation": "remove_declaration",
+            "owner": "BankAccount",
+            "physical_target": "bank.java",
+            "removal_intent": true,
+            "source_text": null
+          },
+          {
+            "definition_ids": [
+              "SavingAccount::SavingAccount::class",
+              "SavingAccount::SavingAccount::constructor",
+              "SavingAccount::accrueSavingsInterest::method",
+              "SavingAccount::password::field",
+              "SavingAccount::savingBalance::field",
+              "SavingAccount::transferToSavings::method",
+              "SavingAccount::verifySavingsPassword::method"
+            ],
+            "existing_declaration": null,
+            "operation": "draft_new_file",
+            "owner": "SavingAccount",
+            "physical_target": "SavingAccount.java",
+            "removal_intent": false,
+            "source_text": "public class SavingAccount extends BankAccount {\n\n  private double savingBalance;\n  private String password;\n  public SavingAccount(double opening, String password) {\n    super(opening);\n    this.password = password;\n  }\n  private boolean verifySavingsPassword(String providedPassword) {\n    return password.equals(providedPassword);\n  }\n  public boolean transferToSavings(double amount, String providedPassword) {\n    if (!verifySavingsPassword(providedPassword)) return false;\n    if (!debitForSavings(amount)) return false;\n    savingBalance += amount;\n    return true;\n  }\n  public void accrueSavingsInterest(double rate) {\n    if (!verifySavingsPassword(System.console().readLine())) return;\n    savingBalance += savingBalance * rate;\n  }\n}\n"
+          }
+        ],
+        "p1_fingerprint": "bdc2a833d822002ff8ad7a4f0efc5fa13254cdeaa9b86b3d0386bc8e8e1222df",
+        "patch": "",
+        "phase_id": "PATCH.AUTHOR.STRUCTURAL.1",
+        "repair_scope_delta": 0,
+        "repository_evidence_fingerprint": "2f46cb15b7598370973279ccf51c74bb02177f981c8857a7753f3c975962dfe4",
+        "repository_id": "c-a-t-t-u-s-70868012c5a8c5a5e3d0caa91a5347a4",
+        "schema_version": "patch_author_structural_1_v1",
+        "source_bindings": [
+          [
+            "bank.java",
+            "BankAccount",
+            "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+            "04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+          ]
+        ],
+        "status": "structural_patch_candidate",
+        "task_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "write_authority": false
+      },
+      "deterministic": true,
+      "performance": {
+        "admitted_scope_containment_seconds": {
+          "max_ms": 5.533,
+          "median_ms": 3.3586
+        },
+        "author_context_projection_seconds": {
+          "max_ms": 14.5875,
+          "median_ms": 3.3315
+        },
+        "candidate_fingerprint_seconds": {
+          "max_ms": 10.5338,
+          "median_ms": 2.9405
+        },
+        "candidate_normalization_seconds": {
+          "max_ms": 0.2669,
+          "median_ms": 0.1714
+        },
+        "fresh_admission_validation_seconds": {
+          "max_ms": 1094.9111,
+          "median_ms": 696.1492
+        },
+        "java_structural_parsing_seconds": {
+          "max_ms": 3.5972,
+          "median_ms": 2.8354
+        },
+        "provider_latency_seconds": {
+          "max_ms": 0.0,
+          "median_ms": 0.0
+        },
+        "total_deterministic_seconds": {
+          "max_ms": 1129.4808,
+          "median_ms": 708.7931
+        }
+      }
+    },
+    "subclass_specialization": {
+      "candidate": {
+        "admission_fingerprint": "83bdf923290cb4822762089e9d16e1b47bc6677dee53af03cf6bfce48c1b8814",
+        "apply_authority": false,
+        "approval_receipt_fingerprint": "f1687902c9f769016c4644a6ed96957a3b63d8e4188fc356b1481beff9e938a0",
+        "approved_ceiling_fingerprint": "ea2fbd788be09c7e42372f085f6f7c469c216b9694f45a17142737d900023184",
+        "authoring_scope_delta": 0,
+        "authority": "candidate_only",
+        "candidate_fingerprint": "50e1816a517ca42004a66992fd6481548a52d022abc05e209bacdde3547a5bb6",
+        "effective_design_fingerprint": "21bee1fec38daf7705d635edbe9e23f664be9b6a905b44d4903284ae59da779c",
+        "execution_authorized": false,
+        "filesystem_file_creation_authority": false,
+        "filesystem_write_authority": false,
+        "implementation_plan_fingerprint": "31bac1f58f7f092c2f18b2d39f7919a9ee2d76023945f6625f98e26e42b3c018",
+        "new_path_absence_witnesses": [
+          {
+            "ancestors": [],
+            "path": "SavingAccount.java",
+            "resolved_relative_path": "SavingAccount.java",
+            "source_fingerprint": null,
+            "state": "absent"
+          }
+        ],
+        "operations": [
+          {
+            "definition_ids": [
+              "BankAccount::debitForSavings::method"
+            ],
+            "existing_declaration": null,
+            "operation": "insert_member",
+            "owner": "BankAccount",
+            "physical_target": "bank.java",
+            "removal_intent": false,
+            "source_text": "protected boolean debitForSavings(double amount) {\n  if (amount <= balance) { balance -= amount; return true; }\n  return false;\n}"
+          },
+          {
+            "definition_ids": [
+              "SavingAccount::SavingAccount::class",
+              "SavingAccount::SavingAccount::constructor",
+              "SavingAccount::password::field",
+              "SavingAccount::saving::method",
+              "SavingAccount::savingBalance::field",
+              "SavingAccount::transferToSavings::method",
+              "SavingAccount::verifySavingsPassword::method"
+            ],
+            "existing_declaration": null,
+            "operation": "draft_new_file",
+            "owner": "SavingAccount",
+            "physical_target": "SavingAccount.java",
+            "removal_intent": false,
+            "source_text": "public class SavingAccount extends BankAccount {\n\n  private double savingBalance;\n  private String password;\n  public SavingAccount(double opening, String password) {\n    super(opening);\n    this.password = password;\n  }\n  private boolean verifySavingsPassword(String providedPassword) {\n    return password.equals(providedPassword);\n  }\n  public boolean transferToSavings(double amount, String providedPassword) {\n    if (!verifySavingsPassword(providedPassword)) return false;\n    if (!debitForSavings(amount)) return false;\n    savingBalance += amount;\n    return true;\n  }\n  public void saving(double rate) {\n    if (!verifySavingsPassword(System.console().readLine())) return;\n    savingBalance += savingBalance * rate;\n  }\n}\n"
+          }
+        ],
+        "p1_fingerprint": "5fb61ed3910cb5055c631246bedb909047a750b7839ab432d70ba7416cc75ae4",
+        "patch": "",
+        "phase_id": "PATCH.AUTHOR.STRUCTURAL.1",
+        "repair_scope_delta": 0,
+        "repository_evidence_fingerprint": "2f46cb15b7598370973279ccf51c74bb02177f981c8857a7753f3c975962dfe4",
+        "repository_id": "c-a-t-t-u-s-70868012c5a8c5a5e3d0caa91a5347a4",
+        "schema_version": "patch_author_structural_1_v1",
+        "source_bindings": [
+          [
+            "bank.java",
+            "BankAccount",
+            "c18644eef46f21f69c04b98d29bb9d043ae2d069fe4c92b7fba52fd9e9f71f4c",
+            "04a9f852df34751fb2d7637e6d224575db1ceb2091121fc174119ff8915a8e51"
+          ]
+        ],
+        "status": "structural_patch_candidate",
+        "task_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "write_authority": false
+      },
+      "deterministic": true,
+      "performance": {
+        "admitted_scope_containment_seconds": {
+          "max_ms": 3.5462,
+          "median_ms": 2.7774
+        },
+        "author_context_projection_seconds": {
+          "max_ms": 3.6795,
+          "median_ms": 3.1797
+        },
+        "candidate_fingerprint_seconds": {
+          "max_ms": 2.9954,
+          "median_ms": 2.0427
+        },
+        "candidate_normalization_seconds": {
+          "max_ms": 0.1825,
+          "median_ms": 0.1145
+        },
+        "fresh_admission_validation_seconds": {
+          "max_ms": 855.1152,
+          "median_ms": 665.1971
+        },
+        "java_structural_parsing_seconds": {
+          "max_ms": 3.381,
+          "median_ms": 2.7105
+        },
+        "provider_latency_seconds": {
+          "max_ms": 0.0,
+          "median_ms": 0.0
+        },
+        "total_deterministic_seconds": {
+          "max_ms": 865.4048,
+          "median_ms": 676.4765
+        }
+      }
+    }
+  },
+  "source_mutation": false,
+  "write_authority": false
+}

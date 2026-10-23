@@ -1,0 +1,25 @@
+{
+  "phase_id": "PATCH.CANDIDATE.MATERIALIZE.1",
+  "reversals": [
+    {
+      "path": "docs/roadmap/phase_registry.json",
+      "entry_sha256": "73df0a94f778e5dc016832e559e01a1cced852999ecf825296d0358e2a441bc7",
+      "post_sha256": "241eb2e4a576e1c2264baa6dbcafff28332bcc42e6c3f7e86b9b855f5f791647"
+    },
+    {
+      "path": "tests/test_phase_registry.py",
+      "entry_sha256": "305c1e1e61cb5e725123b350ad902e1ecb7f7d4d8b8d32a03b6219ec560eca59",
+      "post_sha256": "397590e463e7d989ea1be5d177b52a01793128b28c3560b8bfa5c3808648cda5"
+    },
+    {
+      "path": "tests/test_phase_picker.py",
+      "entry_sha256": "6a0d23d33a59375a67a25259eb775bbea656292edbd7913dced5790309690fd4",
+      "post_sha256": "0686283dd44fd47c2b9ef84d2be189df90d2b9eed74f577ea6447db92044bb1e"
+    },
+    {
+      "path": "tests/_patch_author_structural1_maintenance.py",
+      "entry_sha256": "76d2240609234b496a5ccc89dc78ecd78e8fe08425457c06559a66781ee38292",
+      "post_sha256": "b1b5f508b908eb9b865bed0841950e9fb74b6e53abcce6f5717b0deaef3a1e10"
+    }
+  ]
+}

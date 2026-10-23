@@ -1,0 +1,785 @@
+{
+  "evidence_index": "evidence_index.json",
+  "selection": {
+    "authority_flags": {
+      "Apply": false,
+      "BANK": false,
+      "BANK_authority": false,
+      "apply_authority": false,
+      "arbitrary_Java": false,
+      "arbitrary_class_authority": false,
+      "arbitrary_class_loading_authority": false,
+      "arbitrary_command": false,
+      "arbitrary_command_authority": false,
+      "arbitrary_filesystem": false,
+      "arbitrary_java_authority": false,
+      "arbitrary_method_authority": false,
+      "arbitrary_reflection_authority": false,
+      "arbitrary_source_authority": false,
+      "compilation_authority": false,
+      "constructor_reflection_authority": false,
+      "consumer_readiness_authority": false,
+      "container_creation": false,
+      "container_creation_authority": false,
+      "controller_implementation": false,
+      "enumeration_authority": false,
+      "exact_sandbox_materialization_authority": false,
+      "exact_scenario_compilation_authority": false,
+      "executor": false,
+      "executor_authority": false,
+      "field_write_authority": false,
+      "generic_reflection_authority": false,
+      "host_mount": false,
+      "host_mount_authority": false,
+      "network": false,
+      "network_authority": false,
+      "preparation_authority": false,
+      "private_method_authority": false,
+      "real_task_runtime_authority": false,
+      "reflection": false,
+      "reflection_execution_authority": false,
+      "repository_java_authority": false,
+      "repository_source_write_authority": false,
+      "repository_write": false,
+      "repository_write_authority": false,
+      "runtime_activation": false,
+      "runtime_activation_authority": false,
+      "runtime_authority": false,
+      "sandbox_materialization_authority": false,
+      "scenario_compilation": false,
+      "scenario_compilation_authority": false,
+      "shell": false,
+      "shell_authority": false,
+      "source_identity_authority_issued_by_this_phase": false,
+      "source_materialization": false,
+      "work_write_authority_from_workspace_possession": false,
+      "workspace_issuance": false,
+      "workspace_issuance_authority": false
+    },
+    "bootstrap": {
+      "argv_count": 6,
+      "argv_literal_pending_source_identity": true,
+      "argv_prefix": [
+        "/usr/local/bin/python",
+        "-I",
+        "-S",
+        "-B",
+        "-c"
+      ],
+      "auto_remove": false,
+      "container_entrypoint": [
+        "/usr/local/bin/python"
+      ],
+      "control_deadlines": "Every fixed create/inspect/start control action is bounded by min(existing 8000ms control ceiling, remaining host work cutoff); no call may spend cleanup reserve or reset lifetime. If creation/inspection leaves insufficient full preparation window, cleanup without preparation.",
+      "delivery": "Future authorized workspace creator supplies fixed owner source as immutable container-create Cmd; validates exact inspected entrypoint/Cmd/image/env/policy before sole start. Same immutable pinned image; never rebuild, copy, mount, exec-upload, stdin-source or tmpfs script.",
+      "delivery_boundary": "NEW additive fixed bootstrap adapter is an explicit effect/input boundary. Its future separately authorized workspace-creation/launch admission must bind actual source bytes/hash/size and exact Cmd before create/start. Neither historical provider authority nor preparation facets authorize this bootstrap. This selection issues no bootstrap authority; missing fixed launch authorization/identity fails PROOF_UNRESOLVED before creation. No additional generalized source-delivery authority selected.",
+      "environment": {
+        "GPG_KEY": "",
+        "HOME": "/work",
+        "HOSTNAME": "runtime-sandbox1",
+        "LANG": "C.UTF-8",
+        "PATH": "/usr/local/bin:/usr/bin:/bin",
+        "PYTHON_SHA256": "",
+        "PYTHON_VERSION": "",
+        "SANDBOX_PUBLIC_SENTINEL": "phase-owned"
+      },
+      "historical_validator_reused_for_new_source": false,
+      "inspection": "New additive pure inspector compares every frozen sandbox dimension and actual source Cmd plus Tty/OpenStdin/StdinOnce/RestartPolicy/RestartCount. Existing exact-source safe_configuration must remain unchanged; no claim it already accepts new controller.",
+      "interpreter_sha256": "0e6475dfda68a9b2d93501449fc47593ca169010e8f4881577b97463fd0c1263",
+      "native_argv_limit": "Before create, compute exact platform-native serialized argv, including Docker prefix/options and quoted source. Require Windows CreateProcess command line <32767 UTF-16 code units including terminator and Linux single-argument/system limits. Source_max_bytes is only a secondary ceiling, not a claim every such source fits. Oversize is PROOF_UNRESOLVED, with no file/stdin/copy/mount/image fallback. Actual fit remains an implementation identity check.",
+      "normalized_executable": "/usr/local/bin/python",
+      "open_stdin": true,
+      "resolved_executable": "/usr/local/bin/python3.12",
+      "restart_policy": "no",
+      "source_argument": "Exact future reviewed fixed source bytes, decoded strict UTF-8 and roundtrip-equal, as ONE argv element; no NUL/BOM, formatting, interpolation or caller input. No extra argv.",
+      "source_argument_index": 5,
+      "source_location_container": "No filesystem source path: exact Docker Config.Cmd[-1] input to Python -c, code filename <string>, resident interpreter memory. Never claim embedded in image.",
+      "source_location_host": "core/synthetic_execution_preparation_controller_source_pinned.py (future fixed bytes accessor; not created)",
+      "source_max_bytes": 65536,
+      "start_channel": "Exactly one fixed start --attach --interactive against owner-retained inspected full 64-lowercase-hex container ID; split stdout/stderr, no PTY, no generic attach/exec method exposed. No reattach/start retry after ambiguity.",
+      "status": "REVIEWED_CANDIDATE_PROFILE_NOT_FINAL_SELECTION",
+      "stdin_once": true,
+      "tty": false,
+      "working_directory": "/work"
+    },
+    "candidate_decisions_are_operational_authority": false,
+    "candidates": [
+      {
+        "architecture": "persistent_in_container_controller",
+        "classification": "PREFERRED_BUT_SELECTION_UNRESOLVED",
+        "criteria": {
+          "capture_reaping": "Single-thread nonblocking stdout/stderr capture and complete group kill/wait/adopted-child reap/EOF verification before success.",
+          "challenge_sequence": "Same serial state retains strict sequence, used IDs and owner-issued 32-byte challenges; no disk/session restore.",
+          "child_supervision": "PID1 launches only frozen javac argv in a new session/process group under existing pids/memory/cpu/seccomp constraints.",
+          "cleanup_after_loss": "Independent retained cleanup identity is required after inner failure, but concrete backend-generation authentication for full-ID kill/remove is missing. Candidate not finally selected.",
+          "closed_environment": "Exact eight-variable environment, no identifiers or deadlines added as environment variables.",
+          "complexity": "Smallest supported evolution: one inner event loop plus fixed host adapter and independent outer custodian.",
+          "controller_generation": "One live PID1 process and unbroken owner-held channel, source/executable/image and kernel incarnation bound together; PID alone insufficient.",
+          "disconnect": "Any EOF, malformed frame, capture failure or attach loss invalidates owner relation; independent outer teardown follows.",
+          "local_fence": "Single selector state machine; coherent snapshot or one active mutation/reservation; priority cleanup installs permanent barrier.",
+          "no_network": "Inherited stdio pipes only; no socket/socketpair/network syscall required.",
+          "observation_coherence": "Snapshot runs only while compiler is fully reaped and no mutation/reservation race exists; incomplete writer/mount/task inventory fails unresolved.",
+          "readonly_root_exact_tmpfs": "Inline fixed Python -c source creates no infrastructure files; exact immutable root and tmpfs options unchanged.",
+          "reconnect_resurrection": "No reconnect, reattach, restart or restored generation; replacements require new workspace issuance after old cleanup.",
+          "sandbox2_change": "None. Existing policy permits pipes/selectors/setsid/kill/wait and ordinary child creation; future live validation remains mandatory.",
+          "single_active_mutation": "One active operation ID or one exclusive handoff identity, never both; ordinary extra requests fail closed.",
+          "workspace_continuity": "Same /work and /tmp mounts, container and controller from empty observation through preparation and reservation; no artifact export."
+        },
+        "id": "A"
+      },
+      {
+        "architecture": "retained_container_host_supervised_fixed_per_operation",
+        "classification": "NOT_SELECTED",
+        "criteria": {
+          "capture_reaping": "Short-lived controller may exit before proving adopted child/EOF closure; outer supervisor must own the gap.",
+          "challenge_sequence": "Host state could retain challenges/sequences; short-lived child responses require independent binding every operation.",
+          "child_supervision": "Needs a keeper process and bounded exec-child ownership, or persistent PID1 dispatcher equivalent to A.",
+          "cleanup_after_loss": "Independent outer custodian still required.",
+          "closed_environment": "Each child environment must be independently fixed/inspected; inheritance from a keeper is insufficient.",
+          "complexity": "More boundaries, keeper, per-operation exec and generation proofs than A; no repository-native retained implementation found.",
+          "controller_generation": "Per-operation Python process identity changes. A retained host supervisor could own generation, but that is a new independently authenticated controller architecture.",
+          "disconnect": "Operation channel loss leaves keeper/container alive; invalidate and independently remove.",
+          "local_fence": "Host fence possible; inner observation/mutation must prove no residual writer between executions.",
+          "no_network": "Fixed Docker exec is host control-plane activity, not workload networking, but generic exec authority is forbidden.",
+          "observation_coherence": "Additional idle PID1 plus per-operation process inventory and no-writer proof; exact originals must remain bound.",
+          "readonly_root_exact_tmpfs": "Possible only with inline fixed source; a spool/socket/file dispatcher violates exact manifests or becomes A.",
+          "reconnect_resurrection": "Host reconnection must never recreate controller identity from same container; no existing retained implementation proves it.",
+          "sandbox2_change": "No syscall widening intrinsically required for fixed exec; NOT_SELECTED because extra unsupported authority and continuity complexity.",
+          "single_active_mutation": "Host serialization possible, but only after designing a fixed supervisor and per-child admission/cancellation relation.",
+          "workspace_continuity": "Retained container tmpfs can persist, but container continuity alone cannot prove controller continuity."
+        },
+        "id": "B"
+      },
+      {
+        "architecture": "repository_existing_JAVA_1C_one_shot",
+        "classification": "INCOMPATIBLE_WITH_RETAINED_SEMANTICS",
+        "criteria": {
+          "capture_reaping": "Existing selector/group/reaping ownership supplies a pattern; never invoke it here.",
+          "challenge_sequence": "No semantic challenge/sequence operation loop.",
+          "child_supervision": "Existing bounded compiler and Java child ownership is useful source evidence only.",
+          "cleanup_after_loss": "Existing outer finally cleanup is source evidence, but targets historical names and must not be reused as new full-ID API.",
+          "closed_environment": "Exact closed environment supported historically.",
+          "complexity": "Historical reuse cannot satisfy retention; changing it is explicitly forbidden.",
+          "controller_generation": "Historical JAVA.1C is one fixed proof invocation, not a retained preparation generation.",
+          "disconnect": "Finally cleanup already mandatory.",
+          "local_fence": "No retained admission fence.",
+          "no_network": "Exact no-network profile supported historically.",
+          "observation_coherence": "Historical before/after facts, not current workspace observations.",
+          "readonly_root_exact_tmpfs": "Exact profile supported historically.",
+          "reconnect_resurrection": "There is no resumable generation to reconnect.",
+          "sandbox2_change": "None if preserved; NOT_SELECTED because semantic retention is impossible without forbidden historical mutation.",
+          "single_active_mutation": "Single historical run only; cannot reserve handoff.",
+          "workspace_continuity": "Always kills/removes container before returning; no live workspace survives."
+        },
+        "id": "C"
+      }
+    ],
+    "capabilities_issued": false,
+    "challenge": {
+      "binding": [
+        "exact request_id and operation_id",
+        "purpose equals operation",
+        "original container_identity",
+        "workspace_generation",
+        "controller_generation",
+        "original owner/channel relation"
+      ],
+      "bytes": 32,
+      "issuer": "original workspace owner using unpredictable OS entropy",
+      "observation_only": "Non-null request challenge exactly for frozen three OBSERVE tags. Mutation poststate uses separate spent-admission post-observation reference exactly as frozen schema; no new wire challenge field. Validate entire response once, consume before readiness; stale or duplicate response cannot restore state.",
+      "sequence": "Strictly increasing positive_int, exactly previous accepted+1; bounded by frozen integer maximum, exhaustion terminal. Single-use IDs/challenges; no reset/retry/replay after loss.",
+      "wire_encoding": "64 lowercase hex characters"
+    },
+    "child_process": {
+      "argv": [
+        "/opt/temurin-26.0.2.1/bin/javac",
+        "-J-Xms8m",
+        "-J-Xmx32m",
+        "-J-XX:ActiveProcessorCount=1",
+        "-J-XX:-UsePerfData",
+        "-d",
+        "/work/classes",
+        "/work/SyntheticStateBox.java"
+      ],
+      "attempt_deadline_ms": 5000,
+      "attempt_deadline_origin": "One host-monotonic preparation admission instant before materialization; compiler shares remaining budget, never resets. First inner materialization fixes <=5000ms inner budget; host independently enforces original absolute deadline including transport latency.",
+      "cleanup_budget": "All cancellation/reaping/EOF closure must fit remaining original <=10000ms hard preparation deadline and retained cleanup reserve. Existing 1s wait/.25s reap are maximum sub-budgets clamped to original hard deadline, never appended past it.",
+      "compiler_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+      "constraint_support": "Current SANDBOX.2 default allow with namespace-clone denials and clone3 ENOSYS retains ordinary child creation/setsid/pipe/select/read/wait/kill; pids=128/memory=128MiB/cpu=1 unchanged. JAVA.1C selector capture supplies source-level precedent, not a new live proof. New implementation must fail rather than widen if actual limits are insufficient.",
+      "cwd": "/work",
+      "environment": {
+        "GPG_KEY": "",
+        "HOME": "/work",
+        "HOSTNAME": "runtime-sandbox1",
+        "LANG": "C.UTF-8",
+        "PATH": "/usr/local/bin:/usr/bin:/bin",
+        "PYTHON_SHA256": "",
+        "PYTHON_VERSION": "",
+        "SANDBOX_PUBLIC_SENTINEL": "phase-owned"
+      },
+      "maximum_launches": 1,
+      "operation": "COMPILE_EXACT_SCENARIO",
+      "outer_hard_deadline_ms": 10000,
+      "ownership": "Persistent single-thread PID1 owns javac session/process group; stays PID1 to adopt orphaned group descendants. Nonblocking bounded pipe selectors share attempt deadline and prioritize cleanup input. Kill group even after parent exit; wait direct child, waitpid group adopted descendants, prove no group/task/writer remains, observe both EOFs, close pipes/selectors. No target JVM launch.",
+      "shell": false,
+      "start_new_session": true,
+      "stderr_limit_bytes": 2048,
+      "stdin": "DEVNULL",
+      "stdout_limit_bytes": 2048,
+      "success": "Exact source/materialization remains same controller/workspace generation; compiler exit=0, empty complete captures, both EOFs, no lingering group, unchanged 239-byte source and exact one bounded class. Inert metadata parsing only. Controller stays alive until handoff/cleanup/retention limit."
+    },
+    "cleanup_response_composition": "Logical controller boundary includes host adapter: inner CLEANUP_AND_REPORT produces exactly one bounded frozen response with partial evidence and PROOF_UNRESOLVED until outer outcomes exist. Host adapter retains it, invokes custodian independently, and returns one separately provenance-bound composite typed result to owning workspace (in-process, not a second inner wire response). Inner never claims COMPLETE after its own removal. Components use frozen cleanup_evidence/outer schemas and exact original IDs; missing child/EOF facts remain unresolved even with outer absence. No new semantic field or readiness is inferred.",
+    "completion_marker_earned": false,
+    "conceptual_owner": "core.synthetic_execution_preparation_controller_pinned",
+    "controller_implemented": false,
+    "disconnect_reconnect": {
+      "reconnect_allowed": false,
+      "response": "Host fence permanently invalidates capability/generations before attempting cancellation; inner installs barrier if EOF/cancellation observed. Docker attach disconnect is NOT guaranteed to deliver immediate inner EOF: independent outer custodian kills/removes exact container, and inner startup watchdog bounds disconnected survival. Readiness cannot depend on reconnect.",
+      "restore_state_allowed": false,
+      "triggers": [
+        "EOF/partial/duplicate/trailing/oversize frame",
+        "noncanonical or unmatched response",
+        "attach-process exit or pipe replacement",
+        "host owner or backend continuity loss",
+        "controller exit/restart",
+        "unexpected stderr or stream budget exhaustion"
+      ],
+      "uncertain_effect": "No automatic replay or fresh facet after lost reply; keep spent state, cleanup only."
+    },
+    "evidence": [
+      {
+        "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+        "sha256": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328",
+        "size_bytes": 61888
+      },
+      {
+        "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+        "sha256": "1c40559d4a48b747632ec4e75b49eaeae33bad9ed63fa7cbd5b19337d840406e",
+        "size_bytes": 30969
+      },
+      {
+        "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+        "sha256": "259f3e60a9f33677a335cb6f309b5b89a4f60d7321a2dc623dff186fd98a692d",
+        "size_bytes": 44595
+      },
+      {
+        "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+        "sha256": "e6e25d5ac912a07b35dffab148e8b3dc209aa124429920f374c46f7fd1386192",
+        "size_bytes": 37431
+      },
+      {
+        "path": "core/sandboxed_java_positive_probe.py",
+        "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+        "size_bytes": 7358
+      },
+      {
+        "path": "core/sandboxed_java_positive_continuation.py",
+        "sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+        "size_bytes": 28167
+      },
+      {
+        "path": "core/java_single_thread_capture.py",
+        "sha256": "4ac691b2919b3e778a98c044fb166fd9804b102cdd651995eb8689839ac438fb",
+        "size_bytes": 6312
+      },
+      {
+        "path": "core/candidate_runtime_sandbox.py",
+        "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+        "size_bytes": 34833
+      },
+      {
+        "path": "core/sandbox_backend_provenance.py",
+        "sha256": "42e18b86556118ba67f5a62f913e27c5598321af83a7b35c84b89042737da3b8",
+        "size_bytes": 12132
+      },
+      {
+        "path": "core/thread_compatible_runtime_sandbox.py",
+        "sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+        "size_bytes": 22400
+      },
+      {
+        "path": "docs/roadmap/RUNTIME_SANDBOX_2_SECCOMP.json",
+        "sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+        "size_bytes": 1642
+      }
+    ],
+    "foundation": {
+      "additional_unchanged_inspection_pins": {
+        "cap_add": [],
+        "cgroupns_mode": "private",
+        "controller_entrypoint": [
+          "/usr/local/bin/python"
+        ],
+        "ipc_mode": "none",
+        "log_driver": "none",
+        "pid_mode": "private default ('', None)",
+        "privileged": false,
+        "working_directory": "/work"
+      },
+      "dimensions_widened": [],
+      "historical_controller": {
+        "executable_sha256": "0e6475dfda68a9b2d93501449fc47593ca169010e8f4881577b97463fd0c1263",
+        "identity_kind": "frozen historical provider proof metadata; no current liveness claim",
+        "may_be_widened_here": false,
+        "normalized_executable": "/usr/local/bin/python",
+        "observed_source_semantics": [
+          "one fixed JavaSandboxProbe.java fixture",
+          "requires initially empty /work",
+          "creates /work/classes, compiles fixed fixture and then executes its fixed Java main",
+          "no caller source/flags/environment/stdin",
+          "outer finally kills/removes container and independently observes absence before returning",
+          "successful provider evidence requires verified cleanup"
+        ],
+        "offers_exclusive_live_artifact_handoff": false,
+        "owner": "core.sandboxed_java_positive_continuation",
+        "phase": "RUNTIME.JAVA.1C",
+        "resolved_executable": "/usr/local/bin/python3.12",
+        "retains_live_empty_workspace": false,
+        "source_accessor": "source",
+        "source_owner": "core.sandboxed_java_positive_probe",
+        "source_sha256": "4f81640e2f01bc1f7a1a833beb269a9d1df51088b69cf24c8369fb6683f11a58",
+        "source_size_bytes": 13037
+      },
+      "historical_provider_is_live_authority": false,
+      "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+      "preparation_contract": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+      "sandbox": {
+        "cap_drop": [
+          "ALL"
+        ],
+        "environment": {
+          "GPG_KEY": "",
+          "HOME": "/work",
+          "HOSTNAME": "runtime-sandbox1",
+          "LANG": "C.UTF-8",
+          "PATH": "/usr/local/bin:/usr/bin:/bin",
+          "PYTHON_SHA256": "",
+          "PYTHON_VERSION": "",
+          "SANDBOX_PUBLIC_SENTINEL": "phase-owned"
+        },
+        "environment_source": "Exact eight-variable core.candidate_runtime_sandbox._WORKLOAD_ENVIRONMENT, source-pinned in evidence_index.json; no caller environment extension.",
+        "host_mounts": [],
+        "image_declared_volumes_allowed": false,
+        "live_workspace_requirement": "Provider proof's successfully cleaned workspace is historical evidence, never the scenario workspace. A separate authorized live workspace must be authenticated and bound to the original provider graph by public evidence. This contract grants no sandbox/container issuance.",
+        "memory_bytes": 134217728,
+        "nano_cpus": 1000000000,
+        "network": "none",
+        "no_new_privileges": true,
+        "pids_max": 128,
+        "provider_proof_workspace_reusable": false,
+        "remaining_checks": "Every unchanged SANDBOX.2 inspection/ladder/resource/namespace/cgroup/controller gate; same backend route/version, immutable image and authenticated actual workspace/container generation.",
+        "rootfs_readonly": true,
+        "tmpfs": {
+          "/tmp": "rw,nosuid,nodev,noexec,size=16m,mode=1777",
+          "/work": "rw,nosuid,nodev,size=32m,mode=1777"
+        },
+        "uid_gid": "65534:65534"
+      },
+      "sandbox_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "sandbox_profile": "runtime_sandbox_2_v1",
+      "scenario": {
+        "alternative_implementation_allowed": false,
+        "arguments": [
+          3
+        ],
+        "class_name": "SyntheticStateBox",
+        "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+        "expected_values_are_observed_evidence": false,
+        "field": "SyntheticStateBox.value:int",
+        "method_signature": "boolean SyntheticStateBox.decrement(int)",
+        "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+        "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+        "source_accessor": "get_executor1r_decrement_3_source",
+        "source_kind": "phase_owned_synthetic_fixture",
+        "source_owner": "core.synthetic_runtime_authorization",
+        "source_regeneration_allowed": false,
+        "source_rewriting_allowed": false,
+        "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+        "source_size_bytes": 239
+      },
+      "workspace_contract": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+      "workspace_result_preserved": "WORKSPACE_REQUIRES_CONTROLLER_EVOLUTION"
+    },
+    "frozen_semantic_schema": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+      "sha256": "1c40559d4a48b747632ec4e75b49eaeae33bad9ed63fa7cbd5b19337d840406e",
+      "size_bytes": 30969
+    },
+    "future_modules": [
+      {
+        "module": "core.synthetic_execution_preparation_controller_source_pinned",
+        "role": "Additive fixed source bytes and inner event-loop/protocol implementation; exact source measurement, no issuer."
+      },
+      {
+        "module": "core.synthetic_execution_preparation_controller_pinned",
+        "role": "Additive host fixed bootstrap/channel adapter, inspector, framing and original admission/source/generation registry; no public arbitrary process API."
+      },
+      {
+        "module": "core.synthetic_execution_preparation_cleanup_pinned",
+        "role": "Independent outer exact-generation teardown/absence custodian with retained authenticated identity; remains usable after inner loss."
+      }
+    ],
+    "future_source_identity": {
+      "binding": [
+        "exact source bytes/SHA256/size",
+        "normalized/resolved interpreter and full interpreter SHA256",
+        "bootstrap argv including entire source argument",
+        "exact environment",
+        "immutable image and SANDBOX.2 policy",
+        "protocol ID and wire framing ID",
+        "owning host process and original registry object",
+        "full container ID and observed kernel incarnation",
+        "workspace/controller generations and channel relation",
+        "absolute host-monotonic deadlines/capture bounds"
+      ],
+      "measurement": "Measure final exact emitted UTF-8 source bytes before delivery: size=len(bytes), SHA256(bytes), no normalized text hash or predicted value. Verify full inspected source argument roundtrip bytes; immutable reviewed source is not caller supplied.",
+      "missing_any_binding": "PROOF_UNRESOLVED at the corresponding staged gate; no readiness/operation admission with any missing binding",
+      "source_bytes": null,
+      "source_sha256": null,
+      "source_size_bytes": null,
+      "staged_gates": [
+        "BEFORE_CREATE: reviewed source/hash/size and native argv fit, interpreter/image/config/environment identities plus separately authorized fixed creation admission. Do not demand not-yet-existing container/mount/channel observations here.",
+        "BEFORE_START: returned full container ID independently inspected against exact expected configuration, with retained authorized creation and cleanup relation registered in independent custodian. Missing safe backend-generation mechanism currently blocks this gate.",
+        "BEFORE_READINESS_OR_EFFECT: actual original channel/process/kernel/mount/generation relations and fresh authenticated complete challenge observation plus operation admission. No source identity substitutes for a live instance."
+      ]
+    },
+    "generations": {
+      "container_generation": "Owner-generated unpredictable 32-byte hex token bound once to independently observed full immutable container ID, authenticated original backend control relation, actual no-restart start incarnation, namespaces/cgroup and inspected pinned configuration. Container name and StartedAt alone are not identity. No extra schema field: token is retained inside original owner relation.",
+      "continuity_limit": "Route, Docker/server version, name, PID, token or challenge echo is insufficient. Authenticate current original owner object plus exact retained channel/kernel/container relation. Any control-plane disconnect, host restart, unobservable daemon-generation/ABA gap or ambiguous start is permanent invalidity, not inferred continuity. Report PROOF_UNRESOLVED where proof unavailable.",
+      "controller_generation": "Independent owner-generated 32-byte hex token bound to source/executable/argv/config plus exact PID1 incarnation and original unreplaced channel/host object. Existing wire controller_generation carries token. First authenticated request fixes relation in inner volatile state; never adopt another relation.",
+      "controller_incarnation": "Independently observe PID1 PID namespace, /proc starttime ticks, boot context where observable, namespace inodes/cgroup and no-restart full-container start relation; combine with unbroken original channel and unpredictable generation token. PID/starttime/timestamp tuple alone never proves liveness or daemon continuity.",
+      "independent_observations": [
+        "full container ID and exact inspect configuration",
+        "kernel process start/namespace/cgroup facts",
+        "mount IDs and roots",
+        "original host process/pipe handles and attach exit/EOF",
+        "fresh complete challenged workspace snapshot"
+      ],
+      "owner_generated_identifiers": [
+        "container generation token",
+        "workspace_generation",
+        "controller_generation",
+        "channel generation token",
+        "request/operation/handoff IDs",
+        "observation challenge"
+      ],
+      "replacement": "Lost controller generation permanently invalid for workspace capability. New process in same container cannot inherit tokens/state; reject all readiness, then remove original. No restore, reconnect, renewal or token import.",
+      "session_channel_generation": "Host-generated unpredictable 32-byte token for sole original start-attach process and exact stdin/stdout/stderr handles, retained registry identity and framing ID. Not an added semantic field: bind in immutable owner-authenticated relation and controller-generation identity. No second session for same workspace/controller.",
+      "workspace_generation": "Independent owner-generated 32-byte hex token bound to original container generation plus actual /work and /tmp mount IDs/root identities and namespace incarnation; keep unchanged until terminal. Existing wire workspace_generation carries token. Recreated mounts/container require new workspace."
+    },
+    "implementation_authorized": false,
+    "local_fence": {
+      "admission": "Original workspace/preparation owners independently authenticate/spend their own facets. Fixed host adapter checks original single-use admission relation before forwarding; no caller receives raw stdin/argv. Scalar admission ID alone grants nothing. Inner pins relation and checks exact operation, generation, IDs/sequence, manifest and local state before effect.",
+      "cleanup": "Validated priority BEGIN_CLEANUP, EOF, local deadline or outer cancellation installs/increments permanent cleanup barrier first, withdraws readiness, cancels operation/handoff, kills group and reaps/closes captures, then reports. Never BUSY while leaving readiness. After barrier only cleanup/evidence paths; no new observation-for-readiness, materialization, compile or handoff.",
+      "cooperation": "Materialization uses bounded descriptor operations and checks control/deadline between steps; compile integrates stdin, child pipes and child status in selector. Existing blocking capture_process is evidence/pattern, not reused unchanged for preemption.",
+      "mutual_exclusion": "At most one mutation or exclusive handoff; observation runs only quiescent after full child reaping and under same fence. No observation queued behind active mutation. Active ID and handoff identity are complete snapshot fields.",
+      "no_cross_owner_atomicity": "No private cross-owner locks or transactional claims. Immediately reauthenticate original operation-bound admission and current upstream eligibility at effect/handoff boundary; any unobservable gap fails PROOF_UNRESOLVED before effect. Late loss stops subsequent effects; no facet refund/retry.",
+      "placement": "One PID1 selector event loop plus host adapter admission state for its exact single channel; no threads/background workers or locks shared with other owners.",
+      "state": [
+        "immutable generations/channel binding",
+        "last accepted sequence",
+        "used request/operation IDs",
+        "active_operation_id",
+        "exclusive handoff_identity",
+        "monotonic cleanup_barrier_sequence",
+        "absolute deadlines",
+        "capture and request budgets"
+      ]
+    },
+    "meaning": "The preferred retained-controller design is reviewed, but no candidate proves independent safe outer cleanup after inner loss or complete aggregate capture feasibility. No architecture is finally selected, and no controller or workspace is implemented or created.",
+    "operational_effects": {
+      "Apply": 0,
+      "BANK": 0,
+      "Docker": 0,
+      "EXECUTOR.1R": 0,
+      "EXECUTOR_1R": 0,
+      "JAVA1C": 0,
+      "SANDBOX2": 0,
+      "SyntheticStateBox": 0,
+      "auth_issuance": 0,
+      "capability_consumption": 0,
+      "capability_invalidation": 0,
+      "class_loading": 0,
+      "container_creation": 0,
+      "container_removal": 0,
+      "filesystem_runtime_writes": 0,
+      "java": 0,
+      "javac": 0,
+      "pinned_auth_issuance": 0,
+      "preparation_authority_issuance": 0,
+      "provider_issuance": 0,
+      "reflection": 0,
+      "reflection_admission_issuance": 0,
+      "reflection_issuance": 0,
+      "reflection_lease_issuance": 0,
+      "runtime_issuance": 0,
+      "runtime_lease_issuance": 0,
+      "source_materialization": 0,
+      "workspace_issuance": 0
+    },
+    "outer_cleanup": {
+      "absence": "Only independently authenticated exact-ID not-found on same provable backend relation establishes absence; timeout, connection error, wrong backend, empty response or generic nonzero does not. Removal and fresh absence are distinct. Neither proves lost child wait/EOF; composite preserves unresolved components.",
+      "bootstrap_failure": "Custodian must retain returned full ID before start; if create response lost and full identity cannot be safely recovered via authorized creation relation, report cleanup unresolved, never guess a name/target.",
+      "fixed_control": "Exact full-ID inspect, kill and rm --force --volumes only behind TERMINATE; separate exact full-ID absence inspection behind OBSERVE. No generic Docker API/passthrough. Cleanup retries bounded by fixed original identity and cleanup budget; any backend-generation ambiguity yields unresolved targeting.",
+      "independence": "Custodian has its own fixed bounded backend operations/control handle and retained identity; no inner channel, live workspace readiness, upstream ISSUED status or unspent facet required. Host-loop cleanup works after inner/attach loss. Entire host loss does not magically preserve in-memory authority: independent startup watchdog stops inner, external supervision or later safe cleanup proof remains unresolved; no persisted JSON authority restore.",
+      "operations": [
+        "TERMINATE_REMOVE_EXACT_RETAINED_GENERATION",
+        "OBSERVE_EXACT_RETAINED_GENERATION_ABSENCE"
+      ],
+      "target_supply": "Creator receives full 64-lowercase-hex container ID; independent inspect must match exact ID, immutable image/config and authorized creation relation before start. Before starting, custodian retains immutable original backend/generation/full-ID cleanup relation in its own host registry. Public input is only frozen authenticated retained relation plus fresh request ID/barrier; never caller target, name, Docker prefix or command."
+    },
+    "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.TRANSPORT.1",
+    "protocol_id": "synthetic_preparation_controller_pinned_1_v1",
+    "remaining_unresolved": [
+      "Actual new controller implementation bytes/hash/size and therefore literal final source argv element; identity placeholders are not readiness.",
+      "Implementation and separate authorized fixed workspace/bootstrap issuance, original-object authentication/admission coordination and live generation observation; no authority issued here.",
+      "Source-level pipe/process primitives have supporting precedent; overall selection remains unresolved. Actual controller sandbox/process/capture/EOF/observation and 8192-byte aggregate-fit validation must precede readiness without widening.",
+      "Live backend/kernel/container continuity and exact cleanup targeting where original relation is unobservable; fail PROOF_UNRESOLVED rather than invent daemon generation.",
+      "Future consumer/harness/borrower authentication and activation. Handoff here is exclusive reservation only; frozen activation_status stays PROOF_UNRESOLVED.",
+      "Physical cleanup proof after total host/control-plane loss; watchdog is not independent container-removal or reaping evidence."
+    ],
+    "retained_lifetime": {
+      "admission": "Do not start preparation unless full remaining <=10s hard window fits before work cutoff; request and observation budgets may shorten but never extend total. Reservation/consumer work must fit before work cutoff; no consumer authority is supplied here.",
+      "cleanup_reserve_ms": 10000,
+      "enforcement": "Workspace-owning foreground event loop selects on channel/deadlines; no detached worker or returning live capability after scope ends. At work cutoff or earlier completion/failure/abandonment/upstream loss set barrier, withdraw readiness, cancel handoff/operation and run cleanup. Inner has independent <=30s startup watchdog for disconnected execution. Its origin is actual inner startup, so after total host loss it may fire later than host creation-origin deadline; it NEVER grants readiness beyond host cutoff and does not prove physical absence by host deadline. No host/inner clock equality or hidden deadline transfer claim.",
+      "expiration": "By total deadline no intentional readiness, handoff or running work is permitted. If backend removal/absence cannot be proved within reserve, retain terminal cleanup obligation and report WORKSPACE_CLEANUP_UNRESOLVED; never claim physical absence or extend/renew capability. Any later exact-identity cleanup retry is cleanup-only, not retained readiness.",
+      "liveness": "Timestamps and deadline values bound policy only; fresh challenge plus original live relation still required.",
+      "rationale": "Small practical foreground envelope: up to existing 10s hard preparation window plus up to 10s bounded creation/observation/reservation slack, followed by 10s cleanup reserve. No idle service or indefinite ready retention.",
+      "renewable": false,
+      "start": "Host monotonic instant immediately BEFORE first container creation attempt, bound to original workspace/controller relation. Creation/start/empty observation consume the same total lifetime.",
+      "status": "REVIEWED_CANDIDATE_POLICY_NOT_FINAL_SELECTION",
+      "total_ms": 30000,
+      "work_cutoff_ms": 20000
+    },
+    "reviewed_candidate_architecture": "persistent_in_container_controller",
+    "reviewed_candidate_transport": "persistent_stdio",
+    "sandbox2_changes_required": false,
+    "sandbox2_feasibility_scope": "No widening is identified for candidate A's pipe/process primitives. This is not a claim that a fully compliant retained architecture has been selected.",
+    "sandbox_dimensions_widened": [],
+    "scope": "DESIGN_SELECTION_ONLY",
+    "selected_architecture": null,
+    "selected_transport": null,
+    "selection_blockers": [
+      {
+        "effect": "Candidate A fails independent-safe-outer-cleanup criterion as currently specified; do not finally select it or claim COMPLETE.",
+        "evidence": "core/sandbox_backend_provenance.py:assess_backend_freshness explicitly has no owner-defined backend continuity mechanism; independent Docker CLI connections and endpoint/version/full-ID equality cannot prove original daemon/generation continuity or eliminate ABA.",
+        "id": "INDEPENDENT_OUTER_BACKEND_GENERATION_BINDING",
+        "required_resolution": "Specify a concrete independently authenticated original backend/container-generation relation which the outer custodian can safely use after inner channel loss, without generic targeting, network/mount/sandbox widening or historical owner mutation. A live inner channel cannot be its only proof; saying future provable relation is not a mechanism.",
+        "status": "UNRESOLVED"
+      },
+      {
+        "effect": "Fail-closed overflow behavior is necessary but does not itself demonstrate a successful implementation is feasible.",
+        "evidence": "Full repeated workspace_state plus compiler/capture metadata must fit frozen cumulative8192 bytes, not merely individual frame limits. Optimistic sizing is documented separately; current design does not specify a truthful complete observed identity encoding and full lifecycle budget allocation proved to fit.",
+        "id": "FROZEN_AGGREGATE_CAPTURE_FEASIBILITY",
+        "required_resolution": "Demonstrate canonical complete materialize/compile/required observation responses with truthful kernel/writer/mount identities and explicit frozen attempt boundaries within unchanged aggregate cap. Do not silently exclude required observations, truncate state, invent aliases or reset cap. If impossible, separately evolve requirement; no semantic change in this phase.",
+        "status": "UNRESOLVED_NOT_IMPOSSIBILITY_PROOF"
+      }
+    ],
+    "selection_complete": false,
+    "semantic_schema_changed": false,
+    "separate_future_owners": [
+      "core.synthetic_execution_preparation_workspace_pinned",
+      "core.synthetic_execution_preparation_pinned"
+    ],
+    "sizing_evidence": [
+      {
+        "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/sizing_analysis.py",
+        "sha256": "3a9f36e80ee195aba74439183d90395c2d60167baf69c86ebbee841b2e6e49b9",
+        "size_bytes": 7360
+      },
+      {
+        "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/sizing_witness.json",
+        "sha256": "d2b5ba07111e2aa9fb228440e061d69f948ee083e4ef762468c5d61a45e436c8",
+        "size_bytes": 44677
+      },
+      {
+        "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/sizing_validation.json",
+        "sha256": "d6bf759fe9f7536d2cd8d4fd0e2b6b971ceee9e1c602ac0f34525690afb6a648",
+        "size_bytes": 354
+      }
+    ],
+    "stop_after_selection": true,
+    "transport_candidates": [
+      {
+        "classification": "PREFERRED_BUT_SELECTION_UNRESOLVED",
+        "reason": "Existing exact inline controller/start-attach pattern; pipes need no new syscalls, mounts or files. Safe independent outer cleanup and aggregate budget feasibility are not yet resolved.",
+        "transport": "persistent_stdio"
+      },
+      {
+        "classification": "REQUIRES_REQUIREMENT_EVOLUTION",
+        "reason": "SANDBOX.2 denies socket/socketpair/bind/listen/accept/connect including AF_UNIX; endpoint in /tmp or /work also violates frozen exact manifest. Unlinking does not remove syscall denial.",
+        "transport": "container_local_unix_endpoint"
+      },
+      {
+        "classification": "NOT_SELECTED",
+        "reason": "No generic exec allowed; a new fixed exec boundary and keeper add unsupported generation/reaping coordination compared with A.",
+        "transport": "host_supervised_fixed_stdio_per_operation"
+      }
+    ],
+    "typed_result": "TRANSPORT_SELECTION_UNRESOLVED",
+    "wire": {
+      "admission_boundary": "Before dispatch reject any already-buffered/readable unexpected trailing input. An unbounded future stream cannot be proved empty forever: later invalid bytes install terminal barrier/cancel and suppress success, never claim to undo an already admitted effect. A second ordinary frame cannot grant another effect.",
+      "canonical_encoding": "UTF-8 JSON; sort_keys=true; separators=(',', ':'); ensure_ascii=true; allow_nan=false; exact schema types and list order; no Unicode normalization",
+      "cardinality": "Exactly one terminal semantic response for each admitted complete request if channel survives; no unsolicited messages. Loss may prevent response; never retry an uncertain effect. Multiple sequential request/response pairs in one lifetime/channel.",
+      "duplicate_trailing": "Track request_id and operation_id across entire nonrenewable generation; reused IDs/sequences are rejected without repeating effects. Bytes beyond an announced body are either a permitted next complete frame at its admission point, the sole priority cleanup frame, or fatal unexpected/trailing data; never ignored.",
+      "eof": "Any EOF, including frame-boundary EOF, is terminal: barrier, invalidate, cancel, cleanup. Partial header/body is protocol failure. Successful final cleanup report followed by EOF is normal terminal closure, never retained readiness.",
+      "frame_bound_reason": "Frozen schema says all frames <=8192, so header is included; never silently allow 8196.",
+      "framing_id": "synthetic_preparation_controller_u32be_json_1_v1",
+      "length_counts": "canonical JSON payload octets only",
+      "length_encoding": "unsigned 32-bit big-endian binary, exactly four octets",
+      "magic": null,
+      "maximum_frame_bytes": 8192,
+      "maximum_header_bytes": 4,
+      "maximum_outstanding_requests": 2,
+      "maximum_payload_bytes": 8188,
+      "minimum_payload_bytes": 1,
+      "ordering": "Complete frames never interleave and responses remain FIFO. No logical multiplex, response reordering, general queue or concurrent mutation streams.",
+      "partial_frame_timeout_ms": 1000,
+      "partial_timeout_rule": "Header/body assembly starts at first byte, uses one 1000ms absolute deadline (not reset per byte), further limited by operation/preparation/retention deadline; a stalled cleanup frame triggers outer cleanup.",
+      "priority_basis": "Frozen contract minimum_operation_review.cleanup_split requires preemption without waiting for active effect completion. FIFO control pipelining has no independently multiplexed stream and adds no semantic fields or operations.",
+      "priority_control_exception": "Only one complete BEGIN_CLEANUP may follow one pending ordinary request. It belongs to the same serial state machine; validate and set barrier before waiting for active work. If original reply has not started, finish original with frozen typed failure, then cleanup response in FIFO order. No second mutation or observation is admitted. Any other extra/duplicate frame is fatal. If original reply bytes already started, finish that bounded frame without rewriting bytes; host barrier suppresses its readiness/success publication and no receipt is issued, then deliver cleanup reply. No cross-owner rollback is claimed.",
+      "reader": "Accumulate exactly four header bytes then exactly declared payload; bounded storage, no overread-as-new-request. Partial reads wait only to current absolute deadline. Zero/oversize rejected before allocation or effect. No raw command interpretation.",
+      "semantic_validation": "Reject BOM, malformed UTF-8, duplicate keys at all depths, unknown/missing keys, bool-as-int, coercion, NaN/infinity, trailing JSON/whitespace and noncanonical byte serialization. Compare validated re-encoding to original payload before operation admission.",
+      "status": "REVIEWED_CANDIDATE_PROFILE_NOT_FINAL_SELECTION",
+      "stream_budgets": "No logging on controller stdout; controller stderr empty on success. Child streams separate. Keep <=8192 captured bytes per outer stream cumulatively over whole preparation attempt, INCLUDING wire headers; no reset at materialize/compile/observation boundaries. Also cap entire retained session at 65536 outer bytes per direction and 64 requests, including cleanup. Reserve two request slots for BEGIN_CLEANUP and CLEANUP_AND_REPORT plus bounded cleanup/error response budget before ordinary admission. If complete evidence or cumulative budget cannot fit, fail closed and use independent outer teardown; no truncation or success. Separate session budget never relaxes preparation budget.",
+      "version_prefix": null,
+      "version_reason": "Authenticated fixed launch/channel selects this framing ID; canonical semantic envelope already carries exact protocol_id and version=1. Redundant magic/version adds no boundary."
+    },
+    "workspace_created": false
+  },
+  "selection_sha256": "d96d57dcabd07f8b77a358a1188b1f5dd2240e9e6d3ed6ea36677f6efbf2e7f6",
+  "stop_after_selection": true,
+  "validation": {
+    "benchmark": {
+      "checked": 54,
+      "errors": 0,
+      "exit_code": 0
+    },
+    "completion_marker_earned": false,
+    "focused": {
+      "collected": 17,
+      "exit_code": 0,
+      "passed": 17
+    },
+    "git": {
+      "existing_whitespace_unchanged": true,
+      "passed": true,
+      "phase_whitespace_passed": true
+    },
+    "operational_guard": {
+      "author": {
+        "all_operational_effects_zero": true,
+        "blocked_actions": [],
+        "counters": {
+          "capability_or_transition_attempts": 0,
+          "capability_owner_import_attempts": 0,
+          "execution_or_verification_attempts": 0,
+          "network_attempts": 0,
+          "outside_phase_write_attempts": 0,
+          "process_attempts": 0
+        },
+        "imported_capability_owners": []
+      },
+      "benchmark": {
+        "all_operational_effects_zero": true,
+        "blocked_actions": [],
+        "counters": {
+          "capability_or_transition_attempts": 0,
+          "capability_owner_import_attempts": 0,
+          "execution_or_verification_attempts": 0,
+          "network_attempts": 0,
+          "outside_phase_write_attempts": 0,
+          "process_attempts": 0
+        },
+        "imported_capability_owners": []
+      },
+      "focused": {
+        "all_operational_effects_zero": true,
+        "blocked_actions": [],
+        "counters": {
+          "capability_or_transition_attempts": 0,
+          "capability_owner_import_attempts": 0,
+          "execution_or_verification_attempts": 0,
+          "network_attempts": 0,
+          "outside_phase_write_attempts": 0,
+          "process_attempts": 0
+        },
+        "imported_capability_owners": []
+      },
+      "registry_after": {
+        "all_operational_effects_zero": true,
+        "blocked_actions": [],
+        "counters": {
+          "capability_or_transition_attempts": 0,
+          "capability_owner_import_attempts": 0,
+          "execution_or_verification_attempts": 0,
+          "network_attempts": 0,
+          "outside_phase_write_attempts": 0,
+          "process_attempts": 0
+        },
+        "imported_capability_owners": []
+      },
+      "registry_baseline": {
+        "all_operational_effects_zero": true,
+        "blocked_actions": [],
+        "counters": {
+          "capability_or_transition_attempts": 0,
+          "capability_owner_import_attempts": 0,
+          "execution_or_verification_attempts": 0,
+          "network_attempts": 0,
+          "outside_phase_write_attempts": 0,
+          "process_attempts": 0
+        },
+        "imported_capability_owners": []
+      }
+    },
+    "passed": true,
+    "preservation": {
+      "added_outside_new_phase": [],
+      "after_file_count": 26856,
+      "allowed_additions_outside_phase": [],
+      "baseline_file_count": 26856,
+      "changed": [],
+      "deleted": [],
+      "historical_preservation_passed": true,
+      "scope": "entire non-cache workspace including root/config/web and frozen history"
+    },
+    "registry_picker": {
+      "collected": 299,
+      "existing_failure_count": 7,
+      "failed_nodes": [
+        "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "tests/test_phase_registry.py::test_seed_registry_summary_counts"
+      ],
+      "passed": 292,
+      "unchanged": true
+    },
+    "selection_complete": false,
+    "sizing_guard": {
+      "blocked_effects": [],
+      "mode": "pure_schema_sizing",
+      "operational_guard_counters": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "passed": true
+    },
+    "static": {
+      "compiled_count": 1360,
+      "errors": [],
+      "json_count": 19,
+      "passed": true,
+      "whitespace_errors": []
+    },
+    "typed_result": "TRANSPORT_SELECTION_UNRESOLVED"
+  }
+}

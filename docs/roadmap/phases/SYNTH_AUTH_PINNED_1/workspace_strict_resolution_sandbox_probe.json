@@ -1,0 +1,10 @@
+{
+  "captured_utc": "2026-10-10T01:18:49.133062+00:00",
+  "workspace_directory_is_dir": true,
+  "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S",
+  "read_only_metadata_probe": true,
+  "resolved": false,
+  "exception_type": "PermissionError",
+  "error": "[WinError 5] Access is denied: 'C:\\\\Users\\\\Admin\\\\Documents\\\\Code\\\\J.A.R.V.I.S\\\\districts\\\\C.A.T.T.U.S'",
+  "winerror": 5
+}

@@ -1,0 +1,1 @@
+{"typed_result": "CANDIDATE_A_REJECTED_BUDGET_INCOMPATIBLE", "physical_stdout_lower_bound": 8821, "proven_excess_lower_bound": 629, "input_artifacts": 93, "listed_residuals": 88}

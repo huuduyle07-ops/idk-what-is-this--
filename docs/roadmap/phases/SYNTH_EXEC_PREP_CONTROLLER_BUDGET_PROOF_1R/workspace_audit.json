@@ -1,0 +1,154 @@
+{
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.PROOF.1R",
+  "kind": "PURE_STATIC_WORKSPACE_SOURCE_AUDIT",
+  "attainable_witness_constructed": false,
+  "historical_relaxations_promoted": false,
+  "minimum_effect_wire_sequence": [
+    "MATERIALIZE_EXACT_SCENARIO_SOURCE request",
+    "MATERIALIZE_EXACT_SCENARIO_SOURCE COMPLETE response with full workspace_state",
+    "COMPILE_EXACT_SCENARIO request",
+    "COMPILE_EXACT_SCENARIO COMPLETE response with full post-reap workspace_state"
+  ],
+  "extra_in_effect_observation": {
+    "distinct_OBSERVE_frame_explicitly_required_by_frozen_text": false,
+    "added_for_caution": false,
+    "required_checks": "Fresh exact-generation owner state and final local source/readback/current-manifest fence remain mandatory before compilation; four wire frames do not waive these checks.",
+    "source_to_wire_allocation_limit": "The frozen coordination text does not prescribe an additional distinct OBSERVE_CURRENT_WORKSPACE wire exchange. Its implementation is not proven. Candidate A's BEFORE_READINESS_OR_EFFECT wording is a conditional candidate requirement, not a universal additional frame.",
+    "citations": [
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json:314-352",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json:767-779",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json:1023",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json:450",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json:464-465",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/selection.json:303-305"
+    ]
+  },
+  "mutation_poststate": {
+    "request_and_enclosing_response_challenge": null,
+    "workspace_state_observation_challenge": "Separate single-use 32-byte owner challenge encoded as 64 lowercase hex, prebound with its sequence in the spent mutation admission.",
+    "readiness": "Operation-bound source evidence only. A new OBSERVE_* challenge remains mandatory before readiness or handoff, outside the newly frozen successful effect endpoint.",
+    "citations": [
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json:1023",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json:581-587"
+    ]
+  },
+  "writer_evidence": {
+    "writer_free_truthful": false,
+    "reason": "A controller executing as UID/GID65534 can potentially write both frozen01777 tmpfs roots. Every potential/open writer must be accounted by an original relation.",
+    "post_materialization": "Controller and its task remain. Source creation/readback descriptors cannot be assumed still open or closed absent a reviewed descriptor lifecycle. Root potential-write access remains; /work/classes and possibly source access also require exact accounting under the eventual inventory semantics.",
+    "post_compilation": "Compiler/group/tasks/writers must be gone after successful reap and EOF. Controller and its task remain, with potential access to both roots, classes and possibly source/class files according to actual observed modes and retained handles.",
+    "one_writer_two_root_handles": "Structural lower profile only. It includes the unavoidable potential access to /tmp and /work, but no frozen rule establishes that root entries cover all descendant access or that exactly two handles exhaust the truthful inventory.",
+    "exact_minimum_inventory": "UNRESOLVED: potential-access coverage/grouping, descriptor lifecycle, observed creation modes/umask and identity encodings have not been specified.",
+    "required_identity_references": [
+      "writer.process_identity",
+      "writer.task_identity",
+      "writer.accounted_original_relation_id",
+      "writer_handle.descriptor_identity",
+      "writer_handle.mount_identity",
+      "writer_handle.admitted_operation_id or truthful null"
+    ],
+    "citations": [
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json:30",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json:39-40",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json:636-643",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json:727",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json:287-325",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json:1025"
+    ]
+  },
+  "numeric_and_kernel_widths": {
+    "mode": {
+      "semantic_integer_convention": "UNRESOLVED: no frozen full st_mode versus permission bits convention; no frozen source/classes/class creation modes or umask.",
+      "syntactic_maximum_decimal_digits": 19,
+      "truthful_zero_assumed": false
+    },
+    "uid_gid": {
+      "controller": 65534,
+      "controller_decimal_digits": 5,
+      "mount_roots_and_manifest_entries": "Actual observed metadata required. Controller-created objects should retain actual creation ownership; generic zero substitution is not evidence.",
+      "syntactic_maximum_decimal_digits": 19
+    },
+    "link_counts": {
+      "regular_files": 1,
+      "directory_and_mount_roots": "Observed positive integer; no exact count frozen.",
+      "syntactic_maximum_decimal_digits": 19
+    },
+    "pid_tid_parent_pid_child_pid": {
+      "universal_exact_values": "Not frozen by the semantic architecture-independent contract.",
+      "candidate_A_only": "Single PID1 controller/main TID1/parent0; actual compiler child PID not frozen.",
+      "syntactic_maximum_decimal_digits": 19
+    },
+    "namespace_cgroup_start_text": {
+      "semantic_exact_encoding": "Not universally frozen for all new identity fields.",
+      "existing_observation_precedent": "Readlink text from /proc/*/ns/* and raw or stripped /proc/*/cgroup text exist in historical fixed probes. They do not settle the future aggregate namespace_identity, generations, start_identity or process/group references.",
+      "id_utf8_bytes_max": 256,
+      "id_canonical_json_string_content_bytes_max": 1536,
+      "id_canonical_json_string_bytes_including_quotes_max": 1538,
+      "maximum_basis": "ensure_ascii=true can encode each permitted one-byte ASCII control as six bytes; NUL alone is forbidden by id. This is a schema upper envelope, not an attainable kernel format or a claim that kernel identity text contains controls."
+    },
+    "citations": [
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json:13-17",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json:28-38",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json:173-285",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json:1024-1026",
+      "core/thread_compatible_runtime_sandbox_probe.py:4-5",
+      "core/thread_compatible_runtime_sandbox_probe.py:29-34",
+      "core/sandboxed_java_toolchain_probe.py:27-30",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/selection.json:348"
+    ]
+  },
+  "source_and_class": {
+    "source_owner_literal": "core/synthetic_runtime_authorization.py:_SOURCE",
+    "source_size_bytes": 239,
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "source_read_method": "AST literal recovery only; never owner import/issuance/accessor call.",
+    "raw_source_in_wire_response": false,
+    "wire_requirement": "Full source manifest and materialization readback identity; schema forbids raw source/class/capture bytes in protocol messages.",
+    "class_size": {
+      "minimum": 1,
+      "maximum": 32768,
+      "decimal_digits": [1, 2, 3, 4, 5],
+      "serialized_occurrences_in_compile_response": 2,
+      "maximum_width_delta_from_one_digit": 8,
+      "one_byte_success_witness": false,
+      "measured_exact_size_required_for_width_arithmetic": false
+    },
+    "class_hash": {
+      "actual_value_known": false,
+      "serialized_occurrences_in_compile_response": 2,
+      "canonical_content_width_each": 64,
+      "exact_value_required_for_truthful_concrete_witness": true,
+      "fake_hash_used_as_execution_witness": false
+    },
+    "other_class_metadata": "Path, internal_class_name=SyntheticStateBox, inspection_kind=inert_bounded_classfile_metadata and class_loaded=false are exact fixed fields. No major/minor version, constant-pool count or methods are serialized by this schema. Actual internal identity must still be checked inertly after a real future compilation; it is not measured here.",
+    "compiler": "Exact fixed javac path/hash/eight argv/cwd/eight-variable closed environment/image plus full seven namespaces and cgroup identity; no target JVM. capture_and_reap must have successful exact flags, zero observed bytes on both child streams and exact empty SHA256.",
+    "citations": [
+      "core/synthetic_runtime_authorization.py:26",
+      "core/synthetic_runtime_authorization.py:36-46",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json:632-645",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json:652-727",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json:441-525",
+      "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json:1027"
+    ]
+  },
+  "operational_effects": {
+    "controller_execution": 0,
+    "owner_import": 0,
+    "capability_issuance": 0,
+    "source_materialization": 0,
+    "javac": 0,
+    "java": 0,
+    "Docker": 0,
+    "network": 0,
+    "live_kernel_inspection": 0
+  },
+  "authority_flags": {
+    "controller_implementation": false,
+    "transport_selection": false,
+    "candidate_A_selection": false,
+    "workspace_issuance": false,
+    "source_materialization": false,
+    "compilation": false,
+    "runtime_activation": false
+  }
+}

@@ -1,0 +1,792 @@
+{
+  "frozen_semantic_relaxation": {
+    "materialize_compile": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 930,
+          "frame_overhead_bytes": 8,
+          "candidate_a_wire_bytes": 938,
+          "payload_minus_8192": -7262,
+          "wire_minus_8192": -7254
+        },
+        "response": {
+          "semantic_payload_bytes": 6702,
+          "frame_overhead_bytes": 8,
+          "candidate_a_wire_bytes": 6710,
+          "payload_minus_8192": -1490,
+          "wire_minus_8192": -1482
+        }
+      },
+      "semantic_payload_total_both_directions": 7632,
+      "frame_overhead_both_directions": 16,
+      "candidate_a_outer_stdout_bytes": 6710,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "Guaranteed materialize/compile core only"
+    },
+    "materialize_compile_fresh_current": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_CURRENT_WORKSPACE"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1424,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 1436,
+          "payload_minus_8192": -6768,
+          "wire_minus_8192": -6756
+        },
+        "response": {
+          "semantic_payload_bytes": 9423,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 9435,
+          "payload_minus_8192": 1231,
+          "wire_minus_8192": 1243
+        }
+      },
+      "semantic_payload_total_both_directions": 10847,
+      "frame_overhead_both_directions": 24,
+      "candidate_a_outer_stdout_bytes": 9435,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "materialize_compile_fresh_prepared": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1483,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 1495,
+          "payload_minus_8192": -6709,
+          "wire_minus_8192": -6697
+        },
+        "response": {
+          "semantic_payload_bytes": 9425,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 9437,
+          "payload_minus_8192": 1233,
+          "wire_minus_8192": 1245
+        }
+      },
+      "semantic_payload_total_both_directions": 10908,
+      "frame_overhead_both_directions": 24,
+      "candidate_a_outer_stdout_bytes": 9437,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "empty_materialize_compile_fresh_current": {
+      "operations": [
+        "OBSERVE_EMPTY_WORKSPACE",
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_CURRENT_WORKSPACE"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1914,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 1930,
+          "payload_minus_8192": -6278,
+          "wire_minus_8192": -6262
+        },
+        "response": {
+          "semantic_payload_bytes": 11629,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 11645,
+          "payload_minus_8192": 3437,
+          "wire_minus_8192": 3453
+        }
+      },
+      "semantic_payload_total_both_directions": 13543,
+      "frame_overhead_both_directions": 32,
+      "candidate_a_outer_stdout_bytes": 11645,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "empty_materialize_compile_fresh_prepared": {
+      "operations": [
+        "OBSERVE_EMPTY_WORKSPACE",
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1973,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 1989,
+          "payload_minus_8192": -6219,
+          "wire_minus_8192": -6203
+        },
+        "response": {
+          "semantic_payload_bytes": 11631,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 11647,
+          "payload_minus_8192": 3439,
+          "wire_minus_8192": 3455
+        }
+      },
+      "semantic_payload_total_both_directions": 13604,
+      "frame_overhead_both_directions": 32,
+      "candidate_a_outer_stdout_bytes": 11647,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    }
+  },
+  "candidate_a_relaxation": {
+    "materialize_compile": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1182,
+          "frame_overhead_bytes": 8,
+          "candidate_a_wire_bytes": 1190,
+          "payload_minus_8192": -7010,
+          "wire_minus_8192": -7002
+        },
+        "response": {
+          "semantic_payload_bytes": 7332,
+          "frame_overhead_bytes": 8,
+          "candidate_a_wire_bytes": 7340,
+          "payload_minus_8192": -860,
+          "wire_minus_8192": -852
+        }
+      },
+      "semantic_payload_total_both_directions": 8514,
+      "frame_overhead_both_directions": 16,
+      "candidate_a_outer_stdout_bytes": 7340,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "Guaranteed materialize/compile core only"
+    },
+    "materialize_compile_fresh_current": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_CURRENT_WORKSPACE"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1802,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 1814,
+          "payload_minus_8192": -6390,
+          "wire_minus_8192": -6378
+        },
+        "response": {
+          "semantic_payload_bytes": 10368,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 10380,
+          "payload_minus_8192": 2176,
+          "wire_minus_8192": 2188
+        }
+      },
+      "semantic_payload_total_both_directions": 12170,
+      "frame_overhead_both_directions": 24,
+      "candidate_a_outer_stdout_bytes": 10380,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "materialize_compile_fresh_prepared": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1861,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 1873,
+          "payload_minus_8192": -6331,
+          "wire_minus_8192": -6319
+        },
+        "response": {
+          "semantic_payload_bytes": 10370,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 10382,
+          "payload_minus_8192": 2178,
+          "wire_minus_8192": 2190
+        }
+      },
+      "semantic_payload_total_both_directions": 12231,
+      "frame_overhead_both_directions": 24,
+      "candidate_a_outer_stdout_bytes": 10382,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "empty_materialize_compile_fresh_current": {
+      "operations": [
+        "OBSERVE_EMPTY_WORKSPACE",
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_CURRENT_WORKSPACE"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 2418,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 2434,
+          "payload_minus_8192": -5774,
+          "wire_minus_8192": -5758
+        },
+        "response": {
+          "semantic_payload_bytes": 12889,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 12905,
+          "payload_minus_8192": 4697,
+          "wire_minus_8192": 4713
+        }
+      },
+      "semantic_payload_total_both_directions": 15307,
+      "frame_overhead_both_directions": 32,
+      "candidate_a_outer_stdout_bytes": 12905,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "empty_materialize_compile_fresh_prepared": {
+      "operations": [
+        "OBSERVE_EMPTY_WORKSPACE",
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 2477,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 2493,
+          "payload_minus_8192": -5715,
+          "wire_minus_8192": -5699
+        },
+        "response": {
+          "semantic_payload_bytes": 12891,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 12907,
+          "payload_minus_8192": 4699,
+          "wire_minus_8192": 4715
+        }
+      },
+      "semantic_payload_total_both_directions": 15368,
+      "frame_overhead_both_directions": 32,
+      "candidate_a_outer_stdout_bytes": 12907,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    }
+  },
+  "candidate_a_controller_writer_relaxation": {
+    "materialize_compile": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1182,
+          "frame_overhead_bytes": 8,
+          "candidate_a_wire_bytes": 1190,
+          "payload_minus_8192": -7010,
+          "wire_minus_8192": -7002
+        },
+        "response": {
+          "semantic_payload_bytes": 8052,
+          "frame_overhead_bytes": 8,
+          "candidate_a_wire_bytes": 8060,
+          "payload_minus_8192": -140,
+          "wire_minus_8192": -132
+        }
+      },
+      "semantic_payload_total_both_directions": 9234,
+      "frame_overhead_both_directions": 16,
+      "candidate_a_outer_stdout_bytes": 8060,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "Guaranteed materialize/compile core only"
+    },
+    "materialize_compile_fresh_current": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_CURRENT_WORKSPACE"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1802,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 1814,
+          "payload_minus_8192": -6390,
+          "wire_minus_8192": -6378
+        },
+        "response": {
+          "semantic_payload_bytes": 11450,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 11462,
+          "payload_minus_8192": 3258,
+          "wire_minus_8192": 3270
+        }
+      },
+      "semantic_payload_total_both_directions": 13252,
+      "frame_overhead_both_directions": 24,
+      "candidate_a_outer_stdout_bytes": 11462,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "materialize_compile_fresh_prepared": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1861,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 1873,
+          "payload_minus_8192": -6331,
+          "wire_minus_8192": -6319
+        },
+        "response": {
+          "semantic_payload_bytes": 11452,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 11464,
+          "payload_minus_8192": 3260,
+          "wire_minus_8192": 3272
+        }
+      },
+      "semantic_payload_total_both_directions": 13313,
+      "frame_overhead_both_directions": 24,
+      "candidate_a_outer_stdout_bytes": 11464,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "empty_materialize_compile_fresh_current": {
+      "operations": [
+        "OBSERVE_EMPTY_WORKSPACE",
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_CURRENT_WORKSPACE"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 2418,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 2434,
+          "payload_minus_8192": -5774,
+          "wire_minus_8192": -5758
+        },
+        "response": {
+          "semantic_payload_bytes": 14333,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 14349,
+          "payload_minus_8192": 6141,
+          "wire_minus_8192": 6157
+        }
+      },
+      "semantic_payload_total_both_directions": 16751,
+      "frame_overhead_both_directions": 32,
+      "candidate_a_outer_stdout_bytes": 14349,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "empty_materialize_compile_fresh_prepared": {
+      "operations": [
+        "OBSERVE_EMPTY_WORKSPACE",
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 2477,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 2493,
+          "payload_minus_8192": -5715,
+          "wire_minus_8192": -5699
+        },
+        "response": {
+          "semantic_payload_bytes": 14335,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 14351,
+          "payload_minus_8192": 6143,
+          "wire_minus_8192": 6159
+        }
+      },
+      "semantic_payload_total_both_directions": 16812,
+      "frame_overhead_both_directions": 32,
+      "candidate_a_outer_stdout_bytes": 14351,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    }
+  },
+  "stress_minimum_class_envelope": {
+    "materialize_compile": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1812,
+          "frame_overhead_bytes": 8,
+          "candidate_a_wire_bytes": 1820,
+          "payload_minus_8192": -6380,
+          "wire_minus_8192": -6372
+        },
+        "response": {
+          "semantic_payload_bytes": 9728,
+          "frame_overhead_bytes": 8,
+          "candidate_a_wire_bytes": 9736,
+          "payload_minus_8192": 1536,
+          "wire_minus_8192": 1544
+        }
+      },
+      "semantic_payload_total_both_directions": 11540,
+      "frame_overhead_both_directions": 16,
+      "candidate_a_outer_stdout_bytes": 9736,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "Guaranteed materialize/compile core only"
+    },
+    "materialize_compile_fresh_current": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_CURRENT_WORKSPACE"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 2684,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 2696,
+          "payload_minus_8192": -5508,
+          "wire_minus_8192": -5496
+        },
+        "response": {
+          "semantic_payload_bytes": 13812,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 13824,
+          "payload_minus_8192": 5620,
+          "wire_minus_8192": 5632
+        }
+      },
+      "semantic_payload_total_both_directions": 16496,
+      "frame_overhead_both_directions": 24,
+      "candidate_a_outer_stdout_bytes": 13824,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "materialize_compile_fresh_prepared": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 2869,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 2881,
+          "payload_minus_8192": -5323,
+          "wire_minus_8192": -5311
+        },
+        "response": {
+          "semantic_payload_bytes": 13814,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 13826,
+          "payload_minus_8192": 5622,
+          "wire_minus_8192": 5634
+        }
+      },
+      "semantic_payload_total_both_directions": 16683,
+      "frame_overhead_both_directions": 24,
+      "candidate_a_outer_stdout_bytes": 13826,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "empty_materialize_compile_fresh_current": {
+      "operations": [
+        "OBSERVE_EMPTY_WORKSPACE",
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_CURRENT_WORKSPACE"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 3552,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 3568,
+          "payload_minus_8192": -4640,
+          "wire_minus_8192": -4624
+        },
+        "response": {
+          "semantic_payload_bytes": 17369,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 17385,
+          "payload_minus_8192": 9177,
+          "wire_minus_8192": 9193
+        }
+      },
+      "semantic_payload_total_both_directions": 20921,
+      "frame_overhead_both_directions": 32,
+      "candidate_a_outer_stdout_bytes": 17385,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "empty_materialize_compile_fresh_prepared": {
+      "operations": [
+        "OBSERVE_EMPTY_WORKSPACE",
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 3737,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 3753,
+          "payload_minus_8192": -4455,
+          "wire_minus_8192": -4439
+        },
+        "response": {
+          "semantic_payload_bytes": 17371,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 17387,
+          "payload_minus_8192": 9179,
+          "wire_minus_8192": 9195
+        }
+      },
+      "semantic_payload_total_both_directions": 21108,
+      "frame_overhead_both_directions": 32,
+      "candidate_a_outer_stdout_bytes": 17387,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    }
+  },
+  "stress_plausible_class": {
+    "materialize_compile": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 1812,
+          "frame_overhead_bytes": 8,
+          "candidate_a_wire_bytes": 1820,
+          "payload_minus_8192": -6380,
+          "wire_minus_8192": -6372
+        },
+        "response": {
+          "semantic_payload_bytes": 9732,
+          "frame_overhead_bytes": 8,
+          "candidate_a_wire_bytes": 9740,
+          "payload_minus_8192": 1540,
+          "wire_minus_8192": 1548
+        }
+      },
+      "semantic_payload_total_both_directions": 11544,
+      "frame_overhead_both_directions": 16,
+      "candidate_a_outer_stdout_bytes": 9740,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "Guaranteed materialize/compile core only"
+    },
+    "materialize_compile_fresh_current": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_CURRENT_WORKSPACE"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 2684,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 2696,
+          "payload_minus_8192": -5508,
+          "wire_minus_8192": -5496
+        },
+        "response": {
+          "semantic_payload_bytes": 13818,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 13830,
+          "payload_minus_8192": 5626,
+          "wire_minus_8192": 5638
+        }
+      },
+      "semantic_payload_total_both_directions": 16502,
+      "frame_overhead_both_directions": 24,
+      "candidate_a_outer_stdout_bytes": 13830,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "materialize_compile_fresh_prepared": {
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 2869,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 2881,
+          "payload_minus_8192": -5323,
+          "wire_minus_8192": -5311
+        },
+        "response": {
+          "semantic_payload_bytes": 13820,
+          "frame_overhead_bytes": 12,
+          "candidate_a_wire_bytes": 13832,
+          "payload_minus_8192": 5628,
+          "wire_minus_8192": 5640
+        }
+      },
+      "semantic_payload_total_both_directions": 16689,
+      "frame_overhead_both_directions": 24,
+      "candidate_a_outer_stdout_bytes": 13832,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "empty_materialize_compile_fresh_current": {
+      "operations": [
+        "OBSERVE_EMPTY_WORKSPACE",
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_CURRENT_WORKSPACE"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 3552,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 3568,
+          "payload_minus_8192": -4640,
+          "wire_minus_8192": -4624
+        },
+        "response": {
+          "semantic_payload_bytes": 17375,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 17391,
+          "payload_minus_8192": 9183,
+          "wire_minus_8192": 9199
+        }
+      },
+      "semantic_payload_total_both_directions": 20927,
+      "frame_overhead_both_directions": 32,
+      "candidate_a_outer_stdout_bytes": 17391,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    },
+    "empty_materialize_compile_fresh_prepared": {
+      "operations": [
+        "OBSERVE_EMPTY_WORKSPACE",
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "directions": {
+        "request": {
+          "semantic_payload_bytes": 3737,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 3753,
+          "payload_minus_8192": -4455,
+          "wire_minus_8192": -4439
+        },
+        "response": {
+          "semantic_payload_bytes": 17377,
+          "frame_overhead_bytes": 16,
+          "candidate_a_wire_bytes": 17393,
+          "payload_minus_8192": 9185,
+          "wire_minus_8192": 9201
+        }
+      },
+      "semantic_payload_total_both_directions": 21114,
+      "frame_overhead_both_directions": 32,
+      "candidate_a_outer_stdout_bytes": 17393,
+      "candidate_a_outer_stderr_bytes": 0,
+      "child_compiler_stdout_bytes": 0,
+      "child_compiler_stderr_bytes": 0,
+      "request_bytes_added_to_outer_stdout": 0,
+      "attempt_scope": "CONDITIONAL_UNRESOLVED_SCOPE"
+    }
+  }
+}

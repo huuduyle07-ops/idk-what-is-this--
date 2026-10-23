@@ -1,0 +1,1154 @@
+{
+  "MainApp_session_touched": false,
+  "apply_authority": false,
+  "arbitrary_command_execution_count": 0,
+  "author_calls": 0,
+  "execution_authorized": false,
+  "filesystem_file_creation_authority": false,
+  "filesystem_write_authority": false,
+  "first_remaining_blocker": "STRUCTURAL_CANDIDATE_BEHAVIORAL_VALIDATION_NOT_IMPLEMENTED",
+  "fixture_kind": "synthetic_frozen_MATERIALIZE1_candidates_compiled_without_revision",
+  "frozen_BANK_scenario": "preserve_base_compatibility",
+  "java_code_executed": false,
+  "javac_invocation_count": 21,
+  "javac_total_invocation_count": 42,
+  "model_calls": 0,
+  "phase_id": "PATCH.CANDIDATE.VALIDATE.1A",
+  "real_BANK2_approval_consumed": false,
+  "repetitions": 3,
+  "repository_traversals": 0,
+  "scenarios": {
+    "crlf": {
+      "candidate_semantics_unchanged": true,
+      "compile_receipt": {
+        "admission_fingerprint": "0e4cd7f3b6a190195fdc7c470ece77a1eece91608c64ef895159e69744061764",
+        "apply_authority": false,
+        "approval_receipt_fingerprint": "05892b026ce1c14a642e90540a508e8e532a87fe60b6a5c352088de59b933b42",
+        "approved_ceiling_fingerprint": "ce5a22864da3c09854a2e9cad7fab59bfb80785256e395d9b58a42a0a79e6368",
+        "arbitrary_command_execution_count": 0,
+        "author_calls": 0,
+        "authority": "diagnostic_evidence_only",
+        "auto_apply": false,
+        "behavior_validated": false,
+        "behavioral_validation_pending": true,
+        "candidate_fingerprint": "bd946b26b45ab165d19c91c17c1ca14cd40db61c05b78d433c1fe9869e7ee7fb",
+        "compile_success": true,
+        "compile_timeout_seconds": 60,
+        "compiler_receipt_fingerprint": "393a15413a7bf7244194cfd2d980a14af59d808dc0b83714db76c1dc390bd1c0",
+        "compiler_result": {
+          "compiler": {
+            "executable": "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath_target_432447671\\javac.exe",
+            "executable_sha256": "c788d3369408b0dd43be8e0732f24b4493e047e4cb5b5bda46fece05e9ba7039",
+            "version": "javac 26.0.2.1"
+          },
+          "exit_code": 0,
+          "javac_invocation_count": 1,
+          "output_overflow": false,
+          "stderr": "",
+          "stdout": "",
+          "timed_out": false,
+          "unavailable_reason": "",
+          "version_probe_count": 1
+        },
+        "correctness_proven": false,
+        "diagnostics": [],
+        "effective_design_fingerprint": "79ee4238e8a78772ffb4cd7b722762f388c781b2b052eb3d76f01e1652b5f0be",
+        "execution_authorized": false,
+        "filesystem_file_creation_authority": false,
+        "filesystem_write_authority": false,
+        "first_remaining_blocker": "STRUCTURAL_CANDIDATE_BEHAVIORAL_VALIDATION_NOT_IMPLEMENTED",
+        "implementation_plan_fingerprint": "f57851cfc3a4505c0788a4fcc07d6dde43521fdcb8a6035d843bf03ab3c27f0b",
+        "input_manifest": [
+          {
+            "path": "SavingAccount.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "3460262bfa3d9ece43c5d8df97f76a08fd83cbb7ad224557a837c1ee6ef56588",
+            "size": 746
+          },
+          {
+            "path": "bank.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "6b843919aedc883888d9909c418578d8bc5e228b17531fd4ad1909d14b1a4efa",
+            "size": 412
+          }
+        ],
+        "invocation_contract": [
+          "javac",
+          "-J-Duser.language=en",
+          "-J-Duser.country=US",
+          "-J-XX:-UsePerfData",
+          "-J-Dstdout.encoding=UTF-8",
+          "-J-Dstderr.encoding=UTF-8",
+          "-encoding",
+          "UTF-8",
+          "-proc:none",
+          "-implicit:none",
+          "-sourcepath",
+          "<isolated-empty>",
+          "-classpath",
+          "<isolated-empty>",
+          "-d",
+          "<isolated-output>",
+          "-Xmaxerrs",
+          "100",
+          "-Xmaxwarns",
+          "100",
+          "SavingAccount.java",
+          "bank.java"
+        ],
+        "java_execution_count": 0,
+        "javac_evidence_satisfaction": [
+          {
+            "compiler_receipt_fingerprint": "393a15413a7bf7244194cfd2d980a14af59d808dc0b83714db76c1dc390bd1c0",
+            "implementation_plan_fingerprint": "f57851cfc3a4505c0788a4fcc07d6dde43521fdcb8a6035d843bf03ab3c27f0b",
+            "kind": "javac",
+            "need_fingerprint": "17597ffa269c3cfdb333c4c0742e5f25f329f7db1e81ec6762ab0d6df5fe4b8f",
+            "satisfied": true
+          }
+        ],
+        "materialization_fingerprint": "597939c969c9a593189f1341de8bb1b7d1844d020bd773476972ffed40d86e24",
+        "max_diagnostics": 32,
+        "max_output_bytes_per_stream": 65536,
+        "model_calls": 0,
+        "output_capture_policy": "bounded_raw_text_with_logical_path_normalization; overflow_fail_closed",
+        "p1_fingerprint": "72a3d8abcd580ee0bb48fc6f5cbec65395fdc30f3f06f7a3765512ee5470023f",
+        "phase_id": "PATCH.CANDIDATE.VALIDATE.1A",
+        "repository_evidence_fingerprint": "9c3f9d99db6c5a9fb3fbebb8409a274edfa4263935894a12ee1e1622243fa530",
+        "repository_id": "patch-candidate-validate1a-fixture-ed-qaojo-94124cd7150cecb5cf0e590adf2ed124",
+        "repository_traversals": 0,
+        "schema_version": "patch_candidate_validate_1a_v1",
+        "shell": false,
+        "source_mutation": 0,
+        "status": "compile_validated",
+        "task_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "test_generation_count": 0,
+        "test_write_authority": false,
+        "validation_fingerprint": "0a1ded162a9f55a53c0fc9b12da3888e3474800e21bba51eab504afac0e666fc",
+        "version_probe_timeout_seconds": 30,
+        "warnings": [],
+        "write_authority": false
+      },
+      "deterministic": true,
+      "historical_plan_unchanged": true,
+      "new_repository_source_created": false,
+      "performance": {
+        "compiler_identity_seconds": {
+          "max_ms": 7.683,
+          "median_ms": 7.6115
+        },
+        "diagnostic_normalization_seconds": {
+          "max_ms": 2.8574,
+          "median_ms": 1.6244
+        },
+        "exact_evidence_acquisition_seconds": {
+          "max_ms": 11.1717,
+          "median_ms": 11.0545
+        },
+        "fresh_materialization_validation_seconds": {
+          "max_ms": 609.4141,
+          "median_ms": 609.3681
+        },
+        "javac_provider_seconds": {
+          "max_ms": 1268.2111,
+          "median_ms": 1102.6839
+        },
+        "owner_mapping_seconds": {
+          "max_ms": 1.8856,
+          "median_ms": 1.83
+        },
+        "receipt_fingerprinting_seconds": {
+          "max_ms": 1.978,
+          "median_ms": 1.6379
+        },
+        "temporary_workspace_construction_seconds": {
+          "max_ms": 4.6279,
+          "median_ms": 4.5946
+        },
+        "total_harness_overhead_seconds": {
+          "max_ms": 655.2823,
+          "median_ms": 653.7419
+        },
+        "total_seconds": {
+          "max_ms": 1923.4934,
+          "median_ms": 1756.0266
+        },
+        "virtual_byte_integrity_verification_seconds": {
+          "max_ms": 2.7,
+          "median_ms": 1.9192
+        }
+      },
+      "source_bytes_unchanged": true,
+      "virtual_bytes_unchanged": true
+    },
+    "lf": {
+      "candidate_semantics_unchanged": true,
+      "compile_receipt": {
+        "admission_fingerprint": "659bb344d04bf54055cd6f5208a38748d8c9b6ea38d17dc0e27f1e9646e74405",
+        "apply_authority": false,
+        "approval_receipt_fingerprint": "847a70f684dcdc9754bb5abfe89f6aa2697420ce82009d44e00cc9491b46dcc3",
+        "approved_ceiling_fingerprint": "20c04c1b6d4308731ab9fc226713e2f6a74f5c0cc411c6963e0cc1bc1e4324a1",
+        "arbitrary_command_execution_count": 0,
+        "author_calls": 0,
+        "authority": "diagnostic_evidence_only",
+        "auto_apply": false,
+        "behavior_validated": false,
+        "behavioral_validation_pending": true,
+        "candidate_fingerprint": "b2cdea8e57e2b669b02f259ac315057e915981cb5018d3eeab5607ca468bcb03",
+        "compile_success": true,
+        "compile_timeout_seconds": 60,
+        "compiler_receipt_fingerprint": "7b805d411bd57bda99602ff561d1b1e39a2f2d30680af1cb2632f5b450c430a8",
+        "compiler_result": {
+          "compiler": {
+            "executable": "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath_target_432447671\\javac.exe",
+            "executable_sha256": "c788d3369408b0dd43be8e0732f24b4493e047e4cb5b5bda46fece05e9ba7039",
+            "version": "javac 26.0.2.1"
+          },
+          "exit_code": 0,
+          "javac_invocation_count": 1,
+          "output_overflow": false,
+          "stderr": "",
+          "stdout": "",
+          "timed_out": false,
+          "unavailable_reason": "",
+          "version_probe_count": 1
+        },
+        "correctness_proven": false,
+        "diagnostics": [],
+        "effective_design_fingerprint": "dfa3e4b4306f26d18f0f86d60c2118830043d98c3d50b9530c8654890246387b",
+        "execution_authorized": false,
+        "filesystem_file_creation_authority": false,
+        "filesystem_write_authority": false,
+        "first_remaining_blocker": "STRUCTURAL_CANDIDATE_BEHAVIORAL_VALIDATION_NOT_IMPLEMENTED",
+        "implementation_plan_fingerprint": "26361f2b012355590788e3f978af24b5f73bdedf7c8d202a662cc28b9aeb6578",
+        "input_manifest": [
+          {
+            "path": "SavingAccount.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "3460262bfa3d9ece43c5d8df97f76a08fd83cbb7ad224557a837c1ee6ef56588",
+            "size": 746
+          },
+          {
+            "path": "bank.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "8771b7def21331c615a88991a1117a716a6c22b18b8fc5ea5e20d2802d99aa39",
+            "size": 401
+          }
+        ],
+        "invocation_contract": [
+          "javac",
+          "-J-Duser.language=en",
+          "-J-Duser.country=US",
+          "-J-XX:-UsePerfData",
+          "-J-Dstdout.encoding=UTF-8",
+          "-J-Dstderr.encoding=UTF-8",
+          "-encoding",
+          "UTF-8",
+          "-proc:none",
+          "-implicit:none",
+          "-sourcepath",
+          "<isolated-empty>",
+          "-classpath",
+          "<isolated-empty>",
+          "-d",
+          "<isolated-output>",
+          "-Xmaxerrs",
+          "100",
+          "-Xmaxwarns",
+          "100",
+          "SavingAccount.java",
+          "bank.java"
+        ],
+        "java_execution_count": 0,
+        "javac_evidence_satisfaction": [
+          {
+            "compiler_receipt_fingerprint": "7b805d411bd57bda99602ff561d1b1e39a2f2d30680af1cb2632f5b450c430a8",
+            "implementation_plan_fingerprint": "26361f2b012355590788e3f978af24b5f73bdedf7c8d202a662cc28b9aeb6578",
+            "kind": "javac",
+            "need_fingerprint": "b9d6ca57dc82a6647a2dcc15c161b27b42ba8d145371b9cc2b948ef7a264139a",
+            "satisfied": true
+          }
+        ],
+        "materialization_fingerprint": "71525b6801fd8bd3b4f877712b6bd13e3f875bea51957b4bf4452e57c1e9c3ec",
+        "max_diagnostics": 32,
+        "max_output_bytes_per_stream": 65536,
+        "model_calls": 0,
+        "output_capture_policy": "bounded_raw_text_with_logical_path_normalization; overflow_fail_closed",
+        "p1_fingerprint": "519939eb28c8e6831efe9768734f2ed5345d18e8e4235b2d8a4c27ee2b5a982e",
+        "phase_id": "PATCH.CANDIDATE.VALIDATE.1A",
+        "repository_evidence_fingerprint": "ae2a2546a2602cda7799eb67451b3cd3b1fe8f548018316bade2fcc3b6f7ba8a",
+        "repository_id": "patch-candidate-validate1a-fixture-1e-zdp2c-c6644b7b57cec8bfad9d285e8e1c3b84",
+        "repository_traversals": 0,
+        "schema_version": "patch_candidate_validate_1a_v1",
+        "shell": false,
+        "source_mutation": 0,
+        "status": "compile_validated",
+        "task_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "test_generation_count": 0,
+        "test_write_authority": false,
+        "validation_fingerprint": "fc33f735a0e4a0ef26c44c7275f802b79fd1e643511b7066140ffa30772e4acd",
+        "version_probe_timeout_seconds": 30,
+        "warnings": [],
+        "write_authority": false
+      },
+      "deterministic": true,
+      "historical_plan_unchanged": true,
+      "new_repository_source_created": false,
+      "performance": {
+        "compiler_identity_seconds": {
+          "max_ms": 8.2372,
+          "median_ms": 7.8644
+        },
+        "diagnostic_normalization_seconds": {
+          "max_ms": 2.7252,
+          "median_ms": 1.2897
+        },
+        "exact_evidence_acquisition_seconds": {
+          "max_ms": 14.4434,
+          "median_ms": 11.3952
+        },
+        "fresh_materialization_validation_seconds": {
+          "max_ms": 668.287,
+          "median_ms": 636.2258
+        },
+        "javac_provider_seconds": {
+          "max_ms": 1237.0657,
+          "median_ms": 1194.4171
+        },
+        "owner_mapping_seconds": {
+          "max_ms": 1.5149,
+          "median_ms": 1.4171
+        },
+        "receipt_fingerprinting_seconds": {
+          "max_ms": 1.6349,
+          "median_ms": 1.524
+        },
+        "temporary_workspace_construction_seconds": {
+          "max_ms": 5.1815,
+          "median_ms": 4.8653
+        },
+        "total_harness_overhead_seconds": {
+          "max_ms": 719.2089,
+          "median_ms": 680.6255
+        },
+        "total_seconds": {
+          "max_ms": 1956.2746,
+          "median_ms": 1863.5194
+        },
+        "virtual_byte_integrity_verification_seconds": {
+          "max_ms": 2.4233,
+          "median_ms": 2.0099
+        }
+      },
+      "source_bytes_unchanged": true,
+      "virtual_bytes_unchanged": true
+    },
+    "nested": {
+      "candidate_semantics_unchanged": true,
+      "compile_receipt": {
+        "admission_fingerprint": "1393ad4e02b16e90ceeafbcf572d7ee3564fd4e65451c013f3f1a3928fd22f0a",
+        "apply_authority": false,
+        "approval_receipt_fingerprint": "0b08c598e952d1086eb11e589b5ec70ca525d927e0e3c489a2fe5ce559af4db1",
+        "approved_ceiling_fingerprint": "505c6267a5a0ae0f1bbe1bb76fe4a4b00456df8c27e26dbd162e047f64aa4487",
+        "arbitrary_command_execution_count": 0,
+        "author_calls": 0,
+        "authority": "diagnostic_evidence_only",
+        "auto_apply": false,
+        "behavior_validated": false,
+        "behavioral_validation_pending": true,
+        "candidate_fingerprint": "2e1ce3f86225c0067fb2ad05308e1f0bd1f4bbdcb3770655e92bc9f9128aaab0",
+        "compile_success": true,
+        "compile_timeout_seconds": 60,
+        "compiler_receipt_fingerprint": "26ff28ae62982a5df3b14235f5190c63ce4ddc68222564d99070c3016bac0516",
+        "compiler_result": {
+          "compiler": {
+            "executable": "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath_target_432447671\\javac.exe",
+            "executable_sha256": "c788d3369408b0dd43be8e0732f24b4493e047e4cb5b5bda46fece05e9ba7039",
+            "version": "javac 26.0.2.1"
+          },
+          "exit_code": 0,
+          "javac_invocation_count": 1,
+          "output_overflow": false,
+          "stderr": "",
+          "stdout": "",
+          "timed_out": false,
+          "unavailable_reason": "",
+          "version_probe_count": 1
+        },
+        "correctness_proven": false,
+        "diagnostics": [],
+        "effective_design_fingerprint": "f200158e34aeaccd3e2b3c35f3050c12629134f6048852cfca9f5d09a64797d1",
+        "execution_authorized": false,
+        "filesystem_file_creation_authority": false,
+        "filesystem_write_authority": false,
+        "first_remaining_blocker": "STRUCTURAL_CANDIDATE_BEHAVIORAL_VALIDATION_NOT_IMPLEMENTED",
+        "implementation_plan_fingerprint": "ed374d3a36ea4fe3bf9c5295ea8326139bfbb7f9768f982ce45acdce96a6eda7",
+        "input_manifest": [
+          {
+            "path": "bank.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "844ff23a5659e9950bb4004ad7835112a49a687c8521f72d0f643c7c2e9107ab",
+            "size": 1164
+          }
+        ],
+        "invocation_contract": [
+          "javac",
+          "-J-Duser.language=en",
+          "-J-Duser.country=US",
+          "-J-XX:-UsePerfData",
+          "-J-Dstdout.encoding=UTF-8",
+          "-J-Dstderr.encoding=UTF-8",
+          "-encoding",
+          "UTF-8",
+          "-proc:none",
+          "-implicit:none",
+          "-sourcepath",
+          "<isolated-empty>",
+          "-classpath",
+          "<isolated-empty>",
+          "-d",
+          "<isolated-output>",
+          "-Xmaxerrs",
+          "100",
+          "-Xmaxwarns",
+          "100",
+          "bank.java"
+        ],
+        "java_execution_count": 0,
+        "javac_evidence_satisfaction": [
+          {
+            "compiler_receipt_fingerprint": "26ff28ae62982a5df3b14235f5190c63ce4ddc68222564d99070c3016bac0516",
+            "implementation_plan_fingerprint": "ed374d3a36ea4fe3bf9c5295ea8326139bfbb7f9768f982ce45acdce96a6eda7",
+            "kind": "javac",
+            "need_fingerprint": "6cb6d038e71e93d83a9cfd9c2eb2a22aea6d86d7d673e2f2d4b6c02f58222b02",
+            "satisfied": true
+          }
+        ],
+        "materialization_fingerprint": "88ae6fb3a8f8247c08946aa120a1be57f35760686c0d9618a7c6dc08eb0d0baf",
+        "max_diagnostics": 32,
+        "max_output_bytes_per_stream": 65536,
+        "model_calls": 0,
+        "output_capture_policy": "bounded_raw_text_with_logical_path_normalization; overflow_fail_closed",
+        "p1_fingerprint": "8bff38a256b1def0ee73d46ba5ebca83468d57cc5b841b393b241189f1a356e6",
+        "phase_id": "PATCH.CANDIDATE.VALIDATE.1A",
+        "repository_evidence_fingerprint": "55e94f8a5ff265effb2db7f4168df958201ae2a204a13bec91117ca3f7b98755",
+        "repository_id": "patch-candidate-validate1a-fixture-87qcrnmr-4c8b8406b35fb8892cdbccc837d2a86b",
+        "repository_traversals": 0,
+        "schema_version": "patch_candidate_validate_1a_v1",
+        "shell": false,
+        "source_mutation": 0,
+        "status": "compile_validated",
+        "task_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "test_generation_count": 0,
+        "test_write_authority": false,
+        "validation_fingerprint": "ab2ccff95f9a16cd058bb206ecc59e00547f5005e4423f56ec447982071b30d4",
+        "version_probe_timeout_seconds": 30,
+        "warnings": [],
+        "write_authority": false
+      },
+      "deterministic": true,
+      "historical_plan_unchanged": true,
+      "new_repository_source_created": false,
+      "performance": {
+        "compiler_identity_seconds": {
+          "max_ms": 9.2325,
+          "median_ms": 7.2736
+        },
+        "diagnostic_normalization_seconds": {
+          "max_ms": 3.179,
+          "median_ms": 1.3717
+        },
+        "exact_evidence_acquisition_seconds": {
+          "max_ms": 11.1371,
+          "median_ms": 9.7715
+        },
+        "fresh_materialization_validation_seconds": {
+          "max_ms": 624.4874,
+          "median_ms": 622.5746
+        },
+        "javac_provider_seconds": {
+          "max_ms": 1251.9254,
+          "median_ms": 1245.8989
+        },
+        "owner_mapping_seconds": {
+          "max_ms": 1.6655,
+          "median_ms": 1.4253
+        },
+        "receipt_fingerprinting_seconds": {
+          "max_ms": 1.6279,
+          "median_ms": 1.5084
+        },
+        "temporary_workspace_construction_seconds": {
+          "max_ms": 3.9323,
+          "median_ms": 3.805
+        },
+        "total_harness_overhead_seconds": {
+          "max_ms": 667.1444,
+          "median_ms": 664.4092
+        },
+        "total_seconds": {
+          "max_ms": 1916.3346,
+          "median_ms": 1913.0433
+        },
+        "virtual_byte_integrity_verification_seconds": {
+          "max_ms": 1.5155,
+          "median_ms": 1.0921
+        }
+      },
+      "source_bytes_unchanged": true,
+      "virtual_bytes_unchanged": true
+    },
+    "packaged": {
+      "candidate_semantics_unchanged": true,
+      "compile_receipt": {
+        "admission_fingerprint": "c24d7fb9f4352cc70e42bc55d82bcb4661cf32a5928f009ecaa53464670ecb6e",
+        "apply_authority": false,
+        "approval_receipt_fingerprint": "7cd08ae1377ecb64638406fb36c7ddba04ca63a870d6f53c690c21089e6dec5a",
+        "approved_ceiling_fingerprint": "f3f2570756fe667ac82ea959a6d0de942e3cf51dd5a3d897109098d32db6e099",
+        "arbitrary_command_execution_count": 0,
+        "author_calls": 0,
+        "authority": "diagnostic_evidence_only",
+        "auto_apply": false,
+        "behavior_validated": false,
+        "behavioral_validation_pending": true,
+        "candidate_fingerprint": "3556dfccf355b1745064cbf698e38c0f9115e6d513ff59159047b0fa752116cc",
+        "compile_success": true,
+        "compile_timeout_seconds": 60,
+        "compiler_receipt_fingerprint": "6d7c37c7249c986a189a501ecc2f5ab63df99ec21e0df265a06018f076df6cf3",
+        "compiler_result": {
+          "compiler": {
+            "executable": "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath_target_432447671\\javac.exe",
+            "executable_sha256": "c788d3369408b0dd43be8e0732f24b4493e047e4cb5b5bda46fece05e9ba7039",
+            "version": "javac 26.0.2.1"
+          },
+          "exit_code": 0,
+          "javac_invocation_count": 1,
+          "output_overflow": false,
+          "stderr": "",
+          "stdout": "",
+          "timed_out": false,
+          "unavailable_reason": "",
+          "version_probe_count": 1
+        },
+        "correctness_proven": false,
+        "diagnostics": [],
+        "effective_design_fingerprint": "a64031597af050d08f89ba1bdaf209a3e129eeb9e30e8b6db07f236a457c92c3",
+        "execution_authorized": false,
+        "filesystem_file_creation_authority": false,
+        "filesystem_write_authority": false,
+        "first_remaining_blocker": "STRUCTURAL_CANDIDATE_BEHAVIORAL_VALIDATION_NOT_IMPLEMENTED",
+        "implementation_plan_fingerprint": "4fe9c36674be0d214408abd3c6e21e4f70a218351ef53274c2cf641c6550f051",
+        "input_manifest": [
+          {
+            "path": "edu/SavingAccount.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "f04666f2b7a33236fbee8de53b279d71154b734d72a202a3ee3a28045dd94fd9",
+            "size": 759
+          },
+          {
+            "path": "edu/bank.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "1b6e1e9c1828c235fbaf93c5d4deab5dc3bc242c1337834ad000fc21c79fec1e",
+            "size": 414
+          }
+        ],
+        "invocation_contract": [
+          "javac",
+          "-J-Duser.language=en",
+          "-J-Duser.country=US",
+          "-J-XX:-UsePerfData",
+          "-J-Dstdout.encoding=UTF-8",
+          "-J-Dstderr.encoding=UTF-8",
+          "-encoding",
+          "UTF-8",
+          "-proc:none",
+          "-implicit:none",
+          "-sourcepath",
+          "<isolated-empty>",
+          "-classpath",
+          "<isolated-empty>",
+          "-d",
+          "<isolated-output>",
+          "-Xmaxerrs",
+          "100",
+          "-Xmaxwarns",
+          "100",
+          "edu/SavingAccount.java",
+          "edu/bank.java"
+        ],
+        "java_execution_count": 0,
+        "javac_evidence_satisfaction": [
+          {
+            "compiler_receipt_fingerprint": "6d7c37c7249c986a189a501ecc2f5ab63df99ec21e0df265a06018f076df6cf3",
+            "implementation_plan_fingerprint": "4fe9c36674be0d214408abd3c6e21e4f70a218351ef53274c2cf641c6550f051",
+            "kind": "javac",
+            "need_fingerprint": "f1ae0b8bcafcc7b2001bd0707c8ece2e0d1d360bc2c815fe07a946b939e808bb",
+            "satisfied": true
+          }
+        ],
+        "materialization_fingerprint": "a2ffe129e95765c20a4c6870c3f97ae73cad54fe5613ca9384dc998e53e94ad3",
+        "max_diagnostics": 32,
+        "max_output_bytes_per_stream": 65536,
+        "model_calls": 0,
+        "output_capture_policy": "bounded_raw_text_with_logical_path_normalization; overflow_fail_closed",
+        "p1_fingerprint": "7017d1efdcc276a57f6e1064de53b7bfcb91f0180314b949fd11ba90997c6999",
+        "phase_id": "PATCH.CANDIDATE.VALIDATE.1A",
+        "repository_evidence_fingerprint": "ac5d45d46c7da40ed0fc449828a1f702b465ea021b2129f11e27be4e4f6c9c86",
+        "repository_id": "patch-candidate-validate1a-fixture-s0urda2w-c8a1a7bc0a80b67cbea1353a0ec0344e",
+        "repository_traversals": 0,
+        "schema_version": "patch_candidate_validate_1a_v1",
+        "shell": false,
+        "source_mutation": 0,
+        "status": "compile_validated",
+        "task_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "test_generation_count": 0,
+        "test_write_authority": false,
+        "validation_fingerprint": "7ba0bf7a9b54eb31707d9f2382c236ad1b89c08be058767ed4e5e2c5cd6c4e0e",
+        "version_probe_timeout_seconds": 30,
+        "warnings": [],
+        "write_authority": false
+      },
+      "deterministic": true,
+      "historical_plan_unchanged": true,
+      "new_repository_source_created": false,
+      "performance": {
+        "compiler_identity_seconds": {
+          "max_ms": 8.6679,
+          "median_ms": 8.5557
+        },
+        "diagnostic_normalization_seconds": {
+          "max_ms": 2.8805,
+          "median_ms": 2.7362
+        },
+        "exact_evidence_acquisition_seconds": {
+          "max_ms": 16.8361,
+          "median_ms": 15.7113
+        },
+        "fresh_materialization_validation_seconds": {
+          "max_ms": 656.1818,
+          "median_ms": 613.2498
+        },
+        "javac_provider_seconds": {
+          "max_ms": 1394.3057,
+          "median_ms": 1293.3975
+        },
+        "owner_mapping_seconds": {
+          "max_ms": 1.7322,
+          "median_ms": 1.4987
+        },
+        "receipt_fingerprinting_seconds": {
+          "max_ms": 1.5951,
+          "median_ms": 1.595
+        },
+        "temporary_workspace_construction_seconds": {
+          "max_ms": 8.332,
+          "median_ms": 5.5246
+        },
+        "total_harness_overhead_seconds": {
+          "max_ms": 710.7503,
+          "median_ms": 658.4069
+        },
+        "total_seconds": {
+          "max_ms": 2105.056,
+          "median_ms": 1951.8044
+        },
+        "virtual_byte_integrity_verification_seconds": {
+          "max_ms": 3.3825,
+          "median_ms": 2.4006
+        }
+      },
+      "source_bytes_unchanged": true,
+      "virtual_bytes_unchanged": true
+    },
+    "preserve_base_compatibility": {
+      "candidate_semantics_unchanged": true,
+      "compile_receipt": {
+        "admission_fingerprint": "06c7f8c8b1839acb55ad946a50cfbe938663ee6f9f0b5db05844f6894322b79a",
+        "apply_authority": false,
+        "approval_receipt_fingerprint": "483679b6127d8785f10862f7c5f0ca2081ceb03063aa52632c70c4be3ea4bfa8",
+        "approved_ceiling_fingerprint": "873a47fdb6a5a1ec337411255e7efa3c36b1f2d0dc3955fb9b94c08679c0aa5e",
+        "arbitrary_command_execution_count": 0,
+        "author_calls": 0,
+        "authority": "diagnostic_evidence_only",
+        "auto_apply": false,
+        "behavior_validated": false,
+        "behavioral_validation_pending": true,
+        "candidate_fingerprint": "d24d60767fc8676769ff6ab9218292d16076b7379078ee3a3e3dae0fb131fde3",
+        "compile_success": true,
+        "compile_timeout_seconds": 60,
+        "compiler_receipt_fingerprint": "4cc094ba731852f57212029c43202342ee8d91870c9ebecd07a7118d167b7c95",
+        "compiler_result": {
+          "compiler": {
+            "executable": "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath_target_432447671\\javac.exe",
+            "executable_sha256": "c788d3369408b0dd43be8e0732f24b4493e047e4cb5b5bda46fece05e9ba7039",
+            "version": "javac 26.0.2.1"
+          },
+          "exit_code": 0,
+          "javac_invocation_count": 1,
+          "output_overflow": false,
+          "stderr": "",
+          "stdout": "",
+          "timed_out": false,
+          "unavailable_reason": "",
+          "version_probe_count": 1
+        },
+        "correctness_proven": false,
+        "diagnostics": [],
+        "effective_design_fingerprint": "c00615117f3ebecfc234a057533e6ccf67ffbb5c691b41b70c9ee92609689e9d",
+        "execution_authorized": false,
+        "filesystem_file_creation_authority": false,
+        "filesystem_write_authority": false,
+        "first_remaining_blocker": "STRUCTURAL_CANDIDATE_BEHAVIORAL_VALIDATION_NOT_IMPLEMENTED",
+        "implementation_plan_fingerprint": "a0859ba02eba53dfa00fe171cc9c860e9ced795f13aba35fe2597b6017cf1ad1",
+        "input_manifest": [
+          {
+            "path": "SavingAccount.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "3460262bfa3d9ece43c5d8df97f76a08fd83cbb7ad224557a837c1ee6ef56588",
+            "size": 746
+          },
+          {
+            "path": "bank.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "8771b7def21331c615a88991a1117a716a6c22b18b8fc5ea5e20d2802d99aa39",
+            "size": 401
+          }
+        ],
+        "invocation_contract": [
+          "javac",
+          "-J-Duser.language=en",
+          "-J-Duser.country=US",
+          "-J-XX:-UsePerfData",
+          "-J-Dstdout.encoding=UTF-8",
+          "-J-Dstderr.encoding=UTF-8",
+          "-encoding",
+          "UTF-8",
+          "-proc:none",
+          "-implicit:none",
+          "-sourcepath",
+          "<isolated-empty>",
+          "-classpath",
+          "<isolated-empty>",
+          "-d",
+          "<isolated-output>",
+          "-Xmaxerrs",
+          "100",
+          "-Xmaxwarns",
+          "100",
+          "SavingAccount.java",
+          "bank.java"
+        ],
+        "java_execution_count": 0,
+        "javac_evidence_satisfaction": [
+          {
+            "compiler_receipt_fingerprint": "4cc094ba731852f57212029c43202342ee8d91870c9ebecd07a7118d167b7c95",
+            "implementation_plan_fingerprint": "a0859ba02eba53dfa00fe171cc9c860e9ced795f13aba35fe2597b6017cf1ad1",
+            "kind": "javac",
+            "need_fingerprint": "db7fa64822dade62fdee73e9059006f671c619027c8069f571a3246bbe3e6d41",
+            "satisfied": true
+          }
+        ],
+        "materialization_fingerprint": "a2af8c5db990bc04ef2162cb45d312ad916a36e8824589884977fcb5618e2d87",
+        "max_diagnostics": 32,
+        "max_output_bytes_per_stream": 65536,
+        "model_calls": 0,
+        "output_capture_policy": "bounded_raw_text_with_logical_path_normalization; overflow_fail_closed",
+        "p1_fingerprint": "92d3d4a974ba1d0dd88e971f246a0ed4c32f6e9b7ec43eb6d77d21dec3922d9f",
+        "phase_id": "PATCH.CANDIDATE.VALIDATE.1A",
+        "repository_evidence_fingerprint": "396181844f07cb557086841619cdd9aae86348d32501bb953bd9ac35aab6c447",
+        "repository_id": "patch-candidate-validate1a-fixture-0djr59wc-02d89ad676b3bb3cf665ce3641bc8761",
+        "repository_traversals": 0,
+        "schema_version": "patch_candidate_validate_1a_v1",
+        "shell": false,
+        "source_mutation": 0,
+        "status": "compile_validated",
+        "task_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "test_generation_count": 0,
+        "test_write_authority": false,
+        "validation_fingerprint": "d4467479c8963629947ac75b29990c95f6b0e8fde286c6217758d540b0a5da7e",
+        "version_probe_timeout_seconds": 30,
+        "warnings": [],
+        "write_authority": false
+      },
+      "deterministic": true,
+      "historical_plan_unchanged": true,
+      "new_repository_source_created": false,
+      "performance": {
+        "compiler_identity_seconds": {
+          "max_ms": 8.8926,
+          "median_ms": 8.4599
+        },
+        "diagnostic_normalization_seconds": {
+          "max_ms": 3.318,
+          "median_ms": 2.9483
+        },
+        "exact_evidence_acquisition_seconds": {
+          "max_ms": 17.5382,
+          "median_ms": 12.9047
+        },
+        "fresh_materialization_validation_seconds": {
+          "max_ms": 681.3998,
+          "median_ms": 616.7267
+        },
+        "javac_provider_seconds": {
+          "max_ms": 1444.5426,
+          "median_ms": 1255.7777
+        },
+        "owner_mapping_seconds": {
+          "max_ms": 1.4647,
+          "median_ms": 1.3816
+        },
+        "receipt_fingerprinting_seconds": {
+          "max_ms": 1.6426,
+          "median_ms": 1.615
+        },
+        "temporary_workspace_construction_seconds": {
+          "max_ms": 5.2532,
+          "median_ms": 4.8135
+        },
+        "total_harness_overhead_seconds": {
+          "max_ms": 731.0085,
+          "median_ms": 671.5196
+        },
+        "total_seconds": {
+          "max_ms": 2116.0622,
+          "median_ms": 1986.7862
+        },
+        "virtual_byte_integrity_verification_seconds": {
+          "max_ms": 2.7023,
+          "median_ms": 2.6208
+        }
+      },
+      "source_bytes_unchanged": true,
+      "virtual_bytes_unchanged": true
+    },
+    "savings_only_on_subclass": {
+      "candidate_semantics_unchanged": true,
+      "compile_receipt": {
+        "admission_fingerprint": "141d0ff207fe1bd9612e7754b3aaf0b739846162f4551abfd4817dcaf04e8575",
+        "apply_authority": false,
+        "approval_receipt_fingerprint": "3d73b77b43196f4af45a8ecf2a73adb04a36f9e68ff2e065747fa5ecffdc1244",
+        "approved_ceiling_fingerprint": "551c1fb1393a7a6e3690b873e6ce8e388c1dfafe6d0902683009ed7c715f11be",
+        "arbitrary_command_execution_count": 0,
+        "author_calls": 0,
+        "authority": "diagnostic_evidence_only",
+        "auto_apply": false,
+        "behavior_validated": false,
+        "behavioral_validation_pending": true,
+        "candidate_fingerprint": "a93272a728e5ff7c2be2ac81380cb9492ce518888574bd3a47167656e8d101fc",
+        "compile_success": true,
+        "compile_timeout_seconds": 60,
+        "compiler_receipt_fingerprint": "ff6fe671ccea7c7be0dd8157a88fe6fcb45cf9e914feaceb899b0dbb35b93924",
+        "compiler_result": {
+          "compiler": {
+            "executable": "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath_target_432447671\\javac.exe",
+            "executable_sha256": "c788d3369408b0dd43be8e0732f24b4493e047e4cb5b5bda46fece05e9ba7039",
+            "version": "javac 26.0.2.1"
+          },
+          "exit_code": 0,
+          "javac_invocation_count": 1,
+          "output_overflow": false,
+          "stderr": "",
+          "stdout": "",
+          "timed_out": false,
+          "unavailable_reason": "",
+          "version_probe_count": 1
+        },
+        "correctness_proven": false,
+        "diagnostics": [],
+        "effective_design_fingerprint": "c96896ddbeecb1ecd3744ea8e8f43309ff5cc5d2c6eb47b70e6830003012f48c",
+        "execution_authorized": false,
+        "filesystem_file_creation_authority": false,
+        "filesystem_write_authority": false,
+        "first_remaining_blocker": "STRUCTURAL_CANDIDATE_BEHAVIORAL_VALIDATION_NOT_IMPLEMENTED",
+        "implementation_plan_fingerprint": "85c5be092a968cf08fcc6b1a7b48be2957c0e09c16dce3eb062f45d689b4da1c",
+        "input_manifest": [
+          {
+            "path": "SavingAccount.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "3460262bfa3d9ece43c5d8df97f76a08fd83cbb7ad224557a837c1ee6ef56588",
+            "size": 746
+          },
+          {
+            "path": "bank.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "a9fe04529a192eda8891e3c96458ff3125c48e83ca583165123a0b990f7b2ee1",
+            "size": 346
+          }
+        ],
+        "invocation_contract": [
+          "javac",
+          "-J-Duser.language=en",
+          "-J-Duser.country=US",
+          "-J-XX:-UsePerfData",
+          "-J-Dstdout.encoding=UTF-8",
+          "-J-Dstderr.encoding=UTF-8",
+          "-encoding",
+          "UTF-8",
+          "-proc:none",
+          "-implicit:none",
+          "-sourcepath",
+          "<isolated-empty>",
+          "-classpath",
+          "<isolated-empty>",
+          "-d",
+          "<isolated-output>",
+          "-Xmaxerrs",
+          "100",
+          "-Xmaxwarns",
+          "100",
+          "SavingAccount.java",
+          "bank.java"
+        ],
+        "java_execution_count": 0,
+        "javac_evidence_satisfaction": [
+          {
+            "compiler_receipt_fingerprint": "ff6fe671ccea7c7be0dd8157a88fe6fcb45cf9e914feaceb899b0dbb35b93924",
+            "implementation_plan_fingerprint": "85c5be092a968cf08fcc6b1a7b48be2957c0e09c16dce3eb062f45d689b4da1c",
+            "kind": "javac",
+            "need_fingerprint": "930823abeaf58d20ae35c26f20aa001780d2ab422b00de3a771d1c241a5fbad8",
+            "satisfied": true
+          }
+        ],
+        "materialization_fingerprint": "70d52c59771ecdb89ac1c86d51ace4df9bfc429a4f17578e6703abf56ed8167e",
+        "max_diagnostics": 32,
+        "max_output_bytes_per_stream": 65536,
+        "model_calls": 0,
+        "output_capture_policy": "bounded_raw_text_with_logical_path_normalization; overflow_fail_closed",
+        "p1_fingerprint": "aedb86b729855bc06452e3d413c4aaa4c03c3da770750a736dddfe63d6eabf03",
+        "phase_id": "PATCH.CANDIDATE.VALIDATE.1A",
+        "repository_evidence_fingerprint": "331f5ffc0ff00aa52c222cfdab967c3b049f7d097b24b0a1115c66423520eb05",
+        "repository_id": "patch-candidate-validate1a-fixture-67m6gcte-648edcdeef9d4d797569c52627c1f0a3",
+        "repository_traversals": 0,
+        "schema_version": "patch_candidate_validate_1a_v1",
+        "shell": false,
+        "source_mutation": 0,
+        "status": "compile_validated",
+        "task_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "test_generation_count": 0,
+        "test_write_authority": false,
+        "validation_fingerprint": "e04a9520a57d4daca11677ededb18149500019a35c515e16da387e6bc70bc13b",
+        "version_probe_timeout_seconds": 30,
+        "warnings": [],
+        "write_authority": false
+      },
+      "deterministic": true,
+      "historical_plan_unchanged": true,
+      "new_repository_source_created": false,
+      "performance": {
+        "compiler_identity_seconds": {
+          "max_ms": 8.8529,
+          "median_ms": 8.4243
+        },
+        "diagnostic_normalization_seconds": {
+          "max_ms": 3.6175,
+          "median_ms": 3.0422
+        },
+        "exact_evidence_acquisition_seconds": {
+          "max_ms": 13.6822,
+          "median_ms": 11.8348
+        },
+        "fresh_materialization_validation_seconds": {
+          "max_ms": 627.8373,
+          "median_ms": 612.9714
+        },
+        "javac_provider_seconds": {
+          "max_ms": 1460.3186,
+          "median_ms": 1312.4743
+        },
+        "owner_mapping_seconds": {
+          "max_ms": 1.6614,
+          "median_ms": 1.325
+        },
+        "receipt_fingerprinting_seconds": {
+          "max_ms": 2.1107,
+          "median_ms": 1.5826
+        },
+        "temporary_workspace_construction_seconds": {
+          "max_ms": 6.5052,
+          "median_ms": 5.5406
+        },
+        "total_harness_overhead_seconds": {
+          "max_ms": 682.4603,
+          "median_ms": 652.5714
+        },
+        "total_seconds": {
+          "max_ms": 2142.7789,
+          "median_ms": 1965.0457
+        },
+        "virtual_byte_integrity_verification_seconds": {
+          "max_ms": 2.4716,
+          "median_ms": 2.0971
+        }
+      },
+      "source_bytes_unchanged": true,
+      "virtual_bytes_unchanged": true
+    },
+    "subclass_specialization": {
+      "candidate_semantics_unchanged": true,
+      "compile_receipt": {
+        "admission_fingerprint": "7399161919cdea777f4766f9706e3efe448048126ce0a6af575ac19db38321e1",
+        "apply_authority": false,
+        "approval_receipt_fingerprint": "575c5af51c3717f5ca0d71c275d65872e893ac062c272c238980c9519fe00bb8",
+        "approved_ceiling_fingerprint": "c681de52a889044ca7680d359d6b69e01ecb8e449b8081803c5b8e667c2d6149",
+        "arbitrary_command_execution_count": 0,
+        "author_calls": 0,
+        "authority": "diagnostic_evidence_only",
+        "auto_apply": false,
+        "behavior_validated": false,
+        "behavioral_validation_pending": true,
+        "candidate_fingerprint": "2a1c44da65987ae2c73c93c901f307ab77600c2b030a07743a6ca40b265e4749",
+        "compile_success": true,
+        "compile_timeout_seconds": 60,
+        "compiler_receipt_fingerprint": "f20abced53fc53f4b622042c70b2f602d6256b1019191cf59da2bd73f81500be",
+        "compiler_result": {
+          "compiler": {
+            "executable": "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath_target_432447671\\javac.exe",
+            "executable_sha256": "c788d3369408b0dd43be8e0732f24b4493e047e4cb5b5bda46fece05e9ba7039",
+            "version": "javac 26.0.2.1"
+          },
+          "exit_code": 0,
+          "javac_invocation_count": 1,
+          "output_overflow": false,
+          "stderr": "",
+          "stdout": "",
+          "timed_out": false,
+          "unavailable_reason": "",
+          "version_probe_count": 1
+        },
+        "correctness_proven": false,
+        "diagnostics": [],
+        "effective_design_fingerprint": "808b51408472a6f4ede302779cc246cec2ea2e2e88cc1e769ed02c5af8694137",
+        "execution_authorized": false,
+        "filesystem_file_creation_authority": false,
+        "filesystem_write_authority": false,
+        "first_remaining_blocker": "STRUCTURAL_CANDIDATE_BEHAVIORAL_VALIDATION_NOT_IMPLEMENTED",
+        "implementation_plan_fingerprint": "4b13fb582d26e87b75b7c95a25598311006a610d2f72d93fc260687b879529ef",
+        "input_manifest": [
+          {
+            "path": "SavingAccount.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "d74892acb1dd0a278d37daffc55c9f66602ef1512a6783eed9dd4dbf9a2e3598",
+            "size": 731
+          },
+          {
+            "path": "bank.java",
+            "provenance": "materialized_virtual_file",
+            "sha256": "8771b7def21331c615a88991a1117a716a6c22b18b8fc5ea5e20d2802d99aa39",
+            "size": 401
+          }
+        ],
+        "invocation_contract": [
+          "javac",
+          "-J-Duser.language=en",
+          "-J-Duser.country=US",
+          "-J-XX:-UsePerfData",
+          "-J-Dstdout.encoding=UTF-8",
+          "-J-Dstderr.encoding=UTF-8",
+          "-encoding",
+          "UTF-8",
+          "-proc:none",
+          "-implicit:none",
+          "-sourcepath",
+          "<isolated-empty>",
+          "-classpath",
+          "<isolated-empty>",
+          "-d",
+          "<isolated-output>",
+          "-Xmaxerrs",
+          "100",
+          "-Xmaxwarns",
+          "100",
+          "SavingAccount.java",
+          "bank.java"
+        ],
+        "java_execution_count": 0,
+        "javac_evidence_satisfaction": [
+          {
+            "compiler_receipt_fingerprint": "f20abced53fc53f4b622042c70b2f602d6256b1019191cf59da2bd73f81500be",
+            "implementation_plan_fingerprint": "4b13fb582d26e87b75b7c95a25598311006a610d2f72d93fc260687b879529ef",
+            "kind": "javac",
+            "need_fingerprint": "acb6c900b50bc68055bf9e6821487104ebb28fa46b8d10ffaf9f7090a42f5b5a",
+            "satisfied": true
+          }
+        ],
+        "materialization_fingerprint": "f644123cc98b228e4d5bd06838cf3483b359fcddbe78f5f24f9d72965029b60b",
+        "max_diagnostics": 32,
+        "max_output_bytes_per_stream": 65536,
+        "model_calls": 0,
+        "output_capture_policy": "bounded_raw_text_with_logical_path_normalization; overflow_fail_closed",
+        "p1_fingerprint": "849beaeb2d59575a0cc15e8951ddd4d2e1f628327017b2751b36ec28c5c3e295",
+        "phase_id": "PATCH.CANDIDATE.VALIDATE.1A",
+        "repository_evidence_fingerprint": "b1ccd32c91f15f6d561b6d0e1437092a4c12a411bdb213bf9c2c2b164405e0c8",
+        "repository_id": "patch-candidate-validate1a-fixture-n78mjmm7-511fb5a665de8b5d63907651e58cda23",
+        "repository_traversals": 0,
+        "schema_version": "patch_candidate_validate_1a_v1",
+        "shell": false,
+        "source_mutation": 0,
+        "status": "compile_validated",
+        "task_fingerprint": "45a6e931756356673af819ba424275179e4c40612aa994565e1fe27108f177c6",
+        "test_generation_count": 0,
+        "test_write_authority": false,
+        "validation_fingerprint": "5442430cde81773c95fd232eca79d697ca40156094e17b87958fa8f3850c51fc",
+        "version_probe_timeout_seconds": 30,
+        "warnings": [],
+        "write_authority": false
+      },
+      "deterministic": true,
+      "historical_plan_unchanged": true,
+      "new_repository_source_created": false,
+      "performance": {
+        "compiler_identity_seconds": {
+          "max_ms": 7.4956,
+          "median_ms": 7.2571
+        },
+        "diagnostic_normalization_seconds": {
+          "max_ms": 3.9944,
+          "median_ms": 1.2726
+        },
+        "exact_evidence_acquisition_seconds": {
+          "max_ms": 11.7126,
+          "median_ms": 11.2768
+        },
+        "fresh_materialization_validation_seconds": {
+          "max_ms": 615.5848,
+          "median_ms": 614.0555
+        },
+        "javac_provider_seconds": {
+          "max_ms": 1324.1625,
+          "median_ms": 1189.7674
+        },
+        "owner_mapping_seconds": {
+          "max_ms": 1.4791,
+          "median_ms": 1.4698
+        },
+        "receipt_fingerprinting_seconds": {
+          "max_ms": 1.8226,
+          "median_ms": 1.5953
+        },
+        "temporary_workspace_construction_seconds": {
+          "max_ms": 5.8193,
+          "median_ms": 5.6747
+        },
+        "total_harness_overhead_seconds": {
+          "max_ms": 660.2594,
+          "median_ms": 653.2148
+        },
+        "total_seconds": {
+          "max_ms": 1977.1177,
+          "median_ms": 1842.9822
+        },
+        "virtual_byte_integrity_verification_seconds": {
+          "max_ms": 1.9563,
+          "median_ms": 1.8096
+        }
+      },
+      "source_bytes_unchanged": true,
+      "virtual_bytes_unchanged": true
+    }
+  },
+  "source_mutation": false,
+  "test_generated": false,
+  "version_probe_count": 21,
+  "virtual_source_repair": false,
+  "write_authority": false
+}

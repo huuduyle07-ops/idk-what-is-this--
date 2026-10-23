@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="cattus-csrf-token" content="{{ cattus_csrf_token() }}">
+    <meta name="cattus-auth-state" content="{{ cattus_auth_state() }}">
+    <meta name="color-scheme" content="light">
+    <title>Học cùng C.A.T.T.U.S</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='learn.css') }}">
+    <script src="{{ url_for('static', filename='request_integrity.js') }}"></script>
+    <script id="lessonPreview" type="application/json">{{ lesson_preview|tojson }}</script>
+    <script src="{{ url_for('static', filename='learn.js') }}" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#lessonTitle">Đến bài học</a>
+    <div class="studio">
+        <aside class="rail" aria-label="Điều hướng">
+            <a class="brand" href="/learn" aria-label="C.A.T.T.U.S — Không gian học">
+                <span class="brand-mark" aria-hidden="true">c<span>·</span></span>
+                <span>C.A.T.T.U.S<small>Hiểu từ gốc.</small></span>
+            </a>
+            <nav class="mode-nav" aria-label="Chế độ làm việc">
+                <a class="mode-link active" href="/learn" aria-current="page">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 5v15M3 4.5c3.5-1 6.5-.5 9 1.5 2.5-2 5.5-2.5 9-1.5v14c-3.5-1-6.5-.5-9 1.5-2.5-2-5.5-2.5-9-1.5z"/></svg>
+                    <span>Học cùng tôi</span><span class="nav-dot" aria-hidden="true"></span>
+                </a>
+                <a class="mode-link" href="/learn/materials"><span aria-hidden="true">▤</span><span>Tài liệu của tôi</span></a>
+                <a class="mode-link" href="/?web_mode=instant">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-5-15-2 18"/></svg>
+                    <span>Coding agent</span><span aria-hidden="true">↗</span>
+                </a>
+            </nav>
+            <section class="journey" aria-labelledby="journeyTitle">
+                <p id="journeyTitle" class="eyebrow">Trong bài học này</p>
+                <ol id="lessonSteps" class="lesson-steps">
+                    <li><span class="step-marker">1</span><span>Quan sát code</span></li>
+                    <li><span class="step-marker">2</span><span>Tự đưa ra dự đoán</span></li>
+                    <li><span class="step-marker">3</span><span>Thử một tình huống mới</span></li>
+                </ol>
+                <p id="progressText" class="progress-caption">Đi từng bước, theo nhịp của bạn.</p>
+            </section>
+            <div class="rail-note"><span class="small-leaf" aria-hidden="true">↗</span><p>Hiểu một điều nhỏ.<br>Tự làm thêm một bước.</p></div>
+            <details class="privacy-details">
+                <summary>Bài làm của tôi được lưu ở đâu?</summary>
+                <p>Phiên học được lưu trên máy chủ C.A.T.T.U.S này và mở lại trong trình duyệt hiện tại. Bài thử dùng đáp án soạn sẵn, không gửi bài làm đến dịch vụ AI.</p>
+                <p>Bạn có thể tải dữ liệu hoặc xóa phiên bằng các nút trên đầu trang. Phần trả lời chưa gửi chưa được lưu.</p>
+            </details>
+        </aside>
+
+        <main class="main learning-main">
+            <header class="topbar">
+                <p class="breadcrumb">Không gian học <span aria-hidden="true">/</span> <strong>Java</strong></p>
+                <div class="session-tools" id="sessionTools" hidden>
+                    <span id="saveStatus" class="save-status"><span aria-hidden="true"></span>Đã lưu phiên</span>
+                    <button id="exportButton" class="text-button" type="button" title="Tải dữ liệu phiên học">Tải bài làm <span aria-hidden="true">↓</span></button>
+                    <button id="deleteButton" class="text-button" type="button">Xóa phiên</button>
+                </div>
+            </header>
+
+            <section id="notice" class="notice" role="alert" hidden>
+                <p id="noticeText"></p>
+                <button id="retryButton" class="text-button" type="button" hidden>Thử lại</button>
+            </section>
+            <p id="announcement" class="visually-hidden" role="status" aria-live="polite"></p>
+
+            <div class="lesson-heading">
+                <div><p class="eyebrow">JAVA · KẾ THỪA & ĐA HÌNH</p>
+                    <h1 id="lessonTitle" tabindex="-1">Đọc code. Hiểu điều xảy ra.</h1>
+                    <p id="lessonSubtitle" class="lesson-subtitle">Một đoạn code nhỏ, một ý tưởng để tự khám phá.</p>
+                </div>
+                <span id="lessonBadge" class="lesson-badge">Bài thử đầu tiên</span>
+            </div>
+
+            <div id="workspace" class="workspace" aria-busy="true">
+                <section class="code-column" aria-labelledby="codeHeading">
+                    <div class="code-window">
+                        <div class="code-toolbar"><h2 id="codeHeading"><span class="file-icon" aria-hidden="true">{ }</span><span id="filename">{{ lesson_preview.filename }}</span></h2><span class="language-label">JAVA</span></div>
+                        <div class="code-scroll" tabindex="0" aria-label="Code Java, cuộn ngang nếu cần">
+                            <pre class="code-block"><code id="lessonCode"></code></pre>
+                        </div>
+                        <div class="code-footer"><span id="codeCaption">Chỉ đọc · Hãy thử chạy đoạn code trong đầu</span><span class="code-footer-dot" aria-hidden="true"></span></div>
+                    </div>
+                    <div id="observationNote" class="observation-note"><span aria-hidden="true">↳</span><p>Hãy để ý <strong>kiểu của biến</strong> và <strong>đối tượng thực sự được tạo</strong>. Chúng có luôn giống nhau?</p></div>
+                    <p class="pilot-note">Bài thực hành có đáp án được soạn sẵn. Code trong bài này không được chạy trực tiếp.</p>
+                </section>
+
+                <section class="interaction-column" aria-label="Hoạt động học">
+                    <div id="welcomeCard" class="teaching-card welcome-card">
+                        <span class="section-number" aria-hidden="true">01 / KHÁM PHÁ</span>
+                        <h2>Một biến. Hai kiểu.<br>Method nào được gọi?</h2>
+                        <p>Bắt đầu với kế thừa trong Java. Bạn dự đoán kết quả, đọc phản hồi, rồi thử lại với một tình huống khác.</p>
+                        <div class="welcome-points"><p><span aria-hidden="true">↗</span>Được xin gợi ý khi cần.</p><p><span aria-hidden="true">↗</span>Được xem lời giải để tiếp tục.</p><p><span aria-hidden="true">↗</span>Không chấm điểm tốc độ.</p></div>
+                        <button id="startButton" class="button button-primary" type="button" disabled><span>Đang mở bài học…</span><span aria-hidden="true">→</span></button>
+                        <p class="under-button">Mục tiêu: tự giải thích được lựa chọn của mình.</p>
+                    </div>
+
+                    <div id="questionCard" class="teaching-card" hidden>
+                        <p id="itemPosition" class="section-number"></p>
+                        <h2 id="questionTitle" tabindex="-1"></h2>
+                        <form id="answerForm">
+                            <fieldset id="optionsFieldset" class="answer-options"><legend class="visually-hidden">Chọn dự đoán của bạn</legend><div id="optionsList"></div></fieldset>
+                            <details id="reflectionDetails" class="reflection-details">
+                                <summary>Viết cách bạn suy nghĩ <span>không bắt buộc</span></summary>
+                                <label class="visually-hidden" for="reflectionInput">Giải thích lựa chọn của bạn</label>
+                                <textarea id="reflectionInput" rows="3" maxlength="1600" placeholder="Tôi nghĩ method này được gọi vì…" aria-describedby="reflectionHelp"></textarea>
+                                <p id="reflectionHelp">Phần giải thích của bạn được lưu khi gửi câu trả lời để trao đổi, chưa được chấm tự động.</p>
+                            </details>
+                            <button id="answerButton" class="button button-primary" type="submit"><span>Kiểm tra dự đoán</span><span aria-hidden="true">→</span></button>
+                        </form>
+                        <div class="help-actions"><button id="hintButton" class="text-button" type="button">Cho tôi một gợi ý</button><button id="solutionButton" class="text-button subtle" type="button">Xem lời giải</button></div>
+                    </div>
+
+                    <section id="hintsCard" class="response-card hint-card" hidden aria-labelledby="hintsHeading"><h3 id="hintsHeading" tabindex="-1">Một chút gợi ý</h3><div id="hintsList"></div></section>
+                    <section id="feedbackCard" class="response-card feedback-card" hidden aria-labelledby="feedbackHeading"><p class="eyebrow">ĐỐI CHIẾU VỚI CODE</p><h3 id="feedbackHeading" tabindex="-1"></h3><p id="feedbackBody"></p><p id="assistanceLabel" class="response-footnote"></p></section>
+                    <section id="solutionCard" class="response-card solution-card" hidden aria-labelledby="solutionHeading"><p class="eyebrow">LỜI GIẢI</p><h3 id="solutionHeading" tabindex="-1">Cùng đi qua cách chọn method</h3><p id="solutionBody"></p></section>
+                    <button id="nextButton" class="button button-next" type="button" hidden><span>Thử tình huống tiếp theo</span><span aria-hidden="true">→</span></button>
+
+                    <section id="summaryCard" class="teaching-card summary-card" hidden aria-labelledby="summaryHeading"><span class="summary-mark" aria-hidden="true">✓</span><p class="section-number">DỪNG LẠI MỘT CHÚT</p><h2 id="summaryHeading" tabindex="-1">Bạn vừa đi thêm một bước.</h2><p id="summaryMessage"></p><dl class="summary-stats"><div><dt>Đúng ở lần đầu, chưa dùng trợ giúp trong phiên</dt><dd id="independentSuccesses">0</dd></div><div><dt>Chưa đúng ở lần đầu, chưa dùng trợ giúp trong phiên</dt><dd id="independentFailures">0</dd></div><div><dt>Đúng sau khi có trợ giúp</dt><dd id="assistedSuccesses">0</dd></div></dl><p class="summary-caveat">Một câu chưa đúng ban đầu có thể được làm đúng sau trợ giúp, nên các nhóm trên có thể trùng nhau. Ứng dụng không biết bạn có dùng tài liệu bên ngoài hay không. Kết quả bài này chưa đủ để kết luận thành thạo; một bài mới ở lần học sau sẽ cho thêm bằng chứng.</p><button id="restartButton" class="button button-secondary" type="button">Làm lại bài học</button><p class="under-button">Tải bài làm trước nếu bạn muốn giữ bản hiện tại.</p></section>
+                </section>
+            </div>
+            <footer class="studio-footer"><span>C.A.T.T.U.S / Learning studio</span><span>Hiểu code, theo cách của bạn.</span></footer>
+        </main>
+    </div>
+    <noscript><p class="noscript-note">Hãy bật JavaScript để mở và gửi bài học. Không có bài làm nào được gửi khi JavaScript tắt.</p></noscript>
+</body>
+</html>

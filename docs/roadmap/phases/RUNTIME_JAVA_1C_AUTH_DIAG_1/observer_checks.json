@@ -1,0 +1,17 @@
+{
+  "Docker_effects": 0,
+  "Java_effects": 0,
+  "exact_original_pair_retained": true,
+  "historical_preservation": {
+    "changed_or_missing": [],
+    "files_checked": 1828,
+    "passed": true
+  },
+  "owner_mutation_occurred": false,
+  "passed": true,
+  "preexisting_instrumentation_rejected": [
+    "profile",
+    "trace"
+  ],
+  "restoration_passed": true
+}

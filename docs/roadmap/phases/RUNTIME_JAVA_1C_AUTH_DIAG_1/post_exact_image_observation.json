@@ -1,0 +1,22 @@
+{
+  "config_absent_after": true,
+  "config_absent_before": true,
+  "context": "host",
+  "exit_code": 0,
+  "format_correction": "Use index for the optional Volumes key; preserve prior template error artifact.",
+  "identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+  "metadata": {
+    "Architecture": "amd64",
+    "Id": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "Os": "linux",
+    "Volumes": null
+  },
+  "observed_utc": "2026-10-10T02:34:59.099596+00:00",
+  "private_config_path": "C:\\Users\\Admin\\AppData\\Local\\Temp\\runtime-sandbox1-no-config-2de8021fb34daeb3832e07a08b6c4826",
+  "process_reaped_and_pipes_closed": true,
+  "provenance": "Separate post-attempt read-only observation; no live attempt repeated.",
+  "provider_issuance": 0,
+  "read_only_Docker_controls": 1,
+  "standalone_owner_invocations": 0,
+  "stderr": ""
+}

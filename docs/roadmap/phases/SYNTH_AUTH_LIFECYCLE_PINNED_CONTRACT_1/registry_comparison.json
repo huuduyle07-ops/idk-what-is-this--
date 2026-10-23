@@ -1,0 +1,50 @@
+{
+  "after_failed_count": 7,
+  "after_passed_count": 292,
+  "baseline_failed_count": 7,
+  "baseline_passed_count": 292,
+  "compared_fields_equal": {
+    "collected": true,
+    "exit_code": true,
+    "failed": true,
+    "passed_count": true,
+    "passed_nodes": true,
+    "picker": true,
+    "registry_summary": true,
+    "skipped": true
+  },
+  "existing_failures": [
+    {
+      "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+      "when": "call"
+    },
+    {
+      "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+      "when": "call"
+    },
+    {
+      "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+      "when": "call"
+    },
+    {
+      "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+      "when": "call"
+    },
+    {
+      "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+      "when": "call"
+    },
+    {
+      "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+      "when": "call"
+    },
+    {
+      "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+      "when": "call"
+    }
+  ],
+  "failure_ids_match_frozen_compat": true,
+  "passed": true,
+  "picker_behavior_changed": false,
+  "registry_seed_changed": false
+}

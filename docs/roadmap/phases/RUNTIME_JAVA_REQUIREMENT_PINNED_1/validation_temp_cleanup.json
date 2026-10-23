@@ -1,0 +1,42 @@
+{
+  "scope": "Only new phase-local validation_temp_* trees; historical temporary directories untouched.",
+  "removed_trees": [
+    {
+      "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_REQUIREMENT_PINNED_1\\validation_temp_frozen_after_61237fbbf1cb4a93adedf7d5f8bca126",
+      "verified_exact_phase_child": true,
+      "name_matched": true,
+      "removed": true
+    },
+    {
+      "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_REQUIREMENT_PINNED_1\\validation_temp_frozen_baseline",
+      "verified_exact_phase_child": true,
+      "name_matched": true,
+      "removed": true
+    },
+    {
+      "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_REQUIREMENT_PINNED_1\\validation_temp_new_requirement_0a179947084f4eb2991be86f6aef6080",
+      "verified_exact_phase_child": true,
+      "name_matched": true,
+      "removed": true
+    },
+    {
+      "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_REQUIREMENT_PINNED_1\\validation_temp_new_requirement_72eae0567a464452a0b5de3abd1e0b0b",
+      "verified_exact_phase_child": true,
+      "name_matched": true,
+      "removed": true
+    },
+    {
+      "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_REQUIREMENT_PINNED_1\\validation_temp_registry_after_e9a7f1452a8b49cbb33ea3d3b2f5d539",
+      "verified_exact_phase_child": true,
+      "name_matched": true,
+      "removed": true
+    },
+    {
+      "path": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_REQUIREMENT_PINNED_1\\validation_temp_registry_baseline",
+      "verified_exact_phase_child": true,
+      "name_matched": true,
+      "removed": true
+    }
+  ],
+  "count": 6
+}

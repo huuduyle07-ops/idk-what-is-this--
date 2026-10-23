@@ -33,6 +33,7 @@ from core.behavioral_expectation import (
     MAX_BEHAVIORAL_EXPECTATIONS,
     BehavioralExpectation,
 )
+from core.explicit_design_evidence import DesignEvidence
 from core.explicit_evidence import (
     CONSTRAINT_KINDS,
     FRAMEWORK_TYPES,
@@ -86,6 +87,8 @@ PRESERVATION_ITEM_KINDS: tuple[str, ...] = (
     "provenance",
     # DEFECT.FACT.LIVE.1 — one explicit "should be X, is Y" claim.
     "behavioral_expectation",
+    # OOP.INTENT.DESIGN.1 — exact additive design-evidence identity.
+    "design_commitment",
 )
 
 # ── Bounds ────────────────────────────────────────────────────────────────────
@@ -397,8 +400,11 @@ class TaskContract:
     notes: tuple[str, ...] = ()
     routing_allowed: bool = False
     schema_version: str = CONTRACT_SCHEMA_VERSION
+    design_evidence: DesignEvidence = field(default_factory=DesignEvidence)
 
     def __post_init__(self) -> None:
+        if not isinstance(self.design_evidence, DesignEvidence):
+            raise TypeError("task design evidence must be a DesignEvidence")
         _bounded_tuple(self.subjects, MAX_SUBJECTS, "subjects")
         _bounded_tuple(self.relationships, MAX_RELATIONSHIPS, "relationships")
         _bounded_tuple(self.constraints, MAX_CONSTRAINTS, "constraints")
@@ -445,6 +451,8 @@ class TaskContract:
             "routing_allowed": self.routing_allowed,
             "notes": list(self.notes),
             "guardrails": _guardrails(),
+            **({"design_evidence": self.design_evidence.as_dict()}
+               if not self.design_evidence.is_empty() else {}),
         }
 
 

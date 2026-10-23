@@ -1,0 +1,1074 @@
+{
+  "kind": "pure_declarative_schema_sizing_lower_bound",
+  "source_schema": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+  "live_observations": false,
+  "controller_or_protocol_implementation": false,
+  "limitations": [
+    "All kernel, descriptor and relationship identifiers optimistically use one character.",
+    "File mode integers include only mandatory type bits, not actual observed permission bits.",
+    "Class length is one byte; hashes/challenges are invented sizing strings, never evidence.",
+    "No claim these illustrative records satisfy every authenticated runtime cross-field predicate.",
+    "Writer-free case is strictly a smaller structural lower bound; writer case includes only one controller and two potential-write root handles.",
+    "No initial empty observation, error, cleanup or additional current observation is counted.",
+    "Short labels do not prove a truthful complete kernel inventory can fit the remaining bytes."
+  ],
+  "frozen_attempt_outer_stdout_limit": 8192,
+  "preliminary_structural_count": {
+    "payload_plus_four_header_bytes": [
+      3256,
+      4803,
+      3405
+    ],
+    "materialize_compile_total": 8059,
+    "materialize_compile_fresh_observation_total": 11464,
+    "description": "Earlier direct schema-default count with one writer/two handles and UID65534, but zero mode fields, default boolean values and null writer-accounting reference. This is byte arithmetic only, not a semantically valid successful witness. The main cases below correct mandatory mode type bits, success booleans and the writer reference."
+  },
+  "attempt_boundary_source": [
+    "PREP closure contract.json:521 describes one fixed materialize-then-compile attempt.",
+    "PREP closure contract.json:219-220 also describes receipt revalidation during one live attempt.",
+    "Controller schema cross_field_rules requires a fresh OBSERVE before readiness/handoff and preserves whole-attempt8192 capture.",
+    "Excluding postcompile readiness observation from this cap requires an explicit, faithful distinction between preparation-operation interval and retained lifecycle; these sizes do not authorize redefining the frozen attempt."
+  ],
+  "cases": [
+    {
+      "one_controller_writer_two_root_handles": false,
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "payload_plus_four_header_bytes": [
+        2915,
+        4469,
+        3068
+      ],
+      "materialize_compile_total": 7384,
+      "materialize_compile_fresh_observation_total": 10452,
+      "illustrative_records": [
+        {
+          "protocol_id": "synthetic_preparation_controller_pinned_1_v1",
+          "version": 1,
+          "operation": "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "request_id": "x",
+          "operation_id": "x",
+          "workspace_capability_id": "x",
+          "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+          "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+          "sequence": 1,
+          "challenge": null,
+          "purpose": "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "status": "COMPLETE",
+          "result": {
+            "workspace_state": {
+              "workspace_capability_id": "x",
+              "stable_fingerprint": "0000000000000000000000000000000000000000000000000000000000000000",
+              "issuing_pid": 1,
+              "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+              "controller_identity": "x",
+              "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+              "observation_sequence": 1,
+              "observation_challenge": "0000000000000000000000000000000000000000000000000000000000000000",
+              "stage": "materialized",
+              "mounts": [
+                {
+                  "path": "/tmp",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,noexec,size=16m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                },
+                {
+                  "path": "/work",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,size=32m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                }
+              ],
+              "work_manifest": [
+                {
+                  "path": "/work/SyntheticStateBox.java",
+                  "kind": "file",
+                  "mode": 32768,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 1,
+                  "size_bytes": 239,
+                  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+                },
+                {
+                  "path": "/work/classes",
+                  "kind": "directory",
+                  "mode": 16384,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 2,
+                  "size_bytes": null,
+                  "sha256": null
+                }
+              ],
+              "tmp_manifest": [],
+              "process_exclusivity_observation": {
+                "controller_process_identity": "x",
+                "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+                "namespace_identity": "x",
+                "processes": [
+                  {
+                    "pid": 1,
+                    "parent_pid": 0,
+                    "start_identity": "x",
+                    "role": "controller",
+                    "namespaces": {
+                      "user": "x",
+                      "mnt": "x",
+                      "net": "x",
+                      "pid": "x",
+                      "ipc": "x",
+                      "cgroup": "x",
+                      "uts": "x"
+                    },
+                    "cgroup_identity": "x",
+                    "uid": 65534,
+                    "gid": 65534,
+                    "tasks": [
+                      {
+                        "tid": 1,
+                        "start_identity": "x"
+                      }
+                    ],
+                    "admitted_operation_id": null
+                  }
+                ],
+                "writers": [],
+                "exclusive_owner_relation_id": "x",
+                "authorized_borrower_relation_id": null,
+                "inventory_method": "complete_readonly_kernel_inventory",
+                "cleanup_barrier_sequence": 0,
+                "active_operation_id": null,
+                "handoff_identity": null
+              }
+            },
+            "preparation_attempt_id": "x",
+            "source_readback_size": 239,
+            "source_readback_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "source_readback_exact": true
+          },
+          "error": null
+        },
+        {
+          "protocol_id": "synthetic_preparation_controller_pinned_1_v1",
+          "version": 1,
+          "operation": "COMPILE_EXACT_SCENARIO",
+          "request_id": "x",
+          "operation_id": "x",
+          "workspace_capability_id": "x",
+          "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+          "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+          "sequence": 1,
+          "challenge": null,
+          "purpose": "COMPILE_EXACT_SCENARIO",
+          "status": "COMPLETE",
+          "result": {
+            "workspace_state": {
+              "workspace_capability_id": "x",
+              "stable_fingerprint": "0000000000000000000000000000000000000000000000000000000000000000",
+              "issuing_pid": 1,
+              "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+              "controller_identity": "x",
+              "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+              "observation_sequence": 1,
+              "observation_challenge": "0000000000000000000000000000000000000000000000000000000000000000",
+              "stage": "prepared",
+              "mounts": [
+                {
+                  "path": "/tmp",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,noexec,size=16m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                },
+                {
+                  "path": "/work",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,size=32m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                }
+              ],
+              "work_manifest": [
+                {
+                  "path": "/work/SyntheticStateBox.java",
+                  "kind": "file",
+                  "mode": 32768,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 1,
+                  "size_bytes": 239,
+                  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+                },
+                {
+                  "path": "/work/classes",
+                  "kind": "directory",
+                  "mode": 16384,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 2,
+                  "size_bytes": null,
+                  "sha256": null
+                },
+                {
+                  "path": "/work/classes/SyntheticStateBox.class",
+                  "kind": "file",
+                  "mode": 32768,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 1,
+                  "size_bytes": 1,
+                  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+                }
+              ],
+              "tmp_manifest": [],
+              "process_exclusivity_observation": {
+                "controller_process_identity": "x",
+                "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+                "namespace_identity": "x",
+                "processes": [
+                  {
+                    "pid": 1,
+                    "parent_pid": 0,
+                    "start_identity": "x",
+                    "role": "controller",
+                    "namespaces": {
+                      "user": "x",
+                      "mnt": "x",
+                      "net": "x",
+                      "pid": "x",
+                      "ipc": "x",
+                      "cgroup": "x",
+                      "uts": "x"
+                    },
+                    "cgroup_identity": "x",
+                    "uid": 65534,
+                    "gid": 65534,
+                    "tasks": [
+                      {
+                        "tid": 1,
+                        "start_identity": "x"
+                      }
+                    ],
+                    "admitted_operation_id": null
+                  }
+                ],
+                "writers": [],
+                "exclusive_owner_relation_id": "x",
+                "authorized_borrower_relation_id": null,
+                "inventory_method": "complete_readonly_kernel_inventory",
+                "cleanup_barrier_sequence": 0,
+                "active_operation_id": null,
+                "handoff_identity": null
+              }
+            },
+            "preparation_attempt_id": "x",
+            "compiler_identity": {
+              "path": "/opt/temurin-26.0.2.1/bin/javac",
+              "sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+              "argv": [
+                "/opt/temurin-26.0.2.1/bin/javac",
+                "-J-Xms8m",
+                "-J-Xmx32m",
+                "-J-XX:ActiveProcessorCount=1",
+                "-J-XX:-UsePerfData",
+                "-d",
+                "/work/classes",
+                "/work/SyntheticStateBox.java"
+              ],
+              "cwd": "/work",
+              "environment": {
+                "PATH": "/usr/local/bin:/usr/bin:/bin",
+                "LANG": "C.UTF-8",
+                "GPG_KEY": "",
+                "PYTHON_VERSION": "",
+                "PYTHON_SHA256": "",
+                "SANDBOX_PUBLIC_SENTINEL": "phase-owned",
+                "HOME": "/work",
+                "HOSTNAME": "runtime-sandbox1"
+              },
+              "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+              "namespaces": {
+                "user": "x",
+                "mnt": "x",
+                "net": "x",
+                "pid": "x",
+                "ipc": "x",
+                "cgroup": "x",
+                "uts": "x"
+              },
+              "cgroup_identity": "x"
+            },
+            "capture_and_reap": {
+              "child_pid": 1,
+              "process_group_identity": "x",
+              "exit_code": 0,
+              "timed_out": false,
+              "reaped": true,
+              "group_terminated": true,
+              "stdout": {
+                "observed_bytes": 0,
+                "limit_bytes": 2048,
+                "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+                "eof": true,
+                "overflow": false,
+                "closed": true
+              },
+              "stderr": {
+                "observed_bytes": 0,
+                "limit_bytes": 2048,
+                "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+                "eof": true,
+                "overflow": false,
+                "closed": true
+              },
+              "selectors_closed": true,
+              "deadline_identity": "x"
+            },
+            "class_metadata": {
+              "path": "/work/classes/SyntheticStateBox.class",
+              "size_bytes": 1,
+              "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+              "internal_class_name": "SyntheticStateBox",
+              "inspection_kind": "inert_bounded_classfile_metadata",
+              "class_loaded": false
+            }
+          },
+          "error": null
+        },
+        {
+          "protocol_id": "synthetic_preparation_controller_pinned_1_v1",
+          "version": 1,
+          "operation": "OBSERVE_PREPARED_ARTIFACTS",
+          "request_id": "x",
+          "operation_id": "x",
+          "workspace_capability_id": "x",
+          "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+          "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+          "sequence": 1,
+          "challenge": "0000000000000000000000000000000000000000000000000000000000000000",
+          "purpose": "OBSERVE_PREPARED_ARTIFACTS",
+          "status": "COMPLETE",
+          "result": {
+            "workspace_state": {
+              "workspace_capability_id": "x",
+              "stable_fingerprint": "0000000000000000000000000000000000000000000000000000000000000000",
+              "issuing_pid": 1,
+              "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+              "controller_identity": "x",
+              "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+              "observation_sequence": 1,
+              "observation_challenge": "0000000000000000000000000000000000000000000000000000000000000000",
+              "stage": "prepared",
+              "mounts": [
+                {
+                  "path": "/tmp",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,noexec,size=16m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                },
+                {
+                  "path": "/work",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,size=32m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                }
+              ],
+              "work_manifest": [
+                {
+                  "path": "/work/SyntheticStateBox.java",
+                  "kind": "file",
+                  "mode": 32768,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 1,
+                  "size_bytes": 239,
+                  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+                },
+                {
+                  "path": "/work/classes",
+                  "kind": "directory",
+                  "mode": 16384,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 2,
+                  "size_bytes": null,
+                  "sha256": null
+                },
+                {
+                  "path": "/work/classes/SyntheticStateBox.class",
+                  "kind": "file",
+                  "mode": 32768,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 1,
+                  "size_bytes": 1,
+                  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+                }
+              ],
+              "tmp_manifest": [],
+              "process_exclusivity_observation": {
+                "controller_process_identity": "x",
+                "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+                "namespace_identity": "x",
+                "processes": [
+                  {
+                    "pid": 1,
+                    "parent_pid": 0,
+                    "start_identity": "x",
+                    "role": "controller",
+                    "namespaces": {
+                      "user": "x",
+                      "mnt": "x",
+                      "net": "x",
+                      "pid": "x",
+                      "ipc": "x",
+                      "cgroup": "x",
+                      "uts": "x"
+                    },
+                    "cgroup_identity": "x",
+                    "uid": 65534,
+                    "gid": 65534,
+                    "tasks": [
+                      {
+                        "tid": 1,
+                        "start_identity": "x"
+                      }
+                    ],
+                    "admitted_operation_id": null
+                  }
+                ],
+                "writers": [],
+                "exclusive_owner_relation_id": "x",
+                "authorized_borrower_relation_id": null,
+                "inventory_method": "complete_readonly_kernel_inventory",
+                "cleanup_barrier_sequence": 0,
+                "active_operation_id": null,
+                "handoff_identity": null
+              }
+            },
+            "cleanup_barrier_sequence": 0,
+            "active_operation_id": null,
+            "handoff_identity": null
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "one_controller_writer_two_root_handles": true,
+      "operations": [
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "OBSERVE_PREPARED_ARTIFACTS"
+      ],
+      "payload_plus_four_header_bytes": [
+        3271,
+        4825,
+        3424
+      ],
+      "materialize_compile_total": 8096,
+      "materialize_compile_fresh_observation_total": 11520,
+      "illustrative_records": [
+        {
+          "protocol_id": "synthetic_preparation_controller_pinned_1_v1",
+          "version": 1,
+          "operation": "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "request_id": "x",
+          "operation_id": "x",
+          "workspace_capability_id": "x",
+          "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+          "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+          "sequence": 1,
+          "challenge": null,
+          "purpose": "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "status": "COMPLETE",
+          "result": {
+            "workspace_state": {
+              "workspace_capability_id": "x",
+              "stable_fingerprint": "0000000000000000000000000000000000000000000000000000000000000000",
+              "issuing_pid": 1,
+              "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+              "controller_identity": "x",
+              "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+              "observation_sequence": 1,
+              "observation_challenge": "0000000000000000000000000000000000000000000000000000000000000000",
+              "stage": "materialized",
+              "mounts": [
+                {
+                  "path": "/tmp",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,noexec,size=16m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                },
+                {
+                  "path": "/work",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,size=32m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                }
+              ],
+              "work_manifest": [
+                {
+                  "path": "/work/SyntheticStateBox.java",
+                  "kind": "file",
+                  "mode": 32768,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 1,
+                  "size_bytes": 239,
+                  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+                },
+                {
+                  "path": "/work/classes",
+                  "kind": "directory",
+                  "mode": 16384,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 2,
+                  "size_bytes": null,
+                  "sha256": null
+                }
+              ],
+              "tmp_manifest": [],
+              "process_exclusivity_observation": {
+                "controller_process_identity": "x",
+                "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+                "namespace_identity": "x",
+                "processes": [
+                  {
+                    "pid": 1,
+                    "parent_pid": 0,
+                    "start_identity": "x",
+                    "role": "controller",
+                    "namespaces": {
+                      "user": "x",
+                      "mnt": "x",
+                      "net": "x",
+                      "pid": "x",
+                      "ipc": "x",
+                      "cgroup": "x",
+                      "uts": "x"
+                    },
+                    "cgroup_identity": "x",
+                    "uid": 65534,
+                    "gid": 65534,
+                    "tasks": [
+                      {
+                        "tid": 1,
+                        "start_identity": "x"
+                      }
+                    ],
+                    "admitted_operation_id": null
+                  }
+                ],
+                "writers": [
+                  {
+                    "process_identity": "x",
+                    "task_identity": "x",
+                    "handles": [
+                      {
+                        "descriptor_identity": "x",
+                        "path": "/tmp",
+                        "mount_identity": "x",
+                        "access_kind": "potential_write_access",
+                        "admitted_operation_id": null
+                      },
+                      {
+                        "descriptor_identity": "x",
+                        "path": "/work",
+                        "mount_identity": "x",
+                        "access_kind": "potential_write_access",
+                        "admitted_operation_id": null
+                      }
+                    ],
+                    "accounted_original_relation_id": "x"
+                  }
+                ],
+                "exclusive_owner_relation_id": "x",
+                "authorized_borrower_relation_id": null,
+                "inventory_method": "complete_readonly_kernel_inventory",
+                "cleanup_barrier_sequence": 0,
+                "active_operation_id": null,
+                "handoff_identity": null
+              }
+            },
+            "preparation_attempt_id": "x",
+            "source_readback_size": 239,
+            "source_readback_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "source_readback_exact": true
+          },
+          "error": null
+        },
+        {
+          "protocol_id": "synthetic_preparation_controller_pinned_1_v1",
+          "version": 1,
+          "operation": "COMPILE_EXACT_SCENARIO",
+          "request_id": "x",
+          "operation_id": "x",
+          "workspace_capability_id": "x",
+          "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+          "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+          "sequence": 1,
+          "challenge": null,
+          "purpose": "COMPILE_EXACT_SCENARIO",
+          "status": "COMPLETE",
+          "result": {
+            "workspace_state": {
+              "workspace_capability_id": "x",
+              "stable_fingerprint": "0000000000000000000000000000000000000000000000000000000000000000",
+              "issuing_pid": 1,
+              "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+              "controller_identity": "x",
+              "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+              "observation_sequence": 1,
+              "observation_challenge": "0000000000000000000000000000000000000000000000000000000000000000",
+              "stage": "prepared",
+              "mounts": [
+                {
+                  "path": "/tmp",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,noexec,size=16m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                },
+                {
+                  "path": "/work",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,size=32m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                }
+              ],
+              "work_manifest": [
+                {
+                  "path": "/work/SyntheticStateBox.java",
+                  "kind": "file",
+                  "mode": 32768,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 1,
+                  "size_bytes": 239,
+                  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+                },
+                {
+                  "path": "/work/classes",
+                  "kind": "directory",
+                  "mode": 16384,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 2,
+                  "size_bytes": null,
+                  "sha256": null
+                },
+                {
+                  "path": "/work/classes/SyntheticStateBox.class",
+                  "kind": "file",
+                  "mode": 32768,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 1,
+                  "size_bytes": 1,
+                  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+                }
+              ],
+              "tmp_manifest": [],
+              "process_exclusivity_observation": {
+                "controller_process_identity": "x",
+                "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+                "namespace_identity": "x",
+                "processes": [
+                  {
+                    "pid": 1,
+                    "parent_pid": 0,
+                    "start_identity": "x",
+                    "role": "controller",
+                    "namespaces": {
+                      "user": "x",
+                      "mnt": "x",
+                      "net": "x",
+                      "pid": "x",
+                      "ipc": "x",
+                      "cgroup": "x",
+                      "uts": "x"
+                    },
+                    "cgroup_identity": "x",
+                    "uid": 65534,
+                    "gid": 65534,
+                    "tasks": [
+                      {
+                        "tid": 1,
+                        "start_identity": "x"
+                      }
+                    ],
+                    "admitted_operation_id": null
+                  }
+                ],
+                "writers": [
+                  {
+                    "process_identity": "x",
+                    "task_identity": "x",
+                    "handles": [
+                      {
+                        "descriptor_identity": "x",
+                        "path": "/tmp",
+                        "mount_identity": "x",
+                        "access_kind": "potential_write_access",
+                        "admitted_operation_id": null
+                      },
+                      {
+                        "descriptor_identity": "x",
+                        "path": "/work",
+                        "mount_identity": "x",
+                        "access_kind": "potential_write_access",
+                        "admitted_operation_id": null
+                      }
+                    ],
+                    "accounted_original_relation_id": "x"
+                  }
+                ],
+                "exclusive_owner_relation_id": "x",
+                "authorized_borrower_relation_id": null,
+                "inventory_method": "complete_readonly_kernel_inventory",
+                "cleanup_barrier_sequence": 0,
+                "active_operation_id": null,
+                "handoff_identity": null
+              }
+            },
+            "preparation_attempt_id": "x",
+            "compiler_identity": {
+              "path": "/opt/temurin-26.0.2.1/bin/javac",
+              "sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+              "argv": [
+                "/opt/temurin-26.0.2.1/bin/javac",
+                "-J-Xms8m",
+                "-J-Xmx32m",
+                "-J-XX:ActiveProcessorCount=1",
+                "-J-XX:-UsePerfData",
+                "-d",
+                "/work/classes",
+                "/work/SyntheticStateBox.java"
+              ],
+              "cwd": "/work",
+              "environment": {
+                "PATH": "/usr/local/bin:/usr/bin:/bin",
+                "LANG": "C.UTF-8",
+                "GPG_KEY": "",
+                "PYTHON_VERSION": "",
+                "PYTHON_SHA256": "",
+                "SANDBOX_PUBLIC_SENTINEL": "phase-owned",
+                "HOME": "/work",
+                "HOSTNAME": "runtime-sandbox1"
+              },
+              "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+              "namespaces": {
+                "user": "x",
+                "mnt": "x",
+                "net": "x",
+                "pid": "x",
+                "ipc": "x",
+                "cgroup": "x",
+                "uts": "x"
+              },
+              "cgroup_identity": "x"
+            },
+            "capture_and_reap": {
+              "child_pid": 1,
+              "process_group_identity": "x",
+              "exit_code": 0,
+              "timed_out": false,
+              "reaped": true,
+              "group_terminated": true,
+              "stdout": {
+                "observed_bytes": 0,
+                "limit_bytes": 2048,
+                "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+                "eof": true,
+                "overflow": false,
+                "closed": true
+              },
+              "stderr": {
+                "observed_bytes": 0,
+                "limit_bytes": 2048,
+                "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+                "eof": true,
+                "overflow": false,
+                "closed": true
+              },
+              "selectors_closed": true,
+              "deadline_identity": "x"
+            },
+            "class_metadata": {
+              "path": "/work/classes/SyntheticStateBox.class",
+              "size_bytes": 1,
+              "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+              "internal_class_name": "SyntheticStateBox",
+              "inspection_kind": "inert_bounded_classfile_metadata",
+              "class_loaded": false
+            }
+          },
+          "error": null
+        },
+        {
+          "protocol_id": "synthetic_preparation_controller_pinned_1_v1",
+          "version": 1,
+          "operation": "OBSERVE_PREPARED_ARTIFACTS",
+          "request_id": "x",
+          "operation_id": "x",
+          "workspace_capability_id": "x",
+          "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+          "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+          "sequence": 1,
+          "challenge": "0000000000000000000000000000000000000000000000000000000000000000",
+          "purpose": "OBSERVE_PREPARED_ARTIFACTS",
+          "status": "COMPLETE",
+          "result": {
+            "workspace_state": {
+              "workspace_capability_id": "x",
+              "stable_fingerprint": "0000000000000000000000000000000000000000000000000000000000000000",
+              "issuing_pid": 1,
+              "container_identity": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "workspace_generation": "0000000000000000000000000000000000000000000000000000000000000000",
+              "controller_identity": "x",
+              "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+              "observation_sequence": 1,
+              "observation_challenge": "0000000000000000000000000000000000000000000000000000000000000000",
+              "stage": "prepared",
+              "mounts": [
+                {
+                  "path": "/tmp",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,noexec,size=16m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                },
+                {
+                  "path": "/work",
+                  "mount_identity": "x",
+                  "namespace_generation": "x",
+                  "filesystem_kind": "tmpfs",
+                  "options": "rw,nosuid,nodev,size=32m,mode=1777",
+                  "subordinate_mount_count": 0,
+                  "root_identity": "x",
+                  "root_metadata": {
+                    "mode": 17407,
+                    "uid": 0,
+                    "gid": 0,
+                    "link_count": 2
+                  }
+                }
+              ],
+              "work_manifest": [
+                {
+                  "path": "/work/SyntheticStateBox.java",
+                  "kind": "file",
+                  "mode": 32768,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 1,
+                  "size_bytes": 239,
+                  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+                },
+                {
+                  "path": "/work/classes",
+                  "kind": "directory",
+                  "mode": 16384,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 2,
+                  "size_bytes": null,
+                  "sha256": null
+                },
+                {
+                  "path": "/work/classes/SyntheticStateBox.class",
+                  "kind": "file",
+                  "mode": 32768,
+                  "uid": 65534,
+                  "gid": 65534,
+                  "link_count": 1,
+                  "size_bytes": 1,
+                  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+                }
+              ],
+              "tmp_manifest": [],
+              "process_exclusivity_observation": {
+                "controller_process_identity": "x",
+                "controller_generation": "1111111111111111111111111111111111111111111111111111111111111111",
+                "namespace_identity": "x",
+                "processes": [
+                  {
+                    "pid": 1,
+                    "parent_pid": 0,
+                    "start_identity": "x",
+                    "role": "controller",
+                    "namespaces": {
+                      "user": "x",
+                      "mnt": "x",
+                      "net": "x",
+                      "pid": "x",
+                      "ipc": "x",
+                      "cgroup": "x",
+                      "uts": "x"
+                    },
+                    "cgroup_identity": "x",
+                    "uid": 65534,
+                    "gid": 65534,
+                    "tasks": [
+                      {
+                        "tid": 1,
+                        "start_identity": "x"
+                      }
+                    ],
+                    "admitted_operation_id": null
+                  }
+                ],
+                "writers": [
+                  {
+                    "process_identity": "x",
+                    "task_identity": "x",
+                    "handles": [
+                      {
+                        "descriptor_identity": "x",
+                        "path": "/tmp",
+                        "mount_identity": "x",
+                        "access_kind": "potential_write_access",
+                        "admitted_operation_id": null
+                      },
+                      {
+                        "descriptor_identity": "x",
+                        "path": "/work",
+                        "mount_identity": "x",
+                        "access_kind": "potential_write_access",
+                        "admitted_operation_id": null
+                      }
+                    ],
+                    "accounted_original_relation_id": "x"
+                  }
+                ],
+                "exclusive_owner_relation_id": "x",
+                "authorized_borrower_relation_id": null,
+                "inventory_method": "complete_readonly_kernel_inventory",
+                "cleanup_barrier_sequence": 0,
+                "active_operation_id": null,
+                "handoff_identity": null
+              }
+            },
+            "cleanup_barrier_sequence": 0,
+            "active_operation_id": null,
+            "handoff_identity": null
+          },
+          "error": null
+        }
+      ]
+    }
+  ]
+}

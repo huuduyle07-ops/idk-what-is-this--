@@ -1,0 +1,929 @@
+{
+  "attainable_witness_produced": false,
+  "authority_flags": {
+    "Apply": false,
+    "BANK": false,
+    "BANK_authority": false,
+    "apply_authority": false,
+    "arbitrary_Java": false,
+    "arbitrary_class_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "arbitrary_command": false,
+    "arbitrary_command_authority": false,
+    "arbitrary_filesystem": false,
+    "arbitrary_java_authority": false,
+    "arbitrary_method_authority": false,
+    "arbitrary_reflection_authority": false,
+    "arbitrary_source_authority": false,
+    "compilation_authority": false,
+    "constructor_reflection_authority": false,
+    "consumer_readiness_authority": false,
+    "container_creation": false,
+    "container_creation_authority": false,
+    "controller_implementation": false,
+    "enumeration_authority": false,
+    "exact_sandbox_materialization_authority": false,
+    "exact_scenario_compilation_authority": false,
+    "executor": false,
+    "executor_authority": false,
+    "field_write_authority": false,
+    "generic_reflection_authority": false,
+    "host_mount": false,
+    "host_mount_authority": false,
+    "network": false,
+    "network_authority": false,
+    "preparation_authority": false,
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection": false,
+    "reflection_execution_authority": false,
+    "repository_java_authority": false,
+    "repository_source_write_authority": false,
+    "repository_write": false,
+    "repository_write_authority": false,
+    "runtime_activation": false,
+    "runtime_activation_authority": false,
+    "runtime_authority": false,
+    "sandbox_materialization_authority": false,
+    "scenario_compilation": false,
+    "scenario_compilation_authority": false,
+    "shell": false,
+    "shell_authority": false,
+    "source_identity_authority_issued_by_this_phase": false,
+    "source_materialization": false,
+    "work_write_authority_from_workspace_possession": false,
+    "workspace_issuance": false,
+    "workspace_issuance_authority": false
+  },
+  "backend_generation_cleanup_blocker": "Independent same-backend immutable-generation continuity and exact retained full-ID teardown/absence provenance remain unresolved; pinning a container ID or runtime fingerprint does not freeze backend incarnation.",
+  "budget_blocker_removed": false,
+  "candidate_A_could_fit_proved": false,
+  "candidate_A_impossible_proved": false,
+  "candidate_A_selected": false,
+  "canonical_encoding": {
+    "allow_nan": false,
+    "encoding": "UTF-8",
+    "ensure_ascii": true,
+    "separators": [
+      ",",
+      ":"
+    ],
+    "sort_keys": true
+  },
+  "cap_changed": false,
+  "cap_per_outer_stream": 8192,
+  "class_size_analysis": {
+    "bound_is_valid_class_conditional": true,
+    "class_existence_proved_by_width_arithmetic": false,
+    "dependencies": [
+      "exact class SHA256 in manifest and class_metadata; value unknown but fixed width",
+      "exact class size in manifest and class_metadata; 1..32768 controls only decimal width",
+      "stable_fingerprint covers immutable original identity only, excludes mutable manifests/liveness; SHA256 always fixed width and not a class-byte dependency",
+      "internal_class_name/inspection_kind/class_loaded fixed success predicates; no other byte-derived schema metadata"
+    ],
+    "legal_decimal_widths": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "legal_envelope": [
+      1,
+      32768
+    ],
+    "occurrences": 2,
+    "one_byte_class_claimed": false,
+    "sha256_canonical_width_each": 66,
+    "sha256_occurrences": 2,
+    "worst_minus_best_response_bytes": 8
+  },
+  "effect_sequence": [
+    "MATERIALIZE_EXACT_SCENARIO_SOURCE request",
+    "MATERIALIZE_EXACT_SCENARIO_SOURCE COMPLETE response",
+    "COMPILE_EXACT_SCENARIO request",
+    "COMPILE_EXACT_SCENARIO COMPLETE response"
+  ],
+  "exact_attainable_aggregate_payload_bytes": null,
+  "exact_attainable_compile_response_bytes": null,
+  "exact_attainable_materialization_response_bytes": null,
+  "exact_attainable_physical_bytes": null,
+  "exact_class_size_required_for_width_arithmetic": false,
+  "excluded_separately_bounded": [
+    "initial OBSERVE_EMPTY_WORKSPACE",
+    "fresh post-compile readiness OBSERVE_*",
+    "receipt authentication",
+    "handoff",
+    "cleanup",
+    "outer custodian evidence"
+  ],
+  "frozen_envelope_strategy": {
+    "class_size": "all five decimal widths evaluated; exact compiled size unnecessary for conditional fit conclusion",
+    "kernel_and_owner_text": "Only broad schema superset yields finite canonical widths; it does not fit and is not a semantic execution profile. No shorter encoding inferred.",
+    "modes_uid_gid_links_pid": "Full schema 63-bit integer superset assessed; mode meaning not selected. UID/GID65534 fixed for controller and artifacts.",
+    "worst_case_fit_proved": false
+  },
+  "full_field_and_subtree_ledgers": "budget_witness.json",
+  "historical_BUDGET_PROOF_1_result": "AGGREGATE_BUDGET_SCOPE_UNRESOLVED",
+  "identity_encoding_matrix": [
+    {
+      "anchors": [
+        "S:369",
+        "S:795",
+        "W:114",
+        "W:135",
+        "W:168"
+      ],
+      "classification": "FUTURE_OWNER_ENCODING_UNRESOLVED",
+      "field": "workspace_capability_id",
+      "reason": "Future workspace owner retains original live object/registry relation; no ID generator or textual grammar is frozen."
+    },
+    {
+      "anchors": [
+        "S:374",
+        "C:116",
+        "C:119",
+        "C:124",
+        "C:993"
+      ],
+      "classification": "FUTURE_OWNER_ENCODING_UNRESOLVED",
+      "field": "controller_identity",
+      "reason": "Conceptual controller identity must bind exact future source/executable/protocol/incarnation/host/container/transport/bootstrap; the interpreter hash or owner module name alone cannot stand in for it."
+    },
+    {
+      "anchors": [
+        "S:342",
+        "W:149",
+        "W:303",
+        "C:162"
+      ],
+      "classification": "FUTURE_OWNER_ENCODING_UNRESOLVED",
+      "field": "exclusive_owner_relation_id",
+      "reason": "Authenticated exact original exclusive owner relation exists only as a semantic requirement; no scalar projection is frozen."
+    },
+    {
+      "anchors": [
+        "S:805",
+        "C:162",
+        "C:869"
+      ],
+      "classification": "FUTURE_OWNER_ENCODING_UNRESOLVED",
+      "field": "admission_relation_id",
+      "reason": "Separate authenticated single-operation relation belongs to future appropriate owner; existing reflection admission IDs are not preparation admissions."
+    },
+    {
+      "anchors": [
+        "S:750",
+        "S:758",
+        "S:844",
+        "S:866",
+        "P:203",
+        "P:317",
+        "P:506"
+      ],
+      "classification": "FUTURE_OWNER_ENCODING_UNRESOLVED",
+      "field": "preparation_attempt_id",
+      "reason": "Preparation owner remains unimplemented; spent same-attempt binding is required without an exact textual encoding."
+    },
+    {
+      "anchors": [
+        "S:793",
+        "S:916",
+        "C:762",
+        "A:326"
+      ],
+      "classification": "FUTURE_OWNER_ENCODING_UNRESOLVED",
+      "field": "request_id",
+      "reason": "Single-use owner-generated request identity is required; Candidate A lists it as owner generated but does not freeze a byte grammar or entropy count."
+    },
+    {
+      "anchors": [
+        "S:794",
+        "S:917",
+        "C:762",
+        "A:326"
+      ],
+      "classification": "FUTURE_OWNER_ENCODING_UNRESOLVED",
+      "field": "operation_id",
+      "reason": "Single-use operation identity is required; neither generic ID typing nor the unrelated owner token generators derives its exact representation."
+    },
+    {
+      "anchors": [
+        "S:372",
+        "S:796",
+        "C:134",
+        "C:879",
+        "A:278",
+        "A:435"
+      ],
+      "candidate_A_content_bytes": 64,
+      "classification": "CANDIDATE_SPECIFIC_ENCODING_ONLY",
+      "field": "container_identity",
+      "reason": "Universal semantics require actual full container identity without a frozen wire grammar. Candidate A alone explicitly requires full 64-lowercase-hex container ID."
+    },
+    {
+      "anchors": [
+        "S:373",
+        "S:797",
+        "W:138",
+        "A:310"
+      ],
+      "candidate_A_content_bytes": 64,
+      "classification": "CANDIDATE_SPECIFIC_ENCODING_ONLY",
+      "field": "workspace_generation",
+      "reason": "Universal generation reference is a generic id. Candidate A explicitly uses an independent owner-generated 32-byte hex token."
+    },
+    {
+      "anchors": [
+        "S:330",
+        "S:375",
+        "S:798",
+        "W:139",
+        "A:311"
+      ],
+      "candidate_A_content_bytes": 64,
+      "classification": "CANDIDATE_SPECIFIC_ENCODING_ONLY",
+      "field": "controller_generation",
+      "reason": "Universal generation reference is a generic id. Candidate A explicitly uses an independent owner-generated 32-byte hex token."
+    },
+    {
+      "anchors": [
+        "S:210",
+        "S:292",
+        "C:536",
+        "W:289",
+        "A:317"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "mount_identity",
+      "reason": "Observed mount relation is mandatory, but mount ID versus composite incarnation/root projection and exact scalar serializer are not frozen."
+    },
+    {
+      "anchors": [
+        "S:211",
+        "C:536",
+        "W:289"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "namespace_generation",
+      "reason": "Namespace/generation relation must be observed and bound; no scalar encoding is provided."
+    },
+    {
+      "anchors": [
+        "S:231",
+        "C:536",
+        "W:289"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "root_identity",
+      "reason": "Authenticated root identity is required, without a dev/inode/mount/generation tuple grammar or projection."
+    },
+    {
+      "anchors": [
+        "S:329",
+        "C:550",
+        "A:312"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "controller_process_identity",
+      "reason": "PID alone is insufficient; no exact incarnation-bearing textual encoding is frozen."
+    },
+    {
+      "anchors": [
+        "S:331",
+        "C:550",
+        "A:312"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "namespace_identity",
+      "reason": "Aggregate process namespace relation is required; seven namespace strings do not define this additional scalar projection."
+    },
+    {
+      "anchors": [
+        "S:159",
+        "B:22",
+        "B:23",
+        "B:24",
+        "B:65"
+      ],
+      "classification": "EXISTING_OWNER_ENCODING_RECOVERABLE",
+      "field": "namespaces.user,mnt,net,pid,ipc,cgroup,uts",
+      "reason": "Historical JAVA.1C boundary(pid) directly returns os.readlink('/proc/<pid>/ns/<name>') for all seven names. This is a recoverable source observation convention, not a chosen alias or live value. Adoption into the new observer and semantic finite width still need to be made explicit; it does not define aggregate namespace_identity."
+    },
+    {
+      "anchors": [
+        "S:271",
+        "S:483",
+        "B:25",
+        "A:312"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "cgroup_identity",
+      "reason": "Historical boundary.cgroup is raw /proc/<pid>/cgroup text, an exact recoverable primitive for that historical field. No frozen mapping says the new cgroup_identity is that raw text, a normalized line, a kernel inode or a composite incarnation identity; no smaller universal width may be assumed."
+    },
+    {
+      "anchors": [
+        "S:261",
+        "A:312"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "process.start_identity",
+      "reason": "Candidate A identifies /proc starttime ticks plus context as observation facts, but neither universal nor candidate profile defines this scalar serializer."
+    },
+    {
+      "anchors": [
+        "S:251",
+        "C:550",
+        "A:312"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "task.start_identity",
+      "reason": "Complete task inventory requires exact task incarnation; no task start scalar encoder exists."
+    },
+    {
+      "anchors": [
+        "S:428",
+        "C:727",
+        "A:398"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "process_group_identity",
+      "reason": "Retained child/group ownership and reap facts are required; numeric PGID alone is not established as an incarnation-safe identity encoding."
+    },
+    {
+      "anchors": [
+        "S:436",
+        "C:486",
+        "A:397"
+      ],
+      "classification": "FUTURE_OWNER_ENCODING_UNRESOLVED",
+      "field": "deadline_identity",
+      "reason": "Shared monotonic deadline is fixed semantically; no authenticated deadline relation ID or textual projection is frozen."
+    },
+    {
+      "anchors": [
+        "S:311",
+        "C:550"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "writer.process_identity",
+      "reason": "Writer must bind inventoried original process incarnation; no exact serialization is given."
+    },
+    {
+      "anchors": [
+        "S:312",
+        "C:550"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "writer.task_identity",
+      "reason": "Writer task relation is required but not a frozen PID/TID string convention."
+    },
+    {
+      "anchors": [
+        "S:290",
+        "C:550"
+      ],
+      "classification": "KERNEL_OBSERVATION_ENCODING_UNRESOLVED",
+      "field": "writer_handle.descriptor_identity",
+      "reason": "Potential access and actual open handles have distinct access kinds, yet descriptor identity projection for either kind is unspecified."
+    },
+    {
+      "anchors": [
+        "S:318",
+        "C:550",
+        "W:303"
+      ],
+      "classification": "FUTURE_OWNER_ENCODING_UNRESOLVED",
+      "field": "writer.accounted_original_relation_id",
+      "reason": "Must account the writer through its authenticated original owner relation, not a fabricated process relation."
+    },
+    {
+      "anchors": [
+        "S:279",
+        "S:300",
+        "S:354",
+        "C:762"
+      ],
+      "classification": "FUTURE_OWNER_ENCODING_UNRESOLVED",
+      "field": "process.admitted_operation_id,writer_handle.admitted_operation_id,active_operation_id",
+      "reason": "Non-null values must reuse the exact future operation ID; permitted nulls require truthful quiescent state and are not omitted keys."
+    },
+    {
+      "anchors": [
+        "S:343",
+        "S:358",
+        "C:746"
+      ],
+      "classification": "FUTURE_OWNER_ENCODING_UNRESOLVED",
+      "field": "authorized_borrower_relation_id,handoff_identity",
+      "reason": "The minimum preparation path has no borrower or handoff, so these mandatory nullable keys can truthfully be null without inventing identity encoding."
+    },
+    {
+      "anchors": [
+        "S:46",
+        "S:370",
+        "W:178",
+        "C:985"
+      ],
+      "classification": "FROZEN_EXACT_ENCODING",
+      "content_bytes": 64,
+      "field": "stable_fingerprint",
+      "reason": "Exact lowercase 64-hex SHA256 width is frozen. Actual value is derived from the future authenticated immutable original identity payload and cannot be invented."
+    },
+    {
+      "anchors": [
+        "S:51",
+        "S:377",
+        "C:584",
+        "S:1023"
+      ],
+      "classification": "FROZEN_EXACT_ENCODING",
+      "content_bytes": 64,
+      "field": "workspace_state.observation_challenge",
+      "reason": "Owner unpredictable 32 bytes encoded as 64 lowercase hex; mutations use the separate single-use post-observation reference prebound in spent admission, never a fresh readiness challenge."
+    },
+    {
+      "anchors": [
+        "S:441",
+        "C:653",
+        "C:678"
+      ],
+      "classification": "FROZEN_EXACT_ENCODING",
+      "field": "compiler_identity.path,sha256,argv,cwd,environment,image_identity",
+      "reason": "Complete compiler identity constants are frozen and recoverable directly without executing compiler or issuing owners; namespace/cgroup parts remain separately audited."
+    },
+    {
+      "anchors": [
+        "S:488",
+        "C:709"
+      ],
+      "classification": "FROZEN_EXACT_ENCODING",
+      "field": "class_metadata.internal_class_name,inspection_kind,class_loaded,path",
+      "reason": "Constants are exact. Actual class SHA256 is always 64 hex; actual size lies in 1..32768. No class-byte-dependent metadata beyond fixed-width hash and decimal size appears in this record."
+    }
+  ],
+  "identity_subresult": "BUDGET_WITNESS_IDENTITY_ENCODING_UNRESOLVED",
+  "intervening_observation_required": false,
+  "minimum_next_semantic_contract": [
+    "Freeze owner-backed encodings and equality/binding rules for workspace, controller, exclusive-owner, admission, attempt, request, operation and deadline identities; identify any reuse of existing owner primitives explicitly.",
+    "Freeze kernel observation serialization for mount/root/generation/process/task/namespaces/cgroup/start/group and potential-writer handles, snapshot active-operation semantics, creation permissions/umask and descriptor lifecycle. Define numeric mode/ownership/link/PID/TID projections and finite semantic widths, or prove the fit result invariant across their legitimate representations.",
+    "Freeze applicable physical response/diagnostic stream mapping and an upper bound on actual framing. A transport-independent framing envelope would suffice; this phase selects none."
+  ],
+  "observation_basis": "Final local fenced current snapshots/readbacks are mandatory; frozen contract does not require an additional serialized OBSERVE exchange between the two effects. Mutation post-observation challenges/sequence remain embedded and distinct.",
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR.1R": 0,
+    "EXECUTOR_1R": 0,
+    "JAVA1C": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "auth_issuance": 0,
+    "capability_consumption": 0,
+    "capability_invalidation": 0,
+    "class_loading": 0,
+    "container_creation": 0,
+    "container_removal": 0,
+    "filesystem_runtime_writes": 0,
+    "java": 0,
+    "javac": 0,
+    "pinned_auth_issuance": 0,
+    "preparation_authority_issuance": 0,
+    "provider_issuance": 0,
+    "reflection": 0,
+    "reflection_admission_issuance": 0,
+    "reflection_issuance": 0,
+    "reflection_lease_issuance": 0,
+    "runtime_issuance": 0,
+    "runtime_lease_issuance": 0,
+    "source_materialization": 0,
+    "workspace_issuance": 0
+  },
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.PROOF.1R",
+  "physical_transport_feasibility": "UNRESOLVED",
+  "pins_changed": false,
+  "profile_byte_totals": [
+    {
+      "attainable_execution_witness": false,
+      "candidate_A_UNSELECTED": true,
+      "candidate_A_framed_aggregate_bytes": null,
+      "candidate_A_margin": null,
+      "candidate_A_stderr_success_bytes": null,
+      "candidate_A_utilization_percent": null,
+      "class_size_decimal_width": 1,
+      "compile_response_bytes": 4000,
+      "controller_writers": 0,
+      "kernel_widths_illustrative_not_frozen": false,
+      "kind": "SYMBOLIC_RELAXATION_OR_CONDITIONAL_SENSITIVITY_NOT_WITNESS",
+      "materialization_response_bytes": 2450,
+      "name": "universal_lower_relaxation",
+      "owner_id_content_width": 1,
+      "potential_write_handles_per_writer": 0,
+      "request_bytes_added_to_stdout": 0,
+      "request_payload_total": 804,
+      "response_aggregate_payload_bytes": 6450,
+      "response_frame_overhead_bytes": null,
+      "schema_superset_upper_envelope": false,
+      "semantic_margin": 1742,
+      "semantic_utilization_percent": 78.7353515625,
+      "stderr_basis": "Candidate A success emits no controller stderr; compiler captures are separate and empty. Universal mapping/diagnostics unresolved.",
+      "writer_free_is_relaxation_only": true
+    },
+    {
+      "attainable_execution_witness": false,
+      "candidate_A_UNSELECTED": true,
+      "candidate_A_framed_aggregate_bytes": null,
+      "candidate_A_margin": null,
+      "candidate_A_stderr_success_bytes": null,
+      "candidate_A_utilization_percent": null,
+      "class_size_decimal_width": 1,
+      "compile_response_bytes": 4360,
+      "controller_writers": 1,
+      "kernel_widths_illustrative_not_frozen": false,
+      "kind": "SYMBOLIC_RELAXATION_OR_CONDITIONAL_SENSITIVITY_NOT_WITNESS",
+      "materialization_response_bytes": 2810,
+      "name": "minimal_writer_layout_lower_widths",
+      "owner_id_content_width": 1,
+      "potential_write_handles_per_writer": 2,
+      "request_bytes_added_to_stdout": 0,
+      "request_payload_total": 804,
+      "response_aggregate_payload_bytes": 7170,
+      "response_frame_overhead_bytes": null,
+      "schema_superset_upper_envelope": false,
+      "semantic_margin": 1022,
+      "semantic_utilization_percent": 87.5244140625,
+      "stderr_basis": "Candidate A success emits no controller stderr; compiler captures are separate and empty. Universal mapping/diagnostics unresolved.",
+      "writer_free_is_relaxation_only": false
+    },
+    {
+      "attainable_execution_witness": false,
+      "candidate_A_UNSELECTED": true,
+      "candidate_A_framed_aggregate_bytes": 8060,
+      "candidate_A_margin": 132,
+      "candidate_A_stderr_success_bytes": 0,
+      "candidate_A_utilization_percent": 98.388671875,
+      "class_size_decimal_width": 1,
+      "compile_response_bytes": 4801,
+      "controller_writers": 1,
+      "kernel_widths_illustrative_not_frozen": false,
+      "kind": "SYMBOLIC_RELAXATION_OR_CONDITIONAL_SENSITIVITY_NOT_WITNESS",
+      "materialization_response_bytes": 3251,
+      "name": "candidate_A_writer_lower_widths_class_1_digit",
+      "owner_id_content_width": 1,
+      "potential_write_handles_per_writer": 2,
+      "request_bytes_added_to_stdout": 0,
+      "request_payload_total": 1182,
+      "response_aggregate_payload_bytes": 8052,
+      "response_frame_overhead_bytes": 8,
+      "schema_superset_upper_envelope": false,
+      "semantic_margin": 140,
+      "semantic_utilization_percent": 98.291015625,
+      "stderr_basis": "Candidate A success emits no controller stderr; compiler captures are separate and empty. Universal mapping/diagnostics unresolved.",
+      "writer_free_is_relaxation_only": false
+    },
+    {
+      "attainable_execution_witness": false,
+      "candidate_A_UNSELECTED": true,
+      "candidate_A_framed_aggregate_bytes": 8068,
+      "candidate_A_margin": 124,
+      "candidate_A_stderr_success_bytes": 0,
+      "candidate_A_utilization_percent": 98.486328125,
+      "class_size_decimal_width": 5,
+      "compile_response_bytes": 4809,
+      "controller_writers": 1,
+      "kernel_widths_illustrative_not_frozen": false,
+      "kind": "SYMBOLIC_RELAXATION_OR_CONDITIONAL_SENSITIVITY_NOT_WITNESS",
+      "materialization_response_bytes": 3251,
+      "name": "candidate_A_writer_lower_widths_class_5_digits",
+      "owner_id_content_width": 1,
+      "potential_write_handles_per_writer": 2,
+      "request_bytes_added_to_stdout": 0,
+      "request_payload_total": 1182,
+      "response_aggregate_payload_bytes": 8060,
+      "response_frame_overhead_bytes": 8,
+      "schema_superset_upper_envelope": false,
+      "semantic_margin": 132,
+      "semantic_utilization_percent": 98.388671875,
+      "stderr_basis": "Candidate A success emits no controller stderr; compiler captures are separate and empty. Universal mapping/diagnostics unresolved.",
+      "writer_free_is_relaxation_only": false
+    },
+    {
+      "attainable_execution_witness": false,
+      "candidate_A_UNSELECTED": true,
+      "candidate_A_framed_aggregate_bytes": 8595,
+      "candidate_A_margin": -403,
+      "candidate_A_stderr_success_bytes": 0,
+      "candidate_A_utilization_percent": 104.91943359375,
+      "class_size_decimal_width": 5,
+      "compile_response_bytes": 5088,
+      "controller_writers": 1,
+      "kernel_widths_illustrative_not_frozen": false,
+      "kind": "SYMBOLIC_RELAXATION_OR_CONDITIONAL_SENSITIVITY_NOT_WITNESS",
+      "materialization_response_bytes": 3499,
+      "name": "candidate_A_owner_32_hex_width_sensitivity",
+      "owner_id_content_width": 32,
+      "potential_write_handles_per_writer": 2,
+      "request_bytes_added_to_stdout": 0,
+      "request_payload_total": 1492,
+      "response_aggregate_payload_bytes": 8587,
+      "response_frame_overhead_bytes": 8,
+      "schema_superset_upper_envelope": false,
+      "semantic_margin": -395,
+      "semantic_utilization_percent": 104.82177734375,
+      "stderr_basis": "Candidate A success emits no controller stderr; compiler captures are separate and empty. Universal mapping/diagnostics unresolved.",
+      "writer_free_is_relaxation_only": false
+    },
+    {
+      "attainable_execution_witness": false,
+      "candidate_A_UNSELECTED": true,
+      "candidate_A_framed_aggregate_bytes": 9139,
+      "candidate_A_margin": -947,
+      "candidate_A_stderr_success_bytes": 0,
+      "candidate_A_utilization_percent": 111.56005859375,
+      "class_size_decimal_width": 5,
+      "compile_response_bytes": 5376,
+      "controller_writers": 1,
+      "kernel_widths_illustrative_not_frozen": false,
+      "kind": "SYMBOLIC_RELAXATION_OR_CONDITIONAL_SENSITIVITY_NOT_WITNESS",
+      "materialization_response_bytes": 3755,
+      "name": "candidate_A_owner_64_hex_width_sensitivity",
+      "owner_id_content_width": 64,
+      "potential_write_handles_per_writer": 2,
+      "request_bytes_added_to_stdout": 0,
+      "request_payload_total": 1812,
+      "response_aggregate_payload_bytes": 9131,
+      "response_frame_overhead_bytes": 8,
+      "schema_superset_upper_envelope": false,
+      "semantic_margin": -939,
+      "semantic_utilization_percent": 111.46240234375,
+      "stderr_basis": "Candidate A success emits no controller stderr; compiler captures are separate and empty. Universal mapping/diagnostics unresolved.",
+      "writer_free_is_relaxation_only": false
+    },
+    {
+      "attainable_execution_witness": false,
+      "candidate_A_UNSELECTED": true,
+      "candidate_A_framed_aggregate_bytes": 8661,
+      "candidate_A_margin": -469,
+      "candidate_A_stderr_success_bytes": 0,
+      "candidate_A_utilization_percent": 105.72509765625,
+      "class_size_decimal_width": 5,
+      "compile_response_bytes": 5165,
+      "controller_writers": 1,
+      "kernel_widths_illustrative_not_frozen": true,
+      "kind": "SYMBOLIC_RELAXATION_OR_CONDITIONAL_SENSITIVITY_NOT_WITNESS",
+      "materialization_response_bytes": 3488,
+      "name": "candidate_A_illustrative_kernel_width_sensitivity",
+      "owner_id_content_width": 1,
+      "potential_write_handles_per_writer": 2,
+      "request_bytes_added_to_stdout": 0,
+      "request_payload_total": 1182,
+      "response_aggregate_payload_bytes": 8653,
+      "response_frame_overhead_bytes": 8,
+      "schema_superset_upper_envelope": false,
+      "semantic_margin": -461,
+      "semantic_utilization_percent": 105.62744140625,
+      "stderr_basis": "Candidate A success emits no controller stderr; compiler captures are separate and empty. Universal mapping/diagnostics unresolved.",
+      "writer_free_is_relaxation_only": false
+    },
+    {
+      "attainable_execution_witness": false,
+      "candidate_A_UNSELECTED": true,
+      "candidate_A_framed_aggregate_bytes": 9732,
+      "candidate_A_margin": -1540,
+      "candidate_A_stderr_success_bytes": 0,
+      "candidate_A_utilization_percent": 118.798828125,
+      "class_size_decimal_width": 5,
+      "compile_response_bytes": 5732,
+      "controller_writers": 1,
+      "kernel_widths_illustrative_not_frozen": true,
+      "kind": "SYMBOLIC_RELAXATION_OR_CONDITIONAL_SENSITIVITY_NOT_WITNESS",
+      "materialization_response_bytes": 3992,
+      "name": "candidate_A_64_hex_and_kernel_width_sensitivity",
+      "owner_id_content_width": 64,
+      "potential_write_handles_per_writer": 2,
+      "request_bytes_added_to_stdout": 0,
+      "request_payload_total": 1812,
+      "response_aggregate_payload_bytes": 9724,
+      "response_frame_overhead_bytes": 8,
+      "schema_superset_upper_envelope": false,
+      "semantic_margin": -1532,
+      "semantic_utilization_percent": 118.701171875,
+      "stderr_basis": "Candidate A success emits no controller stderr; compiler captures are separate and empty. Universal mapping/diagnostics unresolved.",
+      "writer_free_is_relaxation_only": false
+    },
+    {
+      "attainable_execution_witness": false,
+      "candidate_A_UNSELECTED": true,
+      "candidate_A_framed_aggregate_bytes": null,
+      "candidate_A_margin": null,
+      "candidate_A_stderr_success_bytes": null,
+      "candidate_A_utilization_percent": null,
+      "class_size_decimal_width": 5,
+      "compile_response_bytes": 79925,
+      "controller_writers": 1,
+      "kernel_widths_illustrative_not_frozen": false,
+      "kind": "SYMBOLIC_RELAXATION_OR_CONDITIONAL_SENSITIVITY_NOT_WITNESS",
+      "materialization_response_bytes": 62981,
+      "name": "schema_superset_upper_envelope",
+      "owner_id_content_width": 1,
+      "potential_write_handles_per_writer": 2,
+      "request_bytes_added_to_stdout": 0,
+      "request_payload_total": 25400,
+      "response_aggregate_payload_bytes": 142906,
+      "response_frame_overhead_bytes": null,
+      "schema_superset_upper_envelope": true,
+      "semantic_margin": -134714,
+      "semantic_utilization_percent": 1744.4580078125,
+      "stderr_basis": "Candidate A success emits no controller stderr; compiler captures are separate and empty. Universal mapping/diagnostics unresolved.",
+      "writer_free_is_relaxation_only": false
+    }
+  ],
+  "schema_changed": false,
+  "schema_layout_check_is_attainability_proof": false,
+  "scope_requirement_result": "SYNTH_EXEC_PREP_CONTROLLER_BUDGET_SCOPE_REQ_1_COMPLETE",
+  "semantic_response_payload_feasibility": "UNRESOLVED",
+  "sensitivity": {
+    "all_equal_owner_content_width_fit_threshold_with_every_other_lower_width_held": 8,
+    "class_decimal_width_rows": [
+      {
+        "candidate_A_framed_bytes": 8060,
+        "decimal_width": 1,
+        "response_payload_bytes": 8052
+      },
+      {
+        "candidate_A_framed_bytes": 8062,
+        "decimal_width": 2,
+        "response_payload_bytes": 8054
+      },
+      {
+        "candidate_A_framed_bytes": 8064,
+        "decimal_width": 3,
+        "response_payload_bytes": 8056
+      },
+      {
+        "candidate_A_framed_bytes": 8066,
+        "decimal_width": 4,
+        "response_payload_bytes": 8058
+      },
+      {
+        "candidate_A_framed_bytes": 8068,
+        "decimal_width": 5,
+        "response_payload_bytes": 8060
+      }
+    ],
+    "conclusion": "The 4/5-digit conventional mode ceilings both fit the lower-width layout; mode is not independently shown to block fit. The 19-digit schema-superset excess cannot settle a tighter semantic width theorem. Broad upper excess and illustrative-width excess are not universal lower bounds.",
+    "conventional_mode_width_sensitivity": [
+      {
+        "candidate_A_framed_bytes": 8095,
+        "convention": "permission bits",
+        "frozen_exhaustive_semantic_envelope": false,
+        "maximum_decimal_width": 4,
+        "mode_occurrences": 9,
+        "remaining_margin": 97
+      },
+      {
+        "candidate_A_framed_bytes": 8104,
+        "convention": "ordinary Linux full st_mode",
+        "frozen_exhaustive_semantic_envelope": false,
+        "maximum_decimal_width": 5,
+        "mode_occurrences": 9,
+        "remaining_margin": 88
+      }
+    ],
+    "effect_of_one_more_canonical_byte_at_every_future_owner_id": 17,
+    "extra_bytes_at_broad_schema_width_ceiling_by_family": {
+      "class_size": 0,
+      "container": 5888,
+      "fixed_digest": 0,
+      "future_owner": 26095,
+      "generation": 14720,
+      "issuing_pid": 36,
+      "kernel_cgroup": 4605,
+      "kernel_descriptor": 6140,
+      "kernel_group": 1535,
+      "kernel_mount": 12280,
+      "kernel_namespace": 41445,
+      "kernel_process": 9210,
+      "kernel_root": 6140,
+      "kernel_start": 6140,
+      "link_count": 108,
+      "mode": 162,
+      "pid": 126,
+      "root_uid_gid": 144,
+      "sequence": 72
+    },
+    "family_occurrences_in_responses": {
+      "class_size": 2,
+      "container": 4,
+      "fixed_digest": 6,
+      "future_owner": 17,
+      "generation": 10,
+      "issuing_pid": 2,
+      "kernel_cgroup": 3,
+      "kernel_descriptor": 4,
+      "kernel_group": 1,
+      "kernel_mount": 8,
+      "kernel_namespace": 27,
+      "kernel_process": 6,
+      "kernel_root": 4,
+      "kernel_start": 4,
+      "link_count": 6,
+      "mode": 9,
+      "pid": 7,
+      "root_uid_gid": 8,
+      "sequence": 4
+    },
+    "frozen_kernel_max_width_fit": false,
+    "mode_convention_sources": [
+      "core/direct_read_receipt.py:94,323 and core/repository_inventory.py:45 use int(st_mode)",
+      "core/undo_backup.py:107 uses stat.S_IMODE; core/failed_rollback_recovery.py:144 bounds permission mode by 0o7777"
+    ],
+    "owner_width_threshold_is_attainable_or_recommended": false,
+    "reference_framed_bytes": 8068,
+    "reference_profile": "candidate_A_writer_lower_widths_class_5_digits",
+    "writer_increment_scope": "One accounted writer/two potential root handle records in EACH response, with unknown identity widths at lower relaxation. Exhaustiveness unresolved.",
+    "writer_root_layout_increment_payload": 712
+  },
+  "source_audit": {
+    "bytes": 239,
+    "exact_source_ascii": "final class SyntheticStateBox {\n    private int value = 10;\n\n    public boolean decrement(int amount) {\n        if (amount <= 0 || amount > value) {\n            return false;\n        }\n        value -= amount;\n        return true;\n    }\n}\n",
+    "owner_source_path": "core/synthetic_runtime_authorization.py",
+    "recovery": "AST literal only; owner never imported",
+    "sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "wire_source_bytes": 0,
+    "wire_source_reason": "Frozen schema has exact readback/manifest evidence; no raw source field. No mandatory field omitted."
+  },
+  "source_audits": [
+    "identity_audit.json",
+    "workspace_audit.json"
+  ],
+  "stop": true,
+  "symbolic_relation_constraints": [
+    "Same original workspace/controller/container/generations/attempt/exclusive-owner bindings throughout.",
+    "Same immutable stable_fingerprint in both states; it excludes mutable manifests and liveness.",
+    "Distinct single-use request/operation/admission identities per exchange; exact encodings unresolved.",
+    "Fresh mutation-bound post-observation references/sequences prebound in each spent admission; no readiness challenge reused.",
+    "Source unchanged; same eventual actual class digest/size in output manifest and class_metadata.",
+    "Width assignments alone cannot authenticate any original relation or kernel observation."
+  ],
+  "transport_selected": false,
+  "transport_selection_may_continue": false,
+  "transport_selection_reason": "Review can continue; final selection gate remains blocked by truthful aggregate proof and independent backend-generation cleanup continuity.",
+  "typed_result": "BUDGET_WITNESS_UNRESOLVED",
+  "typed_result_reason": "Identity/kernel/writer representation prevents an attainable witness; independently, unselected physical framing/mapping prevents universal physical feasibility. Identity is not the only blocker.",
+  "universal_impossibility_proved": false,
+  "validation": {
+    "all_guarded_effects_zero": true,
+    "all_required_validation_checks_passed": true,
+    "benchmark_checked": 54,
+    "benchmark_errors": 0,
+    "created_at": "2026-10-19",
+    "evidence_files": [
+      "benchmark.json",
+      "focused.json",
+      "git_validation.json",
+      "preservation_comparison.json",
+      "proof.json",
+      "registry_after.json",
+      "registry_baseline.json",
+      "registry_comparison.json",
+      "static_validation.json"
+    ],
+    "finalizer_blocked_actions": [],
+    "finalizer_guard": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "focused_collected": 122,
+    "focused_passed": 122,
+    "git_diff_check_passed": true,
+    "historical_preservation": true,
+    "in_memory_python_compiled": 1373,
+    "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.PROOF.1R",
+    "registry_baseline_collected": 299,
+    "registry_baseline_passed": 292,
+    "registry_baseline_vs_after_identical": true,
+    "registry_existing_failures": 7,
+    "typed_result": "BUDGET_WITNESS_UNRESOLVED",
+    "validator_sha256": "f09a2125c7a6e8552dadfaf22527a4a4868ef76f80f8925568c63a1604dfb16e"
+  },
+  "writer_analysis": {
+    "closed_transient_handles_assumed_for_minimal_shape": true,
+    "exact_representation_frozen": false,
+    "no_writer_free_attainability_claim": true,
+    "structural_lower_profile": "One accounted controller task with potential write access to both /work and /tmp; two root-access records per snapshot. Compiler reaped before prepared snapshot. These records are not proved exhaustive.",
+    "unresolved": [
+      "process/task incarnation encoding",
+      "potential-access descriptor identity",
+      "accounted original owner relation encoding",
+      "active/admitted operation marker observation instant",
+      "descendant access grouping for classes/source/class",
+      "creation modes/umask and retained descriptor inventory"
+    ]
+  }
+}

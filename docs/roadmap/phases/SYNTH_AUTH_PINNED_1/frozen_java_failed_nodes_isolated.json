@@ -1,0 +1,36 @@
+{
+  "command": [
+    "C:\\Python314\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/test_runtime_java1b.py::test_live_orchestration_stops_at_first_failed_gate_without_java_continuation",
+    "tests/test_runtime_java1c.py::test_new_authenticated_pair_binds_fresh_sandbox_and_pure_compatibility",
+    "tests/test_runtime_java1c.py::test_inconclusive_outer_timeout_reports_unknown_counts_and_unproven_child_cleanup",
+    "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\task_synth_auth_pinned1_validation\\pytest_java_failed_nodes_isolated_20261010"
+  ],
+  "exit_code": 1,
+  "duration_seconds": 27.891,
+  "tail": [
+    "        safe_patch.setattr(owner, '_invoke', lambda *args: (",
+    "            capture(status='sandbox_timeout', exit_code=1, termination_within_deadline=False), {}, True, True))",
+    "        descriptor, receipt, report = owner.verify()",
+    "        assert descriptor is receipt is None and report['status'] == owner.CLEANUP_FAILURE",
+    ">       assert report['compile_count'] is report['jvm_fixture_count'] is None",
+    "E       assert 0 is None",
+    "",
+    "tests\\test_runtime_java1c.py:284: AssertionError",
+    "============================== warnings summary ===============================",
+    "tests/test_runtime_java1b.py::test_live_orchestration_stops_at_first_failed_gate_without_java_continuation[non_java]",
+    "  C:\\Users\\Admin\\AppData\\Roaming\\Python\\Python314\\site-packages\\google\\genai\\types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17",
+    "    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]",
+    "",
+    "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+    "=========================== short test summary info ===========================",
+    "FAILED tests/test_runtime_java1b.py::test_live_orchestration_stops_at_first_failed_gate_without_java_continuation[non_java]",
+    "FAILED tests/test_runtime_java1b.py::test_live_orchestration_stops_at_first_failed_gate_without_java_continuation[javac_version]",
+    "FAILED tests/test_runtime_java1c.py::test_new_authenticated_pair_binds_fresh_sandbox_and_pure_compatibility",
+    "FAILED tests/test_runtime_java1c.py::test_inconclusive_outer_timeout_reports_unknown_counts_and_unproven_child_cleanup",
+    "4 failed, 1 warning in 25.73s"
+  ]
+}

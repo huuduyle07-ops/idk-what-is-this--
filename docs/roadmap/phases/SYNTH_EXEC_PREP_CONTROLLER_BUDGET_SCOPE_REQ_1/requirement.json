@@ -1,0 +1,1081 @@
+{
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.SCOPE.REQ.1",
+  "new_requirement_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.SCOPE.REQ.1",
+  "artifact_kind": "PURE_ADDITIVE_REQUIREMENT_CLARIFICATION",
+  "typed_result": "SYNTH_EXEC_PREP_CONTROLLER_BUDGET_SCOPE_REQ_1_COMPLETE",
+  "completion_marker": "SYNTH_EXEC_PREP_CONTROLLER_BUDGET_SCOPE_REQ_1_COMPLETE",
+  "requirement_frozen": true,
+  "historical_bytes_preserved": true,
+  "historical_contract_globally_wrong": false,
+  "prior_text_uniquely_defined_endpoint": false,
+  "semantic_selection": {
+    "choice": "A",
+    "effect_attempt_semantics": true,
+    "wider_readiness_lifecycle_semantics": false,
+    "selection_based_on_budget_fit": false,
+    "reason": "PREP admits exactly two non-interchangeable effect facets in one fixed attempt. Initial workspace eligibility precedes admission; fresh current readiness and optional handoff revalidate retained workspace after effects; cleanup is explicitly not preparation. This additive requirement supplies the previously missing exact byte events without changing those effect meanings.",
+    "not_claimed": "The historical proof did not already entail these exact byte events. This is the authorized new normative scope interpretation, not a reinterpretation of the old proof outcome."
+  },
+  "counter_interval": {
+    "start_event_id": "OWNER_MATERIALIZATION_ADMISSION_BEFORE_DISPATCH",
+    "start": "Preparation owning boundary records the authenticated single-operation admission for this attempt's already-spent original materialization facet, before dispatching the MATERIALIZE_EXACT_SCENARIO_SOURCE request. That admission record is the single counter-origin event: open both counters at zero there, before any request or response byte of this exchange. Facet spending precedes the record; no cross-owner atomic transaction is claimed.",
+    "successful_end_event_id": "COMPLETE_COMPILE_RESPONSE_FINAL_BYTE",
+    "successful_end": "The final physical byte of the complete terminal COMPILE_EXACT_SCENARIO response frame is captured by the owning boundary, including all actual framing and its entire mandatory workspace_state, compiler_identity, capture_and_reap and class_metadata. A successful attempt requires the complete valid COMPLETE response; child exit, payload parsing before frame completion, receipt authentication, new readiness OBSERVE request/response, handoff admission and cleanup completion are not this endpoint.",
+    "origin_derived_from_deadline_alone": false,
+    "origin_basis": "The materialization facet admission opens the one-shot effect attempt; independently, the existing shared deadline also begins there. Initial empty observation/request/response precede this effect boundary. Inner final local admission and first response byte are not new origins.",
+    "earlier_events_outside": [
+      "before empty observation",
+      "OBSERVE_EMPTY_WORKSPACE request",
+      "OBSERVE_EMPTY_WORKSPACE response"
+    ],
+    "failure_end_event_id": "ORDINARY_RESPONSE_DRAIN_TERMINATION",
+    "failure_end_cases": {
+      "no_response_pending": "Recorded irrevocable terminal attempt-abort event when no admitted ordinary operation response remains pending.",
+      "response_pending": "First of: final byte of the last terminal ordinary response already admitted to this attempt; observed terminal channel closure/loss; original 10000ms hard preparation deadline. Count every observed partial/invalid ordinary byte until that event.",
+      "early_failure": "A materialization failure/rejection or a later admission/compilation failure cannot wait for a nonexistent successful compile response. Apply the no-pending or pending-response case to the failed admitted operation; no second attempt or new counter is allowed.",
+      "cleanup_preemption": "The cleanup barrier suppresses success immediately but does not close a pending ordinary response ledger. Its complete response suffix still belongs to the failed effect attempt, even if physically delivered after the barrier. Cleanup exchanges have their own ledger.",
+      "overflow": "Overflow fails the attempt, never resets or forgives observed bytes; retain an exceeded/incomplete result and bounded partial/drain evidence. It never authorizes unbounded buffering, a late successful receipt or denial of mandatory independent cleanup.",
+      "loss_or_deadline": "No terminal response is fabricated. Any still-unobserved ordinary suffix is unresolved, not an outside-budget exemption; the failed epoch cannot reopen or publish success. Mandatory cleanup remains independently bounded."
+    },
+    "no_deadline_extension": "The shared 5000ms attempt deadline is never renewed. Cancellation/reaping/capture closure and terminal drain remain clamped to original 10000ms hard bound; a failed result never appends a new preparation interval.",
+    "no_resets": [
+      "compile admission",
+      "observation",
+      "receipt authentication",
+      "cleanup barrier",
+      "lost response",
+      "generation or retained lifetime"
+    ],
+    "membership_rule": "All ordinary effect request/response frames and any current observation invoked after origin but before the effect endpoint are members. Include actual framing in its own physical stream. Separately identifiable cleanup control/results retain cleanup membership even during preemption; pending ordinary bytes cannot be relabeled.",
+    "no_evidence_deferral": "Every mandatory materialization/compile record must be complete in its own response before the endpoint. No chunking, delayed suffix, post-end receipt, observation or handoff may carry deferred effect response evidence to evade the unchanged cap."
+  },
+  "caps": {
+    "outer_stdout_max_bytes": 8192,
+    "outer_stderr_max_bytes": 8192,
+    "individual_frame_max_bytes": 8192,
+    "shared_attempt_deadline_ms": 5000,
+    "hard_preparation_bound_ms": 10000,
+    "compiler_child_stdout_max_bytes": 2048,
+    "compiler_child_stderr_max_bytes": 2048,
+    "controller_stdin_cumulative_8192_cap_frozen": false
+  },
+  "fresh_readiness_observation": {
+    "classification": "OUTSIDE_PREPARATION_CAPTURE_WITH_SEPARATE_BOUND",
+    "mandatory_before_readiness_or_handoff": true,
+    "mutation_poststate_substitutes": false,
+    "lifecycle_class": "workspace current-liveness/readiness evidence",
+    "bounds_ref": "independent_bounds.observation",
+    "reason": "Current eligibility is a fresh challenged observation of retained prepared workspace after completed effects; it is not a third preparation effect facet. Earlier in-attempt observations still count.",
+    "required_tag": "new complete challenged OBSERVE_* of prepared current state",
+    "CURRENT_before_initial_receipt_allowed": true,
+    "PREPARED_before_original_receipt_allowed": false,
+    "PREPARED_with_original_receipt_allowed": true,
+    "no_new_receipt_ordering_rule": "Preserve all existing owner evidence/authentication checks. The byte endpoint does not require a receipt to precede CURRENT or force PREPARED to create the receipt it already requires."
+  },
+  "initial_empty_observation": {
+    "classification": "OUTSIDE_PREPARATION_CAPTURE_WITH_SEPARATE_BOUND",
+    "mandatory": true,
+    "lifecycle_class": "workspace initial eligibility before effect admission",
+    "bounds_ref": "independent_bounds.observation",
+    "request_and_response_both_classified": true
+  },
+  "independent_bounds": {
+    "observation": {
+      "timeout_ms": 5000,
+      "outer_timeout_ms": 10000,
+      "request_max_bytes": 8192,
+      "response_max_bytes": 8192,
+      "work_entries_max": 3,
+      "tmp_entries_max": 0,
+      "process_tasks_max": 128,
+      "regular_file_bytes_max": 33007,
+      "writer_records_max": 128,
+      "writer_handles_max": 128,
+      "mount_records_max": 2
+    },
+    "cleanup": {
+      "outer_timeout_ms": 10000,
+      "response_max_bytes": 8192,
+      "automatic_retry_max": 0,
+      "explicit_retry_scope": "bounded same original identity only; permanent invalidity"
+    },
+    "all_frames_max_bytes": 8192,
+    "outer_custodian": "Fixed 10000ms invocation deadline and <=8192-byte bounded response, no automatic retry. Explicit same-identity cleanup retry never restores readiness.",
+    "retained_lifetime_gate": "Exclusive workspace remains only until completion/abort/timeout/abandonment/upstream loss. No new retained lifetime numeric duration is preauthorized; future owner must enforce separately reviewed bounded lifetime policy before readiness.",
+    "no_unbounded_exemption": "Every outside observation/handoff uses existing per-operation time/frame/record/byte bounds and a separately reviewed finite retained lifetime policy before readiness. No universal numeric session/lifetime ceiling is invented or authorized here. Missing reviewed retained bounds denies readiness, not an unlimited channel.",
+    "outside_diagnostics": "Observation request/response ceilings do not independently bound arbitrary controller stderr or unsolicited output. Outside lifecycle traffic has no free diagnostic channel: unexpected/nonprotocol output fails closed; any future transport must prove finite capture bounds for all outer channels under its separately reviewed retained policy before operational eligibility. No new universal stderr number is invented. Candidate A retains empty successful controller stderr and its conditional session ceilings only.",
+    "conditional_candidate_A_only": {
+      "accepted": false,
+      "session_bytes_each_direction": 65536,
+      "session_request_count_including_cleanup": 64,
+      "reserved_cleanup_request_slots": 2,
+      "retained_total_ms": 30000,
+      "work_cutoff_ms": 20000,
+      "cleanup_reserve_ms": 10000,
+      "framing_header_bytes": 4,
+      "whole_frame_max_bytes": 8192,
+      "reason": "These are preserved reviewed candidate profile limits, not final transport or architecture selection; they never enlarge the 8192 effect cap."
+    }
+  },
+  "cleanup": {
+    "cleanup_is_preparation": false,
+    "membership": "OUTSIDE_PREPARATION_CAPTURE_WITH_SEPARATE_BOUND",
+    "preemption_allowed": true,
+    "duty_mandatory": true,
+    "requires_remaining_effect_budget": false,
+    "safety_capacity": "Before ordinary admission the future transport must guarantee bounded independent/reserved cleanup capacity, including both cleanup exchanges and outer fallback. Normal effect capture may consume all 8192 bytes without spending cleanup capacity. If the channel cannot preserve this, deny ordinary admission; this requirement selects no transport.",
+    "shared_channel": "Separately identified cleanup frames are charged to cleanup and to any applicable retained-session ceiling once per ledger, not the ordinary effect ledger. Finishing an already-started ordinary response cannot convert its bytes to cleanup. Channel/normal-quota failure still invokes independent exact-generation outer teardown.",
+    "reserves": "For conditional candidate A, preserve two cleanup slots plus bounded cleanup/error response capacity within the 65536/session/64-request ceiling and the 10000ms cleanup time reserve. Ordinary admission cannot spend them. Existing independent cleanup and outer invocation bounds remain; reserves do not enlarge preparation capture.",
+    "lost_inner_evidence": "Removal and absence do not prove missing child reaping/EOF. Preserve unresolved components; no fabricated cleanup success."
+  },
+  "stream_accounting": {
+    "controller_stdin_requests": "Report request payload/framing in its own direction. Semantic attempt membership does not turn stdin into captured outer stdout or stderr; no bidirectional sum or new cumulative stdin cap.",
+    "controller_stdout_responses": "Count each member response byte, including full embedded poststate and actual transport framing, once if mapped to outer stdout by a future transport. All partial/malformed/unframed/unexpected captured bytes during the effect epoch also count and deny success; missing labels do not exempt them. No omission, compression, alias or removal of duplicated evidence.",
+    "controller_stderr": "All bytes observed during the effect capture epoch count toward its separate 8192 stderr cap unless independently attributable to a separately bounded lifecycle channel. No untagged/shared stderr may be favorably relabeled as cleanup or observation. Empty successful candidate stderr is conditional precedent, not a new encoding shortcut.",
+    "compiler_child_stdout": "Separate <=2048 child capture; exact successful observed bytes=0. Metadata is already counted in compile response; do not add it twice.",
+    "compiler_child_stderr": "Separate <=2048 child capture; exact successful observed bytes=0. Metadata is already counted in compile response; do not add it twice.",
+    "outer_custodian_channel": "Separate fixed bounded cleanup invocation, no invented four-byte prefix and no charge to normal effect allowance.",
+    "host_in_process_composed_evidence": "Receipt authentication and provenance-preserving cleanup composition are not extra controller wire responses. A future serialization would require its actual bounded channel accounting, not a free exemption.",
+    "payload_vs_physical": "Freeze lifecycle membership here. Canonical semantic payload and actual physical framing are distinct; bytes on a capped physical stream include its real headers. No transport mapping is selected. Candidate A alone would put request+4 on stdin and response+4 on stdout.",
+    "attempt_vs_session": "Preparation attempt budget != retained controller session budget != workspace lifetime. One physical byte may be checked against nested applicable ceilings but is never added twice within one ledger. A larger session ceiling neither expands the effect allowance nor makes it a lifetime allowance.",
+    "unattributed_or_late_bytes": "A future channel must prove attribution and preserve bounded capture/closure; it cannot publish success by moving ordinary response suffixes past the endpoint. Unknown/lost/invalid bytes remain failure evidence, never an unlimited uncharged channel."
+  },
+  "handoff": {
+    "required_for_preparation_eligibility": false,
+    "frame_budget_class": "retained-session/handoff budget",
+    "inside_preparation_capture": false,
+    "existing_operation_bounds_profile": "observation",
+    "activation_status": "PROOF_UNRESOLVED",
+    "future_consumer_capture_scope": "UNRESOLVED_FUTURE_CONSUMER_SCOPE",
+    "consumer_authority_invented": false
+  },
+  "normative_table": [
+    {
+      "event_message": "OBSERVE_EMPTY_WORKSPACE request / response",
+      "semantic_lifecycle_owner": "workspace initial eligibility",
+      "mandatory": "YES before materialization admission",
+      "inside_8192_preparation_cap": "NO",
+      "other_applicable_bound": "observation profile: 5000ms, outer 10000ms, request/response frame <=8192; full inventory bounds; reviewed retained policy required",
+      "reason": "Establishes the independently authorized empty workspace required before an effect facet can be admitted. Its bytes are outside this effect capture; no unlimited observation or retained lifetime is authorized."
+    },
+    {
+      "event_message": "MATERIALIZE_EXACT_SCENARIO_SOURCE request / response",
+      "semantic_lifecycle_owner": "preparation effect attempt",
+      "mandatory": "YES",
+      "inside_8192_preparation_cap": "YES",
+      "other_applicable_bound": "one shared 5000ms deadline, hard 10000ms; each frame <=8192; outer stdout and stderr each cumulatively <=8192",
+      "reason": "Originating fixed effect exchange of the original spent materialization facet. Request belongs to the interval but stdin is not stdout/stderr."
+    },
+    {
+      "event_message": "materialize response.result.workspace_state",
+      "semantic_lifecycle_owner": "preparation materialization evidence",
+      "mandatory": "YES complete embedded record",
+      "inside_8192_preparation_cap": "YES_IN_PARENT_ONCE",
+      "other_applicable_bound": "parent frame and effect bounds",
+      "reason": "Full poststate remains part of the response. It is neither another frame nor current readiness."
+    },
+    {
+      "event_message": "OBSERVE_CURRENT_WORKSPACE request / response between materialization admission and compile response completion",
+      "semantic_lifecycle_owner": "workspace observation within active preparation effect attempt",
+      "mandatory": "IF required by the existing admission checks or explicitly invoked",
+      "inside_8192_preparation_cap": "YES",
+      "other_applicable_bound": "observation profile: 5000ms, outer 10000ms, request/response frame <=8192; full inventory bounds; reviewed retained policy required; also original remaining effect bounds",
+      "reason": "An observation inside the still-open effect interval consumes that same cumulative capture; an observation profile never resets or exempts an in-attempt frame."
+    },
+    {
+      "event_message": "COMPILE_EXACT_SCENARIO request / response",
+      "semantic_lifecycle_owner": "preparation effect attempt",
+      "mandatory": "YES on successful preparation path",
+      "inside_8192_preparation_cap": "YES",
+      "other_applicable_bound": "one shared 5000ms deadline, hard 10000ms; each frame <=8192; outer stdout and stderr each cumulatively <=8192; compiler child pipes each <=2048",
+      "reason": "Distinct compilation facet in the same fixed attempt. Complete terminal response is the successful counter endpoint, including all metadata and poststate."
+    },
+    {
+      "event_message": "compile response.result.workspace_state",
+      "semantic_lifecycle_owner": "preparation compilation evidence",
+      "mandatory": "YES complete post-reap embedded record",
+      "inside_8192_preparation_cap": "YES_IN_PARENT_ONCE",
+      "other_applicable_bound": "parent frame and effect bounds",
+      "reason": "Full duplicated source/class/mount/process/writer evidence stays unchanged and is counted once in this response."
+    },
+    {
+      "event_message": "fresh prepared-current-state OBSERVE_* request / response after compile response",
+      "semantic_lifecycle_owner": "workspace current-liveness/readiness evidence",
+      "mandatory": "YES before readiness or handoff",
+      "inside_8192_preparation_cap": "NO",
+      "other_applicable_bound": "observation profile: 5000ms, outer 10000ms, request/response frame <=8192; full inventory bounds; reviewed retained policy required",
+      "reason": "Re-establishes current workspace eligibility after completed effects, rather than performing another preparation effect. No mutation poststate substitution. CURRENT may precede the initial receipt; PREPARED requires the original receipt."
+    },
+    {
+      "event_message": "additional OBSERVE_CURRENT_WORKSPACE or OBSERVE_PREPARED_ARTIFACTS request / response after effect endpoint",
+      "semantic_lifecycle_owner": "workspace current-liveness/readiness evidence",
+      "mandatory": "IF invoked; new challenge for each use",
+      "inside_8192_preparation_cap": "NO",
+      "other_applicable_bound": "observation profile: 5000ms, outer 10000ms, request/response frame <=8192; full inventory bounds; reviewed retained policy required",
+      "reason": "Readiness revalidation cannot reopen or reset the spent effect attempt. PREPARED is legal only with its original receipt and all existing predicates."
+    },
+    {
+      "event_message": "preparation receipt authentication",
+      "semantic_lifecycle_owner": "preparation owner authenticated effect evidence",
+      "mandatory": "YES for a success receipt",
+      "inside_8192_preparation_cap": "NO_CONTROLLER_WIRE_BYTES",
+      "other_applicable_bound": "exact frozen owner authentication, original graph/generation and lifetime rules; no new wire envelope",
+      "reason": "Host in-process receipt authentication follows exact preparation evidence. Its data already serialized in effect responses is not counted again; this does not make the receipt current readiness or consumer permission."
+    },
+    {
+      "event_message": "PREPARE_EXCLUSIVE_HANDOFF request / response",
+      "semantic_lifecycle_owner": "workspace retained-session/handoff lifecycle",
+      "mandatory": "NO for preparation eligibility; only with separately reviewed consumer",
+      "inside_8192_preparation_cap": "NO",
+      "other_applicable_bound": "observation profile: 5000ms, outer 10000ms, request/response frame <=8192; full inventory bounds; reviewed retained policy required; conditional candidate session ceilings",
+      "reason": "Optional exclusive reservation follows the effect interval. Activation remains PROOF_UNRESOLVED. A consumer execution/capture budget is unresolved future consumer scope, not supplied here."
+    },
+    {
+      "event_message": "BEGIN_CLEANUP request / response",
+      "semantic_lifecycle_owner": "monotonic cleanup duty",
+      "mandatory": "YES barrier duty; inner exchange if channel available",
+      "inside_8192_preparation_cap": "NO",
+      "other_applicable_bound": "cleanup profile: outer 10000ms, response <=8192, request frame <=8192, automatic retries 0; guaranteed separate cleanup capacity",
+      "reason": "cleanup_is_preparation=false even when cleanup preempts the attempt. Ordinary pending response bytes remain charged to the failed attempt, never relabeled as this control exchange."
+    },
+    {
+      "event_message": "CLEANUP_AND_REPORT request / response",
+      "semantic_lifecycle_owner": "monotonic cleanup duty",
+      "mandatory": "YES evidence duty; inner exchange if channel available",
+      "inside_8192_preparation_cap": "NO",
+      "other_applicable_bound": "cleanup profile: outer 10000ms, response <=8192, request frame <=8192, automatic retries 0; guaranteed separate cleanup capacity",
+      "reason": "Separate bounded teardown/reap/EOF evidence; no readiness requirement and no dependence on remaining normal effect budget. Lost inner evidence stays unresolved."
+    },
+    {
+      "event_message": "outer TERMINATE_REMOVE_EXACT_RETAINED_GENERATION",
+      "semantic_lifecycle_owner": "independent outer cleanup custodian",
+      "mandatory": "YES cleanup duty, including after inner loss",
+      "inside_8192_preparation_cap": "NO",
+      "other_applicable_bound": "fixed 10000ms invocation and <=8192-byte response; original immutable cleanup relation; no automatic retry",
+      "reason": "Independent channel with fixed exact-generation authority; normal capture exhaustion cannot prevent teardown. No generic command or authority is created."
+    },
+    {
+      "event_message": "outer OBSERVE_EXACT_RETAINED_GENERATION_ABSENCE",
+      "semantic_lifecycle_owner": "independent outer cleanup custodian",
+      "mandatory": "YES independent absence evidence",
+      "inside_8192_preparation_cap": "NO",
+      "other_applicable_bound": "fixed 10000ms invocation and <=8192-byte response; exact same-backend full-ID absence; no automatic retry",
+      "reason": "Fresh outer absence is separate from removal and cannot replace lost child wait or capture EOF evidence."
+    },
+    {
+      "event_message": "outer cleanup evidence composed with retained inner cleanup result",
+      "semantic_lifecycle_owner": "workspace owner host in-process cleanup evidence",
+      "mandatory": "YES for truthful composite cleanup completion",
+      "inside_8192_preparation_cap": "NO_CONTROLLER_WIRE_BYTES",
+      "other_applicable_bound": "bounded existing component schemas/inventories and invocation bounds; no extra inner response",
+      "reason": "Keep provenance. Composition is not an inner process reporting its own removal and is not preparation success."
+    }
+  ],
+  "clarifications": [
+    {
+      "new_requirement_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.SCOPE.REQ.1",
+      "historical_artifact": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "historical_key": "/bounds/attempt_budget_scope",
+      "old_ambiguous_wording": "One monotonic 5000ms deadline starts at materialization admission and includes materialize, compile, in-attempt observations and intervening time; never reset per operation. Outer preparation attempt hard timeout 10000ms. Total outer stdout/stderr each <=8192 over all attempt frames, not 8192 per unlimited frame. Retained lifetime is not this attempt budget and confers no indefinite readiness.",
+      "new_exact_interpretation": "A: the one fixed materialize-then-compile preparation EFFECT attempt; successful outer capture begins at owning materialization admission and ends at complete compilation response. In-attempt observations remain inside; independent initial/current-readiness/handoff/cleanup lifecycle exchanges remain separately bounded.",
+      "scope": "Only byte-accounting membership of the existing cumulative preparation capture; transport candidate wording remains conditional.",
+      "reason": "Historical wording was underspecified for this newly measured budget question. The fixed effect attempt, independent workspace readiness and mandatory non-preparation cleanup supply the semantic basis; numeric fit is not the selection criterion.",
+      "historical_bytes_preserved": true
+    },
+    {
+      "new_requirement_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.SCOPE.REQ.1",
+      "historical_artifact": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+      "historical_key": "/cross_field_rules/10",
+      "old_ambiguous_wording": "All frames <=8192 bytes; preparation total outer stream captures remain <=8192 each over whole attempt. Larger/incomplete evidence fails typed incomplete and cleanup duty continues. No generic string command, path, argv, environment or arbitrary map.",
+      "new_exact_interpretation": "A: the one fixed materialize-then-compile preparation EFFECT attempt; successful outer capture begins at owning materialization admission and ends at complete compilation response. In-attempt observations remain inside; independent initial/current-readiness/handoff/cleanup lifecycle exchanges remain separately bounded.",
+      "scope": "Only byte-accounting membership of the existing cumulative preparation capture; transport candidate wording remains conditional.",
+      "reason": "Historical wording was underspecified for this newly measured budget question. The fixed effect attempt, independent workspace readiness and mandatory non-preparation cleanup supply the semantic basis; numeric fit is not the selection criterion.",
+      "historical_bytes_preserved": true
+    },
+    {
+      "new_requirement_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.SCOPE.REQ.1",
+      "historical_artifact": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/selection.json",
+      "historical_key": "/wire/stream_budgets",
+      "old_ambiguous_wording": "No logging on controller stdout; controller stderr empty on success. Child streams separate. Keep <=8192 captured bytes per outer stream cumulatively over whole preparation attempt, INCLUDING wire headers; no reset at materialize/compile/observation boundaries. Also cap entire retained session at 65536 outer bytes per direction and 64 requests, including cleanup. Reserve two request slots for BEGIN_CLEANUP and CLEANUP_AND_REPORT plus bounded cleanup/error response budget before ordinary admission. If complete evidence or cumulative budget cannot fit, fail closed and use independent outer teardown; no truncation or success. Separate session budget never relaxes preparation budget.",
+      "new_exact_interpretation": "A: the one fixed materialize-then-compile preparation EFFECT attempt; successful outer capture begins at owning materialization admission and ends at complete compilation response. In-attempt observations remain inside; independent initial/current-readiness/handoff/cleanup lifecycle exchanges remain separately bounded.",
+      "scope": "Only byte-accounting membership of the existing cumulative preparation capture; transport candidate wording remains conditional.",
+      "reason": "Historical wording was underspecified for this newly measured budget question. The fixed effect attempt, independent workspace readiness and mandatory non-preparation cleanup supply the semantic basis; numeric fit is not the selection criterion.",
+      "historical_bytes_preserved": true
+    },
+    {
+      "new_requirement_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.SCOPE.REQ.1",
+      "historical_artifact": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+      "historical_key": "/compiler",
+      "old_ambiguous_wording": {
+        "path": "/opt/temurin-26.0.2.1/bin/javac",
+        "sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+        "image": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+        "sandbox_profile": "runtime_sandbox_2_v1",
+        "sandbox_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+        "historical_JAVA_1C_argv": [
+          "/opt/temurin-26.0.2.1/bin/javac",
+          "-J-Xms8m",
+          "-J-Xmx32m",
+          "-J-XX:ActiveProcessorCount=1",
+          "-J-XX:-UsePerfData",
+          "-d",
+          "/work/classes",
+          "/work/JavaSandboxProbe.java"
+        ],
+        "exact_scenario_argv": [
+          "/opt/temurin-26.0.2.1/bin/javac",
+          "-J-Xms8m",
+          "-J-Xmx32m",
+          "-J-XX:ActiveProcessorCount=1",
+          "-J-XX:-UsePerfData",
+          "-d",
+          "/work/classes",
+          "/work/SyntheticStateBox.java"
+        ],
+        "template_derivation": "Recover every flag and output path unchanged from JAVA.1C; explicitly freeze only the scenario source operand substitution as new scope. Historical invocation, controller and provider remain unchanged and cannot perform this operation.",
+        "shell": false,
+        "cwd": "/work",
+        "caller_flags_allowed": false,
+        "argument_files_allowed": false,
+        "arbitrary_classpath_allowed": false,
+        "maven_allowed": false,
+        "gradle_allowed": false,
+        "dependency_download_allowed": false,
+        "network_allowed": false,
+        "processor_plugin_inputs_allowed": false,
+        "input_closure": "Only the exact frozen source and immutable pinned JDK/image; no class/JAR/processor/service/config inputs in initially empty cwd or writable tmpfs, no source imports/annotations, no caller CLASSPATH/JDK_JAVAC_OPTIONS/JAVA_TOOL_OPTIONS/_JAVA_OPTIONS. Do not invent -proc:none or other flags.",
+        "max_attempts": 1,
+        "compiler_stdout_max_bytes": 2048,
+        "compiler_stderr_max_bytes": 2048,
+        "outer_stdout_max_bytes": 8192,
+        "outer_stderr_max_bytes": 8192,
+        "outer_timeout_ms": 10000,
+        "shared_controller_deadline_ms": 5000,
+        "output_directory": "/work/classes"
+      },
+      "new_exact_interpretation": "A: the one fixed materialize-then-compile preparation EFFECT attempt; successful outer capture begins at owning materialization admission and ends at complete compilation response. In-attempt observations remain inside; independent initial/current-readiness/handoff/cleanup lifecycle exchanges remain separately bounded.",
+      "scope": "Only byte-accounting membership of the existing cumulative preparation capture; transport candidate wording remains conditional.",
+      "reason": "Historical wording was underspecified for this newly measured budget question. The fixed effect attempt, independent workspace readiness and mandatory non-preparation cleanup supply the semantic basis; numeric fit is not the selection criterion.",
+      "historical_bytes_preserved": true
+    }
+  ],
+  "evidence": {
+    "fixed_attempt": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+      "pointer": "/preparation_authority/semantics/preparation_authority_design",
+      "value": "One narrow one-shot preparation authority plus one immutable success receipt. Two non-interchangeable operation facets bind one fixed materialize-then-compile attempt. No generic file or command API; no independent capability per field.",
+      "sha256": "e6e25d5ac912a07b35dffab148e8b3dc209aa124429920f374c46f7fd1386192",
+      "size_bytes": 37431,
+      "reason": "The semantic effect unit is exactly materialize then compile."
+    },
+    "facets": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+      "pointer": "/preparation_authority/facets",
+      "value": [
+        "exact_sandbox_materialization_authority",
+        "exact_scenario_compilation_authority"
+      ],
+      "sha256": "e6e25d5ac912a07b35dffab148e8b3dc209aa124429920f374c46f7fd1386192",
+      "size_bytes": 37431,
+      "reason": "Two distinct effect facets in one attempt, not readiness authority."
+    },
+    "ordering": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+      "pointer": "/ordering/sequence",
+      "value": [
+        {
+          "id": "capability_gates",
+          "operation": "authenticate original pinned auth/runtime/provider graph and all capability gates"
+        },
+        {
+          "id": "prepare_reflection",
+          "operation": "prepare distinct BEFORE and AFTER admissions and leases while runtime ISSUED"
+        },
+        {
+          "id": "source_authentication",
+          "operation": "authenticate exact frozen source, future narrow preparation authority and already-authorized live exclusive workspace generation"
+        },
+        {
+          "id": "source_projection",
+          "operation": "obtain exact existing source bytes in memory"
+        },
+        {
+          "id": "materialization",
+          "operation": "exclusively materialize exact source and authenticate full readback"
+        },
+        {
+          "id": "compilation",
+          "operation": "one exact bounded scenario compilation; authenticate source unchanged and bounded inert class output"
+        },
+        {
+          "id": "preparation_evidence",
+          "operation": "authenticate original preparation receipt and live workspace/artifact generation"
+        },
+        {
+          "id": "future_full_readiness",
+          "operation": "authenticate separately reviewed full harness and consumer readiness; presently unresolved"
+        },
+        {
+          "id": "handoff",
+          "operation": "complete all integrity, original graph, freshness and exclusive handoff checks while runtime ISSUED"
+        },
+        {
+          "id": "runtime_consume",
+          "operation": "consume runtime lease ISSUED -> CONSUMED"
+        },
+        {
+          "id": "before_permission_consume",
+          "operation": "authenticate and consume BEFORE reflection lease"
+        },
+        {
+          "id": "scenario_dispatch",
+          "operation": "dispatch exact scenario JVM"
+        },
+        {
+          "id": "target_activation",
+          "operation": "load/link/initialize target as required by future reviewed harness"
+        },
+        {
+          "id": "ordinary_construction",
+          "operation": "ordinary exact SyntheticStateBox construction"
+        },
+        {
+          "id": "before_read",
+          "operation": "BEFORE exact reflection read"
+        },
+        {
+          "id": "decrement",
+          "operation": "exact public decrement(3)"
+        },
+        {
+          "id": "after_permission_consume",
+          "operation": "authenticate and consume AFTER reflection lease"
+        },
+        {
+          "id": "after_read",
+          "operation": "AFTER exact reflection read"
+        },
+        {
+          "id": "cleanup",
+          "operation": "finish consumer; tear down entire workspace and independently verify absence"
+        }
+      ],
+      "sha256": "e6e25d5ac912a07b35dffab148e8b3dc209aa124429920f374c46f7fd1386192",
+      "size_bytes": 37431,
+      "reason": "Preparation evidence, full readiness and handoff are distinct lifecycle positions."
+    },
+    "cleanup_not_preparation": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+      "pointer": "/ordering/cleanup_is_preparation",
+      "value": false,
+      "sha256": "e6e25d5ac912a07b35dffab148e8b3dc209aa124429920f374c46f7fd1386192",
+      "size_bytes": 37431,
+      "reason": "Cleanup cannot consume the successful effect allowance as a prerequisite."
+    },
+    "receipt": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+      "pointer": "/preparation_receipt",
+      "value": {
+        "kind": "authenticated_evidence_not_capability",
+        "proposed_type": "PinnedSyntheticPreparationReceipt",
+        "owner": "core.synthetic_execution_preparation_pinned",
+        "schema": "synthetic_preparation_receipt_pinned_1_v1",
+        "single_receipt_with_distinct_source_and_compile_sections": true,
+        "runtime_permission": false,
+        "execution_permission": false,
+        "caller_boolean_accepted": false,
+        "minimum_signed_bindings": [
+          "owner/phase/schema/PID/receipt_id",
+          "original preparation authority id and spent attempt identity",
+          "original pinned authorization id/fingerprint/proof_context",
+          "original runtime lease id/stable fingerprint",
+          "exact scenario/source kind/hash/size/definition/invocation/field",
+          "retained authenticated provider graph and requirement",
+          "actual backend route/version/container/workspace generation/controller executable and controller-source identity",
+          "exact image/SANDBOX profile/policy/namespace/resource/environment evidence",
+          "source authentication and materialization readback hash/size/path",
+          "compiler path/hash and exact argv/cwd/environment",
+          "compile exit/complete bounded capture/reaped process evidence",
+          "full exact bounded source/class output manifest",
+          "harness scope exclusion and frozen renderer/helper identities",
+          "workspace live/artifact-integrity state; cleanup pending",
+          "domain-separated evidence digest/stable fingerprint"
+        ],
+        "harness_claim": "Scenario receipt does not prove a harness exists or has compiled. Its explicit exclusion prevents scenario output evidence from being misused as whole-executor readiness.",
+        "lifetime": "Same issuing host process, exact live attempt/container/workspace generation and unchanged original graph/artifacts. No wall-clock Boolean or timestamp alone establishes freshness. Timeout/abort/teardown, changed manifest, controller disconnect or terminal runtime state ends preactivation readiness.",
+        "reusable": "Read-only evidence may be revalidated repeatedly during one live attempt, including for final audit; it grants no repeat preparation or execution. Post-teardown authenticity may survive as evidence, readiness may not.",
+        "cleanup_state_at_success": "LIVE_EPHEMERAL_ARTIFACTS_CLEANUP_PENDING",
+        "cleanup_success_claimed_at_preparation_success": false,
+        "decision": "ACCEPTED_WITH_ADDITIVE_CLARIFICATION",
+        "may_prove_only": [
+          "exact source authentication",
+          "materialization and full readback",
+          "compiler identity",
+          "exact argv/cwd/environment",
+          "compile result",
+          "bounded output manifest with actual class hash",
+          "live workspace generation",
+          "cleanup pending"
+        ],
+        "context_bindings_are_additional_readiness_claims": false,
+        "may_claim_full_harness_readiness": false,
+        "may_claim_consumer_readiness": false,
+        "may_claim_behavior_success": false,
+        "alone_unlocks_runtime_consumption": false
+      },
+      "sha256": "e6e25d5ac912a07b35dffab148e8b3dc209aa124429920f374c46f7fd1386192",
+      "size_bytes": 37431,
+      "reason": "Authenticated evidence, no current/consumer authority from receipt alone."
+    },
+    "owner_admission": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "pointer": "/authority_separation/admission",
+      "value": "Owning boundary authenticates and spends its own exact facet where required, then supplies a separately authenticated single-operation admission bound to exact originals, tag, attempt, generations, observation and local fence. Controller checks only this authenticated relation and its local operational predicates; it cannot replace owner validation, issue permission or spend/refund facets.",
+      "sha256": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328",
+      "size_bytes": 61888,
+      "reason": "Owning boundary spends/admit before dispatch; controller final checks do not restart attempt."
+    },
+    "old_scope": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "pointer": "/bounds/attempt_budget_scope",
+      "value": "One monotonic 5000ms deadline starts at materialization admission and includes materialize, compile, in-attempt observations and intervening time; never reset per operation. Outer preparation attempt hard timeout 10000ms. Total outer stdout/stderr each <=8192 over all attempt frames, not 8192 per unlimited frame. Retained lifetime is not this attempt budget and confers no indefinite readiness.",
+      "sha256": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328",
+      "size_bytes": 61888,
+      "reason": "Old ambiguous interval wording remains historically unchanged."
+    },
+    "operations": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "pointer": "/operations",
+      "value": [
+        {
+          "tag": "OBSERVE_EMPTY_WORKSPACE",
+          "required_admission_owner": "core.synthetic_execution_preparation_workspace_pinned",
+          "permissible_predicates": [
+            "same original live controller/container/workspace generation",
+            "exclusive",
+            "no active mutation or handoff",
+            "not cleanup-started",
+            "not invalid"
+          ],
+          "input_projection": {},
+          "fixed_paths": [
+            "/work",
+            "/tmp"
+          ],
+          "allowed_subprocess": null,
+          "bounds_profile": "observation",
+          "postconditions": [
+            "one complete current snapshot; /work and /tmp empty; /work/classes absent",
+            "full mounts/manifests/process/writer inventory; no target JVM or target activation",
+            "observed exact preparation-empty predicate; owner independently authenticates readiness"
+          ],
+          "failure_behavior": "Incomplete observation yields CONTROLLER_OBSERVATION_INCOMPLETE or PROOF_UNRESOLVED; unexpected state preserves workspace semantic error; never repair.",
+          "cleanup_interaction": "Read-only; cleanup barrier preempts observation and prevents ready result.",
+          "controller_spends_authority": false,
+          "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#initial_workspace"
+        },
+        {
+          "tag": "OBSERVE_CURRENT_WORKSPACE",
+          "required_admission_owner": "core.synthetic_execution_preparation_workspace_pinned",
+          "permissible_predicates": [
+            "same original live generation",
+            "exclusive",
+            "coherent controller fence",
+            "no active mutation or handoff",
+            "not cleanup-started",
+            "not invalid"
+          ],
+          "input_projection": {},
+          "fixed_paths": [
+            "/work",
+            "/tmp"
+          ],
+          "allowed_subprocess": null,
+          "bounds_profile": "observation",
+          "postconditions": [
+            "complete current snapshot of stage-appropriate exact manifest",
+            "stage derived from original same-attempt preparation evidence, never caller stage",
+            "partial progress is neither preparation-empty nor prepared-artifacts-present"
+          ],
+          "failure_behavior": "No cached/unchanged-manifest shortcut; incomplete observation fails closed; altered inputs invalidate eligibility.",
+          "cleanup_interaction": "Read-only; cleanup preempts and denies readiness.",
+          "controller_spends_authority": false,
+          "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#workspace_state_digest"
+        },
+        {
+          "tag": "OBSERVE_PREPARED_ARTIFACTS",
+          "required_admission_owner": "core.synthetic_execution_preparation_workspace_pinned",
+          "permissible_predicates": [
+            "same original live generation",
+            "prepared-artifacts-present from preparation owner",
+            "cleanup pending",
+            "exclusive",
+            "no active mutation or handoff",
+            "compiler fully reaped; captures closed and EOF",
+            "not cleanup-started",
+            "not invalid"
+          ],
+          "input_projection": {
+            "preparation_attempt_id": "id",
+            "preparation_receipt_id": "id"
+          },
+          "fixed_paths": [
+            "/work",
+            "/tmp",
+            "/work/SyntheticStateBox.java",
+            "/work/classes",
+            "/work/classes/SyntheticStateBox.class"
+          ],
+          "allowed_subprocess": null,
+          "bounds_profile": "observation",
+          "postconditions": [
+            "fresh complete source/class manifest matches original same-attempt receipt",
+            "no compiler/target JVM/unexpected writer; live artifacts remain in same generation",
+            "evidence only; no consumer readiness or runtime activation permission"
+          ],
+          "failure_behavior": "Missing original receipt relation or changed artifacts fail closed; no recompile or repair.",
+          "cleanup_interaction": "Read-only; cleanup preempts and denies readiness.",
+          "controller_spends_authority": false,
+          "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#preparation_interaction.receipt_readiness"
+        },
+        {
+          "tag": "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+          "required_admission_owner": "core.synthetic_execution_preparation_pinned",
+          "permissible_predicates": [
+            "same original live eligible generation",
+            "preparation-empty",
+            "exclusive",
+            "runtime ISSUED according to owning boundary at admission",
+            "exact materialization facet already spent/admitted",
+            "no active operation/handoff",
+            "not cleanup-started",
+            "not invalid"
+          ],
+          "input_projection": {
+            "preparation_attempt_id": "id"
+          },
+          "fixed_paths": [
+            "/work",
+            "/tmp",
+            "/work/classes",
+            "/work/SyntheticStateBox.java"
+          ],
+          "allowed_subprocess": null,
+          "bounds_profile": "preparation_attempt",
+          "postconditions": [
+            "exclusive /work/classes creation then exclusive source creation",
+            "exact authenticated existing 239 bytes; complete no-follow readback size/hash/bytes",
+            "exact materialized manifest, no compilation"
+          ],
+          "failure_behavior": "Facet remains spent on any failure; no overwrite/refund/reissue/retry; begin bounded cleanup; no success receipt.",
+          "cleanup_interaction": "Cleanup preempts active write; cancel, account for partial files, no readiness, tear down whole generation.",
+          "controller_spends_authority": false,
+          "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json#materialization; docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#initial_workspace.classes_directory"
+        },
+        {
+          "tag": "COMPILE_EXACT_SCENARIO",
+          "required_admission_owner": "core.synthetic_execution_preparation_pinned",
+          "permissible_predicates": [
+            "same original eligible generation",
+            "verified same-attempt materialization",
+            "exact source/readback unchanged; exclusive classes directory from materialization",
+            "runtime ISSUED according to owning boundary at admission",
+            "exact compilation facet already spent/admitted",
+            "exclusive",
+            "no active operation/handoff",
+            "not cleanup-started",
+            "not invalid"
+          ],
+          "input_projection": {
+            "preparation_attempt_id": "id"
+          },
+          "fixed_paths": [
+            "/work",
+            "/tmp",
+            "/work/SyntheticStateBox.java",
+            "/work/classes",
+            "/work/classes/SyntheticStateBox.class"
+          ],
+          "allowed_subprocess": [
+            "/opt/temurin-26.0.2.1/bin/javac",
+            "-J-Xms8m",
+            "-J-Xmx32m",
+            "-J-XX:ActiveProcessorCount=1",
+            "-J-XX:-UsePerfData",
+            "-d",
+            "/work/classes",
+            "/work/SyntheticStateBox.java"
+          ],
+          "bounds_profile": "preparation_attempt",
+          "postconditions": [
+            "one bounded javac only; fully reap; complete empty captures and both EOFs",
+            "exact one-class 1..32768 byte envelope; hash actual bytes; source unchanged",
+            "inert bounded classfile metadata inspection only, never load target",
+            "return preparation observations; preparation owner alone authenticates success receipt"
+          ],
+          "failure_behavior": "Spent facet stays spent; child start/timeout/capture/reap failures typed separately; compile/output semantic errors preserved; cleanup mandatory.",
+          "cleanup_interaction": "Cleanup barrier cancels/kills/reaps compiler group; no raced success readiness.",
+          "controller_spends_authority": false,
+          "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json#compiler; #compile_output"
+        },
+        {
+          "tag": "PREPARE_EXCLUSIVE_HANDOFF",
+          "required_admission_owner": "core.synthetic_execution_preparation_workspace_pinned with separately authenticated future consumer boundary",
+          "permissible_predicates": [
+            "same controller/workspace generation",
+            "prepared-artifacts-present",
+            "cleanup pending",
+            "same source/class manifest",
+            "exact original preparation attempt/receipt",
+            "no compiler/target process",
+            "all preparation captures complete/reaped",
+            "no unexpected writer",
+            "no active handoff or mutation",
+            "not cleanup-started",
+            "not invalid"
+          ],
+          "input_projection": {
+            "preparation_attempt_id": "id",
+            "preparation_receipt_id": "id",
+            "authenticated_borrower_relation_id": "id"
+          },
+          "fixed_paths": [
+            "/work",
+            "/tmp",
+            "/work/SyntheticStateBox.java",
+            "/work/classes",
+            "/work/classes/SyntheticStateBox.class"
+          ],
+          "allowed_subprocess": null,
+          "bounds_profile": "observation",
+          "postconditions": [
+            "controller-local exclusive reservation binds exact generation/attempt/receipt/artifact manifest/borrower relation",
+            "no artifact copy/export or target launch; reservation is not consumer authority",
+            "activation unavailable until separately reviewed consumer contract; currently PROOF_UNRESOLVED"
+          ],
+          "failure_behavior": "CONTROLLER_HANDOFF_UNRESOLVED or PROOF_UNRESOLVED without authenticated future borrower; no anonymous reservation; disconnect/failure triggers cleanup.",
+          "cleanup_interaction": "Reservation holds exclusive fence; cleanup cancels it and never returns BUSY.",
+          "controller_spends_authority": false,
+          "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#lifecycle.handoff; docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json#cleanup.after_preparation_success"
+        },
+        {
+          "tag": "BEGIN_CLEANUP",
+          "required_admission_owner": "independent exact-generation cleanup custodian",
+          "permissible_predicates": [
+            "retained authenticated immutable cleanup identity",
+            "any lifecycle condition including invalid or controller lost"
+          ],
+          "input_projection": {
+            "cleanup_reason": "cleanup_reason_enum"
+          },
+          "fixed_paths": [],
+          "allowed_subprocess": null,
+          "bounds_profile": "cleanup",
+          "postconditions": [
+            "set monotonic barrier under controller-local fence if controller reachable",
+            "outer custodian records terminal readiness withdrawal even if inner lost",
+            "deny new work; cancel active mutation/handoff; no success readiness"
+          ],
+          "failure_behavior": "Never BUSY and never requires ISSUED, unspent facets or inner challenge; lost inner delegates outer teardown; unknown identity yields WORKSPACE_CLEANUP_UNRESOLVED.",
+          "cleanup_interaction": "Preempts every operation; idempotent barrier re-observation never reopens generation.",
+          "controller_spends_authority": false,
+          "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#lifecycle.predicates.cleanup-started"
+        },
+        {
+          "tag": "CLEANUP_AND_REPORT",
+          "required_admission_owner": "independent exact-generation cleanup custodian",
+          "permissible_predicates": [
+            "retained authenticated immutable cleanup identity",
+            "cleanup-started (establish barrier first if absent)"
+          ],
+          "input_projection": {},
+          "fixed_paths": [
+            "/work",
+            "/tmp"
+          ],
+          "allowed_subprocess": null,
+          "bounds_profile": "cleanup",
+          "postconditions": [
+            "kill/reap children/groups; close captures/pipes/selectors; observe EOF",
+            "outer fixed primitive removes exact container and independently verifies absence",
+            "complete bounded composite cleanup evidence; /work and /tmp generation gone",
+            "terminal evidence only; incomplete child/EOF/absence proof remains unresolved"
+          ],
+          "failure_behavior": "CONTROLLER_CLEANUP_UNRESOLVED at controller layer, WORKSPACE_CLEANUP_UNRESOLVED at workspace mapping; do not infer lost reaping/EOF from removal success.",
+          "cleanup_interaction": "Only bounded exact-identity teardown retry allowed; no readiness restoration or new generation.",
+          "controller_spends_authority": false,
+          "downstream_requirement": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json#cleanup; docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json#cleanup"
+        }
+      ],
+      "sha256": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328",
+      "size_bytes": 61888,
+      "reason": "Mutation, observation and cleanup profiles and owners are distinct."
+    },
+    "observation_bounds": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "pointer": "/bounds/observation",
+      "value": {
+        "timeout_ms": 5000,
+        "outer_timeout_ms": 10000,
+        "request_max_bytes": 8192,
+        "response_max_bytes": 8192,
+        "work_entries_max": 3,
+        "tmp_entries_max": 0,
+        "process_tasks_max": 128,
+        "regular_file_bytes_max": 33007,
+        "writer_records_max": 128,
+        "writer_handles_max": 128,
+        "mount_records_max": 2
+      },
+      "sha256": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328",
+      "size_bytes": 61888,
+      "reason": "Independent bounded observation evidence, no first-N truncation."
+    },
+    "cleanup_bounds": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "pointer": "/bounds/cleanup",
+      "value": {
+        "outer_timeout_ms": 10000,
+        "response_max_bytes": 8192,
+        "automatic_retry_max": 0,
+        "explicit_retry_scope": "bounded same original identity only; permanent invalidity"
+      },
+      "sha256": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328",
+      "size_bytes": 61888,
+      "reason": "Independent bounded cleanup, zero automatic retries."
+    },
+    "outer_bounds": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "pointer": "/cleanup/outer",
+      "value": {
+        "owner_role": "independently authorized fixed host/control-plane cleanup custodian",
+        "operations": [
+          "TERMINATE_REMOVE_EXACT_RETAINED_GENERATION",
+          "OBSERVE_EXACT_RETAINED_GENERATION_ABSENCE"
+        ],
+        "target": "Retained authenticated immutable full original container ID/backend and workspace/controller generation relation, never name or caller ID alone; independently prove safe targeting on current control plane or fail unresolved.",
+        "requires_workspace_readiness": false,
+        "requires_runtime_ISSUED": false,
+        "requires_unspent_preparation_facet": false,
+        "requires_inner_controller_challenge": false,
+        "input_projection": [
+          "retained_authenticated_cleanup_relation_id",
+          "fresh_cleanup_request_id"
+        ],
+        "generic_Docker_command_authority": false,
+        "may_create_or_restore": false,
+        "bounds": "Fixed 10000ms invocation deadline and <=8192-byte bounded response, no automatic retry. Explicit same-identity cleanup retry never restores readiness.",
+        "absence": "Fresh independent exact same-backend full-ID inspect/absence observation with authenticated observer identity/method and generation relation. Removal exit status, transient inspect failure, name absence or inner self-report alone insufficient.",
+        "identity_target_failure": "WORKSPACE_CLEANUP_UNRESOLVED",
+        "lost_inner_evidence": "Kill/remove/absence must still be attempted safely after inner loss. Unknown child/group reap or capture EOF stays unresolved even if container absent; never fabricate composite cleanup success."
+      },
+      "sha256": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328",
+      "size_bytes": 61888,
+      "reason": "Outer custodian bound and independence survive inner loss."
+    },
+    "retention_gate": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "pointer": "/bounds/retention",
+      "value": "Exclusive workspace remains only until completion/abort/timeout/abandonment/upstream loss. No new retained lifetime numeric duration is preauthorized; future owner must enforce separately reviewed bounded lifetime policy before readiness.",
+      "sha256": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328",
+      "size_bytes": 61888,
+      "reason": "No unbounded retained workspace is preauthorized."
+    },
+    "fresh_challenge": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+      "pointer": "/cross_field_rules/1",
+      "value": "Request/response IDs, purpose=operation, all generations and owner sequence/challenge match exact original relation. Challenge non-null exactly for three observation tags. Mutation poststate uses a separate single-use owner-issued post-observation challenge/sequence prebound in its spent admission; it is operation-bound source evidence only, never a current-readiness response. Owner consumes that reference once and requires a new OBSERVE_* challenge before readiness or handoff.",
+      "sha256": "1c40559d4a48b747632ec4e75b49eaeae33bad9ed63fa7cbd5b19337d840406e",
+      "size_bytes": 30969,
+      "reason": "Fresh observation mandatory, never mutation poststate."
+    },
+    "frame_and_capture": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+      "pointer": "/cross_field_rules/10",
+      "value": "All frames <=8192 bytes; preparation total outer stream captures remain <=8192 each over whole attempt. Larger/incomplete evidence fails typed incomplete and cleanup duty continues. No generic string command, path, argv, environment or arbitrary map.",
+      "sha256": "1c40559d4a48b747632ec4e75b49eaeae33bad9ed63fa7cbd5b19337d840406e",
+      "size_bytes": 30969,
+      "reason": "Frame and cumulative cap, full evidence and persistent cleanup duty."
+    },
+    "workspace_order": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+      "pointer": "/lifecycle/ordering",
+      "value": [
+        "independently authorized new empty exclusive generation",
+        "exact preparation attempt in that generation",
+        "verified inert artifacts retained live with cleanup pending",
+        "optional exclusive separately authorized consumer handoff",
+        "terminal cleanup and independent absence evidence"
+      ],
+      "sha256": "259f3e60a9f33677a335cb6f309b5b89a4f60d7321a2dc623dff186fd98a692d",
+      "size_bytes": 44595,
+      "reason": "Empty generation precedes attempt; consumer handoff is optional."
+    },
+    "workspace_receipt": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+      "pointer": "/preparation_interaction/receipt_readiness",
+      "value": "Preparation receipt is evidence, not workspace capability. Require original live workspace and fresh artifact integrity at handoff; after cleanup/invalidity the receipt remains historical only and never crosses generations.",
+      "sha256": "259f3e60a9f33677a335cb6f309b5b89a4f60d7321a2dc623dff186fd98a692d",
+      "size_bytes": 44595,
+      "reason": "Fresh workspace integrity at handoff is distinct from receipt authenticity."
+    },
+    "candidate_budget": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/selection.json",
+      "pointer": "/wire/stream_budgets",
+      "value": "No logging on controller stdout; controller stderr empty on success. Child streams separate. Keep <=8192 captured bytes per outer stream cumulatively over whole preparation attempt, INCLUDING wire headers; no reset at materialize/compile/observation boundaries. Also cap entire retained session at 65536 outer bytes per direction and 64 requests, including cleanup. Reserve two request slots for BEGIN_CLEANUP and CLEANUP_AND_REPORT plus bounded cleanup/error response budget before ordinary admission. If complete evidence or cumulative budget cannot fit, fail closed and use independent outer teardown; no truncation or success. Separate session budget never relaxes preparation budget.",
+      "sha256": "d96d57dcabd07f8b77a358a1188b1f5dd2240e9e6d3ed6ea36677f6efbf2e7f6",
+      "size_bytes": 49070,
+      "reason": "Reviewed conditional session limits/reserves do not select a transport."
+    },
+    "candidate_lifetime": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/selection.json",
+      "pointer": "/retained_lifetime",
+      "value": {
+        "status": "REVIEWED_CANDIDATE_POLICY_NOT_FINAL_SELECTION",
+        "total_ms": 30000,
+        "cleanup_reserve_ms": 10000,
+        "work_cutoff_ms": 20000,
+        "renewable": false,
+        "start": "Host monotonic instant immediately BEFORE first container creation attempt, bound to original workspace/controller relation. Creation/start/empty observation consume the same total lifetime.",
+        "rationale": "Small practical foreground envelope: up to existing 10s hard preparation window plus up to 10s bounded creation/observation/reservation slack, followed by 10s cleanup reserve. No idle service or indefinite ready retention.",
+        "admission": "Do not start preparation unless full remaining <=10s hard window fits before work cutoff; request and observation budgets may shorten but never extend total. Reservation/consumer work must fit before work cutoff; no consumer authority is supplied here.",
+        "enforcement": "Workspace-owning foreground event loop selects on channel/deadlines; no detached worker or returning live capability after scope ends. At work cutoff or earlier completion/failure/abandonment/upstream loss set barrier, withdraw readiness, cancel handoff/operation and run cleanup. Inner has independent <=30s startup watchdog for disconnected execution. Its origin is actual inner startup, so after total host loss it may fire later than host creation-origin deadline; it NEVER grants readiness beyond host cutoff and does not prove physical absence by host deadline. No host/inner clock equality or hidden deadline transfer claim.",
+        "expiration": "By total deadline no intentional readiness, handoff or running work is permitted. If backend removal/absence cannot be proved within reserve, retain terminal cleanup obligation and report WORKSPACE_CLEANUP_UNRESOLVED; never claim physical absence or extend/renew capability. Any later exact-identity cleanup retry is cleanup-only, not retained readiness.",
+        "liveness": "Timestamps and deadline values bound policy only; fresh challenge plus original live relation still required."
+      },
+      "sha256": "d96d57dcabd07f8b77a358a1188b1f5dd2240e9e6d3ed6ea36677f6efbf2e7f6",
+      "size_bytes": 49070,
+      "reason": "Candidate-only finite retained lifetime/reserve; not a universal policy."
+    },
+    "old_proof": {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1_REPORT.json",
+      "pointer": "/typed_result",
+      "value": "AGGREGATE_BUDGET_SCOPE_UNRESOLVED",
+      "sha256": "3bedb221a1af90ddb0c324d2507af7a6ea0d6a8a47acb9168d855a9e2187b627",
+      "size_bytes": 39224,
+      "reason": "Frozen old proof stays AGGREGATE_BUDGET_SCOPE_UNRESOLVED; no rerun."
+    }
+  },
+  "budget_arithmetic_consequence": {
+    "historical_proof_outcome_unchanged": "AGGREGATE_BUDGET_SCOPE_UNRESOLVED",
+    "old_proof_rerun": false,
+    "next_phase": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.PROOF.1R",
+    "next_phase_requirement": "TRUTHFUL_ATTAINABLE_WITNESS_REQUIRED",
+    "reason": "Fresh readiness observation is outside this effect capture. The already-known 6702-byte relaxed materialize+compile payload is only a lower relaxation; it does not prove an attainable semantic identity encoding or complete framed exchange can fit.",
+    "known_relaxations_read_only": {
+      "materialize_compile_payload": 6702,
+      "with_fresh_CURRENT_payload": 9423
+    },
+    "inside_branch_not_selected": "Had fresh observation been inside, 1R would seek impossibility confirmation using the already-known universal relaxed excess. That branch is not selected or proved here.",
+    "feasibility_decision": "NOT_MADE_IN_SCOPE_PHASE",
+    "budget_blocker_removed": false
+  },
+  "non_changes": {
+    "cap_changed": false,
+    "schema_changed": false,
+    "operation_changed": false,
+    "transport_selected": false,
+    "candidate_A_selected": false,
+    "historical_proof_modified": false,
+    "pins_changed": false,
+    "owners_implemented": false,
+    "capabilities_issued": false,
+    "evidence_compressed_or_deduplicated": false,
+    "id_widths_changed": false,
+    "stash_reset_clean_used": false,
+    "registry_modified": false
+  },
+  "authority_flags": {
+    "Apply": false,
+    "BANK": false,
+    "BANK_authority": false,
+    "apply_authority": false,
+    "arbitrary_Java": false,
+    "arbitrary_class_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "arbitrary_command": false,
+    "arbitrary_command_authority": false,
+    "arbitrary_filesystem": false,
+    "arbitrary_java_authority": false,
+    "arbitrary_method_authority": false,
+    "arbitrary_reflection_authority": false,
+    "arbitrary_source_authority": false,
+    "compilation_authority": false,
+    "constructor_reflection_authority": false,
+    "consumer_readiness_authority": false,
+    "container_creation": false,
+    "container_creation_authority": false,
+    "controller_implementation": false,
+    "enumeration_authority": false,
+    "exact_sandbox_materialization_authority": false,
+    "exact_scenario_compilation_authority": false,
+    "executor": false,
+    "executor_authority": false,
+    "field_write_authority": false,
+    "generic_reflection_authority": false,
+    "host_mount": false,
+    "host_mount_authority": false,
+    "network": false,
+    "network_authority": false,
+    "preparation_authority": false,
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection": false,
+    "reflection_execution_authority": false,
+    "repository_java_authority": false,
+    "repository_source_write_authority": false,
+    "repository_write": false,
+    "repository_write_authority": false,
+    "runtime_activation": false,
+    "runtime_activation_authority": false,
+    "runtime_authority": false,
+    "sandbox_materialization_authority": false,
+    "scenario_compilation": false,
+    "scenario_compilation_authority": false,
+    "shell": false,
+    "shell_authority": false,
+    "source_identity_authority_issued_by_this_phase": false,
+    "source_materialization": false,
+    "work_write_authority_from_workspace_possession": false,
+    "workspace_issuance": false,
+    "workspace_issuance_authority": false,
+    "controller_authority": false,
+    "workspace_authority": false,
+    "reflection_authority": false
+  },
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR.1R": 0,
+    "EXECUTOR_1R": 0,
+    "JAVA1C": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "auth_issuance": 0,
+    "capability_consumption": 0,
+    "capability_invalidation": 0,
+    "class_loading": 0,
+    "container_creation": 0,
+    "container_removal": 0,
+    "filesystem_runtime_writes": 0,
+    "java": 0,
+    "javac": 0,
+    "pinned_auth_issuance": 0,
+    "preparation_authority_issuance": 0,
+    "provider_issuance": 0,
+    "reflection": 0,
+    "reflection_admission_issuance": 0,
+    "reflection_issuance": 0,
+    "reflection_lease_issuance": 0,
+    "runtime_issuance": 0,
+    "runtime_lease_issuance": 0,
+    "source_materialization": 0,
+    "workspace_issuance": 0,
+    "network": 0,
+    "process": 0,
+    "controller_execution": 0
+  },
+  "effect_counter_scope": "Domain operational effects are zero. Local Python source/JSON analysis and explicitly required in-process tests/benchmark checks are validation, not preparation/controller execution; guards measure child process/network/owner-import/issuance/outside-phase writes separately.",
+  "stop": true
+}

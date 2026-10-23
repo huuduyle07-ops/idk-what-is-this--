@@ -1,0 +1,48 @@
+{
+  "all_operational_effects_zero": true,
+  "audit_guard": {
+    "capability_or_transition_attempts": 0,
+    "capability_owner_import_attempts": 0,
+    "execution_or_verification_attempts": 0,
+    "network_attempts": 0,
+    "outside_phase_write_attempts": 0,
+    "process_attempts": 0
+  },
+  "blocked_actions": [],
+  "bytecode_writes_disabled": true,
+  "collected": 17,
+  "collection_errors": [],
+  "exit_code": 0,
+  "failed": [],
+  "full_issuance_dependent_suites_run": false,
+  "imported_capability_owners": [],
+  "mode": "focused",
+  "passed_count": 17,
+  "passed_nodes": [
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_cleanup_preempts_without_general_queue_or_multiplex",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_complete_record_sizing_is_reproducible_and_not_live_evidence",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_exact_bootstrap_is_fixed_inline_source_not_file_or_stdin_upload",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_exact_javac_only_and_source_supervision_primitives",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_fresh_challenge_and_mutation_poststate_preserve_frozen_rules",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_frozen_contract_schema_and_all_evidence_bytes_match",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_generations_separate_observation_from_owner_tokens_and_never_restore",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_missing_cleanup_mechanism_and_budget_proof_preclude_completion",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_outer_cleanup_survives_inner_loss_and_does_not_fabricate_reaping",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_partial_duplicate_trailing_and_noncanonical_data_are_fail_closed",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_phase_sources_do_not_contain_controller_implementation_or_owner_imports",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_retained_total_reserves_cleanup_and_runs_foreground_timer",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_selection_is_design_only_and_authority_free",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_source_measurement_has_no_predicted_values",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_three_real_architectures_cover_every_requested_dimension",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_unix_socket_is_requirement_evolution_not_accepted",
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py::test_wire_length_includes_header_and_keeps_frozen_semantics"
+  ],
+  "production_registries_seeded": false,
+  "production_validators_patched": false,
+  "scratch_inside_new_phase": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1\\validation_tmp\\focused",
+  "selected_nodes": [
+    "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/test_selection.py"
+  ],
+  "skipped": [],
+  "validator_sha256": "df7b824199c86f8c708845c95aa35b24fb4032bac71e086926b823620a540af5"
+}

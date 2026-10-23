@@ -1,0 +1,150 @@
+{
+  "artifact_consistency": {
+    "SANDBOX2_issuance_count": 2,
+    "critical_pair_count": 1,
+    "final_status": "SYNTH_AUTH_PINNED_1R_COMPLETE",
+    "independent_cleanup_retained_verbatim": {
+      "counts": {
+        "BIND_SANDBOX2": 0,
+        "PINNED1A": 0,
+        "runtime-java1c": 0,
+        "runtime-sandbox2": 0
+      },
+      "exit_code": 0,
+      "observation_available": true,
+      "owner_cleanup_modified": false,
+      "read_only_command": [
+        "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.EXE",
+        "--config",
+        "C:\\Users\\Admin\\AppData\\Local\\Temp\\runtime-sandbox1-no-config-f27758259ef9cd77685c1bbcf02be67e",
+        "--host",
+        "npipe:////./pipe/dockerDesktopLinuxEngine",
+        "ps",
+        "-a",
+        "--format",
+        "{{.Names}}",
+        "--filter",
+        "name=runtime-sandbox2-",
+        "--filter",
+        "name=runtime-java1c-",
+        "--filter",
+        "name=runtime-java-pinned1a-",
+        "--filter",
+        "name=runtime-java-pinned-"
+      ],
+      "remaining_phase_container_names": [],
+      "status": "sandbox_completed",
+      "stderr_byte_count": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_byte_count": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "original_Docker_control_count": 167,
+    "owner_cleanup_retained_verbatim": {
+      "cleanup_verified": true,
+      "remaining_phase_containers": 0
+    },
+    "passed": true,
+    "problems": []
+  },
+  "artifact_sha256": {
+    "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_AUTH_PINNED_1R\\SYNTH_AUTH_PINNED_1R_REPORT.json": "76e9d2e1aef8d5a5a8acaae76da9ad5cede18c5f08b7e8b47530f95c6f19c3f2",
+    "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_AUTH_PINNED_1R\\single_attempt_reservation.json": "c92f36e1fa1d4d1b10edeb83517bffe3479b3616f92f58eeea2cb211b6ea9f77"
+  },
+  "audit_guard": {
+    "forbidden_process_attempts": 0,
+    "forbidden_socket_attempts": 0,
+    "forbidden_write_attempts": 0,
+    "guarded_report_only_test_children": 2,
+    "read_only_git_enumerations": 1
+  },
+  "full_suite_run": false,
+  "historical_identity_preservation": {
+    "changed_or_missing": [],
+    "frozen_source_bindings_checked": 359,
+    "frozen_source_drift": [],
+    "historical_file_count": 2246,
+    "live_owner_invocations": 0,
+    "original_blocked_attempt_preserved": true,
+    "passed": true,
+    "phase_id": "SYNTH.AUTH.PINNED.1R",
+    "prior_historical_baseline_integrity": [
+      {
+        "baseline_path": "docs/roadmap/phases/SYNTH_AUTH_PINNED_1/preservation_baseline.json",
+        "baseline_sha256": "064a95cadd8e31fe6ec89362447731153225d2278a7ca8ba8d9155cdb2e5c7bf",
+        "bindings_checked": 355,
+        "drift": [],
+        "passed": true
+      },
+      {
+        "baseline_path": "docs/roadmap/phases/RUNTIME_JAVA_1C_AUTH_DIAG_1/preservation_baseline.json",
+        "baseline_sha256": "3634d191c71543d564acb27f1df3a505b80358fe27d1c6b93d72549ca7b5a9f0",
+        "bindings_checked": 1828,
+        "drift": [],
+        "passed": true
+      },
+      {
+        "baseline_path": "docs/roadmap/phases/RUNTIME_SANDBOX_2_PRELADDER_DIAG_1/preservation_baseline.json",
+        "baseline_sha256": "83227b1637319ae442bef273c9e2efcefbc64ca6a2a27c3252aa0f969831aa57",
+        "bindings_checked": 2126,
+        "drift": [],
+        "passed": true
+      },
+      {
+        "baseline_path": "docs/roadmap/phases/RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1/preservation_baseline.json",
+        "baseline_sha256": "52edfb503e98ef0b5ab857ae65e6d0d245a89b0be4b441bf3f8cc6ff2f806a43",
+        "bindings_checked": 2185,
+        "drift": [],
+        "passed": true
+      }
+    ],
+    "provider_effects": 0,
+    "repository_writes": 0,
+    "source_identity_unchanged": true,
+    "unexpected_new_files_outside_retry_phase": [],
+    "verifier_unchanged": true
+  },
+  "live_owner_invocations": 0,
+  "new_live_attempts": 0,
+  "passed": true,
+  "provider_effects": 0,
+  "registry_picker_after": {
+    "collected": 299,
+    "failed": 7,
+    "failure_ids": [
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      }
+    ],
+    "passed": 292
+  },
+  "registry_picker_reports_unchanged": true,
+  "registry_picker_tests_unchanged": true,
+  "report_and_reservation_unchanged_during_post_validation": true,
+  "repository_writes": 0
+}

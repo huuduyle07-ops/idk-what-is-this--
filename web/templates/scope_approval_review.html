@@ -1,0 +1,44 @@
+<section id="scopeApprovalReview" aria-label="Structural scope review">
+  <h3>Review structural scope ceiling</h3>
+  <p id="scopeApprovalStatus">{{ scope_approval.status | replace('_', ' ') }}</p>
+  {% if scope_approval.summary %}
+  {% set summary = scope_approval.summary %}
+  <p>{{ summary.transition_summary }}</p>
+  <h4>New logical structure</h4>
+  <ul>{% for item in summary.new_logical_structure %}
+    <li>{{ item.target }} — {{ item.kind | replace('_', ' ') }}{% if item.parent %}, parent: {{ item.parent }}{% endif %}. Physical file unresolved.</li>
+  {% endfor %}</ul>
+  <h4>Required capabilities</h4>
+  <ul>{% for item in summary.required_capabilities %}
+    <li>{{ item.target }}: {{ item.requirement }} ({{ 'possibly required API support' if item.certainty == 'MAY_REQUIRE_EXISTING_API_CHANGE' else 'definitely required capability' }})</li>
+  {% endfor %}</ul>
+  <h4>Existing structure potentially affected</h4>
+  <ul>{% for item in summary.existing_structure %}
+    <li>{{ item.target }} in {{ item.file }} — {{ item.reason | replace('_', ' ') }}.
+      {{ 'Possible API modification; an approved ceiling target, not a mandatory edit.' if item.category == 'MAY_REQUIRE_EXISTING_API_CHANGE' else ('Implementation target remains deferred.' if item.category == 'DEFERRED_IMPLEMENTATION_TARGET' else 'Required structural support.') }}</li>
+  {% endfor %}</ul>
+  {% if summary.possible_api_changes %}<p>API-surface risk: this ceiling includes possible changes to existing APIs. Approval does not choose their signatures or implementation.</p>{% endif %}
+  <p>Structural blast radius: {{ summary.blast_radius | join(', ') }}.</p>
+  <h4>Implementation details still deferred</h4>
+  <ul>{% for item in summary.deferred_implementation %}
+    <li>{{ item.target }}: {{ item.decision | replace('_', ' ') }}{% if item.alternatives %} ({{ item.alternatives | join(', ') | replace('_', ' ') }}){% endif %}</li>
+  {% endfor %}</ul>
+  <p>{{ summary.approval_note }}</p>
+  <details><summary>Exact proposal identity</summary><p>{{ scope_approval.proposal_fingerprint }}</p></details>
+  {% if scope_approval.decision_available %}
+  <form id="scopeApprovalForm" action="/scope_approval/decision" method="post">
+    <input type="hidden" name="csrf_token" value="{{ cattus_csrf_token() }}">
+    <input type="hidden" name="session_id" value="{{ current.id }}">
+    <input type="hidden" name="repo_path" value="{{ current.repo_path }}">
+    <input type="hidden" name="proposal_fingerprint" value="{{ scope_approval.proposal_fingerprint }}">
+    <input type="hidden" name="review_fingerprint" value="{{ scope_approval.review_fingerprint }}">
+    <label for="scopeRevisionNote">Optional revision note (recorded only for a revision request)</label>
+    <textarea id="scopeRevisionNote" name="note" maxlength="1000" rows="2"></textarea>
+    <button type="submit" name="decision" value="approve_exact_scope_ceiling">Approve exact scope ceiling</button>
+    <button type="submit" name="decision" value="decline_scope_expansion">Decline scope expansion</button>
+    <button type="submit" name="decision" value="request_scope_revision">Request scope revision</button>
+  </form>
+  <script src="{{ url_for('static', filename='scope_approval.js') }}" defer></script>
+  {% endif %}
+  {% else %}<p>{{ scope_approval.unavailable_reason }}</p>{% endif %}
+</section>

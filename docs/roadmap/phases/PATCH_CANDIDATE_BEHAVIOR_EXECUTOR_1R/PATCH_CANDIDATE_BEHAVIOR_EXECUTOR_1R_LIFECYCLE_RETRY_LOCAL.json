@@ -1,0 +1,1099 @@
+{
+  "after_admission": {
+    "admission_fingerprint": "8357960618e5cf17750cd7e5865aa3d00b6906bdd9bd35fd09364d3656c31830",
+    "admission_id": "f3c4314b1c12f8d97a955042780a9a497992b7d761f4368ac63373017fe3920a",
+    "apply_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "constructor_reflection_authority": false,
+    "consumption_state": "issued",
+    "declared_type": "int",
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "enumeration_authority": false,
+    "field_write_authority": false,
+    "issuer_phase_id": "SYNTH.REFLECT.ADMIT.1",
+    "issuing_process_id": 24244,
+    "member": "value",
+    "observation_role": "exact_private_state_after",
+    "operation": "read_exact_bound_field",
+    "owner": "SyntheticStateBox",
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_request_fingerprint": "d8f404b4214f5f90b15b6b50e5bb9395f7cf472baa654d0e80c439118f763f5e",
+    "reflection_request_issuance_id": "8bdd89e963d86bb246ca7d07825279ccf96a2e8b90d96c81a13e5cc2a0f1f7dc",
+    "renderer_fingerprint": "f892fcdb2ac021699d811e78f2e55b7933993556791b84bc2f11ab5cd143689c",
+    "renderer_identity": "SYNTH.REFLECT.1.render_synthetic_read_only_reflection",
+    "report_only": true,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "schema_version": "synthetic_reflection_execution_admission_v1",
+    "single_execution_use": true,
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "synthetic_authorization_fingerprint": "d49b91970ed043155fdecf8770d3e44b8701e66d0a8917e783c698622779e02c",
+    "synthetic_authorization_issuance_id": "ca6adc1661329a159452160923afe8cffe9fc1e75adc604a8dc4f568fe5bee5a",
+    "synthetic_reflection_execution_authority": true
+  },
+  "after_consumption_point": null,
+  "after_lease_final_state": "ISSUED",
+  "after_lease_initial_state": "ISSUED",
+  "after_reflection_lease": {
+    "apply_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "arbitrary_command_authority": false,
+    "constructor_reflection_authority": false,
+    "declared_type": "int",
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "enumeration_authority": false,
+    "field_write_authority": false,
+    "generic_reflection_authority": false,
+    "host_mount_authority": false,
+    "initial_lifecycle_state": "ISSUED",
+    "issuer_phase_id": "SYNTH.REFLECT.LIFECYCLE.1",
+    "issuing_process_id": 24244,
+    "lease_fingerprint": "322d918e73b15c99358a5a334151921803172503824fb245551410d4e657549b",
+    "lease_id": "6fd7b2010b19a0cb543368fca9ed920807cab754edabdfc9b554dc9e5491f3fd",
+    "lifecycle_state": "ISSUED",
+    "member": "value",
+    "network_authority": false,
+    "observation_role": "exact_private_state_after",
+    "operation": "read_exact_bound_field",
+    "owner": "SyntheticStateBox",
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_admission_fingerprint": "8357960618e5cf17750cd7e5865aa3d00b6906bdd9bd35fd09364d3656c31830",
+    "reflection_admission_id": "f3c4314b1c12f8d97a955042780a9a497992b7d761f4368ac63373017fe3920a",
+    "reflection_request_fingerprint": "d8f404b4214f5f90b15b6b50e5bb9395f7cf472baa654d0e80c439118f763f5e",
+    "reflection_request_issuance_id": "8bdd89e963d86bb246ca7d07825279ccf96a2e8b90d96c81a13e5cc2a0f1f7dc",
+    "report_only": true,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "runtime_execution_lease_fingerprint": "f1fd7470b2cd4a8ec4208d990aea9f234cbe8a3f8258dc91d387a9ada03609b6",
+    "runtime_execution_lease_id": "73eb69acc7f7fd008d142e8d13d5658d43936011e7c238c05f7d49486954e0ac",
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "schema_version": "synthetic_reflection_execution_lease_v1",
+    "shell_authority": false,
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "synthetic_reflection_execution_lease": true,
+    "upstream_authorization_fingerprint": "d49b91970ed043155fdecf8770d3e44b8701e66d0a8917e783c698622779e02c",
+    "upstream_authorization_issuance_id": "ca6adc1661329a159452160923afe8cffe9fc1e75adc604a8dc4f568fe5bee5a"
+  },
+  "after_reflection_leases_consumed": 0,
+  "after_reflection_leases_issued": 1,
+  "after_request": {
+    "apply_authority": false,
+    "declared_type": "int",
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "enumeration_authority": false,
+    "execution_ready": false,
+    "field_write_authority": false,
+    "issuance_id": "8bdd89e963d86bb246ca7d07825279ccf96a2e8b90d96c81a13e5cc2a0f1f7dc",
+    "issuer_process_id": 24244,
+    "member": "value",
+    "observation_role": "exact_private_state_after",
+    "operation": "read_exact_bound_field",
+    "owner": "SyntheticStateBox",
+    "phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_execution_authority": false,
+    "reflection_request_valid": true,
+    "report_only": true,
+    "repository_write_authority": false,
+    "request_fingerprint": "d8f404b4214f5f90b15b6b50e5bb9395f7cf472baa654d0e80c439118f763f5e",
+    "runtime_authority": false,
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "schema_version": "synthetic_reflection_request_v1",
+    "source_kind": "phase_owned_synthetic_fixture",
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302"
+  },
+  "apply_actions": 0,
+  "apply_authority": false,
+  "arbitrary_class_loading_authority": false,
+  "arbitrary_command_authority": false,
+  "author_calls": 0,
+  "authority_graph_authenticated": true,
+  "bank_execution_count": 0,
+  "bank_oracle_reduced": false,
+  "before_admission": {
+    "admission_fingerprint": "bdcf206fb522aa8d64885a5d0ace93805b939a162800c6255ec9ce0951a54b81",
+    "admission_id": "8d64fd8dc5684f621e0a75224e5f81b94dc91cdd7d5d2d39e7bfb109d368dad9",
+    "apply_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "constructor_reflection_authority": false,
+    "consumption_state": "issued",
+    "declared_type": "int",
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "enumeration_authority": false,
+    "field_write_authority": false,
+    "issuer_phase_id": "SYNTH.REFLECT.ADMIT.1",
+    "issuing_process_id": 24244,
+    "member": "value",
+    "observation_role": "exact_private_state_before",
+    "operation": "read_exact_bound_field",
+    "owner": "SyntheticStateBox",
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_request_fingerprint": "dbffd8211482a3c8771b0a4cb06488962757991fa812b49855113192588a3aa1",
+    "reflection_request_issuance_id": "9ba9b98d79caa9ce119d63d22d4f4ed66f1ead5ba991b38d32372a4e22ec4e78",
+    "renderer_fingerprint": "a540a00d9e6625036970a5b58ae53ae35714a65d67f560eb262e1d49bef264a0",
+    "renderer_identity": "SYNTH.REFLECT.1.render_synthetic_read_only_reflection",
+    "report_only": true,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "schema_version": "synthetic_reflection_execution_admission_v1",
+    "single_execution_use": true,
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "synthetic_authorization_fingerprint": "d49b91970ed043155fdecf8770d3e44b8701e66d0a8917e783c698622779e02c",
+    "synthetic_authorization_issuance_id": "ca6adc1661329a159452160923afe8cffe9fc1e75adc604a8dc4f568fe5bee5a",
+    "synthetic_reflection_execution_authority": true
+  },
+  "before_consumption_point": null,
+  "before_lease_final_state": "ISSUED",
+  "before_lease_initial_state": "ISSUED",
+  "before_reflection_lease": {
+    "apply_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "arbitrary_command_authority": false,
+    "constructor_reflection_authority": false,
+    "declared_type": "int",
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "enumeration_authority": false,
+    "field_write_authority": false,
+    "generic_reflection_authority": false,
+    "host_mount_authority": false,
+    "initial_lifecycle_state": "ISSUED",
+    "issuer_phase_id": "SYNTH.REFLECT.LIFECYCLE.1",
+    "issuing_process_id": 24244,
+    "lease_fingerprint": "61f7525f15eb9f462342a87f9aa694d86071abb627e0bcd6e12891c9656a1f3a",
+    "lease_id": "0c3b7fb390ab1ed3c962896a65ea96d9675d21412d033a64cdc439c26bb94d59",
+    "lifecycle_state": "ISSUED",
+    "member": "value",
+    "network_authority": false,
+    "observation_role": "exact_private_state_before",
+    "operation": "read_exact_bound_field",
+    "owner": "SyntheticStateBox",
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_admission_fingerprint": "bdcf206fb522aa8d64885a5d0ace93805b939a162800c6255ec9ce0951a54b81",
+    "reflection_admission_id": "8d64fd8dc5684f621e0a75224e5f81b94dc91cdd7d5d2d39e7bfb109d368dad9",
+    "reflection_request_fingerprint": "dbffd8211482a3c8771b0a4cb06488962757991fa812b49855113192588a3aa1",
+    "reflection_request_issuance_id": "9ba9b98d79caa9ce119d63d22d4f4ed66f1ead5ba991b38d32372a4e22ec4e78",
+    "report_only": true,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "runtime_execution_lease_fingerprint": "f1fd7470b2cd4a8ec4208d990aea9f234cbe8a3f8258dc91d387a9ada03609b6",
+    "runtime_execution_lease_id": "73eb69acc7f7fd008d142e8d13d5658d43936011e7c238c05f7d49486954e0ac",
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "schema_version": "synthetic_reflection_execution_lease_v1",
+    "shell_authority": false,
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "synthetic_reflection_execution_lease": true,
+    "upstream_authorization_fingerprint": "d49b91970ed043155fdecf8770d3e44b8701e66d0a8917e783c698622779e02c",
+    "upstream_authorization_issuance_id": "ca6adc1661329a159452160923afe8cffe9fc1e75adc604a8dc4f568fe5bee5a"
+  },
+  "before_reflection_leases_consumed": 0,
+  "before_reflection_leases_issued": 1,
+  "before_request": {
+    "apply_authority": false,
+    "declared_type": "int",
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "enumeration_authority": false,
+    "execution_ready": false,
+    "field_write_authority": false,
+    "issuance_id": "9ba9b98d79caa9ce119d63d22d4f4ed66f1ead5ba991b38d32372a4e22ec4e78",
+    "issuer_process_id": 24244,
+    "member": "value",
+    "observation_role": "exact_private_state_before",
+    "operation": "read_exact_bound_field",
+    "owner": "SyntheticStateBox",
+    "phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_execution_authority": false,
+    "reflection_request_valid": true,
+    "report_only": true,
+    "repository_write_authority": false,
+    "request_fingerprint": "dbffd8211482a3c8771b0a4cb06488962757991fa812b49855113192588a3aa1",
+    "runtime_authority": false,
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "schema_version": "synthetic_reflection_request_v1",
+    "source_kind": "phase_owned_synthetic_fixture",
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302"
+  },
+  "child_processes": 0,
+  "class_manifest": null,
+  "cleanup_outcome": "not_required_no_runtime_resources_created",
+  "compilation_boundary": "preserve the existing infrastructure/structural compilation contract; this owner grants no compilation authority; a future executor must report any contract that classifies compilation as runtime activation before proceeding",
+  "compile_argv": null,
+  "compile_count": 0,
+  "compile_stage": null,
+  "compiler_reaped": null,
+  "console_count": 0,
+  "constructor_reflection_authority": false,
+  "controller_thread_start_attempts": 0,
+  "docker_calls": 0,
+  "effect_denial": {
+    "controller_thread_start_attempts": 0,
+    "denied_attempts": {},
+    "strict": true
+  },
+  "enumeration_authority": false,
+  "error": "Required JAVA.1 schema/policy pair has no compatible frozen SANDBOX.2 issuer",
+  "execution_completed": false,
+  "exported_json_can_recreate_authority": false,
+  "field_write_authority": false,
+  "fixture_expectation_comparison": null,
+  "fixture_expectations": {
+    "after": 7,
+    "before": 10,
+    "return": true
+  },
+  "generic_reflection_authority": false,
+  "harness_rendered": false,
+  "harness_sha256": null,
+  "historical_executor_relabelled": false,
+  "historical_preservation": {
+    "already_missing_paths": [
+      "tmp_tests_continue1_authority/test_browser_candidate_payload0/repo/reviewed.txt",
+      "tmp_tests_continue1_authority/test_exact_audit_post_executes0/repo/reviewed.txt",
+      "tmp_tests_continue1_authority/test_exact_audit_pre_latest_se0/repo/unreviewed.txt",
+      "tmp_tests_continue1_authority/test_legacy_report_requires_fr0/repo/reviewed.txt",
+      "tmp_tests_continue1_authority/test_replay_preserves_existing0/repo/reviewed.txt",
+      "tmp_tests_continue1_browser/test_browser_candidate_payload0/repo/reviewed.txt",
+      "tmp_tests_continue1_browser/test_browser_exact_a_selection0/repo/reviewed.txt",
+      "tmp_tests_continue1_browser/test_browser_review_transition4/repo/reviewed.txt"
+    ],
+    "byte_identical": 1812,
+    "changed_paths": [],
+    "historical_files_repinned": false,
+    "manifest": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_PRESERVATION.json",
+    "preexisting_files": 1812
+  },
+  "host_java_artifacts_created": 0,
+  "host_mount_authority": false,
+  "infrastructure_blocker": "RUNTIME_JAVA_1_BLOCKED_SANDBOX_INCOMPATIBLE",
+  "java1_authentication": "not_attempted_java_contract_gate_blocked",
+  "java_compatibility": "incompatible_frozen_profile_contract",
+  "java_contract_audit": {
+    "capabilities_authenticated": false,
+    "compatible_frozen_contract_found": false,
+    "conflict": "JAVA.1 binds SANDBOX.1 policy; SANDBOX.2 continuation has JAVA.1C schema",
+    "continuation_profile_matches_required_contract": false,
+    "inspection_only": true,
+    "java1_descriptor_contract": {
+      "phase_id": "RUNTIME.JAVA.1",
+      "schema_version": "runtime_java_1_v1"
+    },
+    "java1_receipt_contract": {
+      "phase_id": "RUNTIME.JAVA.1",
+      "schema_version": "runtime_java_1_v1",
+      "seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447"
+    },
+    "java1_sandbox_owner_phase_id": "RUNTIME.SANDBOX.1",
+    "java1_sandbox_owner_schema_version": "runtime_sandbox_1_v1",
+    "java1c_descriptor_contract": {
+      "phase_id": "RUNTIME.JAVA.1C",
+      "schema_version": "runtime_java_1c_v1"
+    },
+    "java1c_receipt_contract": {
+      "phase_id": "RUNTIME.JAVA.1C",
+      "schema_version": "runtime_java_1c_v1",
+      "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75"
+    },
+    "original_profile_matches_required_policy": false,
+    "owner_compatibility_predicates": [
+      "core.sandboxed_java_toolchain.java_toolchain_satisfies_executor_runtime",
+      "core.sandboxed_java_positive_continuation.java_toolchain_satisfies_executor_runtime"
+    ],
+    "profile_alias_inferred": false,
+    "required": {
+      "phase_id": "RUNTIME.JAVA.1",
+      "schema_version": "runtime_java_1_v1",
+      "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75"
+    },
+    "sandbox2_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75"
+  },
+  "jvm_execution_count": 0,
+  "jvm_reaped": null,
+  "measured_after": null,
+  "measured_before": null,
+  "measured_direct_return": null,
+  "measured_observations": null,
+  "model_calls": 0,
+  "network_authority": false,
+  "network_calls": 0,
+  "output_bound_result": "not_measured_no_runtime",
+  "phase_containers_created": 0,
+  "phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+  "positive_runtime_receipt": null,
+  "positive_runtime_receipt_fingerprint": null,
+  "positive_runtime_receipt_issued": false,
+  "preexecution_compatibility": {
+    "after": true,
+    "before": true,
+    "runtime": true
+  },
+  "private_method_authority": false,
+  "pty_count": 0,
+  "public_method_invocation_count": 0,
+  "real_behavioral_execution_count": 0,
+  "real_runtime_authorizations_consumed": 0,
+  "real_task_runtime_authority": false,
+  "reason": "java_profile_contract_mismatch",
+  "reflection_execution_count": 0,
+  "remaining_phase_containers": null,
+  "remaining_phase_containers_measurement": "not_queried_no_container_effects",
+  "report_only": true,
+  "repository_write_authority": false,
+  "repository_writes": 0,
+  "runtime_argv": null,
+  "runtime_authority": false,
+  "runtime_consumption_point": null,
+  "runtime_execution_lease": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "host_mount_authority": false,
+    "initial_lifecycle_state": "ISSUED",
+    "invocation_argument": 3,
+    "invocation_method": "decrement",
+    "invocation_owner": "SyntheticStateBox",
+    "issuer_phase_id": "SYNTH.AUTH.LIFECYCLE.1",
+    "issuing_process_id": 24244,
+    "lease_fingerprint": "f1fd7470b2cd4a8ec4208d990aea9f234cbe8a3f8258dc91d387a9ada03609b6",
+    "lease_id": "73eb69acc7f7fd008d142e8d13d5658d43936011e7c238c05f7d49486954e0ac",
+    "lifecycle_state": "ISSUED",
+    "network_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_authority": false,
+    "report_only": true,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "schema_version": "synthetic_runtime_execution_lease_v1",
+    "shell_authority": false,
+    "source_kind": "phase_owned_synthetic_fixture",
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "synthetic_runtime_execution_lease": true,
+    "upstream_authorization_fingerprint": "d49b91970ed043155fdecf8770d3e44b8701e66d0a8917e783c698622779e02c",
+    "upstream_authorization_issuance_id": "ca6adc1661329a159452160923afe8cffe9fc1e75adc604a8dc4f568fe5bee5a"
+  },
+  "runtime_execution_leases_consumed": 0,
+  "runtime_execution_leases_issued": 1,
+  "runtime_lease_final_state": "ISSUED",
+  "runtime_lease_initial_state": "ISSUED",
+  "runtime_stage": null,
+  "same_activation_proven": true,
+  "sandbox2_authentication": "not_attempted_java_contract_gate_blocked",
+  "scenario_authorization": {
+    "allowed_runtime_operations": [
+      "direct_public_invocation"
+    ],
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "authorization_fingerprint": "d49b91970ed043155fdecf8770d3e44b8701e66d0a8917e783c698622779e02c",
+    "compile_count": 0,
+    "console_authority": false,
+    "execution_completed": false,
+    "execution_ready": false,
+    "future_exact_reflection_required": true,
+    "human_approval_required": false,
+    "issuance_id": "ca6adc1661329a159452160923afe8cffe9fc1e75adc604a8dc4f568fe5bee5a",
+    "issuer_phase_id": "SYNTH.AUTH.1",
+    "issuer_process_id": 24244,
+    "java_capability_available": false,
+    "java_profile_id": "RUNTIME.JAVA.1",
+    "java_schema_version": "runtime_java_1_v1",
+    "jvm_execution_count": 0,
+    "network_authority": false,
+    "operational_real_task_source": false,
+    "purpose": "phase_owned_synthetic_diagnostic",
+    "real_human_approval": false,
+    "real_runtime_authorizations_consumed": 0,
+    "real_session_consumed": false,
+    "real_task_runtime_authority": false,
+    "real_task_source": false,
+    "reflection_authority": false,
+    "reflection_capability_available": false,
+    "reflection_execution_count": 0,
+    "report_only": true,
+    "repository_access_authority": false,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "sandbox_capability_available": false,
+    "sandbox_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "sandbox_profile_id": "runtime_sandbox_2_v1",
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "schema_version": "synthetic_runtime_authorization_v1",
+    "source_kind": "phase_owned_synthetic_fixture",
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "source_size_bytes": 239,
+    "spec_fingerprint": "5d576873a217bddaf6c55aa2a587b6c443dc0b8735d6838134b3f0decd5c14c5",
+    "status": "SYNTHETIC_RUNTIME_AUTHORIZATION_ISSUED",
+    "synthetic_runtime_authority": true,
+    "synthetic_runtime_authorizations_consumed": 0
+  },
+  "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+  "schema_version": "patch_candidate_behavior_executor_1r_lifecycle_retry_v1",
+  "shared_authorization_fingerprint": "d49b91970ed043155fdecf8770d3e44b8701e66d0a8917e783c698622779e02c",
+  "shared_authorization_issuance_id": "ca6adc1661329a159452160923afe8cffe9fc1e75adc604a8dc4f568fe5bee5a",
+  "shared_runtime_execution_lease_fingerprint": "f1fd7470b2cd4a8ec4208d990aea9f234cbe8a3f8258dc91d387a9ada03609b6",
+  "shared_runtime_execution_lease_id": "73eb69acc7f7fd008d142e8d13d5658d43936011e7c238c05f7d49486954e0ac",
+  "shell_authority": false,
+  "shell_calls": 0,
+  "source_projected": false,
+  "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+  "source_size_bytes": 239,
+  "status": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_BLOCKED_UNRESOLVED",
+  "synthetic_behavioral_execution_count": 0,
+  "synthetic_runtime_authorizations_issued": 1,
+  "timed_out": null,
+  "validation": {
+    "benchmarks": {
+      "agent_calls": 0,
+      "checked": 54,
+      "command": "python -B benchmarks/run_benchmarks.py --check --quiet",
+      "errors": 0
+    },
+    "compile": {
+      "failures": [],
+      "files": 1218,
+      "mode": "in-memory compilation of all non-ignored project Python files outside benchmark input fixtures; no bytecode emission"
+    },
+    "distinct_baseline_failure_identities": [
+      "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1 [call]",
+      "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts [call]",
+      "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts [call]",
+      "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation [call]",
+      "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets [call]",
+      "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked [call]",
+      "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call [call]",
+      "tests/test_phase_registry.py::test_seed_registry_has_expected_phases [call]",
+      "tests/test_phase_registry.py::test_seed_registry_is_conservative [call]",
+      "tests/test_phase_registry.py::test_seed_registry_summary_counts [call]",
+      "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts [call]",
+      "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+    ],
+    "focused": {
+      "after": {
+        "allowed_fixture_processes": [],
+        "argv": [
+          "--basetemp=tmp_tests",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_focused",
+          "tests/test_synthetic_reflection_execution_lifecycle.py",
+          "tests/test_synthetic_runtime_authorization_lifecycle.py",
+          "tests/test_synthetic_runtime_authorization.py",
+          "tests/test_synthetic_read_only_reflection.py",
+          "tests/test_synthetic_reflection_execution_admission.py",
+          "tests/test_patch_candidate_behavior_executor1r_retry.py",
+          "tests/test_patch_candidate_behavior_executor1r.py"
+        ],
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "passed": 801,
+        "selection": [
+          "tests/test_synthetic_reflection_execution_lifecycle.py",
+          "tests/test_synthetic_runtime_authorization_lifecycle.py",
+          "tests/test_synthetic_runtime_authorization.py",
+          "tests/test_synthetic_read_only_reflection.py",
+          "tests/test_synthetic_reflection_execution_admission.py",
+          "tests/test_patch_candidate_behavior_executor1r_retry.py",
+          "tests/test_patch_candidate_behavior_executor1r.py"
+        ]
+      },
+      "baseline": {
+        "allowed_fixture_processes": [],
+        "argv": [
+          "--basetemp=tmp_tests",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_focused",
+          "tests/test_synthetic_reflection_execution_lifecycle.py",
+          "tests/test_synthetic_runtime_authorization_lifecycle.py",
+          "tests/test_synthetic_runtime_authorization.py",
+          "tests/test_synthetic_read_only_reflection.py",
+          "tests/test_synthetic_reflection_execution_admission.py",
+          "tests/test_patch_candidate_behavior_executor1r_retry.py",
+          "tests/test_patch_candidate_behavior_executor1r.py"
+        ],
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "passed": 801,
+        "selection": [
+          "tests/test_synthetic_reflection_execution_lifecycle.py",
+          "tests/test_synthetic_runtime_authorization_lifecycle.py",
+          "tests/test_synthetic_runtime_authorization.py",
+          "tests/test_synthetic_read_only_reflection.py",
+          "tests/test_synthetic_reflection_execution_admission.py",
+          "tests/test_patch_candidate_behavior_executor1r_retry.py",
+          "tests/test_patch_candidate_behavior_executor1r.py"
+        ]
+      }
+    },
+    "full_suite_run": false,
+    "git_diff_check": {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    "historical": {
+      "after": {
+        "allowed_fixture_processes": [],
+        "argv": [
+          "--basetemp=tmp_tests",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_historical",
+          "tests/test_patch_candidate_behavior_executor1.py::test_descriptor_truthfully_declares_required_isolation_unavailable",
+          "tests/test_patch_candidate_behavior_executor1.py::test_real_BANK_without_operational_runtime_authority_is_authenticated_negative",
+          "tests/test_patch_candidate_behavior_executor1.py::test_missing_or_caller_authored_authorization_stops_before_effects",
+          "tests/test_patch_candidate_behavior_executor1.py::test_unavailable_boundary_has_no_renderer_launcher_or_runtime_receipt_issuance",
+          "tests/test_patch_candidate_behavior_executor1.py::test_entire_fixture_guard_prevents_runtime_generation_network_traversal_and_writes",
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+          "tests/test_preflight_runtime1.py::test_BANK_without_runtime_source_preserves_frozen_negative_authority",
+          "tests/test_preflight_runtime1.py::test_direct_only_capability_remains_unauthorized_until_typed_source",
+          "tests/test_preflight_runtime1.py::test_capability_descriptor_freshness_does_not_mutate_prior_authorization",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_descriptor_reconstruction_improves_only_architecture_truth",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_nonfinite_native_double_cannot_become_canonical_evidence",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_native_double_normalization_never_coerces_other_types",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_finite_double_bits_are_exact_and_deterministic",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts"
+        ],
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failed": 3,
+        "failure_identities": [
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts [call]",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts [call]",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts [call]"
+        ],
+        "passed": 23,
+        "selection": [
+          "tests/test_patch_candidate_behavior_executor1.py::test_descriptor_truthfully_declares_required_isolation_unavailable",
+          "tests/test_patch_candidate_behavior_executor1.py::test_real_BANK_without_operational_runtime_authority_is_authenticated_negative",
+          "tests/test_patch_candidate_behavior_executor1.py::test_missing_or_caller_authored_authorization_stops_before_effects",
+          "tests/test_patch_candidate_behavior_executor1.py::test_unavailable_boundary_has_no_renderer_launcher_or_runtime_receipt_issuance",
+          "tests/test_patch_candidate_behavior_executor1.py::test_entire_fixture_guard_prevents_runtime_generation_network_traversal_and_writes",
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+          "tests/test_preflight_runtime1.py::test_BANK_without_runtime_source_preserves_frozen_negative_authority",
+          "tests/test_preflight_runtime1.py::test_direct_only_capability_remains_unauthorized_until_typed_source",
+          "tests/test_preflight_runtime1.py::test_capability_descriptor_freshness_does_not_mutate_prior_authorization",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_descriptor_reconstruction_improves_only_architecture_truth",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_nonfinite_native_double_cannot_become_canonical_evidence",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_native_double_normalization_never_coerces_other_types",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_finite_double_bits_are_exact_and_deterministic",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts"
+        ]
+      },
+      "baseline": {
+        "allowed_fixture_processes": [],
+        "argv": [
+          "--basetemp=tmp_tests",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_historical",
+          "tests/test_patch_candidate_behavior_executor1.py::test_descriptor_truthfully_declares_required_isolation_unavailable",
+          "tests/test_patch_candidate_behavior_executor1.py::test_real_BANK_without_operational_runtime_authority_is_authenticated_negative",
+          "tests/test_patch_candidate_behavior_executor1.py::test_missing_or_caller_authored_authorization_stops_before_effects",
+          "tests/test_patch_candidate_behavior_executor1.py::test_unavailable_boundary_has_no_renderer_launcher_or_runtime_receipt_issuance",
+          "tests/test_patch_candidate_behavior_executor1.py::test_entire_fixture_guard_prevents_runtime_generation_network_traversal_and_writes",
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+          "tests/test_preflight_runtime1.py::test_BANK_without_runtime_source_preserves_frozen_negative_authority",
+          "tests/test_preflight_runtime1.py::test_direct_only_capability_remains_unauthorized_until_typed_source",
+          "tests/test_preflight_runtime1.py::test_capability_descriptor_freshness_does_not_mutate_prior_authorization",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_descriptor_reconstruction_improves_only_architecture_truth",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_nonfinite_native_double_cannot_become_canonical_evidence",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_native_double_normalization_never_coerces_other_types",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_finite_double_bits_are_exact_and_deterministic",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts"
+        ],
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failed": 3,
+        "failure_identities": [
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts [call]",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts [call]",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts [call]"
+        ],
+        "passed": 23,
+        "selection": [
+          "tests/test_patch_candidate_behavior_executor1.py::test_descriptor_truthfully_declares_required_isolation_unavailable",
+          "tests/test_patch_candidate_behavior_executor1.py::test_real_BANK_without_operational_runtime_authority_is_authenticated_negative",
+          "tests/test_patch_candidate_behavior_executor1.py::test_missing_or_caller_authored_authorization_stops_before_effects",
+          "tests/test_patch_candidate_behavior_executor1.py::test_unavailable_boundary_has_no_renderer_launcher_or_runtime_receipt_issuance",
+          "tests/test_patch_candidate_behavior_executor1.py::test_entire_fixture_guard_prevents_runtime_generation_network_traversal_and_writes",
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+          "tests/test_preflight_runtime1.py::test_BANK_without_runtime_source_preserves_frozen_negative_authority",
+          "tests/test_preflight_runtime1.py::test_direct_only_capability_remains_unauthorized_until_typed_source",
+          "tests/test_preflight_runtime1.py::test_capability_descriptor_freshness_does_not_mutate_prior_authorization",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_descriptor_reconstruction_improves_only_architecture_truth",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_nonfinite_native_double_cannot_become_canonical_evidence",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_native_double_normalization_never_coerces_other_types",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_finite_double_bits_are_exact_and_deterministic",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts"
+        ]
+      }
+    },
+    "infrastructure": {
+      "after": {
+        "allowed_fixture_processes": [],
+        "argv": [
+          "--basetemp=tmp_tests",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_infrastructure",
+          "tests/test_runtime_sandbox1.py",
+          "tests/test_runtime_sandbox2.py",
+          "tests/test_runtime_java1.py",
+          "tests/test_runtime_java1_discovery.py",
+          "tests/test_runtime_java1_governance.py",
+          "tests/test_runtime_java1a.py",
+          "tests/test_runtime_java1b.py",
+          "tests/test_runtime_java1c.py",
+          "-k",
+          "not test_collectors_bound_infinite_fake_streams_and_disconnect_before_backend_kill and not test_natural_completion_within_original_bound_does_not_require_cutoff_kill and not test_host_observer_joins_and_restores_original_reader_class"
+        ],
+        "denied_fixture_processes": [],
+        "deselected": 5,
+        "exit_code": 1,
+        "failed": 1,
+        "failure_identities": [
+          "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+        ],
+        "passed": 498,
+        "selection": [
+          "tests/test_runtime_sandbox1.py",
+          "tests/test_runtime_sandbox2.py",
+          "tests/test_runtime_java1.py",
+          "tests/test_runtime_java1_discovery.py",
+          "tests/test_runtime_java1_governance.py",
+          "tests/test_runtime_java1a.py",
+          "tests/test_runtime_java1b.py",
+          "tests/test_runtime_java1c.py"
+        ]
+      },
+      "baseline": {
+        "allowed_fixture_processes": [],
+        "argv": [
+          "--basetemp=tmp_tests",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_infrastructure",
+          "tests/test_runtime_sandbox1.py",
+          "tests/test_runtime_sandbox2.py",
+          "tests/test_runtime_java1.py",
+          "tests/test_runtime_java1_discovery.py",
+          "tests/test_runtime_java1_governance.py",
+          "tests/test_runtime_java1a.py",
+          "tests/test_runtime_java1b.py",
+          "tests/test_runtime_java1c.py",
+          "-k",
+          "not test_collectors_bound_infinite_fake_streams_and_disconnect_before_backend_kill and not test_natural_completion_within_original_bound_does_not_require_cutoff_kill and not test_host_observer_joins_and_restores_original_reader_class"
+        ],
+        "denied_fixture_processes": [],
+        "deselected": 5,
+        "exit_code": 1,
+        "failed": 1,
+        "failure_identities": [
+          "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+        ],
+        "passed": 498,
+        "selection": [
+          "tests/test_runtime_sandbox1.py",
+          "tests/test_runtime_sandbox2.py",
+          "tests/test_runtime_java1.py",
+          "tests/test_runtime_java1_discovery.py",
+          "tests/test_runtime_java1_governance.py",
+          "tests/test_runtime_java1a.py",
+          "tests/test_runtime_java1b.py",
+          "tests/test_runtime_java1c.py"
+        ]
+      }
+    },
+    "new_failure_identities": [],
+    "notes": [
+      "All baseline selections completed before adding the new retry files; no registry projection or historical repinning was used.",
+      "Five historical reader-thread tests are excluded using the prior frozen pure selection; actual Java fixtures and BANK execution were not run.",
+      "Strict retry denies process, network, console, filesystem writes/traversal and Thread.start; denied_attempts is empty.",
+      "Safety fixtures permit only four exact read-only Git commands and the exact current Python interpreter -m pytest command in the fixture basetemp tree. Windows fixture pipe threads are outside the strict retry.",
+      "An initial safety baseline denied those Windows pipe threads (240 passed, two failures); corrected baseline and after runs both have 241 passed and the same one pre-existing registry failure. That initial record remains in ignored scratch.",
+      "Lifecycle unit tests issue separate test-only handles and exercise terminal transitions; their operations are not operational runtime measurements.",
+      "One development import/smoke check constructed a separate effect-free graph in another process; it consumed no leases and performed no behavior. The exported strict retry itself issued exactly one authorization and one activation."
+    ],
+    "operational": {
+      "allowed_fixture_processes": [],
+      "argv": [
+        "--basetemp=tmp_tests",
+        "-q",
+        "--tb=short",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_operational",
+        "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+      ],
+      "denied_fixture_processes": [],
+      "exit_code": 0,
+      "failure_identities": [],
+      "passed": 46,
+      "selection": [
+        "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+      ]
+    },
+    "registry": {
+      "after": {
+        "allowed_fixture_processes": [],
+        "argv": [
+          "--basetemp=tmp_tests",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_registry",
+          "tests/test_phase_registry.py",
+          "tests/test_phase_picker.py",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts",
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+          "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping",
+          "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1"
+        ],
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failed": 12,
+        "failure_identities": [
+          "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1 [call]",
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts [call]",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts [call]",
+          "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation [call]",
+          "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets [call]",
+          "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked [call]",
+          "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call [call]",
+          "tests/test_phase_registry.py::test_seed_registry_has_expected_phases [call]",
+          "tests/test_phase_registry.py::test_seed_registry_is_conservative [call]",
+          "tests/test_phase_registry.py::test_seed_registry_summary_counts [call]",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts [call]",
+          "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+        ],
+        "passed": 292,
+        "selection": [
+          "tests/test_phase_registry.py",
+          "tests/test_phase_picker.py",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts",
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+          "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping",
+          "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1"
+        ]
+      },
+      "baseline": {
+        "allowed_fixture_processes": [],
+        "argv": [
+          "--basetemp=tmp_tests",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_registry",
+          "tests/test_phase_registry.py",
+          "tests/test_phase_picker.py",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts",
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+          "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping",
+          "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1"
+        ],
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failed": 12,
+        "failure_identities": [
+          "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1 [call]",
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts [call]",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts [call]",
+          "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation [call]",
+          "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets [call]",
+          "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked [call]",
+          "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call [call]",
+          "tests/test_phase_registry.py::test_seed_registry_has_expected_phases [call]",
+          "tests/test_phase_registry.py::test_seed_registry_is_conservative [call]",
+          "tests/test_phase_registry.py::test_seed_registry_summary_counts [call]",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts [call]",
+          "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+        ],
+        "passed": 292,
+        "selection": [
+          "tests/test_phase_registry.py",
+          "tests/test_phase_picker.py",
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts",
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+          "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping",
+          "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1"
+        ]
+      }
+    },
+    "safety": {
+      "after": {
+        "allowed_fixture_processes": [
+          {
+            "argv": "git rev-parse HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": "git rev-parse --abbrev-ref HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": "git status --porcelain",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": "git diff --stat HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": "C:\\Python314\\python.exe -m pytest",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": "git rev-parse HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": "git rev-parse --abbrev-ref HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": "git status --porcelain",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": "git diff --stat HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": "git rev-parse HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": "git rev-parse --abbrev-ref HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": "git status --porcelain",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": "git diff --stat HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": "git rev-parse HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": "git rev-parse --abbrev-ref HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": "git status --porcelain",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": "git diff --stat HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_automation_path_cannot_us0\\repo"
+          }
+        ],
+        "argv": [
+          "--basetemp=tmp_tests",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety",
+          "tests/test_human_apply_authorization.py",
+          "tests/test_human_authority_branch_checkpoint.py",
+          "tests/test_patch_safety.py",
+          "tests/test_patch_safety_chokepoint.py",
+          "tests/test_executor_single_file_path.py",
+          "tests/test_executor_single_file_patch_safety.py",
+          "tests/test_validation_execution_safety.py",
+          "tests/test_validation_command_safety.py",
+          "tests/test_github_pr_safety_contract.py"
+        ],
+        "denied_fixture_processes": [
+          {
+            "argv": "C:\\WINDOWS\\system32\\cmd.exe /c \"python -c \"import sys; sys.exit(1)\"\"",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\after_safety\\test_authorized_manual_attempt0"
+          }
+        ],
+        "exit_code": 1,
+        "failed": 1,
+        "failure_identities": [
+          "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1 [call]"
+        ],
+        "passed": 241,
+        "selection": [
+          "tests/test_human_apply_authorization.py",
+          "tests/test_human_authority_branch_checkpoint.py",
+          "tests/test_patch_safety.py",
+          "tests/test_patch_safety_chokepoint.py",
+          "tests/test_executor_single_file_path.py",
+          "tests/test_executor_single_file_patch_safety.py",
+          "tests/test_validation_execution_safety.py",
+          "tests/test_validation_command_safety.py",
+          "tests/test_github_pr_safety_contract.py"
+        ]
+      },
+      "baseline": {
+        "allowed_fixture_processes": [
+          {
+            "argv": "git rev-parse HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": "git rev-parse --abbrev-ref HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": "git status --porcelain",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": "git diff --stat HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": "C:\\Python314\\python.exe -m pytest",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": "git rev-parse HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": "git rev-parse --abbrev-ref HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": "git status --porcelain",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": "git diff --stat HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": "git rev-parse HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": "git rev-parse --abbrev-ref HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": "git status --porcelain",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": "git diff --stat HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": "git rev-parse HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": "git rev-parse --abbrev-ref HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": "git status --porcelain",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": "git diff --stat HEAD",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_automation_path_cannot_us0\\repo"
+          }
+        ],
+        "argv": [
+          "--basetemp=tmp_tests",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety",
+          "tests/test_human_apply_authorization.py",
+          "tests/test_human_authority_branch_checkpoint.py",
+          "tests/test_patch_safety.py",
+          "tests/test_patch_safety_chokepoint.py",
+          "tests/test_executor_single_file_path.py",
+          "tests/test_executor_single_file_patch_safety.py",
+          "tests/test_validation_execution_safety.py",
+          "tests/test_validation_command_safety.py",
+          "tests/test_github_pr_safety_contract.py"
+        ],
+        "denied_fixture_processes": [
+          {
+            "argv": "C:\\WINDOWS\\system32\\cmd.exe /c \"python -c \"import sys; sys.exit(1)\"\"",
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\executor1r_lifecycle\\baseline_safety\\test_authorized_manual_attempt0"
+          }
+        ],
+        "exit_code": 1,
+        "failed": 1,
+        "failure_identities": [
+          "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1 [call]"
+        ],
+        "passed": 241,
+        "selection": [
+          "tests/test_human_apply_authorization.py",
+          "tests/test_human_authority_branch_checkpoint.py",
+          "tests/test_patch_safety.py",
+          "tests/test_patch_safety_chokepoint.py",
+          "tests/test_executor_single_file_path.py",
+          "tests/test_executor_single_file_patch_safety.py",
+          "tests/test_validation_execution_safety.py",
+          "tests/test_validation_command_safety.py",
+          "tests/test_github_pr_safety_contract.py"
+        ]
+      }
+    },
+    "whitespace": {
+      "files": [
+        "core/behavioral_diagnostic_executor_lifecycle_retry.py",
+        "scripts/replay_patch_candidate_behavior_executor1r_lifecycle_retry.py",
+        "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py",
+        "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY.md",
+        "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_LOCAL.json",
+        "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_PRESERVATION.json"
+      ],
+      "missing_final_newlines": 0,
+      "status": "passed",
+      "trailing_whitespace": 0
+    }
+  }
+}

@@ -1,0 +1,302 @@
+{
+  "artifact_sha256": {
+    "benchmark.json": "988116bfbf18afba7191bb0ddde268ac6216f17e0e22e960629fcbba0f765b0c",
+    "contract.json": "e6e25d5ac912a07b35dffab148e8b3dc209aa124429920f374c46f7fd1386192",
+    "evidence_index.json": "ad6e44346cdb924407bd4d10d73b2558ad1fa56ed1c8ad8cf2ebcf9c367aa27d",
+    "finalize_report.py": "3a3e863f321ac4eb154ba25752559d3845e984c760e8fa72c0942bb8819b1f27",
+    "focused.json": "b357c1a8858659dde392294e2f0af6ad22fa36f7a80e1945908492ecd6182464",
+    "git_diff_check.json": "703033cf833293c1214c42eb19261a46ac98ebc9b841a74f413b869d121ab75e",
+    "preservation_after.json": "b33f01ec19083eeaf2c5d496f5eecbb1dc64814d23540bab0fbdbbe86f6f2ba1",
+    "preservation_baseline.json": "b33f01ec19083eeaf2c5d496f5eecbb1dc64814d23540bab0fbdbbe86f6f2ba1",
+    "preservation_comparison.json": "48e6839bc4d9fbc0386f439f76b248bc7ffcd6f36e7e9b4dc310439bbae0abdd",
+    "registry_after.json": "37e9bc94bdee5d90f79e11a84bb793d2a66df7f2afdb371fc23baf4107a308e1",
+    "registry_baseline.json": "11c298961ff408e30aa2872d4526e1370a338898fbb655151be255ad9bbcec86",
+    "registry_comparison.json": "135756d1ad250bcf9de2c4523085be7e5baa199b760feafee34741f8f412e7e2",
+    "static_validation.json": "8bbb3c4d4ac94d6161cc3174d19716f015b0c9224da3a33a6284c984a4b5a87a",
+    "test_contract.py": "0d2c02539b5ae3ba33589ac5cd2e2abca66ab532834fc4d0e19000b923b88241",
+    "validate_pure.py": "d69b2c7c4c9cdcae702fa7bd6ed74fd0d02d1b4dd2f595a79120e8c1da29e3e1",
+    "validation_summary.json": "bdfd6c971467f3a0eddc9703f2fe8a1076c7dade4fa09b4ecf811aee70d1d1e4",
+    "write_contract.py": "0b0b1aeba8dc846503de96dccdfb19081aae61accd71b7936e1a300f835b484b"
+  },
+  "authority_flags": {
+    "BANK_authority": false,
+    "apply_authority": false,
+    "arbitrary_class_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "arbitrary_command_authority": false,
+    "arbitrary_java_authority": false,
+    "arbitrary_method_authority": false,
+    "arbitrary_reflection_authority": false,
+    "arbitrary_source_authority": false,
+    "compilation_authority": false,
+    "constructor_reflection_authority": false,
+    "consumer_readiness_authority": false,
+    "enumeration_authority": false,
+    "exact_sandbox_materialization_authority": false,
+    "exact_scenario_compilation_authority": false,
+    "executor_authority": false,
+    "field_write_authority": false,
+    "generic_reflection_authority": false,
+    "host_mount_authority": false,
+    "network_authority": false,
+    "preparation_authority": false,
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_execution_authority": false,
+    "repository_java_authority": false,
+    "repository_source_write_authority": false,
+    "repository_write_authority": false,
+    "runtime_activation_authority": false,
+    "runtime_authority": false,
+    "sandbox_materialization_authority": false,
+    "scenario_compilation_authority": false,
+    "shell_authority": false,
+    "source_identity_authority_issued_by_this_phase": false
+  },
+  "behavioral_activation_ready": false,
+  "decision_frozen": true,
+  "harness_contract_complete": false,
+  "implementation_authorized": false,
+  "meaning": "The prior preparation proposals have been reviewed against the revised activation boundary and are now frozen preparation semantics. No owner, authority or operational effect exists.",
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR_1R": 0,
+    "JAVA1C": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "capability_consumption": 0,
+    "capability_invalidation": 0,
+    "class_loading": 0,
+    "filesystem_runtime_writes": 0,
+    "java": 0,
+    "javac": 0,
+    "pinned_auth_issuance": 0,
+    "preparation_authority_issuance": 0,
+    "provider_issuance": 0,
+    "reflection": 0,
+    "reflection_admission_issuance": 0,
+    "reflection_lease_issuance": 0,
+    "runtime_lease_issuance": 0,
+    "source_materialization": 0
+  },
+  "phase_id": "SYNTH.EXEC.PREP.PINNED.CONTRACT.CLOSE.1",
+  "preparation_contract_complete": true,
+  "proposal_review": [
+    {
+      "classification": "PURE_DERIVATION",
+      "decision": "ACCEPTED_UNCHANGED",
+      "item": 1,
+      "proposal": "in_memory_source_projection",
+      "rationale": "Exact existing authenticated bytes are projected in memory without synthesis, rewriting or a filesystem effect."
+    },
+    {
+      "classification": "PREPARATION_EFFECT",
+      "decision": "ACCEPTED_UNCHANGED",
+      "item": 2,
+      "proposal": "sandbox_materialization",
+      "rationale": "The exclusive ephemeral source write and full readback change preparation state only; all original path/workspace controls remain binding."
+    },
+    {
+      "classification": "PREPARATION_EFFECT",
+      "decision": "ACCEPTED_WITH_ADDITIVE_CLARIFICATION",
+      "item": 3,
+      "proposal": "javac_compilation",
+      "rationale": "Compiler JVM infrastructure startup is distinct from scenario JVM dispatch. Only the exact closed source/JDK/image/environment inputs are accepted; no target loading, initialization, construction or invocation, processor/plugin/dependency inputs or extra flags are permitted. Source evidence contradicting this premise stops closure."
+    },
+    {
+      "classification": "BEHAVIORAL_ACTIVATION_EFFECT",
+      "decision": "ACCEPTED_WITH_ADDITIVE_CLARIFICATION",
+      "item": 4,
+      "proposal": "JVM_startup",
+      "rationale": "This denotes dispatch of the exact scenario-executing JVM under the completed activation-boundary requirement. It is no longer a proposed requirement revision and makes no universal classification of compiler or inert infrastructure JVM startup."
+    },
+    {
+      "classification": "AFTER_ACTIVATION_BOUNDARY",
+      "decision": "ACCEPTED_UNCHANGED",
+      "item": 5,
+      "proposal": "target_loading_initialization_construction",
+      "rationale": "Target loading/linking and initialization remain behavioral activation effects; ordinary construction is a behavioral effect. All occur after scenario JVM dispatch; inert class metadata inspection never loads the class."
+    },
+    {
+      "classification": "ORDERING_INVARIANT",
+      "decision": "ACCEPTED_UNCHANGED",
+      "item": 6,
+      "proposal": "no_preparation_after_runtime_consumption",
+      "rationale": "All preparation and full harness/consumer readiness evidence precede runtime consumption. Only mandatory authenticated permission checks/commits intervene before dispatch; no materialization, compilation, artifact repair or readiness acquisition after consumption."
+    }
+  ],
+  "runtime_consumption": "PROOF_UNRESOLVED",
+  "stop": true,
+  "typed_result": "SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1_COMPLETE",
+  "validation": {
+    "all_actual_operational_effects_zero": true,
+    "audit_guards": {
+      "benchmark": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "focused": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "registry_after": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "registry_baseline": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      }
+    },
+    "baseline_failure_policy": "Disclose and preserve identical existing failed nodes and registry/picker projections; never repair prior files in this phase.",
+    "benchmark": {
+      "benchmark_cases_checked": 54,
+      "benchmark_errors": 0,
+      "exit_code": 0
+    },
+    "checks": {
+      "all_six_proposals_accepted": true,
+      "benchmark_check_passed": true,
+      "evidence_uses_current_validator": true,
+      "focused_closure_tests_passed": true,
+      "git_diff_check_passed": true,
+      "harness_and_consumer_stay_unresolved": true,
+      "historical_preservation_passed": true,
+      "implementation_not_authorized": true,
+      "in_memory_compilation_JSON_whitespace_passed": true,
+      "no_authority_or_operations": true,
+      "operational_guards_zero": true,
+      "registry_exit_codes_explained_by_existing_test_failures": true,
+      "registry_picker_baseline_unchanged": true,
+      "source_does_not_contradict_preparation": true
+    },
+    "focused": {
+      "collected": 20,
+      "failed": [],
+      "passed": 20,
+      "skipped": []
+    },
+    "full_issuance_dependent_suites_run": false,
+    "git_diff_check": {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "executed_outside_operational_guard": true,
+      "exit_code": 0,
+      "operational_command_invoked": false,
+      "source_validation_only": true
+    },
+    "historical_preservation": {
+      "added_outside_new_phase": [],
+      "after_file_count": 26759,
+      "allowed_additions_outside_phase": [],
+      "baseline_file_count": 26759,
+      "changed": [],
+      "deleted": [],
+      "historical_preservation_passed": true,
+      "scope": "entire non-cache workspace including root/config/web and frozen history"
+    },
+    "operational_owner_modules_imported": [],
+    "phase_id": "SYNTH.EXEC.PREP.PINNED.CONTRACT.CLOSE.1",
+    "registry_picker": {
+      "after_collected": 299,
+      "after_failed": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "after_passed": 292,
+      "baseline_collected": 299,
+      "baseline_failed": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "baseline_passed": 292,
+      "existing_failures_preserved": true,
+      "old_files_not_modified_to_repair_baseline": true,
+      "registry_and_picker_projections_identical": true,
+      "unchanged": true
+    },
+    "static": {
+      "compiled_count": 1347,
+      "errors": [],
+      "json_count": 14,
+      "passed": true,
+      "whitespace_errors": []
+    },
+    "typed_result": "SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1_COMPLETE",
+    "validation_passed": true,
+    "writes_scope": "new additive closure phase documentation, pure tests, validation evidence and scratch only"
+  }
+}

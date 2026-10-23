@@ -1,0 +1,24 @@
+{
+  "changed_or_missing": [],
+  "historical_file_count": 2185,
+  "passed": true,
+  "prior_historical_pin_integrity": {
+    "historical_drift_not_repinned": true,
+    "passed": true,
+    "prior_pin_sets": [
+      {
+        "changed_or_missing": [],
+        "historical_pins_checked": 1828,
+        "passed": true,
+        "prior_phase": "RUNTIME_JAVA_1C_AUTH_DIAG_1"
+      },
+      {
+        "changed_or_missing": [],
+        "historical_pins_checked": 2126,
+        "passed": true,
+        "prior_phase": "RUNTIME_SANDBOX_2_PRELADDER_DIAG_1"
+      }
+    ]
+  },
+  "unexpected_new_files_outside_phase": []
+}

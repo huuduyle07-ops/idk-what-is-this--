@@ -1,0 +1,16 @@
+{
+  "added_outside_new_phase": [],
+  "after_file_count": 2196,
+  "allowed_additions_outside_phase": [],
+  "baseline_file_count": 2196,
+  "changed": [],
+  "deleted": [],
+  "historical_preservation_passed": true,
+  "scope": [
+    "core",
+    "tests",
+    "scripts",
+    "benchmarks",
+    "docs/roadmap"
+  ]
+}

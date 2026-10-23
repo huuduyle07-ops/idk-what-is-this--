@@ -1,0 +1,27 @@
+{
+  "source": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/pure_preoperational_gates.json",
+  "source_sha256": "4e7a886e6883c9bbee2938ec55a8e044789eef8fe8d0d451a44bda3fb332ed19",
+  "added_paths": [
+    "core/candidate_runtime_sandbox.py",
+    "core/candidate_runtime_sandbox_probe.py",
+    "core/context_search_runtime.py",
+    "core/direct_context_runtime.py",
+    "core/java_runtime_compatibility.py",
+    "core/java_single_thread_capture.py",
+    "core/runtime_diagnostic_authorization.py",
+    "core/runtime_environment.py",
+    "core/sandbox_backend_binding.py",
+    "core/test_runtime_operations_branch_checkpoint.py",
+    "core/test_suite_runtime_profile_audit.py",
+    "core/thread_compatible_runtime_sandbox.py",
+    "core/thread_compatible_runtime_sandbox_probe.py"
+  ],
+  "drift": [],
+  "current_hash_confirmation_only": true,
+  "additional_preservation_binding": {
+    "path": "core/sandbox_backend_provenance.py",
+    "source": "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1C_RETRY/preservation_baseline.json",
+    "original_pin_source": "docs/roadmap/phases/RUNTIME_JAVA_REQUIREMENT_PINNED_1/preservation_baseline.json",
+    "drift": false
+  }
+}

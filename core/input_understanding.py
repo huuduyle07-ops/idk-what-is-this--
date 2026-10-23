@@ -84,6 +84,7 @@ def understand_request(
         requested_output=interpretation.requested_output,
         constraints=interpretation.constraints,
         behavioral_expectations=interpretation.behavioral_expectations,
+        design_evidence=interpretation.design_evidence,
         ambiguities=interpretation.ambiguities,
         missing_information=interpretation.missing_information,
         execution_requirements=interpretation.execution_requirements,

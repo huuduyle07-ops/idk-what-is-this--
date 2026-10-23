@@ -1,0 +1,82 @@
+{
+  "mode": "config_path_validation",
+  "exit_code": 0,
+  "collected": 13,
+  "passed": 13,
+  "skipped": 0,
+  "failures": [],
+  "suites": {
+    "tests/test_runtime_java_pinned_provider.py": {
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java_pinned_provider_retry.py": {
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "test_nodeids": [
+    "tests/test_runtime_java_pinned_provider.py::test_frozen_fresh_empty_docker_config_paths_do_not_change_backend_identity",
+    "tests/test_runtime_java_pinned_provider.py::test_existing_docker_configuration_path_cannot_replace_frozen_empty_configuration",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_random_distinct_bind_and_runtime_private_configs_accept_exact_backend",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_each_private_config_absence_failure_rejects[generation-0]",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_each_private_config_absence_failure_rejects[generation-1]",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_each_private_config_absence_failure_rejects[control-0]",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_each_private_config_absence_failure_rejects[control-1]",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_each_private_config_absence_failure_rejects[after-0]",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_each_private_config_absence_failure_rejects[after-1]",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_backend_route_or_version_difference_rejects[route]",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_backend_route_or_version_difference_rejects[version]",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_caller_config_alias_and_report_reconstruction_reject[alias]",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_caller_config_alias_and_report_reconstruction_reject[reconstruction]"
+  ],
+  "test_files": [
+    "tests/test_runtime_java_pinned_provider.py::test_frozen_fresh_empty_docker_config_paths_do_not_change_backend_identity",
+    "tests/test_runtime_java_pinned_provider.py::test_existing_docker_configuration_path_cannot_replace_frozen_empty_configuration",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_random_distinct_bind_and_runtime_private_configs_accept_exact_backend",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_each_private_config_absence_failure_rejects",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_backend_route_or_version_difference_rejects",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_caller_config_alias_and_report_reconstruction_reject"
+  ],
+  "pytest_arguments": [
+    "--basetemp=tmp_tests",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1C_RETRY\\validation_temp_config_path_validation_b314bc6298d7471796271c1943ce269c\\pytest",
+    "tests/test_runtime_java_pinned_provider.py::test_frozen_fresh_empty_docker_config_paths_do_not_change_backend_identity",
+    "tests/test_runtime_java_pinned_provider.py::test_existing_docker_configuration_path_cannot_replace_frozen_empty_configuration",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_random_distinct_bind_and_runtime_private_configs_accept_exact_backend",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_each_private_config_absence_failure_rejects",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_backend_route_or_version_difference_rejects",
+    "tests/test_runtime_java_pinned_provider_retry.py::test_caller_config_alias_and_report_reconstruction_reject"
+  ],
+  "real_effect_attempts": [],
+  "denied_attempts": {},
+  "registry_projection_plugin_used": false,
+  "validation_temporary_directory_removed": true,
+  "validation_temporary_directory": "docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1C_RETRY\\validation_temp_config_path_validation_b314bc6298d7471796271c1943ce269c",
+  "elapsed_seconds": 17.808,
+  "retry_validation": true,
+  "attempt1_artifacts_modified": false,
+  "scope": "Pure host maintenance and fabricated in-memory fixtures only. Audit hook and frozen guard deny operational processes/network before execution. Owner/control mocks validate contracts; no live Docker, Java, javac, controller, authorization, lease, executor or Apply executes. Repository reads, Python validation and new retry-owned temporary/artifact writes are maintenance. Historical registry projection is deliberately disabled so pre-existing drift remains visible.",
+  "successful_operational_effect_counts": {
+    "Docker": 0,
+    "containers": 0,
+    "exports": 0,
+    "Java": 0,
+    "javac": 0,
+    "controller": 0,
+    "network": 0,
+    "shell": 0,
+    "host mounts": 0,
+    "source projection": 0,
+    "runtime lease consumption": 0,
+    "reflection lease consumption": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0
+  }
+}

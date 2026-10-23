@@ -1,0 +1,131 @@
+{
+  "mode": "frozen_baseline",
+  "exit_code": 0,
+  "collected": 735,
+  "passed": 735,
+  "skipped": 0,
+  "failures": [],
+  "suites": {
+    "tests/test_runtime_java_requirement_pinned1.py": {
+      "passed": 64,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java_discovery_contract1.py": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java_discovery_diag1.py": {
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1.py": {
+      "passed": 91,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1_discovery.py": {
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1_governance.py": {
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java_compat1.py": {
+      "passed": 67,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1d.py": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1d_retry.py": {
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_sandbox_bind1.py": {
+      "passed": 129,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java1c.py": {
+      "passed": 89,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_synthetic_runtime_authorization.py": {
+      "passed": 117,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_patch_candidate_behavior_executor1r.py": {
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_patch_candidate_behavior_executor1r_retry.py": {
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py": {
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "test_files": [
+    "tests/test_runtime_java_requirement_pinned1.py",
+    "tests/test_runtime_java_discovery_contract1.py",
+    "tests/test_runtime_java_discovery_diag1.py",
+    "tests/test_runtime_java1.py",
+    "tests/test_runtime_java1_discovery.py",
+    "tests/test_runtime_java1_governance.py",
+    "tests/test_runtime_java_compat1.py",
+    "tests/test_runtime_java1d.py",
+    "tests/test_runtime_java1d_retry.py",
+    "tests/test_runtime_sandbox_bind1.py",
+    "tests/test_runtime_java1c.py",
+    "tests/test_synthetic_runtime_authorization.py",
+    "tests/test_patch_candidate_behavior_executor1r.py",
+    "tests/test_patch_candidate_behavior_executor1r_retry.py",
+    "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+  ],
+  "pytest_arguments": [
+    "--basetemp=tmp_tests",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_frozen_baseline_7460abec9ee34a38b163d65b4539b290\\pytest",
+    "tests/test_runtime_java_requirement_pinned1.py",
+    "tests/test_runtime_java_discovery_contract1.py",
+    "tests/test_runtime_java_discovery_diag1.py",
+    "tests/test_runtime_java1.py",
+    "tests/test_runtime_java1_discovery.py",
+    "tests/test_runtime_java1_governance.py",
+    "tests/test_runtime_java_compat1.py",
+    "tests/test_runtime_java1d.py",
+    "tests/test_runtime_java1d_retry.py",
+    "tests/test_runtime_sandbox_bind1.py",
+    "tests/test_runtime_java1c.py",
+    "tests/test_synthetic_runtime_authorization.py",
+    "tests/test_patch_candidate_behavior_executor1r.py",
+    "tests/test_patch_candidate_behavior_executor1r_retry.py",
+    "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+  ],
+  "real_effect_attempts": [
+    "socket.bind"
+  ],
+  "denied_attempts": {},
+  "registry_projection_plugin_used": false,
+  "elapsed_seconds": 37.005,
+  "scope": "Pure host maintenance and fabricated in-memory fixture evidence only; this validation harness performs no live target inspection, Docker/Java, runtime authorization, leases, executor, or apply. Root separately owns one authorized exact-target live proof after pure gates."
+}

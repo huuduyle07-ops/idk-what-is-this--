@@ -1,0 +1,73 @@
+{
+  "command": [
+    "C:\\Python314\\python.exe",
+    "-B",
+    "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation.py",
+    "worker",
+    "registry-picker-before"
+  ],
+  "exit_code": 1,
+  "passed": false,
+  "stderr_retained": "registry-picker-before.stderr.txt",
+  "stdout_retained": "registry-picker-before.stdout.txt",
+  "worker_result": {
+    "args": [
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "-o",
+      "addopts=",
+      "-o",
+      "log_file=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-log-registry-picker-before.txt",
+      "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-basetemp-registry-picker-before-30668",
+      "tests/test_phase_registry.py",
+      "tests/test_phase_picker.py"
+    ],
+    "audit_guard": {
+      "allowed_pure_domain_children": 0,
+      "forbidden_process_attempts": 0,
+      "forbidden_socket_attempts": 0,
+      "forbidden_write_attempts": 0
+    },
+    "collected_test_count": 299,
+    "controlled_fixture_owner_frames_permitted": false,
+    "exit_code": 1,
+    "failed_test_count": 7,
+    "failed_test_ids": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "live_owner_issuance": 0,
+    "passed": false,
+    "passed_test_count": 292,
+    "skipped_test_ids": [],
+    "successful_operational_effects": 0,
+    "temporary_root_confined_to_new_phase": true
+  }
+}

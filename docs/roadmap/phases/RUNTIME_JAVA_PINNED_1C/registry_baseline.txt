@@ -1,0 +1,280 @@
+...............................................F........................ [ 24%]
+.......................................F..FF............................ [ 48%]
+........................................................................ [ 72%]
+............F........................................................... [ 96%]
+.........FF                                                              [100%]
+================================== FAILURES ===================================
+___________________ test_seed_registry_has_expected_phases ____________________
+
+    def test_seed_registry_has_expected_phases():
+        data = load_phase_registry(str(_SEED_PATH))
+        ids = {p["phase_id"] for p in data["phases"]}
+        assert {
+            "ROAD.1", "ROAD.2", "ROAD.3", "ROAD.4", "AUTO.2a", "AUTO.2b", "AUTO.2c",
+            "MODEL.1", "MODEL.2", "MODEL.3", "MODEL.N1", "MODEL.N2", "MODEL.N3", "MODEL.N4", "MODEL.N5", "MODEL.N6", "MODEL.N7", "MODEL.CLOSE", "EVAL.1", "EVAL.2", "EVAL.3", "EVAL.N1", "EVAL.N2", "EVAL.N3", "EVAL.N4", "EVAL.N5", "EVAL.N6", "EVAL.N7", "EVAL.CLOSE", "HUMAN.N1", "HUMAN.N2", "HUMAN.N3", "HUMAN.N4", "HUMAN.CLOSE", "ADOPT.MODEL.1", "ADOPT.MODEL.2", "ADOPT.MODEL.CLOSE", "CMD.1", "CMD.2", "CMD.3", "CMD.4", "CMD.N1", "CMD.N2", "CMD.N3", "CMD.N4", "CMD.N5", "CMD.N6", "CMD.CLOSE",
+            "HARDEN.1", "HARDEN.2", "HARDEN.3", "HARDEN.CLOSE", "HARDEN.N1", "HARDEN.N2", "HARDEN.N3", "HARDEN.N4", "HARDEN.PROGRESS.1", "OPS.TEST.1", "OPS.TEST.2", "OPS.TEST.3", "OPS.TEST.CLOSE", "UX.RUN.1", "UX.RUN.2", "UX.RUN.3", "UX.1", "UX.2", "UX.3", "UX.4", "UX.5", "UX.6", "UX.7", "UX.8", "UX.9", "UX.10", "UX.11",
+            "UX.CLOSE", "MIRROR.1", "MIRROR.2", "MIRROR.3", "MIRROR.4", "MIRROR.5", "MIRROR.6", "MIRROR.CLOSE", "MIRROR.7", "MIRROR.8", "MIRROR.9", "MIRROR.10", "MIRROR.11", "MIRROR.12", "MIRROR.CLOSE3", "MIRROR.13",
+        } <= ids
+        assert {"UX.RUN.CLOSE", "UX.LIVE.1", "UX.LIVE.2", "UX.LIVE.3", "UX.LIVE.4", "UX.LIVE.5", "UX.LIVE.6", "UX.LIVE.7", "UX.LIVE.8", "UX.LIVE.9", "UX.LIVE.10", "UX.LIVE.CLOSE", "DOGFOOD.1A", "DOGFOOD.1B", "VERIFY.TEST.1"} <= ids
+        assert {
+            "INDEX.1D.1",
+            "INDEX.1D.2A",
+            "INDEX.1D.2B",
+            "INDEX.1D.2C",
+            "INDEX.1D.3",
+            "INDEX.1E.0",
+            "INDEX.1E.1",
+            "INDEX.1E.2",
+        } <= ids
+        assert {
+            "CTX.SELECT.1",
+            "CTX.SEARCH.1",
+            "CTX.READ.1",
+            "CTX.PATCH.1",
+            "CTX.APPLY.0",
+        } <= ids
+        assert {"INPUT.1", "INPUT.2", "INPUT.3"} <= ids
+        assert {"WAITER.1", "WAITER.2"} <= ids
+        assert {"ACQUIRE.1", "ACQUIRE.2", "ACQUIRE.3"} <= ids
+        assert {"EVIDENCE.1", "EVIDENCE.2"} <= ids
+        assert {"CLAIM.1"} <= ids
+        assert {"SYNTHESIS.1"} <= ids
+        assert {"CHECK.1", "CHECK.2"} <= ids
+        assert {
+            "WORKER.DECL.1",
+            "WORKER.DECL.2A",
+            "WORKER.DECL.2A.1",
+            "WORKER.DECL.2A.2",
+            "WORKER.DECL.2B",
+        } <= ids
+        assert "CONTROL.SAFETY.LIVE.1" in ids
+        assert "WAITER.LIVE.1" in ids
+        assert "PATCH.BASIS.LIVE.1" in ids
+        assert "OPS.PATCH.2" in ids
+        assert {
+            "RETRIEVE.LIVE.1",
+            "RETRIEVE.LIVE.2",
+            "RETRIEVE.LIVE.3",
+            "RETRIEVE.LIVE.4",
+        } <= ids
+        assert "ANSWER.GROUND.LIVE.1" in ids
+        assert "DEFECT.PROBE.LIVE.1" in ids
+        assert "VALIDATE.ORACLE.LIVE.1" in ids
+        assert "EXEC.POLICY.LIVE.1" in ids
+        assert "EXEC.APPROVAL.LIVE.1" in ids
+        assert "ANSWER.GROUND.LIVE.2" in ids
+        assert "CONTROL.LOCALIZE.LIVE.2" in ids
+        assert "REPAIR.INTENT.1" in ids
+        assert "REPAIR.INTENT.ADMIT.1" in ids
+        assert "REPAIR.INTENT.UI.1" in ids
+        assert "CTX.OOP.1A" in ids
+        assert "CTX.OOP.1C" in ids
+        assert "OOP.INTENT.UI.1" in ids
+        assert "OOP.INTENT.DESIGN.1" in ids
+        assert "OOP.INTENT.DETECT.2" in ids
+        assert "OOP.INTENT.CONTINUE.1" in ids
+        assert "PATCH.SCOPE.EXPAND.1" in ids
+        assert "PATCH.SCOPE.RECHECK.1" in ids
+        assert "PATCH.SCOPE.REFRESH.1" in ids
+>       assert len(data["phases"]) == 224
+E       AssertionError: assert 225 == 224
+E        +  where 225 = len([{'phase_id': 'ROAD.1', 'title': 'Machine-Readable Phase Registry', 'track': 'ROAD', 'status': 'complete', ...}, {'pha...ase_id': 'MODEL.1', 'title': 'C.A.T.T.U.S Artifact Dataset Builder', 'track': 'MODEL', 'status': 'complete', ...}, ...])
+
+tests\test_phase_registry.py:591: AssertionError
+_ test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call _
+
+    def test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call():
+        """It spends provider calls, and the registry says so in the only way it can.
+    
+        ``model_calls_allowed`` is the registry's vocabulary for provider traffic and
+        is legal only under the approval budget tier, so a dogfood phase must carry
+        both.  ``network_allowed`` stays false because ROAD.1 rejects true outright;
+        that flag is not this phase claiming it made no requests.
+        """
+        data = load_phase_registry(str(_SEED_PATH))
+        phases = data["phases"]
+        by_id = {phase["phase_id"]: phase for phase in phases}
+        phase = by_id["WORKER.DECL.2A.2"]
+    
+        assert phase["model_calls_allowed"] is True
+        assert phase["budget_tier"] == "strong_model_requires_approval"
+        assert phase["requires_sandbox"] is True
+        # ROAD.1 forbids raw network access for every managed phase, this one included.
+        assert phase["network_allowed"] is False
+        assert not validate_phase_registry(data)["errors"]
+    
+        # And it really is the first.  The set of phases allowed to spend provider
+        # calls is enumerated here, deliberately: a phase that wants provider
+        # traffic has to be added to this literal and to pay the approval price
+        # below, so it cannot arrive quietly.  PATCH.AUTHOR.LIVE.1 joined on
+        # 2026-09-09 with a hard cap of one verification-guided revision per run.
+        declared_model_call_phases = {
+            "WORKER.DECL.2A.2",
+            "WORKER.DECL.2B",
+            "PATCH.AUTHOR.LIVE.1",
+            # CONTROL.BOOTSTRAP.1 joined on 2026-09-18 with one bootstrap authoring call per fresh request.
+            "CONTROL.BOOTSTRAP.1",
+            # PLAN.1 exposes one already-authorized planner call and no author call.
+            "PATCH.SCOPE.PLAN.1",
+            # AUTHOR.STRUCTURAL.1 permits one injected read-only author call.
+            "PATCH.AUTHOR.STRUCTURAL.1",
+        }
+        others = [
+            item for item in phases if item["phase_id"] not in declared_model_call_phases
+        ]
+        assert all(item["model_calls_allowed"] is False for item in others)
+>       assert all(item["budget_tier"] == "local_only" for item in others)
+E       assert False
+E        +  where False = all(<generator object test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call.<locals>.<genexpr> at 0x000002660AD38860>)
+
+tests\test_phase_registry.py:2130: AssertionError
+_____________________ test_seed_registry_is_conservative ______________________
+
+    def test_seed_registry_is_conservative():
+        """No phase merges or reaches the network, and none writes speculatively.
+    
+        A phase may declare model calls, but only by paying the registry's price for
+        them: the approval budget tier, which routes it to human approval and out of
+        the safe-to-prepare bucket.  A phase cannot quietly grant itself provider
+        traffic under ``local_only``.
+    
+        ``writes_real_repo`` is the same shape of price.  It is not forbidden - a
+        live production fix such as OPS.PATCH.1 genuinely edits shipped runtime
+        code, and recording that as observation-only would make the registry lie -
+        but it is only ever true for shipped history that already went through
+        human approval and still may not merge itself.  That is the rule the
+        registry validator enforces at ``core/phase_registry.py``; this asserts the
+        seed actually obeys it, so no *proposed* or *active* phase can hold write
+        authority over the real worktree.
+        """
+        data = load_phase_registry(str(_SEED_PATH))
+        for phase in data["phases"]:
+            assert phase["automation_level"] != "AUTO_4_AUTO_MERGE"
+            assert phase["merge_allowed"] is False
+            assert phase["network_allowed"] is False
+            if phase["writes_real_repo"]:
+                assert phase["status"] == "complete", phase["phase_id"]
+                assert phase["human_approval_required"] is True, phase["phase_id"]
+                assert phase["merge_allowed"] is False, phase["phase_id"]
+            if phase["model_calls_allowed"]:
+                assert phase["budget_tier"] == "strong_model_requires_approval", (
+                    phase["phase_id"]
+                )
+                assert phase["human_approval_required"] is True, phase["phase_id"]
+            else:
+>               assert phase["budget_tier"] == "local_only", phase["phase_id"]
+E               AssertionError: RUNTIME.JAVA.1
+E               assert 'blocked' == 'local_only'
+E                 
+E                 - local_only
+E                 + blocked
+
+tests\test_phase_registry.py:2249: AssertionError
+______________________ test_seed_registry_summary_counts ______________________
+
+    def test_seed_registry_summary_counts():
+        data = load_phase_registry(str(_SEED_PATH))
+        report = summarize_phase_registry(data, report_id="r", created_at="t")
+>       assert report["counts_by_track"] == {
+            "ADOPT": 3,
+            "AUTO": 3,
+            "CMD": 11,
+            "CTX": 5,
+            "DOGFOOD": 2,
+            "VERIFY": 1,
+            "EVAL": 11,
+            "HARDEN": 16,
+            "HUMAN": 5,
+            # RETRIEVE.LIVE.* is an ID namespace inside INDEX, not a new track.
+            "INDEX": 12,
+            "ACQUIRE": 3,
+            "CLAIM": 1,
+            "EVIDENCE": 2,
+            "INPUT": 4,
+            "SYNTHESIS": 1,
+                "CHECK": 9,
+                "CONTROL": 42,
+                "WAITER": 5,
+            "WORKER": 5,
+            "MIRROR": 15,
+            "MODEL": 11,
+            "OPS": 22,
+            "ROAD": 4,
+                "UX": 31,
+        }
+E       AssertionError: assert {'ACQUIRE': 3...HECK': 9, ...} == {'ADOPT': 3, ...'CTX': 5, ...}
+E         
+E         Omitting 23 identical items, use -vv to show
+E         Differing items:
+E         {'CONTROL': 43} != {'CONTROL': 42}
+E         Use -v to get more diff
+
+tests\test_phase_registry.py:2257: AssertionError
+________________ test_seed_registry_produces_expected_buckets _________________
+
+    def test_seed_registry_produces_expected_buckets():
+        data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+        report = _report(data, report_id="r", created_at="t", registry_path=str(_SEED_PATH))
+        assert report["registry_valid"] is True
+>       assert report["bucket_counts"] == {
+            "safe_to_prepare": 3,
+            "sandbox_required": 1,
+            "human_approval_required": 0,
+            "blocked": 1,
+            "deferred_or_parked": 0,
+            "complete_or_history": 219,
+        }
+E       AssertionError: assert {'safe_to_pre...cked': 2, ...} == {'safe_to_pre...cked': 1, ...}
+E         
+E         Omitting 5 identical items, use -vv to show
+E         Differing items:
+E         {'blocked': 2} != {'blocked': 1}
+E         Use -v to get more diff
+
+tests\test_phase_picker.py:557: AssertionError
+_ test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation _
+
+    def test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation():
+        data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+        phase = {p["phase_id"]: p for p in data["phases"]}["PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1"]
+        report = _report(data, report_id="r", created_at="t")
+        assert phase["track"] == "CONTROL" and phase["status"] == "active"
+        assert phase["risk_level"] == "blocked" and phase["budget_tier"] == "local_only"
+        blocked = [p for p in report["blocked"] if p["phase_id"] == phase["phase_id"]]
+        assert len(blocked) == 1
+        assert "risk_level is blocked" in blocked[0]["reasons"]
+        assert phase["phase_id"] not in {p["phase_id"] for p in report["safe_to_prepare"]}
+        assert phase["phase_id"] not in {p["phase_id"] for p in report["complete_or_history"]}
+>       assert report["bucket_counts"]["blocked"] == 1
+E       assert 2 == 1
+
+tests\test_phase_picker.py:1634: AssertionError
+_____ test_verified_runtime_sandbox_is_history_and_executor_stays_blocked _____
+
+    def test_verified_runtime_sandbox_is_history_and_executor_stays_blocked():
+        data = json.loads(_SEED_PATH.read_text(encoding="utf-8"))
+        phase = {p["phase_id"]: p for p in data["phases"]}["RUNTIME.SANDBOX.1"]
+        report = _report(data, report_id="r", created_at="t")
+        assert report["registry_valid"] is True
+        assert phase["track"] == "CONTROL" and phase["status"] == "complete"
+        assert phase["risk_level"] == "medium" and phase["budget_tier"] == "local_only"
+        assert phase["phase_id"] in {p["phase_id"] for p in report["complete_or_history"]}
+        assert phase["phase_id"] not in {p["phase_id"] for p in report["safe_to_prepare"]}
+        assert phase["phase_id"] not in {p["phase_id"] for p in report["sandbox_required"]}
+>       assert {p["phase_id"] for p in report["blocked"]} == {"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1"}
+E       AssertionError: assert {'PATCH.CANDI...NTIME.JAVA.1'} == {'PATCH.CANDI...R.EXECUTOR.1'}
+E         
+E         Extra items in the left set:
+E         'RUNTIME.JAVA.1'
+E         Use -v to get more diff
+
+tests\test_phase_picker.py:1651: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_phase_registry.py::test_seed_registry_has_expected_phases
+FAILED tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call
+FAILED tests/test_phase_registry.py::test_seed_registry_is_conservative - Ass...
+FAILED tests/test_phase_registry.py::test_seed_registry_summary_counts - Asse...
+FAILED tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets
+FAILED tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation
+FAILED tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked
+7 failed, 292 passed in 37.00s

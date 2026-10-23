@@ -1,0 +1,25 @@
+{
+  "authored_files": [
+    "core/runtime_java_pinned_target_inspection.py",
+    "core/runtime_java_pinned_target_archive.py",
+    "scripts/replay_runtime_java_pinned1a.py",
+    "tests/test_runtime_java_pinned_target_inspection.py",
+    "tests/test_runtime_java_pinned_target_archive.py",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/benchmark_check.json",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/check_preoperational_gates.py",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/finalize_validation.py",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/frozen_after.json",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/frozen_baseline.json",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/git_diff_check.json",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/new_target_inspection.json",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/preservation_baseline.json",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/pure_preoperational_gates.json",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/README.md",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/registry_after.json",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/registry_baseline.json",
+    "docs/roadmap/phases/RUNTIME_JAVA_PINNED_1A/validate_pure_phase.py"
+  ],
+  "whitespace_issues": [],
+  "authored_whitespace_passed": true,
+  "git_diff_check_passed": true
+}

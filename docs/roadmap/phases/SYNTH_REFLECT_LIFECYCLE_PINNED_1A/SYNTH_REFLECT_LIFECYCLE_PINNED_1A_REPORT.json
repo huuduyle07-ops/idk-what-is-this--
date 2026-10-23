@@ -1,0 +1,506 @@
+{
+  "all_operational_effects_zero": true,
+  "atomicity": {
+    "cross_owner_lock_or_transaction": false,
+    "failure_preserves_previous_store": true,
+    "issue": "Construct/sign and prepare complete store; final public runtime ISSUED check; single store replacement publishes key and record",
+    "lock": "Independent owner lock, PID rejection first",
+    "race_result": "Exactly one publication or terminal commit; competing operation rejected",
+    "race_tests": [
+      "duplicate issuance",
+      "consume versus consume",
+      "invalidate versus invalidate",
+      "consume versus invalidate"
+    ],
+    "runtime_change_after_publication": "Lease remains issuance evidence; readiness and consume authenticate runtime again",
+    "transition": "Authenticate snapshot; check semantic prerequisites; sign target record; replace complete store once"
+  },
+  "authentication_domain": "CATTUS:SYNTH.REFLECT.LIFECYCLE.PINNED.1:exact-reflection-lease:v1",
+  "authority_matrix": {
+    "BANK_authority": false,
+    "apply_authority": false,
+    "arbitrary_class_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "arbitrary_command_authority": false,
+    "arbitrary_java_authority": false,
+    "arbitrary_method_authority": false,
+    "arbitrary_reflection_authority": false,
+    "arbitrary_source_authority": false,
+    "compilation_authority": false,
+    "constructor_reflection_authority": false,
+    "enumeration_authority": false,
+    "executor_authority": false,
+    "field_write_authority": false,
+    "generic_reflection_authority": false,
+    "host_mount_authority": false,
+    "network_authority": false,
+    "one_shot_exact_role_read_only_permission": "Only exact bound SyntheticStateBox.value:int / read_exact_bound_field / BEFORE or AFTER role; state and runtime rechecks required",
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "repository_java_authority": false,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "shell_authority": false
+  },
+  "behavioral_activation_ready": false,
+  "compilation_authority": false,
+  "completion_meaning": "The additive pinned reflection one-shot lifecycle owner is implemented and pure-validated. No operational reflection lease was issued or consumed and no reflection effect occurred.",
+  "downstream_dependencies": {
+    "consumer_executor_proof": "UNRESOLVED_DOWNSTREAM_DEPENDENCY",
+    "scenario_compilation_authority": "UNRESOLVED_DOWNSTREAM_DEPENDENCY",
+    "scenario_compilation_timing": "UNRESOLVED_DOWNSTREAM_DEPENDENCY",
+    "source_materialization_placement": "UNRESOLVED_DOWNSTREAM_DEPENDENCY"
+  },
+  "effect_evidence": {
+    "method_invoked_by_lifecycle": false,
+    "read_performed_by_lifecycle": false,
+    "reflection_consumption_proves_read": false,
+    "runtime_consumption_proves_invocation": false
+  },
+  "error_taxonomy": [
+    "PINNED_AUTH_UNAUTHENTICATED",
+    "PINNED_AUTH_SCOPE_MISMATCH",
+    "PINNED_PROVIDER_PROVENANCE_MISMATCH",
+    "PINNED_RUNTIME_LEASE_UNAUTHENTICATED",
+    "PINNED_RUNTIME_STATE_MISMATCH",
+    "REFLECTION_REQUEST_UNAUTHENTICATED",
+    "REFLECTION_SCOPE_MISMATCH",
+    "REFLECTION_ADMISSION_UNAUTHENTICATED",
+    "DUPLICATE_REFLECTION_ADMISSION",
+    "DUPLICATE_REFLECTION_LEASE",
+    "REFLECTION_LEASE_UNAUTHENTICATED",
+    "REFLECTION_LEASE_ALREADY_CONSUMED",
+    "REFLECTION_LEASE_INVALIDATED",
+    "REFLECTION_ROLE_MISMATCH",
+    "REFLECTION_WRONG_PROCESS",
+    "PROOF_UNRESOLVED"
+  ],
+  "exact_type": "PinnedSyntheticReflectionExecutionLease",
+  "exact_upstream_graph": [
+    {
+      "owner": "core.synthetic_reflection_execution_admission_pinned",
+      "type": "PinnedSyntheticReflectionExecutionAdmission",
+      "validator": "validate_pinned_synthetic_reflection_execution_admission"
+    },
+    {
+      "owner": "core.synthetic_read_only_reflection",
+      "type": "SyntheticReflectionRequest",
+      "validator": "validate_synthetic_reflection_request"
+    },
+    {
+      "authorization": "exact retained original",
+      "owner": "core.synthetic_runtime_authorization_pinned_lifecycle",
+      "type": "PinnedSyntheticRuntimeExecutionLease",
+      "validator": "validate_pinned_synthetic_runtime_execution_lease"
+    },
+    {
+      "owner": "core.synthetic_runtime_authorization_pinned",
+      "type": "PinnedSyntheticRuntimeAuthorization",
+      "validator": "validate_pinned_synthetic_runtime_authorization"
+    }
+  ],
+  "immutable_projection": {
+    "canonicalization": "Exact str/int/bool/null/list/string-key-dict nested types; sorted keys, compact separators, allow_nan=false, UTF-8; domain NUL role NUL canonical payload",
+    "lease_fields": [
+      "lease_id",
+      "issuing_pid",
+      "semantic_role",
+      "exact_request_observation_role",
+      "admission_owner_identity",
+      "admission_phase_id",
+      "admission_schema_version",
+      "admission_issuing_pid",
+      "admission_id",
+      "admission_fingerprint",
+      "authorization_owner_identity",
+      "authorization_phase_id",
+      "authorization_schema_version",
+      "authorization_issuing_pid",
+      "authorization_id",
+      "authorization_fingerprint",
+      "authorization_proof_context_id",
+      "runtime_owner_identity",
+      "runtime_phase_id",
+      "runtime_schema_version",
+      "runtime_issuing_pid",
+      "runtime_lease_id",
+      "runtime_lease_fingerprint",
+      "request_issuance_id",
+      "request_issuing_pid",
+      "request_fingerprint",
+      "renderer_helper_sha256",
+      "renderer_fingerprint",
+      "evidence_digest",
+      "stable_fingerprint",
+      "owner_identity",
+      "phase_id",
+      "schema_version",
+      "initial_state",
+      "runtime_state_at_issuance",
+      "scenario_phase_id",
+      "scenario_id",
+      "source_kind",
+      "source_sha256",
+      "source_size_bytes",
+      "definition_sha256",
+      "class_name",
+      "method_name",
+      "method_signature",
+      "arguments",
+      "argument_types",
+      "return_type",
+      "field_owner",
+      "field_name",
+      "field_type",
+      "operation",
+      "renderer_identity",
+      "renderer_phase",
+      "renderer_schema_version",
+      "lease_issued",
+      "exact_role_read_only_permission",
+      "one_shot_exact_role_read_only_permission",
+      "runtime_authority",
+      "real_task_runtime_authority",
+      "repository_write_authority",
+      "apply_authority",
+      "network_authority",
+      "host_mount_authority",
+      "shell_authority",
+      "arbitrary_java_authority",
+      "arbitrary_reflection_authority",
+      "arbitrary_class_authority",
+      "arbitrary_method_authority",
+      "private_method_authority",
+      "field_write_authority",
+      "enumeration_authority",
+      "executor_authority",
+      "BANK_authority",
+      "compilation_authority",
+      "constructor_reflection_authority",
+      "arbitrary_class_loading_authority",
+      "arbitrary_source_authority",
+      "repository_java_authority",
+      "arbitrary_command_authority",
+      "generic_reflection_authority",
+      "consumption_proves_reflection_read",
+      "runtime_consumption_proves_invocation",
+      "behavioral_activation_ready",
+      "behavioral_readiness_reason"
+    ],
+    "private_current_state": "Independent-secret HMAC-SHA256 over immutable issuance projection plus current state; never exported",
+    "stable_fingerprint": "Domain-framed SHA256 issuance identity; excludes mutable current reflection state"
+  },
+  "issuance_runtime_state": "ISSUED for both BEFORE and AFTER, including final check immediately before publication",
+  "old_lifecycle_source_changed": false,
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR.1R": 0,
+    "JAVA1C": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "decrement_3_invocation": 0,
+    "operational_admission_issuance": 0,
+    "operational_reflection_consume": 0,
+    "operational_reflection_invalidate": 0,
+    "operational_reflection_lease_issuance": 0,
+    "operational_reflection_request_issuance": 0,
+    "pinned_authorization_issuance": 0,
+    "pinned_runtime_lease_operational_issuance": 0,
+    "provider_issuance": 0,
+    "reflection_read": 0,
+    "repository_runtime_writes": 0,
+    "runtime_operational_consume": 0,
+    "runtime_operational_invalidate": 0
+  },
+  "operational_reflection_effect": false,
+  "operational_reflection_lease_issued": false,
+  "ordering": [
+    "all capability/authentication gates",
+    "source/harness ready",
+    "consume pinned runtime lease",
+    "consume BEFORE reflection lease",
+    "perform BEFORE exact reflection read",
+    "invoke exact public decrement(3)",
+    "consume AFTER reflection lease",
+    "perform AFTER exact reflection read"
+  ],
+  "ordering_is_execution": false,
+  "originals": {
+    "optional_supplied_inputs_identity_required": true,
+    "provider_provenance": "Inherited transitively through unchanged pinned public validators; no provider input",
+    "same_original_validator_returns_required": true,
+    "scalar_projection_is_authenticity": false,
+    "strongly_retained": true
+  },
+  "owner_identity": "core.synthetic_reflection_execution_lifecycle_pinned",
+  "owner_source_sha256": "c88d743d5820cdeb4877c4311470b745d1f8abf97a53dd4db8f93e4b1c155057",
+  "permanent_admission_key": {
+    "alternate_ID_role_request_fingerprint_keys": false,
+    "components": [
+      "authenticated admission.owner_identity",
+      "admission.phase_id",
+      "admission.schema_version",
+      "admission.issuing_pid",
+      "admission.admission_id"
+    ],
+    "derived_only_after_public_authentication": true,
+    "original_admission_retained": true,
+    "private_owner_process_store": "core.synthetic_reflection_execution_lifecycle_pinned",
+    "survives_lease_collection_and_terminal_transition": true
+  },
+  "phase_id": "SYNTH.REFLECT.LIFECYCLE.PINNED.1",
+  "pinned_admission_source_changed": false,
+  "public_APIs": [
+    {
+      "arguments": "admission, authorization, runtime, request, role",
+      "name": "issue_pinned_synthetic_reflection_execution_lease"
+    },
+    {
+      "arguments": "lease, admission=None, authorization=None, runtime=None, request=None, role=None",
+      "name": "validate_pinned_synthetic_reflection_execution_lease"
+    },
+    {
+      "arguments": "lease, admission=None, authorization=None, runtime=None, request=None, role=None",
+      "name": "pinned_synthetic_reflection_execution_lease_fingerprint"
+    },
+    {
+      "arguments": "lease, admission=None, authorization=None, runtime=None, request=None, role=None",
+      "name": "pinned_synthetic_reflection_execution_lease_state"
+    },
+    {
+      "arguments": "lease, admission=None, authorization=None, runtime=None, request=None, role=None",
+      "name": "check_pinned_synthetic_reflection_execution_lease_preexecution_readiness"
+    },
+    {
+      "arguments": "lease, admission=None, authorization=None, runtime=None, request=None, role=None",
+      "name": "check_pinned_synthetic_reflection_execution_lease_active_readiness"
+    },
+    {
+      "arguments": "lease, admission=None, authorization=None, runtime=None, request=None, role=None",
+      "name": "consume_pinned_synthetic_reflection_execution_lease"
+    },
+    {
+      "arguments": "lease, admission=None, authorization=None, runtime=None, request=None, role=None",
+      "name": "invalidate_pinned_synthetic_reflection_execution_lease"
+    }
+  ],
+  "readiness_diagnostics": "readiness_reason holds terminal/runtime mismatch category; overall reason remains PROOF_UNRESOLVED",
+  "readiness_matrix": [
+    {
+      "behavioral_activation_ready": false,
+      "local_ready": true,
+      "reason": "PROOF_UNRESOLVED",
+      "reflection": "ISSUED",
+      "reflection_active_ready": false,
+      "runtime": "ISSUED"
+    },
+    {
+      "behavioral_activation_ready": false,
+      "local_ready": false,
+      "reason": "PROOF_UNRESOLVED",
+      "reflection": "ISSUED",
+      "reflection_active_ready": true,
+      "runtime": "CONSUMED"
+    },
+    {
+      "behavioral_activation_ready": false,
+      "local_ready": false,
+      "reason": "PROOF_UNRESOLVED",
+      "reflection": "ISSUED",
+      "reflection_active_ready": false,
+      "runtime": "INVALIDATED"
+    },
+    {
+      "behavioral_activation_ready": false,
+      "local_ready": false,
+      "reason": "PROOF_UNRESOLVED",
+      "reflection": "CONSUMED",
+      "reflection_active_ready": false,
+      "runtime": "ISSUED"
+    },
+    {
+      "behavioral_activation_ready": false,
+      "local_ready": false,
+      "reason": "PROOF_UNRESOLVED",
+      "reflection": "CONSUMED",
+      "reflection_active_ready": false,
+      "runtime": "CONSUMED"
+    },
+    {
+      "behavioral_activation_ready": false,
+      "local_ready": false,
+      "reason": "PROOF_UNRESOLVED",
+      "reflection": "CONSUMED",
+      "reflection_active_ready": false,
+      "runtime": "INVALIDATED"
+    },
+    {
+      "behavioral_activation_ready": false,
+      "local_ready": false,
+      "reason": "PROOF_UNRESOLVED",
+      "reflection": "INVALIDATED",
+      "reflection_active_ready": false,
+      "runtime": "ISSUED"
+    },
+    {
+      "behavioral_activation_ready": false,
+      "local_ready": false,
+      "reason": "PROOF_UNRESOLVED",
+      "reflection": "INVALIDATED",
+      "reflection_active_ready": false,
+      "runtime": "CONSUMED"
+    },
+    {
+      "behavioral_activation_ready": false,
+      "local_ready": false,
+      "reason": "PROOF_UNRESOLVED",
+      "reflection": "INVALIDATED",
+      "reflection_active_ready": false,
+      "runtime": "INVALIDATED"
+    }
+  ],
+  "reason": "PROOF_UNRESOLVED",
+  "rejection_matrix": {
+    "consume_before_runtime_CONSUMED": "PINNED_RUNTIME_STATE_MISMATCH",
+    "copied_reconstructed_projected_or_ID_inputs": "Reject exact identity/type authentication",
+    "different_same_role_request_or_matching_runtime_auth": "Reject original graph substitution",
+    "duplicate_admission_slot_including_collected_or_terminal_lease": "DUPLICATE_REFLECTION_LEASE",
+    "provider_or_ready_boolean_input": "Not accepted by public signatures",
+    "repeat_terminal": "REFLECTION_LEASE_ALREADY_CONSUMED or REFLECTION_LEASE_INVALIDATED",
+    "runtime_CONSUMED_or_INVALIDATED_on_issue": "PINNED_RUNTIME_STATE_MISMATCH",
+    "unknown_public_validator_failure": "PROOF_UNRESOLVED",
+    "wrong_process": "REFLECTION_WRONG_PROCESS before lock",
+    "wrong_role": "REFLECTION_ROLE_MISMATCH",
+    "wrong_scenario_source_invocation_field_read": "REFLECTION_SCOPE_MISMATCH"
+  },
+  "runtime_state_authority": "Public pinned_synthetic_runtime_execution_lease_state(runtime, authorization=exact_original)",
+  "schema_version": "synthetic_reflection_execution_lease_pinned_1_v1",
+  "states": [
+    "ISSUED",
+    "CONSUMED",
+    "INVALIDATED"
+  ],
+  "status": "SYNTH_REFLECT_LIFECYCLE_PINNED_1A_COMPLETE",
+  "stop": "No source/compile resolution or live capability issuance follows this phase.",
+  "terminal_validation": "CONSUMED and INVALIDATED remain valid evidence while all exact originals authenticate; neither grants readiness",
+  "transitions": [
+    {
+      "from": "ISSUED",
+      "runtime_required": "CONSUMED",
+      "to": "CONSUMED"
+    },
+    {
+      "from": "ISSUED",
+      "runtime_required": "any authentic state",
+      "to": "INVALIDATED"
+    }
+  ],
+  "upstream_error_policy": "Known code/reason preserved as upstream_code/upstream_reason with typed category; unknown failure -> PROOF_UNRESOLVED",
+  "validation": {
+    "additional_frozen_source_AST_passed": 14,
+    "benchmark_cases_checked": 54,
+    "benchmark_errors": 0,
+    "contract_source_AST_passed": 151,
+    "frozen_source_AST_regression_passed": 14,
+    "full_suite_run": false,
+    "git_diff_check_exit": 0,
+    "historical_preservation": {
+      "baseline_file_count": 2444,
+      "basis": "Preimplementation workspace bytes, including existing untracked historical files and user edits",
+      "changed": [],
+      "deleted": [],
+      "passed": true
+    },
+    "initial_bootstrap_rejection": "Outer guard blocked an existing-directory mkdir attempted by the shared historical test guard; no write occurred. Focused guard corrected collection; initial evidence retained in isolated_bootstrap_blocked.json.",
+    "isolated": {
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "process_attempts": 0,
+        "production_validator_attempts": 0,
+        "repository_runtime_write_attempts": 0
+      },
+      "collected": 176,
+      "exit_code": 0,
+      "failed": [],
+      "passed_count": 176
+    },
+    "registry_picker": {
+      "after_collected": 299,
+      "after_failed": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "after_passed": 292,
+      "baseline_collected": 299,
+      "baseline_failed": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "baseline_passed": 292,
+      "registry_and_picker_projections_identical": true,
+      "unchanged": true
+    },
+    "stale_contract_test_deselected": {
+      "nodeid": "tests/test_synthetic_reflection_pinned_contract.py::test_contract_freezes_semantics_and_creates_no_owners_types_or_registry_entries",
+      "reason": "Historical contract-freeze assertion predates additive owners; pinned admission already exists at baseline. Frozen test and contract bytes preserved."
+    },
+    "static_passed": true
+  }
+}

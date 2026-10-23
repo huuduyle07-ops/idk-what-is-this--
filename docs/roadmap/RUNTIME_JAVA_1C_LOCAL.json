@@ -1,0 +1,1984 @@
+{
+  "abort_after_ms": 5000,
+  "all_frozen_files_byte_identical": true,
+  "apply_authority": false,
+  "arbitrary_command_authority": false,
+  "attempt_number": 2,
+  "author_calls": 0,
+  "bank_execution_count": 0,
+  "behavioral_execution_count": 0,
+  "child_and_capture_cleanup_verified": true,
+  "cleanup_verified": true,
+  "compile_count": 1,
+  "console_count": 0,
+  "container_cleanup_verified": true,
+  "controller_progress": [
+    {
+      "event": "started",
+      "pid": 7,
+      "stage": "javac"
+    },
+    {
+      "cleanup_verified": true,
+      "event": "completed",
+      "exit_code": 0,
+      "pid": 7,
+      "stage": "javac"
+    },
+    {
+      "event": "started",
+      "pid": 20,
+      "stage": "java"
+    },
+    {
+      "cleanup_verified": true,
+      "event": "completed",
+      "exit_code": 0,
+      "pid": 20,
+      "stage": "java"
+    }
+  ],
+  "controller_source_sha256": "4f81640e2f01bc1f7a1a833beb269a9d1df51088b69cf24c8369fb6683f11a58",
+  "decoded_stages": {
+    "java": {
+      "argv": [
+        "/opt/temurin-26.0.2.1/bin/java",
+        "-Xms8m",
+        "-Xmx32m",
+        "-XX:ActiveProcessorCount=1",
+        "-XX:-UsePerfData",
+        "-cp",
+        "/work/classes",
+        "JavaSandboxProbe"
+      ],
+      "capture_method": "single_thread_selector",
+      "child_boundary": {
+        "cgroup": "0::/\n",
+        "namespaces": {
+          "cgroup": "cgroup:[4026532705]",
+          "ipc": "ipc:[4026532703]",
+          "mnt": "mnt:[4026532701]",
+          "net": "net:[4026532706]",
+          "pid": "pid:[4026532704]",
+          "user": "user:[4026531837]",
+          "uts": "uts:[4026532702]"
+        }
+      },
+      "child_waited": true,
+      "cleanup_errors": [],
+      "cleanup_verified": true,
+      "controller_error": "",
+      "eof": [
+        true,
+        true
+      ],
+      "exit_code": 0,
+      "limit_bytes": 1024,
+      "overflow": false,
+      "pid": 20,
+      "pipes_closed": true,
+      "read_bytes": [
+        15,
+        0
+      ],
+      "selector_cleanup_verified": true,
+      "status": "completed",
+      "stderr": "",
+      "stderr_b64": "",
+      "stdout": "JAVA_SANDBOX_OK",
+      "stdout_b64": "SkFWQV9TQU5EQk9YX09L",
+      "threads_after": {
+        "os_threads": 1,
+        "pid": 1,
+        "python_threads": 1,
+        "thread_start_attempts": 0
+      },
+      "threads_before": {
+        "os_threads": 1,
+        "pid": 1,
+        "python_threads": 1,
+        "thread_start_attempts": 0
+      },
+      "timed_out": false
+    },
+    "javac": {
+      "argv": [
+        "/opt/temurin-26.0.2.1/bin/javac",
+        "-J-Xms8m",
+        "-J-Xmx32m",
+        "-J-XX:ActiveProcessorCount=1",
+        "-J-XX:-UsePerfData",
+        "-d",
+        "/work/classes",
+        "/work/JavaSandboxProbe.java"
+      ],
+      "capture_method": "single_thread_selector",
+      "child_boundary": {
+        "cgroup": "0::/\n",
+        "namespaces": {
+          "cgroup": "cgroup:[4026532705]",
+          "ipc": "ipc:[4026532703]",
+          "mnt": "mnt:[4026532701]",
+          "net": "net:[4026532706]",
+          "pid": "pid:[4026532704]",
+          "user": "user:[4026531837]",
+          "uts": "uts:[4026532702]"
+        }
+      },
+      "child_waited": true,
+      "cleanup_errors": [],
+      "cleanup_verified": true,
+      "controller_error": "",
+      "eof": [
+        true,
+        true
+      ],
+      "exit_code": 0,
+      "limit_bytes": 2048,
+      "overflow": false,
+      "pid": 7,
+      "pipes_closed": true,
+      "read_bytes": [
+        0,
+        0
+      ],
+      "selector_cleanup_verified": true,
+      "status": "completed",
+      "stderr": "",
+      "stderr_b64": "",
+      "stdout": "",
+      "stdout_b64": "",
+      "threads_after": {
+        "os_threads": 1,
+        "pid": 1,
+        "python_threads": 1,
+        "thread_start_attempts": 0
+      },
+      "threads_before": {
+        "os_threads": 1,
+        "pid": 1,
+        "python_threads": 1,
+        "thread_start_attempts": 0
+      },
+      "timed_out": false
+    }
+  },
+  "descriptor": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "available": true,
+    "class_output_projection_supported": true,
+    "host_mount_authority": false,
+    "java_descriptor_fingerprint": "2250667c59a57f33125e5a5cbeae05dc92b4c0d012e7b967298f8307f2be63f0",
+    "network_authority": false,
+    "phase_id": "RUNTIME.JAVA.1C",
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "sandbox_compatibility": true,
+    "sandbox_descriptor_fingerprint": "e8aa3dbccada7d8b92163a47444861ee78715fc204c4f340a393303b43701215",
+    "sandbox_receipt_fingerprint": "e7746e2b0195abc4c981c590792a5a5cac4f25a52422d1528d91a2f288a80012",
+    "schema_version": "runtime_java_1c_v1",
+    "shell_available": false,
+    "source_projection_supported": true,
+    "status": "RUNTIME_JAVA_1_COMPLETE_WITH_WARNINGS",
+    "verification_receipt_fingerprint": "fe149c271d2856728cc862355f34393a29f11a4dd070be443342e80a7d3a716c",
+    "verified": true
+  },
+  "execution_count_scope": "this_successful_verified_attempt_only",
+  "executor_refreshed_or_resumed": false,
+  "executor_run_count": 0,
+  "exported_json_is_report_only": true,
+  "facts": {
+    "class_manifest": [
+      {
+        "kind": "file",
+        "path": "classes/JavaSandboxProbe.class",
+        "sha256": "4f208c5185c89288900305283884ac0e4d71fd7088488d8a57ee50673393bd0e",
+        "size_bytes": 439
+      }
+    ],
+    "controller_after": {
+      "boundary": {
+        "cgroup": "0::/\n",
+        "namespaces": {
+          "cgroup": "cgroup:[4026532705]",
+          "ipc": "ipc:[4026532703]",
+          "mnt": "mnt:[4026532701]",
+          "net": "net:[4026532706]",
+          "pid": "pid:[4026532704]",
+          "user": "user:[4026531837]",
+          "uts": "uts:[4026532702]"
+        }
+      },
+      "capabilities_zero": true,
+      "cpu_max": "100000 100000",
+      "environment": {
+        "GPG_KEY": "",
+        "HOME": "/work",
+        "HOSTNAME": "runtime-sandbox1",
+        "LANG": "C.UTF-8",
+        "PATH": "/usr/local/bin:/usr/bin:/bin",
+        "PYTHON_SHA256": "",
+        "PYTHON_VERSION": "",
+        "SANDBOX_PUBLIC_SENTINEL": "phase-owned"
+      },
+      "gid": 65534,
+      "memory_max": "134217728",
+      "no_new_privileges": true,
+      "os_threads": 1,
+      "pid": 1,
+      "pids_max": "128",
+      "python_threads": 1,
+      "readonly_root": true,
+      "thread_start_attempts": 0,
+      "tmp_writable": true,
+      "uid": 65534,
+      "work_writable": true
+    },
+    "controller_before": {
+      "boundary": {
+        "cgroup": "0::/\n",
+        "namespaces": {
+          "cgroup": "cgroup:[4026532705]",
+          "ipc": "ipc:[4026532703]",
+          "mnt": "mnt:[4026532701]",
+          "net": "net:[4026532706]",
+          "pid": "pid:[4026532704]",
+          "user": "user:[4026531837]",
+          "uts": "uts:[4026532702]"
+        }
+      },
+      "capabilities_zero": true,
+      "cpu_max": "100000 100000",
+      "environment": {
+        "GPG_KEY": "",
+        "HOME": "/work",
+        "HOSTNAME": "runtime-sandbox1",
+        "LANG": "C.UTF-8",
+        "PATH": "/usr/local/bin:/usr/bin:/bin",
+        "PYTHON_SHA256": "",
+        "PYTHON_VERSION": "",
+        "SANDBOX_PUBLIC_SENTINEL": "phase-owned"
+      },
+      "gid": 65534,
+      "memory_max": "134217728",
+      "no_new_privileges": true,
+      "os_threads": 1,
+      "pid": 1,
+      "pids_max": "128",
+      "python_threads": 1,
+      "readonly_root": true,
+      "thread_start_attempts": 0,
+      "tmp_writable": true,
+      "uid": 65534,
+      "work_writable": true
+    },
+    "descendants_contained": true,
+    "java_binary_sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+    "javac_binary_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+    "phase_pids_after_cleanup": [
+      1
+    ],
+    "source_readback_exact": true,
+    "source_sha256": "3975c5e03edb79439d6146b7714a6d3c31af86ce42f05624cdf6c28f69b4e224",
+    "source_size_bytes": 129,
+    "stages": {
+      "java": {
+        "argv": [
+          "/opt/temurin-26.0.2.1/bin/java",
+          "-Xms8m",
+          "-Xmx32m",
+          "-XX:ActiveProcessorCount=1",
+          "-XX:-UsePerfData",
+          "-cp",
+          "/work/classes",
+          "JavaSandboxProbe"
+        ],
+        "capture_method": "single_thread_selector",
+        "child_boundary": {
+          "cgroup": "0::/\n",
+          "namespaces": {
+            "cgroup": "cgroup:[4026532705]",
+            "ipc": "ipc:[4026532703]",
+            "mnt": "mnt:[4026532701]",
+            "net": "net:[4026532706]",
+            "pid": "pid:[4026532704]",
+            "user": "user:[4026531837]",
+            "uts": "uts:[4026532702]"
+          }
+        },
+        "child_waited": true,
+        "cleanup_errors": [],
+        "cleanup_verified": true,
+        "controller_error": "",
+        "eof": [
+          true,
+          true
+        ],
+        "exit_code": 0,
+        "limit_bytes": 1024,
+        "overflow": false,
+        "pid": 20,
+        "pipes_closed": true,
+        "read_bytes": [
+          15,
+          0
+        ],
+        "selector_cleanup_verified": true,
+        "status": "completed",
+        "stderr_b64": "",
+        "stdout_b64": "SkFWQV9TQU5EQk9YX09L",
+        "threads_after": {
+          "os_threads": 1,
+          "pid": 1,
+          "python_threads": 1,
+          "thread_start_attempts": 0
+        },
+        "threads_before": {
+          "os_threads": 1,
+          "pid": 1,
+          "python_threads": 1,
+          "thread_start_attempts": 0
+        },
+        "timed_out": false
+      },
+      "javac": {
+        "argv": [
+          "/opt/temurin-26.0.2.1/bin/javac",
+          "-J-Xms8m",
+          "-J-Xmx32m",
+          "-J-XX:ActiveProcessorCount=1",
+          "-J-XX:-UsePerfData",
+          "-d",
+          "/work/classes",
+          "/work/JavaSandboxProbe.java"
+        ],
+        "capture_method": "single_thread_selector",
+        "child_boundary": {
+          "cgroup": "0::/\n",
+          "namespaces": {
+            "cgroup": "cgroup:[4026532705]",
+            "ipc": "ipc:[4026532703]",
+            "mnt": "mnt:[4026532701]",
+            "net": "net:[4026532706]",
+            "pid": "pid:[4026532704]",
+            "user": "user:[4026531837]",
+            "uts": "uts:[4026532702]"
+          }
+        },
+        "child_waited": true,
+        "cleanup_errors": [],
+        "cleanup_verified": true,
+        "controller_error": "",
+        "eof": [
+          true,
+          true
+        ],
+        "exit_code": 0,
+        "limit_bytes": 2048,
+        "overflow": false,
+        "pid": 7,
+        "pipes_closed": true,
+        "read_bytes": [
+          0,
+          0
+        ],
+        "selector_cleanup_verified": true,
+        "status": "completed",
+        "stderr_b64": "",
+        "stdout_b64": "",
+        "threads_after": {
+          "os_threads": 1,
+          "pid": 1,
+          "python_threads": 1,
+          "thread_start_attempts": 0
+        },
+        "threads_before": {
+          "os_threads": 1,
+          "pid": 1,
+          "python_threads": 1,
+          "thread_start_attempts": 0
+        },
+        "timed_out": false
+      }
+    },
+    "synthetic_java_execution_count": 1,
+    "toolchain_launch_count": 2,
+    "unexpected_output_files": [],
+    "work_after_compile": [
+      {
+        "kind": "file",
+        "path": "JavaSandboxProbe.java",
+        "sha256": "3975c5e03edb79439d6146b7714a6d3c31af86ce42f05624cdf6c28f69b4e224",
+        "size_bytes": 129
+      },
+      {
+        "kind": "directory",
+        "path": "classes"
+      },
+      {
+        "kind": "file",
+        "path": "classes/JavaSandboxProbe.class",
+        "sha256": "4f208c5185c89288900305283884ac0e4d71fd7088488d8a57ee50673393bd0e",
+        "size_bytes": 439
+      }
+    ],
+    "work_after_runtime": [
+      {
+        "kind": "file",
+        "path": "JavaSandboxProbe.java",
+        "sha256": "3975c5e03edb79439d6146b7714a6d3c31af86ce42f05624cdf6c28f69b4e224",
+        "size_bytes": 129
+      },
+      {
+        "kind": "directory",
+        "path": "classes"
+      },
+      {
+        "kind": "file",
+        "path": "classes/JavaSandboxProbe.class",
+        "sha256": "4f208c5185c89288900305283884ac0e4d71fd7088488d8a57ee50673393bd0e",
+        "size_bytes": 439
+      }
+    ],
+    "work_before": []
+  },
+  "frozen_file_preservation": {
+    "core/behavioral_diagnostic_executor.py": {
+      "after_sha256": "f9e071b040979431fabfee98d93883a3cd4f9f0460c77bd0994f539efb3a7272",
+      "before_sha256": "f9e071b040979431fabfee98d93883a3cd4f9f0460c77bd0994f539efb3a7272"
+    },
+    "core/candidate_runtime_sandbox.py": {
+      "after_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "before_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913"
+    },
+    "core/candidate_runtime_sandbox_probe.py": {
+      "after_sha256": "aa090e85f34a75c429fc98a20b562e6ebc2b7261d400b08fd7758da4994f4b6c",
+      "before_sha256": "aa090e85f34a75c429fc98a20b562e6ebc2b7261d400b08fd7758da4994f4b6c"
+    },
+    "core/candidate_sandbox_validation.py": {
+      "after_sha256": "73d7a3d3de4b2e666b5ac486f693883ff247c99da4e0dd577e051e2a203bf626",
+      "before_sha256": "73d7a3d3de4b2e666b5ac486f693883ff247c99da4e0dd577e051e2a203bf626"
+    },
+    "core/java_class_semantic_context.py": {
+      "after_sha256": "c6c5cbfce5cd00e11d6077cd6e43eef096a5333d7103021cf7910cef3d5b770d",
+      "before_sha256": "c6c5cbfce5cd00e11d6077cd6e43eef096a5333d7103021cf7910cef3d5b770d"
+    },
+    "core/java_repair_intent_ambiguity.py": {
+      "after_sha256": "c9f66ce908099e37cbbee87d714b348d451fb428ae378fb05c3576108e331da7",
+      "before_sha256": "c9f66ce908099e37cbbee87d714b348d451fb428ae378fb05c3576108e331da7"
+    },
+    "core/java_single_thread_capture.py": {
+      "after_sha256": "4ac691b2919b3e778a98c044fb166fd9804b102cdd651995eb8689839ac438fb",
+      "before_sha256": "4ac691b2919b3e778a98c044fb166fd9804b102cdd651995eb8689839ac438fb"
+    },
+    "core/phase_registry.py": {
+      "after_sha256": "c79dff3b6f311de61ec001ecbe5c22f2d340a8d75afaab1d50effaf03e0bcd60",
+      "before_sha256": "c79dff3b6f311de61ec001ecbe5c22f2d340a8d75afaab1d50effaf03e0bcd60"
+    },
+    "core/project_evolution_sandbox_validation.py": {
+      "after_sha256": "1b8906a202f1b3de9434ec00ff1341175ee3226744d4050d2aa203c66a9e0a69",
+      "before_sha256": "1b8906a202f1b3de9434ec00ff1341175ee3226744d4050d2aa203c66a9e0a69"
+    },
+    "core/read_only_reflection_java.py": {
+      "after_sha256": "8f86fb70fe0afd8185064f6a6b7a07274aa74fef12b4750c1d372cce5003db8e",
+      "before_sha256": "8f86fb70fe0afd8185064f6a6b7a07274aa74fef12b4750c1d372cce5003db8e"
+    },
+    "core/runtime_diagnostic_authorization.py": {
+      "after_sha256": "cb9c0ed3cf9ae7cadd10d2de9fb6170a991ae75b8f2ea9da643262aaf80ea085",
+      "before_sha256": "cb9c0ed3cf9ae7cadd10d2de9fb6170a991ae75b8f2ea9da643262aaf80ea085"
+    },
+    "core/runtime_java_controller_diagnostic.py": {
+      "after_sha256": "6cdb16c2bb24b565bd8caa52555d85bf956402823ba73a3bc9f62942e86d3099",
+      "before_sha256": "6cdb16c2bb24b565bd8caa52555d85bf956402823ba73a3bc9f62942e86d3099"
+    },
+    "core/runtime_java_controller_diagnostic_probe.py": {
+      "after_sha256": "c931f9bce83ca2ea4df4a1c974ade833c513d9de14bc46ceae1b4f149302c538",
+      "before_sha256": "c931f9bce83ca2ea4df4a1c974ade833c513d9de14bc46ceae1b4f149302c538"
+    },
+    "core/sandbox_patch_candidate_evaluation.py": {
+      "after_sha256": "efc67be281fba12642cc685d0c32ec3a92b657b01444113653ebd0fc2b0e9990",
+      "before_sha256": "efc67be281fba12642cc685d0c32ec3a92b657b01444113653ebd0fc2b0e9990"
+    },
+    "core/sandbox_patch_graduation_review.py": {
+      "after_sha256": "5cb4aa13cdd70c3e87c3bc9ea4b1f1e02cf202e6b45c6a7143e91f27050abf69",
+      "before_sha256": "5cb4aa13cdd70c3e87c3bc9ea4b1f1e02cf202e6b45c6a7143e91f27050abf69"
+    },
+    "core/sandbox_runner.py": {
+      "after_sha256": "57406be34443f7e6b029b189e9906a91c161e64fec37ec73b0050bd4869ba40b",
+      "before_sha256": "57406be34443f7e6b029b189e9906a91c161e64fec37ec73b0050bd4869ba40b"
+    },
+    "core/sandbox_self_evolution_runner.py": {
+      "after_sha256": "127211ffad23bd79c2ba76506eb75eb8bf31591adb73f0d6c913a704bc7ddf6b",
+      "before_sha256": "127211ffad23bd79c2ba76506eb75eb8bf31591adb73f0d6c913a704bc7ddf6b"
+    },
+    "core/sandbox_self_evolution_trial.py": {
+      "after_sha256": "6434221551b4146ba2df72d2ba8838d08c7db223148b511953cdbc3ddcc4d8c2",
+      "before_sha256": "6434221551b4146ba2df72d2ba8838d08c7db223148b511953cdbc3ddcc4d8c2"
+    },
+    "core/sandboxed_java_capture_recovery.py": {
+      "after_sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861",
+      "before_sha256": "4eb248c80c357966018604f208f766120a845935574aba52d9be52e55b6ae861"
+    },
+    "core/sandboxed_java_single_thread_probe.py": {
+      "after_sha256": "7bb2bceac444c80f6b2c75b335731d61b73dfff58b1b0ca72ac85f027e635716",
+      "before_sha256": "7bb2bceac444c80f6b2c75b335731d61b73dfff58b1b0ca72ac85f027e635716"
+    },
+    "core/sandboxed_java_toolchain.py": {
+      "after_sha256": "ed96e56a875535d4cafaa107721ee6eafd5c0c1b0f8d14f59f4ad728f00288c9",
+      "before_sha256": "ed96e56a875535d4cafaa107721ee6eafd5c0c1b0f8d14f59f4ad728f00288c9"
+    },
+    "core/sandboxed_java_toolchain_discovery.py": {
+      "after_sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff",
+      "before_sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff"
+    },
+    "core/sandboxed_java_toolchain_probe.py": {
+      "after_sha256": "58e791ed6ac7c99a41386345ce8d392ca74cb8f574a8207fe1c85afa335ec606",
+      "before_sha256": "58e791ed6ac7c99a41386345ce8d392ca74cb8f574a8207fe1c85afa335ec606"
+    },
+    "core/structural_java.py": {
+      "after_sha256": "cb581669c07138550eeb451d1f879762e3cf06c49b0791a6505e92e1542071fd",
+      "before_sha256": "cb581669c07138550eeb451d1f879762e3cf06c49b0791a6505e92e1542071fd"
+    },
+    "core/thread_compatible_runtime_sandbox.py": {
+      "after_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "before_sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45"
+    },
+    "core/thread_compatible_runtime_sandbox_probe.py": {
+      "after_sha256": "be45d3a0106186d84a0464234f701140df6e90e99107477af358886cf5568075",
+      "before_sha256": "be45d3a0106186d84a0464234f701140df6e90e99107477af358886cf5568075"
+    },
+    "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json": {
+      "after_sha256": "b56e2d883b08b7dc0040a69d851c9158e232869f07cfc4740e2ccc5b981a28b3",
+      "before_sha256": "b56e2d883b08b7dc0040a69d851c9158e232869f07cfc4740e2ccc5b981a28b3"
+    },
+    "docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json": {
+      "after_sha256": "1bda26a4fc288cf35d8d73f203af7819423f681dfd0ba7dee4b53b4587f61124",
+      "before_sha256": "1bda26a4fc288cf35d8d73f203af7819423f681dfd0ba7dee4b53b4587f61124"
+    },
+    "docs/roadmap/RUNTIME_JAVA_1.md": {
+      "after_sha256": "1ac641eaf21aeff69adc0dda3781a05e909bd1a05e8a0180d8c100b942a4c93c",
+      "before_sha256": "1ac641eaf21aeff69adc0dda3781a05e909bd1a05e8a0180d8c100b942a4c93c"
+    },
+    "docs/roadmap/RUNTIME_JAVA_1A.md": {
+      "after_sha256": "7e26653896b37bbadeba9675429697fbfa6326391054f0e539c5097c938359c0",
+      "before_sha256": "7e26653896b37bbadeba9675429697fbfa6326391054f0e539c5097c938359c0"
+    },
+    "docs/roadmap/RUNTIME_JAVA_1A_LOCAL.json": {
+      "after_sha256": "09f64408b71a8f0eebf161a2b312ae68c93f8d993cd5b1c2d400e6815520044b",
+      "before_sha256": "09f64408b71a8f0eebf161a2b312ae68c93f8d993cd5b1c2d400e6815520044b"
+    },
+    "docs/roadmap/RUNTIME_JAVA_1B.md": {
+      "after_sha256": "5f789b7a036066b0023bb3dc4ede723bef3ccd526819646787c7701a2ade1429",
+      "before_sha256": "5f789b7a036066b0023bb3dc4ede723bef3ccd526819646787c7701a2ade1429"
+    },
+    "docs/roadmap/RUNTIME_JAVA_1B_LOCAL.json": {
+      "after_sha256": "ffa611d74d91ed685ea690f1be4d1bd785c8ee66aebb7ff3c79488fcf83a9925",
+      "before_sha256": "ffa611d74d91ed685ea690f1be4d1bd785c8ee66aebb7ff3c79488fcf83a9925"
+    },
+    "docs/roadmap/RUNTIME_JAVA_1_LOCAL.json": {
+      "after_sha256": "bf73f4b738e3fd094b0034db2bd3cc00342f3c451a4d77760fa00947c48b7ede",
+      "before_sha256": "bf73f4b738e3fd094b0034db2bd3cc00342f3c451a4d77760fa00947c48b7ede"
+    },
+    "docs/roadmap/RUNTIME_SANDBOX_1.md": {
+      "after_sha256": "609f39639fa2cd99b691a4635123a466e1325d4aa18cb0026f166eb77d8d3068",
+      "before_sha256": "609f39639fa2cd99b691a4635123a466e1325d4aa18cb0026f166eb77d8d3068"
+    },
+    "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json": {
+      "after_sha256": "9ff682d3459795cc0ccbd712dad8485288238b20ccfa5cde22334d5ca907bb7f",
+      "before_sha256": "9ff682d3459795cc0ccbd712dad8485288238b20ccfa5cde22334d5ca907bb7f"
+    },
+    "docs/roadmap/RUNTIME_SANDBOX_2.md": {
+      "after_sha256": "ee32a7e0456fd76e574918ea97a07929e63423e521766f699d010ecf27fe1609",
+      "before_sha256": "ee32a7e0456fd76e574918ea97a07929e63423e521766f699d010ecf27fe1609"
+    },
+    "docs/roadmap/RUNTIME_SANDBOX_2_LOCAL.json": {
+      "after_sha256": "eb858a574bfa781b4a6537d720847a58d622e403e0e28e9f9a3def05284c8394",
+      "before_sha256": "eb858a574bfa781b4a6537d720847a58d622e403e0e28e9f9a3def05284c8394"
+    },
+    "docs/roadmap/RUNTIME_SANDBOX_2_SECCOMP.json": {
+      "after_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "before_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75"
+    },
+    "docs/roadmap/phase_registry.json": {
+      "after_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+      "before_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c"
+    },
+    "scripts/replay_runtime_java1.py": {
+      "after_sha256": "d3f66af04eb582b8ea1276b270174482d69b6c4084d1e3c774af61b87f7764e6",
+      "before_sha256": "d3f66af04eb582b8ea1276b270174482d69b6c4084d1e3c774af61b87f7764e6"
+    },
+    "scripts/replay_runtime_java1a.py": {
+      "after_sha256": "553f9a30f38ba8d8831b3e8266d9195af1f11b977d1ffd616bb591ed7f776322",
+      "before_sha256": "553f9a30f38ba8d8831b3e8266d9195af1f11b977d1ffd616bb591ed7f776322"
+    },
+    "scripts/replay_runtime_java1b.py": {
+      "after_sha256": "ae11ec3ea431e1cb7a8acedbe9ea78127fbf8cce15168f563d0179718d3a3491",
+      "before_sha256": "ae11ec3ea431e1cb7a8acedbe9ea78127fbf8cce15168f563d0179718d3a3491"
+    },
+    "scripts/replay_runtime_sandbox1.py": {
+      "after_sha256": "97f4545e3701c1dbe1c2fa6a22525590b05be0822d1a7bad3e74ecd125563c36",
+      "before_sha256": "97f4545e3701c1dbe1c2fa6a22525590b05be0822d1a7bad3e74ecd125563c36"
+    },
+    "scripts/replay_runtime_sandbox2.py": {
+      "after_sha256": "757edc9b1e57db62915d51701433c8d9308ce645d963a7b95b2d338a71c325f7",
+      "before_sha256": "757edc9b1e57db62915d51701433c8d9308ce645d963a7b95b2d338a71c325f7"
+    },
+    "tests/_preflight_runtime1_guard.py": {
+      "after_sha256": "79133d2859312df711a6426d6d09c7a7108237c22e9026752c29a24cdfb72f44",
+      "before_sha256": "79133d2859312df711a6426d6d09c7a7108237c22e9026752c29a24cdfb72f44"
+    },
+    "tests/_preflight_runtime1_maintenance.py": {
+      "after_sha256": "cda8ca00d7579080ea2f400c7470b20eee6871b508a6800b134eb401b34691bd",
+      "before_sha256": "cda8ca00d7579080ea2f400c7470b20eee6871b508a6800b134eb401b34691bd"
+    },
+    "tests/_runtime_java1_frozen_regressions.py": {
+      "after_sha256": "ef4a5808bbba60ffc1b499b23fc20a373ca6544c6e6f5bca3658979818f45263",
+      "before_sha256": "ef4a5808bbba60ffc1b499b23fc20a373ca6544c6e6f5bca3658979818f45263"
+    },
+    "tests/_runtime_java1_maintenance.py": {
+      "after_sha256": "fe10b42d3be22d3e60d9f102ec07a1e169f6c781913d425ab4a67fd0cc6443c5",
+      "before_sha256": "fe10b42d3be22d3e60d9f102ec07a1e169f6c781913d425ab4a67fd0cc6443c5"
+    },
+    "tests/_runtime_sandbox1_maintenance.py": {
+      "after_sha256": "41e36924002812cd4a652f59f062ed51467f7f03b623968b14751db6d4d0fba7",
+      "before_sha256": "41e36924002812cd4a652f59f062ed51467f7f03b623968b14751db6d4d0fba7"
+    },
+    "tests/fixtures/2026-09-10-harness-remediation-reversal.json": {
+      "after_sha256": "dc9da134dcfedec5d352d6d0a48d172f04b90133447f8b3dffd40153cf9dc34d",
+      "before_sha256": "dc9da134dcfedec5d352d6d0a48d172f04b90133447f8b3dffd40153cf9dc34d"
+    },
+    "tests/fixtures/answer_coherence_live1_reversal.json": {
+      "after_sha256": "be529151b36babe61d4a0cbe42cb604f2440860aa598bb83b7c7570da9a7e9fb",
+      "before_sha256": "be529151b36babe61d4a0cbe42cb604f2440860aa598bb83b7c7570da9a7e9fb"
+    },
+    "tests/fixtures/auth_dream1_reversal.json": {
+      "after_sha256": "cc3aa6e964226bf5d340cb0b2226eae8234a5260c354acbf0d4c01832111af99",
+      "before_sha256": "cc3aa6e964226bf5d340cb0b2226eae8234a5260c354acbf0d4c01832111af99"
+    },
+    "tests/fixtures/auth_web1_reversal.json": {
+      "after_sha256": "47fdde7a65648affd735a4e91d275ef91552522261d1abc13c1a7ffc840ab17f",
+      "before_sha256": "47fdde7a65648affd735a4e91d275ef91552522261d1abc13c1a7ffc840ab17f"
+    },
+    "tests/fixtures/auth_web_read1_reversal.json": {
+      "after_sha256": "b767cb5cb294a32721474d0eb79a233b0307bc7c7f49359a77e746922e5825a2",
+      "before_sha256": "b767cb5cb294a32721474d0eb79a233b0307bc7c7f49359a77e746922e5825a2"
+    },
+    "tests/fixtures/control_bootstrap1_reversal.json": {
+      "after_sha256": "de6056655057546e7965763c607ff526ea6c4adf01ffead501633320ada86bcb",
+      "before_sha256": "de6056655057546e7965763c607ff526ea6c4adf01ffead501633320ada86bcb"
+    },
+    "tests/fixtures/control_fresh1_reversal.json": {
+      "after_sha256": "2e1b1814a51cdb28756685383a2a7ac89971b161c3a43d1b211734ef132e9870",
+      "before_sha256": "2e1b1814a51cdb28756685383a2a7ac89971b161c3a43d1b211734ef132e9870"
+    },
+    "tests/fixtures/data_rollback1_reversal.json": {
+      "after_sha256": "5e3fba30858a2ca1da0d8ca479e3b547c691454ddcdc4b03a161fd79b6e6513b",
+      "before_sha256": "5e3fba30858a2ca1da0d8ca479e3b547c691454ddcdc4b03a161fd79b6e6513b"
+    },
+    "tests/fixtures/data_undo1_reversal.json": {
+      "after_sha256": "d3fab768ad79fd2c6d2bb19973fe904324e867ca71ccfc45ce9ebaec1430f4bb",
+      "before_sha256": "d3fab768ad79fd2c6d2bb19973fe904324e867ca71ccfc45ce9ebaec1430f4bb"
+    },
+    "tests/fixtures/exec_plan1_reversal.json": {
+      "after_sha256": "b6688a08ca51018d73e7342884bacfa1b39b231e21057bdcda7aac614e315549",
+      "before_sha256": "b6688a08ca51018d73e7342884bacfa1b39b231e21057bdcda7aac614e315549"
+    },
+    "tests/fixtures/indent_runtime1_reversal.json": {
+      "after_sha256": "3836212cd444d10ea8408eab4376e22f07895c4ffebee6cb17c5f5d4b60e53df",
+      "before_sha256": "3836212cd444d10ea8408eab4376e22f07895c4ffebee6cb17c5f5d4b60e53df"
+    },
+    "tests/fixtures/indent_semantics1_reversal.json": {
+      "after_sha256": "6dd9321a129bd5cc21ac4563bc2b0af394892b78fd79bbeb09bb2c4b381e0309",
+      "before_sha256": "6dd9321a129bd5cc21ac4563bc2b0af394892b78fd79bbeb09bb2c4b381e0309"
+    },
+    "tests/fixtures/oop_intent_continue1_reversal.json": {
+      "after_sha256": "b9bd2bcef2d9dd521ed77f1324e458c20b8c0721a965c54002804005c2d93e25",
+      "before_sha256": "b9bd2bcef2d9dd521ed77f1324e458c20b8c0721a965c54002804005c2d93e25"
+    },
+    "tests/fixtures/oop_intent_design1_reversal.json": {
+      "after_sha256": "99466461902ac4d69bf8e689c446da90ccc91cdafa3ce5d847179b297ae7a240",
+      "before_sha256": "99466461902ac4d69bf8e689c446da90ccc91cdafa3ce5d847179b297ae7a240"
+    },
+    "tests/fixtures/patch_author_live2_contract_reversal.json": {
+      "after_sha256": "ea7e15c9d67f489c709776464550d8e3f38483f9b7a56cd971ec71ac2f0e021e",
+      "before_sha256": "ea7e15c9d67f489c709776464550d8e3f38483f9b7a56cd971ec71ac2f0e021e"
+    },
+    "tests/fixtures/patch_author_live3_reversal.json": {
+      "after_sha256": "04aa9d32a0c2275b35e7ff59ddb0259a31465441396df4b322042ae5ee0d4a36",
+      "before_sha256": "04aa9d32a0c2275b35e7ff59ddb0259a31465441396df4b322042ae5ee0d4a36"
+    },
+    "tests/fixtures/patch_author_scope1_reversal.json": {
+      "after_sha256": "554f5d7d251316ca9da232e7f0d427b3be4f992c1b5e1c2c84a4ea2eb837b6f5",
+      "before_sha256": "554f5d7d251316ca9da232e7f0d427b3be4f992c1b5e1c2c84a4ea2eb837b6f5"
+    },
+    "tests/fixtures/patch_author_span1_reversal.json": {
+      "after_sha256": "0e60be49f61a7b03a4ef4a9ce8d5686bd05616b0bdb855ecb813509a1ff4e93b",
+      "before_sha256": "0e60be49f61a7b03a4ef4a9ce8d5686bd05616b0bdb855ecb813509a1ff4e93b"
+    },
+    "tests/fixtures/patch_author_structural1_reversal.json": {
+      "after_sha256": "a055e5a87713993d7147579ea68fe25625e0795b06fa66655e97c445bc3e5288",
+      "before_sha256": "a055e5a87713993d7147579ea68fe25625e0795b06fa66655e97c445bc3e5288"
+    },
+    "tests/fixtures/patch_basis_target1_reversal.json": {
+      "after_sha256": "92194b1df64a19bfc44324d47fec460e8f6d3549e3cc25d9c49319734539c2c6",
+      "before_sha256": "92194b1df64a19bfc44324d47fec460e8f6d3549e3cc25d9c49319734539c2c6"
+    },
+    "tests/fixtures/patch_candidate_behavior_exec_admit1_reversal.json": {
+      "after_sha256": "26ab99af5e0ea3f8f7d757dc6d6e9f8f72fc5f8bf496bb6e3e81193cb3d63469",
+      "before_sha256": "26ab99af5e0ea3f8f7d757dc6d6e9f8f72fc5f8bf496bb6e3e81193cb3d63469"
+    },
+    "tests/fixtures/patch_candidate_behavior_exec_plan1_reversal.json": {
+      "after_sha256": "fdaacc080955dff1d42e852398a9392030981ebbd48f59df6d0d032555439d02",
+      "before_sha256": "fdaacc080955dff1d42e852398a9392030981ebbd48f59df6d0d032555439d02"
+    },
+    "tests/fixtures/patch_candidate_behavior_executor1_reversal.json": {
+      "after_sha256": "429295d7b064163a293afea47188292d2fd8dfbd867be966e6441b1ae9fd4538",
+      "before_sha256": "429295d7b064163a293afea47188292d2fd8dfbd867be966e6441b1ae9fd4538"
+    },
+    "tests/fixtures/patch_candidate_behavior_reflect1_reversal.json": {
+      "after_sha256": "2634df72228d5bc9f1215624c38e1b7ff8cd51aa1bd5f78cde6aa8e0378d65ba",
+      "before_sha256": "2634df72228d5bc9f1215624c38e1b7ff8cd51aa1bd5f78cde6aa8e0378d65ba"
+    },
+    "tests/fixtures/patch_candidate_behavior_spec1_reversal.json": {
+      "after_sha256": "d9d95a4c5d0d5c9873fdebb5ca62da0e1a44e26da03e66c8ea11b2d9782b1aa7",
+      "before_sha256": "d9d95a4c5d0d5c9873fdebb5ca62da0e1a44e26da03e66c8ea11b2d9782b1aa7"
+    },
+    "tests/fixtures/patch_candidate_materialize1_reversal.json": {
+      "after_sha256": "c851b0d4a3969cd298ec800f30ea3f5208586eb64fafb0fea6d1fd91f3ae4821",
+      "before_sha256": "c851b0d4a3969cd298ec800f30ea3f5208586eb64fafb0fea6d1fd91f3ae4821"
+    },
+    "tests/fixtures/patch_candidate_validate1a_reversal.json": {
+      "after_sha256": "e5254283eb8f1fb38d3a122edbd371ec24e1af159b75b36ad2fb4567da7c4a6a",
+      "before_sha256": "e5254283eb8f1fb38d3a122edbd371ec24e1af159b75b36ad2fb4567da7c4a6a"
+    },
+    "tests/fixtures/patch_minimal_live2_safe_minimal_reversal.json": {
+      "after_sha256": "b19ea07841506efda4b822da685d3cb43641cdb514abf01bc7382782c8548d7c",
+      "before_sha256": "b19ea07841506efda4b822da685d3cb43641cdb514abf01bc7382782c8548d7c"
+    },
+    "tests/fixtures/patch_minimal_live3_reversal.json": {
+      "after_sha256": "02a12c7db4a53d049e649eccf11540a28329bb5ae48e57f336c6f8c02ebc2c10",
+      "before_sha256": "02a12c7db4a53d049e649eccf11540a28329bb5ae48e57f336c6f8c02ebc2c10"
+    },
+    "tests/fixtures/patch_scope_admit1_reversal.json": {
+      "after_sha256": "2f9a0786149613478554aeb255df7f8919b7ac8b296153348ef7a36b9dc3e178",
+      "before_sha256": "2f9a0786149613478554aeb255df7f8919b7ac8b296153348ef7a36b9dc3e178"
+    },
+    "tests/fixtures/patch_scope_approve1_reversal.json": {
+      "after_sha256": "f1050a5fb75b6f7be85ebdaffc3f4631b501cb932d56fdcb088e9b88f5c8f815",
+      "before_sha256": "f1050a5fb75b6f7be85ebdaffc3f4631b501cb932d56fdcb088e9b88f5c8f815"
+    },
+    "tests/fixtures/patch_scope_plan1_reversal.json": {
+      "after_sha256": "081e178ecb781bc32d54616eb6f9076e8b6885c3bd1e62ca017d7a18686bfe0e",
+      "before_sha256": "081e178ecb781bc32d54616eb6f9076e8b6885c3bd1e62ca017d7a18686bfe0e"
+    },
+    "tests/fixtures/preflight_request1_reversal.json": {
+      "after_sha256": "9d6a868d4dc4b3de0e4d8c6c67eed614fcf2b256ea521618c304fb409fb1ec05",
+      "before_sha256": "9d6a868d4dc4b3de0e4d8c6c67eed614fcf2b256ea521618c304fb409fb1ec05"
+    },
+    "tests/fixtures/preflight_runtime1_reversal.json": {
+      "after_sha256": "c158a92a88cc9a7403d823e3ff5d45fccd6ef54cde5bdc703f834fb4983adf1a",
+      "before_sha256": "c158a92a88cc9a7403d823e3ff5d45fccd6ef54cde5bdc703f834fb4983adf1a"
+    },
+    "tests/fixtures/runtime_java1_reversal.json": {
+      "after_sha256": "18b41f3549c6c3dd73b141a8f15ab8aaa8a07e3efbd517fc408a953f65e9e135",
+      "before_sha256": "18b41f3549c6c3dd73b141a8f15ab8aaa8a07e3efbd517fc408a953f65e9e135"
+    },
+    "tests/fixtures/runtime_sandbox1_reversal.json": {
+      "after_sha256": "b93c55772993454a871cee0eb2baa232ef1c4979c347463e8ac8fef7b3d55c32",
+      "before_sha256": "b93c55772993454a871cee0eb2baa232ef1c4979c347463e8ac8fef7b3d55c32"
+    },
+    "tests/fixtures/sec_ui1_reversal.json": {
+      "after_sha256": "b9de3398d8a5691d918de8f875a8d539a10a65695938b00b0b20fb863b970771",
+      "before_sha256": "b9de3398d8a5691d918de8f875a8d539a10a65695938b00b0b20fb863b970771"
+    },
+    "tests/fixtures/ux_context1_reversal.json": {
+      "after_sha256": "877e9dbef5bb348a5cb76f04acd18a7dd21340d6828602eba4998347d3979245",
+      "before_sha256": "877e9dbef5bb348a5cb76f04acd18a7dd21340d6828602eba4998347d3979245"
+    },
+    "tests/fixtures/ux_state1_reversal.json": {
+      "after_sha256": "f755fac120130c6f004982acfb95a83eb69e3286b210690eea4bec402d45d697",
+      "before_sha256": "f755fac120130c6f004982acfb95a83eb69e3286b210690eea4bec402d45d697"
+    },
+    "tests/test_context_search_runtime.py": {
+      "after_sha256": "5c738b51b5f0d9ddd0415beca9ea88fb0efdacec01d9772bacc9b8d241f37109",
+      "before_sha256": "5c738b51b5f0d9ddd0415beca9ea88fb0efdacec01d9772bacc9b8d241f37109"
+    },
+    "tests/test_direct_context_runtime.py": {
+      "after_sha256": "787da2b3b4adb120c677888ea7966eaf2b4eb2280a98d805facddd1d2962b83d",
+      "before_sha256": "787da2b3b4adb120c677888ea7966eaf2b4eb2280a98d805facddd1d2962b83d"
+    },
+    "tests/test_indent_runtime1.py": {
+      "after_sha256": "b42b21689e517c95a7432d6f5e00e0a04ef81d437a894f36d8b95f2089329bae",
+      "before_sha256": "b42b21689e517c95a7432d6f5e00e0a04ef81d437a894f36d8b95f2089329bae"
+    },
+    "tests/test_preflight_runtime1.py": {
+      "after_sha256": "c80c9a93fbb82992f2cbef945390e551d155415f0daab359f460b22d8ca33845",
+      "before_sha256": "c80c9a93fbb82992f2cbef945390e551d155415f0daab359f460b22d8ca33845"
+    },
+    "tests/test_runtime_environment.py": {
+      "after_sha256": "81cecd5e9bb26a34398f3915b87c8515afdd9c485c2104f80f3f12851fc92c76",
+      "before_sha256": "81cecd5e9bb26a34398f3915b87c8515afdd9c485c2104f80f3f12851fc92c76"
+    },
+    "tests/test_runtime_environment_web.py": {
+      "after_sha256": "7cb13bd4ec2e085d014d9b801a5c3b79a49cd21938fc147bc9c3f7e3ed382db9",
+      "before_sha256": "7cb13bd4ec2e085d014d9b801a5c3b79a49cd21938fc147bc9c3f7e3ed382db9"
+    },
+    "tests/test_runtime_java1.py": {
+      "after_sha256": "ab71e7ff6c983b508b9a06b67b525cef5aa1b14e75ddefa6875472fdd3264a2d",
+      "before_sha256": "ab71e7ff6c983b508b9a06b67b525cef5aa1b14e75ddefa6875472fdd3264a2d"
+    },
+    "tests/test_runtime_java1_discovery.py": {
+      "after_sha256": "9ce83dea5c6b12dacd3b3b1148b962c5b18d7358321d744fcb1e53363f569f77",
+      "before_sha256": "9ce83dea5c6b12dacd3b3b1148b962c5b18d7358321d744fcb1e53363f569f77"
+    },
+    "tests/test_runtime_java1_governance.py": {
+      "after_sha256": "04503cb9f337235923cedddc07b642f2c8f36369df8f2560beb2449a1c66205e",
+      "before_sha256": "04503cb9f337235923cedddc07b642f2c8f36369df8f2560beb2449a1c66205e"
+    },
+    "tests/test_runtime_java1a.py": {
+      "after_sha256": "3f11fef0852db102966396ceb7c38de7f4b17587eedfd64b936031037a149d02",
+      "before_sha256": "3f11fef0852db102966396ceb7c38de7f4b17587eedfd64b936031037a149d02"
+    },
+    "tests/test_runtime_java1b.py": {
+      "after_sha256": "d47dc1777d907a6400873e4c9aeba58320922dec3228b73a967c35e655baed37",
+      "before_sha256": "d47dc1777d907a6400873e4c9aeba58320922dec3228b73a967c35e655baed37"
+    },
+    "tests/test_runtime_sandbox1.py": {
+      "after_sha256": "1c20c787dca61ef83c01ec44ebecd6b6b509c41663af55af907a2922d8e62d29",
+      "before_sha256": "1c20c787dca61ef83c01ec44ebecd6b6b509c41663af55af907a2922d8e62d29"
+    },
+    "tests/test_runtime_sandbox2.py": {
+      "after_sha256": "b492f70ae45d6c3e4e09173e24b7b1396cae75fa9885edf4c4ff00815202e08c",
+      "before_sha256": "b492f70ae45d6c3e4e09173e24b7b1396cae75fa9885edf4c4ff00815202e08c"
+    },
+    "tests/test_test_runtime_operations_branch_checkpoint.py": {
+      "after_sha256": "9f315218eb245a7272262751be8586348276ccd1d3c4e34edfd1b5ab1b80bc38",
+      "before_sha256": "9f315218eb245a7272262751be8586348276ccd1d3c4e34edfd1b5ab1b80bc38"
+    },
+    "tests/test_test_suite_runtime_profile_audit.py": {
+      "after_sha256": "402c803d59d486497759dcff4c36874f179d14483a573d45a24088bde0f7ea26",
+      "before_sha256": "402c803d59d486497759dcff4c36874f179d14483a573d45a24088bde0f7ea26"
+    }
+  },
+  "historical_sandbox_descriptor_fingerprint": "f9cc912a4f14d9c2582b10dd0a80269f9ac78f4c582a90e4d1b0fff6ae38807e",
+  "historical_sandbox_receipt_fingerprint": "b9639a0caf3788a7f8d9dfe145b8b4894639721f7c43e1b08a0b9da4cca523d0",
+  "host_mount_authority": false,
+  "host_persistent_java_artifact_count": 0,
+  "host_profile_workspace_files": [
+    "seccomp.json"
+  ],
+  "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+  "image_identity_verified": true,
+  "inspected_configuration_verified": true,
+  "java_workload_attempted": true,
+  "jvm_fixture_count": 1,
+  "live_sandbox2": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "bank_execution_count": 0,
+    "behavioral_execution_count": 0,
+    "cleanup_verified": true,
+    "compile_count": 0,
+    "console_count": 0,
+    "descriptor": {
+      "apply_authority": false,
+      "arbitrary_command_authority": false,
+      "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+      "eligible_for_java1_continuation": true,
+      "host_mount_authority": false,
+      "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+      "network_authority": false,
+      "phase_id": "RUNTIME.SANDBOX.2",
+      "relationship": "additive_epoch_preserving_SANDBOX_1_history",
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "sandbox_descriptor_fingerprint": "e8aa3dbccada7d8b92163a47444861ee78715fc204c4f340a393303b43701215",
+      "schema_version": "runtime_sandbox_2_v1",
+      "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "shell_available": false,
+      "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+      "verification_receipt_fingerprint": "e7746e2b0195abc4c981c590792a5a5cac4f25a52422d1528d91a2f288a80012"
+    },
+    "executor_refreshed_or_resumed": false,
+    "exported_json_is_report_only": true,
+    "host_mount_authority": false,
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "java1_completed": false,
+    "java_version_count": 1,
+    "javac_version_count": 1,
+    "jvm_fixture_count": 0,
+    "network_authority": false,
+    "phase_container_count_after_teardown": 0,
+    "phase_id": "RUNTIME.SANDBOX.2",
+    "policy_diff": {
+      "baseline_profile": "runtime_sandbox_1_v1",
+      "baseline_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+      "candidate_profile": "runtime_sandbox_2_v1",
+      "candidate_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "legacy_clone_policy": "allow_except_seven_forbidden_namespace_bits",
+      "legacy_clone_rules_unchanged": true,
+      "semantic_changes": [
+        {
+          "execution_allowed_after": false,
+          "execution_allowed_before": false,
+          "new_action": "SCMP_ACT_ERRNO",
+          "new_errno": 38,
+          "old_action": "SCMP_ACT_ERRNO",
+          "old_errno": 1,
+          "syscall": "clone3"
+        }
+      ],
+      "thread_only_clone_enforced": false
+    },
+    "policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "profile_id": "runtime_sandbox_2_v1",
+    "receipt_authenticated_in_issuing_process": true,
+    "reflection_count": 0,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "runtime_policy_authorizations_consumed": 0,
+    "shell_available": false,
+    "stages": [
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "after": {
+            "capabilities_zero": true,
+            "cgroup": "0::/",
+            "gid": 65534,
+            "memory_max": "134217728",
+            "namespaces": {
+              "cgroup": "cgroup:[4026532707]",
+              "ipc": "ipc:[4026532705]",
+              "mnt": "mnt:[4026532703]",
+              "net": "net:[4026532708]",
+              "pid": "pid:[4026532706]",
+              "user": "user:[4026531837]",
+              "uts": "uts:[4026532704]"
+            },
+            "no_new_privileges": true,
+            "os_threads": 1,
+            "pid": 1,
+            "pids_current": "1",
+            "pids_max": "128",
+            "ppid": 0,
+            "processes": [
+              1
+            ],
+            "tid": 1,
+            "uid": 65534
+          },
+          "before": {
+            "capabilities_zero": true,
+            "cgroup": "0::/",
+            "gid": 65534,
+            "memory_max": "134217728",
+            "namespaces": {
+              "cgroup": "cgroup:[4026532707]",
+              "ipc": "ipc:[4026532705]",
+              "mnt": "mnt:[4026532703]",
+              "net": "net:[4026532708]",
+              "pid": "pid:[4026532706]",
+              "user": "user:[4026531837]",
+              "uts": "uts:[4026532704]"
+            },
+            "no_new_privileges": true,
+            "os_threads": 1,
+            "pid": 1,
+            "pids_current": "1",
+            "pids_max": "128",
+            "ppid": 0,
+            "processes": [
+              1
+            ],
+            "tid": 1,
+            "uid": 65534
+          },
+          "clone3": {
+            "errno": 38,
+            "result": -1
+          },
+          "libc_version": "2.41"
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "clone3",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 979,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "after": {
+            "capabilities_zero": true,
+            "cgroup": "0::/",
+            "gid": 65534,
+            "memory_max": "134217728",
+            "namespaces": {
+              "cgroup": "cgroup:[4026532707]",
+              "ipc": "ipc:[4026532705]",
+              "mnt": "mnt:[4026532703]",
+              "net": "net:[4026532708]",
+              "pid": "pid:[4026532706]",
+              "user": "user:[4026531837]",
+              "uts": "uts:[4026532704]"
+            },
+            "no_new_privileges": true,
+            "os_threads": 1,
+            "pid": 1,
+            "pids_current": "1",
+            "pids_max": "128",
+            "ppid": 0,
+            "processes": [
+              1
+            ],
+            "tid": 1,
+            "uid": 65534
+          },
+          "before": {
+            "capabilities_zero": true,
+            "cgroup": "0::/",
+            "gid": 65534,
+            "memory_max": "134217728",
+            "namespaces": {
+              "cgroup": "cgroup:[4026532707]",
+              "ipc": "ipc:[4026532705]",
+              "mnt": "mnt:[4026532703]",
+              "net": "net:[4026532708]",
+              "pid": "pid:[4026532706]",
+              "user": "user:[4026531837]",
+              "uts": "uts:[4026532704]"
+            },
+            "no_new_privileges": true,
+            "os_threads": 1,
+            "pid": 1,
+            "pids_current": "1",
+            "pids_max": "128",
+            "ppid": 0,
+            "processes": [
+              1
+            ],
+            "tid": 1,
+            "uid": 65534
+          },
+          "libc_version": "2.41",
+          "namespace_probes": {
+            "cgroup": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "ipc": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "mnt": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "net": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "pid": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "user": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "uts": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            }
+          },
+          "pthreads": [
+            {
+              "after": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 1,
+                "pid": 1,
+                "pids_current": "1",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 1,
+                "uid": 65534
+              },
+              "before": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 1,
+                "pid": 1,
+                "pids_current": "1",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 1,
+                "uid": 65534
+              },
+              "create_return_code": 0,
+              "join_return_code": 0,
+              "label": "candidate_unmodified",
+              "socket_errno": 1,
+              "thread": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 2,
+                "pid": 1,
+                "pids_current": "2",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 7,
+                "uid": 65534
+              }
+            },
+            {
+              "after": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 1,
+                "pid": 1,
+                "pids_current": "1",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 1,
+                "uid": 65534
+              },
+              "before": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 1,
+                "pid": 1,
+                "pids_current": "1",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 1,
+                "uid": 65534
+              },
+              "create_return_code": 0,
+              "join_return_code": 0,
+              "label": "exact_legacy_clone_flags",
+              "socket_errno": 1,
+              "thread": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 2,
+                "pid": 1,
+                "pids_current": "2",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 8,
+                "uid": 65534
+              }
+            }
+          ],
+          "witness_filter": {
+            "errno": 0,
+            "result": 0
+          },
+          "witness_flags": 4001536,
+          "witness_rejects_other_flags": {
+            "errno": 1,
+            "result": -1
+          }
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "pthread",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 4918,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "capabilities_zero": true,
+          "environment": {
+            "GPG_KEY": "",
+            "HOME": "/work",
+            "HOSTNAME": "runtime-sandbox1",
+            "LANG": "C.UTF-8",
+            "PATH": "/usr/local/bin:/usr/bin:/bin",
+            "PYTHON_SHA256": "",
+            "PYTHON_VERSION": "",
+            "SANDBOX_PUBLIC_SENTINEL": "phase-owned"
+          },
+          "external_read_denied": true,
+          "external_write_denied": true,
+          "host_secret_absent": true,
+          "local_connect_denied": true,
+          "manifest": [
+            {
+              "path": "projection.txt",
+              "sha256": "8dbe754d8c894788500505a0c4a0537f63cfb6439a9706853968474f5fabbd9b",
+              "size_bytes": 45
+            }
+          ],
+          "namespaces": [
+            "cgroup",
+            "ipc",
+            "mnt",
+            "net",
+            "pid"
+          ],
+          "no_new_privileges": true,
+          "pid_is_one": true,
+          "root_write_denied": true,
+          "socket_denials": {
+            "dns_udp": true,
+            "ipv4_tcp": true,
+            "ipv6_tcp": true,
+            "unix_socket": true
+          },
+          "socketpair_denied": true,
+          "uid": 65534,
+          "workspace_write": true
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "boundary",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 798,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "child_alive": true,
+          "child_spawned": true,
+          "pid_is_one": true,
+          "same_cgroup": true,
+          "same_namespaces": true
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "descendant",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 111,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_timeout",
+        "cleanup_verified": true,
+        "exit_code": 1,
+        "facts": {
+          "child_alive": true,
+          "child_spawned": true,
+          "pid_is_one": true,
+          "same_cgroup": true,
+          "same_namespaces": true
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": 7281.437500030734,
+        "mode": "timeout",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 111,
+        "termination_verified": true,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_output_limit_exceeded",
+        "cleanup_verified": true,
+        "exit_code": 1,
+        "facts": {},
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": 3759.814199991524,
+        "mode": "stdout",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 8192,
+        "termination_verified": true,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_output_limit_exceeded",
+        "cleanup_verified": true,
+        "exit_code": 1,
+        "facts": {},
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": 3859.2754000565037,
+        "mode": "stderr",
+        "outer_stderr": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "stderr_size": 8192,
+        "stdout_size": 0,
+        "termination_verified": true,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "gid": 65534,
+          "removed": [
+            true,
+            true
+          ],
+          "uid": 65534,
+          "writable": [
+            "/work",
+            "/tmp"
+          ]
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "tmp",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 85,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "controller_after": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "controller_before": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "descendants_contained": true,
+          "phase_pids_after_cleanup": [
+            1
+          ],
+          "stages": {
+            "non_java_boundary": {
+              "argv": [
+                "/usr/local/bin/python",
+                "-I",
+                "-S",
+                "-B",
+                "-c",
+                "import io,sys\nsys.stdin=io.TextIOWrapper(io.BytesIO(b'{\"inputs\": [{\"path\": \"projection.txt\", \"bytes\": \"UlVOVElNRS5TQU5EQk9YLjEgZXhhY3Qgc3ludGhldGljIHByb2plY3Rpb24K\"}], \"host_paths\": [], \"port\": 1}\\n'))\nsys.argv=['runtime-sandbox1','boundary']\n\nimport base64, errno, hashlib, json, os, signal, socket, subprocess, sys, time\n\nrequest = json.loads(sys.stdin.buffer.readline(131073))\nmode = sys.argv[1]\ndef emit(value):\n    print(json.dumps(value, sort_keys=True), flush=True)\ndef denied(operation):\n    try:\n        result = operation()\n        if hasattr(result, 'close'): result.close()\n        return False\n    except OSError as error:\n        return error.errno in (errno.EPERM, errno.EACCES, errno.EROFS, errno.ENOENT)\ndef boundary():\n    return {name: os.readlink('/proc/self/ns/' + name)\n            for name in ('pid', 'mnt', 'net', 'ipc', 'cgroup')}\nif mode == 'boundary':\n    manifest = []\n    for item in request['inputs']:\n        data = base64.b64decode(item['bytes'])\n        path = '/work/' + item['path']\n        with open(path, 'xb') as output: output.write(data)\n        with open(path, 'rb') as source: actual = source.read()\n        manifest.append({'path': item['path'], 'sha256': hashlib.sha256(actual).hexdigest(),\n                         'size_bytes': len(actual)})\n    with open('/work/workspace-write', 'xb') as output: output.write(b'workspace-write')\n    host_reads = [denied(lambda path=path: open(path, 'rb')) for path in request['host_paths']]\n    host_writes = [denied(lambda path=path: open(path, 'wb')) for path in request['host_paths']]\n    root_denied = denied(lambda: open('/phase-owned-root-write', 'wb'))\n    socket_results = {}\n    for name, family, kind in (('ipv4_tcp', socket.AF_INET, socket.SOCK_STREAM),\n            ('ipv6_tcp', socket.AF_INET6, socket.SOCK_STREAM),\n            ('dns_udp', socket.AF_INET, socket.SOCK_DGRAM),\n            ('unix_socket', socket.AF_UNIX, socket.SOCK_STREAM)):\n        socket_results[name] = denied(lambda family=family, kind=kind: socket.socket(family, kind))\n    local_denied = denied(lambda: socket.create_connection(('127.0.0.1', request['port']), .2))\n    pair_denied = denied(socket.socketpair)\n    env = dict(os.environ)\n    emit({'manifest': manifest, 'workspace_write': True, 'external_read_denied': all(host_reads),\n          'external_write_denied': all(host_writes), 'root_write_denied': root_denied,\n          'socket_denials': socket_results, 'local_connect_denied': local_denied,\n          'socketpair_denied': pair_denied, 'environment': env,\n          'host_secret_absent': 'CATTUS_SANDBOX_HOST_ONLY' not in env,\n          'uid': os.getuid(), 'namespaces': sorted(boundary()), 'pid_is_one': os.getpid() == 1,\n          'no_new_privileges': 'NoNewPrivs:\\t1' in open('/proc/self/status').read(),\n          'capabilities_zero': 'CapEff:\\t0000000000000000' in open('/proc/self/status').read()})\nelif mode in ('descendant', 'timeout'):\n    child_source = \"import json,os,time; print(json.dumps({'namespaces':{n:os.readlink('/proc/self/ns/'+n) for n in ('pid','mnt','net','ipc','cgroup')},'cgroup':open('/proc/self/cgroup').read()}),flush=True); time.sleep(60)\"\n    child = subprocess.Popen([sys.executable, '-I', '-S', '-B', '-c', child_source], stdout=subprocess.PIPE)\n    evidence = json.loads(child.stdout.readline(4096))\n    emit({'child_spawned': True, 'child_alive': child.poll() is None,\n          'same_namespaces': evidence['namespaces'] == boundary(),\n          'same_cgroup': evidence['cgroup'] == open('/proc/self/cgroup').read(),\n          'pid_is_one': os.getpid() == 1})\n    if mode == 'timeout':\n        while True: time.sleep(.1)\nelif mode in ('stdout', 'stderr'):\n    stream = 1 if mode == 'stdout' else 2\n    while True: os.write(stream, b'X' * 4096)\nelse:\n    raise SystemExit(64)\n"
+              ],
+              "capture_method": "single_thread_selector",
+              "child_waited": true,
+              "cleanup_errors": [],
+              "cleanup_verified": true,
+              "controller_error": "",
+              "eof": [
+                true,
+                true
+              ],
+              "exit_code": 0,
+              "limit_bytes": 1024,
+              "overflow": false,
+              "pid": 7,
+              "pipes_closed": true,
+              "read_bytes": [
+                799,
+                0
+              ],
+              "status": "completed",
+              "stderr_b64": "",
+              "stdout_b64": "eyJjYXBhYmlsaXRpZXNfemVybyI6IHRydWUsICJlbnZpcm9ubWVudCI6IHsiR1BHX0tFWSI6ICIiLCAiSE9NRSI6ICIvd29yayIsICJIT1NUTkFNRSI6ICJydW50aW1lLXNhbmRib3gxIiwgIkxBTkciOiAiQy5VVEYtOCIsICJQQVRIIjogIi91c3IvbG9jYWwvYmluOi91c3IvYmluOi9iaW4iLCAiUFlUSE9OX1NIQTI1NiI6ICIiLCAiUFlUSE9OX1ZFUlNJT04iOiAiIiwgIlNBTkRCT1hfUFVCTElDX1NFTlRJTkVMIjogInBoYXNlLW93bmVkIn0sICJleHRlcm5hbF9yZWFkX2RlbmllZCI6IHRydWUsICJleHRlcm5hbF93cml0ZV9kZW5pZWQiOiB0cnVlLCAiaG9zdF9zZWNyZXRfYWJzZW50IjogdHJ1ZSwgImxvY2FsX2Nvbm5lY3RfZGVuaWVkIjogdHJ1ZSwgIm1hbmlmZXN0IjogW3sicGF0aCI6ICJwcm9qZWN0aW9uLnR4dCIsICJzaGEyNTYiOiAiOGRiZTc1NGQ4Yzg5NDc4ODUwMDUwNWEwYzRhMDUzN2Y2M2NmYjY0MzlhOTcwNjg1Mzk2ODQ3NGY1ZmFiYmQ5YiIsICJzaXplX2J5dGVzIjogNDV9XSwgIm5hbWVzcGFjZXMiOiBbImNncm91cCIsICJpcGMiLCAibW50IiwgIm5ldCIsICJwaWQiXSwgIm5vX25ld19wcml2aWxlZ2VzIjogdHJ1ZSwgInBpZF9pc19vbmUiOiBmYWxzZSwgInJvb3Rfd3JpdGVfZGVuaWVkIjogdHJ1ZSwgInNvY2tldF9kZW5pYWxzIjogeyJkbnNfdWRwIjogdHJ1ZSwgImlwdjRfdGNwIjogdHJ1ZSwgImlwdjZfdGNwIjogdHJ1ZSwgInVuaXhfc29ja2V0IjogdHJ1ZX0sICJzb2NrZXRwYWlyX2RlbmllZCI6IHRydWUsICJ1aWQiOiA2NTUzNCwgIndvcmtzcGFjZV93cml0ZSI6IHRydWV9Cg==",
+              "threads_after": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "threads_before": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "timed_out": false
+            }
+          },
+          "synthetic_java_execution_count": 0,
+          "toolchain_launch_count": 1,
+          "work_files_after_cleanup": []
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "controller",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 6013,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "controller_after": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "controller_before": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "descendants_contained": true,
+          "javac_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+          "phase_pids_after_cleanup": [
+            1
+          ],
+          "stages": {
+            "javac_identity": {
+              "argv": [
+                "/opt/temurin-26.0.2.1/bin/javac",
+                "-version"
+              ],
+              "capture_method": "single_thread_selector",
+              "child_waited": true,
+              "cleanup_errors": [],
+              "cleanup_verified": true,
+              "controller_error": "",
+              "eof": [
+                true,
+                true
+              ],
+              "exit_code": 0,
+              "limit_bytes": 1024,
+              "overflow": false,
+              "pid": 7,
+              "pipes_closed": true,
+              "read_bytes": [
+                15,
+                0
+              ],
+              "status": "completed",
+              "stderr_b64": "",
+              "stdout_b64": "amF2YWMgMjYuMC4yLjEK",
+              "threads_after": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "threads_before": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "timed_out": false
+            }
+          },
+          "synthetic_java_execution_count": 0,
+          "toolchain_launch_count": 1,
+          "work_files_after_cleanup": []
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "javac_version",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 1163,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "controller_after": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "controller_before": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "descendants_contained": true,
+          "javac_sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+          "phase_pids_after_cleanup": [
+            1
+          ],
+          "stages": {
+            "javac_identity": {
+              "argv": [
+                "/opt/temurin-26.0.2.1/bin/java",
+                "-version"
+              ],
+              "capture_method": "single_thread_selector",
+              "child_waited": true,
+              "cleanup_errors": [],
+              "cleanup_verified": true,
+              "controller_error": "",
+              "eof": [
+                true,
+                true
+              ],
+              "exit_code": 0,
+              "limit_bytes": 1024,
+              "overflow": false,
+              "pid": 7,
+              "pipes_closed": true,
+              "read_bytes": [
+                0,
+                188
+              ],
+              "status": "completed",
+              "stderr_b64": "b3BlbmpkayB2ZXJzaW9uICIyNi4wLjIuMSIgMjAyNi0wOC0xOApPcGVuSkRLIFJ1bnRpbWUgRW52aXJvbm1lbnQgVGVtdXJpbi0yNi4wLjIuMSsxIChidWlsZCAyNi4wLjIuMSsxKQpPcGVuSkRLIDY0LUJpdCBTZXJ2ZXIgVk0gVGVtdXJpbi0yNi4wLjIuMSsxIChidWlsZCAyNi4wLjIuMSsxLCBtaXhlZCBtb2RlLCBzaGFyaW5nKQo=",
+              "stdout_b64": "",
+              "threads_after": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "threads_before": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "timed_out": false
+            }
+          },
+          "synthetic_java_execution_count": 0,
+          "toolchain_launch_count": 1,
+          "work_files_after_cleanup": []
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "java_version",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 1396,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      }
+    ],
+    "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+    "temporary_workspace_removed": true,
+    "verification_receipt": {
+      "apply_authority": false,
+      "arbitrary_command_authority": false,
+      "authority": "infrastructure_compatibility_measurement_only",
+      "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+      "baseline_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+      "baseline_seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+      "cleanup_verified": true,
+      "compatibility_classification": "eligible_for_JAVA_1_continuation_only",
+      "evidence_sha256": "8c4ab52709874142c505cefac5b49e80d8b2086d290025b9228360d15566618e",
+      "host_mount_authority": false,
+      "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+      "network_authority": false,
+      "phase_id": "RUNTIME.SANDBOX.2",
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "schema_version": "runtime_sandbox_2_v1",
+      "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "shell_available": false,
+      "stage_results": [
+        [
+          "clone3",
+          "stage_passed"
+        ],
+        [
+          "pthread",
+          "stage_passed"
+        ],
+        [
+          "boundary",
+          "stage_passed"
+        ],
+        [
+          "descendant",
+          "stage_passed"
+        ],
+        [
+          "timeout",
+          "stage_passed"
+        ],
+        [
+          "stdout",
+          "stage_passed"
+        ],
+        [
+          "stderr",
+          "stage_passed"
+        ],
+        [
+          "tmp",
+          "stage_passed"
+        ],
+        [
+          "controller",
+          "stage_passed"
+        ],
+        [
+          "javac_version",
+          "stage_passed"
+        ],
+        [
+          "java_version",
+          "stage_passed"
+        ]
+      ],
+      "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+      "verification_receipt_fingerprint": "e7746e2b0195abc4c981c590792a5a5cac4f25a52422d1528d91a2f288a80012"
+    }
+  },
+  "measured_termination_ms": null,
+  "model_calls": 0,
+  "network_authority": false,
+  "new_implementation_sha256": {
+    "core/sandboxed_java_positive_continuation.py": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+    "core/sandboxed_java_positive_probe.py": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+    "scripts/replay_runtime_java1c.py": "72e38777679dc9d3033c1a8737a31251837e047c06981a13e68de7507482ac8f",
+    "tests/test_runtime_java1c.py": "67a5b71e38550a671a20c7393f246d6740f8faed7de60d32ff87857e5ae2fe3a"
+  },
+  "outer_capture_status": "sandbox_completed",
+  "outer_exit_code": 0,
+  "outer_stderr": "{\"event\": \"started\", \"stage\": \"javac\", \"pid\": 7}\n{\"event\": \"completed\", \"stage\": \"javac\", \"pid\": 7, \"exit_code\": 0, \"cleanup_verified\": true}\n{\"event\": \"started\", \"stage\": \"java\", \"pid\": 20}\n{\"event\": \"completed\", \"stage\": \"java\", \"pid\": 20, \"exit_code\": 0, \"cleanup_verified\": true}\n",
+  "outer_stdout_size": 5069,
+  "phase_container_count_after_teardown": 0,
+  "phase_id": "RUNTIME.JAVA.1C",
+  "prior_attempt_nested_counts_known": false,
+  "prior_attempt_report": "docs/roadmap/RUNTIME_JAVA_1C_ATTEMPT1.json",
+  "protected_historical_file_count": 104,
+  "pure_executor_compatibility": true,
+  "reason": "exact_frozen_java_fixture_verified",
+  "receipt_authenticated_in_issuing_process": true,
+  "reflection_count": 0,
+  "repository_write_authority": false,
+  "runtime_authority": false,
+  "runtime_policy_authorizations_consumed": 0,
+  "sandbox_authentication": {
+    "authenticated_in_issuing_process": true,
+    "compatibility_classification": "eligible_for_JAVA_1_continuation_only",
+    "descriptor_fingerprint": "e8aa3dbccada7d8b92163a47444861ee78715fc204c4f340a393303b43701215",
+    "evidence_sha256": "8c4ab52709874142c505cefac5b49e80d8b2086d290025b9228360d15566618e",
+    "receipt_fingerprint": "e7746e2b0195abc4c981c590792a5a5cac4f25a52422d1528d91a2f288a80012"
+  },
+  "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+  "shell_available": false,
+  "source_class_tmpfs_destroyed": true,
+  "source_contract_reference": "docs/roadmap/RUNTIME_JAVA_1.md item 13; original JavaSandboxProbe remains 129 exact bytes",
+  "status": "RUNTIME_JAVA_1_COMPLETE_WITH_WARNINGS",
+  "stderr_limit_bytes": 8192,
+  "stdout_limit_bytes": 8192,
+  "temporary_workspace_removed": true,
+  "termination_verified": false,
+  "termination_within_deadline": true,
+  "timeout_ms": 10000,
+  "tmp_diagnostics_destroyed": true,
+  "toolchain_versions": {
+    "java_version": "openjdk version \"26.0.2.1\" 2026-08-18\nOpenJDK Runtime Environment Temurin-26.0.2.1+1 (build 26.0.2.1+1)\nOpenJDK 64-Bit Server VM Temurin-26.0.2.1+1 (build 26.0.2.1+1, mixed mode, sharing)\n",
+    "javac_version": "javac 26.0.2.1\n"
+  },
+  "validation": {
+    "authority_apply_path_patch_safety_registry_picker": {
+      "failed": 0,
+      "passed": 464,
+      "seconds": 51.94
+    },
+    "benchmarks_check": {
+      "agent_calls": 0,
+      "cases": 54,
+      "errors": 0
+    },
+    "compileall": "passed",
+    "execution_note": "Final checks ran in separate pytest processes; larger combined attempts were interrupted for runtime and are not counted as passing runs.",
+    "failed": 0,
+    "frozen_regression_plugin": "tests._runtime_java1_frozen_regressions",
+    "git_diff_check": "passed",
+    "java_1_historical_discovery_governance": {
+      "failed": 0,
+      "passed": 122,
+      "seconds": 8.96
+    },
+    "java_1c_and_java_1a_1b": {
+      "failed": 0,
+      "java_1a_1b_passed": 68,
+      "java_1c_focused_passed": 89,
+      "passed": 157,
+      "seconds": 14.3
+    },
+    "new_file_whitespace_check": "passed",
+    "sandbox_1_and_2": {
+      "failed": 0,
+      "passed": 225,
+      "seconds": 11.36
+    },
+    "selected_preflight_authority_and_executor_blocked_state": {
+      "failed": 0,
+      "passed": 8,
+      "seconds": 155.15
+    },
+    "total_passed": 976,
+    "warnings": [
+      "Existing google.genai _UnionGenericAlias deprecation warning"
+    ]
+  },
+  "verification_date_kst": "2026-10-07",
+  "verification_receipt": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "class_sha256": "4f208c5185c89288900305283884ac0e4d71fd7088488d8a57ee50673393bd0e",
+    "class_size_bytes": 439,
+    "cleanup_verified": true,
+    "compile_argv": [
+      "/opt/temurin-26.0.2.1/bin/javac",
+      "-J-Xms8m",
+      "-J-Xmx32m",
+      "-J-XX:ActiveProcessorCount=1",
+      "-J-XX:-UsePerfData",
+      "-d",
+      "/work/classes",
+      "/work/JavaSandboxProbe.java"
+    ],
+    "compiler_version": "javac 26.0.2.1\n",
+    "evidence_sha256": "08ef8f9923b17892b527cfe898bf8af2fd633cc6c9c06006e5d37224dab8dd42",
+    "expected_runtime_stderr": "",
+    "expected_runtime_stdout": "JAVA_SANDBOX_OK",
+    "host_mount_authority": false,
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "java_path": "/opt/temurin-26.0.2.1/bin/java",
+    "java_sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+    "javac_path": "/opt/temurin-26.0.2.1/bin/javac",
+    "javac_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+    "network_authority": false,
+    "phase_id": "RUNTIME.JAVA.1C",
+    "repository_write_authority": false,
+    "runtime_argv": [
+      "/opt/temurin-26.0.2.1/bin/java",
+      "-Xms8m",
+      "-Xmx32m",
+      "-XX:ActiveProcessorCount=1",
+      "-XX:-UsePerfData",
+      "-cp",
+      "/work/classes",
+      "JavaSandboxProbe"
+    ],
+    "runtime_authority": false,
+    "runtime_version": "openjdk version \"26.0.2.1\" 2026-08-18\nOpenJDK Runtime Environment Temurin-26.0.2.1+1 (build 26.0.2.1+1)\nOpenJDK 64-Bit Server VM Temurin-26.0.2.1+1 (build 26.0.2.1+1, mixed mode, sharing)\n",
+    "sandbox_descriptor_fingerprint": "e8aa3dbccada7d8b92163a47444861ee78715fc204c4f340a393303b43701215",
+    "sandbox_receipt_fingerprint": "e7746e2b0195abc4c981c590792a5a5cac4f25a52422d1528d91a2f288a80012",
+    "schema_version": "runtime_java_1c_v1",
+    "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "shell_available": false,
+    "source_sha256": "3975c5e03edb79439d6146b7714a6d3c31af86ce42f05624cdf6c28f69b4e224",
+    "status": "RUNTIME_JAVA_1_COMPLETE_WITH_WARNINGS",
+    "verification_receipt_fingerprint": "fe149c271d2856728cc862355f34393a29f11a4dd070be443342e80a7d3a716c"
+  },
+  "workspace_java_artifact_inventory_added": [],
+  "workspace_java_artifact_inventory_method": "rg --files with hidden files, honoring repository ignore rules; excludes .git, node_modules and pytest workspaces"
+}

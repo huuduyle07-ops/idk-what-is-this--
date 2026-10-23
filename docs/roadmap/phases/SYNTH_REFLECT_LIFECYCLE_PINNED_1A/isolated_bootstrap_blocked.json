@@ -1,0 +1,33 @@
+{
+  "all_operational_effects_zero": false,
+  "audit_guard": {
+    "capability_or_transition_attempts": 0,
+    "capability_owner_import_attempts": 0,
+    "execution_or_verification_attempts": 0,
+    "network_attempts": 0,
+    "process_attempts": 0,
+    "production_validator_attempts": 0,
+    "repository_runtime_write_attempts": 1
+  },
+  "blocked_actions": [
+    "os.mkdir:('C:\\\\Users\\\\Admin\\\\Documents\\\\Code\\\\J.A.R.V.I.S\\\\districts\\\\C.A.T.T.U.S\\\\storage', 511, -1)"
+  ],
+  "bytecode_writes_disabled": true,
+  "collected": 0,
+  "exit_code": 2,
+  "failed": [],
+  "full_issuance_dependent_suites_run": false,
+  "harness_sha256": "dd3491dcb063191e46ba6e890161b0d4188510a7872d33ce9a70d45177dfd17b",
+  "imported_capability_owners": [],
+  "mode": "isolated",
+  "passed_count": 0,
+  "passed_nodes": [],
+  "production_registries_seeded": false,
+  "production_validators_patched": false,
+  "readonly_production_imports_for_preservation_snapshots": true,
+  "scratch_inside_new_phase": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_REFLECT_LIFECYCLE_PINNED_1A\\validation_tmp\\isolated",
+  "selected_nodes": [
+    "tests/test_synthetic_reflection_execution_lifecycle_pinned.py"
+  ],
+  "skipped": []
+}

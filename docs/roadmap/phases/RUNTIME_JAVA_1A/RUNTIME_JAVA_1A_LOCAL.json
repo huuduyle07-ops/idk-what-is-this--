@@ -1,0 +1,444 @@
+{
+  "all_frozen_bytes_preserved": true,
+  "apply_authority": false,
+  "bank_execution_count": 0,
+  "behavioral_execution_count": 0,
+  "bounded_controller_stderr": "",
+  "capture_exit_code": 0,
+  "capture_status": "sandbox_completed",
+  "cause_measurements": {
+    "clone3_denial_measured": true,
+    "clone3_glibc_mechanism_is_inference": true,
+    "controller_layer": "sandbox_container",
+    "failed_reader": "stdout_reader",
+    "historical_pthread_syscall_trace_obtained": false,
+    "memory_limit_exhaustion_observed": false,
+    "native_thread_error": "EPERM",
+    "pid_budget_exhaustion_observed": false,
+    "python_thread_start_failures": 3,
+    "thread_accumulation_observed": false
+  },
+  "classification": "sandbox_controller_thread_failure",
+  "compilation_count": 0,
+  "console_count": 0,
+  "container_cleanup_verified": true,
+  "current_java_stage": {
+    "javac_output_bytes": 0,
+    "javac_process_started": false,
+    "jvm_fixture_reached": false,
+    "retry_skipped_reason": "container controller health gate failed on all three non-Java attempts"
+  },
+  "diagnostic_identity": {
+    "core/runtime_java_controller_diagnostic.py": "6cdb16c2bb24b565bd8caa52555d85bf956402823ba73a3bc9f62942e86d3099",
+    "core/runtime_java_controller_diagnostic_probe.py": "c931f9bce83ca2ea4df4a1c974ade833c513d9de14bc46ceae1b4f149302c538",
+    "scripts/replay_runtime_java1a.py": "553f9a30f38ba8d8831b3e8266d9195af1f11b977d1ffd616bb591ed7f776322"
+  },
+  "executor_refreshed_or_resumed": false,
+  "failing_thread_site": {
+    "embedded_line": 41,
+    "embedded_source": "JAVA_PROBE_SOURCE",
+    "function": "run",
+    "module": "core/sandboxed_java_toolchain_probe.py",
+    "module_line": 56,
+    "ownership": "sandbox_container",
+    "purpose": "stdout_reader",
+    "statement": "for reader in readers: reader.start()"
+  },
+  "frozen_file_preservation": {
+    "core/behavioral_diagnostic_executor.py": {
+      "after_sha256": "f9e071b040979431fabfee98d93883a3cd4f9f0460c77bd0994f539efb3a7272",
+      "before_sha256": "f9e071b040979431fabfee98d93883a3cd4f9f0460c77bd0994f539efb3a7272"
+    },
+    "core/candidate_runtime_sandbox.py": {
+      "after_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "before_sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913"
+    },
+    "core/candidate_runtime_sandbox_probe.py": {
+      "after_sha256": "aa090e85f34a75c429fc98a20b562e6ebc2b7261d400b08fd7758da4994f4b6c",
+      "before_sha256": "aa090e85f34a75c429fc98a20b562e6ebc2b7261d400b08fd7758da4994f4b6c"
+    },
+    "core/runtime_diagnostic_authorization.py": {
+      "after_sha256": "cb9c0ed3cf9ae7cadd10d2de9fb6170a991ae75b8f2ea9da643262aaf80ea085",
+      "before_sha256": "cb9c0ed3cf9ae7cadd10d2de9fb6170a991ae75b8f2ea9da643262aaf80ea085"
+    },
+    "core/sandboxed_java_toolchain.py": {
+      "after_sha256": "ed96e56a875535d4cafaa107721ee6eafd5c0c1b0f8d14f59f4ad728f00288c9",
+      "before_sha256": "ed96e56a875535d4cafaa107721ee6eafd5c0c1b0f8d14f59f4ad728f00288c9"
+    },
+    "core/sandboxed_java_toolchain_discovery.py": {
+      "after_sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff",
+      "before_sha256": "df3c047cdc64dec92827bf32cd78ba85a61837d436fe3d90c04905662019dbff"
+    },
+    "core/sandboxed_java_toolchain_probe.py": {
+      "after_sha256": "58e791ed6ac7c99a41386345ce8d392ca74cb8f574a8207fe1c85afa335ec606",
+      "before_sha256": "58e791ed6ac7c99a41386345ce8d392ca74cb8f574a8207fe1c85afa335ec606"
+    },
+    "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json": {
+      "after_sha256": "b56e2d883b08b7dc0040a69d851c9158e232869f07cfc4740e2ccc5b981a28b3",
+      "before_sha256": "b56e2d883b08b7dc0040a69d851c9158e232869f07cfc4740e2ccc5b981a28b3"
+    },
+    "docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json": {
+      "after_sha256": "1bda26a4fc288cf35d8d73f203af7819423f681dfd0ba7dee4b53b4587f61124",
+      "before_sha256": "1bda26a4fc288cf35d8d73f203af7819423f681dfd0ba7dee4b53b4587f61124"
+    },
+    "docs/roadmap/RUNTIME_JAVA_1.md": {
+      "after_sha256": "1ac641eaf21aeff69adc0dda3781a05e909bd1a05e8a0180d8c100b942a4c93c",
+      "before_sha256": "1ac641eaf21aeff69adc0dda3781a05e909bd1a05e8a0180d8c100b942a4c93c"
+    },
+    "docs/roadmap/RUNTIME_JAVA_1_LOCAL.json": {
+      "after_sha256": "bf73f4b738e3fd094b0034db2bd3cc00342f3c451a4d77760fa00947c48b7ede",
+      "before_sha256": "bf73f4b738e3fd094b0034db2bd3cc00342f3c451a4d77760fa00947c48b7ede"
+    },
+    "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json": {
+      "after_sha256": "9ff682d3459795cc0ccbd712dad8485288238b20ccfa5cde22334d5ca907bb7f",
+      "before_sha256": "9ff682d3459795cc0ccbd712dad8485288238b20ccfa5cde22334d5ca907bb7f"
+    },
+    "docs/roadmap/phase_registry.json": {
+      "after_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+      "before_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c"
+    },
+    "tests/fixtures/runtime_java1_reversal.json": {
+      "after_sha256": "18b41f3549c6c3dd73b141a8f15ab8aaa8a07e3efbd517fc408a953f65e9e135",
+      "before_sha256": "18b41f3549c6c3dd73b141a8f15ab8aaa8a07e3efbd517fc408a953f65e9e135"
+    }
+  },
+  "historical_interpretation": "RUNTIME_JAVA_1_BLOCKED_SANDBOX_INCOMPATIBLE was an umbrella blocked outcome. Its measured cause was controller output-reader thread start failure. No JVM/seccomp incompatibility was proven.",
+  "historical_java_stage": {
+    "javac_output_bytes": null,
+    "javac_pid": null,
+    "javac_popen_returned_before_thread_failure": true,
+    "jvm_fixture_reached": false,
+    "jvm_initialization_observed": false,
+    "scope": "Popen return is proven by frozen source and historical traceback; no historical PID or output measurement exists."
+  },
+  "host_after_cleanup": {
+    "os_threads": null,
+    "pid": 30816,
+    "python_threads": 1,
+    "reader_threads_alive": 0
+  },
+  "host_before": {
+    "os_threads": null,
+    "pid": 30816,
+    "python_threads": 1,
+    "reader_threads_alive": 0
+  },
+  "host_readers": {
+    "created": 92,
+    "joined": 92,
+    "started": 92,
+    "surviving": 0
+  },
+  "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+  "java_launch_count": 0,
+  "java_stage_classification": "java_stage_not_started",
+  "jvm_fixture_count": 0,
+  "measurements": {
+    "after_cleanup": {
+      "memory_current": "13606912",
+      "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+      "memory_max": "134217728",
+      "os_threads": 1,
+      "pid": 1,
+      "pids_current": "1",
+      "pids_events": "max 0",
+      "pids_max": "128",
+      "python_threads": 1,
+      "reader_threads_alive": 0,
+      "seccomp_mode": "2",
+      "vm_rss": "21548 kB",
+      "vm_size": "36268 kB"
+    },
+    "attempts": [
+      {
+        "after_cleanup": {
+          "memory_current": "13463552",
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "memory_max": "134217728",
+          "os_threads": 1,
+          "pid": 1,
+          "pids_current": "1",
+          "pids_events": "max 0",
+          "pids_max": "128",
+          "python_threads": 1,
+          "reader_threads_alive": 0,
+          "seccomp_mode": "2",
+          "vm_rss": "21544 kB",
+          "vm_size": "36264 kB"
+        },
+        "before": {
+          "memory_current": "13357056",
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "memory_max": "134217728",
+          "os_threads": 1,
+          "pid": 1,
+          "pids_current": "1",
+          "pids_events": "max 0",
+          "pids_max": "128",
+          "python_threads": 1,
+          "reader_threads_alive": 0,
+          "seccomp_mode": "2",
+          "vm_rss": "21540 kB",
+          "vm_size": "28068 kB"
+        },
+        "capture_completed": false,
+        "error": "can't start new thread",
+        "error_type": "RuntimeError",
+        "index": 0,
+        "live_children_after_cleanup": 0,
+        "open_child_streams_after_cleanup": 0,
+        "reader_start_events": [
+          {
+            "before_start": {
+              "memory_current": "13357056",
+              "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+              "memory_max": "134217728",
+              "os_threads": 1,
+              "pid": 1,
+              "pids_current": "2",
+              "pids_events": "max 0",
+              "pids_max": "128",
+              "python_threads": 1,
+              "reader_threads_alive": 0,
+              "seccomp_mode": "2",
+              "vm_rss": "21540 kB",
+              "vm_size": "28068 kB"
+            },
+            "error": "can't start new thread",
+            "error_type": "RuntimeError",
+            "purpose": "stdout_reader",
+            "started": false
+          }
+        ],
+        "readers_created": 2,
+        "readers_joined": 0,
+        "readers_started": 0
+      },
+      {
+        "after_cleanup": {
+          "memory_current": "13471744",
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "memory_max": "134217728",
+          "os_threads": 1,
+          "pid": 1,
+          "pids_current": "1",
+          "pids_events": "max 0",
+          "pids_max": "128",
+          "python_threads": 1,
+          "reader_threads_alive": 0,
+          "seccomp_mode": "2",
+          "vm_rss": "21544 kB",
+          "vm_size": "36264 kB"
+        },
+        "before": {
+          "memory_current": "13463552",
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "memory_max": "134217728",
+          "os_threads": 1,
+          "pid": 1,
+          "pids_current": "1",
+          "pids_events": "max 0",
+          "pids_max": "128",
+          "python_threads": 1,
+          "reader_threads_alive": 0,
+          "seccomp_mode": "2",
+          "vm_rss": "21544 kB",
+          "vm_size": "36264 kB"
+        },
+        "capture_completed": false,
+        "error": "can't start new thread",
+        "error_type": "RuntimeError",
+        "index": 1,
+        "live_children_after_cleanup": 0,
+        "open_child_streams_after_cleanup": 0,
+        "reader_start_events": [
+          {
+            "before_start": {
+              "memory_current": "13348864",
+              "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+              "memory_max": "134217728",
+              "os_threads": 1,
+              "pid": 1,
+              "pids_current": "2",
+              "pids_events": "max 0",
+              "pids_max": "128",
+              "python_threads": 1,
+              "reader_threads_alive": 0,
+              "seccomp_mode": "2",
+              "vm_rss": "21544 kB",
+              "vm_size": "36264 kB"
+            },
+            "error": "can't start new thread",
+            "error_type": "RuntimeError",
+            "purpose": "stdout_reader",
+            "started": false
+          }
+        ],
+        "readers_created": 2,
+        "readers_joined": 0,
+        "readers_started": 0
+      },
+      {
+        "after_cleanup": {
+          "memory_current": "13606912",
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "memory_max": "134217728",
+          "os_threads": 1,
+          "pid": 1,
+          "pids_current": "1",
+          "pids_events": "max 0",
+          "pids_max": "128",
+          "python_threads": 1,
+          "reader_threads_alive": 0,
+          "seccomp_mode": "2",
+          "vm_rss": "21544 kB",
+          "vm_size": "36264 kB"
+        },
+        "before": {
+          "memory_current": "13471744",
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "memory_max": "134217728",
+          "os_threads": 1,
+          "pid": 1,
+          "pids_current": "1",
+          "pids_events": "max 0",
+          "pids_max": "128",
+          "python_threads": 1,
+          "reader_threads_alive": 0,
+          "seccomp_mode": "2",
+          "vm_rss": "21544 kB",
+          "vm_size": "36264 kB"
+        },
+        "capture_completed": false,
+        "error": "can't start new thread",
+        "error_type": "RuntimeError",
+        "index": 2,
+        "live_children_after_cleanup": 0,
+        "open_child_streams_after_cleanup": 0,
+        "reader_start_events": [
+          {
+            "before_start": {
+              "memory_current": "13471744",
+              "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+              "memory_max": "134217728",
+              "os_threads": 1,
+              "pid": 1,
+              "pids_current": "2",
+              "pids_events": "max 0",
+              "pids_max": "128",
+              "python_threads": 1,
+              "reader_threads_alive": 0,
+              "seccomp_mode": "2",
+              "vm_rss": "21544 kB",
+              "vm_size": "36264 kB"
+            },
+            "error": "can't start new thread",
+            "error_type": "RuntimeError",
+            "purpose": "stdout_reader",
+            "started": false
+          }
+        ],
+        "readers_created": 2,
+        "readers_joined": 0,
+        "readers_started": 0
+      }
+    ],
+    "compilation_count": 0,
+    "container_processes_after_cleanup": [
+      1
+    ],
+    "controller": {
+      "baseline": {
+        "memory_current": "13357056",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "memory_max": "134217728",
+        "os_threads": 1,
+        "pid": 1,
+        "pids_current": "1",
+        "pids_events": "max 0",
+        "pids_max": "128",
+        "python_threads": 1,
+        "reader_threads_alive": 0,
+        "seccomp_mode": "2",
+        "vm_rss": "21540 kB",
+        "vm_size": "28068 kB"
+      },
+      "executable": "/usr/local/bin/python",
+      "owner": "sandbox_container",
+      "pid": 1,
+      "python_version": "3.12.13",
+      "uid": 65534
+    },
+    "java_launch_count": 0,
+    "jvm_fixture_count": 0,
+    "native": {
+      "clone3_errno": 1,
+      "clone3_invalid_arguments_result": -1,
+      "libc_version": "2.41",
+      "pthread_create_return_code": 1,
+      "rlimit_as": [
+        -1,
+        -1
+      ],
+      "rlimit_nproc": [
+        -1,
+        -1
+      ],
+      "rlimit_stack": [
+        8388608,
+        -1
+      ]
+    },
+    "work_files_after_cleanup": []
+  },
+  "phase_container_count_after_teardown": 0,
+  "phase_id": "RUNTIME.JAVA.1A",
+  "reflection_count": 0,
+  "report_only": true,
+  "repository_write_authority": false,
+  "runtime_authority": false,
+  "runtime_policy_authorizations_consumed": 0,
+  "sandbox_authentication": {
+    "descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+    "receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+    "status": "RUNTIME_SANDBOX_1_COMPLETE_WITH_WARNINGS"
+  },
+  "seccomp_jvm_causality_proven": false,
+  "seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+  "status": "RUNTIME_JAVA_1A_CONTROLLER_FAILURE_UNRESOLVED",
+  "temporary_workspace_removed": true,
+  "validation": {
+    "benchmarks_check": {
+      "agent_execution": false,
+      "cases": 54,
+      "errors": 0
+    },
+    "compileall": "passed",
+    "git_diff_check": "passed",
+    "java1a_focused": {
+      "failed": 0,
+      "passed": 23
+    },
+    "new_file_whitespace_check": "passed",
+    "protected_file_hashes_rechecked": "passed",
+    "required_adjacent_regressions": {
+      "failed": 0,
+      "historical_registry_plugin": "tests._runtime_java1_frozen_regressions",
+      "includes_java1a_focused_tests": 23,
+      "passed": 740,
+      "scope": [
+        "JAVA.1A",
+        "RUNTIME.SANDBOX.1 authentication and lifecycle",
+        "RUNTIME.JAVA.1 negatives, discovery and governance",
+        "EXECUTOR.1 blocked state and effect denial",
+        "PREFLIGHT.RUNTIME.1 authority and effect denial",
+        "authority, Apply and path safety",
+        "registry and picker"
+      ],
+      "seconds": 86.87,
+      "warning_category": "existing google.genai dependency deprecation",
+      "warnings": 1
+    }
+  },
+  "verification_date_kst": "2026-10-07"
+}

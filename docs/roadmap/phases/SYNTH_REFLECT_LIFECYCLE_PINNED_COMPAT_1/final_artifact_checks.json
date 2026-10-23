@@ -1,0 +1,9 @@
+{
+  "JSON": true,
+  "checked_artifacts": 20,
+  "final_report_sha256": "f0062d712636e9aa0693bf829b3de9e31e3e5fd7e54547a27d8c4078d64e4cf2",
+  "focused_test_matches_executed_bytes": true,
+  "in_memory_compilation": true,
+  "passed": true,
+  "whitespace": true
+}

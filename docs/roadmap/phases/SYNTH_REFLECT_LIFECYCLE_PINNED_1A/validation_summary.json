@@ -1,0 +1,458 @@
+{
+  "all_guarded_runs_zero_effects": true,
+  "benchmark_cases_checked": 54,
+  "benchmark_errors": 0,
+  "frozen_source_checks": {
+    "capability_objects_constructed": false,
+    "checks": {
+      "behavioral_diagnostic_executor_lifecycle_retry_historical_stop_preserved": true,
+      "behavioral_diagnostic_executor_lifecycle_retry_no_transition_or_executor_added": true,
+      "behavioral_diagnostic_executor_refresh_historical_stop_preserved": true,
+      "behavioral_diagnostic_executor_refresh_no_transition_or_executor_added": true,
+      "behavioral_diagnostic_executor_retry_historical_stop_preserved": true,
+      "behavioral_diagnostic_executor_retry_no_transition_or_executor_added": true,
+      "old_admission_uses_unchanged_public_auth_and_request_validators": true,
+      "old_lifecycle_keeps_original_public_epoch": true,
+      "old_renderer_only_authenticates_original_request": true,
+      "pinned_admission_keeps_public_graph_authentication": true,
+      "pinned_admission_retains_original_graph_and_signed_identity": true,
+      "pinned_runtime_behavioral_readiness_remains_false": true,
+      "pinned_runtime_consumer_still_unconditionally_unresolved": true,
+      "pinned_runtime_state_uses_public_exact_authorization": true
+    },
+    "owner_modules_imported": false,
+    "passed": true,
+    "passed_count": 14
+  },
+  "full_suite_run": false,
+  "git_diff_check": {
+    "command": "git diff --check",
+    "exit_code": 0,
+    "output": "warning: in the working copy of 'core/explicit_evidence.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'core/input_understanding.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'core/live_task_shape.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'core/oop_intent_session.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'core/oop_semantic_review.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'core/phase_registry.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'core/requirement_preservation.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'core/semantic_waiter.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'core/semantic_waiter_adapter.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'core/task_contract.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'docs/roadmap/phase_registry.json', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'main.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'tests/_oop_intent_ui1_maintenance.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'tests/test_input_understanding.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'tests/test_phase_picker.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'tests/test_phase_registry.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'web/app.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'web/oop_intent_adapter.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'web/runner.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'web/session_presentation.py', LF will be replaced by CRLF the next time Git touches it\r\nwarning: in the working copy of 'web/templates/index.html', LF will be replaced by CRLF the next time Git touches it\r\n"
+  },
+  "passed": true,
+  "phase_id": "SYNTH.REFLECT.LIFECYCLE.PINNED.1",
+  "preservation": {
+    "baseline_file_count": 2444,
+    "basis": "Preimplementation workspace bytes, including existing untracked historical files and user edits",
+    "changed": [],
+    "deleted": [],
+    "passed": true
+  },
+  "registry_picker": {
+    "after_collected": 299,
+    "after_failed": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "after_passed": 292,
+    "baseline_collected": 299,
+    "baseline_failed": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "baseline_passed": 292,
+    "registry_and_picker_projections_identical": true,
+    "unchanged": true
+  },
+  "report_consistency": {
+    "checks": {
+      "all_eight_APIs": true,
+      "exact_domain": true,
+      "exact_phase": true,
+      "exact_schema": true,
+      "exact_status": true,
+      "exact_type": true,
+      "exactly_three_states": true,
+      "historical_and_operational_flags_false": true,
+      "isolated_counts_current": true,
+      "no_effect_evidence_claim": true,
+      "no_full_suite_claim": true,
+      "operational_effects_exact_zero": true,
+      "owner_hash_current": true,
+      "readiness_unresolved": true
+    },
+    "owner_modules_imported": false,
+    "passed": true
+  },
+  "runs": {
+    "benchmark": {
+      "all_operational_effects_zero": true,
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "process_attempts": 0,
+        "repository_runtime_write_attempts": 0
+      },
+      "blocked_actions": [],
+      "bytecode_writes_disabled": true,
+      "exit_code": 0,
+      "full_issuance_dependent_suites_run": false,
+      "harness_sha256": "9b8f68f76ef9bff1d90e12603240f472c2e60411612cb3afce35b2bd13eca679",
+      "imported_capability_owners": [],
+      "mode": "benchmark",
+      "production_registries_seeded": false,
+      "production_validators_patched": false,
+      "scratch_inside_new_phase": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_REFLECT_LIFECYCLE_PINNED_1A\\validation_tmp\\benchmark"
+    },
+    "focused": {
+      "all_operational_effects_zero": true,
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "process_attempts": 0,
+        "repository_runtime_write_attempts": 0
+      },
+      "blocked_actions": [],
+      "bytecode_writes_disabled": true,
+      "collected": 151,
+      "exit_code": 0,
+      "failed": [],
+      "full_issuance_dependent_suites_run": false,
+      "harness_sha256": "9b8f68f76ef9bff1d90e12603240f472c2e60411612cb3afce35b2bd13eca679",
+      "imported_capability_owners": [],
+      "mode": "focused",
+      "passed_count": 151,
+      "production_registries_seeded": false,
+      "production_validators_patched": false,
+      "scratch_inside_new_phase": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_REFLECT_LIFECYCLE_PINNED_1A\\validation_tmp\\focused",
+      "skipped": []
+    },
+    "frozen": {
+      "all_operational_effects_zero": true,
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "process_attempts": 0,
+        "repository_runtime_write_attempts": 0
+      },
+      "blocked_actions": [],
+      "bytecode_writes_disabled": true,
+      "capability_classes_constructed": false,
+      "collected": 14,
+      "exit_code": 0,
+      "failed": [],
+      "full_issuance_dependent_suites_run": false,
+      "harness_sha256": "9b8f68f76ef9bff1d90e12603240f472c2e60411612cb3afce35b2bd13eca679",
+      "imported_capability_owners": [],
+      "mode": "frozen",
+      "owner_modules_imported": false,
+      "passed_count": 14,
+      "production_registries_seeded": false,
+      "production_validators_patched": false,
+      "scratch_inside_new_phase": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_REFLECT_LIFECYCLE_PINNED_1A\\validation_tmp\\frozen",
+      "skipped": [],
+      "source_only_extraction": true,
+      "test_fixtures_executed": false
+    },
+    "isolated": {
+      "all_operational_effects_zero": true,
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "process_attempts": 0,
+        "production_validator_attempts": 0,
+        "repository_runtime_write_attempts": 0
+      },
+      "blocked_actions": [],
+      "bytecode_writes_disabled": true,
+      "collected": 176,
+      "exit_code": 0,
+      "failed": [],
+      "full_issuance_dependent_suites_run": false,
+      "harness_sha256": "dd3491dcb063191e46ba6e890161b0d4188510a7872d33ce9a70d45177dfd17b",
+      "imported_capability_owners": [
+        "core.runtime_java_pinned_backend_target_binding",
+        "core.runtime_java_pinned_provider",
+        "core.runtime_java_pinned_requirement",
+        "core.runtime_java_pinned_target_archive",
+        "core.runtime_java_pinned_target_inspection",
+        "core.sandboxed_java_capture_recovery",
+        "core.sandboxed_java_positive_continuation",
+        "core.sandboxed_java_positive_probe",
+        "core.sandboxed_java_single_thread_probe",
+        "core.sandboxed_java_toolchain",
+        "core.sandboxed_java_toolchain_discovery",
+        "core.sandboxed_java_toolchain_probe",
+        "core.synthetic_read_only_reflection",
+        "core.synthetic_reflection_execution_admission",
+        "core.synthetic_reflection_execution_admission_pinned",
+        "core.synthetic_reflection_execution_lifecycle",
+        "core.synthetic_reflection_execution_lifecycle_pinned",
+        "core.synthetic_runtime_authorization",
+        "core.synthetic_runtime_authorization_lifecycle",
+        "core.synthetic_runtime_authorization_pinned",
+        "core.synthetic_runtime_authorization_pinned_lifecycle"
+      ],
+      "mode": "isolated",
+      "passed_count": 176,
+      "production_registries_seeded": false,
+      "production_validators_patched": false,
+      "readonly_production_imports_for_preservation_snapshots": true,
+      "scratch_inside_new_phase": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_REFLECT_LIFECYCLE_PINNED_1A\\validation_tmp\\isolated",
+      "skipped": []
+    },
+    "registry_after": {
+      "all_operational_effects_zero": true,
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "process_attempts": 0,
+        "production_validator_attempts": 0,
+        "repository_runtime_write_attempts": 0
+      },
+      "blocked_actions": [],
+      "bytecode_writes_disabled": true,
+      "collected": 299,
+      "exit_code": 1,
+      "failed": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "full_issuance_dependent_suites_run": false,
+      "harness_sha256": "dd3491dcb063191e46ba6e890161b0d4188510a7872d33ce9a70d45177dfd17b",
+      "imported_capability_owners": [],
+      "mode": "registry_after",
+      "passed_count": 292,
+      "production_registries_seeded": false,
+      "production_validators_patched": false,
+      "readonly_production_imports_for_preservation_snapshots": false,
+      "scratch_inside_new_phase": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_REFLECT_LIFECYCLE_PINNED_1A\\validation_tmp\\registry_after",
+      "skipped": []
+    },
+    "registry_baseline": {
+      "all_operational_effects_zero": true,
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "process_attempts": 0,
+        "repository_runtime_write_attempts": 0
+      },
+      "blocked_actions": [],
+      "bytecode_writes_disabled": true,
+      "collected": 299,
+      "exit_code": 1,
+      "failed": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "full_issuance_dependent_suites_run": false,
+      "harness_sha256": "9b8f68f76ef9bff1d90e12603240f472c2e60411612cb3afce35b2bd13eca679",
+      "imported_capability_owners": [],
+      "mode": "registry_baseline",
+      "passed_count": 292,
+      "production_registries_seeded": false,
+      "production_validators_patched": false,
+      "scratch_inside_new_phase": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\SYNTH_REFLECT_LIFECYCLE_PINNED_1A\\validation_tmp\\registry_baseline",
+      "skipped": []
+    }
+  },
+  "scope_passed": true,
+  "stale_contract_test_deselected": {
+    "nodeid": "tests/test_synthetic_reflection_pinned_contract.py::test_contract_freezes_semantics_and_creates_no_owners_types_or_registry_entries",
+    "reason": "Historical contract-freeze assertion predates additive owners; pinned admission already exists at baseline. Frozen test and contract bytes preserved."
+  },
+  "static": {
+    "UTF8_JSON_validated": [
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/benchmark.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/focused.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/frozen.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/frozen_source_checks.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/git_diff_check.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/isolated.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/isolated_bootstrap_blocked.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/preservation_baseline.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/preservation_check.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/registry_after.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/registry_baseline.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/registry_comparison.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/report_consistency.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/static_validation.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/SYNTH_REFLECT_LIFECYCLE_PINNED_1A_REPORT.json",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/validation_summary.json"
+    ],
+    "bytecode_written": false,
+    "compiled_in_memory": [
+      "core/behavioral_diagnostic_executor_lifecycle_retry.py",
+      "core/behavioral_diagnostic_executor_refresh.py",
+      "core/behavioral_diagnostic_executor_retry.py",
+      "core/synthetic_read_only_reflection.py",
+      "core/synthetic_reflection_execution_admission.py",
+      "core/synthetic_reflection_execution_admission_pinned.py",
+      "core/synthetic_reflection_execution_lifecycle.py",
+      "core/synthetic_reflection_execution_lifecycle_pinned.py",
+      "core/synthetic_runtime_authorization.py",
+      "core/synthetic_runtime_authorization_lifecycle.py",
+      "core/synthetic_runtime_authorization_pinned.py",
+      "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/finalize_validation.py",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/validate_pure.py",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/write_report.py",
+      "tests/test_synthetic_read_only_reflection.py",
+      "tests/test_synthetic_reflection_execution_admission.py",
+      "tests/test_synthetic_reflection_execution_admission_pinned.py",
+      "tests/test_synthetic_reflection_execution_lifecycle.py",
+      "tests/test_synthetic_reflection_execution_lifecycle_pinned.py",
+      "tests/test_synthetic_reflection_lifecycle_pinned_compat.py",
+      "tests/test_synthetic_reflection_pinned_contract.py",
+      "tests/test_synthetic_runtime_authorization.py",
+      "tests/test_synthetic_runtime_authorization_lifecycle.py",
+      "tests/test_synthetic_runtime_authorization_lifecycle_pinned_compat.py",
+      "tests/test_synthetic_runtime_authorization_lifecycle_pinned_contract.py",
+      "tests/test_synthetic_runtime_authorization_pinned.py",
+      "tests/test_synthetic_runtime_authorization_pinned_lifecycle.py",
+      "tests/test_synthetic_runtime_authorization_pinned_replay.py"
+    ],
+    "errors": [],
+    "owner_modules_imported": false,
+    "parsed_AST": [
+      "core/behavioral_diagnostic_executor_lifecycle_retry.py",
+      "core/behavioral_diagnostic_executor_refresh.py",
+      "core/behavioral_diagnostic_executor_retry.py",
+      "core/synthetic_read_only_reflection.py",
+      "core/synthetic_reflection_execution_admission.py",
+      "core/synthetic_reflection_execution_admission_pinned.py",
+      "core/synthetic_reflection_execution_lifecycle.py",
+      "core/synthetic_reflection_execution_lifecycle_pinned.py",
+      "core/synthetic_runtime_authorization.py",
+      "core/synthetic_runtime_authorization_lifecycle.py",
+      "core/synthetic_runtime_authorization_pinned.py",
+      "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/finalize_validation.py",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/validate_pure.py",
+      "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_PINNED_1A/write_report.py",
+      "tests/test_synthetic_read_only_reflection.py",
+      "tests/test_synthetic_reflection_execution_admission.py",
+      "tests/test_synthetic_reflection_execution_admission_pinned.py",
+      "tests/test_synthetic_reflection_execution_lifecycle.py",
+      "tests/test_synthetic_reflection_execution_lifecycle_pinned.py",
+      "tests/test_synthetic_reflection_lifecycle_pinned_compat.py",
+      "tests/test_synthetic_reflection_pinned_contract.py",
+      "tests/test_synthetic_runtime_authorization.py",
+      "tests/test_synthetic_runtime_authorization_lifecycle.py",
+      "tests/test_synthetic_runtime_authorization_lifecycle_pinned_compat.py",
+      "tests/test_synthetic_runtime_authorization_lifecycle_pinned_contract.py",
+      "tests/test_synthetic_runtime_authorization_pinned.py",
+      "tests/test_synthetic_runtime_authorization_pinned_lifecycle.py",
+      "tests/test_synthetic_runtime_authorization_pinned_replay.py"
+    ],
+    "passed": true,
+    "whitespace_errors": []
+  }
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "command": "image",
+    "config_absent_before": true,
+    "exit_code": 1,
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "image_subcommand": "inspect",
+    "pipes_closed": true,
+    "private_config_path": "C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{ec947724-d301-4a47-a8a5-da1d669e0072}\\AC\\Temp\\runtime-sandbox1-no-config-322dc8609942a6eb0833afad2a05401e",
+    "process_reaped": true,
+    "readers_surviving": 0,
+    "scope": "JAVA1C_SANDBOX2_infrastructure",
+    "shell": false,
+    "status": "sandbox_completed"
+  },
+  {
+    "command": "ps",
+    "config_absent_before": true,
+    "exit_code": 1,
+    "pipes_closed": true,
+    "private_config_path": "C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{ec947724-d301-4a47-a8a5-da1d669e0072}\\AC\\Temp\\runtime-sandbox1-no-config-322dc8609942a6eb0833afad2a05401e",
+    "process_reaped": true,
+    "readers_surviving": 0,
+    "scope": "JAVA1C_SANDBOX2_infrastructure",
+    "shell": false,
+    "status": "sandbox_completed"
+  },
+  {
+    "command": "ps",
+    "config_absent_before": true,
+    "exit_code": 1,
+    "pipes_closed": true,
+    "private_config_path": "C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{ec947724-d301-4a47-a8a5-da1d669e0072}\\AC\\Temp\\runtime-sandbox1-no-config-77e1b68c0512dc6390c795e87ff61ec4",
+    "process_reaped": true,
+    "readers_surviving": 0,
+    "scope": "JAVA1C_controls",
+    "shell": false,
+    "status": "sandbox_completed"
+  }
+]

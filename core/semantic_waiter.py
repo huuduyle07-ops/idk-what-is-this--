@@ -30,6 +30,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
 
 from core.behavioral_expectation import BehavioralExpectation
+from core.explicit_design_evidence import DesignEvidence
 from core.explicit_evidence import ExplicitEvidence
 from core.task_contract import (
     MAX_SUBJECTS,
@@ -91,6 +92,8 @@ class SemanticInterpretation:
     missing_information: tuple[str, ...] = ()
     execution_requirements: ExecutionRequirements = field(default_factory=ExecutionRequirements)
     notes: tuple[str, ...] = ()
+    #: OOP.INTENT.DESIGN.1 — intake-owned literals, never model-authored.
+    design_evidence: DesignEvidence = field(default_factory=DesignEvidence)
 
     def subjects_by_value(self) -> dict[str, Subject]:
         return {subject.value: subject for subject in self.subjects}
@@ -112,6 +115,8 @@ class SemanticInterpretation:
             "missing_information": list(self.missing_information),
             "execution_requirements": self.execution_requirements.as_dict(),
             "notes": list(self.notes),
+            **({"design_evidence": self.design_evidence.as_dict()}
+               if not self.design_evidence.is_empty() else {}),
         }
 
 
@@ -230,6 +235,7 @@ class ExplicitEvidenceInterpreter:
             # DEFECT.FACT.LIVE.1 — promoted verbatim.  These are already typed
             # and already user-sourced; there is nothing here left to interpret.
             behavioral_expectations=explicit_evidence.behavioral_expectations,
+            design_evidence=explicit_evidence.design_evidence,
             execution_requirements=_execution_requirements(explicit_evidence),
         )
 

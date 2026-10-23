@@ -1,0 +1,31 @@
+{
+  "mode": "benchmark_check",
+  "exit_code": 0,
+  "real_effect_attempts": [
+    "socket.bind"
+  ],
+  "denied_attempts": {},
+  "benchmark_arguments": [
+    "benchmarks/run_benchmarks.py",
+    "--check"
+  ],
+  "elapsed_seconds": 6.212,
+  "scope": "Pure host maintenance and fabricated in-memory fixtures only. Audit hooks and frozen guard deny operational processes/network before execution. Tests may mock owners/controls to validate contracts; no live Docker, Java, javac, controller, authorization, lease, executor, or Apply is run. Repository reads, Python validation, and new phase temporary/artifact writes are maintenance.",
+  "successful_operational_effect_counts": {
+    "Docker": 0,
+    "containers": 0,
+    "exports": 0,
+    "Java": 0,
+    "javac": 0,
+    "controller": 0,
+    "network": 0,
+    "shell": 0,
+    "host mounts": 0,
+    "source projection": 0,
+    "runtime lease consumption": 0,
+    "reflection lease consumption": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0
+  }
+}

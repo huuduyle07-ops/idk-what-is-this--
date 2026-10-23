@@ -1,0 +1,3042 @@
+{
+  "aba_resistance_proven": false,
+  "apply_authority": false,
+  "arbitrary_command_authority": false,
+  "attachment": {
+    "aba_resistance_proven": false,
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "attachment_fingerprint": "c6f820460d23ec779c51bf2c8fd52691ef5d24d1d5086c38fad336a105bb4a89",
+    "attachment_id": "ce1463527098fde303a10164c8de818c6d99b157ac28c3b834624e26318eb193",
+    "backend_identity_post": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+    "backend_identity_pre": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+    "backend_version_post": "29.6.1",
+    "backend_version_pre": "29.6.1",
+    "binding_semantics": "original_java1_route_and_server_version_v1",
+    "canonical_backend_identity": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+    "canonical_backend_version": "29.6.1",
+    "compatibility_authority": false,
+    "daemon_continuity_authority": false,
+    "daemon_continuity_proven": false,
+    "daemon_instance_identity_available": false,
+    "host_mount_authority": false,
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "issuing_pid": 36892,
+    "measurement_method_id": "frozen_local_docker_version_server_v1",
+    "network_authority": false,
+    "phase_id": "RUNTIME.SANDBOX.BIND.1",
+    "post_control_reaped_and_pipes_closed": true,
+    "pre_control_reaped_and_pipes_closed": true,
+    "real_task_runtime_authority": false,
+    "remaining_phase_containers": 0,
+    "repository_write_authority": false,
+    "route_version_bracket_equal": true,
+    "runtime_authority": false,
+    "sandbox_cleanup_verified": true,
+    "sandbox_descriptor_fingerprint": "fc78c9b36c51bfb49fb99ac145f2aac0f0e1672a612594c7738efa349fc0a504",
+    "sandbox_phase_id": "RUNTIME.SANDBOX.2",
+    "sandbox_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "sandbox_receipt_evidence_sha256": "7241120ac81ed1a46a08ad029881eb25368cb71e2a09cc602d8d7e0f223efe42",
+    "sandbox_receipt_fingerprint": "e3a67bf7ca7919c933fa46dfe7e7b8ee1a666c1f5689cc6088e1b67f765a638d",
+    "sandbox_schema_version": "runtime_sandbox_2_v1",
+    "schema_version": "runtime_sandbox_backend_binding_1_v1",
+    "shell_authority": false,
+    "shell_available": false,
+    "temporary_workspace_removed": true
+  },
+  "attachment_authentication": true,
+  "attachment_fingerprint": "c6f820460d23ec779c51bf2c8fd52691ef5d24d1d5086c38fad336a105bb4a89",
+  "attachment_id": "ce1463527098fde303a10164c8de818c6d99b157ac28c3b834624e26318eb193",
+  "attachment_issued": true,
+  "backend_identity_post": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+  "backend_identity_pre": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+  "backend_version_post": "29.6.1",
+  "backend_version_pre": "29.6.1",
+  "binding_only_effects": {
+    "container_create_attempts": 0,
+    "container_start_attempts": 0,
+    "containers_created": 0,
+    "docker_calls": 2,
+    "image_builds": 0,
+    "image_exports": 0,
+    "image_inspect_calls": 0,
+    "image_inventory_calls": 0,
+    "image_pulls": 0,
+    "version_calls": 2
+  },
+  "binding_semantics": "original_java1_route_and_server_version_v1",
+  "canonical_backend_identity": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+  "canonical_backend_version": "29.6.1",
+  "cleanup_verified": true,
+  "comparison_semantics": "exact Python string equality; no normalization",
+  "compatibility_authority": false,
+  "controlled_discovery_comparison": true,
+  "copy_json_process_hmac_negatives_rejected": true,
+  "daemon_continuity_authority": false,
+  "daemon_continuity_proven": false,
+  "daemon_instance_identity_available": false,
+  "discovery_comparison_is_authenticated_discovery_evidence": false,
+  "docker_control_calls": [
+    {
+      "command": "version",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "binding_pre"
+    },
+    {
+      "command": "image",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": "inspect",
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "create",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "start",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "rm",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "create",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "start",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "rm",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "create",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "start",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "rm",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "create",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "start",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "rm",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "create",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "start",
+      "completed": false,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "rm",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "create",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "start",
+      "completed": false,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "rm",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "create",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "start",
+      "completed": false,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "rm",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "create",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "start",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "rm",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "create",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "start",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "rm",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "create",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "start",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "rm",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "create",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "start",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "kill",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "rm",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "inspect",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 1,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "ps",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "sandbox2_infrastructure"
+    },
+    {
+      "command": "version",
+      "completed": true,
+      "control_reaped_and_pipes_closed": true,
+      "exit_code": 0,
+      "operation": null,
+      "scope": "binding_post"
+    }
+  ],
+  "exact_live_pair_revalidated": true,
+  "exported_json_is_report_only": true,
+  "fresh_sandbox2_authenticated": true,
+  "fresh_sandbox2_invocations": 1,
+  "historical_preservation": {
+    "all_preserved": true,
+    "already_missing_paths_preserved": 8,
+    "existing_files_preserved": 1835,
+    "new_files": [
+      "core/sandbox_backend_binding.py",
+      "scripts/replay_runtime_sandbox_bind1.py",
+      "tests/test_runtime_sandbox_bind1.py",
+      "docs/roadmap/RUNTIME_SANDBOX_BIND_1.md",
+      "docs/roadmap/RUNTIME_SANDBOX_BIND_1_LOCAL.json",
+      "docs/roadmap/RUNTIME_SANDBOX_BIND_1_PRESERVATION.json"
+    ],
+    "phase_id": "RUNTIME.SANDBOX.BIND.1",
+    "pre_existing_paths": 1843,
+    "registry_or_reversal_repins": false,
+    "scope": "all pre-existing tracked/nonignored paths",
+    "stash_reset_clean_used": false
+  },
+  "host_mount_authority": false,
+  "identity_semantics": "\"local-docker:\" + sandbox._local_endpoint()",
+  "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+  "live_sandbox2": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "bank_execution_count": 0,
+    "behavioral_execution_count": 0,
+    "cleanup_verified": true,
+    "compile_count": 0,
+    "console_count": 0,
+    "descriptor": {
+      "apply_authority": false,
+      "arbitrary_command_authority": false,
+      "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+      "eligible_for_java1_continuation": true,
+      "host_mount_authority": false,
+      "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+      "network_authority": false,
+      "phase_id": "RUNTIME.SANDBOX.2",
+      "relationship": "additive_epoch_preserving_SANDBOX_1_history",
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "sandbox_descriptor_fingerprint": "fc78c9b36c51bfb49fb99ac145f2aac0f0e1672a612594c7738efa349fc0a504",
+      "schema_version": "runtime_sandbox_2_v1",
+      "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "shell_available": false,
+      "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+      "verification_receipt_fingerprint": "e3a67bf7ca7919c933fa46dfe7e7b8ee1a666c1f5689cc6088e1b67f765a638d"
+    },
+    "executor_refreshed_or_resumed": false,
+    "exported_json_is_report_only": true,
+    "host_mount_authority": false,
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "java1_completed": false,
+    "java_version_count": 1,
+    "javac_version_count": 1,
+    "jvm_fixture_count": 0,
+    "network_authority": false,
+    "phase_container_count_after_teardown": 0,
+    "phase_id": "RUNTIME.SANDBOX.2",
+    "policy_diff": {
+      "baseline_profile": "runtime_sandbox_1_v1",
+      "baseline_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+      "candidate_profile": "runtime_sandbox_2_v1",
+      "candidate_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "legacy_clone_policy": "allow_except_seven_forbidden_namespace_bits",
+      "legacy_clone_rules_unchanged": true,
+      "semantic_changes": [
+        {
+          "execution_allowed_after": false,
+          "execution_allowed_before": false,
+          "new_action": "SCMP_ACT_ERRNO",
+          "new_errno": 38,
+          "old_action": "SCMP_ACT_ERRNO",
+          "old_errno": 1,
+          "syscall": "clone3"
+        }
+      ],
+      "thread_only_clone_enforced": false
+    },
+    "policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "profile_id": "runtime_sandbox_2_v1",
+    "receipt_authenticated_in_issuing_process": true,
+    "reflection_count": 0,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "runtime_policy_authorizations_consumed": 0,
+    "shell_available": false,
+    "stages": [
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "after": {
+            "capabilities_zero": true,
+            "cgroup": "0::/",
+            "gid": 65534,
+            "memory_max": "134217728",
+            "namespaces": {
+              "cgroup": "cgroup:[4026532707]",
+              "ipc": "ipc:[4026532705]",
+              "mnt": "mnt:[4026532703]",
+              "net": "net:[4026532708]",
+              "pid": "pid:[4026532706]",
+              "user": "user:[4026531837]",
+              "uts": "uts:[4026532704]"
+            },
+            "no_new_privileges": true,
+            "os_threads": 1,
+            "pid": 1,
+            "pids_current": "1",
+            "pids_max": "128",
+            "ppid": 0,
+            "processes": [
+              1
+            ],
+            "tid": 1,
+            "uid": 65534
+          },
+          "before": {
+            "capabilities_zero": true,
+            "cgroup": "0::/",
+            "gid": 65534,
+            "memory_max": "134217728",
+            "namespaces": {
+              "cgroup": "cgroup:[4026532707]",
+              "ipc": "ipc:[4026532705]",
+              "mnt": "mnt:[4026532703]",
+              "net": "net:[4026532708]",
+              "pid": "pid:[4026532706]",
+              "user": "user:[4026531837]",
+              "uts": "uts:[4026532704]"
+            },
+            "no_new_privileges": true,
+            "os_threads": 1,
+            "pid": 1,
+            "pids_current": "1",
+            "pids_max": "128",
+            "ppid": 0,
+            "processes": [
+              1
+            ],
+            "tid": 1,
+            "uid": 65534
+          },
+          "clone3": {
+            "errno": 38,
+            "result": -1
+          },
+          "libc_version": "2.41"
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "clone3",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 979,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "after": {
+            "capabilities_zero": true,
+            "cgroup": "0::/",
+            "gid": 65534,
+            "memory_max": "134217728",
+            "namespaces": {
+              "cgroup": "cgroup:[4026532707]",
+              "ipc": "ipc:[4026532705]",
+              "mnt": "mnt:[4026532703]",
+              "net": "net:[4026532708]",
+              "pid": "pid:[4026532706]",
+              "user": "user:[4026531837]",
+              "uts": "uts:[4026532704]"
+            },
+            "no_new_privileges": true,
+            "os_threads": 1,
+            "pid": 1,
+            "pids_current": "1",
+            "pids_max": "128",
+            "ppid": 0,
+            "processes": [
+              1
+            ],
+            "tid": 1,
+            "uid": 65534
+          },
+          "before": {
+            "capabilities_zero": true,
+            "cgroup": "0::/",
+            "gid": 65534,
+            "memory_max": "134217728",
+            "namespaces": {
+              "cgroup": "cgroup:[4026532707]",
+              "ipc": "ipc:[4026532705]",
+              "mnt": "mnt:[4026532703]",
+              "net": "net:[4026532708]",
+              "pid": "pid:[4026532706]",
+              "user": "user:[4026531837]",
+              "uts": "uts:[4026532704]"
+            },
+            "no_new_privileges": true,
+            "os_threads": 1,
+            "pid": 1,
+            "pids_current": "1",
+            "pids_max": "128",
+            "ppid": 0,
+            "processes": [
+              1
+            ],
+            "tid": 1,
+            "uid": 65534
+          },
+          "libc_version": "2.41",
+          "namespace_probes": {
+            "cgroup": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "ipc": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "mnt": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "net": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "pid": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "user": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            },
+            "uts": {
+              "clone": {
+                "errno": 1,
+                "result": -1
+              },
+              "setns": {
+                "errno": 1,
+                "result": -1
+              },
+              "unshare": {
+                "errno": 1,
+                "result": -1
+              }
+            }
+          },
+          "pthreads": [
+            {
+              "after": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 1,
+                "pid": 1,
+                "pids_current": "1",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 1,
+                "uid": 65534
+              },
+              "before": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 1,
+                "pid": 1,
+                "pids_current": "1",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 1,
+                "uid": 65534
+              },
+              "create_return_code": 0,
+              "join_return_code": 0,
+              "label": "candidate_unmodified",
+              "socket_errno": 1,
+              "thread": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 2,
+                "pid": 1,
+                "pids_current": "2",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 8,
+                "uid": 65534
+              }
+            },
+            {
+              "after": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 1,
+                "pid": 1,
+                "pids_current": "1",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 1,
+                "uid": 65534
+              },
+              "before": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 1,
+                "pid": 1,
+                "pids_current": "1",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 1,
+                "uid": 65534
+              },
+              "create_return_code": 0,
+              "join_return_code": 0,
+              "label": "exact_legacy_clone_flags",
+              "socket_errno": 1,
+              "thread": {
+                "capabilities_zero": true,
+                "cgroup": "0::/",
+                "gid": 65534,
+                "memory_max": "134217728",
+                "namespaces": {
+                  "cgroup": "cgroup:[4026532707]",
+                  "ipc": "ipc:[4026532705]",
+                  "mnt": "mnt:[4026532703]",
+                  "net": "net:[4026532708]",
+                  "pid": "pid:[4026532706]",
+                  "user": "user:[4026531837]",
+                  "uts": "uts:[4026532704]"
+                },
+                "no_new_privileges": true,
+                "os_threads": 2,
+                "pid": 1,
+                "pids_current": "2",
+                "pids_max": "128",
+                "ppid": 0,
+                "processes": [
+                  1
+                ],
+                "tid": 9,
+                "uid": 65534
+              }
+            }
+          ],
+          "witness_filter": {
+            "errno": 0,
+            "result": 0
+          },
+          "witness_flags": 4001536,
+          "witness_rejects_other_flags": {
+            "errno": 1,
+            "result": -1
+          }
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "pthread",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 4918,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "capabilities_zero": true,
+          "environment": {
+            "GPG_KEY": "",
+            "HOME": "/work",
+            "HOSTNAME": "runtime-sandbox1",
+            "LANG": "C.UTF-8",
+            "PATH": "/usr/local/bin:/usr/bin:/bin",
+            "PYTHON_SHA256": "",
+            "PYTHON_VERSION": "",
+            "SANDBOX_PUBLIC_SENTINEL": "phase-owned"
+          },
+          "external_read_denied": true,
+          "external_write_denied": true,
+          "host_secret_absent": true,
+          "local_connect_denied": true,
+          "manifest": [
+            {
+              "path": "projection.txt",
+              "sha256": "8dbe754d8c894788500505a0c4a0537f63cfb6439a9706853968474f5fabbd9b",
+              "size_bytes": 45
+            }
+          ],
+          "namespaces": [
+            "cgroup",
+            "ipc",
+            "mnt",
+            "net",
+            "pid"
+          ],
+          "no_new_privileges": true,
+          "pid_is_one": true,
+          "root_write_denied": true,
+          "socket_denials": {
+            "dns_udp": true,
+            "ipv4_tcp": true,
+            "ipv6_tcp": true,
+            "unix_socket": true
+          },
+          "socketpair_denied": true,
+          "uid": 65534,
+          "workspace_write": true
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "boundary",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 798,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "child_alive": true,
+          "child_spawned": true,
+          "pid_is_one": true,
+          "same_cgroup": true,
+          "same_namespaces": true
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "descendant",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 111,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_timeout",
+        "cleanup_verified": true,
+        "exit_code": 1,
+        "facts": {
+          "child_alive": true,
+          "child_spawned": true,
+          "pid_is_one": true,
+          "same_cgroup": true,
+          "same_namespaces": true
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": 7306.155900005251,
+        "mode": "timeout",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 111,
+        "termination_verified": true,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_output_limit_exceeded",
+        "cleanup_verified": true,
+        "exit_code": 1,
+        "facts": {},
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": 3054.551300010644,
+        "mode": "stdout",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 8192,
+        "termination_verified": true,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_output_limit_exceeded",
+        "cleanup_verified": true,
+        "exit_code": 1,
+        "facts": {},
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": 3359.4093000283465,
+        "mode": "stderr",
+        "outer_stderr": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "stderr_size": 8192,
+        "stdout_size": 0,
+        "termination_verified": true,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "gid": 65534,
+          "removed": [
+            true,
+            true
+          ],
+          "uid": 65534,
+          "writable": [
+            "/work",
+            "/tmp"
+          ]
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "tmp",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 85,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "controller_after": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "controller_before": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "descendants_contained": true,
+          "phase_pids_after_cleanup": [
+            1
+          ],
+          "stages": {
+            "non_java_boundary": {
+              "argv": [
+                "/usr/local/bin/python",
+                "-I",
+                "-S",
+                "-B",
+                "-c",
+                "import io,sys\nsys.stdin=io.TextIOWrapper(io.BytesIO(b'{\"inputs\": [{\"path\": \"projection.txt\", \"bytes\": \"UlVOVElNRS5TQU5EQk9YLjEgZXhhY3Qgc3ludGhldGljIHByb2plY3Rpb24K\"}], \"host_paths\": [], \"port\": 1}\\n'))\nsys.argv=['runtime-sandbox1','boundary']\n\nimport base64, errno, hashlib, json, os, signal, socket, subprocess, sys, time\n\nrequest = json.loads(sys.stdin.buffer.readline(131073))\nmode = sys.argv[1]\ndef emit(value):\n    print(json.dumps(value, sort_keys=True), flush=True)\ndef denied(operation):\n    try:\n        result = operation()\n        if hasattr(result, 'close'): result.close()\n        return False\n    except OSError as error:\n        return error.errno in (errno.EPERM, errno.EACCES, errno.EROFS, errno.ENOENT)\ndef boundary():\n    return {name: os.readlink('/proc/self/ns/' + name)\n            for name in ('pid', 'mnt', 'net', 'ipc', 'cgroup')}\nif mode == 'boundary':\n    manifest = []\n    for item in request['inputs']:\n        data = base64.b64decode(item['bytes'])\n        path = '/work/' + item['path']\n        with open(path, 'xb') as output: output.write(data)\n        with open(path, 'rb') as source: actual = source.read()\n        manifest.append({'path': item['path'], 'sha256': hashlib.sha256(actual).hexdigest(),\n                         'size_bytes': len(actual)})\n    with open('/work/workspace-write', 'xb') as output: output.write(b'workspace-write')\n    host_reads = [denied(lambda path=path: open(path, 'rb')) for path in request['host_paths']]\n    host_writes = [denied(lambda path=path: open(path, 'wb')) for path in request['host_paths']]\n    root_denied = denied(lambda: open('/phase-owned-root-write', 'wb'))\n    socket_results = {}\n    for name, family, kind in (('ipv4_tcp', socket.AF_INET, socket.SOCK_STREAM),\n            ('ipv6_tcp', socket.AF_INET6, socket.SOCK_STREAM),\n            ('dns_udp', socket.AF_INET, socket.SOCK_DGRAM),\n            ('unix_socket', socket.AF_UNIX, socket.SOCK_STREAM)):\n        socket_results[name] = denied(lambda family=family, kind=kind: socket.socket(family, kind))\n    local_denied = denied(lambda: socket.create_connection(('127.0.0.1', request['port']), .2))\n    pair_denied = denied(socket.socketpair)\n    env = dict(os.environ)\n    emit({'manifest': manifest, 'workspace_write': True, 'external_read_denied': all(host_reads),\n          'external_write_denied': all(host_writes), 'root_write_denied': root_denied,\n          'socket_denials': socket_results, 'local_connect_denied': local_denied,\n          'socketpair_denied': pair_denied, 'environment': env,\n          'host_secret_absent': 'CATTUS_SANDBOX_HOST_ONLY' not in env,\n          'uid': os.getuid(), 'namespaces': sorted(boundary()), 'pid_is_one': os.getpid() == 1,\n          'no_new_privileges': 'NoNewPrivs:\\t1' in open('/proc/self/status').read(),\n          'capabilities_zero': 'CapEff:\\t0000000000000000' in open('/proc/self/status').read()})\nelif mode in ('descendant', 'timeout'):\n    child_source = \"import json,os,time; print(json.dumps({'namespaces':{n:os.readlink('/proc/self/ns/'+n) for n in ('pid','mnt','net','ipc','cgroup')},'cgroup':open('/proc/self/cgroup').read()}),flush=True); time.sleep(60)\"\n    child = subprocess.Popen([sys.executable, '-I', '-S', '-B', '-c', child_source], stdout=subprocess.PIPE)\n    evidence = json.loads(child.stdout.readline(4096))\n    emit({'child_spawned': True, 'child_alive': child.poll() is None,\n          'same_namespaces': evidence['namespaces'] == boundary(),\n          'same_cgroup': evidence['cgroup'] == open('/proc/self/cgroup').read(),\n          'pid_is_one': os.getpid() == 1})\n    if mode == 'timeout':\n        while True: time.sleep(.1)\nelif mode in ('stdout', 'stderr'):\n    stream = 1 if mode == 'stdout' else 2\n    while True: os.write(stream, b'X' * 4096)\nelse:\n    raise SystemExit(64)\n"
+              ],
+              "capture_method": "single_thread_selector",
+              "child_waited": true,
+              "cleanup_errors": [],
+              "cleanup_verified": true,
+              "controller_error": "",
+              "eof": [
+                true,
+                true
+              ],
+              "exit_code": 0,
+              "limit_bytes": 1024,
+              "overflow": false,
+              "pid": 7,
+              "pipes_closed": true,
+              "read_bytes": [
+                799,
+                0
+              ],
+              "status": "completed",
+              "stderr_b64": "",
+              "stdout_b64": "eyJjYXBhYmlsaXRpZXNfemVybyI6IHRydWUsICJlbnZpcm9ubWVudCI6IHsiR1BHX0tFWSI6ICIiLCAiSE9NRSI6ICIvd29yayIsICJIT1NUTkFNRSI6ICJydW50aW1lLXNhbmRib3gxIiwgIkxBTkciOiAiQy5VVEYtOCIsICJQQVRIIjogIi91c3IvbG9jYWwvYmluOi91c3IvYmluOi9iaW4iLCAiUFlUSE9OX1NIQTI1NiI6ICIiLCAiUFlUSE9OX1ZFUlNJT04iOiAiIiwgIlNBTkRCT1hfUFVCTElDX1NFTlRJTkVMIjogInBoYXNlLW93bmVkIn0sICJleHRlcm5hbF9yZWFkX2RlbmllZCI6IHRydWUsICJleHRlcm5hbF93cml0ZV9kZW5pZWQiOiB0cnVlLCAiaG9zdF9zZWNyZXRfYWJzZW50IjogdHJ1ZSwgImxvY2FsX2Nvbm5lY3RfZGVuaWVkIjogdHJ1ZSwgIm1hbmlmZXN0IjogW3sicGF0aCI6ICJwcm9qZWN0aW9uLnR4dCIsICJzaGEyNTYiOiAiOGRiZTc1NGQ4Yzg5NDc4ODUwMDUwNWEwYzRhMDUzN2Y2M2NmYjY0MzlhOTcwNjg1Mzk2ODQ3NGY1ZmFiYmQ5YiIsICJzaXplX2J5dGVzIjogNDV9XSwgIm5hbWVzcGFjZXMiOiBbImNncm91cCIsICJpcGMiLCAibW50IiwgIm5ldCIsICJwaWQiXSwgIm5vX25ld19wcml2aWxlZ2VzIjogdHJ1ZSwgInBpZF9pc19vbmUiOiBmYWxzZSwgInJvb3Rfd3JpdGVfZGVuaWVkIjogdHJ1ZSwgInNvY2tldF9kZW5pYWxzIjogeyJkbnNfdWRwIjogdHJ1ZSwgImlwdjRfdGNwIjogdHJ1ZSwgImlwdjZfdGNwIjogdHJ1ZSwgInVuaXhfc29ja2V0IjogdHJ1ZX0sICJzb2NrZXRwYWlyX2RlbmllZCI6IHRydWUsICJ1aWQiOiA2NTUzNCwgIndvcmtzcGFjZV93cml0ZSI6IHRydWV9Cg==",
+              "threads_after": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "threads_before": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "timed_out": false
+            }
+          },
+          "synthetic_java_execution_count": 0,
+          "toolchain_launch_count": 1,
+          "work_files_after_cleanup": []
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "controller",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 6012,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "controller_after": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "controller_before": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "descendants_contained": true,
+          "javac_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+          "phase_pids_after_cleanup": [
+            1
+          ],
+          "stages": {
+            "javac_identity": {
+              "argv": [
+                "/opt/temurin-26.0.2.1/bin/javac",
+                "-version"
+              ],
+              "capture_method": "single_thread_selector",
+              "child_waited": true,
+              "cleanup_errors": [],
+              "cleanup_verified": true,
+              "controller_error": "",
+              "eof": [
+                true,
+                true
+              ],
+              "exit_code": 0,
+              "limit_bytes": 1024,
+              "overflow": false,
+              "pid": 7,
+              "pipes_closed": true,
+              "read_bytes": [
+                15,
+                0
+              ],
+              "status": "completed",
+              "stderr_b64": "",
+              "stdout_b64": "amF2YWMgMjYuMC4yLjEK",
+              "threads_after": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "threads_before": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "timed_out": false
+            }
+          },
+          "synthetic_java_execution_count": 0,
+          "toolchain_launch_count": 1,
+          "work_files_after_cleanup": []
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "javac_version",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 1164,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      },
+      {
+        "capture_status": "sandbox_completed",
+        "cleanup_verified": true,
+        "exit_code": 0,
+        "facts": {
+          "controller_after": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "controller_before": {
+            "os_threads": 1,
+            "pid": 1,
+            "python_threads": 1,
+            "thread_start_attempts": 0
+          },
+          "descendants_contained": true,
+          "javac_sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+          "phase_pids_after_cleanup": [
+            1
+          ],
+          "stages": {
+            "javac_identity": {
+              "argv": [
+                "/opt/temurin-26.0.2.1/bin/java",
+                "-version"
+              ],
+              "capture_method": "single_thread_selector",
+              "child_waited": true,
+              "cleanup_errors": [],
+              "cleanup_verified": true,
+              "controller_error": "",
+              "eof": [
+                true,
+                true
+              ],
+              "exit_code": 0,
+              "limit_bytes": 1024,
+              "overflow": false,
+              "pid": 7,
+              "pipes_closed": true,
+              "read_bytes": [
+                0,
+                188
+              ],
+              "status": "completed",
+              "stderr_b64": "b3BlbmpkayB2ZXJzaW9uICIyNi4wLjIuMSIgMjAyNi0wOC0xOApPcGVuSkRLIFJ1bnRpbWUgRW52aXJvbm1lbnQgVGVtdXJpbi0yNi4wLjIuMSsxIChidWlsZCAyNi4wLjIuMSsxKQpPcGVuSkRLIDY0LUJpdCBTZXJ2ZXIgVk0gVGVtdXJpbi0yNi4wLjIuMSsxIChidWlsZCAyNi4wLjIuMSsxLCBtaXhlZCBtb2RlLCBzaGFyaW5nKQo=",
+              "stdout_b64": "",
+              "threads_after": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "threads_before": {
+                "os_threads": 1,
+                "pid": 1,
+                "python_threads": 1,
+                "thread_start_attempts": 0
+              },
+              "timed_out": false
+            }
+          },
+          "synthetic_java_execution_count": 0,
+          "toolchain_launch_count": 1,
+          "work_files_after_cleanup": []
+        },
+        "host_endpoints_quiet": true,
+        "host_sentinel_unchanged": true,
+        "measured_termination_ms": null,
+        "mode": "java_version",
+        "outer_stderr": "",
+        "stderr_size": 0,
+        "stdout_size": 1396,
+        "termination_verified": false,
+        "termination_within_deadline": true,
+        "verdict": "stage_passed"
+      }
+    ],
+    "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+    "temporary_workspace_removed": true,
+    "verification_receipt": {
+      "apply_authority": false,
+      "arbitrary_command_authority": false,
+      "authority": "infrastructure_compatibility_measurement_only",
+      "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+      "baseline_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+      "baseline_seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+      "cleanup_verified": true,
+      "compatibility_classification": "eligible_for_JAVA_1_continuation_only",
+      "evidence_sha256": "7241120ac81ed1a46a08ad029881eb25368cb71e2a09cc602d8d7e0f223efe42",
+      "host_mount_authority": false,
+      "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+      "network_authority": false,
+      "phase_id": "RUNTIME.SANDBOX.2",
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "schema_version": "runtime_sandbox_2_v1",
+      "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "shell_available": false,
+      "stage_results": [
+        [
+          "clone3",
+          "stage_passed"
+        ],
+        [
+          "pthread",
+          "stage_passed"
+        ],
+        [
+          "boundary",
+          "stage_passed"
+        ],
+        [
+          "descendant",
+          "stage_passed"
+        ],
+        [
+          "timeout",
+          "stage_passed"
+        ],
+        [
+          "stdout",
+          "stage_passed"
+        ],
+        [
+          "stderr",
+          "stage_passed"
+        ],
+        [
+          "tmp",
+          "stage_passed"
+        ],
+        [
+          "controller",
+          "stage_passed"
+        ],
+        [
+          "javac_version",
+          "stage_passed"
+        ],
+        [
+          "java_version",
+          "stage_passed"
+        ]
+      ],
+      "status": "RUNTIME_SANDBOX_2_COMPLETE_WITH_WARNINGS",
+      "verification_receipt_fingerprint": "e3a67bf7ca7919c933fa46dfe7e7b8ee1a666c1f5689cc6088e1b67f765a638d"
+    }
+  },
+  "measurement_method_id": "frozen_local_docker_version_server_v1",
+  "negative_authentication_matrix": {
+    "api_version_substitution": true,
+    "client_version_substitution": true,
+    "context_name_substitution": true,
+    "copy": true,
+    "dataclasses_replace": true,
+    "deepcopy": true,
+    "discovery_wrong_identity": true,
+    "discovery_wrong_version": true,
+    "exported_json": true,
+    "json_reconstruction": true,
+    "same_descriptor_different_receipt": true,
+    "same_receipt_different_descriptor": true,
+    "subclass": true,
+    "tampered__signature": true,
+    "tampered_aba_resistance_proven": true,
+    "tampered_apply_authority": true,
+    "tampered_arbitrary_command_authority": true,
+    "tampered_backend_identity_post": true,
+    "tampered_backend_identity_pre": true,
+    "tampered_backend_version_post": true,
+    "tampered_backend_version_pre": true,
+    "tampered_binding_semantics": true,
+    "tampered_canonical_backend_identity": true,
+    "tampered_canonical_backend_version": true,
+    "tampered_compatibility_authority": true,
+    "tampered_daemon_continuity_authority": true,
+    "tampered_daemon_continuity_proven": true,
+    "tampered_daemon_instance_identity_available": true,
+    "tampered_host_mount_authority": true,
+    "tampered_image_identity": true,
+    "tampered_measurement_method_id": true,
+    "tampered_network_authority": true,
+    "tampered_phase_id": true,
+    "tampered_real_task_runtime_authority": true,
+    "tampered_repository_write_authority": true,
+    "tampered_route_version_bracket_equal": true,
+    "tampered_runtime_authority": true,
+    "tampered_sandbox_descriptor_fingerprint": true,
+    "tampered_sandbox_phase_id": true,
+    "tampered_sandbox_policy_sha256": true,
+    "tampered_sandbox_receipt_evidence_sha256": true,
+    "tampered_sandbox_receipt_fingerprint": true,
+    "tampered_sandbox_schema_version": true,
+    "tampered_schema_version": true,
+    "tampered_shell_authority": true,
+    "tampered_shell_available": true,
+    "wrapper": true,
+    "wrong_descriptor": true,
+    "wrong_process": true,
+    "wrong_receipt": true
+  },
+  "network_authority": false,
+  "pair_binding": true,
+  "phase_id": "RUNTIME.SANDBOX.BIND.1",
+  "post_control_reaped_and_pipes_closed": true,
+  "pre_control_reaped_and_pipes_closed": true,
+  "prohibited_effects": {
+    "apply_actions": 0,
+    "artifact_discovery_calls": 0,
+    "artifact_exports": 0,
+    "bank_executions": 0,
+    "executor1r_retries": 0,
+    "host_mounts": 0,
+    "java1c_invocations": 0,
+    "java1d_retries": 0,
+    "java_fixture_executions": 0,
+    "java_source_compilations": 0,
+    "outbound_network_calls": 0,
+    "reflection_lease_consumptions": 0,
+    "repository_runtime_writes": 0,
+    "runtime_lease_consumptions": 0,
+    "shell_calls": 0
+  },
+  "real_task_runtime_authority": false,
+  "reason": "original_java1_route_and_version_bracket_equal_only",
+  "remaining_phase_containers": 0,
+  "repository_write_authority": false,
+  "route_version_bracket_equal": true,
+  "runtime_authority": false,
+  "sandbox2_infrastructure_effects": {
+    "compile_count": 0,
+    "container_create_attempts": 11,
+    "container_start_attempts": 11,
+    "containers_created": 11,
+    "docker_calls": 74,
+    "image_builds": 0,
+    "image_exports": 0,
+    "image_inspect_calls": 1,
+    "image_inventory_calls": 0,
+    "image_pulls": 0,
+    "java_fixture_count": 0,
+    "java_version_count": 1,
+    "javac_version_count": 1,
+    "version_calls": 0
+  },
+  "sandbox_cleanup_verified": true,
+  "sandbox_descriptor_fingerprint": "fc78c9b36c51bfb49fb99ac145f2aac0f0e1672a612594c7738efa349fc0a504",
+  "sandbox_phase_id": "RUNTIME.SANDBOX.2",
+  "sandbox_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+  "sandbox_receipt_evidence_sha256": "7241120ac81ed1a46a08ad029881eb25368cb71e2a09cc602d8d7e0f223efe42",
+  "sandbox_receipt_fingerprint": "e3a67bf7ca7919c933fa46dfe7e7b8ee1a666c1f5689cc6088e1b67f765a638d",
+  "sandbox_schema_version": "runtime_sandbox_2_v1",
+  "schema_version": "runtime_sandbox_backend_binding_1_v1",
+  "shell_authority": false,
+  "shell_available": false,
+  "status": "RUNTIME_SANDBOX_BIND_1_COMPLETE_WITH_WARNINGS",
+  "strict_proof_complete": true,
+  "strict_proof_stop": "after exact original JAVA.1 binding attachment authentication and pure negatives; no discovery/JAVA.1D/executor operational work",
+  "temporary_workspace_removed": true,
+  "validation": {
+    "additional_executor_blocked_regressions": {
+      "after": {
+        "allowed_fixture_processes": [],
+        "denied_fixture_processes": [],
+        "failed": 0,
+        "passed": 23
+      },
+      "baseline": {
+        "allowed_fixture_processes": [],
+        "denied_fixture_processes": [],
+        "failed": 0,
+        "passed": 23
+      }
+    },
+    "additive_whitespace_check": {
+      "failures": [],
+      "files": [
+        "core/sandbox_backend_binding.py",
+        "scripts/replay_runtime_sandbox_bind1.py",
+        "tests/test_runtime_sandbox_bind1.py",
+        "docs/roadmap/RUNTIME_SANDBOX_BIND_1.md",
+        "docs/roadmap/RUNTIME_SANDBOX_BIND_1_LOCAL.json",
+        "docs/roadmap/RUNTIME_SANDBOX_BIND_1_PRESERVATION.json"
+      ]
+    },
+    "after": [
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 9
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_executor_single_file_patch_safety.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 21
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_executor_single_file_path.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 51
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_github_pr_safety_contract.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "--abbrev-ref",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": [
+              "git",
+              "status",
+              "--porcelain"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": [
+              "git",
+              "diff",
+              "--stat",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": [
+              "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "--abbrev-ref",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": [
+              "git",
+              "status",
+              "--porcelain"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": [
+              "git",
+              "diff",
+              "--stat",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "--abbrev-ref",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": [
+              "git",
+              "status",
+              "--porcelain"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": [
+              "git",
+              "diff",
+              "--stat",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_manual_apply_outcome_is_p0"
+          }
+        ],
+        "counts": {
+          "passed": 22
+        },
+        "denied_fixture_processes": [
+          {
+            "argv": [
+              "C:\\WINDOWS\\system32\\cmd.exe",
+              "/c",
+              "\"python -c \"",
+              "import",
+              "sys;",
+              "sys.exit(1)\"\""
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_safety_repair_temp\\test_authorized_manual_attempt0"
+          }
+        ],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_human_apply_authorization.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 1,
+          "passed": 26
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1"
+        ],
+        "selection": [
+          "tests/test_human_authority_branch_checkpoint.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 1
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts"
+        ],
+        "selection": [
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 12
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_patch_candidate_behavior_executor1r.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 46
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 27
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_patch_candidate_behavior_executor1r_retry.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 1
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts"
+        ],
+        "selection": [
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 29
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_patch_safety.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 22
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_patch_safety_chokepoint.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 3,
+          "passed": 113
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked"
+        ],
+        "selection": [
+          "tests/test_phase_picker.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 4,
+          "passed": 179
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "tests/test_phase_registry.py::test_seed_registry_summary_counts"
+        ],
+        "selection": [
+          "tests/test_phase_registry.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 1
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts"
+        ],
+        "selection": [
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 91
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 24
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1_discovery.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 7
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1_governance.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 23
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1a.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 45
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1b.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 89
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1c.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 10
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1d.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 67
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java_compat1.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 1,
+          "passed": 149
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping"
+        ],
+        "selection": [
+          "tests/test_runtime_sandbox1.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 75
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_sandbox2.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 54
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_sandbox2p.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 256
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_synthetic_read_only_reflection.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 79
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_synthetic_reflection_execution_admission.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 197
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_synthetic_reflection_execution_lifecycle.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 117
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_synthetic_runtime_authorization.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 113
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_synthetic_runtime_authorization_lifecycle.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 52
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_validation_command_safety.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_32_temp\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "--abbrev-ref",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_32_temp\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": [
+              "git",
+              "status",
+              "--porcelain"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_32_temp\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": [
+              "git",
+              "diff",
+              "--stat",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\after_32_temp\\test_automation_path_cannot_us0\\repo"
+          }
+        ],
+        "counts": {
+          "passed": 9
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_validation_execution_safety.py"
+        ]
+      }
+    ],
+    "aggregate": {
+      "after_failed": 12,
+      "after_passed": 2037,
+      "baseline_failed": 12,
+      "baseline_passed": 2037,
+      "new_failure_identities": [],
+      "same_failure_identities": [
+        "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1",
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts",
+        "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+        "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping"
+      ]
+    },
+    "baseline": [
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 9
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_executor_single_file_patch_safety.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 21
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_executor_single_file_path.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 51
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_github_pr_safety_contract.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "--abbrev-ref",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": [
+              "git",
+              "status",
+              "--porcelain"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": [
+              "git",
+              "diff",
+              "--stat",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": [
+              "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.venv\\Scripts\\python.exe",
+              "-m",
+              "pytest"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_t6_bounded_review_apply_i0"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "--abbrev-ref",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": [
+              "git",
+              "status",
+              "--porcelain"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": [
+              "git",
+              "diff",
+              "--stat",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_authorized_manual_attempt0"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "--abbrev-ref",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": [
+              "git",
+              "status",
+              "--porcelain"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_manual_apply_outcome_is_p0"
+          },
+          {
+            "argv": [
+              "git",
+              "diff",
+              "--stat",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_manual_apply_outcome_is_p0"
+          }
+        ],
+        "counts": {
+          "passed": 22
+        },
+        "denied_fixture_processes": [
+          {
+            "argv": [
+              "C:\\WINDOWS\\system32\\cmd.exe",
+              "/c",
+              "\"python -c \"",
+              "import",
+              "sys;",
+              "sys.exit(1)\"\""
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_safety_repair_temp\\test_authorized_manual_attempt0"
+          }
+        ],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_human_apply_authorization.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 1,
+          "passed": 26
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1"
+        ],
+        "selection": [
+          "tests/test_human_authority_branch_checkpoint.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 1
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts"
+        ],
+        "selection": [
+          "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 12
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_patch_candidate_behavior_executor1r.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 46
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 27
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_patch_candidate_behavior_executor1r_retry.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 1
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts"
+        ],
+        "selection": [
+          "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 29
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_patch_safety.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 22
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_patch_safety_chokepoint.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 3,
+          "passed": 113
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked"
+        ],
+        "selection": [
+          "tests/test_phase_picker.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 4,
+          "passed": 179
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "tests/test_phase_registry.py::test_seed_registry_summary_counts"
+        ],
+        "selection": [
+          "tests/test_phase_registry.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 1
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts"
+        ],
+        "selection": [
+          "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 91
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 24
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1_discovery.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 7
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1_governance.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 23
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1a.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 45
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1b.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 89
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1c.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 10
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java1d.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 67
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_java_compat1.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "failed": 1,
+          "passed": 149
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 1,
+        "failure_identities": [
+          "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping"
+        ],
+        "selection": [
+          "tests/test_runtime_sandbox1.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 75
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_sandbox2.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 54
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_runtime_sandbox2p.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 256
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_synthetic_read_only_reflection.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 79
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_synthetic_reflection_execution_admission.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 197
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_synthetic_reflection_execution_lifecycle.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 117
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_synthetic_runtime_authorization.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 113
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_synthetic_runtime_authorization_lifecycle.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [],
+        "counts": {
+          "passed": 52
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_validation_command_safety.py"
+        ]
+      },
+      {
+        "allowed_fixture_processes": [
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_32_temp\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": [
+              "git",
+              "rev-parse",
+              "--abbrev-ref",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_32_temp\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": [
+              "git",
+              "status",
+              "--porcelain"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_32_temp\\test_automation_path_cannot_us0\\repo"
+          },
+          {
+            "argv": [
+              "git",
+              "diff",
+              "--stat",
+              "HEAD"
+            ],
+            "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\runtime_sandbox_bind1\\baseline_32_temp\\test_automation_path_cannot_us0\\repo"
+          }
+        ],
+        "counts": {
+          "passed": 9
+        },
+        "denied_fixture_processes": [],
+        "exit_code": 0,
+        "failure_identities": [],
+        "selection": [
+          "tests/test_validation_execution_safety.py"
+        ]
+      }
+    ],
+    "baseline_source": "byte-exact mirror of pre-edit tracked/nonignored files; no new binding files present; no registry projection; required baseline/after test files isolated into separate processes",
+    "benchmarks": {
+      "agent_calls": 0,
+      "checked": 54,
+      "command": "python -B benchmarks/run_benchmarks.py --check",
+      "errors": 0,
+      "workload_executions": 0
+    },
+    "direct_registry_picker_before_and_after": {
+      "failed_each": 7,
+      "passed_each": 292,
+      "same_failure_identities": [
+        "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "tests/test_phase_registry.py::test_seed_registry_summary_counts"
+      ]
+    },
+    "focused": {
+      "failed": 0,
+      "passed": 129,
+      "runtime_effect_guard": "no_runtime_effects(strict=True)"
+    },
+    "full_repository_suite_run": false,
+    "git_diff_check": {
+      "exit_code": 0,
+      "stderr_notes": "existing working-copy LF/CRLF notices only",
+      "stdout": ""
+    },
+    "harness": {
+      "fixture_effects_excluded_from_operational_counts": true,
+      "historical_repins": false,
+      "initial_combined_baseline": "terminated for accumulated audit-hook overhead; replaced by isolated exact pre-change snapshot runs",
+      "outbound_connections": "socket.connect and connect_ex denied",
+      "runtime_subprocesses": "denied; read-only Git and Python-pytest allowed only in existing temporary safety fixtures",
+      "safety_harness_adjustment": "one fixture rerun in baseline and after with Windows string argv parsing corrected; 22 passed each",
+      "source_sha256": "ab892a44dae9157f2a5b3a74790d2fff8284ed829c917f41e08b503b33d047cb"
+    },
+    "in_memory_compilation": {
+      "bytecode_written": false,
+      "compiled": 1233,
+      "errors": [],
+      "excluded": "benchmark input fixture repositories"
+    }
+  },
+  "version_semantics": "str(server[\"Version\"]); dict Server, Os == \"linux\", truthy Version"
+}

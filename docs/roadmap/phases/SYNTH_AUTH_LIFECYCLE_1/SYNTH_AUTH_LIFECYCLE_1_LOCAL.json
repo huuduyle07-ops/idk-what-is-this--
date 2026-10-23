@@ -1,0 +1,507 @@
+{
+  "apply_actions": 0,
+  "atomicity_mechanism": "one process-local threading.Lock; authenticate/check/replace under lock",
+  "authentication": "independent process-local HMAC-SHA256 over immutable issuance projection and current state",
+  "bank_execution_count": 0,
+  "behavioral_execution_count": 0,
+  "child_processes": 0,
+  "compilation_activation_conflict": "none identified; frozen executors stop before compilation, and structural compilation remains separate diagnostic evidence",
+  "compilation_policy": "preserve the existing infrastructure/structural compilation contract; this owner grants no compilation authority; a future executor must report any contract that classifies compilation as runtime activation before proceeding",
+  "compile_count": 0,
+  "consumption_policy": "after synthetic authorization, both reflection requests/admissions, SANDBOX.2, JAVA.1 and exact source/harness readiness authenticate; immediately before the first behavioral runtime effect; no refund after any subsequent failure",
+  "containers_created": 0,
+  "docker_calls": 0,
+  "duplicate_lease_issuance_result": "synthetic_runtime_authorization_already_leased",
+  "effect_denial": {
+    "denied_attempts": {},
+    "strict": true,
+    "thread_start_attempts": 0
+  },
+  "execution_lease": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "host_mount_authority": false,
+    "initial_lifecycle_state": "ISSUED",
+    "invocation_argument": 3,
+    "invocation_method": "decrement",
+    "invocation_owner": "SyntheticStateBox",
+    "issuer_phase_id": "SYNTH.AUTH.LIFECYCLE.1",
+    "issuing_process_id": 23644,
+    "lease_fingerprint": "e38b01fcbcc66f76a2dfc1821d6936d1ed17ea7fc5a14801418f6460997110c2",
+    "lease_id": "7f0c790d1e5c19a0f80f709da67a33b598eabe17fdaca4b7b9ea3f057e675c89",
+    "lifecycle_state": "ISSUED",
+    "network_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_authority": false,
+    "report_only": true,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "schema_version": "synthetic_runtime_execution_lease_v1",
+    "shell_authority": false,
+    "source_kind": "phase_owned_synthetic_fixture",
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "synthetic_runtime_execution_lease": true,
+    "upstream_authorization_fingerprint": "fdc5c5a36a17b2fe327ef8f55761613a71e2953f5e27897aec415f2c62483ba0",
+    "upstream_authorization_issuance_id": "1bfa89303a45ff780fb4a378da97c7a602bc60f6bb3d79010b8948fc8387a45e"
+  },
+  "execution_leases_issued": 1,
+  "executor_compatibility": true,
+  "executor_retry_performed": false,
+  "exported_json_can_recreate_authority": false,
+  "final_strict_proof_lease_state": "ISSUED",
+  "harness_rendered": false,
+  "historical_preservation": {
+    "already_missing_paths": [
+      "tmp_tests_continue1_authority/test_browser_candidate_payload0/repo/reviewed.txt",
+      "tmp_tests_continue1_authority/test_exact_audit_post_executes0/repo/reviewed.txt",
+      "tmp_tests_continue1_authority/test_exact_audit_pre_latest_se0/repo/unreviewed.txt",
+      "tmp_tests_continue1_authority/test_legacy_report_requires_fr0/repo/reviewed.txt",
+      "tmp_tests_continue1_authority/test_replay_preserves_existing0/repo/reviewed.txt",
+      "tmp_tests_continue1_browser/test_browser_candidate_payload0/repo/reviewed.txt",
+      "tmp_tests_continue1_browser/test_browser_exact_a_selection0/repo/reviewed.txt",
+      "tmp_tests_continue1_browser/test_browser_review_transition4/repo/reviewed.txt"
+    ],
+    "byte_identical": 1800,
+    "changed_paths": [],
+    "historical_files_repinned": false,
+    "historical_manifest_verification": {
+      "SYNTH_AUTH_1_LOCAL.json": {
+        "checked": 134,
+        "matched": 134,
+        "mismatches": []
+      },
+      "SYNTH_REFLECT_1_LOCAL.json": {
+        "checked": 139,
+        "matched": 139,
+        "mismatches": []
+      }
+    },
+    "manifest": "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json",
+    "phase_id": "SYNTH.AUTH.LIFECYCLE.1",
+    "preexisting_files": 1800
+  },
+  "initial_lifecycle_state": "ISSUED",
+  "invalidation_semantics": "ISSUED -> INVALIDATED; terminal; no consumption or reissuance",
+  "java_compile_count": 0,
+  "jvm_execution_count": 0,
+  "lease_authenticated_in_issuing_process": true,
+  "live_identity_registry": "weak lease identity; retained upstream identity; permanent process-local tombstones",
+  "measured_observations": null,
+  "network_calls": 0,
+  "phase_id": "SYNTH.AUTH.LIFECYCLE.1",
+  "positive_runtime_receipt": null,
+  "pure_lifecycle_test_evidence": {
+    "actual_test_threads_started": 0,
+    "concurrent_call_model": "all six legal two-caller precheck/consume schedules, plus shared-lock ownership checks",
+    "consumed_state_is_terminal": true,
+    "copy_reconstruction_rejected": true,
+    "live_thread_contention_tested": false,
+    "process_key_change_rejected": true,
+    "second_consumption": "rejected: synthetic_runtime_lease_not_issued",
+    "successful_transition": "ISSUED -> CONSUMED",
+    "test_only_lease_consumptions": 32,
+    "test_only_lease_ids": [
+      "f3fd1d911915d99c97f53d1118d6500b1b5e0e42315eadea850189b6d95b7f6b",
+      "cb4b776809990abc0b0bffec7045de227b3788eb0b74c6c56e213123cd80dce5",
+      "5ba930ca5b8fd27ca19a95cebbc8debf137ac0d08d5fd106f3db696a6724f1b6",
+      "14e901c530ea76672ddb84a1edb4bed7ad1cbc602dda7ff6910bb874d341fedc",
+      "0e0d2b5d720c697f522bc3f103e3e53cb3e61fe83e7885eaf5debbab50bc93e9",
+      "01f4be08f857e98f6e99331ccb60831a061ba4c782c74eae9c46dcf96e2bb0d4",
+      "d1d6710277dc746401fc4a936273b4e3f9a61083d106607ae63512d8af89696f",
+      "62f1439e2d453f77fa4d9f5b803efbc48867431434428f314133e11ff697b95c",
+      "4b6e444a0568bfa14a90d3d2fd57afad29293d6ce64d510876e37864291839f4",
+      "d2ff5dab283f1af1c185eca5562ebce173d4afc36f825b3506be9794535734a8",
+      "d9f9536202b3f7ac636e75c1abcf5ba9bc672bec08bb6f607798eacbd76b9cd3",
+      "5d871a59a95eaa48f05e25d5b0fdeb41cb94fc9bfcc8c0352a7ce5bd55909644",
+      "4897bf63e100f0f3b465df7a85b6751b74a2bb92326c148b935630f0b51e02e1",
+      "56f1ca6f26206c561f041a879c3186f130838316c121457f4ac53430dd44b144",
+      "a3b20ccce6ff73095edbf069e33d10db57953d762222413e4e9b82df7f2433f9",
+      "170690288195fdffc48dbc54d38b490c81f0bda8410f77cdc247835e0e2993c2",
+      "0987ff4a35c4dfec4b349f9801c8cb7eae88763c78ae07cc18448987ad6ff0d3",
+      "93c91ad618028bc74e649a854b36e22d8eb4f48e83588f4670d85b55db27399b",
+      "b796e6381f8004d95e922ffd513c15a9de86ce5a9a71042dfd84adaa2ab957b4",
+      "136aaf1674ea95a4959e93cec5ef78df369c99b74e17364fcf4b6561bba4f0bf",
+      "abc85dc5f002dd522ce69cca096f91efcbd220443d10b7273e3f7c1a704c4247",
+      "31832803ca42e3fc27b2af28204b050c6120f9ad424b030ad35516d0b7c23b2a",
+      "db4702fcff8102eb85261f704d84acf048d084395e990e6bcdfb3d793c7031a5",
+      "2d572bfbf63878e5932e663dd76e1bfa4267d9c4248f1820487424ced67d4892",
+      "fd71db99af303630c2a7a2ca3ab91f2937fdd713c0c3021c7e56eb9942f33c85",
+      "9c2cb3bcbb793c83a2586c80e61bb7402c0bfabf67edfc58894653fd07724782",
+      "7a4f7f15c843594c12d9447bc2852cdd9ef6336bd06799dd802138610384e66a",
+      "4b4a68f83423b1fee4a5b45bb75022cf2b0b918a14f6403d964fa201715b0482",
+      "d2fe6f74f1155cb8c99f6b855418df2cde45458a54e72be70731fe71cb1f2d6d",
+      "b27d03ae1e81af15a1679cc4abb8b142239d9a4134cdea43a18c115ad5d1bb8c",
+      "f0ebd6ab0ece3e4c228678dc943df5fd175e2aede5115c2825d1b37f12d190ad",
+      "ad58e02e13585c9529c0c1bdf9e31619f8b67707d380655ce04fda7d630a6b98"
+    ]
+  },
+  "real_runtime_authorizations_consumed": 0,
+  "reflection_admission_consumption_implemented": false,
+  "reflection_execution_count": 0,
+  "report_only": true,
+  "repository_writes": 0,
+  "schema_version": "synthetic_runtime_execution_lease_v1",
+  "shell_calls": 0,
+  "source_projected": false,
+  "status": "SYNTH_AUTH_LIFECYCLE_1_COMPLETE",
+  "strict_proof_runtime_authorizations_consumed": 0,
+  "supported_lifecycle_scope_count": 1,
+  "synthetic_authorization": {
+    "allowed_runtime_operations": [
+      "direct_public_invocation"
+    ],
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "authorization_fingerprint": "fdc5c5a36a17b2fe327ef8f55761613a71e2953f5e27897aec415f2c62483ba0",
+    "compile_count": 0,
+    "console_authority": false,
+    "execution_completed": false,
+    "execution_ready": false,
+    "future_exact_reflection_required": true,
+    "human_approval_required": false,
+    "issuance_id": "1bfa89303a45ff780fb4a378da97c7a602bc60f6bb3d79010b8948fc8387a45e",
+    "issuer_phase_id": "SYNTH.AUTH.1",
+    "issuer_process_id": 23644,
+    "java_capability_available": false,
+    "java_profile_id": "RUNTIME.JAVA.1",
+    "java_schema_version": "runtime_java_1_v1",
+    "jvm_execution_count": 0,
+    "network_authority": false,
+    "operational_real_task_source": false,
+    "purpose": "phase_owned_synthetic_diagnostic",
+    "real_human_approval": false,
+    "real_runtime_authorizations_consumed": 0,
+    "real_session_consumed": false,
+    "real_task_runtime_authority": false,
+    "real_task_source": false,
+    "reflection_authority": false,
+    "reflection_capability_available": false,
+    "reflection_execution_count": 0,
+    "report_only": true,
+    "repository_access_authority": false,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "sandbox_capability_available": false,
+    "sandbox_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+    "sandbox_profile_id": "runtime_sandbox_2_v1",
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "schema_version": "synthetic_runtime_authorization_v1",
+    "source_kind": "phase_owned_synthetic_fixture",
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "source_size_bytes": 239,
+    "spec_fingerprint": "5d576873a217bddaf6c55aa2a587b6c443dc0b8735d6838134b3f0decd5c14c5",
+    "status": "SYNTHETIC_RUNTIME_AUTHORIZATION_ISSUED",
+    "synthetic_runtime_authority": true,
+    "synthetic_runtime_authorizations_consumed": 0
+  },
+  "synthetic_behavioral_execution_count": 0,
+  "synthetic_runtime_authorizations_consumed": 0,
+  "synthetic_runtime_authorizations_issued": 1,
+  "test_only_lease_consumptions": 0,
+  "thread_start_attempts": 0,
+  "upstream_authenticated_in_issuing_process": true,
+  "validation": {
+    "baseline": {
+      "exit_code": 1,
+      "failed": 12,
+      "failure_identities": [
+        "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1 [call]",
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts [call]",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts [call]",
+        "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation [call]",
+        "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets [call]",
+        "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked [call]",
+        "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call [call]",
+        "tests/test_phase_registry.py::test_seed_registry_has_expected_phases [call]",
+        "tests/test_phase_registry.py::test_seed_registry_is_conservative [call]",
+        "tests/test_phase_registry.py::test_seed_registry_summary_counts [call]",
+        "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts [call]",
+        "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+      ],
+      "passed": 292,
+      "selection": [
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts",
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+        "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping",
+        "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1"
+      ]
+    },
+    "benchmarks": {
+      "agent_calls": 0,
+      "checked": 54,
+      "exit_code": 0,
+      "failures": 0,
+      "guard": "process/network/model effects denied"
+    },
+    "compile": {
+      "bytecode_written": false,
+      "compiled": 1212,
+      "errors": [],
+      "failed": 0
+    },
+    "focused_final": {
+      "deselected": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "failure_identities": [],
+      "passed": 604,
+      "selection": [
+        "tests/test_synthetic_runtime_authorization_lifecycle.py",
+        "tests/test_synthetic_runtime_authorization.py",
+        "tests/test_synthetic_read_only_reflection.py",
+        "tests/test_synthetic_reflection_execution_admission.py",
+        "tests/test_patch_candidate_behavior_executor1r_retry.py",
+        "tests/test_patch_candidate_behavior_executor1r.py"
+      ],
+      "skipped": 0,
+      "test_only_lease_consumptions": 32,
+      "test_only_lease_ids": [
+        "f3fd1d911915d99c97f53d1118d6500b1b5e0e42315eadea850189b6d95b7f6b",
+        "cb4b776809990abc0b0bffec7045de227b3788eb0b74c6c56e213123cd80dce5",
+        "5ba930ca5b8fd27ca19a95cebbc8debf137ac0d08d5fd106f3db696a6724f1b6",
+        "14e901c530ea76672ddb84a1edb4bed7ad1cbc602dda7ff6910bb874d341fedc",
+        "0e0d2b5d720c697f522bc3f103e3e53cb3e61fe83e7885eaf5debbab50bc93e9",
+        "01f4be08f857e98f6e99331ccb60831a061ba4c782c74eae9c46dcf96e2bb0d4",
+        "d1d6710277dc746401fc4a936273b4e3f9a61083d106607ae63512d8af89696f",
+        "62f1439e2d453f77fa4d9f5b803efbc48867431434428f314133e11ff697b95c",
+        "4b6e444a0568bfa14a90d3d2fd57afad29293d6ce64d510876e37864291839f4",
+        "d2ff5dab283f1af1c185eca5562ebce173d4afc36f825b3506be9794535734a8",
+        "d9f9536202b3f7ac636e75c1abcf5ba9bc672bec08bb6f607798eacbd76b9cd3",
+        "5d871a59a95eaa48f05e25d5b0fdeb41cb94fc9bfcc8c0352a7ce5bd55909644",
+        "4897bf63e100f0f3b465df7a85b6751b74a2bb92326c148b935630f0b51e02e1",
+        "56f1ca6f26206c561f041a879c3186f130838316c121457f4ac53430dd44b144",
+        "a3b20ccce6ff73095edbf069e33d10db57953d762222413e4e9b82df7f2433f9",
+        "170690288195fdffc48dbc54d38b490c81f0bda8410f77cdc247835e0e2993c2",
+        "0987ff4a35c4dfec4b349f9801c8cb7eae88763c78ae07cc18448987ad6ff0d3",
+        "93c91ad618028bc74e649a854b36e22d8eb4f48e83588f4670d85b55db27399b",
+        "b796e6381f8004d95e922ffd513c15a9de86ce5a9a71042dfd84adaa2ab957b4",
+        "136aaf1674ea95a4959e93cec5ef78df369c99b74e17364fcf4b6561bba4f0bf",
+        "abc85dc5f002dd522ce69cca096f91efcbd220443d10b7273e3f7c1a704c4247",
+        "31832803ca42e3fc27b2af28204b050c6120f9ad424b030ad35516d0b7c23b2a",
+        "db4702fcff8102eb85261f704d84acf048d084395e990e6bcdfb3d793c7031a5",
+        "2d572bfbf63878e5932e663dd76e1bfa4267d9c4248f1820487424ced67d4892",
+        "fd71db99af303630c2a7a2ca3ab91f2937fdd713c0c3021c7e56eb9942f33c85",
+        "9c2cb3bcbb793c83a2586c80e61bb7402c0bfabf67edfc58894653fd07724782",
+        "7a4f7f15c843594c12d9447bc2852cdd9ef6336bd06799dd802138610384e66a",
+        "4b4a68f83423b1fee4a5b45bb75022cf2b0b918a14f6403d964fa201715b0482",
+        "d2fe6f74f1155cb8c99f6b855418df2cde45458a54e72be70731fe71cb1f2d6d",
+        "b27d03ae1e81af15a1679cc4abb8b142239d9a4134cdea43a18c115ad5d1bb8c",
+        "f0ebd6ab0ece3e4c228678dc943df5fd175e2aede5115c2825d1b37f12d190ad",
+        "ad58e02e13585c9529c0c1bdf9e31619f8b67707d380655ce04fda7d630a6b98"
+      ]
+    },
+    "full_suite_green": false,
+    "git_diff_check": "passed",
+    "historical": {
+      "deselected": 0,
+      "exit_code": 1,
+      "failed": 3,
+      "failure_identities": [
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts [call]",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts [call]",
+        "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts [call]"
+      ],
+      "passed": 23,
+      "selection": [
+        "tests/test_patch_candidate_behavior_executor1.py::test_descriptor_truthfully_declares_required_isolation_unavailable",
+        "tests/test_patch_candidate_behavior_executor1.py::test_real_BANK_without_operational_runtime_authority_is_authenticated_negative",
+        "tests/test_patch_candidate_behavior_executor1.py::test_missing_or_caller_authored_authorization_stops_before_effects",
+        "tests/test_patch_candidate_behavior_executor1.py::test_unavailable_boundary_has_no_renderer_launcher_or_runtime_receipt_issuance",
+        "tests/test_patch_candidate_behavior_executor1.py::test_entire_fixture_guard_prevents_runtime_generation_network_traversal_and_writes",
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+        "tests/test_preflight_runtime1.py::test_BANK_without_runtime_source_preserves_frozen_negative_authority",
+        "tests/test_preflight_runtime1.py::test_direct_only_capability_remains_unauthorized_until_typed_source",
+        "tests/test_preflight_runtime1.py::test_capability_descriptor_freshness_does_not_mutate_prior_authorization",
+        "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_descriptor_reconstruction_improves_only_architecture_truth",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_nonfinite_native_double_cannot_become_canonical_evidence",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_native_double_normalization_never_coerces_other_types",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_finite_double_bits_are_exact_and_deterministic",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts"
+      ],
+      "skipped": 0,
+      "test_only_lease_consumptions": 0,
+      "test_only_lease_ids": []
+    },
+    "infrastructure": {
+      "deselected": 0,
+      "exit_code": 1,
+      "failed": 1,
+      "failure_identities": [
+        "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+      ],
+      "passed": 503,
+      "selection": [
+        "tests/test_runtime_sandbox1.py",
+        "tests/test_runtime_sandbox2.py",
+        "tests/test_runtime_java1.py",
+        "tests/test_runtime_java1_discovery.py",
+        "tests/test_runtime_java1_governance.py",
+        "tests/test_runtime_java1a.py",
+        "tests/test_runtime_java1b.py",
+        "tests/test_runtime_java1c.py"
+      ],
+      "skipped": 0,
+      "test_only_lease_consumptions": 0,
+      "test_only_lease_ids": []
+    },
+    "new_failure_identities": [],
+    "notes": [
+      "No frozen registry projection or historical repinning was used.",
+      "Historical executor/preflight/reflection coverage is an explicit pure subset; Java runtime fixtures were not selected.",
+      "The focused final suite contains 113 lifecycle tests plus 491 frozen synthetic-owner and blocked-executor regressions.",
+      "The 32 test-only consumptions belong only to the final recorded focused suite; the strict proof consumes zero leases.",
+      "Safety fixtures are separate temporary repositories. Their exact Python pytest child and four read-only Git command forms are allowed; all other process/network effects are denied.",
+      "One deliberately failing validation child was denied by the safety guard; its failure-path regression passed.",
+      "Development and test-runner shell/process activity is outside the strict lifecycle proof effect counters."
+    ],
+    "registry_after": {
+      "deselected": 0,
+      "exit_code": 1,
+      "failed": 12,
+      "failure_identities": [
+        "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1 [call]",
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts [call]",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts [call]",
+        "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation [call]",
+        "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets [call]",
+        "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked [call]",
+        "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call [call]",
+        "tests/test_phase_registry.py::test_seed_registry_has_expected_phases [call]",
+        "tests/test_phase_registry.py::test_seed_registry_is_conservative [call]",
+        "tests/test_phase_registry.py::test_seed_registry_summary_counts [call]",
+        "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts [call]",
+        "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping [call]"
+      ],
+      "passed": 292,
+      "selection": [
+        "tests/test_phase_registry.py",
+        "tests/test_phase_picker.py",
+        "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts",
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+        "tests/test_runtime_sandbox1.py::test_maintenance_reverses_only_exact_additive_bookkeeping",
+        "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1"
+      ],
+      "skipped": 0,
+      "test_only_lease_consumptions": 0,
+      "test_only_lease_ids": []
+    },
+    "safety": {
+      "allowed_fixture_processes": [
+        {
+          "argv": "git rev-parse HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_t6_bounded_review_apply_i0"
+        },
+        {
+          "argv": "git rev-parse --abbrev-ref HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_t6_bounded_review_apply_i0"
+        },
+        {
+          "argv": "git status --porcelain",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_t6_bounded_review_apply_i0"
+        },
+        {
+          "argv": "git diff --stat HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_t6_bounded_review_apply_i0"
+        },
+        {
+          "argv": "C:\\Python314\\python.exe -m pytest",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_t6_bounded_review_apply_i0"
+        },
+        {
+          "argv": "git rev-parse HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_authorized_manual_attempt0"
+        },
+        {
+          "argv": "git rev-parse --abbrev-ref HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_authorized_manual_attempt0"
+        },
+        {
+          "argv": "git status --porcelain",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_authorized_manual_attempt0"
+        },
+        {
+          "argv": "git diff --stat HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_authorized_manual_attempt0"
+        },
+        {
+          "argv": "git rev-parse HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_manual_apply_outcome_is_p0"
+        },
+        {
+          "argv": "git rev-parse --abbrev-ref HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_manual_apply_outcome_is_p0"
+        },
+        {
+          "argv": "git status --porcelain",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_manual_apply_outcome_is_p0"
+        },
+        {
+          "argv": "git diff --stat HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_manual_apply_outcome_is_p0"
+        },
+        {
+          "argv": "git rev-parse HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_automation_path_cannot_us0\\repo"
+        },
+        {
+          "argv": "git rev-parse --abbrev-ref HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_automation_path_cannot_us0\\repo"
+        },
+        {
+          "argv": "git status --porcelain",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_automation_path_cannot_us0\\repo"
+        },
+        {
+          "argv": "git diff --stat HEAD",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_automation_path_cannot_us0\\repo"
+        }
+      ],
+      "denied_fixture_processes": [
+        {
+          "argv": "C:\\WINDOWS\\system32\\cmd.exe /c \"python -c \"import sys; sys.exit(1)\"\"",
+          "cwd": "C:\\Users\\Admin\\AppData\\Local\\Temp\\sl1s_8oct\\test_authorized_manual_attempt0"
+        }
+      ],
+      "exit_code": 1,
+      "failed": 1,
+      "failure_identities": [
+        "tests/test_human_authority_branch_checkpoint.py::test_real_registry_marks_human_close_complete_and_picker_recommends_adopt_model_1 [call]"
+      ],
+      "passed": 241,
+      "scope": "separate temporary-repository safety fixtures; never lifecycle proof effects",
+      "selection": [
+        "tests/test_human_apply_authorization.py",
+        "tests/test_human_authority_branch_checkpoint.py",
+        "tests/test_patch_safety.py",
+        "tests/test_patch_safety_chokepoint.py",
+        "tests/test_executor_single_file_path.py",
+        "tests/test_executor_single_file_patch_safety.py",
+        "tests/test_validation_execution_safety.py",
+        "tests/test_validation_command_safety.py",
+        "tests/test_github_pr_safety_contract.py"
+      ]
+    },
+    "same_baseline_failure_identities_before_and_after": true,
+    "whitespace_check": {
+      "files_checked": [
+        "core/synthetic_runtime_authorization_lifecycle.py",
+        "scripts/replay_synth_auth_lifecycle1.py",
+        "tests/test_synthetic_runtime_authorization_lifecycle.py",
+        "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1.md",
+        "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_LOCAL.json",
+        "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json"
+      ],
+      "missing_final_newlines": 0,
+      "status": "passed",
+      "trailing_whitespace": 0
+    }
+  }
+}

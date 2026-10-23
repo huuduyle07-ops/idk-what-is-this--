@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="cattus-csrf-token" content="{{ cattus_csrf_token() }}">
+    <meta name="cattus-auth-state" content="{{ cattus_auth_state() }}">
+    <meta name="color-scheme" content="light">
+    <title>Tài liệu của tôi — C.A.T.T.U.S</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='learn.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='learning_materials.css') }}">
+    <script src="{{ url_for('static', filename='request_integrity.js') }}"></script>
+    <script src="{{ url_for('static', filename='learning_materials.js') }}" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#materialsTitle">Đến tài liệu</a>
+    <div class="studio">
+        <aside class="rail" aria-label="Điều hướng">
+            <a class="brand" href="/learn" aria-label="C.A.T.T.U.S — Không gian học"><span class="brand-mark" aria-hidden="true">c<span>·</span></span><span>C.A.T.T.U.S<small>Hiểu từ gốc.</small></span></a>
+            <nav class="mode-nav" aria-label="Chế độ làm việc">
+                <a class="mode-link" href="/learn"><span aria-hidden="true">↗</span><span>Học cùng tôi</span></a>
+                <a class="mode-link active" href="/learn/materials" aria-current="page"><span aria-hidden="true">▤</span><span>Tài liệu của tôi</span><span class="nav-dot" aria-hidden="true"></span></a>
+                <a class="mode-link" href="/?web_mode=instant"><span aria-hidden="true">{ }</span><span>Coding agent</span><span aria-hidden="true">↗</span></a>
+            </nav>
+            <div class="rail-note"><span class="small-leaf" aria-hidden="true">↗</span><p>Bắt đầu từ<br>điều bạn đang học.</p></div>
+            <details class="privacy-details"><summary>Tài liệu được dùng thế nào?</summary><p>File được sao chép vào máy chủ C.A.T.T.U.S này để xem lại. Tài liệu được trích chữ; ảnh PNG/JPEG giữ nguyên để bạn xem và tự mô tả, chưa chạy OCR. Bước nhập không gọi dịch vụ AI, không huấn luyện model và chưa đưa tài liệu vào bài học.</p><p>Danh sách gắn với trình duyệt hiện tại. Chưa có chức năng xóa hoặc tải lại file nguồn trên trang này.</p></details>
+        </aside>
+        <main class="main learning-main materials-main">
+            <header class="topbar"><p class="breadcrumb">Không gian học <span aria-hidden="true">/</span> <strong>Tài liệu</strong></p><a class="text-button" href="/learn">Về bài học Java ↗</a></header>
+            <div class="lesson-heading"><div><p class="eyebrow">NGUỒN HỌC CỦA BẠN</p><h1 id="materialsTitle" tabindex="-1">Mang bài giảng vào đây.</h1><p class="lesson-subtitle">Chọn một chương nhỏ. Xem lại chữ trích xuất và hình ảnh trước khi dùng để học.</p></div><span class="lesson-badge">Bước chuẩn bị nguồn</span></div>
+            <section id="materialsNotice" class="notice" role="alert" hidden><p id="materialsNoticeText"></p></section>
+            <p id="materialsAnnouncement" class="visually-hidden" role="status" aria-live="polite"></p>
+            <div class="materials-grid">
+                <section class="material-card intake-card" aria-labelledby="importHeading">
+                    <p class="eyebrow">01 / CHỌN NGUỒN</p><h2 id="importHeading">Bài giảng của tôi</h2>
+                    <div id="materialsDropzone" class="materials-dropzone" aria-label="Vùng thả file hoặc thư mục" aria-describedby="dropHelp">
+                        <span class="drop-symbol" aria-hidden="true">↓</span><p class="drop-title">Thả file hoặc thư mục vào đây</p>
+                        <p id="dropHelp">PDF, PowerPoint .pptx, Word .docx, ảnh PNG/JPEG</p>
+                        <div class="picker-actions"><button id="chooseFilesButton" class="button button-secondary" type="button">Chọn file</button><button id="chooseFolderButton" class="button button-secondary" type="button">Chọn thư mục</button></div>
+                        <input id="materialsFilesInput" class="visually-hidden" type="file" multiple accept=".pdf,.pptx,.docx,.png,.jpg,.jpeg" tabindex="-1" aria-label="Chọn file bài giảng">
+                        <input id="materialsFolderInput" class="visually-hidden" type="file" multiple webkitdirectory directory tabindex="-1" aria-label="Chọn thư mục bài giảng">
+                    </div>
+                    <p class="material-help">Tối đa 10 file được hỗ trợ · 20 MiB/file · 64 MiB tổng. Chọn lại sẽ thay danh sách bên dưới. Thư mục không được đồng bộ tự động.</p>
+                    <p id="selectionMessage" class="selection-message" role="status">Chưa chọn tài liệu.</p>
+                    <ul id="selectedFiles" class="selected-files" aria-label="File chuẩn bị nhập"></ul>
+                    <form id="materialsImportForm" class="material-import-form">
+                        <label for="materialsTitleInput">Tên môn học hoặc chương</label>
+                        <input id="materialsTitleInput" type="text" maxlength="200" placeholder="Ví dụ: Java — Kế thừa" autocomplete="off" required>
+                        <button id="importMaterialsButton" class="button button-primary" type="submit" disabled><span>Nhập tài liệu</span><span aria-hidden="true">→</span></button>
+                        <p id="importStatus" class="material-help" role="status">Chỉ gửi file khi bạn nhấn Nhập tài liệu.</p>
+                    </form>
+                </section>
+                <section class="material-card library-card" aria-labelledby="libraryHeading">
+                    <div class="section-topline"><div><p class="eyebrow">02 / XEM LẠI</p><h2 id="libraryHeading">Các bộ tài liệu</h2></div><button id="refreshMaterialsButton" class="text-button" type="button">Tải lại</button></div>
+                    <p class="material-help">Mỗi lần nhập tạo một bản riêng. Hãy đối chiếu chữ trích xuất và xem lại hình; nhập thành công chưa có nghĩa nội dung đã được kiểm chứng.</p>
+                    <p id="collectionsEmpty" class="empty-materials">Đang mở danh sách tài liệu…</p>
+                    <ul id="materialsCollections" class="materials-collections" aria-label="Bộ tài liệu đã nhập"></ul>
+                </section>
+            </div>
+            <section id="materialPreview" class="material-card material-preview" aria-labelledby="previewHeading" hidden>
+                <div class="section-topline"><div><p class="eyebrow">XEM LẠI NGUỒN</p><h2 id="previewHeading" tabindex="-1"></h2></div><span id="collectionStatus" class="review-badge"></span></div>
+                <p class="material-help">Dùng file gốc để kiểm tra. Chưa có bước xác nhận đã duyệt hoặc trò chuyện với tài liệu trên trang này.</p>
+                <div class="preview-controls"><div class="source-field"><label for="materialSourceSelect">File nguồn</label><select id="materialSourceSelect"></select></div><p id="sourceDetails" class="material-help"></p></div>
+                <ul id="sourceWarnings" class="material-warnings" aria-label="Lưu ý của file nguồn"></ul>
+                <section id="imagePanel" class="image-panel" aria-labelledby="imageHeading" hidden>
+                    <div class="image-toolbar"><div><h3 id="imageHeading">Ảnh nguồn</h3><p id="imageDimensions" class="material-help"></p></div><button id="imageZoomButton" class="text-button" type="button" aria-pressed="false" aria-controls="imageViewport">Xem kích thước gốc</button></div>
+                    <p class="material-help">Ảnh chưa được OCR hoặc AI diễn giải. Bạn có thể xem hình và viết ghi chú riêng bên dưới.</p>
+                    <div id="imageViewport" class="image-viewport" tabindex="0" role="region" aria-label="Ảnh nguồn; cuộn để xem khi mở kích thước gốc"><img id="materialImage" alt="Ảnh bài giảng" decoding="async" referrerpolicy="same-origin"></div>
+                    <p id="imageLoadStatus" class="material-help" role="status"></p>
+                    <form id="imageDescriptionForm" class="image-description-form">
+                        <label for="imageDescriptionInput">Mô tả của tôi về ảnh này</label>
+                        <p id="imageDescriptionHelp" class="material-help">Đây là ghi chú bạn tự viết, được lưu riêng với ảnh. Nội dung này chưa được kiểm chứng, không phải chữ trích xuất hoặc lời giải do AI tạo.</p>
+                        <textarea id="imageDescriptionInput" rows="5" maxlength="4000" aria-describedby="imageDescriptionHelp descriptionCount" placeholder="Ví dụ: Sơ đồ so sánh kiểu khai báo và kiểu đối tượng. Phần tôi còn chưa hiểu là…"></textarea>
+                        <p id="descriptionCount" class="material-help">0 / 4.000 ký tự</p>
+                        <div class="description-actions"><button id="saveDescriptionButton" class="button button-primary" type="submit" disabled>Lưu mô tả</button><button id="discardDescriptionButton" class="text-button" type="button" disabled>Bỏ thay đổi chưa lưu</button></div>
+                        <p id="descriptionStatus" class="material-help" role="status"></p>
+                    </form>
+                    <section id="descriptionConflict" class="description-conflict" aria-label="Đối chiếu mô tả đã thay đổi" hidden>
+                        <p>Mô tả trên máy chủ có thể đã thay đổi. Bản bạn đang viết vẫn được giữ; hãy đọc bản đã lưu trước khi quyết định.</p>
+                        <button id="reloadDescriptionButton" class="text-button" type="button">Đọc bản đã lưu</button>
+                        <div id="latestDescriptionPanel" hidden><p class="eyebrow">BẢN ĐÃ LƯU TRÊN MÁY CHỦ · DO NGƯỜI DÙNG VIẾT</p><pre id="latestDescriptionText" class="latest-description-text"></pre><div class="description-actions"><button id="useSavedDescriptionButton" class="button button-secondary" type="button">Dùng bản đã lưu</button><button id="keepDraftDescriptionButton" class="text-button" type="button">Giữ bản đang viết</button></div></div>
+                    </section>
+                </section>
+                <div id="textSourcePanel">
+                <div class="unit-toolbar"><h3 id="unitCitation"></h3><div class="unit-navigation"><button id="previousUnitButton" class="text-button" type="button" aria-label="Phần nguồn trước">← Trước</button><label for="unitNumberInput">Phần</label><input id="unitNumberInput" type="number" min="1" value="1" aria-label="Số thứ tự phần nguồn"><span id="unitCount"></span><button id="nextUnitButton" class="text-button" type="button" aria-label="Phần nguồn tiếp theo">Sau →</button></div></div>
+                <ul id="unitWarnings" class="material-warnings" aria-label="Lưu ý của phần nguồn"></ul>
+                <pre id="unitText" class="unit-text" tabindex="0" aria-label="Văn bản trích xuất"></pre>
+                <p id="previewLimitNote" class="material-help" hidden></p>
+                </div>
+            </section>
+            <footer class="studio-footer"><span>C.A.T.T.U.S / Learning studio</span><span>Nguồn rõ ràng. Học theo nhịp của bạn.</span></footer>
+        </main>
+    </div>
+    <noscript><p class="noscript-note">Hãy bật JavaScript để chọn, nhập và xem tài liệu. Chưa có file nào được gửi.</p></noscript>
+</body>
+</html>

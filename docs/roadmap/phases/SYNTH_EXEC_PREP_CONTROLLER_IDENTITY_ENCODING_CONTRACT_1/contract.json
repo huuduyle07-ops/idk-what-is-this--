@@ -1,0 +1,133 @@
+{
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+  "schema_version": "synthetic_preparation_identity_encoding_contract_1_v1",
+  "artifact_kind": "pure_additive_future_owner_relation_identity_contract",
+  "typed_result": "SYNTH_EXEC_PREP_CONTROLLER_IDENTITY_ENCODING_CONTRACT_1_COMPLETE",
+  "created_at": "2026-10-19",
+  "contract_frozen": true,
+  "result_meaning": "Future process-local scalar handle semantics and bounded text grammar are frozen. No owner, generator, authentication protocol, transport or operational witness is implemented.",
+  "stop_after_contract": true,
+  "schema_modified": false,
+  "requirement_evolution_required": false,
+  "historical_contracts_modified": false,
+  "historical_budget_result": "BUDGET_WITNESS_UNRESOLVED",
+  "historical_identity_subresult": "BUDGET_WITNESS_IDENTITY_ENCODING_UNRESOLVED",
+  "overall_budget_feasibility": "UNRESOLVED",
+  "candidate_A_selected": false,
+  "cap_bytes": 8192,
+  "budget_scope": "one materialize -> compile preparation EFFECT attempt",
+  "sources": {
+    "C": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+    "S": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+    "W": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+    "P": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+    "B": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1R/budget_witness.json"
+  },
+  "authority_basis": {
+    "scalar_role": "non-secret opaque local lookup, correlation and uniqueness handle",
+    "scalar_is_bearer_credential": false,
+    "scalar_is_authentication_proof": false,
+    "scoped_bearer_ids_found": [],
+    "opaque_meaning": "Consumers compare exact bytes; decoding a counter or predicting the next value grants no permission.",
+    "required_conjunction": [
+      "exact expected owner/relation object type, and exact built-in scalar types; reject wrappers and subclasses",
+      "exact original retained process-local object, not a reconstructed equal object",
+      "owner-specific original registry entry and retained upstream graph",
+      "issuing PID and current original process incarnation with independent process-local owner secret",
+      "constant-time valid domain/role-separated HMAC over exact originally retained canonical bindings",
+      "matching immutable stable fingerprint where required, separately from current state authenticity",
+      "current generations, observation, admission, local fence, eligibility and permanent one-shot/tombstone checks"
+    ],
+    "wire_rule": "JSON scalars may correlate an already authenticated retained exchange. Neither a wire ID nor JSON reconstruction creates a registry entry or original object. A controller must obtain separately authenticated admission through its future authenticated original channel; the scalar admission ID alone never suffices.",
+    "trust_boundary_rule": "No scoped scalar crosses a boundary as a bearer capability under the frozen contracts. If an implementation accepts ID-only lookup as permission, this encoding is inapplicable: stop unresolved and require a separately reviewed capability/authentication contract before effects. Making the handle longer does not repair an ID-only authority path.",
+    "threat_model_limit": "A malicious caller may know or guess all IDs and supply copied values/objects. Arbitrary execution that can mutate private registries, steal secrets or bypass validators is outside the owner abstraction; handles do not provide memory isolation.",
+    "anchors": ["C:/authority_separation/scalar_admission_id_is_authority", "C:/framing/primitive_rules/id", "W:/exact_live_object", "W:/authentication"]
+  },
+  "encoding": {
+    "primitive_name": "family-prefixed positive process-incarnation sequence handle",
+    "alphabet": "prefix from wcxatrod followed only by 0123456789abcdef",
+    "general_regex": "[wcxatrod][0-7][0-9a-f]{15}",
+    "excluded_value": "sixteen zero suffix digits",
+    "semantic_range": [1, 9223372036854775807],
+    "sequence_bits": 63,
+    "suffix_hex_digits": 16,
+    "minimum_content_bytes": 17,
+    "maximum_content_bytes": 17,
+    "exact_content_bytes": 17,
+    "canonical_quoted_json_bytes": 19,
+    "canonical_case": "lowercase only; reject uppercase rather than normalize",
+    "serialization": "exact built-in str, ASCII, one canonical JSON string under the frozen encoding; no padding changes, escapes, whitespace, signs, separators or alternate spellings",
+    "secret": false,
+    "entropy_bits_required": 0,
+    "generation_method": "Owner-reserved positive monotonic integer, represented as exactly sixteen lowercase zero-padded hexadecimal digits following the field-family prefix. This is a specification only; no generator is supplied.",
+    "capacity_rationale": "All classes independently retain histories across an otherwise unbounded process-incarnation lifetime; no audited class has a smaller universal count bound. This phase chooses a 63-bit nonwrapping allocation capacity consistent with C:/framing/primitive_rules/positive_int; that historical rule constrains message sequences, not the existing generic ID strings, and does not mandate this choice. This is a bounded availability policy, not a cryptographic minimum. Equal widths reflect the independently shared retention/capacity obligation, not a demand that semantic classes match or a byte-fit objective. Both 32-bit and 63-bit handles can be security-correct with explicit exhaustion; a smaller bound has no independent class-specific evidence here. Full SHA256 would add authentication responsibilities these scalars do not have.",
+    "additive_grammar": "These predicates constrain future values of existing generic id fields only; S:/definitions/id remains unchanged. Prefix, suffix range and exact field domain must all validate. No issued historical ID is re-encoded."
+  },
+  "generation_semantics": {
+    "namespace": "One retained allocation namespace per future issuer process incarnation, shared across every instance of the participating future owner domains; never one resetting counter per owner object.",
+    "reservation": "A single abstract monotonic reservation ledger assigns a fresh integer across all participating families and owners. Family prefix selects semantic domain; exact owner module/phase/schema/role and original relation are additionally authenticated. Independent owner instances may not start their own overlapping namespace.",
+    "thread_safety": "Reservation, increment and issued/tombstoned collision check are one linearizable critical section. No assumption about the GIL. Owner registration may follow, but any reserved value stays burned on failure, exception or cancellation.",
+    "collision_handling": "At reservation, reject any existing reserved, active, terminal or tombstoned key before claiming it. Registration may publish only that issuer's own newly created reservation, once; reject a foreign reservation or an already published/terminal/tombstoned ID. An unexpected collision or missing namespace continuity is an invariant failure: no overwrite, no retry with the same value, no alias, no dispatch; invalidate affected eligibility and retain burned values.",
+    "reuse_forbidden": true,
+    "wrap": "Never wrap, truncate, modulo, saturate or restart; reject allocation before exceeding 9223372036854775807. Exhaustion withdraws new issuance, not cleanup of retained originals.",
+    "fork_boundary": "PID mismatch invalidates all inherited originals and allocator state before validation or issuance. A forked child may not continue an inherited namespace or lock; it needs a new empty process-incarnation namespace and independently initialized owner secrets through a future reviewed initialization path. No such path is implemented here.",
+    "restart_boundary": "A fresh process incarnation may repeat printable strings only in a disjoint new namespace with new secrets and empty original-object registry. Old objects, JSON and HMACs cannot be imported or reattached. PID equality alone never permits continuity, including after PID reuse.",
+    "reload_boundary": "Module reload, registry recreation, allocator replacement or secret rotation cannot reset counters while any namespace originals/tombstones can be recognized. Retain namespace continuity or fail closed for new issuance and old eligibility. No rehydration from serialized IDs.",
+    "lifetime": "Reservation histories and permanent terminal tombstones last to process-incarnation termination, independently of whether the original operational object remains live. Strong originals/graph remain as required by their owning contracts.",
+    "terminal": "Terminal records may authenticate historical evidence but cannot restore readiness. Never remove a tombstone to free a scalar; no namespace recycling after registry cleanup.",
+    "domain_separation": "Prefix validation rejects class substitution before lookup. A prefix is not an HMAC domain: independent existing owner secret/domain/role separation and exact original graph comparisons remain mandatory for cross-owner substitution within the same class.",
+    "allocation_is_not_coordination": "The abstract reservation ledger concerns name uniqueness only. It does not hold existing private owner locks, bridge owner stores, authenticate an admission, spend a facet or establish a cross-owner effect transaction. Concrete synchronization remains a future implementation obligation.",
+    "caller_control": "Only the authenticated issuing owner reserves a new value; callers may echo an already bound value but cannot select, register, overwrite or alias it. Parse/equality checks use exact strings without coercion.",
+    "random_alternatives": "No scoped scalar requires unpredictability. Random or cryptographic random allocation is not the accepted primitive for these future fields; the frozen historical random conventions remain untouched. Observation challenges and independent HMAC secrets retain their stronger existing requirements."
+  },
+  "identity_classes": [
+    {"class": "WORKSPACE_OBJECT_REFERENCE", "prefix": "w", "regex": "w[0-7][0-9a-f]{15}", "fields": ["workspace_capability_id"], "role": "Lookup exact original workspace capability object; spelling alone conveys no workspace or preparation permission.", "lifetime": "One original workspace relation through terminal evidence and permanent namespace tombstone."},
+    {"class": "CONTROLLER_OBJECT_REFERENCE", "prefix": "c", "regex": "c[0-7][0-9a-f]{15}", "fields": ["controller_identity"], "role": "Lookup exact retained controller owner-object relation whose authenticated record binds source, protocol, original workspace and incarnation facts.", "lifetime": "One original controller object; never reassigned to a replacement controller."},
+    {"class": "EXCLUSIVE_OWNER_RELATION_REFERENCE", "prefix": "x", "regex": "x[0-7][0-9a-f]{15}", "fields": ["exclusive_owner_relation_id", "writer.accounted_original_relation_id"], "role": "Lookup authenticated original exclusive-owner/writer accounting relation. Writer field is an alias of an actual retained original relation, never a new ID minted for observation.", "lifetime": "One exact original exclusive relation. Minimum-path accounted controller writer uses the same exclusive_owner_relation_id. Other writer relations require their own truthful authenticated original mapping; unresolved borrower/handoff encodings are not fabricated."},
+    {"class": "SINGLE_OPERATION_ADMISSION_REFERENCE", "prefix": "a", "regex": "a[0-7][0-9a-f]{15}", "fields": ["admission_relation_id"], "role": "Lookup separately authenticated owner admission bound to exact originals, purpose/tag, attempt, request, operation, generations, observation and fence; scalar is explicitly not authority.", "lifetime": "One admitted operation, permanently spent/rejected/terminal thereafter; no replay or refund."},
+    {"class": "PERMANENT_PREPARATION_ATTEMPT_REFERENCE", "prefix": "t", "regex": "t[0-7][0-9a-f]{15}", "fields": ["preparation_attempt_id"], "role": "Bind the one permanent materialize -> compile attempt and its original spent facets, same workspace/controller and failure history.", "lifetime": "One attempt forever in retained namespace history; no reuse, reopen, refund or new attempt under old value."},
+    {"class": "SINGLE_REQUEST_CORRELATION", "prefix": "r", "regex": "r[0-7][0-9a-f]{15}", "fields": ["request_id"], "role": "Owner-generated unique request correlation key; exact request/response equality plus owner admission/replay history rejects aliasing.", "lifetime": "One exchange; duplicates or lost replies do not authorize redispatch. A permitted cleanup re-observation requires a fresh request."},
+    {"class": "SINGLE_OPERATION_CORRELATION", "prefix": "o", "regex": "o[0-7][0-9a-f]{15}", "fields": ["operation_id", "process.admitted_operation_id", "writer_handle.admitted_operation_id", "active_operation_id"], "role": "Owner-generated unique admitted operation identity. Nonnull inventory/active references copy the exact bound operation_id and do not allocate new values.", "lifetime": "One original operation; no mutation retry after response loss; fresh operation cannot reuse request/admission IDs."},
+    {"class": "AUTHENTICATED_DEADLINE_RELATION_REFERENCE", "prefix": "d", "regex": "d[0-7][0-9a-f]{15}", "fields": ["deadline_identity"], "role": "Lookup one authenticated immutable monotonic deadline relation shared by this attempt from materialization through compile; not a timestamp, clock reading or wall-clock authenticity claim.", "lifetime": "Original attempt budget relation never reset, extended or replaced to refund time; terminal record remains tombstoned."}
+  ],
+  "classification_only": [
+    {"field": "authorized_borrower_relation_id", "class": "UNESTABLISHED_BORROWER_RELATION", "minimum_path_value": null, "minimum_path_json_bytes": 4, "nonnull_encoding_frozen": false, "reason": "No borrower or consumer authenticator exists on the minimum preparation path. Required nullable key remains null; nonnull requires a later contract."},
+    {"field": "handoff_identity", "class": "UNESTABLISHED_HANDOFF_RELATION", "minimum_path_value": null, "minimum_path_json_bytes": 4, "nonnull_encoding_frozen": false, "reason": "No handoff occurs on the minimum preparation path. Required nullable key remains null; no placeholder or encoding is invented."}
+  ],
+  "nullable_operation_references": {
+    "fields": ["process.admitted_operation_id", "writer_handle.admitted_operation_id", "active_operation_id"],
+    "nonnull_content_bytes": 17,
+    "null_json_bytes": 4,
+    "minimum_success_poststate": "Truthfully null after materialization/compile is quiescent and compiler fully reaped. Preserve all mandatory nullable keys. Nonnull values use exact existing o-domain operation ID; do not choose null to save bytes."
+  },
+  "controller_identity_separation": {
+    "controller_identity": "Exact original controller owner-object reference only; its authenticated record must still bind every original C:/identity/must_bind fact.",
+    "stable_implementation_identity": "Separate exact source bytes/hash/size, executable and interpreter identity, reviewed protocol ID/schema, image, bootstrap, closed environment and policy. No source implementation is supplied or repinned.",
+    "incarnation": "Separate controller_generation and original process/channel binding; kernel/process serialization remains unresolved. No controller generation encoder is selected here.",
+    "forbidden_overloads": ["source SHA256", "protocol string", "module name", "PID", "controller_generation", "container_identity", "workspace_generation"]
+  },
+  "digest_separation": {
+    "ID": "public scalar lookup/correlation/uniqueness handle",
+    "stable_fingerprint": "separate unchanged 64-lowercase-hex authenticated immutable identity digest; neither registry authority nor current readiness",
+    "HMAC": "separate unchanged cryptographic record authenticator under independent owner secret/domain/role",
+    "capability": "exact original process-local object plus owner validation and current eligibility, never the scalar spelling"
+  },
+  "security_property_matrix": [
+    {"threat": "accidental collision", "encoding": "Injective fixed-width positive integer representation with disjoint family prefixes; encoding alone cannot ensure allocation uniqueness.", "enforcement": ["linearizable nonwrapping reservation", "collision check against reserved/live/terminal/tombstone ledger", "no overwrite or reuse"]},
+    {"threat": "malicious caller guessing another live ID", "encoding": "Predictable by design; no protection or secrecy claim.", "enforcement": ["exact original object/type", "owner registry", "authenticated bound admission and HMAC", "current eligibility/fence"]},
+    {"threat": "replay of stale ID", "encoding": "Never-reused spelling disambiguates history but is not freshness.", "enforcement": ["permanent spent/terminal/tombstone records", "current observation sequence/challenge", "generations and local fence", "no mutation rerun on lost response"]},
+    {"threat": "cross-process copy", "encoding": "Process-local namespace may repeat text; spelling is not a portable capability.", "enforcement": ["issuing PID", "original process incarnation and independent owner secret", "exact original process-local registry/object", "no reconstruction or fork inheritance acceptance"]},
+    {"threat": "cross-owner substitution", "encoding": "Family prefix rejects mismatched classes; same class does not identify the issuer cryptographically.", "enforcement": ["process-incarnation reservation ledger", "owner/module/phase/schema/domain/role authenticated binding", "exact original upstream graph and registry"]},
+    {"threat": "same-process forged dataclass with copied scalar IDs", "encoding": "Copies validate lexically; no authority claim.", "enforcement": ["exact type", "registry original is supplied object", "retained canonical payload and HMAC", "original upstream graph"]},
+    {"threat": "PID reuse", "encoding": "No PID encoded; no cross-incarnation uniqueness claim.", "enforcement": ["new process-local independent secret", "no old registry/object restore", "original process-incarnation checks; PID equality alone insufficient"]},
+    {"threat": "registry reuse after terminal state", "encoding": "Nonwrapping namespace must persist across registry replacement.", "enforcement": ["permanent terminal history", "no re-registration/reopen", "fail closed on lost namespace continuity"]},
+    {"threat": "ID reuse after tombstone", "encoding": "Reuse is forbidden for the whole process-incarnation namespace.", "enforcement": ["burned reservation retained", "tombstones never recycled", "exhaustion rejects issuance"]},
+    {"threat": "serialization/reconstruction", "encoding": "ASCII canonical text may be serialized as data only.", "enforcement": ["no restore/import API", "exact original object and original registry", "authenticated retained relation rather than deserialized fields"]},
+    {"threat": "JSON copy", "encoding": "Identical bytes are valid correlation data.", "enforcement": ["no authority from JSON", "authenticated retained exchange and original owner admission", "exact original objects remain required"]},
+    {"threat": "wrapper/subclass", "encoding": "No effect; scalar spelling does not certify object type.", "enforcement": ["exact type comparison rather than isinstance", "registry object identity"]},
+    {"threat": "immutable-binding substitution", "encoding": "IDs do not hash their contents.", "enforcement": ["unchanged stable fingerprint of immutable bindings", "HMAC and retained canonical bytes", "current mutable state authenticated separately"]}
+  ],
+  "out_of_scope": ["container_identity", "workspace_generation", "controller_generation", "mount_identity", "namespace_generation", "root_identity", "process/kernel identity", "cgroup identity", "start identity", "process group identity", "descriptor identity", "transport/framing selection", "backend-generation continuity and cleanup blocker"],
+  "authority_flags": {"owner_implementation": false, "identity_generator_implementation": false, "controller_implementation": false, "transport_selection": false, "workspace_issuance": false, "capability_issuance": false, "source_materialization": false, "scenario_compilation": false, "runtime_activation": false, "repin": false, "schema_change": false},
+  "operational_effects": {"owner_import": 0, "capability_issuance": 0, "network": 0, "live_kernel_inspection": 0, "Docker": 0, "javac": 0, "java": 0, "source_materialization": 0, "controller_execution": 0, "identity_generation": 0}
+}

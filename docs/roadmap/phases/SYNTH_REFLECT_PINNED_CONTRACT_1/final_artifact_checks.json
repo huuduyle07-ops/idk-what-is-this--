@@ -1,0 +1,27 @@
+{
+  "checks": {
+    "all_declared_operational_effects_zero": true,
+    "benchmark_counts_match_measurement": true,
+    "completion_status_matches_contract": true,
+    "denied_probe_transparency_preserved": true,
+    "focused_counts_match_measurement": true,
+    "frozen_counts_match_measurement": true,
+    "hashes_match_summary_and_report": true,
+    "historical_counts_match": true,
+    "independent_source_counts_match": true,
+    "no_implementation_or_capability_effect": true,
+    "readiness_remains_fail_closed": true,
+    "registry_baseline_and_after_match": true,
+    "summary_validation_passed": true
+  },
+  "measured_artifact_hashes": {
+    "contract_json": "45f8201fd15adffe41b75859bfcd0458881ab2b50edd13641a1f69be5b13ec97",
+    "new_source_test": "810733a3232fbe4afa24b67d99fdf547bb46d0140021b92a90450d13eeb7d63c",
+    "validation_harness": "a7e7df4005db6709ce5ac0072b3253d00a733f92ff88e298b30b3364218a957b"
+  },
+  "operational_effects_zero": true,
+  "owner_modules_imported": false,
+  "passed": true,
+  "report_json_checked": "SYNTH_REFLECT_PINNED_CONTRACT_1_REPORT.json",
+  "report_markdown_checked": "SYNTH_REFLECT_PINNED_CONTRACT_1_REPORT.md"
+}

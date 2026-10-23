@@ -68,6 +68,102 @@ def make_stored_gap(review: OOPSemanticReview, *, task_text: str,
     return body
 
 
+def make_stored_future_design_gap(
+    detection: Any, *, task_text: str, repo_path: str,
+) -> dict[str, Any] | None:
+    """Adapt one validated DETECT.2 result to the frozen OOP UI lifecycle."""
+    from core.oop_intent_detector import (
+        DISPOSITIONS, OOPIntentDetection, SCHEMA_VERSION as DETECTOR_SCHEMA_VERSION,
+    )
+
+    if not isinstance(detection, OOPIntentDetection):
+        raise TypeError("an OOPIntentDetection is required")
+    if detection.status != "clarification_required":
+        return None
+    gap = detection.gap
+    if gap is None or len(detection.possible_intent_gaps) != 1:
+        raise ValueError("malformed_oop_gap")
+    repository_id = derive_repository_id(repo_path)
+    if (gap.dimension != "future_design_contract"
+            or gap.status != "clarification_required" or gap.owner != "human"
+            or gap.task_fingerprint != sha256(task_text.encode("utf-8")).hexdigest()
+            or gap.repository_id != repository_id
+            or detection.repository_id != repository_id
+            or gap.source_fingerprint != detection.source_fingerprint
+            or gap.design_fingerprint != detection.design_fingerprint
+            or gap.task_contract_fingerprint != detection.task_contract_fingerprint
+            or not gap.subdimensions or not gap.unresolved_dimension_refs
+            or not _sha(gap.source_fingerprint)
+            or not _text(detection.source_path, 300)
+            or not _text(detection.class_identity, 300)):
+        raise ValueError("malformed_oop_gap")
+    evidence = set(gap.evidence_refs)
+    if any(not set(item.evidence_refs) <= evidence for item in detection.comparisons):
+        raise ValueError("malformed_oop_gap")
+    material = tuple(item for item in detection.assessments
+                     if item.disposition == "human_owned_material")
+    if ({item.dimension for item in material} != set(gap.subdimensions)
+            or any(item.disposition not in DISPOSITIONS for item in detection.assessments)):
+        raise ValueError("malformed_oop_gap")
+
+    dimension_refs = dict(zip(gap.subdimensions, gap.unresolved_dimension_refs, strict=True))
+    interpretations = []
+    auth_dimensions = tuple(item.dimension for item in material
+        if item.dimension.startswith("credential_") or item.dimension == "verification_lifecycle")
+    if auth_dimensions:
+        interpretations.append({
+            "kind": "future_authentication_contract",
+            "description": ("Credential ownership, persistence, and verification lifecycle choices "
+                            "produce materially different state and gating behavior."),
+            "evidence_refs": [dimension_refs[item] for item in auth_dimensions],
+            "provenance": "inferred_semantic_interpretation",
+        })
+    savings_dimensions = tuple(item.dimension for item in material
+        if item.dimension.startswith("savings_"))
+    if savings_dimensions:
+        interpretations.append({
+            "kind": "future_savings_contract",
+            "description": ("Funding and interest choices produce materially different mutations of "
+                            "the inherited balance and savingBalance."),
+            "evidence_refs": [dimension_refs[item] for item in savings_dimensions],
+            "provenance": "inferred_semantic_interpretation",
+        })
+    body = {
+        "gap_kind": KIND,
+        "admission_schema": DETECTOR_SCHEMA_VERSION,
+        "dimension": gap.dimension,
+        "subdimensions": list(gap.subdimensions),
+        "unresolved_dimension_refs": list(gap.unresolved_dimension_refs),
+        "question": gap.question,
+        "alternatives": [asdict(item) for item in gap.alternatives],
+        "evidence_refs": list(gap.evidence_refs),
+        "current_facts": [
+            {
+                "kind": item.kind,
+                "description": item.description,
+                "evidence_refs": list(item.evidence_refs),
+                "current_provenance": item.current_provenance,
+                "desired_provenance": item.desired_provenance,
+                "is_defect": False,
+            }
+            for item in detection.comparisons
+        ],
+        "interpretations": interpretations,
+        "dimension_assessments": [asdict(item) for item in detection.assessments],
+        "task_fingerprint": gap.task_fingerprint,
+        "task_contract_fingerprint": gap.task_contract_fingerprint,
+        "design_fingerprint": gap.design_fingerprint,
+        "repository_id": repository_id,
+        "source_fingerprint": gap.source_fingerprint,
+        "source_path": detection.source_path,
+        "class_identity": detection.class_identity,
+        "evidence_fingerprint": _hash(sorted(gap.evidence_refs)),
+        "scope_expansion": "deferred",
+    }
+    body["gap_id"] = _hash(body)
+    return body
+
+
 def validate_stored_gap(value: Mapping[str, Any], *, task_text: str,
                         repo_path: str) -> dict[str, Any]:
     """Validate immutable content before presentation or answer binding."""
@@ -102,6 +198,49 @@ def validate_stored_gap(value: Mapping[str, Any], *, task_text: str,
                         or not _text(item.get("description"), 500)
                         or not isinstance(item.get("evidence_refs"), list)):
                     raise ValueError
+        if gap.get("admission_schema") is not None:
+            from core.oop_intent_detector import DISPOSITIONS, SCHEMA_VERSION as detector_schema
+            from core.input_understanding import understand_request
+            from core.proposed_design_intent import project_proposed_design_intent
+
+            current_contract = understand_request(task_text)
+            current_design = project_proposed_design_intent(current_contract)
+
+            if (gap.get("admission_schema") != detector_schema
+                    or gap.get("dimension") != "future_design_contract"
+                    or not _sha(gap.get("design_fingerprint"))
+                    or not _sha(gap.get("task_contract_fingerprint"))
+                    or gap.get("task_contract_fingerprint") != _hash(current_contract.as_dict())
+                    or gap.get("design_fingerprint") != current_design.fingerprint
+                    or gap.get("scope_expansion") != "deferred"):
+                raise ValueError
+            subdimensions = gap.get("subdimensions")
+            dimension_refs = gap.get("unresolved_dimension_refs")
+            if (not isinstance(subdimensions, list) or not 1 <= len(subdimensions) <= 7
+                    or len(subdimensions) != len(set(subdimensions))
+                    or not isinstance(dimension_refs, list)
+                    or len(dimension_refs) != len(subdimensions)
+                    or len(dimension_refs) != len(set(dimension_refs))
+                    or any(not _text(item, 100) for item in subdimensions)
+                    or any(not isinstance(item, str)
+                           or not item.startswith("unresolved_dimension:")
+                           or len(item) != len("unresolved_dimension:") + 64
+                           for item in dimension_refs)):
+                raise ValueError
+            assessments = gap.get("dimension_assessments")
+            if (not isinstance(assessments, list) or len(assessments) > 11
+                    or any(not isinstance(item, dict)
+                           or item.get("disposition") not in DISPOSITIONS
+                           or not _text(item.get("dimension"), 100)
+                           or not _text(item.get("reason"), 300)
+                           for item in assessments)):
+                raise ValueError
+            material_dimensions = {
+                item["dimension"] for item in assessments
+                if item["disposition"] == "human_owned_material"
+            }
+            if material_dimensions != set(subdimensions):
+                raise ValueError
         gap["gap_id"] = identity
         return gap
     except (KeyError, TypeError, ValueError, OSError) as exc:

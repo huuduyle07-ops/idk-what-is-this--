@@ -1,0 +1,92 @@
+{
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.PROOF.1",
+  "typed_result": "AGGREGATE_BUDGET_SCOPE_UNRESOLVED",
+  "all_required_validation_checks_passed": true,
+  "focused_tests_collected": 33,
+  "focused_tests_passed": 33,
+  "benchmark_cases_checked": 54,
+  "benchmark_errors": 0,
+  "registry_picker_baseline": {
+    "collected": 299,
+    "passed": 292,
+    "failed": 7
+  },
+  "registry_picker_after": {
+    "collected": 299,
+    "passed": 292,
+    "failed": 7
+  },
+  "registry_picker_and_existing_failures_unchanged": true,
+  "baseline_failure_normalization": "Raw diagnostics retained; normalize only Python repr allocator ' at 0x...>' addresses before comparing. All node IDs, assertion text, expected/actual values and failure phases are exact.",
+  "preservation": {
+    "added_outside_new_phase": [],
+    "after_file_count": 26893,
+    "allowed_additions_outside_phase": [],
+    "baseline_file_count": 26893,
+    "changed": [],
+    "deleted": [],
+    "historical_preservation_passed": true,
+    "scope": "entire non-cache workspace including root/config/web and frozen history"
+  },
+  "static_check_passed": true,
+  "git_diff_check_passed": true,
+  "all_operational_effects_zero": true,
+  "guarded_modes": {
+    "focused": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "benchmark": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "proof": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "registry_baseline": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "registry_after": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    }
+  },
+  "no_capability_owner_imports": true,
+  "no_requirements_or_historical_files_changed": true,
+  "no_transport_selected": true,
+  "all_authority_flags_false": true,
+  "proof_outcome_is_scope_unresolved_despite_validation_success": true,
+  "evidence_files": [
+    "focused.json",
+    "benchmark.json",
+    "proof.json",
+    "registry_baseline.json",
+    "registry_after.json",
+    "registry_comparison.json",
+    "preservation_comparison.json",
+    "static_validation.json",
+    "git_validation.json"
+  ]
+}

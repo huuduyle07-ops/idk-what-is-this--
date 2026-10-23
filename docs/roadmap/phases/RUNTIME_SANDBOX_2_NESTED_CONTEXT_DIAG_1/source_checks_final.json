@@ -1,0 +1,9 @@
+{
+  "authored_text_files_checked": 36,
+  "bytecode_emission": false,
+  "failures": [],
+  "git_diff_check_exit_code": 0,
+  "new_json_files_parsed": 26,
+  "new_python_sources_compiled_in_memory": 4,
+  "passed": true
+}

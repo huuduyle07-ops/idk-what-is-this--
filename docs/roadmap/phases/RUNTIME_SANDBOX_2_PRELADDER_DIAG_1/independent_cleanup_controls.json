@@ -1,0 +1,45 @@
+[
+  {
+    "argv": [
+      "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.EXE",
+      "--config",
+      "C:\\Users\\Admin\\AppData\\Local\\Temp\\runtime-sandbox1-no-config-03349bce44000e5f832806b8ed2a7b26",
+      "--host",
+      "npipe:////./pipe/dockerDesktopLinuxEngine",
+      "ps",
+      "-a",
+      "--format",
+      "{{.Names}}",
+      "--filter",
+      "name=runtime-sandbox2-"
+    ],
+    "config_exists_before": false,
+    "config_is_symlink_before": false,
+    "exit_code": 0,
+    "pipes_closed": true,
+    "private_config_path": "C:\\Users\\Admin\\AppData\\Local\\Temp\\runtime-sandbox1-no-config-03349bce44000e5f832806b8ed2a7b26",
+    "process_created": true,
+    "process_reaped": true,
+    "readers_surviving": 0,
+    "scope": "diagnostic_read_only_control",
+    "shell": false,
+    "status": "sandbox_completed",
+    "stderr": {
+      "base64": "",
+      "bytes": 0,
+      "retention": "complete_original_bounded_capture",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text_utf8_replace": ""
+    },
+    "stderr_limit": 16384,
+    "stdout": {
+      "base64": "",
+      "bytes": 0,
+      "retention": "complete_original_bounded_capture",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text_utf8_replace": ""
+    },
+    "stdout_limit": 16384,
+    "timeout_ms": 8000
+  }
+]

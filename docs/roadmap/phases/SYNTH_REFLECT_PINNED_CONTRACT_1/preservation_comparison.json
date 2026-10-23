@@ -1,0 +1,14 @@
+{
+  "added_outside_new_phase": [
+    "tests/test_synthetic_reflection_pinned_contract.py"
+  ],
+  "after_file_count": 26601,
+  "allowed_additions": [
+    "tests/test_synthetic_reflection_pinned_contract.py"
+  ],
+  "baseline_file_count": 26600,
+  "changed": [],
+  "deleted": [],
+  "historical_preservation_passed": true,
+  "initial_dirty_workspace_preserved": true
+}

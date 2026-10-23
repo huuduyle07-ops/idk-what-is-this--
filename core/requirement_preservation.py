@@ -22,6 +22,7 @@ calls no model, inspects no repository, and grants no authority.
 from __future__ import annotations
 
 from core.explicit_evidence import ExplicitEvidence
+from core.explicit_design_evidence import DESIGN_FIELDS
 from core.semantic_waiter import SemanticInterpretation
 from core.task_contract import (
     MAX_PRESERVATION_ITEMS,
@@ -361,6 +362,35 @@ def _check_provenance(
             )
 
 
+def _check_design_evidence(
+    evidence: ExplicitEvidence,
+    interpretation: SemanticInterpretation,
+    ledger: _Ledger,
+) -> None:
+    """OOP.INTENT.DESIGN.1 — preserve complete typed records and provenance.
+
+    This compares intake artifacts, not prose or semantic guesses.  Every
+    source span, identifier, ordering, and provenance must remain unchanged.
+    """
+    supplied = evidence.design_evidence
+    carried = interpretation.design_evidence
+    for name in DESIGN_FIELDS:
+        expected = getattr(supplied, name)
+        actual = getattr(carried, name)
+        if expected == actual:
+            if expected:
+                ledger.keep("design_commitment", name)
+        else:
+            ledger.lose("design_commitment", name,
+                        f"explicit design {name} was dropped, rewritten, reordered or invented")
+    if supplied.overflow or carried.overflow:
+        ledger.lose("design_commitment", "overflow",
+                    "explicit design evidence exceeded a supported bound; no complete projection is available")
+    if supplied.unclassified_clauses_present != carried.unclassified_clauses_present:
+        ledger.lose("design_commitment", "coverage",
+                    "explicit design evidence coverage was rewritten")
+
+
 def check_requirement_preservation(
     evidence: ExplicitEvidence,
     interpretation: SemanticInterpretation,
@@ -378,6 +408,7 @@ def check_requirement_preservation(
     _check_framework(evidence, interpretation, ledger)
     _check_constraints(evidence, interpretation, ledger)
     _check_behavioral_expectations(evidence, interpretation, ledger)
+    _check_design_evidence(evidence, interpretation, ledger)
     _check_requested_output(evidence, interpretation, ledger)
     _check_provenance(evidence, interpretation, ledger)
 

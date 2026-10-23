@@ -1,0 +1,199 @@
+{
+  "kind": "read_only_frozen_semantic_minimum_audit",
+  "live_observations": false,
+  "authority_issued": false,
+  "operational_effects": 0,
+  "method": {
+    "canonical_encoding": "UTF-8 JSON; sort_keys=true; separators=(',', ':'); ensure_ascii=true; allow_nan=false",
+    "unknown_identifier_treatment": "An unresolved identifier encoding has no claimed attainable minimum. Nonempty canonical JSON string length >=3 is only a universal conservative inequality, never a truthful one-character witness or alias.",
+    "lower_bound_logic": "If a relaxed projection using universal inequalities already exceeds a cap, every truthful encoding exceeds it. A relaxed projection below the cap proves no feasible witness.",
+    "generation_profiles": "The semantic controller/workspace contracts type generations as id without a frozen width; reviewed candidate A requires 64 lowercase hex workspace/controller generation tokens. Candidate-specific requirements must not be silently promoted to all possible transports."
+  },
+  "sources": {
+    "schema": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+    "controller": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+    "workspace": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+    "transport": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/selection.json",
+    "preparation": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json"
+  },
+  "field_categories": [
+    {
+      "fields": ["workspace_capability_id", "controller_identity", "exclusive_owner_relation_id", "admission_relation_id", "preparation_attempt_id", "preparation_receipt_id", "authenticated_borrower_relation_id", "reservation_identity", "authenticated_future_borrower_identity"],
+      "schema_minimum": "nonempty str; <=256 UTF-8 bytes; NUL forbidden",
+      "semantic_requirement": "Must identify the exact authenticated original process-local owner relation; equal scalar strings never recreate authority.",
+      "attainable_minimum_encoding": null,
+      "unresolved": "Neither exact textual representation nor width is frozen. HMAC-SHA256 authentication of an enclosing owner record does not imply its IDs are themselves 64-hex.",
+      "universal_lower_bound_utf8_bytes": 1,
+      "references": ["schema:13", "controller:890", "workspace:exact_live_object", "workspace:authentication"]
+    },
+    {
+      "fields": ["container_identity", "target_full_container_identity", "original_full_container_identity"],
+      "schema_minimum": "id",
+      "semantic_requirement": "Actual full immutable original container identity, never a name or shortened container ID.",
+      "reviewed_candidate_a_minimum_utf8_bytes": 64,
+      "reviewed_candidate_a_encoding": "64 lowercase hex",
+      "references": ["controller:134", "controller:879", "transport:start_channel", "transport:generations.container_generation"]
+    },
+    {
+      "fields": ["workspace_generation", "controller_generation"],
+      "schema_minimum": "id",
+      "semantic_requirement": "Exact original workspace/controller incarnation and generation bound to authenticated observed kernel, container and owner relations; new generation cannot inherit readiness.",
+      "frozen_semantic_attainable_minimum_encoding": null,
+      "reviewed_candidate_a_minimum_utf8_bytes": 64,
+      "reviewed_candidate_a_encoding": "independent owner-generated unpredictable 32-byte hex token",
+      "references": ["controller:136", "controller:880", "controller:881", "transport:generations.workspace_generation", "transport:generations.controller_generation"]
+    },
+    {
+      "fields": ["request_id", "operation_id"],
+      "schema_minimum": "id",
+      "semantic_requirement": "Fresh owner-bound IDs; request/operation/admission ID reuse is rejected throughout the retained generation. Cross-message corresponding IDs must match.",
+      "attainable_minimum_encoding": null,
+      "unresolved": "Owner generation and uniqueness are frozen; token byte width and text format are not.",
+      "universal_lower_bound_utf8_bytes": 1,
+      "references": ["controller:762", "schema:1023", "transport:generations.owner_generated_identifiers"]
+    },
+    {
+      "fields": ["sequence", "observation_sequence"],
+      "schema_minimum": 1,
+      "semantic_requirement": "Strict owner-monotonic positive integer; no reset or wrap. Mutation post-observation uses a separate prebound single-use owner challenge/sequence. At most nine small events can still each have a one-decimal-digit conservative width.",
+      "minimum_canonical_value_bytes": 1,
+      "references": ["controller:586", "schema:1023"]
+    },
+    {
+      "fields": ["challenge", "observation_challenge"],
+      "schema_minimum": "64 lowercase hex",
+      "semantic_requirement": "Fresh unpredictable 32-byte single-use owner challenge bound to operation, generations and original relation. Request/response challenge nonnull exactly for the three OBSERVE tags. Mutation request/response challenge=null; nested workspace_state observation_challenge remains 64 hex and separately bound.",
+      "nonnull_utf8_bytes": 64,
+      "nonnull_canonical_value_bytes": 66,
+      "null_canonical_value_bytes": 4,
+      "references": ["schema:1023", "controller:584", "controller:893"]
+    },
+    {
+      "fields": ["stable_fingerprint", "source_readback_sha256", "manifest.sha256", "class_metadata.sha256", "compiler_identity.sha256", "capture_stream.sha256"],
+      "schema_minimum": "64 lowercase hex",
+      "semantic_requirement": "Full actual SHA256 of the respective immutable identity, source, class, compiler or captured bytes. Invented hashes are never evidence.",
+      "minimum_utf8_bytes": 64,
+      "minimum_canonical_value_bytes": 66,
+      "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+      "empty_capture_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "compiler_sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+      "references": ["schema:hash", "schema:compiler_identity", "schema:1027", "workspace:foundation.scenario"]
+    },
+    {
+      "fields": ["mount_identity", "namespace_generation", "root_identity", "namespaces.user", "namespaces.mnt", "namespaces.net", "namespaces.pid", "namespaces.ipc", "namespaces.cgroup", "namespaces.uts", "namespace_identity", "cgroup_identity"],
+      "schema_minimum": "id",
+      "semantic_requirement": "Actual observed mount/root/incarnation and complete seven-namespace/cgroup relation; original owner authentication must bind the full observation. Labels alone do not prove incarnation.",
+      "attainable_minimum_encoding": null,
+      "unresolved": "No fixed serialization of device/inode/starttime/boot/cgroup tuples is frozen. Linux readlink forms, decimal inode forms, 64-hex digests and short aliases must not be invented as mandatory encoding.",
+      "universal_lower_bound_utf8_bytes": 1,
+      "references": ["schema:159", "schema:200", "controller:536", "controller:1023", "transport:generations.controller_incarnation"]
+    },
+    {
+      "fields": ["controller_process_identity", "process_identity", "task_identity", "start_identity", "descriptor_identity", "process_group_identity", "deadline_identity"],
+      "schema_minimum": "id",
+      "semantic_requirement": "Exact authenticated PID/task/start/group/descriptor/deadline relation. PID alone cannot identify a process incarnation; all relevant original relation bindings remain required.",
+      "attainable_minimum_encoding": null,
+      "universal_lower_bound_utf8_bytes": 1,
+      "references": ["schema:247", "schema:256", "schema:308", "schema:424", "transport:generations.controller_incarnation"]
+    },
+    {
+      "fields": ["issuing_pid", "pid", "tid", "child_pid", "parent_pid"],
+      "schema_minimum": "positive integer except parent_pid>=0",
+      "semantic_requirement": "Real host issuing PID and observed namespace process/task IDs. Reviewed candidate A controller is PID1 with parent_pid=0 and its required main task tid=1. Compiler must be a distinct actual child, fully reaped before successful response snapshot.",
+      "minimum_canonical_value_bytes": 1,
+      "references": ["schema:247", "schema:256", "schema:424", "transport:generations.controller_generation", "controller:727"]
+    }
+  ],
+  "minimum_workspace_structure": {
+    "controller_process_count_minimum": 1,
+    "controller_task_count_minimum": 1,
+    "controller_role": "controller",
+    "controller_uid": 65534,
+    "controller_gid": 65534,
+    "namespace_fields_all_required": ["user", "mnt", "net", "pid", "ipc", "cgroup", "uts"],
+    "compiler_in_success_snapshot": false,
+    "compiler_exclusion_basis": "controller:727 postprocess fully reaps compiler before successful result; workspace:lifecycle.predicates.prepared-artifacts-present requires no running compiler/target JVM.",
+    "mounts_ordered": [
+      {"path": "/tmp", "filesystem_kind": "tmpfs", "options": "rw,nosuid,nodev,noexec,size=16m,mode=1777", "subordinate_mount_count": 0, "root_metadata_mode_if_st_mode": 17407, "root_uid_conservative_floor": 0, "root_gid_conservative_floor": 0, "root_link_count_minimum": 2},
+      {"path": "/work", "filesystem_kind": "tmpfs", "options": "rw,nosuid,nodev,size=32m,mode=1777", "subordinate_mount_count": 0, "root_metadata_mode_if_st_mode": 17407, "root_uid_conservative_floor": 0, "root_gid_conservative_floor": 0, "root_link_count_minimum": 2}
+    ],
+    "root_metadata_note": "Exact observed mode/uid/gid/link_count must be emitted. mode=17407 is S_IFDIR | 01777; whether mode includes full st_mode or permission bits only is not explicitly specified by semantic schema, so treating its five-digit width as universal requires the stat-mode convention. Three-digit lower relaxations are safe only as inequalities.",
+    "process_exclusivity_fields_all_required": true,
+    "inventory_method": "complete_readonly_kernel_inventory",
+    "authorized_borrower_relation_id_before_handoff": null,
+    "cleanup_barrier_sequence_before_cleanup": 0,
+    "handoff_identity_before_handoff": null,
+    "active_operation_id_after_successful_completed_mutation": null,
+    "writer_requirement": "Every potential/open writer and every handle must be fully inventoried and accounted by the exact original owner relation. No unexpected writer is allowed. Controller can potentially write both 01777 roots; representative conservative profile may include one controller writer with potential_write_access handles to /tmp and /work. The exact descriptor/potential-access representation and minimum record multiplicity are not separately fixed, so writer-free profile is only a strict relaxation and never a truthful feasible witness.",
+    "tmp_manifest": [],
+    "references": ["schema:1025", "controller:28", "controller:30", "controller:536", "controller:550", "workspace:lifecycle.predicates.prepared-artifacts-present"]
+  },
+  "manifests": {
+    "order": "exact absolute paths sorted by UTF-8 bytes",
+    "empty": [],
+    "materialized": ["/work/SyntheticStateBox.java", "/work/classes"],
+    "prepared": ["/work/SyntheticStateBox.java", "/work/classes", "/work/classes/SyntheticStateBox.class"],
+    "file_link_count": 1,
+    "file_uid": 65534,
+    "file_gid": 65534,
+    "directory_uid": 65534,
+    "directory_gid": 65534,
+    "directory_size_bytes": null,
+    "directory_sha256": null,
+    "source_size_bytes": 239,
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "class_schema_size_minimum": 1,
+    "class_schema_size_maximum": 32768,
+    "class_truthful_one_byte_output": false,
+    "class_exact_minimum_frozen": false,
+    "class_relaxation_note": "Using decimal 1 for byte arithmetic is conservative for the length of every valid positive-size class, but is not a truthful Java classfile witness. The frozen exact javac and source determine actual output only if independently derived; no compilation measurement is authorized.",
+    "mode_note": "Every manifest entry includes observed integer mode. Typical full st_mode lower type bits are 16384 for directory and 32768 for regular file; exact permission bits need an authenticated observation or a frozen creation rule. Do not confuse those illustrative integers with observed actual modes.",
+    "references": ["schema:173", "schema:488", "schema:1024", "controller:547", "controller:709"]
+  },
+  "successful_capture_and_reap": {
+    "child_pid": "actual distinct compiler child positive integer",
+    "process_group_identity": "exact actual original group relation; encoding unresolved",
+    "exit_code": 0,
+    "timed_out": false,
+    "reaped": true,
+    "group_terminated": true,
+    "selectors_closed": true,
+    "deadline_identity": "exact shared original deadline relation; encoding unresolved",
+    "stdout": {"observed_bytes": 0, "limit_bytes": 2048, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "eof": true, "overflow": false, "closed": true},
+    "stderr": {"observed_bytes": 0, "limit_bytes": 2048, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "eof": true, "overflow": false, "closed": true},
+    "raw_capture_bytes_in_semantic_messages": 0,
+    "references": ["schema:406", "schema:424", "schema:1027", "controller:727"]
+  },
+  "compiler_identity": {
+    "path": "/opt/temurin-26.0.2.1/bin/javac",
+    "sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+    "argv": ["/opt/temurin-26.0.2.1/bin/javac", "-J-Xms8m", "-J-Xmx32m", "-J-XX:ActiveProcessorCount=1", "-J-XX:-UsePerfData", "-d", "/work/classes", "/work/SyntheticStateBox.java"],
+    "cwd": "/work",
+    "environment": {"PATH": "/usr/local/bin:/usr/bin:/bin", "LANG": "C.UTF-8", "GPG_KEY": "", "PYTHON_VERSION": "", "PYTHON_SHA256": "", "SANDBOX_PUBLIC_SENTINEL": "phase-owned", "HOME": "/work", "HOSTNAME": "runtime-sandbox1"},
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "namespaces": "all seven exact fields required; actual identity encoding unresolved",
+    "cgroup_identity": "actual authenticated original relation; encoding unresolved",
+    "references": ["schema:441"]
+  },
+  "mandatory_result_shape": {
+    "materialization_workspace_state_complete": true,
+    "compilation_workspace_state_complete": true,
+    "result_workspace_state_digest_reference_permitted": false,
+    "mutation_poststate_is_readiness_response": false,
+    "new_fresh_owner_observation_before_readiness_or_handoff": true,
+    "successful_compile_precedes_fresh_readiness_observation": true,
+    "receipt_issuance_alone_forces_specific_observation_tag": "Not uniquely stated. OBSERVE_PREPARED_ARTIFACTS explicitly requires an existing preparation receipt. A new complete prepared-state OBSERVE_* is mandatory before readiness/handoff; the frozen text does not uniquely require that exact tag, and it cannot silently be placed before issuance of its own required receipt.",
+    "references": ["schema:840", "schema:862", "schema:1023", "controller:247", "controller:270", "workspace:preparation_interaction.receipt_readiness"]
+  },
+  "old_sizing_audit": {
+    "source": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_TRANSPORT_1/sizing_analysis.py",
+    "writer_free_candidate_a_payload_bytes": [2911, 4465, 3064],
+    "writer_free_candidate_a_frames_bytes": [2915, 4469, 3068],
+    "writer_free_materialize_compile_payload_bytes": 7376,
+    "writer_free_three_response_payload_bytes": 10440,
+    "writer_free_three_response_payload_excess_over_8192": 2248,
+    "writer_profile_materialize_compile_framed_bytes": 8096,
+    "writer_profile_three_response_framed_bytes": 11520,
+    "limits": ["Old IDs/hashes/challenges are illustrative values and cannot authenticate truthful kernel or owner relations.", "Writer-free records are a strict structural relaxation only.", "Old repeated request/operation IDs and observation sequences are not a valid complete lifecycle.", "Old empty capture hashes are all-zero sizing placeholders; exact empty SHA256 has the same serialized width.", "Old class size=1 is only conservative relaxation, not valid javac output.", "Old result_observation defaults cleanup_barrier_sequence=0 but old capture objects must still enforce exact semantic success values.", "Candidate A generation widths are not automatically frozen for unselected architectures.", "These response counts omit required request frames, empty readiness and other current observations, cleanup and handoff.", "A three-response inequality above8192 is conditional on that observation being included in the cumulative preparation interval; it cannot settle an unresolved attempt endpoint."]
+  }
+}

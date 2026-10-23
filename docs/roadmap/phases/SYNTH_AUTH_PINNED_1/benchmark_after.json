@@ -1,0 +1,30 @@
+{
+  "job": "benchmark_after",
+  "command": [
+    "C:\\Python314\\python.exe",
+    "benchmarks/run_benchmarks.py",
+    "--check"
+  ],
+  "cwd": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S",
+  "exit_code": 0,
+  "duration_seconds": 1.239,
+  "completed_utc": "2026-10-10T00:46:41.691394+00:00",
+  "output_file": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\.tmp\\task_synth_auth_pinned1_validation\\benchmark_after.txt",
+  "tail": [
+    "PASS  rust_path_normalization_security_trap",
+    "PASS  rust_result_error_handling",
+    "PASS  ts_async_cache_stale_promise_trap",
+    "PASS  ts_callback_dispatch_ambiguity",
+    "PASS  ts_false_positive_no_patch",
+    "PASS  ts_generic_utility_false_positive",
+    "PASS  ts_import_export_mismatch",
+    "PASS  ts_inventory_restock",
+    "PASS  ts_migration_import_path_case",
+    "PASS  ts_nested_dispatch_root_cause",
+    "PASS  ts_optional_property_guard",
+    "PASS  ts_wrong_file_honeypot",
+    "",
+    "Checked: 54",
+    "Errors: 0"
+  ]
+}

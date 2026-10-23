@@ -1,0 +1,245 @@
+{
+  "all_actual_operational_effects_zero": true,
+  "all_guarded_runs_zero_attempts": true,
+  "artifact_hashes": {
+    "contract.json": "435aa8fa0221cd777c2ba5c41ec723a2ed2a2c74dbb2d42594ba5934fd7741b3",
+    "test_contract.py": "df17c3a6d3f5442da4a9435c3e4c4b37edc1d621fbb513473d99ddf29391bb85",
+    "validate_pure.py": "9836067d00ec8c59726b7ec9b857d81d235835b1298cd7e3e6b816ab0d9d40a2"
+  },
+  "benchmark": {
+    "all_operational_effects_zero": true,
+    "audit_guard": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "exit_code": 0
+  },
+  "benchmark_cases_checked": 54,
+  "benchmark_errors": 0,
+  "capability_owners_imported": false,
+  "focused": {
+    "all_operational_effects_zero": true,
+    "audit_guard": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "collected": 49,
+    "exit_code": 0,
+    "failed": [],
+    "passed": 49
+  },
+  "frozen": {
+    "all_operational_effects_zero": true,
+    "audit_guard": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "collected": 14,
+    "exit_code": 0,
+    "failed": [],
+    "passed": 14
+  },
+  "git_diff_check": {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "executed_outside_operational_guard": true,
+    "exit_code": 0,
+    "operational_command_invoked": false,
+    "source_validation_only": true
+  },
+  "historical_preservation": {
+    "added_outside_new_phase": [],
+    "after_file_count": 2196,
+    "allowed_additions_outside_phase": [],
+    "baseline_file_count": 2196,
+    "changed": [],
+    "deleted": [],
+    "historical_preservation_passed": true,
+    "scope": [
+      "core",
+      "tests",
+      "scripts",
+      "benchmarks",
+      "docs/roadmap"
+    ]
+  },
+  "owner_tests_run": false,
+  "phase_id": "SYNTH.EXEC.PREP.PINNED.CONTRACT.1",
+  "preexisting_registry_test_failures_accepted_only_if_identical": true,
+  "registry_after": {
+    "all_operational_effects_zero": true,
+    "audit_guard": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "collected": 299,
+    "exit_code": 1,
+    "failed": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "passed": 292
+  },
+  "registry_baseline": {
+    "all_operational_effects_zero": true,
+    "audit_guard": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "collected": 299,
+    "exit_code": 1,
+    "failed": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "passed": 292
+  },
+  "registry_picker": {
+    "after_collected": 299,
+    "after_failed": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "after_passed": 292,
+    "baseline_collected": 299,
+    "baseline_failed": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "baseline_passed": 292,
+    "existing_failures_preserved": true,
+    "old_files_not_modified_to_repair_baseline": true,
+    "registry_and_picker_projections_identical": true,
+    "unchanged": true
+  },
+  "source_validation_subprocess_exception": "git status baseline and git diff --check only, outside operational guard",
+  "static_validation_passed": true,
+  "validation_passed": true
+}

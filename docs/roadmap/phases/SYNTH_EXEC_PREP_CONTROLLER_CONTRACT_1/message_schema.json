@@ -1,0 +1,1034 @@
+{
+  "schema_id": "synthetic_preparation_controller_pinned_1_v1:semantic-message-schema",
+  "kind": "declarative_pure_contract_data",
+  "parser_implemented": false,
+  "transport_byte_prefix_unselected": true,
+  "root_types": [
+    "request",
+    "response",
+    "outer_cleanup_request",
+    "outer_cleanup_response"
+  ],
+  "definitions": {
+    "id": {
+      "type": "str",
+      "min_utf8_bytes": 1,
+      "max_utf8_bytes": 256,
+      "NUL_allowed": false
+    },
+    "text": {
+      "type": "str",
+      "max_utf8_bytes": 1024,
+      "NUL_allowed": false
+    },
+    "bool": {
+      "type": "bool",
+      "exact_type": true
+    },
+    "uint": {
+      "type": "int",
+      "minimum": 0,
+      "maximum": 9223372036854775807,
+      "bool_allowed": false
+    },
+    "positive_int": {
+      "type": "int",
+      "minimum": 1,
+      "maximum": 9223372036854775807,
+      "bool_allowed": false
+    },
+    "exit_code": {
+      "type": "int",
+      "minimum": -255,
+      "maximum": 255,
+      "bool_allowed": false
+    },
+    "hash": {
+      "type": "str",
+      "pattern": "[0-9a-f]{64}",
+      "max_utf8_bytes": 64
+    },
+    "challenge": {
+      "type": "str",
+      "pattern": "[0-9a-f]{64}",
+      "max_utf8_bytes": 64
+    },
+    "path": {
+      "type": "enum",
+      "values": [
+        "/tmp",
+        "/work",
+        "/work/classes",
+        "/work/SyntheticStateBox.java",
+        "/work/classes/SyntheticStateBox.class"
+      ]
+    },
+    "operation": {
+      "type": "enum",
+      "values": [
+        "OBSERVE_EMPTY_WORKSPACE",
+        "OBSERVE_CURRENT_WORKSPACE",
+        "OBSERVE_PREPARED_ARTIFACTS",
+        "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+        "COMPILE_EXACT_SCENARIO",
+        "PREPARE_EXCLUSIVE_HANDOFF",
+        "BEGIN_CLEANUP",
+        "CLEANUP_AND_REPORT"
+      ]
+    },
+    "cleanup_reason": {
+      "type": "enum",
+      "values": [
+        "preparation_failure",
+        "consumer_failure",
+        "activation_failure",
+        "timeout",
+        "abandonment",
+        "upstream_invalidation",
+        "normal_completion",
+        "controller_loss"
+      ]
+    },
+    "protocol": {
+      "type": "enum",
+      "values": [
+        "synthetic_preparation_controller_pinned_1_v1"
+      ]
+    },
+    "version": {
+      "type": "enum",
+      "values": [
+        1
+      ]
+    },
+    "environment": {
+      "type": "record",
+      "fields": {
+        "PATH": {
+          "type": "enum",
+          "values": [
+            "/usr/local/bin:/usr/bin:/bin"
+          ]
+        },
+        "LANG": {
+          "type": "enum",
+          "values": [
+            "C.UTF-8"
+          ]
+        },
+        "GPG_KEY": {
+          "type": "enum",
+          "values": [
+            ""
+          ]
+        },
+        "PYTHON_VERSION": {
+          "type": "enum",
+          "values": [
+            ""
+          ]
+        },
+        "PYTHON_SHA256": {
+          "type": "enum",
+          "values": [
+            ""
+          ]
+        },
+        "SANDBOX_PUBLIC_SENTINEL": {
+          "type": "enum",
+          "values": [
+            "phase-owned"
+          ]
+        },
+        "HOME": {
+          "type": "enum",
+          "values": [
+            "/work"
+          ]
+        },
+        "HOSTNAME": {
+          "type": "enum",
+          "values": [
+            "runtime-sandbox1"
+          ]
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "namespaces": {
+      "type": "record",
+      "fields": {
+        "user": "id",
+        "mnt": "id",
+        "net": "id",
+        "pid": "id",
+        "ipc": "id",
+        "cgroup": "id",
+        "uts": "id"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "manifest_entry": {
+      "type": "record",
+      "fields": {
+        "path": "path",
+        "kind": {
+          "type": "enum",
+          "values": [
+            "file",
+            "directory"
+          ]
+        },
+        "mode": "uint",
+        "uid": "uint",
+        "gid": "uint",
+        "link_count": "positive_int",
+        "size_bytes": {
+          "type": "nullable",
+          "item": "uint"
+        },
+        "sha256": {
+          "type": "nullable",
+          "item": "hash"
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "mount": {
+      "type": "record",
+      "fields": {
+        "path": {
+          "type": "enum",
+          "values": [
+            "/tmp",
+            "/work"
+          ]
+        },
+        "mount_identity": "id",
+        "namespace_generation": "id",
+        "filesystem_kind": {
+          "type": "enum",
+          "values": [
+            "tmpfs"
+          ]
+        },
+        "options": {
+          "type": "enum",
+          "values": [
+            "rw,nosuid,nodev,size=32m,mode=1777",
+            "rw,nosuid,nodev,noexec,size=16m,mode=1777"
+          ]
+        },
+        "subordinate_mount_count": {
+          "type": "enum",
+          "values": [
+            0
+          ]
+        },
+        "root_identity": "id",
+        "root_metadata": {
+          "type": "record",
+          "fields": {
+            "mode": "uint",
+            "uid": "uint",
+            "gid": "uint",
+            "link_count": "positive_int"
+          },
+          "additional_fields": false,
+          "all_fields_required": true
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "task": {
+      "type": "record",
+      "fields": {
+        "tid": "positive_int",
+        "start_identity": "id"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "process": {
+      "type": "record",
+      "fields": {
+        "pid": "positive_int",
+        "parent_pid": "uint",
+        "start_identity": "id",
+        "role": {
+          "type": "enum",
+          "values": [
+            "controller",
+            "admitted_compiler",
+            "unexpected"
+          ]
+        },
+        "namespaces": "namespaces",
+        "cgroup_identity": "id",
+        "uid": "uint",
+        "gid": "uint",
+        "tasks": {
+          "type": "list",
+          "items": "task",
+          "max_items": 128
+        },
+        "admitted_operation_id": {
+          "type": "nullable",
+          "item": "id"
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "writer_handle": {
+      "type": "record",
+      "fields": {
+        "descriptor_identity": "id",
+        "path": "path",
+        "mount_identity": "id",
+        "access_kind": {
+          "type": "enum",
+          "values": [
+            "potential_write_access",
+            "open_writable_handle"
+          ]
+        },
+        "admitted_operation_id": {
+          "type": "nullable",
+          "item": "id"
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "writer": {
+      "type": "record",
+      "fields": {
+        "process_identity": "id",
+        "task_identity": "id",
+        "handles": {
+          "type": "list",
+          "items": "writer_handle",
+          "max_items": 128
+        },
+        "accounted_original_relation_id": {
+          "type": "nullable",
+          "item": "id"
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "process_exclusivity": {
+      "type": "record",
+      "fields": {
+        "controller_process_identity": "id",
+        "controller_generation": "id",
+        "namespace_identity": "id",
+        "processes": {
+          "type": "list",
+          "items": "process",
+          "max_items": 128
+        },
+        "writers": {
+          "type": "list",
+          "items": "writer",
+          "max_items": 128
+        },
+        "exclusive_owner_relation_id": "id",
+        "authorized_borrower_relation_id": {
+          "type": "nullable",
+          "item": "id"
+        },
+        "inventory_method": {
+          "type": "enum",
+          "values": [
+            "complete_readonly_kernel_inventory"
+          ]
+        },
+        "cleanup_barrier_sequence": "uint",
+        "active_operation_id": {
+          "type": "nullable",
+          "item": "id"
+        },
+        "handoff_identity": {
+          "type": "nullable",
+          "item": "id"
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "workspace_state": {
+      "type": "record",
+      "fields": {
+        "workspace_capability_id": "id",
+        "stable_fingerprint": "hash",
+        "issuing_pid": "positive_int",
+        "container_identity": "id",
+        "workspace_generation": "id",
+        "controller_identity": "id",
+        "controller_generation": "id",
+        "observation_sequence": "positive_int",
+        "observation_challenge": "challenge",
+        "stage": {
+          "type": "enum",
+          "values": [
+            "preparation-empty",
+            "materialized",
+            "prepared"
+          ]
+        },
+        "mounts": {
+          "type": "list",
+          "items": "mount",
+          "max_items": 2
+        },
+        "work_manifest": {
+          "type": "list",
+          "items": "manifest_entry",
+          "max_items": 3
+        },
+        "tmp_manifest": {
+          "type": "list",
+          "items": "manifest_entry",
+          "max_items": 0
+        },
+        "process_exclusivity_observation": "process_exclusivity"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "capture_stream": {
+      "type": "record",
+      "fields": {
+        "observed_bytes": "uint",
+        "limit_bytes": {
+          "type": "enum",
+          "values": [
+            2048
+          ]
+        },
+        "sha256": "hash",
+        "eof": "bool",
+        "overflow": "bool",
+        "closed": "bool"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "capture_and_reap": {
+      "type": "record",
+      "fields": {
+        "child_pid": "positive_int",
+        "process_group_identity": "id",
+        "exit_code": "exit_code",
+        "timed_out": "bool",
+        "reaped": "bool",
+        "group_terminated": "bool",
+        "stdout": "capture_stream",
+        "stderr": "capture_stream",
+        "selectors_closed": "bool",
+        "deadline_identity": "id"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "compiler_identity": {
+      "type": "record",
+      "fields": {
+        "path": {
+          "type": "enum",
+          "values": [
+            "/opt/temurin-26.0.2.1/bin/javac"
+          ]
+        },
+        "sha256": {
+          "type": "enum",
+          "values": [
+            "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023"
+          ]
+        },
+        "argv": {
+          "type": "fixed_list",
+          "values": [
+            "/opt/temurin-26.0.2.1/bin/javac",
+            "-J-Xms8m",
+            "-J-Xmx32m",
+            "-J-XX:ActiveProcessorCount=1",
+            "-J-XX:-UsePerfData",
+            "-d",
+            "/work/classes",
+            "/work/SyntheticStateBox.java"
+          ]
+        },
+        "cwd": {
+          "type": "enum",
+          "values": [
+            "/work"
+          ]
+        },
+        "environment": "environment",
+        "image_identity": {
+          "type": "enum",
+          "values": [
+            "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a"
+          ]
+        },
+        "namespaces": "namespaces",
+        "cgroup_identity": "id"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "class_metadata": {
+      "type": "record",
+      "fields": {
+        "path": {
+          "type": "enum",
+          "values": [
+            "/work/classes/SyntheticStateBox.class"
+          ]
+        },
+        "size_bytes": {
+          "type": "int",
+          "minimum": 1,
+          "maximum": 32768,
+          "bool_allowed": false
+        },
+        "sha256": "hash",
+        "internal_class_name": {
+          "type": "enum",
+          "values": [
+            "SyntheticStateBox"
+          ]
+        },
+        "inspection_kind": {
+          "type": "enum",
+          "values": [
+            "inert_bounded_classfile_metadata"
+          ]
+        },
+        "class_loaded": {
+          "type": "enum",
+          "values": [
+            false
+          ]
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "reservation_bindings": {
+      "type": "record",
+      "fields": {
+        "workspace_generation": "id",
+        "controller_generation": "id",
+        "preparation_attempt_id": "id",
+        "preparation_receipt_id": "id",
+        "exact_artifact_manifest": {
+          "type": "list",
+          "items": "manifest_entry",
+          "max_items": 3
+        },
+        "authenticated_future_borrower_identity": "id"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "component_outcome": {
+      "type": "enum",
+      "values": [
+        "verified",
+        "failed",
+        "unresolved",
+        "not_applicable"
+      ]
+    },
+    "child_cleanup": {
+      "type": "record",
+      "fields": {
+        "process_identity": "id",
+        "process_group_identity": {
+          "type": "nullable",
+          "item": "id"
+        },
+        "termination": "component_outcome",
+        "reaping": "component_outcome"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "capture_cleanup": {
+      "type": "record",
+      "fields": {
+        "capture_identity": "id",
+        "closure": "component_outcome",
+        "EOF": "component_outcome"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "remove_result": {
+      "type": "record",
+      "fields": {
+        "request_id": "id",
+        "target_full_container_identity": "id",
+        "outcome": "component_outcome"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "absence": {
+      "type": "record",
+      "fields": {
+        "request_id": "id",
+        "target_full_container_identity": "id",
+        "backend_relation_id": "id",
+        "observer_identity": "id",
+        "method": {
+          "type": "enum",
+          "values": [
+            "fresh_independent_full_ID_control_plane_inspection"
+          ]
+        },
+        "observation_sequence": "positive_int",
+        "outcome": "component_outcome",
+        "evidence_sha256": {
+          "type": "nullable",
+          "item": "hash"
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "cleanup_identity": {
+      "type": "record",
+      "fields": {
+        "original_workspace_capability_id": "id",
+        "original_workspace_generation": "id",
+        "original_controller_identity": "id",
+        "original_controller_generation": "id",
+        "original_full_container_identity": "id",
+        "original_backend_relation": "id"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "cleanup_evidence": {
+      "type": "record",
+      "fields": {
+        "original_identity": "cleanup_identity",
+        "preparation_attempt_id": {
+          "type": "nullable",
+          "item": "id"
+        },
+        "handoff_identity": {
+          "type": "nullable",
+          "item": "id"
+        },
+        "cleanup_barrier_sequence": "positive_int",
+        "children_and_process_group_results": {
+          "type": "list",
+          "items": "child_cleanup",
+          "max_items": 128
+        },
+        "capture_closure_and_EOF": {
+          "type": "list",
+          "items": "capture_cleanup",
+          "max_items": 128
+        },
+        "remove_result": {
+          "type": "nullable",
+          "item": "remove_result"
+        },
+        "fresh_independent_absence_observation": {
+          "type": "nullable",
+          "item": "absence"
+        },
+        "work_and_tmp_generation_gone": "component_outcome",
+        "no_surviving_artifact_export": "component_outcome",
+        "typed_unresolved_components": {
+          "type": "list",
+          "items": {
+            "type": "enum",
+            "values": [
+              "identity",
+              "barrier",
+              "children",
+              "groups",
+              "captures",
+              "EOF",
+              "removal",
+              "absence",
+              "mount_generations",
+              "artifact_export"
+            ]
+          },
+          "max_items": 10
+        },
+        "complete": "bool"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "typed_error": {
+      "type": "record",
+      "fields": {
+        "layer": {
+          "type": "enum",
+          "values": [
+            "controller",
+            "workspace",
+            "preparation",
+            "provider",
+            "runtime"
+          ]
+        },
+        "code": "id",
+        "origin_status": "id",
+        "origin_reason": "text",
+        "authenticated_origin_relation_id": {
+          "type": "nullable",
+          "item": "id"
+        },
+        "operation_id": "id",
+        "cleanup_required": "bool",
+        "detail_id": {
+          "type": "enum",
+          "values": [
+            "authentication",
+            "generation",
+            "protocol",
+            "admission",
+            "busy",
+            "observation",
+            "source",
+            "executable",
+            "child_start",
+            "timeout",
+            "capture",
+            "reap",
+            "handoff",
+            "cleanup",
+            "coordination",
+            "preserved_upstream"
+          ]
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "payload_OBSERVE_EMPTY_WORKSPACE": {
+      "type": "record",
+      "fields": {},
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "payload_OBSERVE_CURRENT_WORKSPACE": {
+      "type": "record",
+      "fields": {},
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "payload_OBSERVE_PREPARED_ARTIFACTS": {
+      "type": "record",
+      "fields": {
+        "preparation_attempt_id": "id",
+        "preparation_receipt_id": "id"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "payload_MATERIALIZE_EXACT_SCENARIO_SOURCE": {
+      "type": "record",
+      "fields": {
+        "preparation_attempt_id": "id"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "payload_COMPILE_EXACT_SCENARIO": {
+      "type": "record",
+      "fields": {
+        "preparation_attempt_id": "id"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "payload_PREPARE_EXCLUSIVE_HANDOFF": {
+      "type": "record",
+      "fields": {
+        "preparation_attempt_id": "id",
+        "preparation_receipt_id": "id",
+        "authenticated_borrower_relation_id": "id"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "payload_BEGIN_CLEANUP": {
+      "type": "record",
+      "fields": {
+        "cleanup_reason": "cleanup_reason"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "payload_CLEANUP_AND_REPORT": {
+      "type": "record",
+      "fields": {},
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "request": {
+      "type": "record",
+      "fields": {
+        "protocol_id": "protocol",
+        "version": "version",
+        "operation": "operation",
+        "request_id": "id",
+        "operation_id": "id",
+        "workspace_capability_id": "id",
+        "container_identity": "id",
+        "workspace_generation": "id",
+        "controller_generation": "id",
+        "sequence": "positive_int",
+        "challenge": {
+          "type": "nullable",
+          "item": "challenge"
+        },
+        "purpose": "operation",
+        "admission_relation_id": "id",
+        "payload": {
+          "type": "operation_selected_record",
+          "by_operation": {
+            "OBSERVE_EMPTY_WORKSPACE": "payload_OBSERVE_EMPTY_WORKSPACE",
+            "OBSERVE_CURRENT_WORKSPACE": "payload_OBSERVE_CURRENT_WORKSPACE",
+            "OBSERVE_PREPARED_ARTIFACTS": "payload_OBSERVE_PREPARED_ARTIFACTS",
+            "MATERIALIZE_EXACT_SCENARIO_SOURCE": "payload_MATERIALIZE_EXACT_SCENARIO_SOURCE",
+            "COMPILE_EXACT_SCENARIO": "payload_COMPILE_EXACT_SCENARIO",
+            "PREPARE_EXCLUSIVE_HANDOFF": "payload_PREPARE_EXCLUSIVE_HANDOFF",
+            "BEGIN_CLEANUP": "payload_BEGIN_CLEANUP",
+            "CLEANUP_AND_REPORT": "payload_CLEANUP_AND_REPORT"
+          }
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "result_observation": {
+      "type": "record",
+      "fields": {
+        "workspace_state": "workspace_state",
+        "cleanup_barrier_sequence": "uint",
+        "active_operation_id": {
+          "type": "nullable",
+          "item": "id"
+        },
+        "handoff_identity": {
+          "type": "nullable",
+          "item": "id"
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "result_materialize": {
+      "type": "record",
+      "fields": {
+        "workspace_state": "workspace_state",
+        "preparation_attempt_id": "id",
+        "source_readback_size": {
+          "type": "enum",
+          "values": [
+            239
+          ]
+        },
+        "source_readback_sha256": "hash",
+        "source_readback_exact": {
+          "type": "enum",
+          "values": [
+            true
+          ]
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "result_compile": {
+      "type": "record",
+      "fields": {
+        "workspace_state": "workspace_state",
+        "preparation_attempt_id": "id",
+        "compiler_identity": "compiler_identity",
+        "capture_and_reap": "capture_and_reap",
+        "class_metadata": "class_metadata"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "result_handoff": {
+      "type": "record",
+      "fields": {
+        "reservation_identity": "id",
+        "reservation_bindings": "reservation_bindings",
+        "activation_status": {
+          "type": "enum",
+          "values": [
+            "PROOF_UNRESOLVED"
+          ]
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "result_begin_cleanup": {
+      "type": "record",
+      "fields": {
+        "cleanup_barrier_sequence": "positive_int",
+        "cancelled_operation_id": {
+          "type": "nullable",
+          "item": "id"
+        },
+        "outer_teardown_required": "bool"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "result_cleanup": {
+      "type": "record",
+      "fields": {
+        "cleanup_evidence": "cleanup_evidence"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "response": {
+      "type": "record",
+      "fields": {
+        "protocol_id": "protocol",
+        "version": "version",
+        "operation": "operation",
+        "request_id": "id",
+        "operation_id": "id",
+        "workspace_capability_id": "id",
+        "container_identity": "id",
+        "workspace_generation": "id",
+        "controller_generation": "id",
+        "sequence": "positive_int",
+        "challenge": {
+          "type": "nullable",
+          "item": "challenge"
+        },
+        "purpose": "operation",
+        "status": {
+          "type": "enum",
+          "values": [
+            "COMPLETE",
+            "REJECTED",
+            "FAILED",
+            "PROOF_UNRESOLVED"
+          ]
+        },
+        "result": {
+          "type": "nullable",
+          "item": {
+            "type": "operation_selected_record",
+            "by_operation": {
+              "OBSERVE_EMPTY_WORKSPACE": "result_observation",
+              "OBSERVE_CURRENT_WORKSPACE": "result_observation",
+              "OBSERVE_PREPARED_ARTIFACTS": "result_observation",
+              "MATERIALIZE_EXACT_SCENARIO_SOURCE": "result_materialize",
+              "COMPILE_EXACT_SCENARIO": "result_compile",
+              "PREPARE_EXCLUSIVE_HANDOFF": "result_handoff",
+              "BEGIN_CLEANUP": "result_begin_cleanup",
+              "CLEANUP_AND_REPORT": "result_cleanup"
+            }
+          }
+        },
+        "error": {
+          "type": "nullable",
+          "item": "typed_error"
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "outer_cleanup_request": {
+      "type": "record",
+      "fields": {
+        "protocol_id": "protocol",
+        "version": "version",
+        "operation": {
+          "type": "enum",
+          "values": [
+            "TERMINATE_REMOVE_EXACT_RETAINED_GENERATION",
+            "OBSERVE_EXACT_RETAINED_GENERATION_ABSENCE"
+          ]
+        },
+        "request_id": "id",
+        "retained_authenticated_cleanup_relation_id": "id",
+        "original_identity": "cleanup_identity",
+        "cleanup_barrier_sequence": "positive_int"
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    },
+    "outer_cleanup_response": {
+      "type": "record",
+      "fields": {
+        "protocol_id": "protocol",
+        "version": "version",
+        "operation": {
+          "type": "enum",
+          "values": [
+            "TERMINATE_REMOVE_EXACT_RETAINED_GENERATION",
+            "OBSERVE_EXACT_RETAINED_GENERATION_ABSENCE"
+          ]
+        },
+        "request_id": "id",
+        "original_identity": "cleanup_identity",
+        "cleanup_barrier_sequence": "positive_int",
+        "status": {
+          "type": "enum",
+          "values": [
+            "COMPLETE",
+            "FAILED",
+            "PROOF_UNRESOLVED"
+          ]
+        },
+        "remove_result": {
+          "type": "nullable",
+          "item": "remove_result"
+        },
+        "absence": {
+          "type": "nullable",
+          "item": "absence"
+        },
+        "error": {
+          "type": "nullable",
+          "item": "typed_error"
+        }
+      },
+      "additional_fields": false,
+      "all_fields_required": true
+    }
+  },
+  "cross_field_rules": [
+    "Exact primitive types including enum values: bool is never int. All records reject duplicate/missing/extra keys recursively; arrays are complete, unique and bounded, never prefix samples.",
+    "Request/response IDs, purpose=operation, all generations and owner sequence/challenge match exact original relation. Challenge non-null exactly for three observation tags. Mutation poststate uses a separate single-use owner-issued post-observation challenge/sequence prebound in its spent admission; it is operation-bound source evidence only, never a current-readiness response. Owner consumes that reference once and requires a new OBSERVE_* challenge before readiness or handoff.",
+    "workspace_state fields exactly match frozen workspace-state digest top-level fields. Manifest paths sorted UTF-8, file link_count=1 with size/hash, directory size/hash=null. Empty work=[], materialized source+classes, prepared exact source+classes+one class. tmp=[]; no unknown entry accepted.",
+    "Mounts exactly /tmp then /work with their corresponding frozen options and roots/generations. Complete process tasks sum<=128; writer records and all handles sum<=128. Every potential/open writer accounted by original relation; no unknown writer/process or subordinate mount. Unprovable inventory fails unresolved.",
+    "Kernel observation scope is fixed read-only mount/namespace/cgroup/process/task/descriptor metadata derived from observed generation and inventoried PIDs, never caller paths or generic file reads. Fixed source/class reads only; source<=239 and class<=32768, total<=33007. Observation timeout/byte/record limits apply before accepting completion.",
+    "Compilation result exit=0, timed_out=false, reaped/group_terminated/selectors_closed=true, each stream observed_bytes=0, overflow=false,eof/closed=true and exact empty-content hashes; no raw captures/source/class bytes in messages.",
+    "Only controller error codes use controller_codes enum frozen in contract. Other layer codes/status/reasons must match exact authenticated originating owner result verbatim, with preserved origin relation. Bounded projection failure is incomplete; never invent a new upstream code or replace semantic failure with controller authentication.",
+    "COMPLETE result and null error only with all operation postconditions; otherwise typed error and null result, except BEGIN_CLEANUP may retain exact barrier evidence only, and CLEANUP_AND_REPORT may retain partial cleanup_evidence with complete=false and unresolved components. Never truncate a successful response.",
+    "Cleanup composite complete=true requires all required process/group/capture/EOF/removal/independent absence/mount/export outcomes verified and unresolved_components empty; not_applicable only if authenticated original no-child/no-capture evidence proves it. Removal/absence alone never establishes lost reaping/EOF.",
+    "Outer request/response matches authenticated retained cleanup identity, operation and barrier with fresh request ID; typed_error.operation_id equals this outer request_id. No inner observation challenge/admission or runtime/facet/readiness prerequisite. TERMINATE_REMOVE returns remove_result with absence=null; OBSERVE_ABSENCE returns absence with remove_result=null. Outer COMPLETE requires the selected component outcome=verified and error=null; other statuses preserve typed error and available partial component evidence. No arbitrary target or command.",
+    "All frames <=8192 bytes; preparation total outer stream captures remain <=8192 each over whole attempt. Larger/incomplete evidence fails typed incomplete and cleanup duty continues. No generic string command, path, argv, environment or arbitrary map."
+  ]
+}

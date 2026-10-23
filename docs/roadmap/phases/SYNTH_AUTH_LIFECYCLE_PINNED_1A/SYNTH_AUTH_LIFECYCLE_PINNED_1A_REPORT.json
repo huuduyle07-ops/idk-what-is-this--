@@ -1,0 +1,534 @@
+{
+  "atomicity": {
+    "CONSUMED_inspection_fixture": "isolated signed historical record only; no successful consume",
+    "failure_publishes_nothing_or_preserves_prior_record": true,
+    "independent_lock": true,
+    "issuance": "construct and sign before one copy-on-write _STORE publication of permanent key plus signed ISSUED record",
+    "positive_consumption_test_or_fake_consumer_gate": false,
+    "race_tests": {
+      "concurrent_duplicate_issuance": "exactly one inert logical commit",
+      "consume_vs_invalidate": "one INVALIDATED commit; consume is PROOF_UNRESOLVED or LEASE_INVALIDATED",
+      "invalidate_vs_invalidate": "exactly one INVALIDATED commit"
+    },
+    "read_snapshot_under_same_lock": true,
+    "transition": "authenticate/check/sign before one copy-on-write _STORE publication of target record"
+  },
+  "authentication": {
+    "JSON_options": "sort_keys=True; separators=(comma, colon); allow_nan=False",
+    "activation_policy_digest": "0189c9541faf0d45cc1963ccdb4eab749c4ba347a5f553d02d46679a536c74e9",
+    "activation_policy_identity": "SYNTH.AUTH.LIFECYCLE.PINNED.1:exact-decrement-3-activation:v1",
+    "canonical_types": "exact primitives, string dictionary keys, exact nested lists; no numeric/subclass aliases or nonfinite values",
+    "domain": "CATTUS:SYNTH.AUTH.LIFECYCLE.PINNED.1:exact-execution-lease:v1",
+    "every_operation_revalidates_original_upstream_and_provider": true,
+    "framing": "domain + NUL + role + NUL + canonical UTF-8 JSON",
+    "private_signature_or_secret_exported": false,
+    "public_digest_algorithm": "SHA256, domain and role framed",
+    "record_algorithm": "HMAC-SHA256 with independent private 32-byte secret",
+    "roles": [
+      "activation-policy",
+      "lease-evidence",
+      "lease-fingerprint",
+      "lease-record-hmac"
+    ]
+  },
+  "authority_matrix": {
+    "CONSUMED": {
+      "BANK_authority": false,
+      "apply_authority": false,
+      "arbitrary_class_authority": false,
+      "arbitrary_command_authority": false,
+      "arbitrary_java_authority": false,
+      "arbitrary_method_authority": false,
+      "arbitrary_source_authority": false,
+      "compilation_authority": false,
+      "executor_authority": false,
+      "host_mount_authority": false,
+      "network_authority": false,
+      "real_task_runtime_authority": false,
+      "reflection_execution_authority": false,
+      "repository_java_authority": false,
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "shell_authority": false
+    },
+    "INVALIDATED": {
+      "BANK_authority": false,
+      "apply_authority": false,
+      "arbitrary_class_authority": false,
+      "arbitrary_command_authority": false,
+      "arbitrary_java_authority": false,
+      "arbitrary_method_authority": false,
+      "arbitrary_source_authority": false,
+      "compilation_authority": false,
+      "executor_authority": false,
+      "host_mount_authority": false,
+      "network_authority": false,
+      "real_task_runtime_authority": false,
+      "reflection_execution_authority": false,
+      "repository_java_authority": false,
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "shell_authority": false
+    },
+    "ISSUED": {
+      "BANK_authority": false,
+      "apply_authority": false,
+      "arbitrary_class_authority": false,
+      "arbitrary_command_authority": false,
+      "arbitrary_java_authority": false,
+      "arbitrary_method_authority": false,
+      "arbitrary_source_authority": false,
+      "compilation_authority": false,
+      "executor_authority": false,
+      "host_mount_authority": false,
+      "network_authority": false,
+      "real_task_runtime_authority": false,
+      "reflection_execution_authority": false,
+      "repository_java_authority": false,
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "shell_authority": false
+    }
+  },
+  "completion_meaning": "The additive pinned lifecycle owner is implemented and pure-validated against the frozen contract. No operational lease has been issued or consumed.",
+  "consume_behavior": "Reauthenticate under lock, check ISSUED, reject PROOF_UNRESOLVED before signing or replacing state; no caller readiness inputs or bypass.",
+  "date_KST": "2026-10-13",
+  "error_taxonomy": {
+    "ACTIVATION_PRECONDITION_UNSATISFIED": "a defined and authenticated consumer readiness prerequisite is false; no transition",
+    "DUPLICATE_LEASE_ISSUANCE": "authenticated permanent one-shot key already has a lease or tombstone",
+    "LEASE_ALREADY_CONSUMED": "specific LEASE_NOT_ISSUED condition: authentic current state CONSUMED",
+    "LEASE_INVALIDATED": "specific LEASE_NOT_ISSUED condition: authentic current state INVALIDATED",
+    "LEASE_NOT_ISSUED": "parent category for authentic terminal source states only; forged or unknown state is LEASE_UNAUTHENTICATED",
+    "LEASE_UNAUTHENTICATED": "wrong exact lease type, nonoriginal/copy/reconstruction, missing live identity, signature or record-integrity failure, forged or unknown record state, or wrong supplied upstream object; exact semantic scenario/policy mismatches use PINNED_AUTH_SCOPE_MISMATCH and provider projection mismatch uses PINNED_PROVIDER_PROVENANCE_MISMATCH",
+    "LEASE_WRONG_PROCESS": "current PID differs from owner or authenticated lease PID; reject before inherited lock",
+    "PINNED_AUTH_SCOPE_MISMATCH": "upstream public scope mismatch or exact scenario/policy scope mismatch; never relabeled authentication failure",
+    "PINNED_AUTH_UNAUTHENTICATED": "wrong upstream exact type, missing original registry object, rejected signature/process/binding; preserve upstream code and reason",
+    "PINNED_PROVIDER_PROVENANCE_MISMATCH": "public provider/graph/proof-only or exact requirement/image/sandbox/controller/cleanup projection mismatch; preserve upstream code and reason",
+    "PROOF_UNRESOLVED": "required consumer evidence owner/classification/API not established, unavailable or unexpected validator error; no permissive fallback or transition"
+  },
+  "historical_preservation": {
+    "added": [
+      "core/synthetic_runtime_authorization_pinned_lifecycle.py"
+    ],
+    "allowed_additions": [
+      "core/synthetic_runtime_authorization_pinned_lifecycle.py"
+    ],
+    "baseline_file_count": 1463,
+    "changed": [],
+    "historical_bytes_preserved": true,
+    "missing": [],
+    "mode": "check",
+    "unexpected_additions": []
+  },
+  "implementation_phase_id": "SYNTH.AUTH.LIFECYCLE.PINNED.1",
+  "independent_review": {
+    "authentication": {
+      "canonical_json": "sorted keys, compact separators, allow_nan=false; exact primitive and nested types",
+      "domain": "CATTUS:SYNTH.AUTH.LIFECYCLE.PINNED.1:exact-execution-lease:v1",
+      "explanation": "Public role-framed digests are deterministic projection identifiers. They do not independently authenticate capability. Independent secret HMAC, exact live lease identity and mandatory original upstream validation provide authentication.",
+      "framing": "domain + NUL + role + NUL + UTF-8 canonical JSON",
+      "private_record_authentication_algorithm": "HMAC-SHA256",
+      "private_record_binding": "immutable issuance projection including public digests and authenticated current state",
+      "private_record_role": "lease-record-hmac",
+      "public_digest_algorithm": "SHA256",
+      "public_digest_roles": [
+        "activation-policy",
+        "lease-evidence",
+        "lease-fingerprint"
+      ]
+    },
+    "confirmed_by_source": [
+      "Distinct exact owner, type and schema; independent secret, owner lock, maps and record types",
+      "Mandatory unchanged public pinned validator must return the exact original upstream",
+      "Every valid lease operation reauthenticates the retained upstream and recomputes scenario, provider and policy projections under the owner lock",
+      "All fifteen frozen public provider projection fields are bound; no caller provider or private upstream registry access",
+      "Wrong process rejection precedes owner lock acquisition",
+      "Strict primitive and nested types reject equality aliases before canonical JSON serialization",
+      "Copy-on-write store replacement installs permanent issuance key and signed lease record at one publication point",
+      "Strong original upstream retention and weak live lease identity preserve permanent authorization tombstones after collection",
+      "Stable issuance fingerprint excludes mutable current state; current state is separately HMAC-authenticated",
+      "Only ISSUED, CONSUMED and INVALIDATED exist, with terminal transition replacement after all checks and signing",
+      "Consumption has no caller readiness override and fails closed with PROOF_UNRESOLVED",
+      "Invalidation does not require consumer readiness, and preserves the permanent issuance key",
+      "Authentic terminal state inspection remains available while retained upstream authenticates; readiness flags are false for terminal states",
+      "Authentication, scope, provider provenance and unresolved proof retain distinct typed categories; public ERROR_CODES enumerates all eleven frozen categories without introducing a consumer gate",
+      "All seventeen frozen broad authority flags remain false, including compilation; reflection acceptance is not claimed"
+    ],
+    "findings": [],
+    "historical_stage_assertion": {
+      "observation": "One assertion expects the future owner module to be absent. This describes the historical contract-freeze stage and cannot remain true in the implementation tree.",
+      "reporting_requirement": "Preserve frozen bytes and disclose historical-view validation or current-tree failure; do not represent a patched existence view as an unmodified current-tree pass",
+      "semantic_conflict": false,
+      "test": "tests/test_synthetic_runtime_authorization_lifecycle_pinned_contract.py::test_contract_is_additive_and_has_no_owner_implementation_or_registry_entry"
+    },
+    "normative_contract": "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_CONTRACT_1/contract.json",
+    "one_shot_key": {
+      "fields": [
+        "authorization.owner_identity",
+        "authorization.phase_id",
+        "authorization.schema_version",
+        "authorization.issuing_pid",
+        "authorization.authorization_id"
+      ],
+      "normative_explanation": "The frozen contract document at lines 123-125 explicitly says the five-field tuple is from the original pinned authorization. These are upstream identities.",
+      "source": "exact original authorization returned by the mandatory public validator"
+    },
+    "resolved_advisory": {
+      "issue": "Validate generated lease ID shape before publishing any issuance record",
+      "resolution": "Generated and collision-retried IDs now require exact lowercase 64-character hexadecimal strings; malformed generation raises PROOF_UNRESOLVED before publication"
+    },
+    "review_date": "2026-10-13",
+    "review_kind": "independent_read_only_source_review",
+    "review_scope": {
+      "authorization_issued": false,
+      "behavior_executed": false,
+      "execution_lease_issued": false,
+      "lease_consumed": false,
+      "operational_tests_performed": false,
+      "provider_issued": false,
+      "source_inspection_only": true
+    },
+    "reviewed_source": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+    "reviewed_source_sha256": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4",
+    "schema_version": "synthetic_runtime_execution_lease_pinned_1a_source_review_v1",
+    "status": "NO_CONTRACT_BLOCKER_FOUND"
+  },
+  "invalidation_behavior": "Reauthenticate original lease/upstream and scenario/provider/policy/current state under lock; sign INVALIDATED and replace exactly once without consumer readiness; no reissue, consume, refund or reset.",
+  "isolated_tests": "Source-loaded new owner and pinned upstream copies with an inert exact-original public validator seam. No provider graph, production registry seeding or production validator patching. No fixture capability is exported.",
+  "lease_issued_is_immutable_historical_fact": true,
+  "module": "core.synthetic_runtime_authorization_pinned_lifecycle",
+  "old_consumption_policy_changed": false,
+  "old_owner_changed": false,
+  "old_owner_isolation": "All historical bytes preserved; independent type, secret, lock and owner store; unchanged production validators/registries/policies; no compatibility bridge.",
+  "one_shot_key": {
+    "alternate_keys": false,
+    "fields": [
+      "owner_identity",
+      "phase_id",
+      "schema_version",
+      "issuing_pid",
+      "authorization_id"
+    ],
+    "owner_phase_schema_PID_are_upstream_authorization_fields": true,
+    "source": "exact original pinned authorization returned by unchanged public validator"
+  },
+  "operational_attempt_performed": false,
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR.1R": 0,
+    "JAVA1C": 0,
+    "PINNED_provider_issuance": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "authorization_issuance": 0,
+    "execution_lease_issuance": 0,
+    "lease_consumption": 0,
+    "lease_invalidation": 0,
+    "reflection": 0,
+    "repository_runtime_writes": 0
+  },
+  "operational_lease_consumed": false,
+  "operational_lease_issued": false,
+  "phase": "SYNTH.AUTH.LIFECYCLE.PINNED.1A",
+  "phase_registration_performed": false,
+  "pinned_auth_owner_changed": false,
+  "provider_decision": "B",
+  "provider_fields_bound": [
+    "phase_id",
+    "schema_version",
+    "owner_identity",
+    "proof_context_identity",
+    "receipt_id",
+    "fingerprint",
+    "evidence_digest",
+    "requirement_profile",
+    "requirement_schema",
+    "target_image_identity",
+    "runtime_sandbox_profile",
+    "runtime_sandbox_policy_sha256",
+    "controller_identity_evidence_json",
+    "cleanup_evidence_json",
+    "cleanup_evidence_digest"
+  ],
+  "provider_owner_changed": false,
+  "public_APIs": [
+    "issue_pinned_synthetic_runtime_execution_lease",
+    "validate_pinned_synthetic_runtime_execution_lease",
+    "pinned_synthetic_runtime_execution_lease_state",
+    "check_pinned_synthetic_runtime_execution_lease_preconditions",
+    "consume_pinned_synthetic_runtime_execution_lease",
+    "invalidate_pinned_synthetic_runtime_execution_lease"
+  ],
+  "readiness": {
+    "ISSUED_local_preconditions_satisfied": true,
+    "behavioral_activation_ready": false,
+    "is_capability_token_reservation_or_execution_authority": false,
+    "reason": "PROOF_UNRESOLVED",
+    "report_only": true
+  },
+  "reflection_acceptance_claimed": false,
+  "reflection_owners_changed": false,
+  "registry_picker_comparison": {
+    "after_failed": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "after_passed_count": 292,
+    "all_compared_fields_unchanged": true,
+    "baseline_failed": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "baseline_passed_count": 292,
+    "comparison": {
+      "collected": true,
+      "exit_code": true,
+      "failed": true,
+      "passed_count": true,
+      "passed_nodes": true,
+      "picker": true,
+      "registry_summary": true,
+      "selected_nodes": true,
+      "skipped": true
+    },
+    "guard_after_zero": true,
+    "guard_baseline_zero": true,
+    "phase_registration_performed": false,
+    "unchanged_pre_existing_failures": true
+  },
+  "rejection_matrix": {
+    "Boolean_JSON_readiness_override": "TypeError or exact-original typed rejection; never a transition",
+    "authorization_copy_deepcopy_replace_manual_JSON_report_ID_fingerprint_wrapper_subclass_old_schema_relabel": "PINNED_AUTH_UNAUTHENTICATED or distinct authenticated scope error",
+    "lease_copy_deepcopy_replace_manual_JSON_report_ID_fingerprint_wrapper_subclass_old_type_or_relabel": "LEASE_UNAUTHENTICATED",
+    "nonoriginal_supplied_authorization": "LEASE_UNAUTHENTICATED",
+    "provider_projection_mismatch": "PINNED_PROVIDER_PROVENANCE_MISMATCH",
+    "scenario_or_policy_mismatch": "PINNED_AUTH_SCOPE_MISMATCH",
+    "unknown_validator_failure": "PROOF_UNRESOLVED",
+    "wrong_PID": "LEASE_WRONG_PROCESS before lock"
+  },
+  "runtime_activation_consumed": "derived only from authenticated current state == CONSUMED",
+  "scenario_definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+  "scenario_source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+  "schema": "synthetic_runtime_execution_lease_pinned_1_v1",
+  "source_sha256": {
+    "core/runtime_java_pinned_provider.py": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+    "core/runtime_java_pinned_requirement.py": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1",
+    "core/synthetic_read_only_reflection.py": "d24422b68c0eae96890a7e63a177ebc8adcbd64300bf7cfb42d3ada041a5d5bc",
+    "core/synthetic_reflection_execution_admission.py": "ae6d60d7ef418cff366317ad4507d0f2de93f2aa9d188e8e12d453c66ed77b19",
+    "core/synthetic_reflection_execution_lifecycle.py": "c2b85e845f79332b83f3c17e754ba290db739e9c19378317fed16c6402e686ba",
+    "core/synthetic_runtime_authorization.py": "219c868080a6cca3f02dfcfbd4729f012439b8af1e8db5762c09760a41100b88",
+    "core/synthetic_runtime_authorization_lifecycle.py": "dc7cc307a17c63cf65eea0e898015140806ca98e2614c391423c50adfd0e6029",
+    "core/synthetic_runtime_authorization_pinned.py": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c",
+    "core/synthetic_runtime_authorization_pinned_lifecycle.py": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4",
+    "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_PINNED_CONTRACT_1/contract.json": "dccb2d374d28cb3754e11ac8f46f8b667cc164bb165f27af62bdf8b7b15d9473",
+    "tests/test_synthetic_runtime_authorization_pinned_lifecycle.py": "fd5025dec5782363bacae14c48683dfd997cbc09789dbe0682fd16167920a30d"
+  },
+  "state_machine": {
+    "CONSUMED": {
+      "behavioral_ready": false,
+      "consume": "LEASE_ALREADY_CONSUMED",
+      "invalidate": "LEASE_ALREADY_CONSUMED",
+      "local_ready": false,
+      "reason": "LEASE_ALREADY_CONSUMED",
+      "state_read": "CONSUMED",
+      "validation": "same original lease if upstream still authenticates"
+    },
+    "INVALIDATED": {
+      "behavioral_ready": false,
+      "consume": "LEASE_INVALIDATED",
+      "invalidate": "LEASE_INVALIDATED",
+      "local_ready": false,
+      "reason": "LEASE_INVALIDATED",
+      "state_read": "INVALIDATED",
+      "validation": "same original lease if upstream still authenticates"
+    },
+    "ISSUED": {
+      "behavioral_ready": false,
+      "consume": "PROOF_UNRESOLVED; no mutation",
+      "invalidate": "INVALIDATED",
+      "local_ready": true,
+      "reason": "PROOF_UNRESOLVED",
+      "state_read": "ISSUED",
+      "validation": "same original lease"
+    },
+    "collection_reopens_issuance": false,
+    "consumption_transition_operationally_available": false,
+    "refund": false,
+    "states": [
+      "ISSUED",
+      "CONSUMED",
+      "INVALIDATED"
+    ],
+    "terminal_reissue": "DUPLICATE_LEASE_ISSUANCE",
+    "tombstone_lifetime": "owner process lifetime",
+    "transitions": [
+      [
+        "ISSUED",
+        "CONSUMED"
+      ],
+      [
+        "ISSUED",
+        "INVALIDATED"
+      ]
+    ]
+  },
+  "stop_boundary": "Implementation and pure validation complete. No live authorization/provider/lease attempt.",
+  "type": "PinnedSyntheticRuntimeExecutionLease",
+  "typed_status": "SYNTH_AUTH_LIFECYCLE_PINNED_1A_COMPLETE",
+  "validation": {
+    "all_operational_effects_zero": true,
+    "benchmark_check": {
+      "artifact": "benchmark.json",
+      "passed": true
+    },
+    "focused_implementation": {
+      "artifact": "implementation.json",
+      "failed": 0,
+      "passed": 144
+    },
+    "frozen_safe_after": {
+      "artifact": "focused.json",
+      "excluded_stage_snapshot": "Frozen contract-phase snapshot asserted the additive owner file did not exist before implementation. Baseline ran the full safe selection. After implementation excludes only that phase-stage assertion; frozen test bytes and all semantic assertions remain unchanged.",
+      "failed": 0,
+      "passed": 70
+    },
+    "frozen_safe_baseline": {
+      "artifact": "focused_baseline.json",
+      "failed": 0,
+      "passed": 71
+    },
+    "full_suite_claimed": false,
+    "git_diff_check": {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "warning_only": true
+    },
+    "historical_preservation": {
+      "added": [
+        "core/synthetic_runtime_authorization_pinned_lifecycle.py"
+      ],
+      "allowed_additions": [
+        "core/synthetic_runtime_authorization_pinned_lifecycle.py"
+      ],
+      "baseline_file_count": 1463,
+      "changed": [],
+      "historical_bytes_preserved": true,
+      "missing": [],
+      "mode": "check",
+      "unexpected_additions": []
+    },
+    "in_memory_compilation_JSON_whitespace": {
+      "artifact": "static_validation.json",
+      "passed": true
+    },
+    "initial_implementation_run": {
+      "artifacts": [
+        "implementation_initial.json",
+        "implementation_initial.txt"
+      ],
+      "failed": 1,
+      "passed": 138,
+      "reason": "Race-test instrumentation counted record signature verification as terminal commits; corrected to assert actual owner-store publication. No consumer gate or implementation semantics changed."
+    },
+    "isolated_test_only_owner_calls": {
+      "consume": 146,
+      "invalidate": 166,
+      "issue": 167
+    },
+    "issuance_dependent_frozen_suites_run": false,
+    "production_registries_seeded": false,
+    "production_validators_patched": false,
+    "registry_picker": {
+      "after_passed": 292,
+      "artifact": "registry_comparison.json",
+      "baseline_passed": 292,
+      "existing_failure_count": 7,
+      "existing_failures": [
+        {
+          "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+          "when": "call"
+        },
+        {
+          "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+          "when": "call"
+        }
+      ],
+      "unchanged": true
+    },
+    "typed_status": "SYNTH_AUTH_LIFECYCLE_PINNED_1A_COMPLETE"
+  }
+}

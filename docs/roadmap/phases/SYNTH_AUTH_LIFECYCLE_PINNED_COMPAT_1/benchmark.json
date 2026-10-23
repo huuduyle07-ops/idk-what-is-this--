@@ -1,0 +1,16 @@
+{
+  "audit_guard": {
+    "live_verification_or_execution_attempts": 0,
+    "network_attempts": 0,
+    "owner_issuance_or_consumption_attempts": 0,
+    "process_attempts": 0,
+    "repository_write_attempts": 0
+  },
+  "blocked_actions": [],
+  "exit_code": 0,
+  "external_pytest_directory": "C:\\Users\\Admin\\.codex\\visualizations\\2026\\10\\11\\01a129dc-cfa1-7a23-ad79-f88b8e5fc686\\cattus-pinned-lifecycle-audit-7h6uupki",
+  "full_frozen_suites_run": false,
+  "live_registry_fixtures_seeded": false,
+  "mode": "benchmark",
+  "production_validators_patched": false
+}

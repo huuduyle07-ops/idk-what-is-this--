@@ -1,0 +1,607 @@
+{
+  "phase_id": "RUNTIME.JAVA.PINNED.1A",
+  "schema_version": "runtime_java_pinned_target_inspection_1a_v1",
+  "requirement_profile": "RUNTIME.JAVA.PINNED.1",
+  "requirement_schema": "runtime_java_pinned_1_v1",
+  "inspection_owner_identity": "core.runtime_java_pinned_target_inspection",
+  "proof_context_identity": "71772315bf6d548222d32ce94367b9f025eaa8c31ee67f26b4db40d41e8eae61",
+  "target_image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+  "target_presence_result": "present",
+  "image_metadata_result": "exact_linux_amd64_no_declared_volumes",
+  "backend_route_identity": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+  "backend_server_version": "29.6.1",
+  "inspection_receipt_id": "5ebe2ad8ec33b285286238c001e6c5db3c412d3b9135862f15ab3583f9dbcebf",
+  "inspection_receipt_fingerprint": "de18a7f83a2defb6d33378b3d9a58d80cf0137ee4e1ac0296b4b0416e91dab0d",
+  "export_timeout_ms": 30000,
+  "export_elapsed_ms": 15927.051999955438,
+  "archive_bytes": 443077120,
+  "archive_entries": 6057,
+  "archive_inspection_result": {
+    "archive_bytes": 443077120,
+    "archive_entries": 6057,
+    "java": {
+      "normalized_path": "/opt/temurin-26.0.2.1/bin/java",
+      "resolved_path": "/opt/temurin-26.0.2.1/bin/java",
+      "sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+      "size_bytes": 16296,
+      "elf_class": 2,
+      "elf_endianness": 1,
+      "elf_osabi": 0,
+      "elf_type": 3,
+      "elf_machine": 62,
+      "linux_amd64_elf": true,
+      "mode": 493,
+      "uid": 1000,
+      "gid": 1000,
+      "nonroot_executable": true,
+      "ancestor_traversal_allowed": true,
+      "ancestor_metadata_complete": false,
+      "ancestor_traversal_paths": [
+        [
+          "/",
+          null
+        ],
+        [
+          "/opt",
+          true
+        ],
+        [
+          "/opt/temurin-26.0.2.1",
+          true
+        ],
+        [
+          "/opt/temurin-26.0.2.1/bin",
+          true
+        ]
+      ],
+      "link_chain": [],
+      "link_resolution_result": "resolved_within_image_root"
+    },
+    "javac": {
+      "normalized_path": "/opt/temurin-26.0.2.1/bin/javac",
+      "resolved_path": "/opt/temurin-26.0.2.1/bin/javac",
+      "sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+      "size_bytes": 16384,
+      "elf_class": 2,
+      "elf_endianness": 1,
+      "elf_osabi": 0,
+      "elf_type": 3,
+      "elf_machine": 62,
+      "linux_amd64_elf": true,
+      "mode": 493,
+      "uid": 1000,
+      "gid": 1000,
+      "nonroot_executable": true,
+      "ancestor_traversal_allowed": true,
+      "ancestor_metadata_complete": false,
+      "ancestor_traversal_paths": [
+        [
+          "/",
+          null
+        ],
+        [
+          "/opt",
+          true
+        ],
+        [
+          "/opt/temurin-26.0.2.1",
+          true
+        ],
+        [
+          "/opt/temurin-26.0.2.1/bin",
+          true
+        ]
+      ],
+      "link_chain": [],
+      "link_resolution_result": "resolved_within_image_root"
+    },
+    "controller": {
+      "normalized_path": "/usr/local/bin/python",
+      "resolved_path": "/usr/local/bin/python3.12",
+      "sha256": "0e6475dfda68a9b2d93501449fc47593ca169010e8f4881577b97463fd0c1263",
+      "size_bytes": 14472,
+      "elf_class": 2,
+      "elf_endianness": 1,
+      "elf_osabi": 0,
+      "elf_type": 3,
+      "elf_machine": 62,
+      "linux_amd64_elf": true,
+      "mode": 493,
+      "uid": 0,
+      "gid": 0,
+      "nonroot_executable": true,
+      "ancestor_traversal_allowed": true,
+      "ancestor_metadata_complete": false,
+      "ancestor_traversal_paths": [
+        [
+          "/",
+          null
+        ],
+        [
+          "/usr",
+          true
+        ],
+        [
+          "/usr/local",
+          true
+        ],
+        [
+          "/usr/local/bin",
+          true
+        ]
+      ],
+      "link_chain": [
+        {
+          "link_path": "/usr/local/bin/python",
+          "target_path": "/usr/local/bin/python3",
+          "link_kind": "symlink"
+        },
+        {
+          "link_path": "/usr/local/bin/python3",
+          "target_path": "/usr/local/bin/python3.12",
+          "link_kind": "symlink"
+        }
+      ],
+      "link_resolution_result": "resolved_within_image_root"
+    },
+    "toolchain_pair_result": "exact_single_same_directory_pair",
+    "stream_complete": true,
+    "all_paths_validated": true,
+    "all_links_validated": true
+  },
+  "controller_runtime_identity_proven": false,
+  "complete_inventory_claimed": false,
+  "complete_local_artifact_discovery_claimed": false,
+  "global_provider_absence_claimed": false,
+  "global_provider_uniqueness_claimed": false,
+  "exact_provider_proven": false,
+  "bind_linkage_proven": false,
+  "java1c_invoked": false,
+  "runtime_proof_issued": false,
+  "runtime_authority": false,
+  "operational_effect_counts": {
+    "docker_control_calls": 6,
+    "docker_export_calls": 1,
+    "inspection_containers_created": 1,
+    "container_starts": 0,
+    "Java": 0,
+    "javac": 0,
+    "controller_workload_executions": 0,
+    "Java_compilations": 0,
+    "source_projections": 0,
+    "network": 0,
+    "shell": 0,
+    "host_mounts": 0,
+    "pulls": 0,
+    "builds": 0,
+    "generic_image_inventory_calls": 0,
+    "alternative_image_inspections": 0,
+    "runtime_lease_consumption": 0,
+    "reflection_lease_consumption": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0,
+    "JAVA.1C_invocations": 0
+  },
+  "control_children_reaped_and_pipes_closed": true,
+  "cleanup": {
+    "export_child_reaped": true,
+    "export_pipes_closed": true,
+    "deadline_supervisor_stopped": true,
+    "stderr_reader_stopped": true,
+    "control_children_reaped_and_pipes_closed": true,
+    "stopped_container_removed": true,
+    "known_container_absence_verified": true,
+    "temporary_profile_removed": true,
+    "temporary_workspace_removed": true,
+    "remaining_phase_containers": 0
+  },
+  "receipt_authentication": true,
+  "report_only": true,
+  "backend_measurement_semantics": "original_local_route_and_linux_Server.Version_only",
+  "daemon_continuity_proven": false,
+  "aba_resistance_proven": false,
+  "inspection_seccomp_role": "frozen_SANDBOX.1_stopped_inspection_policy; no runtime_SANDBOX.2_verification_claim",
+  "inspection_configuration_digest": "ceb3fc3e0e6f875a24e07fe7dcec59151d321f527f0e91774296ef7399df053f",
+  "inspection_receipt": {
+    "requirement_profile": "RUNTIME.JAVA.PINNED.1",
+    "requirement_schema": "runtime_java_pinned_1_v1",
+    "owner_identity": "core.runtime_java_pinned_target_inspection",
+    "proof_context_identity": "71772315bf6d548222d32ce94367b9f025eaa8c31ee67f26b4db40d41e8eae61",
+    "receipt_id": "5ebe2ad8ec33b285286238c001e6c5db3c412d3b9135862f15ab3583f9dbcebf",
+    "issuing_pid": 12504,
+    "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "image_metadata": [
+      [
+        "Id",
+        "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a"
+      ],
+      [
+        "Os",
+        "linux"
+      ],
+      [
+        "Architecture",
+        "amd64"
+      ]
+    ],
+    "image_metadata_digest": "f87f6fef0ea31d247dd578d5fd53c05bfb635f7e4a090d24d3684a603be922d2",
+    "backend_route_identity": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+    "backend_server_version": "29.6.1",
+    "inspection_container_identity": "68aff400246e6955c06ce137c4a99c558e992fd4d0916589b0358e576868fd11",
+    "inspection_configuration_digest": "ceb3fc3e0e6f875a24e07fe7dcec59151d321f527f0e91774296ef7399df053f",
+    "inspection_seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+    "archive": {
+      "archive_bytes": 443077120,
+      "archive_entries": 6057,
+      "java": {
+        "normalized_path": "/opt/temurin-26.0.2.1/bin/java",
+        "resolved_path": "/opt/temurin-26.0.2.1/bin/java",
+        "sha256": "a719fab9108ba87eba82655ba904edbee0a91ff13365579519f44f99100382b2",
+        "size_bytes": 16296,
+        "elf_class": 2,
+        "elf_endianness": 1,
+        "elf_osabi": 0,
+        "elf_type": 3,
+        "elf_machine": 62,
+        "linux_amd64_elf": true,
+        "mode": 493,
+        "uid": 1000,
+        "gid": 1000,
+        "nonroot_executable": true,
+        "ancestor_traversal_allowed": true,
+        "ancestor_metadata_complete": false,
+        "ancestor_traversal_paths": [
+          [
+            "/",
+            null
+          ],
+          [
+            "/opt",
+            true
+          ],
+          [
+            "/opt/temurin-26.0.2.1",
+            true
+          ],
+          [
+            "/opt/temurin-26.0.2.1/bin",
+            true
+          ]
+        ],
+        "link_chain": [],
+        "link_resolution_result": "resolved_within_image_root"
+      },
+      "javac": {
+        "normalized_path": "/opt/temurin-26.0.2.1/bin/javac",
+        "resolved_path": "/opt/temurin-26.0.2.1/bin/javac",
+        "sha256": "e21c219e342544cbf107d25e86ed1d809eac6cc57bce8f68750a42783f13e023",
+        "size_bytes": 16384,
+        "elf_class": 2,
+        "elf_endianness": 1,
+        "elf_osabi": 0,
+        "elf_type": 3,
+        "elf_machine": 62,
+        "linux_amd64_elf": true,
+        "mode": 493,
+        "uid": 1000,
+        "gid": 1000,
+        "nonroot_executable": true,
+        "ancestor_traversal_allowed": true,
+        "ancestor_metadata_complete": false,
+        "ancestor_traversal_paths": [
+          [
+            "/",
+            null
+          ],
+          [
+            "/opt",
+            true
+          ],
+          [
+            "/opt/temurin-26.0.2.1",
+            true
+          ],
+          [
+            "/opt/temurin-26.0.2.1/bin",
+            true
+          ]
+        ],
+        "link_chain": [],
+        "link_resolution_result": "resolved_within_image_root"
+      },
+      "controller": {
+        "normalized_path": "/usr/local/bin/python",
+        "resolved_path": "/usr/local/bin/python3.12",
+        "sha256": "0e6475dfda68a9b2d93501449fc47593ca169010e8f4881577b97463fd0c1263",
+        "size_bytes": 14472,
+        "elf_class": 2,
+        "elf_endianness": 1,
+        "elf_osabi": 0,
+        "elf_type": 3,
+        "elf_machine": 62,
+        "linux_amd64_elf": true,
+        "mode": 493,
+        "uid": 0,
+        "gid": 0,
+        "nonroot_executable": true,
+        "ancestor_traversal_allowed": true,
+        "ancestor_metadata_complete": false,
+        "ancestor_traversal_paths": [
+          [
+            "/",
+            null
+          ],
+          [
+            "/usr",
+            true
+          ],
+          [
+            "/usr/local",
+            true
+          ],
+          [
+            "/usr/local/bin",
+            true
+          ]
+        ],
+        "link_chain": [
+          {
+            "link_path": "/usr/local/bin/python",
+            "target_path": "/usr/local/bin/python3",
+            "link_kind": "symlink"
+          },
+          {
+            "link_path": "/usr/local/bin/python3",
+            "target_path": "/usr/local/bin/python3.12",
+            "link_kind": "symlink"
+          }
+        ],
+        "link_resolution_result": "resolved_within_image_root"
+      },
+      "toolchain_pair_result": "exact_single_same_directory_pair",
+      "stream_complete": true,
+      "all_paths_validated": true,
+      "all_links_validated": true
+    },
+    "controller_source_identity": [
+      [
+        "phase_id",
+        "RUNTIME.JAVA.1C"
+      ],
+      [
+        "identity_kind",
+        "frozen_controller_source_metadata_only"
+      ],
+      [
+        "source_sha256",
+        "4f81640e2f01bc1f7a1a833beb269a9d1df51088b69cf24c8369fb6683f11a58"
+      ],
+      [
+        "source_size_bytes",
+        "13037"
+      ]
+    ],
+    "cleanup_evidence": [
+      [
+        "export_child_reaped",
+        true
+      ],
+      [
+        "export_pipes_closed",
+        true
+      ],
+      [
+        "deadline_supervisor_stopped",
+        true
+      ],
+      [
+        "stderr_reader_stopped",
+        true
+      ],
+      [
+        "control_children_reaped_and_pipes_closed",
+        true
+      ],
+      [
+        "stopped_container_removed",
+        true
+      ],
+      [
+        "known_container_absence_verified",
+        true
+      ],
+      [
+        "temporary_profile_removed",
+        true
+      ],
+      [
+        "temporary_workspace_removed",
+        true
+      ],
+      [
+        "remaining_phase_containers",
+        0
+      ]
+    ],
+    "cleanup_evidence_digest": "3bbf80742f5b9253c5e9ac93c8e8123ea81d5340584652100745638d6513d86f",
+    "evidence_digest": "5b774e40238ad9d64c6e1ce466ca89d53be12ccea4a02c7b7181761d176a3368",
+    "export_elapsed_ms": 15927.051999955438,
+    "operational_effect_counts": [
+      [
+        "docker_control_calls",
+        6
+      ],
+      [
+        "docker_export_calls",
+        1
+      ],
+      [
+        "inspection_containers_created",
+        1
+      ],
+      [
+        "container_starts",
+        0
+      ],
+      [
+        "Java",
+        0
+      ],
+      [
+        "javac",
+        0
+      ],
+      [
+        "controller_workload_executions",
+        0
+      ],
+      [
+        "Java_compilations",
+        0
+      ],
+      [
+        "source_projections",
+        0
+      ],
+      [
+        "network",
+        0
+      ],
+      [
+        "shell",
+        0
+      ],
+      [
+        "host_mounts",
+        0
+      ],
+      [
+        "pulls",
+        0
+      ],
+      [
+        "builds",
+        0
+      ],
+      [
+        "generic_image_inventory_calls",
+        0
+      ],
+      [
+        "alternative_image_inspections",
+        0
+      ],
+      [
+        "runtime_lease_consumption",
+        0
+      ],
+      [
+        "reflection_lease_consumption",
+        0
+      ],
+      [
+        "BANK",
+        0
+      ],
+      [
+        "EXECUTOR.1R",
+        0
+      ],
+      [
+        "Apply",
+        0
+      ],
+      [
+        "JAVA.1C_invocations",
+        0
+      ]
+    ],
+    "phase_id": "RUNTIME.JAVA.PINNED.1A",
+    "schema_version": "runtime_java_pinned_target_inspection_1a_v1",
+    "status": "RUNTIME_JAVA_PINNED_1A_COMPLETE",
+    "target_controller_measured": true,
+    "runtime_controller_same_executable_proven": false,
+    "complete_inventory_claimed": false,
+    "complete_local_artifact_discovery_claimed": false,
+    "global_provider_absence_claimed": false,
+    "global_provider_uniqueness_claimed": false,
+    "exact_provider_proven": false,
+    "bind_linkage_proven": false,
+    "java1c_linkage_proven": false,
+    "runtime_authority": false,
+    "repository_write_authority": false,
+    "apply_authority": false,
+    "compatibility_authority": false,
+    "lease_consumption": 0,
+    "inspection_receipt_fingerprint": "de18a7f83a2defb6d33378b3d9a58d80cf0137ee4e1ac0296b4b0416e91dab0d",
+    "report_only": true
+  },
+  "status": "RUNTIME_JAVA_PINNED_1A_COMPLETE",
+  "reason": "complete_bounded_target_archive_inspected",
+  "preoperational_gate_summary": {
+    "pure_gates_ready": true,
+    "source_hashes_checked": 9
+  },
+  "single_live_attempt": true,
+  "copy_JSON_negative_matrix": [
+    {
+      "control": "copy",
+      "rejected": true,
+      "reason": "pinned_target_live_original_object_required"
+    },
+    {
+      "control": "deepcopy",
+      "rejected": true,
+      "reason": "pinned_target_live_original_object_required"
+    },
+    {
+      "control": "dataclasses_replace",
+      "rejected": true,
+      "reason": "pinned_target_live_original_object_required"
+    },
+    {
+      "control": "JSON_projection",
+      "rejected": true,
+      "reason": "pinned_target_original_typed_receipt_required"
+    },
+    {
+      "control": "JSON_reconstruction",
+      "rejected": true,
+      "reason": "pinned_target_live_original_object_required"
+    },
+    {
+      "control": "subclass",
+      "rejected": true,
+      "reason": "pinned_target_original_typed_receipt_required"
+    },
+    {
+      "control": "wrapper",
+      "rejected": true,
+      "reason": "pinned_target_original_typed_receipt_required"
+    },
+    {
+      "control": "wrong_process",
+      "rejected": true,
+      "reason": "pinned_target_issuing_process_required"
+    },
+    {
+      "control": "wrong_HMAC",
+      "rejected": true,
+      "reason": "pinned_target_signature_or_evidence_changed"
+    },
+    {
+      "control": "changed_backend",
+      "rejected": true,
+      "reason": "pinned_target_signature_or_evidence_changed"
+    },
+    {
+      "control": "changed_evidence_digest",
+      "rejected": true,
+      "reason": "pinned_target_signature_or_evidence_changed"
+    }
+  ],
+  "receipt_authentication_after_negative_controls": true,
+  "controller_measurement_is_requirement_constant": false,
+  "historical_sources_modified_by_operation": false
+}

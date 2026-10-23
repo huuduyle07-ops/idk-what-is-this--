@@ -1,0 +1,39 @@
+{
+  "total_baseline_files": 355,
+  "unchanged_count": 355,
+  "changed": [],
+  "missing": [],
+  "historical_preservation_verified": true,
+  "registry_comparison": {
+    "baseline_exit_code": 1,
+    "after_exit_code": 1,
+    "baseline_failures": [
+      "FAILED tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+      "FAILED tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+      "FAILED tests/test_phase_registry.py::test_seed_registry_is_conservative",
+      "FAILED tests/test_phase_registry.py::test_seed_registry_summary_counts",
+      "FAILED tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+      "FAILED tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+      "FAILED tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked"
+    ],
+    "after_failures": [
+      "FAILED tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+      "FAILED tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+      "FAILED tests/test_phase_registry.py::test_seed_registry_is_conservative",
+      "FAILED tests/test_phase_registry.py::test_seed_registry_summary_counts",
+      "FAILED tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+      "FAILED tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+      "FAILED tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked"
+    ],
+    "added_failures": [],
+    "removed_failures": []
+  },
+  "benchmark_comparison": {
+    "baseline_exit_code": 0,
+    "after_exit_code": 0,
+    "baseline_failures": [],
+    "after_failures": [],
+    "added_failures": [],
+    "removed_failures": []
+  }
+}

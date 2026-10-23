@@ -1,0 +1,40 @@
+{
+  "mode": "new_target_inspection",
+  "exit_code": 0,
+  "collected": 163,
+  "passed": 163,
+  "skipped": 0,
+  "failures": [],
+  "suites": {
+    "tests/test_runtime_java_pinned_target_inspection.py": {
+      "passed": 101,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tests/test_runtime_java_pinned_target_archive.py": {
+      "passed": 62,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "test_files": [
+    "tests/test_runtime_java_pinned_target_inspection.py",
+    "tests/test_runtime_java_pinned_target_archive.py"
+  ],
+  "pytest_arguments": [
+    "--basetemp=tmp_tests",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1A\\validation_temp_new_target_inspection_a5154e1091014ad7a5c401f53be965dd\\pytest",
+    "tests/test_runtime_java_pinned_target_inspection.py",
+    "tests/test_runtime_java_pinned_target_archive.py"
+  ],
+  "real_effect_attempts": [
+    "socket.bind"
+  ],
+  "denied_attempts": {},
+  "registry_projection_plugin_used": false,
+  "elapsed_seconds": 22.496,
+  "scope": "Pure host maintenance and fabricated in-memory fixture evidence only; this validation harness performs no live target inspection, Docker/Java, runtime authorization, leases, executor, or apply. Root separately owns one authorized exact-target live proof after pure gates."
+}

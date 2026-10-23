@@ -151,6 +151,9 @@ PHASE_ID_PREFIXES: tuple[str, ...] = (
     # ID namespace only, like PATCH above: no registry track was added and
     # nothing in the schema, the counts or the report grew a new dimension.
     "PREFLIGHT",
+    # RUNTIME.* names runtime-infrastructure capability inside CONTROL.
+    # It is an ID namespace only; sandbox capability grants no authority.
+    "RUNTIME",
 )
 
 #: Registry-root fields that must be present.

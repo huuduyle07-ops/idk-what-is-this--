@@ -1,0 +1,117 @@
+{
+  "analysis_only": true,
+  "anchors": [
+    {
+      "anchor": "def _invoke",
+      "line": 305,
+      "path": "core/sandboxed_java_positive_continuation.py"
+    },
+    {
+      "anchor": "def safe_configuration",
+      "line": 87,
+      "path": "core/sandboxed_java_positive_continuation.py"
+    },
+    {
+      "anchor": "child = subprocess.Popen",
+      "line": 28,
+      "path": "core/java_single_thread_capture.py"
+    },
+    {
+      "anchor": "os.killpg(child.pid, signal.SIGKILL)",
+      "line": 67,
+      "path": "core/java_single_thread_capture.py"
+    },
+    {
+      "anchor": "def _bounded_process",
+      "line": 290,
+      "path": "core/candidate_runtime_sandbox.py"
+    },
+    {
+      "anchor": "_DENIED_SYSCALLS =",
+      "line": 51,
+      "path": "core/candidate_runtime_sandbox.py"
+    },
+    {
+      "anchor": "POLICY['syscalls'][0]['names'].remove('clone3')",
+      "line": 35,
+      "path": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "anchor": "def assess_backend_freshness",
+      "line": 86,
+      "path": "core/sandbox_backend_provenance.py"
+    },
+    {
+      "anchor": "\"cleanup_split\":",
+      "line": 460,
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json"
+    },
+    {
+      "anchor": "\"framing_requirement\":",
+      "line": 853,
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json"
+    },
+    {
+      "anchor": "\"tmp_entries_policy\":",
+      "line": 603,
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json"
+    }
+  ],
+  "source_records": [
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "sha256": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328",
+      "size_bytes": 61888
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+      "sha256": "1c40559d4a48b747632ec4e75b49eaeae33bad9ed63fa7cbd5b19337d840406e",
+      "size_bytes": 30969
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+      "sha256": "259f3e60a9f33677a335cb6f309b5b89a4f60d7321a2dc623dff186fd98a692d",
+      "size_bytes": 44595
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1/contract.json",
+      "sha256": "e6e25d5ac912a07b35dffab148e8b3dc209aa124429920f374c46f7fd1386192",
+      "size_bytes": 37431
+    },
+    {
+      "path": "core/sandboxed_java_positive_probe.py",
+      "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+      "size_bytes": 7358
+    },
+    {
+      "path": "core/sandboxed_java_positive_continuation.py",
+      "sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+      "size_bytes": 28167
+    },
+    {
+      "path": "core/java_single_thread_capture.py",
+      "sha256": "4ac691b2919b3e778a98c044fb166fd9804b102cdd651995eb8689839ac438fb",
+      "size_bytes": 6312
+    },
+    {
+      "path": "core/candidate_runtime_sandbox.py",
+      "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "size_bytes": 34833
+    },
+    {
+      "path": "core/sandbox_backend_provenance.py",
+      "sha256": "42e18b86556118ba67f5a62f913e27c5598321af83a7b35c84b89042737da3b8",
+      "size_bytes": 12132
+    },
+    {
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "size_bytes": 22400
+    },
+    {
+      "path": "docs/roadmap/RUNTIME_SANDBOX_2_SECCOMP.json",
+      "sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "size_bytes": 1642
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "phase_id": "PREFLIGHT.RUNTIME.1",
+  "reversals": [
+    {
+      "path": "docs/roadmap/phase_registry.json",
+      "entry_sha256": "ef9c0bac5d4109ffa797992f804acb8fdc01974dccb3eec45cf0f34a013bc668",
+      "post_sha256": "b9cc66d992d58c7e4c1e38cbb1c8b30e40856044c1c6be51f7d4ae9bd5d1b73b"
+    },
+    {
+      "path": "tests/test_phase_registry.py",
+      "entry_sha256": "a101c133f750bc887a97679e548120da4573d5071b395e151eb4c09d853b3003",
+      "post_sha256": "a888747d6e2e6faf42704ecd40d4ac1a704483241f787ce3afe54d7265368212"
+    },
+    {
+      "path": "tests/test_phase_picker.py",
+      "entry_sha256": "3c5c0dbde70ad1611c397c93c48a1d4f79116970d24845be8c4227128f9acce6",
+      "post_sha256": "6a26fa6d6d16e6433e5fcaece40e1a9bb1dbc3e1403a541842585a65a70e6d46"
+    },
+    {
+      "path": "tests/_patch_candidate_behavior_exec_admit1_maintenance.py",
+      "entry_sha256": "bfe02490b063699b854a7c31d513d0814c0b980e8c3daeb6cc35e3ceaea520bf",
+      "post_sha256": "26e593941d721ac55f6e8fa475fe6ecf26003b1f67a2b2e9df9d6e97826f6baf"
+    }
+  ]
+}

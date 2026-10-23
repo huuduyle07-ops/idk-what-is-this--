@@ -1,0 +1,22 @@
+{
+  "audit_guard": {
+    "allowed_pure_domain_children": 1,
+    "forbidden_process_attempts": 0,
+    "forbidden_socket_attempts": 0,
+    "forbidden_write_attempts": 0
+  },
+  "case_count": 57,
+  "effect_counts": {
+    "caller_shell": 0,
+    "docker": 0,
+    "forbidden_attempts": 0,
+    "java": 0,
+    "other_process": 0,
+    "python_domain_child": 1,
+    "socket": 0
+  },
+  "original_child_command_preserved": true,
+  "original_frozen_source_sha256": "e0455b4eb9b5328bf1484dad08a6f57733e93d9e54bc10e84154ba2e7993bab6",
+  "output_only_rebound_to_new_phase": true,
+  "passed": true
+}

@@ -1,0 +1,31 @@
+{
+  "args": [
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "-o",
+    "addopts=",
+    "-o",
+    "log_file=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-log-sandbox2.txt",
+    "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_NESTED_CONTEXT_DIAG_1\\validation_tmp\\pytest-basetemp-sandbox2-25504",
+    "tests/test_runtime_sandbox2.py",
+    "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_SANDBOX_2_PRELADDER_DIAG_1\\test_classifier.py"
+  ],
+  "audit_guard": {
+    "allowed_pure_domain_children": 0,
+    "forbidden_process_attempts": 0,
+    "forbidden_socket_attempts": 0,
+    "forbidden_write_attempts": 0
+  },
+  "collected_test_count": 230,
+  "controlled_fixture_owner_frames_permitted": true,
+  "exit_code": 0,
+  "failed_test_count": 0,
+  "failed_test_ids": [],
+  "live_owner_issuance": 0,
+  "passed": true,
+  "passed_test_count": 230,
+  "skipped_test_ids": [],
+  "successful_operational_effects": 0,
+  "temporary_root_confined_to_new_phase": true
+}

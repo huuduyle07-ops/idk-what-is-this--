@@ -1,0 +1,39 @@
+{
+  "all_guarded_effects_zero": true,
+  "all_required_validation_checks_passed": true,
+  "benchmark_checked": 54,
+  "benchmark_errors": 0,
+  "created_at": "2026-10-19",
+  "evidence_files": [
+    "benchmark.json",
+    "focused.json",
+    "git_validation.json",
+    "preservation_comparison.json",
+    "proof.json",
+    "registry_after.json",
+    "registry_baseline.json",
+    "registry_comparison.json",
+    "static_validation.json"
+  ],
+  "finalizer_blocked_actions": [],
+  "finalizer_guard": {
+    "capability_or_transition_attempts": 0,
+    "capability_owner_import_attempts": 0,
+    "execution_or_verification_attempts": 0,
+    "network_attempts": 0,
+    "outside_phase_write_attempts": 0,
+    "process_attempts": 0
+  },
+  "focused_collected": 122,
+  "focused_passed": 122,
+  "git_diff_check_passed": true,
+  "historical_preservation": true,
+  "in_memory_python_compiled": 1373,
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.BUDGET.PROOF.1R",
+  "registry_baseline_collected": 299,
+  "registry_baseline_passed": 292,
+  "registry_baseline_vs_after_identical": true,
+  "registry_existing_failures": 7,
+  "typed_result": "BUDGET_WITNESS_UNRESOLVED",
+  "validator_sha256": "f09a2125c7a6e8552dadfaf22527a4a4868ef76f80f8925568c63a1604dfb16e"
+}

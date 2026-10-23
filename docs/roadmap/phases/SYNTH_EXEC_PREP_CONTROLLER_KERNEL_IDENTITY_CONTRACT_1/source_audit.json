@@ -1,0 +1,478 @@
+{
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.KERNEL.IDENTITY.CONTRACT.1",
+  "artifact_kind": "historical_source_only_kernel_identity_audit",
+  "method": "Read source bytes and frozen JSON/text only; line-anchored source reasoning. No owner module imported or executed, no live kernel or target filesystem observations, no network.",
+  "recommendation": "KERNEL_IDENTITY_CONTRACT_UNRESOLVED",
+  "recommendation_scope": "Historical evidence supports raw namespace preservation and full stat-mode observation. It does not independently freeze exact mount, root, aggregate namespace, start, process/group or descriptor incarnation projections. The normative contract is a separate artifact.",
+  "historical_convention_is_automatic_requirement": false,
+  "source_audit": [
+    {
+      "path": "core/sandboxed_java_positive_probe.py",
+      "mandatory": true,
+      "anchors": [
+        {
+          "start_line": 22,
+          "end_line": 25,
+          "finding": "boundary(pid) returns os.readlink namespace text for user,mnt,net,pid,ipc,cgroup,uts and open(.../cgroup).read() text with no explicit strip or normalization."
+        },
+        {
+          "start_line": 27,
+          "end_line": 39,
+          "finding": "Controller uid/gid/PID/task counts, capability status text, resource strings and statvfs writability are historical boundary evidence; /proc/self/status is not /proc/PID/stat starttime."
+        },
+        {
+          "start_line": 41,
+          "end_line": 55,
+          "finding": "lstat mode classifies file/directory/other. This historical manifest does not serialize full root or entry stat identity."
+        }
+      ],
+      "byte_size": 7358,
+      "sha256": "d62e7ab3082f728d77bdfcfde91b5f62f11a6b8a2945b8a8c96fb5c97e3c654f",
+      "line_count": 126
+    },
+    {
+      "path": "core/sandbox_backend_provenance.py",
+      "mandatory": true,
+      "anchors": [
+        {
+          "start_line": 86,
+          "end_line": 100,
+          "finding": "Freshness assessment explicitly denies that authenticated snapshots, timestamps, endpoint equality or repeated version equality establish backend replacement/ABA resistance."
+        }
+      ],
+      "byte_size": 12132,
+      "sha256": "42e18b86556118ba67f5a62f913e27c5598321af83a7b35c84b89042737da3b8",
+      "line_count": 217
+    },
+    {
+      "path": "core/direct_read_receipt.py",
+      "mandatory": true,
+      "anchors": [
+        {
+          "start_line": 42,
+          "end_line": 69,
+          "finding": "DirectReadFileIdentity stores device/inode/full mode and rejects bool/noninteger/negative metadata; no narrow Linux ABI width is established."
+        },
+        {
+          "start_line": 91,
+          "end_line": 98,
+          "finding": "from_stat_result projects int(st_dev), int(st_ino), int(st_mode), size and timestamps."
+        },
+        {
+          "start_line": 397,
+          "end_line": 420,
+          "finding": "Freshness compares device/inode/mode and checks S_ISREG(full mode); full mode carries file type, unlike S_IMODE restoration permissions."
+        }
+      ],
+      "byte_size": 17813,
+      "sha256": "0ae7b33ed3273f978e6edb540f551365f255bd0513463f0e79b0a6aff2e0c1ad",
+      "line_count": 454
+    },
+    {
+      "path": "core/repository_inventory.py",
+      "mandatory": true,
+      "anchors": [
+        {
+          "start_line": 28,
+          "end_line": 49,
+          "finding": "RepositoryFileIdentity is descriptor-comparable inventory metadata and captures device/inode/int(st_mode), size and timestamps. It is not an observed namespace or mount-incarnation primitive."
+        }
+      ],
+      "byte_size": 21634,
+      "sha256": "14e7c93df03f0881bf8abdf8301a0308b9265f4a03398e845452863154a789b0",
+      "line_count": 653
+    },
+    {
+      "path": "core/undo_backup.py",
+      "mandatory": true,
+      "anchors": [
+        {
+          "start_line": 105,
+          "end_line": 115,
+          "finding": "Atomic restoration extracts stat.S_IMODE(st_mode) and applies it with chmod; this is permissions restoration, a different purpose from observation metadata."
+        }
+      ],
+      "byte_size": 11338,
+      "sha256": "1c5c6cd16f00dd08c56232e30fc4d378c178a996dd8820dedf19c3b4e9b17050",
+      "line_count": 230
+    },
+    {
+      "path": "core/failed_rollback_recovery.py",
+      "mandatory": true,
+      "anchors": [
+        {
+          "start_line": 136,
+          "end_line": 148,
+          "finding": "Recovery baseline_mode admits exact int 0..0o7777 or None. This bounds restoration permissions, not full observed st_mode."
+        }
+      ],
+      "byte_size": 13568,
+      "sha256": "7ff20ce943df6d4f45e625530b82da32e15ee027237a5bb3213e80b1f9ebcf19",
+      "line_count": 345
+    },
+    {
+      "path": "core/candidate_runtime_sandbox.py",
+      "mandatory": false,
+      "anchors": [
+        {
+          "start_line": 51,
+          "end_line": 58,
+          "finding": "Frozen syscall denial list includes unshare,setns,mount,umount2 and other privileged mechanisms; source evidence supports conditional containment constraints."
+        },
+        {
+          "start_line": 419,
+          "end_line": 436,
+          "finding": "Independent prelaunch configuration predicate checks private PID/cgroup settings, IPC none, no binds/mounts, dropped capabilities, frozen UID/GID, resources and environment. Configuration equality is not an observed mount-incarnation identity."
+        }
+      ],
+      "byte_size": 34833,
+      "sha256": "ebe409e7e798ec1e8f48c4bd2c49e5cd8b282906251f7c2c38c2933d1ef51913",
+      "line_count": 665
+    },
+    {
+      "path": "core/thread_compatible_runtime_sandbox.py",
+      "mandatory": false,
+      "anchors": [
+        {
+          "start_line": 226,
+          "end_line": 235,
+          "finding": "Thread containment assessment compares raw namespace dictionaries and cgroup text before/during/after, verifies distinct TID/PID, and rejects changes. No starttime-based task identity is constructed."
+        }
+      ],
+      "byte_size": 22400,
+      "sha256": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45",
+      "line_count": 382
+    },
+    {
+      "path": "core/sandbox_backend_binding.py",
+      "mandatory": false,
+      "anchors": [
+        {
+          "start_line": 138,
+          "end_line": 175,
+          "finding": "Attachment validation requires exact retained original, issuing process, signature/projection and route/version bracket equality while daemon identity/continuity/ABA flags remain false. Issuing PID is local capability-owner provenance, not observed process incarnation."
+        }
+      ],
+      "byte_size": 26216,
+      "sha256": "202cd1190494beaaf24874ac798b89a8eac276fa8361b496663a573770cdf1ed",
+      "line_count": 469
+    },
+    {
+      "path": "core/runtime_java_pinned_provider.py",
+      "mandatory": false,
+      "anchors": [
+        {
+          "start_line": 341,
+          "end_line": 437,
+          "finding": "Runtime evidence binds authenticated provider/runtime observations and frozen controller identity/configuration. It does not add mountinfo, process stat starttime or fdinfo observation primitives."
+        },
+        {
+          "start_line": 445,
+          "end_line": 456,
+          "finding": "Owned attachment authentication checks retained original and current issuing process. This capability authentication must remain distinct from a nonsecret kernel projection."
+        }
+      ],
+      "byte_size": 42111,
+      "sha256": "bca4a46363a27e23fba60cbc556eb30e3f2b6e03f4ed6e95c81ac7231756ddaa",
+      "line_count": 687
+    },
+    {
+      "path": "core/runtime_java_pinned_requirement.py",
+      "mandatory": false,
+      "anchors": [
+        {
+          "start_line": 93,
+          "end_line": 98,
+          "finding": "Frozen requirements specify private namespaces/cgroup, controller PID1/UIDGID65534, matching seven observed boundaries, bounded resources, fixed mounts and capture limits; no kernel ABI digit widths are frozen."
+        }
+      ],
+      "byte_size": 22597,
+      "sha256": "2f070084b7a62a46bce33cd5dcdf0a06236bfdcc21d5d82ed508ff4b961b8af1",
+      "line_count": 293
+    },
+    {
+      "path": "core/runtime_java_pinned_backend_target_binding.py",
+      "mandatory": false,
+      "anchors": [
+        {
+          "start_line": 277,
+          "end_line": 309,
+          "finding": "Validator authenticates exact current-process original binding and all original upstream objects/signature/evidence. This owner graph does not supply observed process/task or mount incarnations."
+        }
+      ],
+      "byte_size": 34173,
+      "sha256": "94c95d674c0b43cde5811762998d13a65c3eee71c442cf05ff8699e02ec59da9",
+      "line_count": 561
+    },
+    {
+      "path": "core/runtime_java_pinned_target_inspection.py",
+      "mandatory": false,
+      "anchors": [
+        {
+          "start_line": 141,
+          "end_line": 156,
+          "finding": "Receipt validation requires original live registry object, current issuing PID and authenticated canonical evidence."
+        },
+        {
+          "start_line": 382,
+          "end_line": 385,
+          "finding": "Controller source identity is explicitly frozen-controller-source metadata only. The accessor is read as source here and is never called by this audit."
+        }
+      ],
+      "byte_size": 28903,
+      "sha256": "dd65d5731486e0a4d92e858d7d3c3853eba6d6377b0884f988fcf0641bec6e59",
+      "line_count": 521
+    },
+    {
+      "path": "core/sandboxed_java_positive_continuation.py",
+      "mandatory": false,
+      "anchors": [
+        {
+          "start_line": 123,
+          "end_line": 157,
+          "finding": "Historical evaluator requires controller PID1/UIDGID65534, one Python/OS task, unchanged raw boundary, exact namespace key set and equal child boundary. These are historical observations, not a retained live workspace or new observer implementation."
+        }
+      ],
+      "byte_size": 28167,
+      "sha256": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+      "line_count": 462
+    },
+    {
+      "path": "core/synthetic_runtime_authorization_pinned.py",
+      "mandatory": false,
+      "anchors": [
+        {
+          "start_line": 261,
+          "end_line": 288,
+          "finding": "Authorization validator requires issuing process and exact original authorization/provider graph plus independent process-local HMAC. Exported scalar observations cannot replace these originals or grant authority."
+        }
+      ],
+      "byte_size": 24720,
+      "sha256": "c216aaba910b5907d754f51358f1fca4ba4c77bfd38692de7cc192b5e263516c",
+      "line_count": 445
+    },
+    {
+      "path": "core/synthetic_runtime_authorization_pinned_lifecycle.py",
+      "mandatory": false,
+      "anchors": [
+        {
+          "start_line": 130,
+          "end_line": 140,
+          "finding": "Local lock access checks issuing process and original issuing PID. This is process-local owner provenance and supplies no /proc starttime incarnation serialization."
+        }
+      ],
+      "byte_size": 25692,
+      "sha256": "235f630b6e888e55b0fae1fda7699c4a962c0f003feb0bf08e7885c91d63e3c4",
+      "line_count": 497
+    },
+    {
+      "path": "core/java_single_thread_capture.py",
+      "mandatory": false,
+      "additional_reference": "Imported source helper of the frozen historical Java observer.",
+      "anchors": [
+        {
+          "start_line": 28,
+          "end_line": 32,
+          "finding": "Fixed child starts with start_new_session=True and its PID is retained/callback-observed."
+        },
+        {
+          "start_line": 64,
+          "end_line": 99,
+          "finding": "Cleanup addresses the phase child group with child.pid, waits/reaps, and checks group survival. This supports leader/child binding context but does not make PGID durable or observe leader starttime."
+        }
+      ],
+      "byte_size": 6312,
+      "sha256": "4ac691b2919b3e778a98c044fb166fd9804b102cdd651995eb8689839ac438fb",
+      "line_count": 135
+    }
+  ],
+  "contract_references": [
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/evidence_index.json",
+      "anchors": [
+        {
+          "start_line": 3,
+          "finding": "Exact historical core source reference list used for this audit."
+        }
+      ],
+      "byte_size": 39072,
+      "sha256": "2db38cb014750909877f99e0e233e71942f30472f9baae755673df0347a35054",
+      "line_count": 1329
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/evidence_index.json",
+      "anchors": [
+        {
+          "start_line": 3,
+          "finding": "Exact historical core source reference list used for this audit."
+        }
+      ],
+      "byte_size": 33928,
+      "sha256": "2765a37d963f9ff0430f583e31c750d78e6e551f7644eefc2a1ff83afb1b9815",
+      "line_count": 972
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/message_schema.json",
+      "anchors": [
+        {
+          "start_line": 13,
+          "end_line": 17,
+          "finding": "Existing ID envelope admits 1..256 UTF-8 bytes; this is not a semantic kernel digit-width guarantee."
+        },
+        {
+          "start_line": 28,
+          "end_line": 38,
+          "finding": "Existing uint/positive_int fields admit up to 9223372036854775807: maximum accepted decimal width 19; bool excluded."
+        },
+        {
+          "start_line": 159,
+          "end_line": 171,
+          "finding": "Exact seven namespace fields are required."
+        },
+        {
+          "start_line": 210,
+          "end_line": 238,
+          "finding": "Separate mount identity, namespace generation, root identity and root metadata; subordinate_mount_count is the sole allowed value 0."
+        },
+        {
+          "start_line": 287,
+          "end_line": 303,
+          "finding": "writer_handle explicitly permits both potential_write_access and open_writable_handle; serialization must distinguish synthetic relation from actual descriptor."
+        },
+        {
+          "start_line": 1024,
+          "end_line": 1027,
+          "finding": "Complete no-cross-mount/writer observations, fixed read-only kernel scope and capture rules remain unchanged."
+        }
+      ],
+      "byte_size": 30969,
+      "sha256": "1c40559d4a48b747632ec4e75b49eaeae33bad9ed63fa7cbd5b19337d840406e",
+      "line_count": 1034
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1/contract.json",
+      "anchors": [
+        {
+          "start_line": 536,
+          "end_line": 554,
+          "finding": "Mount/root and complete manifest/process/writer observations are generation-bound metadata; state digest alone does not authenticate readiness."
+        },
+        {
+          "start_line": 748,
+          "end_line": 752,
+          "finding": "Local observation fence requires coherent current generations; read-only inventory is not an external writer lock."
+        }
+      ],
+      "byte_size": 61888,
+      "sha256": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328",
+      "line_count": 1146
+    },
+    {
+      "path": "docs/roadmap/phases/SYNTH_EXEC_PREP_WORKSPACE_CONTRACT_1/contract.json",
+      "anchors": [
+        {
+          "start_line": 287,
+          "end_line": 307,
+          "finding": "Mount/root and descriptor-relative no-follow metadata scope, original identities and outer authenticated current state remain required."
+        },
+        {
+          "start_line": 466,
+          "end_line": 473,
+          "finding": "Loss/replacement invalidates the generation; equivalent names, image, paths or manifest do not repair original relations."
+        }
+      ],
+      "byte_size": 44595,
+      "sha256": "259f3e60a9f33677a335cb6f309b5b89a4f60d7321a2dc623dff186fd98a692d",
+      "line_count": 664
+    }
+  ],
+  "findings": [
+    {
+      "kind": "direct_source_evidence",
+      "family": "namespaces.user,mnt,net,pid,ipc,cgroup,uts",
+      "conclusion": "Raw readlink text and raw cgroup text comparison are historical conventions. Individual namespace raw preservation is supported; source does not validate a canonical decimal grammar or establish an inode digit maximum."
+    },
+    {
+      "kind": "contract_design_inference",
+      "family": "namespace_encoding",
+      "conclusion": "A new strict lowercase ASCII kind:[canonical decimal] grammar can preserve the conventional observation directly, with no whitespace/normalization alias. Treat this as an explicit new serialization choice, not a historical validator. No finite semantic inode width is pinned by the reviewed sources."
+    },
+    {
+      "kind": "direct_source_evidence",
+      "family": "cgroup_identity",
+      "conclusion": "Historical open(...).read() preserves text without explicit trim but is text-mode I/O; it is not proof of a newly frozen exact-byte preimage. Namespace cgroup inode and cgroup membership text are distinct facts."
+    },
+    {
+      "kind": "contract_design_inference",
+      "family": "mode",
+      "conclusion": "Freeze full int(st_mode) consistently for observed entry/root metadata, because observation checks file kind and metadata. Permissions-only S_IMODE is source-supported for restoration only. Do not accept both encodings or infer an unpinned narrow maximum."
+    },
+    {
+      "kind": "contract_design_inference",
+      "family": "mount_identity,namespace_generation,root_identity",
+      "conclusion": "Mount ID or device/inode equality alone does not prove incarnation continuity. Bind projection to authenticated actual namespace/container/workspace/controller generation and coherent original mount/root relation. Existing containment permits future conditional continuity reasoning but does not provide its implemented observer. No new held descriptor, hidden counter or lifetime mechanism is established by this audit."
+    },
+    {
+      "kind": "contract_design_inference",
+      "family": "controller_process_identity,writer.process_identity,writer.task_identity,process.start_identity,task.start_identity,process_group_identity",
+      "conclusion": "PID/TID/PGID alone is insufficient. Distinguish whole incarnation projection from starttime component and bind PID namespace plus outer generation. Historical source does not already serialize process/task starttime. Child new-session precedent supports group leader binding only."
+    },
+    {
+      "kind": "contract_design_inference",
+      "family": "namespace_identity",
+      "conclusion": "Distinct aggregate role requires an explicit purposeful canonical seven-observation tuple/digest preimage or remains underspecified. Concatenation or duplicate alias is not supplied by historical source."
+    },
+    {
+      "kind": "contract_design_inference",
+      "family": "writer_handle.descriptor_identity",
+      "conclusion": "Use disjoint actual-fd and potential-relation tags only after each relation is defined. A numeric fd slot must be bound to writer incarnation and current coherent observation; it does not identify a durable open-file-description incarnation. Potential access is an interpreted relation, not a kernel fd. If defining that relation requires deciding forbidden potential-access semantics, keep this scalar unresolved."
+    },
+    {
+      "kind": "direct_contract_evidence",
+      "family": "finite_width",
+      "conclusion": "Accepted integer width is at most 19 digits by the existing schema, accepted ID UTF-8 width is at most 256, and subordinate_mount_count serializes as 0. Neither acceptance cap proves all valid kernel facts have finite semantic widths within it; unrepresentable data must fail closed without truncation or budget-only hashing."
+    },
+    {
+      "kind": "audit_limit",
+      "family": "missing_historical_primitives",
+      "conclusion": "Reviewed source text contains no mountinfo, fdinfo or process/task stat-starttime observer. Capability-owner issuing PID checks and source hashes must not be relabeled as kernel incarnation identities."
+    }
+  ],
+  "unresolved_boundaries": [
+    "exact mount/root incarnation serialization and continuity proof",
+    "namespace_generation alias/continuity semantics",
+    "aggregate namespace identity role",
+    "process/task/start/group exact canonical projections",
+    "cgroup exact canonical text/byte preimage choice",
+    "actual descriptor versus potential-access relation projection",
+    "WRITER_INVENTORY_COMPLETENESS_UNRESOLVED"
+  ],
+  "authority_flags": {
+    "runtime_authority": false,
+    "preparation_authority": false,
+    "workspace_issuance_authority": false,
+    "container_creation_authority": false,
+    "repository_write_authority": false,
+    "apply_authority": false,
+    "network_authority": false,
+    "host_mount_authority": false,
+    "shell_authority": false,
+    "kernel_observation_is_authority": false,
+    "digest_is_authentication": false
+  },
+  "operational_effects": {
+    "Docker": 0,
+    "owner_imports": 0,
+    "owner_issuance": 0,
+    "controller_execution": 0,
+    "live_proc_reads": 0,
+    "live_namespace_inspection": 0,
+    "target_runtime_stat_observations": 0,
+    "runtime_probes": 0,
+    "network": 0,
+    "capabilities_issued": 0
+  },
+  "effect_scope": "Audit and artifact generation only. The two requested audit document writes are not scenario/runtime effects. Existing historical source/contracts are read-only.",
+  "audited_core_source_count": 17,
+  "mandatory_core_source_count": 6
+}

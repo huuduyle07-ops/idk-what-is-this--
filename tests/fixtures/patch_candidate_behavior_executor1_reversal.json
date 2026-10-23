@@ -1,0 +1,25 @@
+{
+  "phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1",
+  "reversals": [
+    {
+      "path": "docs/roadmap/phase_registry.json",
+      "entry_sha256": "b9cc66d992d58c7e4c1e38cbb1c8b30e40856044c1c6be51f7d4ae9bd5d1b73b",
+      "post_sha256": "a9b557bfc9fe33a8e1ef421a5da3675bc852073b870f8c845e075844deddc999"
+    },
+    {
+      "path": "tests/test_phase_registry.py",
+      "entry_sha256": "a888747d6e2e6faf42704ecd40d4ac1a704483241f787ce3afe54d7265368212",
+      "post_sha256": "25be3e1a3dc053805c7fde59b4589998b57e6171a2beb91c97e0396f2a1b6dd7"
+    },
+    {
+      "path": "tests/test_phase_picker.py",
+      "entry_sha256": "6a26fa6d6d16e6433e5fcaece40e1a9bb1dbc3e1403a541842585a65a70e6d46",
+      "post_sha256": "53d2c7dc65d4608162a4bc936d5e257c7ea9ff1f76db181227345849346b09d0"
+    },
+    {
+      "path": "tests/_preflight_runtime1_maintenance.py",
+      "entry_sha256": "b2a74155d251824cc32ac38862b45ef8146f76920fb930feee5242a370b0f63a",
+      "post_sha256": "cda8ca00d7579080ea2f400c7470b20eee6871b508a6800b134eb401b34691bd"
+    }
+  ]
+}

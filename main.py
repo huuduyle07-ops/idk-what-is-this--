@@ -72,6 +72,19 @@ def main() -> None:
     if not state:
         return
 
+    # OOP.INTENT.DETECT.2: the terminal agent shares the same deterministic
+    # pre-author admission as web routes.  A wait/fail-closed result is
+    # terminal here; it is also persisted through the frozen OOP UI lifecycle.
+    if (state.interface == "agent" and state.is_project_input
+            and state.control_result and not route_is_read_only(state.live_route)):
+        from web.oop_intent_adapter import admit_future_design_control_wait
+        intent_wait, _future_design_owned = admit_future_design_control_wait(
+            control=state.control_result, repo_path=state.repo_path or "",
+            task_text=state.user_input)
+        if intent_wait is not None:
+            print(json.dumps(intent_wait, indent=2, ensure_ascii=False))
+            return
+
     try:
         draft = run_draft_pipeline(state)
     except RuntimeError as e:

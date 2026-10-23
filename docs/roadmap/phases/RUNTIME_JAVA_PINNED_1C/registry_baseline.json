@@ -1,0 +1,98 @@
+{
+  "mode": "registry_baseline",
+  "exit_code": 1,
+  "collected": 299,
+  "passed": 292,
+  "skipped": 0,
+  "failures": [
+    {
+      "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+      "when": "call",
+      "outcome": "failed",
+      "detail": "def test_seed_registry_has_expected_phases():\n        data = load_phase_registry(str(_SEED_PATH))\n        ids = {p[\"phase_id\"] for p in data[\"phases\"]}\n        assert {\n            \"ROAD.1\", \"ROAD.2\", \"ROAD.3\", \"ROAD.4\", \"AUTO.2a\", \"AUTO.2b\", \"AUTO.2c\",\n            \"MODEL.1\", \"MODEL.2\", \"MODEL.3\", \"MODEL.N1\", \"MODEL.N2\", \"MODEL.N3\", \"MODEL.N4\", \"MODEL.N5\", \"MODEL.N6\", \"MODEL.N7\", \"MODEL.CLOSE\", \"EVAL.1\", \"EVAL.2\", \"EVAL.3\", \"EVAL.N1\", \"EVAL.N2\", \"EVAL.N3\", \"EVAL.N4\", \"EVAL.N5\", \"EVAL.N6\", \"EVAL.N7\", \"EVAL.CLOSE\", \"HUMAN.N1\", \"HUMAN.N2\", \"HUMAN.N3\", \"HUMAN.N4\", \"HUMAN.CLOSE\", \"ADOPT.MODEL.1\", \"ADOPT.MODEL.2\", \"ADOPT.MODEL.CLOSE\", \"CMD.1\", \"CMD.2\", \"CMD.3\", \"CMD.4\", \"CMD.N1\", \"CMD.N2\", \"CMD.N3\", \"CMD.N4\", \"CMD.N5\", \"CMD.N6\", \"CMD.CLOSE\",\n            \"HARDEN.1\", \"HARDEN.2\", \"HARDEN.3\", \"HARDEN.CLOSE\", \"HARDEN.N1\", \"HARDEN.N2\", \"HARDEN.N3\", \"HARDEN.N4\", \"HARDEN.PROGRESS.1\", \"OPS.TEST.1\", \"OPS.TEST.2\", \"OPS.TEST.3\", \"OPS.TEST.CLOSE\", \"UX.RUN.1\", \"UX.RUN.2\", \"UX.RUN.3\", \"UX.1\", \"UX.2\", \"UX.3\", \"UX.4\", \"UX.5\", \"UX.6\", \"UX.7\", \"UX.8\", \"UX.9\", \"UX.10\", \"UX.11\",\n            \"UX.CLOSE\", \"MIRROR.1\", \"MIRROR.2\", \"MIRROR.3\", \"MIRROR.4\", \"MIRROR.5\", \"MIRROR.6\", \"MIRROR.CLOSE\", \"MIRROR.7\", \"MIRROR.8\", \"MIRROR.9\", \"MIRROR.10\", \"MIRROR.11\", \"MIRROR.12\", \"MIRROR.CLOSE3\", \"MIRROR.13\",\n        } <= ids\n        assert {\"UX.RUN.CLOSE\", \"UX.LIVE.1\", \"UX.LIVE.2\", \"UX.LIVE.3\", \"UX.LIVE.4\", \"UX.LIVE.5\", \"UX.LIVE.6\", \"UX.LIVE.7\", \"UX.LIVE.8\", \"UX.LIVE.9\", \"UX.LIVE.10\", \"UX.LIVE.CLOSE\", \"DOGFOOD.1A\", \"DOGFOOD.1B\", \"VERIFY.TEST.1\"} <= ids\n        assert {\n            \"INDEX.1D.1\",\n            \"INDEX.1D.2A\",\n            \"INDEX.1D.2B\",\n            \"INDEX.1D.2C\",\n            \"INDEX.1D.3\",\n            \"INDEX.1E.0\",\n            \"INDEX.1E.1\",\n            \"INDEX.1E.2\",\n        } <= ids\n        assert {\n            \"CTX.SELECT.1\",\n            \"CTX.SEARCH.1\",\n            \"CTX.READ.1\",\n            \"CTX.PATCH.1\",\n            \"CTX.APPLY.0\",\n        } <= ids\n        assert {\"INPUT.1\", \"INPUT.2\", \"INPUT.3\"} <= ids\n        assert {\"WAITER.1\", \"WAITER.2\"} <= ids\n        assert {\"ACQUIRE.1\", \"ACQUIRE.2\", \"ACQUIRE.3\"} <= ids\n        assert {\"EVIDENCE.1\", \"EVIDENCE.2\"} <= ids\n        assert {\"CLAIM.1\"} <= ids\n        assert {\"SYNTHESIS.1\"} <= ids\n        assert {\"CHECK.1\", \"CHECK.2\"} <= ids\n        assert {\n            \"WORKER.DECL.1\",\n            \"WORKER.DECL.2A\",\n            \"WORKER.DECL.2A.1\",\n            \"WORKER.DECL.2A.2\",\n            \"WORKER.DECL.2B\",\n        } <= ids\n        assert \"CONTROL.SAFETY.LIVE.1\" in ids\n        assert \"WAITER.LIVE.1\" in ids\n        assert \"PATCH.BASIS.LIVE.1\" in ids\n        assert \"OPS.PATCH.2\" in ids\n        assert {\n            \"RETRIEVE.LIVE.1\",\n            \"RETRIEVE.LIVE.2\",\n            \"RETRIEVE.LIVE.3\",\n            \"RETRIEVE.LIVE.4\",\n        } <= ids\n        assert \"ANSWER.GROUND.LIVE.1\" in ids\n        assert \"DEFECT.PROBE.LIVE.1\" in ids\n        assert \"VALIDATE.ORACLE.LIVE.1\" in ids\n        assert \"EXEC.POLICY.LIVE.1\" in ids\n        assert \"EXEC.APPROVAL.LIVE.1\" in ids\n        assert \"ANSWER.GROUND.LIVE.2\" in ids\n        assert \"CONTROL.LOCALIZE.LIVE.2\" in ids\n        assert \"REPAIR.INTENT.1\" in ids\n        assert \"REPAIR.INTENT.ADMIT.1\" in ids\n        assert \"REPAIR.INTENT.UI.1\" in ids\n        assert \"CTX.OOP.1A\" in ids\n        assert \"CTX.OOP.1C\" in ids\n        assert \"OOP.INTENT.UI.1\" in ids\n        assert \"OOP.INTENT.DESIGN.1\" in ids\n        assert \"OOP.INTENT.DETECT.2\" in ids\n        assert \"OOP.INTENT.CONTINUE.1\" in ids\n        assert \"PATCH.SCOPE.EXPAND.1\" in ids\n        assert \"PATCH.SCOPE.RECHECK.1\" in ids\n        assert \"PATCH.SCOPE.REFRESH.1\" in ids\n>       assert len(data[\"phases\"]) == 224\nE       AssertionError: assert 225 == 224\nE        +  where 225 = len([{'phase_id': 'ROAD.1', 'title': 'Machine-Readable Phase Registry', 'track': 'ROAD', 'status': 'complete', ...}, {'pha...ase_id': 'MODEL.1', 'title': 'C.A.T.T.U.S Artifact Dataset Builder', 'track': 'MODEL', 'status': 'complete', ...}, ...])\n\ntests\\test_phase_registry.py:591: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+      "when": "call",
+      "outcome": "failed",
+      "detail": "def test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call():\n        \"\"\"It spends provider calls, and the registry says so in the only way it can.\n    \n        ``model_calls_allowed`` is the registry's vocabulary for provider traffic and\n        is legal only under the approval budget tier, so a dogfood phase must carry\n        both.  ``network_allowed`` stays false because ROAD.1 rejects true outright;\n        that flag is not this phase claiming it made no requests.\n        \"\"\"\n        data = load_phase_registry(str(_SEED_PATH))\n        phases = data[\"phases\"]\n        by_id = {phase[\"phase_id\"]: phase for phase in phases}\n        phase = by_id[\"WORKER.DECL.2A.2\"]\n    \n        assert phase[\"model_calls_allowed\"] is True\n        assert phase[\"budget_tier\"] == \"strong_model_requires_approval\"\n        assert phase[\"requires_sandbox\"] is True\n        # ROAD.1 forbids raw network access for every managed phase, this one included.\n        assert phase[\"network_allowed\"] is False\n        assert not validate_phase_registry(data)[\"errors\"]\n    \n        # And it really is the first.  The set of phases allowed to spend provider\n        # calls is enumerated here, deliberately: a phase that wants provider\n        # traffic has to be added to this literal and to pay the approval price\n        # below, so it cannot arrive quietly.  PATCH.AUTHOR.LIVE.1 joined on\n        # 2026-09-09 with a hard cap of one verification-guided revision per run.\n        declared_model_call_phases = {\n            \"WORKER.DECL.2A.2\",\n            \"WORKER.DECL.2B\",\n            \"PATCH.AUTHOR.LIVE.1\",\n            # CONTROL.BOOTSTRAP.1 joined on 2026-09-18 with one bootstrap authoring call per fresh request.\n            \"CONTROL.BOOTSTRAP.1\",\n            # PLAN.1 exposes one already-authorized planner call and no author call.\n            \"PATCH.SCOPE.PLAN.1\",\n            # AUTHOR.STRUCTURAL.1 permits one injected read-only author call.\n            \"PATCH.AUTHOR.STRUCTURAL.1\",\n        }\n        others = [\n            item for item in phases if item[\"phase_id\"] not in declared_model_call_phases\n        ]\n        assert all(item[\"model_calls_allowed\"] is False for item in others)\n>       assert all(item[\"budget_tier\"] == \"local_only\" for item in others)\nE       assert False\nE        +  where False = all(<generator object test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call.<locals>.<genexpr> at 0x000002660AD38860>)\n\ntests\\test_phase_registry.py:2130: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+      "when": "call",
+      "outcome": "failed",
+      "detail": "def test_seed_registry_is_conservative():\n        \"\"\"No phase merges or reaches the network, and none writes speculatively.\n    \n        A phase may declare model calls, but only by paying the registry's price for\n        them: the approval budget tier, which routes it to human approval and out of\n        the safe-to-prepare bucket.  A phase cannot quietly grant itself provider\n        traffic under ``local_only``.\n    \n        ``writes_real_repo`` is the same shape of price.  It is not forbidden - a\n        live production fix such as OPS.PATCH.1 genuinely edits shipped runtime\n        code, and recording that as observation-only would make the registry lie -\n        but it is only ever true for shipped history that already went through\n        human approval and still may not merge itself.  That is the rule the\n        registry validator enforces at ``core/phase_registry.py``; this asserts the\n        seed actually obeys it, so no *proposed* or *active* phase can hold write\n        authority over the real worktree.\n        \"\"\"\n        data = load_phase_registry(str(_SEED_PATH))\n        for phase in data[\"phases\"]:\n            assert phase[\"automation_level\"] != \"AUTO_4_AUTO_MERGE\"\n            assert phase[\"merge_allowed\"] is False\n            assert phase[\"network_allowed\"] is False\n            if phase[\"writes_real_repo\"]:\n                assert phase[\"status\"] == \"complete\", phase[\"phase_id\"]\n                assert phase[\"human_approval_required\"] is True, phase[\"phase_id\"]\n                assert phase[\"merge_allowed\"] is False, phase[\"phase_id\"]\n            if phase[\"model_calls_allowed\"]:\n                assert phase[\"budget_tier\"] == \"strong_model_requires_approval\", (\n                    phase[\"phase_id\"]\n                )\n                assert phase[\"human_approval_required\"] is True, phase[\"phase_id\"]\n            else:\n>               assert phase[\"budget_tier\"] == \"local_only\", phase[\"phase_id\"]\nE               AssertionError: RUNTIME.JAVA.1\nE               assert 'blocked' == 'local_only'\nE                 \nE                 - local_only\nE                 + blocked\n\ntests\\test_phase_registry.py:2249: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+      "when": "call",
+      "outcome": "failed",
+      "detail": "def test_seed_registry_summary_counts():\n        data = load_phase_registry(str(_SEED_PATH))\n        report = summarize_phase_registry(data, report_id=\"r\", created_at=\"t\")\n>       assert report[\"counts_by_track\"] == {\n            \"ADOPT\": 3,\n            \"AUTO\": 3,\n            \"CMD\": 11,\n            \"CTX\": 5,\n            \"DOGFOOD\": 2,\n            \"VERIFY\": 1,\n            \"EVAL\": 11,\n            \"HARDEN\": 16,\n            \"HUMAN\": 5,\n            # RETRIEVE.LIVE.* is an ID namespace inside INDEX, not a new track.\n            \"INDEX\": 12,\n            \"ACQUIRE\": 3,\n            \"CLAIM\": 1,\n            \"EVIDENCE\": 2,\n            \"INPUT\": 4,\n            \"SYNTHESIS\": 1,\n                \"CHECK\": 9,\n                \"CONTROL\": 42,\n                \"WAITER\": 5,\n            \"WORKER\": 5,\n            \"MIRROR\": 15,\n            \"MODEL\": 11,\n            \"OPS\": 22,\n            \"ROAD\": 4,\n                \"UX\": 31,\n        }\nE       AssertionError: assert {'ACQUIRE': 3...HECK': 9, ...} == {'ADOPT': 3, ...'CTX': 5, ...}\nE         \nE         Omitting 23 identical items, use -vv to show\nE         Differing items:\nE         {'CONTROL': 43} != {'CONTROL': 42}\nE         Use -v to get more diff\n\ntests\\test_phase_registry.py:2257: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+      "when": "call",
+      "outcome": "failed",
+      "detail": "def test_seed_registry_produces_expected_buckets():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        report = _report(data, report_id=\"r\", created_at=\"t\", registry_path=str(_SEED_PATH))\n        assert report[\"registry_valid\"] is True\n>       assert report[\"bucket_counts\"] == {\n            \"safe_to_prepare\": 3,\n            \"sandbox_required\": 1,\n            \"human_approval_required\": 0,\n            \"blocked\": 1,\n            \"deferred_or_parked\": 0,\n            \"complete_or_history\": 219,\n        }\nE       AssertionError: assert {'safe_to_pre...cked': 2, ...} == {'safe_to_pre...cked': 1, ...}\nE         \nE         Omitting 5 identical items, use -vv to show\nE         Differing items:\nE         {'blocked': 2} != {'blocked': 1}\nE         Use -v to get more diff\n\ntests\\test_phase_picker.py:557: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+      "when": "call",
+      "outcome": "failed",
+      "detail": "def test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        phase = {p[\"phase_id\"]: p for p in data[\"phases\"]}[\"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1\"]\n        report = _report(data, report_id=\"r\", created_at=\"t\")\n        assert phase[\"track\"] == \"CONTROL\" and phase[\"status\"] == \"active\"\n        assert phase[\"risk_level\"] == \"blocked\" and phase[\"budget_tier\"] == \"local_only\"\n        blocked = [p for p in report[\"blocked\"] if p[\"phase_id\"] == phase[\"phase_id\"]]\n        assert len(blocked) == 1\n        assert \"risk_level is blocked\" in blocked[0][\"reasons\"]\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"safe_to_prepare\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"complete_or_history\"]}\n>       assert report[\"bucket_counts\"][\"blocked\"] == 1\nE       assert 2 == 1\n\ntests\\test_phase_picker.py:1634: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+      "when": "call",
+      "outcome": "failed",
+      "detail": "def test_verified_runtime_sandbox_is_history_and_executor_stays_blocked():\n        data = json.loads(_SEED_PATH.read_text(encoding=\"utf-8\"))\n        phase = {p[\"phase_id\"]: p for p in data[\"phases\"]}[\"RUNTIME.SANDBOX.1\"]\n        report = _report(data, report_id=\"r\", created_at=\"t\")\n        assert report[\"registry_valid\"] is True\n        assert phase[\"track\"] == \"CONTROL\" and phase[\"status\"] == \"complete\"\n        assert phase[\"risk_level\"] == \"medium\" and phase[\"budget_tier\"] == \"local_only\"\n        assert phase[\"phase_id\"] in {p[\"phase_id\"] for p in report[\"complete_or_history\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"safe_to_prepare\"]}\n        assert phase[\"phase_id\"] not in {p[\"phase_id\"] for p in report[\"sandbox_required\"]}\n>       assert {p[\"phase_id\"] for p in report[\"blocked\"]} == {\"PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1\"}\nE       AssertionError: assert {'PATCH.CANDI...NTIME.JAVA.1'} == {'PATCH.CANDI...R.EXECUTOR.1'}\nE         \nE         Extra items in the left set:\nE         'RUNTIME.JAVA.1'\nE         Use -v to get more diff\n\ntests\\test_phase_picker.py:1651: AssertionError"
+    }
+  ],
+  "suites": {
+    "tests/test_phase_registry.py": {
+      "passed": 179,
+      "failed": 4,
+      "skipped": 0
+    },
+    "tests/test_phase_picker.py": {
+      "passed": 113,
+      "failed": 3,
+      "skipped": 0
+    }
+  },
+  "test_files": [
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py"
+  ],
+  "pytest_arguments": [
+    "--basetemp=tmp_tests",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\docs\\roadmap\\phases\\RUNTIME_JAVA_PINNED_1C\\validation_temp_registry_baseline_5856e735a5494b329af84117a7e5108a\\pytest",
+    "tests/test_phase_registry.py",
+    "tests/test_phase_picker.py"
+  ],
+  "real_effect_attempts": [],
+  "denied_attempts": {},
+  "registry_projection_plugin_used": false,
+  "elapsed_seconds": 46.003,
+  "scope": "Pure host maintenance and fabricated in-memory fixtures only. Audit hook and frozen guard deny operational processes/network before execution. Owner/control mocks validate contracts; no live Docker, Java, javac, controller, authorization, lease, executor or Apply executes. Repository reads, Python validation and new phase temporary/artifact writes are maintenance. Historical registry projection is deliberately disabled so pre-existing drift remains visible.",
+  "successful_operational_effect_counts": {
+    "Docker": 0,
+    "containers": 0,
+    "exports": 0,
+    "Java": 0,
+    "javac": 0,
+    "controller": 0,
+    "network": 0,
+    "shell": 0,
+    "host mounts": 0,
+    "source projection": 0,
+    "runtime lease consumption": 0,
+    "reflection lease consumption": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0
+  }
+}

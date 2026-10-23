@@ -1,0 +1,14 @@
+{
+  "added": [
+    "core/synthetic_runtime_authorization_pinned_lifecycle.py"
+  ],
+  "allowed_additions": [
+    "core/synthetic_runtime_authorization_pinned_lifecycle.py"
+  ],
+  "baseline_file_count": 1463,
+  "changed": [],
+  "historical_bytes_preserved": true,
+  "missing": [],
+  "mode": "check",
+  "unexpected_additions": []
+}

@@ -1,0 +1,26 @@
+{
+  "budget_feasibility": "UNRESOLVED",
+  "candidate_current_status": "REJECTED_BUDGET_INCOMPATIBLE",
+  "closure_link": "closure.json",
+  "future_epoch_rule": "Reconsideration after explicit evolution of this reviewed architecture/profile, stdout response mapping, framing, current message/evidence schema or 8192 cumulative cap requires a new epoch and additive phase. This rejection remains immutable historical evidence.",
+  "historical_candidate": "A",
+  "historical_candidate_ever_selected": false,
+  "historical_classification": "PREFERRED_BUT_SELECTION_UNRESOLVED",
+  "historical_phase": "SYNTH.EXEC.PREP.CONTROLLER.TRANSPORT.1",
+  "new_evidence": [
+    "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+    "SYNTH.EXEC.PREP.CONTROLLER.KERNEL.IDENTITY.CONTRACT.1",
+    "SYNTH.EXEC.PREP.CONTROLLER.TRANSPORT.CANDIDATE_A.CLOSE.1"
+  ],
+  "phase_completion_history_changed": false,
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.TRANSPORT.CANDIDATE_A.CLOSE.1R",
+  "prior_closure_result": "CANDIDATE_A_CLOSURE_UNRESOLVED",
+  "production_registry_changed": false,
+  "proof_link": "premise_audit.json",
+  "record_kind": "ADDITIVE_CANDIDATE_REJECTION",
+  "remaining_candidates_ranked": false,
+  "replacement_selected": false,
+  "supersession": "Candidate-level closure based on later evidence and corrected conservative arithmetic; historical preference, TRANSPORT.1 and CLOSE.1 outcomes remain byte-identical.",
+  "transport_status": "TRANSPORT_SELECTION_UNRESOLVED",
+  "typed_result": "CANDIDATE_A_REJECTED_BUDGET_INCOMPATIBLE"
+}

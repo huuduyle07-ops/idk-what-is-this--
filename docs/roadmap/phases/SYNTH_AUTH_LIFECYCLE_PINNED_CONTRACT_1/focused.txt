@@ -1,0 +1,15 @@
+.......................................................................  [100%]
+============================== warnings summary ===============================
+..\..\..\..\..\AppData\Roaming\Python\Python314\site-packages\google\genai\types.py:42
+  C:\Users\Admin\AppData\Roaming\Python\Python314\site-packages\google\genai\types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+..\..\..\..\..\AppData\Roaming\Python\Python314\site-packages\_pytest\python.py:124
+  C:\Users\Admin\AppData\Roaming\Python\Python314\site-packages\_pytest\python.py:124: PytestRemovedIn10Warning: Passing a non-Collection iterable to parametrize is deprecated.
+  Test: tests/test_synthetic_runtime_authorization_lifecycle_pinned_contract.py::test_only_frozen_one_shot_state_transitions_are_permitted, argvalues type: product
+  Please convert to a list or tuple.
+  See https://docs.pytest.org/en/stable/deprecations.html#parametrize-iterators
+    metafunc.parametrize(*marker.args, **marker.kwargs, _param_mark=marker)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+71 passed, 2 warnings in 13.23s

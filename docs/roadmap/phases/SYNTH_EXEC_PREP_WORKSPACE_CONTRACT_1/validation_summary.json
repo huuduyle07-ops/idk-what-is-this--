@@ -1,0 +1,159 @@
+{
+  "all_authority_flags_false": true,
+  "all_guarded_operational_effects_zero": true,
+  "all_required_pure_checks_passed": true,
+  "benchmark": {
+    "cases_checked": 54,
+    "errors": 0
+  },
+  "focused": {
+    "collected": 25,
+    "passed": 25
+  },
+  "full_issuance_dependent_suites_run": false,
+  "git_diff_check": {
+    "existing_whitespace_unchanged": true,
+    "git_index_modified": false,
+    "new_phase_files_checked": 30,
+    "passed": true
+  },
+  "guarded_runs": {
+    "author": {
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "blocked_actions": [],
+      "imported_capability_owners": [],
+      "validator_sha256": "cee30516c2257bdfaa676a1463c773be8208d01827539283f7e35c6f4d2944bf"
+    },
+    "benchmark": {
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "blocked_actions": [],
+      "imported_capability_owners": [],
+      "validator_sha256": "65e21cae6bb7ccd29fcbccaafcda93a3aac31d2838f68674fd53535bd755c410"
+    },
+    "focused": {
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "blocked_actions": [],
+      "imported_capability_owners": [],
+      "validator_sha256": "cee30516c2257bdfaa676a1463c773be8208d01827539283f7e35c6f4d2944bf"
+    },
+    "registry_after": {
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "blocked_actions": [],
+      "imported_capability_owners": [],
+      "validator_sha256": "65e21cae6bb7ccd29fcbccaafcda93a3aac31d2838f68674fd53535bd755c410"
+    },
+    "registry_baseline": {
+      "audit_guard": {
+        "capability_or_transition_attempts": 0,
+        "capability_owner_import_attempts": 0,
+        "execution_or_verification_attempts": 0,
+        "network_attempts": 0,
+        "outside_phase_write_attempts": 0,
+        "process_attempts": 0
+      },
+      "blocked_actions": [],
+      "imported_capability_owners": [],
+      "validator_sha256": "fda4020f2684e8c98a21953751dc17bdb0cc0b9b747d620050721a79463956fe"
+    }
+  },
+  "operational_effects": {
+    "Apply": 0,
+    "BANK": 0,
+    "Docker": 0,
+    "EXECUTOR_1R": 0,
+    "JAVA1C": 0,
+    "SANDBOX2": 0,
+    "SyntheticStateBox": 0,
+    "capability_consumption": 0,
+    "capability_invalidation": 0,
+    "class_loading": 0,
+    "container_creation": 0,
+    "container_removal": 0,
+    "filesystem_runtime_writes": 0,
+    "java": 0,
+    "javac": 0,
+    "pinned_auth_issuance": 0,
+    "preparation_authority_issuance": 0,
+    "provider_issuance": 0,
+    "reflection": 0,
+    "reflection_admission_issuance": 0,
+    "reflection_lease_issuance": 0,
+    "runtime_lease_issuance": 0,
+    "source_materialization": 0,
+    "workspace_issuance": 0
+  },
+  "preservation": {
+    "added_outside_new_phase": [],
+    "after_file_count": 26787,
+    "allowed_additions_outside_phase": [],
+    "baseline_file_count": 26787,
+    "changed": [],
+    "deleted": [],
+    "historical_preservation_passed": true,
+    "scope": "entire non-cache workspace including root/config/web and frozen history"
+  },
+  "registry_picker": {
+    "after_collected": 299,
+    "after_failure_nodes": [
+      "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+      "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+      "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+      "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+      "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+      "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+      "tests/test_phase_registry.py::test_seed_registry_summary_counts"
+    ],
+    "after_passed": 292,
+    "baseline_collected": 299,
+    "baseline_failure_nodes": [
+      "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+      "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+      "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+      "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+      "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+      "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+      "tests/test_phase_registry.py::test_seed_registry_summary_counts"
+    ],
+    "baseline_not_repaired": true,
+    "baseline_passed": 292,
+    "projections_identical": true,
+    "signature_comparison": "Raw diagnostics retained; normalize only Python repr allocator ' at 0x...>' addresses before comparing. All node IDs, assertion text, expected/actual values and failure phases are exact.",
+    "unchanged": true
+  },
+  "scope": "pure source/contract/AST checks only; no operational owner import, creation, issuance or execution",
+  "static": {
+    "JSON_files_validated": 17,
+    "bytecode_written": false,
+    "compiled_in_memory": 1351,
+    "passed": true
+  },
+  "typed_result": "WORKSPACE_REQUIRES_CONTROLLER_EVOLUTION"
+}

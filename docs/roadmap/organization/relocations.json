@@ -1,0 +1,963 @@
+{
+  "historical_json_and_logs_rewritten": false,
+  "historical_repins": false,
+  "moved_files": [
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/OOP_INTENT_CONTINUE_1/OOP_INTENT_CONTINUE_1.md",
+      "old_path": "docs/roadmap/OOP_INTENT_CONTINUE_1.md",
+      "phase": "OOP_INTENT_CONTINUE_1",
+      "sha256_after": "aede3422c892e322e944e2389aacf983afb71f455ebd41d0c382674819844a53",
+      "sha256_before": "aede3422c892e322e944e2389aacf983afb71f455ebd41d0c382674819844a53"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/OOP_INTENT_CONTINUE_1/OOP_INTENT_CONTINUE_1_BANK2.json",
+      "old_path": "docs/roadmap/OOP_INTENT_CONTINUE_1_BANK2.json",
+      "phase": "OOP_INTENT_CONTINUE_1",
+      "sha256_after": "f18938c42fe9a659cfab45e7aadda9f7d1ee8453783807c7c6c1755debfd2ecf",
+      "sha256_before": "f18938c42fe9a659cfab45e7aadda9f7d1ee8453783807c7c6c1755debfd2ecf"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/OOP_INTENT_DESIGN_1/OOP_INTENT_DESIGN_1.md",
+      "old_path": "docs/roadmap/OOP_INTENT_DESIGN_1.md",
+      "phase": "OOP_INTENT_DESIGN_1",
+      "sha256_after": "ba0ad1f57623e5d18e8b1aa23ca4994cefc0a2c0214f32f06e8fcce972da1f0a",
+      "sha256_before": "ba0ad1f57623e5d18e8b1aa23ca4994cefc0a2c0214f32f06e8fcce972da1f0a"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/OOP_INTENT_DESIGN_1/OOP_INTENT_DESIGN_1_BANK2.json",
+      "old_path": "docs/roadmap/OOP_INTENT_DESIGN_1_BANK2.json",
+      "phase": "OOP_INTENT_DESIGN_1",
+      "sha256_after": "9d1b52888fd6c78d377b74df213b5ec354154f6ab808e8c456efe0991f5b65df",
+      "sha256_before": "9d1b52888fd6c78d377b74df213b5ec354154f6ab808e8c456efe0991f5b65df"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/OOP_INTENT_DETECT_2/OOP_INTENT_DETECT_2.md",
+      "old_path": "docs/roadmap/OOP_INTENT_DETECT_2.md",
+      "phase": "OOP_INTENT_DETECT_2",
+      "sha256_after": "c50f738ce8b49d8b1596c730f4ae20b0408ce977fb8ee2d68607bf6e489f42da",
+      "sha256_before": "c50f738ce8b49d8b1596c730f4ae20b0408ce977fb8ee2d68607bf6e489f42da"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/OOP_INTENT_DETECT_2/OOP_INTENT_DETECT_2_BANK2.json",
+      "old_path": "docs/roadmap/OOP_INTENT_DETECT_2_BANK2.json",
+      "phase": "OOP_INTENT_DETECT_2",
+      "sha256_after": "bf2280ad9ab742dbf6fc7ab4b497e45ab6c779640c19c1e65d53cbf7a5531f9f",
+      "sha256_before": "bf2280ad9ab742dbf6fc7ab4b497e45ab6c779640c19c1e65d53cbf7a5531f9f"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_AUTHOR_STRUCTURAL_1/PATCH_AUTHOR_STRUCTURAL_1.md",
+      "old_path": "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1.md",
+      "phase": "PATCH_AUTHOR_STRUCTURAL_1",
+      "sha256_after": "e384fd8195aaf7da9999fb1539cc2f92f8243344ebe3a7e8932e3e6f6f77af4d",
+      "sha256_before": "e384fd8195aaf7da9999fb1539cc2f92f8243344ebe3a7e8932e3e6f6f77af4d"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_AUTHOR_STRUCTURAL_1/PATCH_AUTHOR_STRUCTURAL_1_BANK2.json",
+      "old_path": "docs/roadmap/PATCH_AUTHOR_STRUCTURAL_1_BANK2.json",
+      "phase": "PATCH_AUTHOR_STRUCTURAL_1",
+      "sha256_after": "e303d4593784a17c4eb413f897207bc84cfdbc9bbb3ac017d9e6e9599388704b",
+      "sha256_before": "e303d4593784a17c4eb413f897207bc84cfdbc9bbb3ac017d9e6e9599388704b"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1.md",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1.md",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1",
+      "sha256_after": "d91f2fb1780325d829ac279547031069b1cb8487670b92585a527843a804cc68",
+      "sha256_before": "d91f2fb1780325d829ac279547031069b1cb8487670b92585a527843a804cc68"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1_SYNTHETIC.json",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1_SYNTHETIC.json",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXEC_ADMIT_1",
+      "sha256_after": "0d20522bcfc97ce3e7eafc46f0c0c379d789b7a2e7d1af715b90f4d8e2142144",
+      "sha256_before": "0d20522bcfc97ce3e7eafc46f0c0c379d789b7a2e7d1af715b90f4d8e2142144"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1.md",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1.md",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1",
+      "sha256_after": "3fdc89c9f28ff905d1d62b0eecebba04bb1cb948385488db2903832f524c7e8d",
+      "sha256_before": "3fdc89c9f28ff905d1d62b0eecebba04bb1cb948385488db2903832f524c7e8d"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1_SYNTHETIC.json",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1_SYNTHETIC.json",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXEC_PLAN_1",
+      "sha256_after": "9186b0db11a82bd25825942f3cc84beee03af1f988dac3c5aa78413aea9cc89c",
+      "sha256_before": "9186b0db11a82bd25825942f3cc84beee03af1f988dac3c5aa78413aea9cc89c"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1.md",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1.md",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1",
+      "sha256_after": "dbd6a7ee22e0de772c2b5db6511e36c8593dadf85095c7bf76341082e949a1c8",
+      "sha256_before": "dbd6a7ee22e0de772c2b5db6511e36c8593dadf85095c7bf76341082e949a1c8"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1_SYNTHETIC.json",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1",
+      "sha256_after": "b56e2d883b08b7dc0040a69d851c9158e232869f07cfc4740e2ccc5b981a28b3",
+      "sha256_before": "b56e2d883b08b7dc0040a69d851c9158e232869f07cfc4740e2ccc5b981a28b3"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R.md",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R.md",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R",
+      "sha256_after": "3cda182aa3231ead388e3dc3202c9376176a874f7520c3f150178635e6c6527f",
+      "sha256_before": "3cda182aa3231ead388e3dc3202c9376176a874f7520c3f150178635e6c6527f"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY.md",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY.md",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R",
+      "sha256_after": "febdc6e3c8aab9ac742417539b066bcf59f6963045b6f44c7dbe65366dd55ae8",
+      "sha256_before": "febdc6e3c8aab9ac742417539b066bcf59f6963045b6f44c7dbe65366dd55ae8"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_LOCAL.json",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_LOCAL.json",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R",
+      "sha256_after": "f73ffeda548128a73d5a738616a21e82aa46805f8bf40b3f917e66f5ccebaba4",
+      "sha256_before": "f73ffeda548128a73d5a738616a21e82aa46805f8bf40b3f917e66f5ccebaba4"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_PRESERVATION.json",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LIFECYCLE_RETRY_PRESERVATION.json",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R",
+      "sha256_after": "f9a913ffa3c00552c50e725cd8e06a61807dd0f62c23f6b799b2e58caa6a9d17",
+      "sha256_before": "f9a913ffa3c00552c50e725cd8e06a61807dd0f62c23f6b799b2e58caa6a9d17"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LOCAL.json",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_LOCAL.json",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R",
+      "sha256_after": "f9685c37236db1d92f34dd70402017cc414748d084e93b00e3d7c70bb14b817c",
+      "sha256_before": "f9685c37236db1d92f34dd70402017cc414748d084e93b00e3d7c70bb14b817c"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY.md",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY.md",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R",
+      "sha256_after": "65ad4fec66b9d9ad093f36cd2c9bc91949ba35dd4b9382de6ae85128ba859b18",
+      "sha256_before": "65ad4fec66b9d9ad093f36cd2c9bc91949ba35dd4b9382de6ae85128ba859b18"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY_LOCAL.json",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R_RETRY_LOCAL.json",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_EXECUTOR_1R",
+      "sha256_after": "23beacfcd4175d209f44ae7ffc247eddd6a1e1a339607acd21b316113fb2ba0a",
+      "sha256_before": "23beacfcd4175d209f44ae7ffc247eddd6a1e1a339607acd21b316113fb2ba0a"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1.md",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1.md",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_REFLECT_1",
+      "sha256_after": "35a33bac51433eada7f8a3cb662e3b62d69327b084cd15a862ad0004c9f59ccf",
+      "sha256_before": "35a33bac51433eada7f8a3cb662e3b62d69327b084cd15a862ad0004c9f59ccf"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1_SYNTHETIC.json",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_REFLECT_1_SYNTHETIC.json",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_REFLECT_1",
+      "sha256_after": "50a2aaded089118162c9171bad8169fd66295a21939b3bd93bb108293efb8587",
+      "sha256_before": "50a2aaded089118162c9171bad8169fd66295a21939b3bd93bb108293efb8587"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_SPEC_1/PATCH_CANDIDATE_BEHAVIOR_SPEC_1.md",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1.md",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_SPEC_1",
+      "sha256_after": "9e297015a5b3f5bfd04c50a63d49ca97883eb7ce9a2a02857c36ae7c91b3d365",
+      "sha256_before": "9e297015a5b3f5bfd04c50a63d49ca97883eb7ce9a2a02857c36ae7c91b3d365"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_BEHAVIOR_SPEC_1/PATCH_CANDIDATE_BEHAVIOR_SPEC_1_SYNTHETIC.json",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_BEHAVIOR_SPEC_1_SYNTHETIC.json",
+      "phase": "PATCH_CANDIDATE_BEHAVIOR_SPEC_1",
+      "sha256_after": "e980dea70f15560d5c702acc1ada16ebf06f3d081fde8be2cd261b74e968da36",
+      "sha256_before": "e980dea70f15560d5c702acc1ada16ebf06f3d081fde8be2cd261b74e968da36"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_MATERIALIZE_1/PATCH_CANDIDATE_MATERIALIZE_1.md",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1.md",
+      "phase": "PATCH_CANDIDATE_MATERIALIZE_1",
+      "sha256_after": "27fca3b625af35b1b7bb41921535b48f2a8724284c8343abb45c041d171a81ad",
+      "sha256_before": "27fca3b625af35b1b7bb41921535b48f2a8724284c8343abb45c041d171a81ad"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_MATERIALIZE_1/PATCH_CANDIDATE_MATERIALIZE_1_SYNTHETIC.json",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_MATERIALIZE_1_SYNTHETIC.json",
+      "phase": "PATCH_CANDIDATE_MATERIALIZE_1",
+      "sha256_after": "7d57ef1d256f374bbb3cedc8443e13f282d9e4241e164f93fa926be7941ee18a",
+      "sha256_before": "7d57ef1d256f374bbb3cedc8443e13f282d9e4241e164f93fa926be7941ee18a"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_VALIDATE_1A/PATCH_CANDIDATE_VALIDATE_1A.md",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A.md",
+      "phase": "PATCH_CANDIDATE_VALIDATE_1A",
+      "sha256_after": "41e74d3eb23b8b11f567c3c11851761933df2fcdba385acd5b84105e45f41b73",
+      "sha256_before": "41e74d3eb23b8b11f567c3c11851761933df2fcdba385acd5b84105e45f41b73"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_CANDIDATE_VALIDATE_1A/PATCH_CANDIDATE_VALIDATE_1A_SYNTHETIC.json",
+      "old_path": "docs/roadmap/PATCH_CANDIDATE_VALIDATE_1A_SYNTHETIC.json",
+      "phase": "PATCH_CANDIDATE_VALIDATE_1A",
+      "sha256_after": "8e2c4905aca55ff8493231a878419fb380d7f4c0f4f3ad176c0bff5b2fe6e66b",
+      "sha256_before": "8e2c4905aca55ff8493231a878419fb380d7f4c0f4f3ad176c0bff5b2fe6e66b"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_ADMIT_1/PATCH_SCOPE_ADMIT_1.md",
+      "old_path": "docs/roadmap/PATCH_SCOPE_ADMIT_1.md",
+      "phase": "PATCH_SCOPE_ADMIT_1",
+      "sha256_after": "debcf824cfc0d6f7d3a4e233123974c3e116454a8be2afe24faf97e7f846302d",
+      "sha256_before": "debcf824cfc0d6f7d3a4e233123974c3e116454a8be2afe24faf97e7f846302d"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_ADMIT_1/PATCH_SCOPE_ADMIT_1_BANK2.json",
+      "old_path": "docs/roadmap/PATCH_SCOPE_ADMIT_1_BANK2.json",
+      "phase": "PATCH_SCOPE_ADMIT_1",
+      "sha256_after": "97a7162d2a9f60f094a87907861382c9e6f3dea03514fe827a697b53c5dcd86d",
+      "sha256_before": "97a7162d2a9f60f094a87907861382c9e6f3dea03514fe827a697b53c5dcd86d"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_APPROVE_1/PATCH_SCOPE_APPROVE_1.md",
+      "old_path": "docs/roadmap/PATCH_SCOPE_APPROVE_1.md",
+      "phase": "PATCH_SCOPE_APPROVE_1",
+      "sha256_after": "6e54bbb84c4392b37a3e62aae6ca15aa7321d139e5c920990402d1c96efa4364",
+      "sha256_before": "6e54bbb84c4392b37a3e62aae6ca15aa7321d139e5c920990402d1c96efa4364"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_APPROVE_1/PATCH_SCOPE_APPROVE_1_BANK2.json",
+      "old_path": "docs/roadmap/PATCH_SCOPE_APPROVE_1_BANK2.json",
+      "phase": "PATCH_SCOPE_APPROVE_1",
+      "sha256_after": "f994ac99169dd3a4097a743fb55c9d315282b775d0748c1457ce44d2feb44940",
+      "sha256_before": "f994ac99169dd3a4097a743fb55c9d315282b775d0748c1457ce44d2feb44940"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_EXPAND_1/PATCH_SCOPE_EXPAND_1.md",
+      "old_path": "docs/roadmap/PATCH_SCOPE_EXPAND_1.md",
+      "phase": "PATCH_SCOPE_EXPAND_1",
+      "sha256_after": "efab981df0e1eb269eb8327edd508071124981c140662efc63922bb083c34809",
+      "sha256_before": "efab981df0e1eb269eb8327edd508071124981c140662efc63922bb083c34809"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_EXPAND_1/PATCH_SCOPE_EXPAND_1_BANK2.json",
+      "old_path": "docs/roadmap/PATCH_SCOPE_EXPAND_1_BANK2.json",
+      "phase": "PATCH_SCOPE_EXPAND_1",
+      "sha256_after": "84eebb66a2a78db75fe33798db5e1f45cceb5c5083c1a5fc886d3783603cd2d1",
+      "sha256_before": "84eebb66a2a78db75fe33798db5e1f45cceb5c5083c1a5fc886d3783603cd2d1"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_PLAN_1/PATCH_SCOPE_PLAN_1.md",
+      "old_path": "docs/roadmap/PATCH_SCOPE_PLAN_1.md",
+      "phase": "PATCH_SCOPE_PLAN_1",
+      "sha256_after": "024cf304403b77077fecb5cf8ee720d6ad1ec830dcddaf70c1a4bf178ce5f5f5",
+      "sha256_before": "024cf304403b77077fecb5cf8ee720d6ad1ec830dcddaf70c1a4bf178ce5f5f5"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_PLAN_1/PATCH_SCOPE_PLAN_1_BANK2.json",
+      "old_path": "docs/roadmap/PATCH_SCOPE_PLAN_1_BANK2.json",
+      "phase": "PATCH_SCOPE_PLAN_1",
+      "sha256_after": "e44f8cafab6f8a5d0336f9344ac016e5abd7fb28c6803d439848ad831740350f",
+      "sha256_before": "e44f8cafab6f8a5d0336f9344ac016e5abd7fb28c6803d439848ad831740350f"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_RECHECK_1/PATCH_SCOPE_RECHECK_1.md",
+      "old_path": "docs/roadmap/PATCH_SCOPE_RECHECK_1.md",
+      "phase": "PATCH_SCOPE_RECHECK_1",
+      "sha256_after": "bc2e557c06a0260e6918057aeddd56fed7593d6e6fee831499c6b75a7af0fac8",
+      "sha256_before": "bc2e557c06a0260e6918057aeddd56fed7593d6e6fee831499c6b75a7af0fac8"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_RECHECK_1/PATCH_SCOPE_RECHECK_1_BANK2.json",
+      "old_path": "docs/roadmap/PATCH_SCOPE_RECHECK_1_BANK2.json",
+      "phase": "PATCH_SCOPE_RECHECK_1",
+      "sha256_after": "7943a1b7416eb1e30d45067c0fb94133bd526507ca049a409b2bde0075aea329",
+      "sha256_before": "7943a1b7416eb1e30d45067c0fb94133bd526507ca049a409b2bde0075aea329"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_REFRESH_1/PATCH_SCOPE_REFRESH_1.md",
+      "old_path": "docs/roadmap/PATCH_SCOPE_REFRESH_1.md",
+      "phase": "PATCH_SCOPE_REFRESH_1",
+      "sha256_after": "65cf74e02f846b45e240d54baade6469f96c08492db2009d83c5c36d72cdad0e",
+      "sha256_before": "65cf74e02f846b45e240d54baade6469f96c08492db2009d83c5c36d72cdad0e"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PATCH_SCOPE_REFRESH_1/PATCH_SCOPE_REFRESH_1_BANK2.json",
+      "old_path": "docs/roadmap/PATCH_SCOPE_REFRESH_1_BANK2.json",
+      "phase": "PATCH_SCOPE_REFRESH_1",
+      "sha256_after": "5c0ad90d00ec560eb1162f90e76b497f76717e8aecc41c89754d70cca7847bad",
+      "sha256_before": "5c0ad90d00ec560eb1162f90e76b497f76717e8aecc41c89754d70cca7847bad"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PREFLIGHT_RUNTIME_1/PREFLIGHT_RUNTIME_1.md",
+      "old_path": "docs/roadmap/PREFLIGHT_RUNTIME_1.md",
+      "phase": "PREFLIGHT_RUNTIME_1",
+      "sha256_after": "d43cb58cf3d636ff4059cec688876ba274d74a486a0b766e943be93a1e5bf6a1",
+      "sha256_before": "d43cb58cf3d636ff4059cec688876ba274d74a486a0b766e943be93a1e5bf6a1"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/PREFLIGHT_RUNTIME_1/PREFLIGHT_RUNTIME_1_SYNTHETIC.json",
+      "old_path": "docs/roadmap/PREFLIGHT_RUNTIME_1_SYNTHETIC.json",
+      "phase": "PREFLIGHT_RUNTIME_1",
+      "sha256_after": "1bda26a4fc288cf35d8d73f203af7819423f681dfd0ba7dee4b53b4587f61124",
+      "sha256_before": "1bda26a4fc288cf35d8d73f203af7819423f681dfd0ba7dee4b53b4587f61124"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1/RUNTIME_JAVA_1.md",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1.md",
+      "phase": "RUNTIME_JAVA_1",
+      "sha256_after": "1ac641eaf21aeff69adc0dda3781a05e909bd1a05e8a0180d8c100b942a4c93c",
+      "sha256_before": "1ac641eaf21aeff69adc0dda3781a05e909bd1a05e8a0180d8c100b942a4c93c"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1A/RUNTIME_JAVA_1A.md",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1A.md",
+      "phase": "RUNTIME_JAVA_1A",
+      "sha256_after": "7e26653896b37bbadeba9675429697fbfa6326391054f0e539c5097c938359c0",
+      "sha256_before": "7e26653896b37bbadeba9675429697fbfa6326391054f0e539c5097c938359c0"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1A/RUNTIME_JAVA_1A_LOCAL.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1A_LOCAL.json",
+      "phase": "RUNTIME_JAVA_1A",
+      "sha256_after": "09f64408b71a8f0eebf161a2b312ae68c93f8d993cd5b1c2d400e6815520044b",
+      "sha256_before": "09f64408b71a8f0eebf161a2b312ae68c93f8d993cd5b1c2d400e6815520044b"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1B/RUNTIME_JAVA_1B.md",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1B.md",
+      "phase": "RUNTIME_JAVA_1B",
+      "sha256_after": "5f789b7a036066b0023bb3dc4ede723bef3ccd526819646787c7701a2ade1429",
+      "sha256_before": "5f789b7a036066b0023bb3dc4ede723bef3ccd526819646787c7701a2ade1429"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1B/RUNTIME_JAVA_1B_LOCAL.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1B_LOCAL.json",
+      "phase": "RUNTIME_JAVA_1B",
+      "sha256_after": "ffa611d74d91ed685ea690f1be4d1bd785c8ee66aebb7ff3c79488fcf83a9925",
+      "sha256_before": "ffa611d74d91ed685ea690f1be4d1bd785c8ee66aebb7ff3c79488fcf83a9925"
+    },
+    {
+      "bytes_preserved": false,
+      "markdown_link_changes": [
+        {
+          "after": "../../RUNTIME_JAVA_1C_LOCAL.json",
+          "before": "RUNTIME_JAVA_1C_LOCAL.json"
+        }
+      ],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1C/RUNTIME_JAVA_1C.md",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1C.md",
+      "phase": "RUNTIME_JAVA_1C",
+      "sha256_after": "55af14657a1a9ac802ed88a8f139467e7800b729a6d63d8a4be4eef4f2f864be",
+      "sha256_before": "fc6118e27c479ac863b06f374a1133acf4951f41884b8b547ec99699e6686166"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1C/RUNTIME_JAVA_1C_ATTEMPT1.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1C_ATTEMPT1.json",
+      "phase": "RUNTIME_JAVA_1C",
+      "sha256_after": "60c3fcb1763b2b186e4f1d964aa699686976ba95e0d511ff214f47a6da32c433",
+      "sha256_before": "60c3fcb1763b2b186e4f1d964aa699686976ba95e0d511ff214f47a6da32c433"
+    },
+    {
+      "bytes_preserved": false,
+      "markdown_link_changes": [
+        {
+          "after": "../../../../scripts/replay_runtime_java1d.py",
+          "before": "../../scripts/replay_runtime_java1d.py"
+        },
+        {
+          "after": "../../../../tests/test_runtime_java1d.py",
+          "before": "../../tests/test_runtime_java1d.py"
+        }
+      ],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1D/RUNTIME_JAVA_1D.md",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1D.md",
+      "phase": "RUNTIME_JAVA_1D",
+      "sha256_after": "34c8c56106e768fe0e7c15da81afd21b4589155d4cd358f8b1afaa0917473c05",
+      "sha256_before": "8f15409c8e64f685a7f065416cc939d33d02e2778c3ac84e40b4633115755396"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1D/RUNTIME_JAVA_1D_LOCAL.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1D_LOCAL.json",
+      "phase": "RUNTIME_JAVA_1D",
+      "sha256_after": "0fc20526eb558cfac1df4a8e86d7897cc6fc4de0f0bcbf3874bd2488e7f30b8b",
+      "sha256_before": "0fc20526eb558cfac1df4a8e86d7897cc6fc4de0f0bcbf3874bd2488e7f30b8b"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1D/RUNTIME_JAVA_1D_PRESERVATION.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1D_PRESERVATION.json",
+      "phase": "RUNTIME_JAVA_1D",
+      "sha256_after": "e2c22738a88e4f46d1b02af6eebcb13b258c4bf51ebd20127620cb1d7ec6ecaf",
+      "sha256_before": "e2c22738a88e4f46d1b02af6eebcb13b258c4bf51ebd20127620cb1d7ec6ecaf"
+    },
+    {
+      "bytes_preserved": false,
+      "markdown_link_changes": [
+        {
+          "after": "../../../../core/sandboxed_java_discovery_continuation.py",
+          "before": "../../core/sandboxed_java_discovery_continuation.py"
+        },
+        {
+          "after": "../../../../scripts/replay_runtime_java1d_retry.py",
+          "before": "../../scripts/replay_runtime_java1d_retry.py"
+        },
+        {
+          "after": "../../../../tests/test_runtime_java1d_retry.py",
+          "before": "../../tests/test_runtime_java1d_retry.py"
+        }
+      ],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1D/RUNTIME_JAVA_1D_RETRY.md",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1D_RETRY.md",
+      "phase": "RUNTIME_JAVA_1D",
+      "sha256_after": "6bcdded3fc449e066748f19e7780c0b9ee4b88cc0e0bffe2643dd35ab2e0ece3",
+      "sha256_before": "3f4a3a056d3845af4f795c9a5a5c860b642144d09eeb2d734148d45035f0b79c"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1D/RUNTIME_JAVA_1D_RETRY_LOCAL.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1D_RETRY_LOCAL.json",
+      "phase": "RUNTIME_JAVA_1D",
+      "sha256_after": "61cae6402832ac000052a421ef3fe843a212bc84db4b9d7db3fda8ee332b3bf0",
+      "sha256_before": "61cae6402832ac000052a421ef3fe843a212bc84db4b9d7db3fda8ee332b3bf0"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_1D/RUNTIME_JAVA_1D_RETRY_PRESERVATION.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_1D_RETRY_PRESERVATION.json",
+      "phase": "RUNTIME_JAVA_1D",
+      "sha256_after": "cc861ee8249bae34af9f90b3e080c8537e55e99f16321f38158ab34ab6c7ecfe",
+      "sha256_before": "cc861ee8249bae34af9f90b3e080c8537e55e99f16321f38158ab34ab6c7ecfe"
+    },
+    {
+      "bytes_preserved": false,
+      "markdown_link_changes": [
+        {
+          "after": "../../../../core/java_runtime_compatibility.py",
+          "before": "../../core/java_runtime_compatibility.py"
+        },
+        {
+          "after": "../../../../tests/test_runtime_java_compat1.py",
+          "before": "../../tests/test_runtime_java_compat1.py"
+        },
+        {
+          "after": "../../../../scripts/replay_runtime_java_compat1.py",
+          "before": "../../scripts/replay_runtime_java_compat1.py"
+        }
+      ],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_COMPAT_1/RUNTIME_JAVA_COMPAT_1.md",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_COMPAT_1.md",
+      "phase": "RUNTIME_JAVA_COMPAT_1",
+      "sha256_after": "d89e0b7c16eace37d3fc059eddf6b965291febd85530784674f6958627b3dbc0",
+      "sha256_before": "0032a4989ca04593a1d3a2cdfe60302b517369d7a68f39e4136b6868630f0cb1"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_COMPAT_1/RUNTIME_JAVA_COMPAT_1_LOCAL.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_COMPAT_1_LOCAL.json",
+      "phase": "RUNTIME_JAVA_COMPAT_1",
+      "sha256_after": "6f371dad0bf74afb254cc818dfabb0bee95dd63638b534c14932876f9614c4b2",
+      "sha256_before": "6f371dad0bf74afb254cc818dfabb0bee95dd63638b534c14932876f9614c4b2"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_COMPAT_1/RUNTIME_JAVA_COMPAT_1_PRESERVATION.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_COMPAT_1_PRESERVATION.json",
+      "phase": "RUNTIME_JAVA_COMPAT_1",
+      "sha256_after": "86b9ffb7f3b96b0318d4d23c5ae58165e872f5747afe051fbdcf338aa00da4a1",
+      "sha256_before": "86b9ffb7f3b96b0318d4d23c5ae58165e872f5747afe051fbdcf338aa00da4a1"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_CONTRACT_1/RUNTIME_JAVA_DISCOVERY_CONTRACT_1.md",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1.md",
+      "phase": "RUNTIME_JAVA_DISCOVERY_CONTRACT_1",
+      "sha256_after": "bec9c3a7a17d53375d8022efa437a65558d80928b78451789e5f40284695a961",
+      "sha256_before": "bec9c3a7a17d53375d8022efa437a65558d80928b78451789e5f40284695a961"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_CONTRACT_1/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_BENCHMARKS.txt",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_BENCHMARKS.txt",
+      "phase": "RUNTIME_JAVA_DISCOVERY_CONTRACT_1",
+      "sha256_after": "b3ae1057812f577c5bb4d66367146bfa07097f23d994e4499b9f81920291de8c",
+      "sha256_before": "b3ae1057812f577c5bb4d66367146bfa07097f23d994e4499b9f81920291de8c"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_CONTRACT_1/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_LOCAL.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_LOCAL.json",
+      "phase": "RUNTIME_JAVA_DISCOVERY_CONTRACT_1",
+      "sha256_after": "08f39d7c057bf877a69238fd4d96fcaa3e5cf2e4ef7cb5601a7c866b5398ddb1",
+      "sha256_before": "08f39d7c057bf877a69238fd4d96fcaa3e5cf2e4ef7cb5601a7c866b5398ddb1"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_CONTRACT_1/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_PRESERVATION.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_PRESERVATION.json",
+      "phase": "RUNTIME_JAVA_DISCOVERY_CONTRACT_1",
+      "sha256_after": "1d91babbc9982b9f5428e11e3fd9e739cce6d1647035ec6cad8c3f8881f1365b",
+      "sha256_before": "1d91babbc9982b9f5428e11e3fd9e739cce6d1647035ec6cad8c3f8881f1365b"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_CONTRACT_1/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_REGISTRY_AFTER.txt",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_REGISTRY_AFTER.txt",
+      "phase": "RUNTIME_JAVA_DISCOVERY_CONTRACT_1",
+      "sha256_after": "f0a72ec07d03488bb5576bf9ed209e44f72cb0e5e3aaacd9e5fe8b6bff30ab64",
+      "sha256_before": "f0a72ec07d03488bb5576bf9ed209e44f72cb0e5e3aaacd9e5fe8b6bff30ab64"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_CONTRACT_1/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_REGISTRY_BASELINE.txt",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_REGISTRY_BASELINE.txt",
+      "phase": "RUNTIME_JAVA_DISCOVERY_CONTRACT_1",
+      "sha256_after": "905d144236f02c3097edb21d16c8501a5392b1dfc1bea27e63a07de4be21570a",
+      "sha256_before": "905d144236f02c3097edb21d16c8501a5392b1dfc1bea27e63a07de4be21570a"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_CONTRACT_1/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_TEMP_RECHECK.txt",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_TEMP_RECHECK.txt",
+      "phase": "RUNTIME_JAVA_DISCOVERY_CONTRACT_1",
+      "sha256_after": "06948580ef6e229d212703dcaaa7770cf55d6c492b1409a9da4d98e84fb7f572",
+      "sha256_before": "06948580ef6e229d212703dcaaa7770cf55d6c492b1409a9da4d98e84fb7f572"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_CONTRACT_1/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_TESTS.txt",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_TESTS.txt",
+      "phase": "RUNTIME_JAVA_DISCOVERY_CONTRACT_1",
+      "sha256_after": "824dbd3644d3ad8914d9a42b3486e2ad6f02aaca21f9f361107618af18f979e7",
+      "sha256_before": "824dbd3644d3ad8914d9a42b3486e2ad6f02aaca21f9f361107618af18f979e7"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_CONTRACT_1/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_TESTS_FINAL.txt",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_TESTS_FINAL.txt",
+      "phase": "RUNTIME_JAVA_DISCOVERY_CONTRACT_1",
+      "sha256_after": "e41c61319f2de6bce933a76102576ee52054eebb2b471d1e68ea5a9c357795f3",
+      "sha256_before": "e41c61319f2de6bce933a76102576ee52054eebb2b471d1e68ea5a9c357795f3"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_CONTRACT_1/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_VALIDATION.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_VALIDATION.json",
+      "phase": "RUNTIME_JAVA_DISCOVERY_CONTRACT_1",
+      "sha256_after": "754320be8dffed0bc9f9aaa86dac3668d4f75c4a34346ffb448dd370c3083d03",
+      "sha256_before": "754320be8dffed0bc9f9aaa86dac3668d4f75c4a34346ffb448dd370c3083d03"
+    },
+    {
+      "bytes_preserved": false,
+      "markdown_link_changes": [
+        {
+          "after": "../../../../scripts/measure_runtime_java_discovery_diag1.py",
+          "before": "../../scripts/measure_runtime_java_discovery_diag1.py"
+        },
+        {
+          "after": "../../../../tests/test_runtime_java_discovery_diag1.py",
+          "before": "../../tests/test_runtime_java_discovery_diag1.py"
+        },
+        {
+          "after": "../../../../core/sandboxed_java_toolchain_discovery.py",
+          "before": "../../core/sandboxed_java_toolchain_discovery.py"
+        }
+      ],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_DIAG_1/RUNTIME_JAVA_DISCOVERY_DIAG_1.md",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_DIAG_1.md",
+      "phase": "RUNTIME_JAVA_DISCOVERY_DIAG_1",
+      "sha256_after": "eda0a4db9c605ad8a29d34009e41e5b0a2bc83e72281d7fe853459114550f039",
+      "sha256_before": "2a0029a9a87ca102592ed1eebd2d2b2e3282077abcc017d1821570e1d089df54"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_DIAG_1/RUNTIME_JAVA_DISCOVERY_DIAG_1_LOCAL.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_DIAG_1_LOCAL.json",
+      "phase": "RUNTIME_JAVA_DISCOVERY_DIAG_1",
+      "sha256_after": "b82cf6d7402be08dc745a82439d18c69dbcf82d827711b89f89e129a2973837b",
+      "sha256_before": "b82cf6d7402be08dc745a82439d18c69dbcf82d827711b89f89e129a2973837b"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_JAVA_DISCOVERY_DIAG_1/RUNTIME_JAVA_DISCOVERY_DIAG_1_PRESERVATION.json",
+      "old_path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_DIAG_1_PRESERVATION.json",
+      "phase": "RUNTIME_JAVA_DISCOVERY_DIAG_1",
+      "sha256_after": "e0f72ba0838c329bc8535d55072fa5c06b55eb2dafdbdf10ee019aac5cf727b0",
+      "sha256_before": "e0f72ba0838c329bc8535d55072fa5c06b55eb2dafdbdf10ee019aac5cf727b0"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_SANDBOX_1/RUNTIME_SANDBOX_1.md",
+      "old_path": "docs/roadmap/RUNTIME_SANDBOX_1.md",
+      "phase": "RUNTIME_SANDBOX_1",
+      "sha256_after": "609f39639fa2cd99b691a4635123a466e1325d4aa18cb0026f166eb77d8d3068",
+      "sha256_before": "609f39639fa2cd99b691a4635123a466e1325d4aa18cb0026f166eb77d8d3068"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_SANDBOX_1/RUNTIME_SANDBOX_1_LOCAL.json",
+      "old_path": "docs/roadmap/RUNTIME_SANDBOX_1_LOCAL.json",
+      "phase": "RUNTIME_SANDBOX_1",
+      "sha256_after": "9ff682d3459795cc0ccbd712dad8485288238b20ccfa5cde22334d5ca907bb7f",
+      "sha256_before": "9ff682d3459795cc0ccbd712dad8485288238b20ccfa5cde22334d5ca907bb7f"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_SANDBOX_2/RUNTIME_SANDBOX_2.md",
+      "old_path": "docs/roadmap/RUNTIME_SANDBOX_2.md",
+      "phase": "RUNTIME_SANDBOX_2",
+      "sha256_after": "ee32a7e0456fd76e574918ea97a07929e63423e521766f699d010ecf27fe1609",
+      "sha256_before": "ee32a7e0456fd76e574918ea97a07929e63423e521766f699d010ecf27fe1609"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_SANDBOX_2/RUNTIME_SANDBOX_2_LOCAL.json",
+      "old_path": "docs/roadmap/RUNTIME_SANDBOX_2_LOCAL.json",
+      "phase": "RUNTIME_SANDBOX_2",
+      "sha256_after": "eb858a574bfa781b4a6537d720847a58d622e403e0e28e9f9a3def05284c8394",
+      "sha256_before": "eb858a574bfa781b4a6537d720847a58d622e403e0e28e9f9a3def05284c8394"
+    },
+    {
+      "bytes_preserved": false,
+      "markdown_link_changes": [
+        {
+          "after": "../../../../core/sandbox_backend_provenance.py",
+          "before": "../../core/sandbox_backend_provenance.py"
+        },
+        {
+          "after": "../../../../scripts/replay_runtime_sandbox2p.py",
+          "before": "../../scripts/replay_runtime_sandbox2p.py"
+        },
+        {
+          "after": "../../../../tests/test_runtime_sandbox2p.py",
+          "before": "../../tests/test_runtime_sandbox2p.py"
+        }
+      ],
+      "new_path": "docs/roadmap/phases/RUNTIME_SANDBOX_2P/RUNTIME_SANDBOX_2P.md",
+      "old_path": "docs/roadmap/RUNTIME_SANDBOX_2P.md",
+      "phase": "RUNTIME_SANDBOX_2P",
+      "sha256_after": "c152ed57a71da6811173ae9607dcb87d985960eb8e1c66b2069b6ee54b2585b0",
+      "sha256_before": "41b6f653a2e6b39cbc8b584b1b2b4bb83005316f670e6b0d4e775d9e7ce015d2"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_SANDBOX_2P/RUNTIME_SANDBOX_2P_LOCAL.json",
+      "old_path": "docs/roadmap/RUNTIME_SANDBOX_2P_LOCAL.json",
+      "phase": "RUNTIME_SANDBOX_2P",
+      "sha256_after": "be1ee00ccf48b6089b56883398e24ec8116bc0409bfd9ba93b58dc4f4c124a48",
+      "sha256_before": "be1ee00ccf48b6089b56883398e24ec8116bc0409bfd9ba93b58dc4f4c124a48"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_SANDBOX_2P/RUNTIME_SANDBOX_2P_PRESERVATION.json",
+      "old_path": "docs/roadmap/RUNTIME_SANDBOX_2P_PRESERVATION.json",
+      "phase": "RUNTIME_SANDBOX_2P",
+      "sha256_after": "872314860e169814428ed97d3d1c437cbc788c01d06510aa06feab139502d174",
+      "sha256_before": "872314860e169814428ed97d3d1c437cbc788c01d06510aa06feab139502d174"
+    },
+    {
+      "bytes_preserved": false,
+      "markdown_link_changes": [
+        {
+          "after": "../../../../core/sandbox_backend_binding.py",
+          "before": "../../core/sandbox_backend_binding.py"
+        },
+        {
+          "after": "../../../../scripts/replay_runtime_sandbox_bind1.py",
+          "before": "../../scripts/replay_runtime_sandbox_bind1.py"
+        },
+        {
+          "after": "../../../../tests/test_runtime_sandbox_bind1.py",
+          "before": "../../tests/test_runtime_sandbox_bind1.py"
+        }
+      ],
+      "new_path": "docs/roadmap/phases/RUNTIME_SANDBOX_BIND_1/RUNTIME_SANDBOX_BIND_1.md",
+      "old_path": "docs/roadmap/RUNTIME_SANDBOX_BIND_1.md",
+      "phase": "RUNTIME_SANDBOX_BIND_1",
+      "sha256_after": "82fc0f9c040285f76a067a865b4c89b5cfb93a9ec6316a836198903c29d94dcd",
+      "sha256_before": "c8cb8a05b4ca0edec4406fe37c9dffc20c9ccf64b12124e1ff098887d56e8648"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_SANDBOX_BIND_1/RUNTIME_SANDBOX_BIND_1_LOCAL.json",
+      "old_path": "docs/roadmap/RUNTIME_SANDBOX_BIND_1_LOCAL.json",
+      "phase": "RUNTIME_SANDBOX_BIND_1",
+      "sha256_after": "dbeb621be7c664699eca0a37268b3527c987f275245cee4bfb8cee7830af837d",
+      "sha256_before": "dbeb621be7c664699eca0a37268b3527c987f275245cee4bfb8cee7830af837d"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/RUNTIME_SANDBOX_BIND_1/RUNTIME_SANDBOX_BIND_1_PRESERVATION.json",
+      "old_path": "docs/roadmap/RUNTIME_SANDBOX_BIND_1_PRESERVATION.json",
+      "phase": "RUNTIME_SANDBOX_BIND_1",
+      "sha256_after": "5ea4028342af54acd2045f6c5014f207336e016e3a61ac04f5eb7827daf00051",
+      "sha256_before": "5ea4028342af54acd2045f6c5014f207336e016e3a61ac04f5eb7827daf00051"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_AUTH_1/SYNTH_AUTH_1.md",
+      "old_path": "docs/roadmap/SYNTH_AUTH_1.md",
+      "phase": "SYNTH_AUTH_1",
+      "sha256_after": "003fe0db94a92c0db7818decd20af960d86da74410e93ea454aefe88e5209956",
+      "sha256_before": "003fe0db94a92c0db7818decd20af960d86da74410e93ea454aefe88e5209956"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_AUTH_1/SYNTH_AUTH_1_LOCAL.json",
+      "old_path": "docs/roadmap/SYNTH_AUTH_1_LOCAL.json",
+      "phase": "SYNTH_AUTH_1",
+      "sha256_after": "2428292b820a3c741699cc6c03a6d0c34bbe785e57bb84f6d4220a364bf90bba",
+      "sha256_before": "2428292b820a3c741699cc6c03a6d0c34bbe785e57bb84f6d4220a364bf90bba"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_1/SYNTH_AUTH_LIFECYCLE_1.md",
+      "old_path": "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1.md",
+      "phase": "SYNTH_AUTH_LIFECYCLE_1",
+      "sha256_after": "fed5286113e5dfe58b42beda62851f356b9b7a60ff126617993ebd3ade75c8a9",
+      "sha256_before": "fed5286113e5dfe58b42beda62851f356b9b7a60ff126617993ebd3ade75c8a9"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_1/SYNTH_AUTH_LIFECYCLE_1_LOCAL.json",
+      "old_path": "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_LOCAL.json",
+      "phase": "SYNTH_AUTH_LIFECYCLE_1",
+      "sha256_after": "35dcd5792b8e94bb644bc9141b54b1e6bacafcf0b0240f0c736cff5038262eb2",
+      "sha256_before": "35dcd5792b8e94bb644bc9141b54b1e6bacafcf0b0240f0c736cff5038262eb2"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_AUTH_LIFECYCLE_1/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json",
+      "old_path": "docs/roadmap/SYNTH_AUTH_LIFECYCLE_1_PRESERVATION.json",
+      "phase": "SYNTH_AUTH_LIFECYCLE_1",
+      "sha256_after": "57acae8417995e86e377b726e4296e6b1a1f31f51596c67c6538555fc988689a",
+      "sha256_before": "57acae8417995e86e377b726e4296e6b1a1f31f51596c67c6538555fc988689a"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_REFLECT_1/SYNTH_REFLECT_1.md",
+      "old_path": "docs/roadmap/SYNTH_REFLECT_1.md",
+      "phase": "SYNTH_REFLECT_1",
+      "sha256_after": "77b395d7808cfa9921d85c8179fe371fd8dea162516ed8276fefaf130b2e7d1a",
+      "sha256_before": "77b395d7808cfa9921d85c8179fe371fd8dea162516ed8276fefaf130b2e7d1a"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_REFLECT_1/SYNTH_REFLECT_1_LOCAL.json",
+      "old_path": "docs/roadmap/SYNTH_REFLECT_1_LOCAL.json",
+      "phase": "SYNTH_REFLECT_1",
+      "sha256_after": "0d09683a602de5558d09dedf0d40474965ed0b1a1423f67f03fe18f728b77ca4",
+      "sha256_before": "0d09683a602de5558d09dedf0d40474965ed0b1a1423f67f03fe18f728b77ca4"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_REFLECT_ADMIT_1/SYNTH_REFLECT_ADMIT_1.md",
+      "old_path": "docs/roadmap/SYNTH_REFLECT_ADMIT_1.md",
+      "phase": "SYNTH_REFLECT_ADMIT_1",
+      "sha256_after": "1f3909a58c6b09a7b92a57abe296af0ffb8190373c8e13891ebc766ff50a599c",
+      "sha256_before": "1f3909a58c6b09a7b92a57abe296af0ffb8190373c8e13891ebc766ff50a599c"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_REFLECT_ADMIT_1/SYNTH_REFLECT_ADMIT_1_LOCAL.json",
+      "old_path": "docs/roadmap/SYNTH_REFLECT_ADMIT_1_LOCAL.json",
+      "phase": "SYNTH_REFLECT_ADMIT_1",
+      "sha256_after": "2be66e44b959cdbd235b444f03d5b822078734da41be992d1787f143d0d68754",
+      "sha256_before": "2be66e44b959cdbd235b444f03d5b822078734da41be992d1787f143d0d68754"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_1/SYNTH_REFLECT_LIFECYCLE_1.md",
+      "old_path": "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1.md",
+      "phase": "SYNTH_REFLECT_LIFECYCLE_1",
+      "sha256_after": "3985fd0b362567d6c1619425dcee2e28ba6cec4dae5da35f9584aa1814943f22",
+      "sha256_before": "3985fd0b362567d6c1619425dcee2e28ba6cec4dae5da35f9584aa1814943f22"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_1/SYNTH_REFLECT_LIFECYCLE_1_LOCAL.json",
+      "old_path": "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_LOCAL.json",
+      "phase": "SYNTH_REFLECT_LIFECYCLE_1",
+      "sha256_after": "faed05ec5c9e79bb8c1cb375b0fc6908ff4ed6a4f775b9b05f06213c3bf61bff",
+      "sha256_before": "faed05ec5c9e79bb8c1cb375b0fc6908ff4ed6a4f775b9b05f06213c3bf61bff"
+    },
+    {
+      "bytes_preserved": true,
+      "markdown_link_changes": [],
+      "new_path": "docs/roadmap/phases/SYNTH_REFLECT_LIFECYCLE_1/SYNTH_REFLECT_LIFECYCLE_1_PRESERVATION.json",
+      "old_path": "docs/roadmap/SYNTH_REFLECT_LIFECYCLE_1_PRESERVATION.json",
+      "phase": "SYNTH_REFLECT_LIFECYCLE_1",
+      "sha256_after": "aae901dda6c94d6f51fe36188c6279afb1c6f94c95dbcf84e9585ddd151498a3",
+      "sha256_before": "aae901dda6c94d6f51fe36188c6279afb1c6f94c95dbcf84e9585ddd151498a3"
+    }
+  ],
+  "phase_files_moved": 94,
+  "phase_folder_count": 36,
+  "purpose": "Documentation organization only; no runtime/schema/authority changes.",
+  "registry_rewritten": false,
+  "retained_stable_files": [
+    {
+      "path": "docs/roadmap/phase_registry.json",
+      "reason": "Registry and historical reversal-chain input.",
+      "sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c"
+    },
+    {
+      "path": "docs/roadmap/RUNTIME_SANDBOX_2_SECCOMP.json",
+      "reason": "SANDBOX.2 policy input and frozen compatibility hash input.",
+      "sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75"
+    },
+    {
+      "path": "docs/roadmap/RUNTIME_JAVA_1_LOCAL.json",
+      "reason": "Frozen JAVA.COMPAT.1 input and historical-evidence test reader.",
+      "sha256": "bf73f4b738e3fd094b0034db2bd3cc00342f3c451a4d77760fa00947c48b7ede"
+    },
+    {
+      "path": "docs/roadmap/RUNTIME_JAVA_1C_LOCAL.json",
+      "reason": "Frozen JAVA.COMPAT.1 input and historical-evidence test reader.",
+      "sha256": "7deec9280b20410ea399a4c233f0ccd2fa1dd6517e402f87bfc47af7e036e822"
+    },
+    {
+      "path": "docs/roadmap/RUNTIME_JAVA_DISCOVERY_CONTRACT_1_REPORT.json",
+      "reason": "Existing contract-audit test reader; LOCAL.json is the identical phase-folder copy.",
+      "sha256": "08f39d7c057bf877a69238fd4d96fcaa3e5cf2e4ef7cb5601a7c866b5398ddb1"
+    }
+  ],
+  "runtime_sources_or_tests_changed": false
+}

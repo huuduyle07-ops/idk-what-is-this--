@@ -1,0 +1,207 @@
+{
+  "authority_flags": {
+    "cap_change": false,
+    "capability_issuance": false,
+    "controller_implementation": false,
+    "evidence_change": false,
+    "kernel_contract_completion": false,
+    "kernel_projection_change": false,
+    "owner_encoding_change": false,
+    "repin": false,
+    "repository_write_authority": false,
+    "requirement_evolution": false,
+    "runtime_authority": false,
+    "schema_change": false,
+    "transport_selection": false,
+    "writer_inventory_implementation": false
+  },
+  "candidate": "A",
+  "candidate_ever_selected": false,
+  "candidate_rejection_recorded": true,
+  "candidate_status": "REJECTED_BUDGET_INCOMPATIBLE",
+  "class_width_table": [
+    {
+      "actual_class_size_selected": false,
+      "attainable_equality_claimed": false,
+      "class_decimal_width": 1,
+      "class_width_adjustment": -8,
+      "lower_physical_subtotal": 8821,
+      "proven_excess_lower_bound": 629,
+      "semantic_lower_subtotal": 8813
+    },
+    {
+      "actual_class_size_selected": false,
+      "attainable_equality_claimed": false,
+      "class_decimal_width": 2,
+      "class_width_adjustment": -6,
+      "lower_physical_subtotal": 8823,
+      "proven_excess_lower_bound": 631,
+      "semantic_lower_subtotal": 8815
+    },
+    {
+      "actual_class_size_selected": false,
+      "attainable_equality_claimed": false,
+      "class_decimal_width": 3,
+      "class_width_adjustment": -4,
+      "lower_physical_subtotal": 8825,
+      "proven_excess_lower_bound": 633,
+      "semantic_lower_subtotal": 8817
+    },
+    {
+      "actual_class_size_selected": false,
+      "attainable_equality_claimed": false,
+      "class_decimal_width": 4,
+      "class_width_adjustment": -2,
+      "lower_physical_subtotal": 8827,
+      "proven_excess_lower_bound": 635,
+      "semantic_lower_subtotal": 8819
+    },
+    {
+      "actual_class_size_selected": false,
+      "attainable_equality_claimed": false,
+      "class_decimal_width": 5,
+      "class_width_adjustment": 0,
+      "lower_physical_subtotal": 8829,
+      "proven_excess_lower_bound": 637,
+      "semantic_lower_subtotal": 8821
+    }
+  ],
+  "future_epoch_rule": "Reconsideration after explicit evolution of this reviewed architecture/profile, stdout response mapping, framing, current message/evidence schema or 8192 cumulative cap requires a new epoch and additive phase. This rejection remains immutable historical evidence.",
+  "historical_candidate_classification": "PREFERRED_BUT_SELECTION_UNRESOLVED",
+  "historical_closure": {
+    "bytes_changed": false,
+    "historical_stop_correct": true,
+    "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.TRANSPORT.CANDIDATE_A.CLOSE.1",
+    "reason": "The requested universal 8829-byte lower bound and 637-byte minimum excess were too strong because two variable-width class fields were omitted from residuals.",
+    "relation": "This additive retry closes Candidate A using the corrected conservative theorem; it does not rewrite CLOSE.1.",
+    "typed_result": "CANDIDATE_A_CLOSURE_UNRESOLVED"
+  },
+  "historical_transport_result": "TRANSPORT_SELECTION_UNRESOLVED",
+  "kernel_status": "KERNEL_IDENTITY_CONTRACT_UNRESOLVED",
+  "meaning": "The reviewed Candidate A persistent-stdio profile cannot satisfy the frozen 8192-byte cumulative preparation stdout requirement. The rejection follows from a conservative lower bound of at least 8821 bytes; no actual class size, kernel identity encoding or complete writer inventory is required.",
+  "operational_effects": {
+    "Docker": 0,
+    "capability_issuance": 0,
+    "child_process_creation": 0,
+    "class_size_execution": 0,
+    "class_size_observation": 0,
+    "controller_execution": 0,
+    "historical_proof_execution": 0,
+    "java": 0,
+    "javac": 0,
+    "live_kernel_inspection": 0,
+    "network": 0,
+    "owner_import": 0,
+    "source_materialization": 0,
+    "writer_inventory": 0
+  },
+  "overall_universal_budget_feasibility": "UNRESOLVED",
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.TRANSPORT.CANDIDATE_A.CLOSE.1R",
+  "rejection_scope": {
+    "architecture": "persistent_in_container_controller",
+    "cap_bytes": 8192,
+    "capture_interval": {
+      "earlier_events_outside": [
+        "before empty observation",
+        "OBSERVE_EMPTY_WORKSPACE request",
+        "OBSERVE_EMPTY_WORKSPACE response"
+      ],
+      "failure_end_cases": {
+        "cleanup_preemption": "The cleanup barrier suppresses success immediately but does not close a pending ordinary response ledger. Its complete response suffix still belongs to the failed effect attempt, even if physically delivered after the barrier. Cleanup exchanges have their own ledger.",
+        "early_failure": "A materialization failure/rejection or a later admission/compilation failure cannot wait for a nonexistent successful compile response. Apply the no-pending or pending-response case to the failed admitted operation; no second attempt or new counter is allowed.",
+        "loss_or_deadline": "No terminal response is fabricated. Any still-unobserved ordinary suffix is unresolved, not an outside-budget exemption; the failed epoch cannot reopen or publish success. Mandatory cleanup remains independently bounded.",
+        "no_response_pending": "Recorded irrevocable terminal attempt-abort event when no admitted ordinary operation response remains pending.",
+        "overflow": "Overflow fails the attempt, never resets or forgives observed bytes; retain an exceeded/incomplete result and bounded partial/drain evidence. It never authorizes unbounded buffering, a late successful receipt or denial of mandatory independent cleanup.",
+        "response_pending": "First of: final byte of the last terminal ordinary response already admitted to this attempt; observed terminal channel closure/loss; original 10000ms hard preparation deadline. Count every observed partial/invalid ordinary byte until that event."
+      },
+      "failure_end_event_id": "ORDINARY_RESPONSE_DRAIN_TERMINATION",
+      "membership_rule": "All ordinary effect request/response frames and any current observation invoked after origin but before the effect endpoint are members. Include actual framing in its own physical stream. Separately identifiable cleanup control/results retain cleanup membership even during preemption; pending ordinary bytes cannot be relabeled.",
+      "no_deadline_extension": "The shared 5000ms attempt deadline is never renewed. Cancellation/reaping/capture closure and terminal drain remain clamped to original 10000ms hard bound; a failed result never appends a new preparation interval.",
+      "no_evidence_deferral": "Every mandatory materialization/compile record must be complete in its own response before the endpoint. No chunking, delayed suffix, post-end receipt, observation or handoff may carry deferred effect response evidence to evade the unchanged cap.",
+      "no_resets": [
+        "compile admission",
+        "observation",
+        "receipt authentication",
+        "cleanup barrier",
+        "lost response",
+        "generation or retained lifetime"
+      ],
+      "origin_basis": "The materialization facet admission opens the one-shot effect attempt; independently, the existing shared deadline also begins there. Initial empty observation/request/response precede this effect boundary. Inner final local admission and first response byte are not new origins.",
+      "origin_derived_from_deadline_alone": false,
+      "start": "Preparation owning boundary records the authenticated single-operation admission for this attempt's already-spent original materialization facet, before dispatching the MATERIALIZE_EXACT_SCENARIO_SOURCE request. That admission record is the single counter-origin event: open both counters at zero there, before any request or response byte of this exchange. Facet spending precedes the record; no cross-owner atomic transaction is claimed.",
+      "start_event_id": "OWNER_MATERIALIZATION_ADMISSION_BEFORE_DISPATCH",
+      "successful_end": "The final physical byte of the complete terminal COMPILE_EXACT_SCENARIO response frame is captured by the owning boundary, including all actual framing and its entire mandatory workspace_state, compiler_identity, capture_and_reap and class_metadata. A successful attempt requires the complete valid COMPLETE response; child exit, payload parsing before frame completion, receipt authentication, new readiness OBSERVE request/response, handoff admission and cleanup completion are not this endpoint.",
+      "successful_end_event_id": "COMPLETE_COMPILE_RESPONSE_FINAL_BYTE"
+    },
+    "class_size_legal_envelope": [
+      1,
+      32768
+    ],
+    "controller": "Persistent single-thread in-container Python controller",
+    "header_bytes_per_response": 4,
+    "header_encoding": "unsigned 32-bit big-endian binary, exactly four octets",
+    "message_evidence_semantics": "Current frozen controller schema, owner encoding and settled kernel projection rules, unchanged.",
+    "request_bytes_added_to_stdout": 0,
+    "request_stream": "controller_stdin",
+    "required_complete_responses": [
+      "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+      "COMPILE_EXACT_SCENARIO"
+    ],
+    "response_stream": "controller_stdout",
+    "successful_controller_stderr_bytes": 0,
+    "transport": "persistent_stdio"
+  },
+  "remaining_candidates_ranked": false,
+  "replacement_selected": false,
+  "settled_projection_rules_frozen": true,
+  "stop": true,
+  "theorem": {
+    "actual_class_size_selected": false,
+    "actual_kernel_values_required": false,
+    "attainable_minimum_established": false,
+    "class_width_adjustment_expression": "2*(D_class-5)",
+    "class_width_adjustment_interval": [
+      -8,
+      0
+    ],
+    "class_width_set": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "derivation": [
+      "R_M>=0",
+      "R_C>=0",
+      "2*(D_class-5)>=-8",
+      "physical_stdout_bytes>=8829-8=8821",
+      "8821>8192",
+      "physical_stdout_bytes-8192>=629"
+    ],
+    "exact_minimum_claimed": false,
+    "finite_residual_maxima_required": false,
+    "frozen_cumulative_stdout_cap_bytes": 8192,
+    "physical_stdout_lower_bound_bytes": 8821,
+    "proven_excess_lower_bound_bytes": 629,
+    "quantifier": "For every Candidate-A preparation effect encoding satisfying the frozen schema, reviewed Candidate A profile and current frozen evidence semantics.",
+    "residual_constraints": {
+      "R_C": ">=0",
+      "R_M": ">=0"
+    },
+    "retained_topology_physical_expression": "8829+R_M+R_C+2*(D_class-5)",
+    "witness_required": false
+  },
+  "transport_status": "TRANSPORT_SELECTION_UNRESOLVED",
+  "typed_result": "CANDIDATE_A_REJECTED_BUDGET_INCOMPATIBLE",
+  "universal_transport_impossibility_claimed": false,
+  "writer_completeness": "WRITER_INVENTORY_COMPLETENESS_UNRESOLVED",
+  "writer_lower_profile": {
+    "added_record_count_or_values_selected": false,
+    "complete": false,
+    "controller_writers": 1,
+    "description": "One accounted controller task with potential write access to both /work and /tmp; two root-access records per snapshot. Compiler reaped before prepared snapshot. These records are not proved exhaustive.",
+    "monotonicity": "Each additional mandatory truthful writer/process/task/handle record contributes nonnegative canonical JSON bytes, plus separators where applicable. No removal, replacement or deduplication is authorized. The full encoding is at least the retained lower-topology encoding.",
+    "potential_root_handles_per_response": 2
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "Docker_controls": 0,
+  "JSON_artifacts_parsed": 16,
+  "Java_effects": 0,
+  "authored_whitespace_passed": true,
+  "diagnostic_python_sources_compiled_in_memory": 6,
+  "evidence_consistency_passed": true,
+  "historical_files_preserved": 1828,
+  "live_owner_invocations": 0,
+  "markdown_links_checked": 18,
+  "passed": true,
+  "single_effectful_call_site_and_exclusive_marker": true
+}

@@ -5,6 +5,8 @@
 
 # Runtime generated artifacts
 .agent/
+targeted_subject/*
+!targeted_subject/README.md
 Obsidian Graph/
 obsidian_graph/
 storage/

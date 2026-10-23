@@ -1,0 +1,10 @@
+{
+  "phase_id": "RUNTIME.JAVA.1",
+  "reversals": [
+    {
+      "path": "docs/roadmap/phase_registry.json",
+      "entry_sha256": "33334b0eed9cf0bfc55bf7484abff0766ff5d9e2afff705cd4e65b4a01c8c87a",
+      "post_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c"
+    }
+  ]
+}

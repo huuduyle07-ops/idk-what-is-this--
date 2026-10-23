@@ -1,0 +1,136 @@
+{
+  "files_checked": [
+    {
+      "path": "benchmark.json",
+      "sha256": "55bba22bdae0863c8b5dcf43fd8297a5f20010a095b37665b6ba66cb9cb9dfe2"
+    },
+    {
+      "path": "benchmark.txt",
+      "sha256": "fb2104e31f97f3233e247de1bc7683dd0eb8bbac50114df0c6bf617e673cf4c7"
+    },
+    {
+      "path": "budget_projection.json",
+      "sha256": "c60caa91ae533b561022c13392e32db2b501c8fd1a0cec420433c862a9d87f33"
+    },
+    {
+      "path": "budget_projection.py",
+      "sha256": "459e9c459dd65785d188164a4ea42a740cb6bb1cb49d8a48610f9713fdafc4e4"
+    },
+    {
+      "path": "contract.json",
+      "sha256": "21a22be8b250dbd1eaf9a4921b3b6a64c0c7dedaba8cca224b0c862272f731ba"
+    },
+    {
+      "path": "finalize_artifacts.py",
+      "sha256": "a3d5ed4fa774f05468f34859bfabc22aecd0730ca435af5e99a084a7ffc7de5b"
+    },
+    {
+      "path": "finite_width.json",
+      "sha256": "ca0240aa41c846792839bfd911c73b2a0ac4062a8155d4821690f1ce1a4b2b02"
+    },
+    {
+      "path": "focused.json",
+      "sha256": "475727227b52ab061932274c9716f6d2e9471691d5de5b972029b459fe5f4b07"
+    },
+    {
+      "path": "focused.txt",
+      "sha256": "9d1906a3477ed4db2128ea7af2ceb3d555664d19674527b5dc4fa781365c83c7"
+    },
+    {
+      "path": "git_after.json",
+      "sha256": "fd57dfbf0a7c86f12cc471a6d5bd26b53b7fcc14f7228ec9daf3cc9f949191ae"
+    },
+    {
+      "path": "git_baseline.json",
+      "sha256": "f85ef83227751f68e09dc8bc48e95b7cb1cc6d3504a42be142c21fa85284843b"
+    },
+    {
+      "path": "git_before.json",
+      "sha256": "fd57dfbf0a7c86f12cc471a6d5bd26b53b7fcc14f7228ec9daf3cc9f949191ae"
+    },
+    {
+      "path": "git_checks.py",
+      "sha256": "5edf6ed26284096c8a41feb141688c181ac76feb019cc182ed951d73e59325b8"
+    },
+    {
+      "path": "git_validation.json",
+      "sha256": "264773220589d41aa909931c95a0760d238d08a96488fe5960a13d83c3840d19"
+    },
+    {
+      "path": "preservation_after.json",
+      "sha256": "2cf81add417e93bfb338520724f0a8f38e70e2172b8064306b9fe842a4f11c06"
+    },
+    {
+      "path": "preservation_baseline.json",
+      "sha256": "2cf81add417e93bfb338520724f0a8f38e70e2172b8064306b9fe842a4f11c06"
+    },
+    {
+      "path": "preservation_comparison.json",
+      "sha256": "3afb1d2c7ce5681a85400489382397086f724934a69eb5f70a77c1c5e9adabbf"
+    },
+    {
+      "path": "README.md",
+      "sha256": "58774ab82b24a0135ca80be42ab468cce89c93d95128e88561be8a15550b6d62"
+    },
+    {
+      "path": "registry_after.json",
+      "sha256": "a82891a4dffaab345bbbf9b2dbdb41807d2ca8bfe9d28466aec5ee20c2f481b6"
+    },
+    {
+      "path": "registry_after.txt",
+      "sha256": "1e23abcc93f0c3bf4a4961d22702305aa12f218b4d63574d818f8857dd2ee816"
+    },
+    {
+      "path": "registry_baseline.json",
+      "sha256": "01e862664e671b1fa52dc8d17136569dcdd9c224ecfd78738888b33e922c6233"
+    },
+    {
+      "path": "registry_baseline.txt",
+      "sha256": "e5a2613749bd03ea37025012943f5c492d2b820c8a74535aea1ac45cc1bb6168"
+    },
+    {
+      "path": "registry_comparison.json",
+      "sha256": "67ed9de751ddf91162e6bc02dcfc9df32dc75465f19a55ddc73fce642b7a8372"
+    },
+    {
+      "path": "REPORT.md",
+      "sha256": "6f97bba2f41cd6da090a75ebabf720ff2aea177b9e652594346b342d2a5265c2"
+    },
+    {
+      "path": "source_audit.json",
+      "sha256": "df9a5df8a5680588340051839fc75176ce2ddb4e1142b71f0497cf8227648e00"
+    },
+    {
+      "path": "source_audit.md",
+      "sha256": "d80e979f8bb593a4421fefda34370766f7bbeed6671c79a500cf9ecaced122db"
+    },
+    {
+      "path": "static_validation.json",
+      "sha256": "9d5cad717851ba0db6653cadaa363ab2567e219140d924a595c9c73dfa01a46d"
+    },
+    {
+      "path": "SYNTH_EXEC_PREP_CONTROLLER_KERNEL_IDENTITY_CONTRACT_1_REPORT.json",
+      "sha256": "86b89695026c989dce7cfa1f5612c99af6f53e67571487bf4bb529a1c1aa67b7"
+    },
+    {
+      "path": "tests/test_kernel_identity_contract.py",
+      "sha256": "77f253f7870d08d047b934715ccad8be47538f31eb03139dafe394f050bcfacd"
+    },
+    {
+      "path": "validate_pure.py",
+      "sha256": "b4a6e29bafdb4ce301a9a40df8812d5bd059931a351d1d5c75a140480106c379"
+    },
+    {
+      "path": "validation_summary.json",
+      "sha256": "de5a3e3df90c88c1599e326fbf08d63902814013dc9bfc5efd05855bed8c1e7b"
+    },
+    {
+      "path": "write_contract.py",
+      "sha256": "dbd3f1c5ff7c040ec1383a660c684da3ad36bc1831eb8293cac612ae9e9715d5"
+    }
+  ],
+  "index_is_not_self_authentication": true,
+  "passed": true,
+  "scope": "Additive artifact JSON/whitespace/in-memory compilation; validation scratch excluded.",
+  "volatile_evidence_note": "Later static validation can refresh static_validation.json without changing contract semantics; the authoritative current evidence is that file. No recursive self-hash is claimed."
+}

@@ -1,0 +1,102 @@
+....................................FE..............................F... [ 98%]
+.                                                                        [100%]
+=================================== ERRORS ====================================
+_ ERROR at teardown of test_existing_owner_and_registry_bytes_match_precontract_baseline _
+
+    @pytest.fixture(autouse=True)
+    def pure_scope():
+        registries = (old._ISSUED_HANDLES, pinned._LIVE, lifecycle._AUTHORIZATION_LEASES,
+            lifecycle._LEASES, reflection._LEASES)
+        before = [dict(registry) for registry in registries]
+        with no_runtime_effects(strict=True) as evidence:
+            yield
+>       assert evidence.denied_attempts == {}
+E       AssertionError: assert {'pathlib.Path.glob': 1} == {}
+E         
+E         Left contains 1 more item:
+E         {'pathlib.Path.glob': 1}
+E         Use -v to get more diff
+
+tests\test_synthetic_runtime_authorization_lifecycle_pinned_contract.py:36: AssertionError
+================================== FAILURES ===================================
+______ test_existing_owner_and_registry_bytes_match_precontract_baseline ______
+
+    def test_existing_owner_and_registry_bytes_match_precontract_baseline():
+        baseline = json.loads((HERE / "preservation_baseline.json").read_text(encoding="utf-8"))["files"]
+        names = ["core/synthetic_runtime_authorization.py", "core/synthetic_runtime_authorization_pinned.py",
+            "core/synthetic_runtime_authorization_lifecycle.py", "core/synthetic_read_only_reflection.py",
+            "core/synthetic_reflection_execution_admission.py", "core/synthetic_reflection_execution_lifecycle.py",
+            "core/phase_registry.py", "docs/roadmap/phase_registry.json"]
+>       names.extend(path.relative_to(ROOT).as_posix() for path in (ROOT / "core").glob("runtime_java_pinned*.py"))
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_synthetic_runtime_authorization_lifecycle_pinned_contract.py:348: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\unittest\mock.py:1176: in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\unittest\mock.py:1180: in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\unittest\mock.py:1247: in _execute_mock_call
+    result = effect(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('runtime_java_pinned*.py',), kwargs = {}
+
+    def forbidden(*args, **kwargs):
+        self.denied_attempts[effect] = self.denied_attempts.get(effect, 0) + 1
+>       raise AssertionError("PREFLIGHT.RUNTIME.1 effect denied: " + effect)
+E       AssertionError: PREFLIGHT.RUNTIME.1 effect denied: pathlib.Path.glob
+
+tests\_preflight_runtime1_guard.py:29: AssertionError
+_ test_existing_validators_reject_independent_scenario_and_field_without_aliasing_bank _
+
+    def test_existing_validators_reject_independent_scenario_and_field_without_aliasing_bank():
+>       findings = owner.compatibility_audit()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_patch_candidate_behavior_executor1r.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+core\behavioral_diagnostic_executor_refresh.py:62: in compatibility_audit
+    rejected('source_without_reconstructed_parents', lambda:
+core\behavioral_diagnostic_executor_refresh.py:53: in rejected
+    try: operation()
+         ^^^^^^^^^^^
+core\behavioral_diagnostic_executor_refresh.py:63: in <lambda>
+    authorization.issue_synthetic_runtime_authorization_source(None,
+core\runtime_diagnostic_authorization.py:509: in issue_synthetic_runtime_authorization_source
+    def issue_synthetic_runtime_authorization_source(execution_plan, *, specification, compile_receipt,
+docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_CONTRACT_1\validate_pure_contract.py:101: in profile
+    reject("owner_issuance_or_consumption_attempts", str(path) + ":" + name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+kind = 'owner_issuance_or_consumption_attempts'
+detail = 'C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\runtime_diagnostic_authorization.py:issue_synthetic_runtime_authorization_source'
+
+    def reject(kind, detail):
+        evidence[kind] += 1
+        blocked.append(str(detail))
+>       raise AssertionError("Pure pinned contract denied: " + str(detail))
+E       AssertionError: Pure pinned contract denied: C:\Users\Admin\Documents\Code\J.A.R.V.I.S\districts\C.A.T.T.U.S\core\runtime_diagnostic_authorization.py:issue_synthetic_runtime_authorization_source
+
+docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_CONTRACT_1\validate_pure_contract.py:66: AssertionError
+============================== warnings summary ===============================
+..\..\..\..\..\AppData\Roaming\Python\Python314\site-packages\google\genai\types.py:42
+  C:\Users\Admin\AppData\Roaming\Python\Python314\site-packages\google\genai\types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+..\..\..\..\..\AppData\Roaming\Python\Python314\site-packages\_pytest\python.py:124
+  C:\Users\Admin\AppData\Roaming\Python\Python314\site-packages\_pytest\python.py:124: PytestRemovedIn10Warning: Passing a non-Collection iterable to parametrize is deprecated.
+  Test: tests/test_synthetic_runtime_authorization_lifecycle_pinned_contract.py::test_only_frozen_one_shot_state_transitions_are_permitted, argvalues type: product
+  Please convert to a list or tuple.
+  See https://docs.pytest.org/en/stable/deprecations.html#parametrize-iterators
+    metafunc.parametrize(*marker.args, **marker.kwargs, _param_mark=marker)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_synthetic_runtime_authorization_lifecycle_pinned_contract.py::test_existing_owner_and_registry_bytes_match_precontract_baseline
+FAILED tests/test_patch_candidate_behavior_executor1r.py::test_existing_validators_reject_independent_scenario_and_field_without_aliasing_bank
+ERROR tests/test_synthetic_runtime_authorization_lifecycle_pinned_contract.py::test_existing_owner_and_registry_bytes_match_precontract_baseline
+2 failed, 70 passed, 2 warnings, 1 error in 21.28s

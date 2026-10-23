@@ -1,0 +1,37 @@
+{
+  "git_diff_check_exit_code": 0,
+  "historical_json_and_logs_rewritten": false,
+  "historical_repins": false,
+  "integrity_checks": {
+    "broken_links": [],
+    "existing_file_violations": [],
+    "files_verified": 1864,
+    "index_whitespace_issues": [],
+    "json_and_logs_byte_preserved": true,
+    "markdown_link_only_edits_verified": true,
+    "markdown_links_checked": 364,
+    "preexisting_missing_restored": [],
+    "relocated_files_verified": 94,
+    "stable_paths_byte_preserved": true
+  },
+  "operational_Docker_Java_javac_calls": 0,
+  "organization": {
+    "artifacts_moved": 94,
+    "phase_folders": 36,
+    "relative_links_repaired": 18,
+    "stable_paths_retained": 5
+  },
+  "pure_regressions": {
+    "exit_code": 0,
+    "failures": [],
+    "passed": 84,
+    "real_effect_attempts": [],
+    "test_files": [
+      "tests/test_runtime_java_discovery_contract1.py",
+      "tests/test_runtime_java_compat1.py",
+      "tests/test_runtime_java1_governance.py"
+    ]
+  },
+  "runtime_sources_or_tests_changed": false,
+  "scope": "Documentation reorganization only"
+}

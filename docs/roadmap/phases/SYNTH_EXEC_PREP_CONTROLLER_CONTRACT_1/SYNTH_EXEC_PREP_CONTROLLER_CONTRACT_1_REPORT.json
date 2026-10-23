@@ -1,0 +1,177 @@
+{
+  "behavioral_activation_ready": false,
+  "concrete_transport_selected": false,
+  "controller_source_identity_resolved": false,
+  "controller_workspace_or_operational_capability_exists_by_this_phase": false,
+  "evidence_sha256": {
+    "contract.json": "98569ab0083cab8269e75ef5a5b00f2758ac33e61ef7ab77ab56d5760542a328",
+    "evidence_index.json": "2db38cb014750909877f99e0e233e71942f30472f9baae755673df0347a35054",
+    "finalize_report.py": "8d14b036503cb9c19eee7678cd5e86a249f7d97b5dfebd2800527504ab7fa5c4",
+    "message_schema.json": "1c40559d4a48b747632ec4e75b49eaeae33bad9ed63fa7cbd5b19337d840406e",
+    "preservation_baseline.json": "083956b865394114d00ffe397460d787ceca6f1c8eedf02f7625701c1597e0a1",
+    "test_contract.py": "f6d979b527320ab6b2511096d8f3499ae0abdd5c4b1e0e318f58f4c43e0ca079",
+    "validate_pure.py": "a78101aca9b6fe4911e0c1dab325a402d4f2bc52a8f8ec2e12a53e39591ad05f",
+    "validation_summary.json": "e34696d3284b0bd1e9d21e73db830f25187ed3d19509791d2cedd8d310615f4f",
+    "write_contract.py": "a143d4d9ca3793847232e9f6cebcc36c1c08365fd5a2b1c9a49b5f1f6eb5bca5"
+  },
+  "meaning": "The additive retained-live preparation controller protocol is frozen. No controller implementation, workspace or operational capability exists.",
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.CONTRACT.1",
+  "protocol_frozen": true,
+  "reason": "PROOF_UNRESOLVED",
+  "runtime_consumption_ready": false,
+  "stop": true,
+  "typed_result": "SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1_COMPLETE",
+  "validation": {
+    "all_authority_flags_false": true,
+    "all_guarded_operational_effects_zero": true,
+    "all_required_pure_checks_passed": true,
+    "benchmark": {
+      "cases_checked": 54,
+      "errors": 0
+    },
+    "focused": {
+      "collected": 35,
+      "passed": 35
+    },
+    "git_diff_check": {
+      "existing_whitespace_unchanged": true,
+      "index_modified": false,
+      "new_phase_files_checked": 31,
+      "passed": true
+    },
+    "guarded_runs": {
+      "author": {
+        "audit_guard": {
+          "capability_or_transition_attempts": 0,
+          "capability_owner_import_attempts": 0,
+          "execution_or_verification_attempts": 0,
+          "network_attempts": 0,
+          "outside_phase_write_attempts": 0,
+          "process_attempts": 0
+        },
+        "blocked_actions": [],
+        "imported_capability_owners": [],
+        "validator_sha256": "a78101aca9b6fe4911e0c1dab325a402d4f2bc52a8f8ec2e12a53e39591ad05f"
+      },
+      "benchmark": {
+        "audit_guard": {
+          "capability_or_transition_attempts": 0,
+          "capability_owner_import_attempts": 0,
+          "execution_or_verification_attempts": 0,
+          "network_attempts": 0,
+          "outside_phase_write_attempts": 0,
+          "process_attempts": 0
+        },
+        "blocked_actions": [],
+        "imported_capability_owners": [],
+        "validator_sha256": "a78101aca9b6fe4911e0c1dab325a402d4f2bc52a8f8ec2e12a53e39591ad05f"
+      },
+      "focused": {
+        "audit_guard": {
+          "capability_or_transition_attempts": 0,
+          "capability_owner_import_attempts": 0,
+          "execution_or_verification_attempts": 0,
+          "network_attempts": 0,
+          "outside_phase_write_attempts": 0,
+          "process_attempts": 0
+        },
+        "blocked_actions": [],
+        "imported_capability_owners": [],
+        "validator_sha256": "a78101aca9b6fe4911e0c1dab325a402d4f2bc52a8f8ec2e12a53e39591ad05f"
+      },
+      "registry_after": {
+        "audit_guard": {
+          "capability_or_transition_attempts": 0,
+          "capability_owner_import_attempts": 0,
+          "execution_or_verification_attempts": 0,
+          "network_attempts": 0,
+          "outside_phase_write_attempts": 0,
+          "process_attempts": 0
+        },
+        "blocked_actions": [],
+        "imported_capability_owners": [],
+        "validator_sha256": "a78101aca9b6fe4911e0c1dab325a402d4f2bc52a8f8ec2e12a53e39591ad05f"
+      },
+      "registry_baseline": {
+        "audit_guard": {
+          "capability_or_transition_attempts": 0,
+          "capability_owner_import_attempts": 0,
+          "execution_or_verification_attempts": 0,
+          "network_attempts": 0,
+          "outside_phase_write_attempts": 0,
+          "process_attempts": 0
+        },
+        "blocked_actions": [],
+        "imported_capability_owners": [],
+        "validator_sha256": "a78101aca9b6fe4911e0c1dab325a402d4f2bc52a8f8ec2e12a53e39591ad05f"
+      }
+    },
+    "operational_effects": {
+      "Apply": 0,
+      "BANK": 0,
+      "Docker": 0,
+      "EXECUTOR.1R": 0,
+      "EXECUTOR_1R": 0,
+      "JAVA1C": 0,
+      "SANDBOX2": 0,
+      "SyntheticStateBox": 0,
+      "auth_issuance": 0,
+      "capability_consumption": 0,
+      "capability_invalidation": 0,
+      "class_loading": 0,
+      "container_creation": 0,
+      "container_removal": 0,
+      "filesystem_runtime_writes": 0,
+      "java": 0,
+      "javac": 0,
+      "pinned_auth_issuance": 0,
+      "preparation_authority_issuance": 0,
+      "provider_issuance": 0,
+      "reflection": 0,
+      "reflection_admission_issuance": 0,
+      "reflection_issuance": 0,
+      "reflection_lease_issuance": 0,
+      "runtime_issuance": 0,
+      "runtime_lease_issuance": 0,
+      "source_materialization": 0,
+      "workspace_issuance": 0
+    },
+    "preservation": {
+      "added_outside_new_phase": [],
+      "after_file_count": 26821,
+      "allowed_additions_outside_phase": [],
+      "baseline_file_count": 26821,
+      "changed": [],
+      "deleted": [],
+      "historical_preservation_passed": true,
+      "scope": "entire non-cache workspace including root/config/web and frozen history"
+    },
+    "registry_picker": {
+      "after_collected": 299,
+      "after_passed": 292,
+      "baseline_collected": 299,
+      "baseline_not_repaired": true,
+      "baseline_passed": 292,
+      "existing_failure_nodes": [
+        "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "tests/test_phase_registry.py::test_seed_registry_summary_counts"
+      ],
+      "projections_identical": true,
+      "signature_comparison": "Raw diagnostics retained; normalize only Python repr allocator ' at 0x...>' addresses before comparing. All node IDs, assertion text, expected/actual values and failure phases are exact.",
+      "unchanged": true
+    },
+    "scope": "pure source/AST/contract checks only; no operational owner import, issuance or execution",
+    "static": {
+      "JSON_files_validated": 18,
+      "bytecode_written": false,
+      "compiled_in_memory": 1355,
+      "passed": true
+    },
+    "typed_result": "SYNTH_EXEC_PREP_CONTROLLER_CONTRACT_1_COMPLETE"
+  }
+}

@@ -1,0 +1,1 @@
+{"typed_result": "CANDIDATE_A_CLOSURE_UNRESOLVED", "conditional_excess": 637, "conservative_excess": 629, "input_artifact_count": 59}

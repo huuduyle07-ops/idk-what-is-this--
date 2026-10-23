@@ -1,0 +1,28 @@
+........................................................................ [ 25%]
+........................................................................ [ 50%]
+........................................................................ [ 75%]
+.......................................................................F [100%]
+================================== FAILURES ===================================
+__ test_new_phase_python_has_no_owner_import_runtime_probe_or_process_launch __
+
+    def test_new_phase_python_has_no_owner_import_runtime_probe_or_process_launch():
+        forbidden_imports = ("core", "subprocess", "socket", "requests", "urllib", "http", "importlib")
+        forbidden_calls = {"exec", "eval", "__import__", "Popen", "run", "check_output",
+                           "system", "fork", "spawn", "stat", "lstat", "readlink"}
+        # Validation has explicit instrumentation and source readers; the contract
+        # writer, arithmetic and this fixture file must remain inert source tools.
+        for path in PHASE.rglob("*.py"):
+            if path.name == "validate_pure.py":
+                continue
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+>                   assert not any(alias.name.split(".")[0] in forbidden_imports for alias in node.names), path
+E                   AssertionError: WindowsPath('C:/Users/Admin/Documents/Code/J.A.R.V.I.S/districts/C.A.T.T.U.S/docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_KERNEL_IDENTITY_CONTRACT_1/git_checks.py')
+E                   assert not True
+E                    +  where True = any(<generator object test_new_phase_python_has_no_owner_import_runtime_probe_or_process_launch.<locals>.<genexpr> at 0x00000247C6F459A0>)
+
+docs\roadmap\phases\SYNTH_EXEC_PREP_CONTROLLER_KERNEL_IDENTITY_CONTRACT_1\tests\test_kernel_identity_contract.py:485: AssertionError
+=========================== short test summary info ===========================
+FAILED docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_KERNEL_IDENTITY_CONTRACT_1/tests/test_kernel_identity_contract.py::test_new_phase_python_has_no_owner_import_runtime_probe_or_process_launch
+1 failed, 287 passed in 24.90s

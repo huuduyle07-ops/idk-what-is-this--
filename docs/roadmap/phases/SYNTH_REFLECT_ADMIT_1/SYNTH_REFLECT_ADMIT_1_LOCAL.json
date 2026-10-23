@@ -1,0 +1,200 @@
+{
+  "after_admission": {
+    "admission_fingerprint": "fbba90c74150f1328eccf373e3a0c5bfda7d07ad81ef18f51c80ac8d6556e278",
+    "admission_id": "2aff017aadbfa5e05a26c465c5f2df4438af03e7ecc5d02c058b89bdfe1a4dc4",
+    "apply_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "constructor_reflection_authority": false,
+    "consumption_state": "issued",
+    "declared_type": "int",
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "enumeration_authority": false,
+    "field_write_authority": false,
+    "issuer_phase_id": "SYNTH.REFLECT.ADMIT.1",
+    "issuing_process_id": 1432,
+    "member": "value",
+    "observation_role": "exact_private_state_after",
+    "operation": "read_exact_bound_field",
+    "owner": "SyntheticStateBox",
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_request_fingerprint": "d8f404b4214f5f90b15b6b50e5bb9395f7cf472baa654d0e80c439118f763f5e",
+    "reflection_request_issuance_id": "4575c3e3c8ffbf0d68bfcf892fc7aabc9d1eb27ff9bedac9dbc1f92617f3cdeb",
+    "renderer_fingerprint": "f892fcdb2ac021699d811e78f2e55b7933993556791b84bc2f11ab5cd143689c",
+    "renderer_identity": "SYNTH.REFLECT.1.render_synthetic_read_only_reflection",
+    "report_only": true,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "schema_version": "synthetic_reflection_execution_admission_v1",
+    "single_execution_use": true,
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "synthetic_authorization_fingerprint": "c33a2fe6415c66c915a19806eb57ea8686a462981f96fdb5f927a82c09f14706",
+    "synthetic_authorization_issuance_id": "e5b781e79b765001461260bae134ba0993319965e336a76236867c5e6a11c573",
+    "synthetic_reflection_execution_authority": true
+  },
+  "after_admission_identity": "2aff017aadbfa5e05a26c465c5f2df4438af03e7ecc5d02c058b89bdfe1a4dc4",
+  "after_authorization_identity": "e5b781e79b765001461260bae134ba0993319965e336a76236867c5e6a11c573",
+  "after_request_identity": "4575c3e3c8ffbf0d68bfcf892fc7aabc9d1eb27ff9bedac9dbc1f92617f3cdeb",
+  "allowed_operation": "read_exact_bound_field",
+  "apply_authority": false,
+  "arbitrary_class_loading_authority": false,
+  "authenticated_in_issuing_process": true,
+  "before_admission": {
+    "admission_fingerprint": "4a55562518d8684276d0dfe3b6e638d6b8163bdca3d70c063a6374f85315ff9b",
+    "admission_id": "a461458b0599a519c9ab1881dd73433eeb06879c8e4064975660c2b8136386d0",
+    "apply_authority": false,
+    "arbitrary_class_loading_authority": false,
+    "constructor_reflection_authority": false,
+    "consumption_state": "issued",
+    "declared_type": "int",
+    "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+    "enumeration_authority": false,
+    "field_write_authority": false,
+    "issuer_phase_id": "SYNTH.REFLECT.ADMIT.1",
+    "issuing_process_id": 1432,
+    "member": "value",
+    "observation_role": "exact_private_state_before",
+    "operation": "read_exact_bound_field",
+    "owner": "SyntheticStateBox",
+    "private_method_authority": false,
+    "real_task_runtime_authority": false,
+    "reflection_request_fingerprint": "dbffd8211482a3c8771b0a4cb06488962757991fa812b49855113192588a3aa1",
+    "reflection_request_issuance_id": "a618735c98664c38047d8d2f1cf80635ff09bdc9ac5e10231b541510e3077d26",
+    "renderer_fingerprint": "a540a00d9e6625036970a5b58ae53ae35714a65d67f560eb262e1d49bef264a0",
+    "renderer_identity": "SYNTH.REFLECT.1.render_synthetic_read_only_reflection",
+    "report_only": true,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+    "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+    "schema_version": "synthetic_reflection_execution_admission_v1",
+    "single_execution_use": true,
+    "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+    "synthetic_authorization_fingerprint": "471f821c9df2e133c3e5b9916db085ac6a6b7283b43405ddefae23ad13291108",
+    "synthetic_authorization_issuance_id": "0390d280092edbf06aed55c87df963723b0c2829ba7aceffe1810bd2c59f782e",
+    "synthetic_reflection_execution_authority": true
+  },
+  "before_admission_identity": "a461458b0599a519c9ab1881dd73433eeb06879c8e4064975660c2b8136386d0",
+  "before_authorization_identity": "0390d280092edbf06aed55c87df963723b0c2829ba7aceffe1810bd2c59f782e",
+  "before_request_identity": "a618735c98664c38047d8d2f1cf80635ff09bdc9ac5e10231b541510e3077d26",
+  "child_processes": 0,
+  "constructor_reflection_authority": false,
+  "consumption_implemented": false,
+  "consumption_policy": "single_execution_use_in_executor_issuing_process_immediately_before_exact_read; no replay after success; failure before reflection effect may remain unconsumed",
+  "consumption_state": "issued",
+  "containers_created": 0,
+  "declared_type": "int",
+  "definition_sha256": "e9466adfd5ab3e881b96deab9ac5bdac6907da17a9014f457bb20d7fdc2a941d",
+  "docker_calls": 0,
+  "effect_denial": {
+    "child_processes": 0,
+    "containers_created": 0,
+    "denied_attempts": {},
+    "docker_calls": 0,
+    "java_compile_count": 0,
+    "jvm_execution_count": 0,
+    "network_calls": 0,
+    "reflection_execution_count": 0,
+    "shell_calls": 0,
+    "strict": true
+  },
+  "enumeration_authority": false,
+  "field_write_authority": false,
+  "fresh_synth_auth_1_compatibility": true,
+  "fresh_synth_reflect_1_compatibility": true,
+  "historical_preservation": {
+    "phase_registry_edited_by_this_slice": false,
+    "reversal_records_edited_by_this_slice": false,
+    "upstream_manifests": {
+      "SYNTH_AUTH_1_LOCAL.json": {
+        "byte_identical": true,
+        "changed_files": [],
+        "protected_files_checked": 134
+      },
+      "SYNTH_REFLECT_1_LOCAL.json": {
+        "byte_identical": true,
+        "changed_files": [],
+        "protected_files_checked": 139
+      }
+    }
+  },
+  "java_compile_count": 0,
+  "jvm_execution_count": 0,
+  "measured_observations": null,
+  "member": "value",
+  "network_calls": 0,
+  "new_implementation_sha256": {
+    "core/synthetic_reflection_execution_admission.py": "ae6d60d7ef418cff366317ad4507d0f2de93f2aa9d188e8e12d453c66ed77b19",
+    "docs/roadmap/SYNTH_REFLECT_ADMIT_1.md": "1f3909a58c6b09a7b92a57abe296af0ffb8190373c8e13891ebc766ff50a599c",
+    "scripts/replay_synth_reflect_admit1.py": "427f9b98a3916ac104578f48139a7234d398ca541ba8ba3b5bfa0ae77e527e82",
+    "tests/test_synthetic_reflection_execution_admission.py": "61b259895d190a4ddc2e560b45b7e83a73aac37613de77ea6fa21f7c23d80745"
+  },
+  "owner": "SyntheticStateBox",
+  "phase_id": "SYNTH.REFLECT.ADMIT.1",
+  "positive_runtime_receipt": null,
+  "private_method_authority": false,
+  "real_task_runtime_authority": false,
+  "reflection_admissions_consumed": 0,
+  "reflection_execution_count": 0,
+  "report_only": true,
+  "repository_write_authority": false,
+  "role_separation_enforced": true,
+  "runtime_authority": false,
+  "scenario_id": "synthetic.EXECUTOR.1R.decrement_3",
+  "scenario_phase_id": "PATCH.CANDIDATE.BEHAVIOR.EXECUTOR.1R",
+  "shell_calls": 0,
+  "single_execution_use": true,
+  "source_projected": false,
+  "source_sha256": "813a17fd33e9c3d5a9bdc5bb6f8158e97ad7b021c3a0d2915ef68e45b0f09302",
+  "status": "SYNTH_REFLECT_ADMIT_1_COMPLETE",
+  "supported_roles": [
+    "exact_private_state_before",
+    "exact_private_state_after"
+  ],
+  "supported_synthetic_reflection_admission_count": 2,
+  "synthetic_reflection_execution_authority": true,
+  "synthetic_runtime_authorizations_consumed": 0,
+  "synthetic_runtime_authorizations_issued": 2,
+  "validation": {
+    "authority_apply_path_patch_safety": {
+      "deselected": 1,
+      "failed": 0,
+      "passed": 181
+    },
+    "benchmark_case_check": {
+      "checked": 54,
+      "errors": 0
+    },
+    "focused_admission_tests": {
+      "failed": 0,
+      "passed": 79
+    },
+    "frozen_sandbox_java_governance_discovery_subset": {
+      "containers_created": 0,
+      "failed": 0,
+      "java_executed": 0,
+      "passed": 106
+    },
+    "git_diff_check": "passed",
+    "in_memory_python_compile": {
+      "compiled": 1262,
+      "failed": 0
+    },
+    "preflight_and_historical_bank_reflection_subset": {
+      "failed": 2,
+      "failure_context": "frozen reversal assertions expect an earlier phase_registry.json snapshot; the pre-existing working-tree registry includes RUNTIME.JAVA.1",
+      "passed": 151
+    },
+    "registry_picker": {
+      "failed": 7,
+      "failure_context": "expected registry totals predate the already present RUNTIME.JAVA.1 entry; registry and reversal history were left untouched",
+      "passed": 292
+    },
+    "synth_auth_reflect_and_executor1r_blocked_regressions": {
+      "failed": 0,
+      "passed": 385
+    }
+  }
+}

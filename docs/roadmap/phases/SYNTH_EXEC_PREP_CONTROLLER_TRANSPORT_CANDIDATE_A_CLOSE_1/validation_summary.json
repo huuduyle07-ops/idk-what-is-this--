@@ -1,0 +1,118 @@
+{
+  "all_guard_counters_zero": true,
+  "authority_flags": {
+    "candidate_rejection_published": false,
+    "cap_change": false,
+    "capability_issuance": false,
+    "controller_implementation": false,
+    "kernel_contract_completion": false,
+    "kernel_projection_change": false,
+    "owner_encoding_change": false,
+    "repin": false,
+    "repository_write_authority": false,
+    "requirement_evolution": false,
+    "runtime_authority": false,
+    "schema_change": false,
+    "transport_selection": false,
+    "writer_inventory_implementation": false
+  },
+  "benchmark": {
+    "checked": 54,
+    "errors": 0,
+    "exit_code": 0
+  },
+  "candidate_rejection_published": false,
+  "conditional_arithmetic": {
+    "compile": 5254,
+    "condition": "five-digit class-size profile retained",
+    "excess": 637,
+    "materialize": 3567,
+    "physical": 8829,
+    "semantic": 8821
+  },
+  "conservative_arithmetic": {
+    "excess": 629,
+    "formal_rejection_substituted": false,
+    "physical_lower": 8821
+  },
+  "exact_premise_failure": "Two legal variable-width class-size fields are absent from R_C; profile width 5 is not a universal minimum.",
+  "exact_requested_proof_closed": false,
+  "focused": {
+    "collected": 297,
+    "evidence": "focused_comparison.json",
+    "failed": 1,
+    "passed": 296,
+    "unchanged_historical_failure": true
+  },
+  "git": {
+    "original_dirty_state_preserved": true,
+    "passed": true
+  },
+  "input_hashes": {
+    "artifacts": 59,
+    "embedded_references": 48,
+    "history_imported_or_rerun": false,
+    "passed": true
+  },
+  "kernel_status": "KERNEL_IDENTITY_CONTRACT_UNRESOLVED",
+  "new_closure_tests": {
+    "collected": 9,
+    "failed": 0,
+    "passed": 9
+  },
+  "operational_effects": {
+    "Docker": 0,
+    "capability_issuance": 0,
+    "child_process_creation": 0,
+    "class_size_execution": 0,
+    "controller_execution": 0,
+    "java": 0,
+    "javac": 0,
+    "live_kernel_inspection": 0,
+    "network": 0,
+    "owner_import": 0,
+    "proof_execution": 0,
+    "source_materialization": 0,
+    "writer_inventory": 0
+  },
+  "overall_budget_feasibility": "UNRESOLVED",
+  "owner_imports": [],
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.TRANSPORT.CANDIDATE_A.CLOSE.1",
+  "preservation": {
+    "additions_outside_new_phase": [],
+    "changed": [],
+    "deleted": [],
+    "file_count": 27062,
+    "passed": true
+  },
+  "registry_picker": {
+    "after_failed": 7,
+    "after_passed": 292,
+    "baseline_failed": 7,
+    "baseline_passed": 292,
+    "collected": 299,
+    "existing_failure_signatures_preserved": true,
+    "projections_identical": true
+  },
+  "residuals": {
+    "all_listed_nonnegative": true,
+    "listed_leaves": 88,
+    "omitted_class_width_occurrences": 2,
+    "omitted_difference_interval": [
+      -8,
+      0
+    ]
+  },
+  "settled_projection_rules_frozen": true,
+  "static": {
+    "bytecode_written": false,
+    "in_memory_python_compiled": 1388,
+    "json_whitespace_checked": true,
+    "passed": true
+  },
+  "stop": true,
+  "transport_status": "TRANSPORT_SELECTION_UNRESOLVED",
+  "typed_result": "CANDIDATE_A_CLOSURE_UNRESOLVED",
+  "validation_status": "PASSED_WITH_IDENTICAL_PREEXISTING_FAILURES",
+  "writer_completeness": "WRITER_INVENTORY_COMPLETENESS_UNRESOLVED"
+}

@@ -1,0 +1,113 @@
+{
+  "phase_id": "RUNTIME.JAVA.PINNED.1B",
+  "report_schema": "runtime_java_pinned_1b_frozen_regression_assessment_v1",
+  "raw_validation_artifact": "frozen_validation.json",
+  "raw_validation_sha256": "4bfdd8ec9c032e0affd825052c04acc593d7ca0dafcc849f682e0d32f22220eb",
+  "raw_exit_code_preserved": 1,
+  "collected": 1049,
+  "passed": 1048,
+  "skipped": 0,
+  "preexisting_bookkeeping_failure_count": 1,
+  "sole_maintenance_failure_id": "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+  "all_other_tests_passed": true,
+  "semantic_regressions_passed": true,
+  "classification_rule": "Only the exact separately preserved historical bookkeeping reversal failure may be classified as preexisting. Every other selected pure/blocked regression must pass, all preexisting baseline bytes must remain identical, and the failure must match initial-run evidence. No expected hash or historical file is updated.",
+  "historical_failure_trace": {
+    "test": "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+    "maintenance_helper": "tests/_patch_candidate_behavior_executor1_maintenance.py:9 -> tests/_runtime_sandbox1_maintenance.py:13",
+    "fixture": "tests/fixtures/runtime_sandbox1_reversal.json",
+    "fixture_record": {
+      "path": "docs/roadmap/phase_registry.json",
+      "entry_sha256": "a9b557bfc9fe33a8e1ef421a5da3675bc852073b870f8c845e075844deddc999",
+      "post_sha256": "33334b0eed9cf0bfc55bf7484abff0766ff5d9e2afff705cd4e65b4a01c8c87a"
+    },
+    "registry_path": "docs/roadmap/phase_registry.json",
+    "initial_registry_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+    "current_registry_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+    "historical_expected_post_sha256": "33334b0eed9cf0bfc55bf7484abff0766ff5d9e2afff705cd4e65b4a01c8c87a",
+    "historical_expectation_disagrees_with_initial_and_current": true,
+    "failure_present_in_initial_environment_run": true,
+    "initial_and_elevated_failure_details_identical": true
+  },
+  "affected_frozen_bytes": [
+    {
+      "path": "docs/roadmap/phase_registry.json",
+      "initial_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+      "after_sha256": "44eb9fb7d5a5538dbb7646449d17c3193f7c5ca8dab2100945dccd1c37cf179c",
+      "bytes_unchanged": true
+    },
+    {
+      "path": "tests/fixtures/runtime_sandbox1_reversal.json",
+      "initial_sha256": "b93c55772993454a871cee0eb2baa232ef1c4979c347463e8ac8fef7b3d55c32",
+      "after_sha256": "b93c55772993454a871cee0eb2baa232ef1c4979c347463e8ac8fef7b3d55c32",
+      "bytes_unchanged": true
+    },
+    {
+      "path": "tests/fixtures/patch_candidate_behavior_executor1_reversal.json",
+      "initial_sha256": "429295d7b064163a293afea47188292d2fd8dfbd867be966e6441b1ae9fd4538",
+      "after_sha256": "429295d7b064163a293afea47188292d2fd8dfbd867be966e6441b1ae9fd4538",
+      "bytes_unchanged": true
+    },
+    {
+      "path": "tests/test_patch_candidate_behavior_executor1.py",
+      "initial_sha256": "b7870bce23c8d5080d4bf2fa962a42663c25657b1ab9161b529161cdfd14a238",
+      "after_sha256": "b7870bce23c8d5080d4bf2fa962a42663c25657b1ab9161b529161cdfd14a238",
+      "bytes_unchanged": true
+    },
+    {
+      "path": "tests/_patch_candidate_behavior_executor1_maintenance.py",
+      "initial_sha256": "f51c291c48626e8b8ea1b156512d1b199622f058fafef3bad1eefdf4a1beb522",
+      "after_sha256": "f51c291c48626e8b8ea1b156512d1b199622f058fafef3bad1eefdf4a1beb522",
+      "bytes_unchanged": true
+    },
+    {
+      "path": "tests/_runtime_sandbox1_maintenance.py",
+      "initial_sha256": "41e36924002812cd4a652f59f062ed51467f7f03b623968b14751db6d4d0fba7",
+      "after_sha256": "41e36924002812cd4a652f59f062ed51467f7f03b623968b14751db6d4d0fba7",
+      "bytes_unchanged": true
+    }
+  ],
+  "preservation_baseline_files_checked": 1962,
+  "all_preexisting_baseline_bytes_unchanged": true,
+  "changed_preexisting_files": [],
+  "missing_preexisting_files": [],
+  "historical_repins": false,
+  "execution_provenance": {
+    "command": "python -B docs/roadmap/phases/RUNTIME_JAVA_PINNED_1B/pure_validation.py frozen_validation",
+    "filesystem_permission": "require_escalated automatic approval accepted",
+    "reason": "Allow read-only directory metadata required by historical synthetic fixtures for Path.resolve(strict=True); normal Windows filesystem sandbox returns WinError 5.",
+    "initial_environment_failure_artifacts": [
+      "frozen_validation_initial_environment.json",
+      "frozen_validation_initial_environment.txt"
+    ],
+    "original_owner_and_test_files_changed": false,
+    "root_canonicalizer_patched": false,
+    "owner_validator_bypasses": false,
+    "process_network_runtime_denial_guard_active": true,
+    "guard_harness_sha256": "2c97a3b5a9cde42969abcb9e39fd669ef03d2181690f1e90aaa76c721e0bb4d2"
+  },
+  "real_effect_attempts": [],
+  "denied_attempts": {},
+  "successful_operational_effect_counts": {
+    "Docker": 0,
+    "containers": 0,
+    "exports": 0,
+    "Java": 0,
+    "javac": 0,
+    "controller": 0,
+    "network": 0,
+    "shell": 0,
+    "host mounts": 0,
+    "source projection": 0,
+    "runtime lease consumption": 0,
+    "reflection lease consumption": 0,
+    "BANK": 0,
+    "EXECUTOR.1R": 0,
+    "Apply": 0
+  },
+  "runtime_authority_issued": false,
+  "preexisting_bookkeeping_drift_verified": true,
+  "accepted_preexisting_failure_ids": [
+    "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts"
+  ]
+}

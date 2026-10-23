@@ -1,0 +1,76 @@
+{
+  "HMAC_results": {
+    "descriptor": true,
+    "receipt": true
+  },
+  "demonstrated_HMAC_failure": false,
+  "descriptor": {
+    "exact_type": "core.thread_compatible_runtime_sandbox.ThreadCompatibleSandboxDescriptor",
+    "issuing_pid_exposed": null,
+    "object_id_decimal": 1744924142656,
+    "object_id_hex": "0x19645956c40",
+    "signed_public_fields": {
+      "apply_authority": false,
+      "arbitrary_command_authority": false,
+      "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+      "eligible_for_java1_continuation": false,
+      "host_mount_authority": false,
+      "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+      "network_authority": false,
+      "phase_id": "RUNTIME.SANDBOX.2",
+      "relationship": "additive_epoch_preserving_SANDBOX_1_history",
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "sandbox_descriptor_fingerprint": "edd9ba704304d997dd2ab3db61c6761132de3a4c36e458c5d2df3dab1d949ba6",
+      "schema_version": "runtime_sandbox_2_v1",
+      "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "shell_available": false,
+      "status": "RUNTIME_SANDBOX_2_BLOCKED_UNRESOLVED",
+      "verification_receipt_fingerprint": "67aab975dd09eed2968975df1358c8f98188f17a2a0b8d323afc1d07b29b2d1b"
+    }
+  },
+  "observed_pid": 14420,
+  "public_validators": {
+    "JAVA1C_semantic_gate": {
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "result": "FAIL"
+    },
+    "descriptor_and_pair": {
+      "result": "PASS"
+    },
+    "receipt": {
+      "result": "PASS"
+    }
+  },
+  "receipt": {
+    "exact_type": "core.thread_compatible_runtime_sandbox.ThreadCompatibleSandboxReceipt",
+    "issuing_pid_exposed": null,
+    "object_id_decimal": 1744937358480,
+    "object_id_hex": "0x196465f1490",
+    "signed_public_fields": {
+      "apply_authority": false,
+      "arbitrary_command_authority": false,
+      "authority": "infrastructure_compatibility_measurement_only",
+      "baseline_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+      "baseline_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+      "baseline_seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+      "cleanup_verified": false,
+      "compatibility_classification": "blocked_no_java_capability",
+      "evidence_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "host_mount_authority": false,
+      "image_identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+      "network_authority": false,
+      "phase_id": "RUNTIME.SANDBOX.2",
+      "repository_write_authority": false,
+      "runtime_authority": false,
+      "schema_version": "runtime_sandbox_2_v1",
+      "seccomp_policy_sha256": "5a36bdf1676c4b0d7b4bef489f5e90b5c8fb201b5194be48baf61f4206a81f75",
+      "shell_available": false,
+      "stage_results": [],
+      "status": "RUNTIME_SANDBOX_2_BLOCKED_UNRESOLVED",
+      "verification_receipt_fingerprint": "67aab975dd09eed2968975df1358c8f98188f17a2a0b8d323afc1d07b29b2d1b"
+    }
+  },
+  "registry_membership": "NOT_APPLICABLE:no registry in frozen owner",
+  "semantic_eligibility": false
+}

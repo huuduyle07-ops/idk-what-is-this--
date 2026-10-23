@@ -1,0 +1,40 @@
+{
+  "finalizer_blocked_actions": [],
+  "finalizer_guard": {
+    "capability_or_transition_attempts": 0,
+    "capability_owner_import_attempts": 0,
+    "execution_or_verification_attempts": 0,
+    "network_attempts": 0,
+    "outside_phase_write_attempts": 0,
+    "process_attempts": 0
+  },
+  "json_validated": [
+    "benchmark.json",
+    "budget_witness.json",
+    "byte_totals.json",
+    "focused.json",
+    "git_validation.json",
+    "git_validation_baseline.json",
+    "identity_audit.json",
+    "preservation_after.json",
+    "preservation_baseline.json",
+    "preservation_comparison.json",
+    "proof.json",
+    "registry_after.json",
+    "registry_baseline.json",
+    "registry_comparison.json",
+    "static_validation.json",
+    "SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1R_REPORT.json",
+    "validation_summary.json",
+    "workspace_audit.json"
+  ],
+  "passed": true,
+  "python_compiled": [
+    "finalize_artifacts.py",
+    "proof.py",
+    "validate_pure.py",
+    "tests/test_budget_witness.py"
+  ],
+  "report_sha256": "4c2b6ca2992e3d6dc94f11d27f2ea548212a61a1f36a8a0488bd33dbbdee427f",
+  "whitespace_errors": []
+}

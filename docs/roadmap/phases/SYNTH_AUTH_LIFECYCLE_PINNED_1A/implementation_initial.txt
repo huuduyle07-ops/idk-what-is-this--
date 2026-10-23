@@ -1,0 +1,24 @@
+........................................................................ [ 51%]
+................................................................F..      [100%]
+================================== FAILURES ===================================
+_ test_consume_invalidate_race_commits_only_invalidation_with_unresolved_consumer _
+
+inert = namespace(owner=<module '_test_pinned_lifecycle_owner' from 'C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts...000001D8EB942350>, original_validator=<function validate_pinned_synthetic_runtime_authorization at 0x000001D8EBB34D50>)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D8EB6BC710>
+
+>   ???
+E   AssertionError: assert 3 == 1
+E    +  where 3 = <built-in method count of list object at 0x000001D8EB8D8D00>('INVALIDATED')
+E    +    where <built-in method count of list object at 0x000001D8EB8D8D00> = ['ISSUED', 'INVALIDATED', 'INVALIDATED', 'INVALIDATED'].count
+E    +    and   'INVALIDATED' = <module '_test_pinned_lifecycle_owner' from 'C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\synthetic_runtime_authorization_pinned_lifecycle.py'>.INVALIDATED
+
+tests\test_synthetic_runtime_authorization_pinned_lifecycle.py:812: AssertionError
+============================== warnings summary ===============================
+..\..\..\..\..\AppData\Roaming\Python\Python314\site-packages\google\genai\types.py:42
+  C:\Users\Admin\AppData\Roaming\Python\Python314\site-packages\google\genai\types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_synthetic_runtime_authorization_pinned_lifecycle.py::test_consume_invalidate_race_commits_only_invalidation_with_unresolved_consumer
+1 failed, 138 passed, 1 warning in 162.71s (0:02:42)

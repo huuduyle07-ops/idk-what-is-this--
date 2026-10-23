@@ -1,0 +1,169 @@
+{
+  "all_actual_operational_effects_zero": true,
+  "audit_guards": {
+    "benchmark": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "focused": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "registry_after": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    },
+    "registry_baseline": {
+      "capability_or_transition_attempts": 0,
+      "capability_owner_import_attempts": 0,
+      "execution_or_verification_attempts": 0,
+      "network_attempts": 0,
+      "outside_phase_write_attempts": 0,
+      "process_attempts": 0
+    }
+  },
+  "baseline_failure_policy": "Disclose and preserve identical existing failed nodes and registry/picker projections; never repair prior files in this phase.",
+  "benchmark": {
+    "benchmark_cases_checked": 54,
+    "benchmark_errors": 0,
+    "exit_code": 0
+  },
+  "checks": {
+    "all_six_proposals_accepted": true,
+    "benchmark_check_passed": true,
+    "evidence_uses_current_validator": true,
+    "focused_closure_tests_passed": true,
+    "git_diff_check_passed": true,
+    "harness_and_consumer_stay_unresolved": true,
+    "historical_preservation_passed": true,
+    "implementation_not_authorized": true,
+    "in_memory_compilation_JSON_whitespace_passed": true,
+    "no_authority_or_operations": true,
+    "operational_guards_zero": true,
+    "registry_exit_codes_explained_by_existing_test_failures": true,
+    "registry_picker_baseline_unchanged": true,
+    "source_does_not_contradict_preparation": true
+  },
+  "focused": {
+    "collected": 20,
+    "failed": [],
+    "passed": 20,
+    "skipped": []
+  },
+  "full_issuance_dependent_suites_run": false,
+  "git_diff_check": {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "executed_outside_operational_guard": true,
+    "exit_code": 0,
+    "operational_command_invoked": false,
+    "source_validation_only": true
+  },
+  "historical_preservation": {
+    "added_outside_new_phase": [],
+    "after_file_count": 26759,
+    "allowed_additions_outside_phase": [],
+    "baseline_file_count": 26759,
+    "changed": [],
+    "deleted": [],
+    "historical_preservation_passed": true,
+    "scope": "entire non-cache workspace including root/config/web and frozen history"
+  },
+  "operational_owner_modules_imported": [],
+  "phase_id": "SYNTH.EXEC.PREP.PINNED.CONTRACT.CLOSE.1",
+  "registry_picker": {
+    "after_collected": 299,
+    "after_failed": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "after_passed": 292,
+    "baseline_collected": 299,
+    "baseline_failed": [
+      {
+        "nodeid": "tests/test_phase_picker.py::test_behavioral_runtime_executor_is_blocked_and_never_recommended_without_isolation",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_seed_registry_produces_expected_buckets",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_picker.py::test_verified_runtime_sandbox_is_history_and_executor_stays_blocked",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_live_strict_envelope_dogfood_is_the_first_phase_to_declare_a_model_call",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_has_expected_phases",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_is_conservative",
+        "when": "call"
+      },
+      {
+        "nodeid": "tests/test_phase_registry.py::test_seed_registry_summary_counts",
+        "when": "call"
+      }
+    ],
+    "baseline_passed": 292,
+    "existing_failures_preserved": true,
+    "old_files_not_modified_to_repair_baseline": true,
+    "registry_and_picker_projections_identical": true,
+    "unchanged": true
+  },
+  "static": {
+    "compiled_count": 1347,
+    "errors": [],
+    "json_count": 14,
+    "passed": true,
+    "whitespace_errors": []
+  },
+  "typed_result": "SYNTH_EXEC_PREP_PINNED_CONTRACT_CLOSE_1_COMPLETE",
+  "validation_passed": true,
+  "writes_scope": "new additive closure phase documentation, pure tests, validation evidence and scratch only"
+}

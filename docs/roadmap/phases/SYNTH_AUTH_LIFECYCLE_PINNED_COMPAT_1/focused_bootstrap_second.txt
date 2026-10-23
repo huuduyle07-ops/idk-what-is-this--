@@ -1,0 +1,198 @@
+
+=================================== ERRORS ====================================
+____ ERROR collecting tests/test_synthetic_runtime_authorization_pinned.py ____
+tests\test_synthetic_runtime_authorization_pinned.py:20: in <module>
+    with no_runtime_effects(strict=False):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+tests\_preflight_runtime1_guard.py:89: in no_runtime_effects
+    guards.enter_context(patch(target, side_effect=evidence.deny(target)))
+C:\Python314\Lib\contextlib.py:530: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+C:\Python314\Lib\unittest\mock.py:1494: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+C:\Python314\Lib\pkgutil.py:463: in resolve_name
+    mod = importlib.import_module(s)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:759: in exec_module
+    ???
+<frozen importlib._bootstrap>:491: in _call_with_frames_removed
+    ???
+core\pipeline.py:11: in <module>
+    from agents.deepseek_client import run_deepseek_review
+agents\deepseek_client.py:13: in <module>
+    from config import DEEPSEEK_MODELS
+config.py:133: in <module>
+    STORAGE_PATH.mkdir(exist_ok=True)
+C:\Python314\Lib\pathlib\__init__.py:1011: in mkdir
+    os.mkdir(self, mode)
+docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1\validate_pure_audit.py:84: in hook
+    reject("repository_write_attempts", event + ":" + str(args))
+docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1\validate_pure_audit.py:60: in reject
+    raise AssertionError("Pure compatibility audit denied: " + str(detail))
+E   AssertionError: Pure compatibility audit denied: os.mkdir:('C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\storage', 511, -1)
+__ ERROR collecting tests/test_synthetic_runtime_authorization_lifecycle.py ___
+tests\test_synthetic_runtime_authorization_lifecycle.py:18: in <module>
+    with no_runtime_effects(strict=False):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+tests\_preflight_runtime1_guard.py:89: in no_runtime_effects
+    guards.enter_context(patch(target, side_effect=evidence.deny(target)))
+C:\Python314\Lib\contextlib.py:530: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+C:\Python314\Lib\unittest\mock.py:1494: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+C:\Python314\Lib\pkgutil.py:463: in resolve_name
+    mod = importlib.import_module(s)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:759: in exec_module
+    ???
+<frozen importlib._bootstrap>:491: in _call_with_frames_removed
+    ???
+core\pipeline.py:11: in <module>
+    from agents.deepseek_client import run_deepseek_review
+agents\deepseek_client.py:13: in <module>
+    from config import DEEPSEEK_MODELS
+config.py:133: in <module>
+    STORAGE_PATH.mkdir(exist_ok=True)
+C:\Python314\Lib\pathlib\__init__.py:1011: in mkdir
+    os.mkdir(self, mode)
+docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1\validate_pure_audit.py:84: in hook
+    reject("repository_write_attempts", event + ":" + str(args))
+docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1\validate_pure_audit.py:60: in reject
+    raise AssertionError("Pure compatibility audit denied: " + str(detail))
+E   AssertionError: Pure compatibility audit denied: os.mkdir:('C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\storage', 511, -1)
+_____ ERROR collecting tests/test_patch_candidate_behavior_executor1r.py ______
+tests\test_patch_candidate_behavior_executor1r.py:8: in <module>
+    from core import behavioral_diagnostic_executor_refresh as owner
+core\behavioral_diagnostic_executor_refresh.py:12: in <module>
+    from core import runtime_diagnostic_authorization as authorization
+core\runtime_diagnostic_authorization.py:21: in <module>
+    from core import behavioral_execution_admission as admission_owner
+core\behavioral_execution_admission.py:16: in <module>
+    from core import behavioral_evidence_execution_plan as planner
+core\behavioral_evidence_execution_plan.py:15: in <module>
+    from core import behavioral_validation_specification as oracle
+core\behavioral_validation_specification.py:14: in <module>
+    from core import structural_compile_validation as compiler
+core\structural_compile_validation.py:19: in <module>
+    from core import structural_candidate_materialization as materializer
+core\structural_candidate_materialization.py:20: in <module>
+    from core.structural_patch_author import (
+core\structural_patch_author.py:17: in <module>
+    from core.structural_scope_admission import (
+core\structural_scope_admission.py:23: in <module>
+    from core.structural_implementation_plan import (
+core\structural_implementation_plan.py:19: in <module>
+    from core.structural_scope_approval import validate_structural_scope_approval_receipt
+core\structural_scope_approval.py:14: in <module>
+    from core.structural_scope_expansion import (
+core\structural_scope_expansion.py:15: in <module>
+    from core.authoring_repair_scope import AuthoringRepairScope
+core\authoring_repair_scope.py:16: in <module>
+    from core.repair_scope import (
+core\repair_scope.py:16: in <module>
+    from core.treesitter_parse import structural_definitions
+core\treesitter_parse.py:13: in <module>
+    from config import TREESITTER_LANG_MAP
+config.py:133: in <module>
+    STORAGE_PATH.mkdir(exist_ok=True)
+C:\Python314\Lib\pathlib\__init__.py:1011: in mkdir
+    os.mkdir(self, mode)
+docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1\validate_pure_audit.py:84: in hook
+    reject("repository_write_attempts", event + ":" + str(args))
+docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1\validate_pure_audit.py:60: in reject
+    raise AssertionError("Pure compatibility audit denied: " + str(detail))
+E   AssertionError: Pure compatibility audit denied: os.mkdir:('C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\storage', 511, -1)
+_ ERROR collecting tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py _
+tests\test_patch_candidate_behavior_executor1r_lifecycle_retry.py:11: in <module>
+    with no_runtime_effects(strict=False):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+tests\_preflight_runtime1_guard.py:89: in no_runtime_effects
+    guards.enter_context(patch(target, side_effect=evidence.deny(target)))
+C:\Python314\Lib\contextlib.py:530: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+C:\Python314\Lib\unittest\mock.py:1494: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+C:\Python314\Lib\pkgutil.py:463: in resolve_name
+    mod = importlib.import_module(s)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:759: in exec_module
+    ???
+<frozen importlib._bootstrap>:491: in _call_with_frames_removed
+    ???
+core\pipeline.py:11: in <module>
+    from agents.deepseek_client import run_deepseek_review
+agents\deepseek_client.py:13: in <module>
+    from config import DEEPSEEK_MODELS
+config.py:133: in <module>
+    STORAGE_PATH.mkdir(exist_ok=True)
+C:\Python314\Lib\pathlib\__init__.py:1011: in mkdir
+    os.mkdir(self, mode)
+docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1\validate_pure_audit.py:84: in hook
+    reject("repository_write_attempts", event + ":" + str(args))
+docs\roadmap\phases\SYNTH_AUTH_LIFECYCLE_PINNED_COMPAT_1\validate_pure_audit.py:60: in reject
+    raise AssertionError("Pure compatibility audit denied: " + str(detail))
+E   AssertionError: Pure compatibility audit denied: os.mkdir:('C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\storage', 511, -1)
+=========================== short test summary info ===========================
+ERROR tests/test_synthetic_runtime_authorization_pinned.py - AssertionError: ...
+ERROR tests/test_synthetic_runtime_authorization_lifecycle.py - AssertionErro...
+ERROR tests/test_patch_candidate_behavior_executor1r.py - AssertionError: Pur...
+ERROR tests/test_patch_candidate_behavior_executor1r_lifecycle_retry.py - Ass...
+4 errors in 9.31s
+ERROR: found no collectors for C:\Users\Admin\Documents\Code\J.A.R.V.I.S\districts\C.A.T.T.U.S\tests\test_synthetic_runtime_authorization_pinned.py::test_public_issuer_accepts_no_free_form_inputs
+
+ERROR: found no collectors for C:\Users\Admin\Documents\Code\J.A.R.V.I.S\districts\C.A.T.T.U.S\tests\test_synthetic_runtime_authorization_lifecycle.py::test_future_consumption_boundary_is_explicit_and_has_no_runtime_implementation
+
+ERROR: found no collectors for C:\Users\Admin\Documents\Code\J.A.R.V.I.S\districts\C.A.T.T.U.S\tests\test_patch_candidate_behavior_executor1r.py::test_exact_fixture_is_independent_and_bound_to_its_field_definition
+
+ERROR: found no collectors for C:\Users\Admin\Documents\Code\J.A.R.V.I.S\districts\C.A.T.T.U.S\tests\test_patch_candidate_behavior_executor1r_lifecycle_retry.py::test_java_contract_audit_checks_exact_schema_and_policy_without_inventing_alias
+
+ERROR: found no collectors for C:\Users\Admin\Documents\Code\J.A.R.V.I.S\districts\C.A.T.T.U.S\tests\test_patch_candidate_behavior_executor1r_lifecycle_retry.py::test_renaming_continuation_module_does_not_change_its_frozen_contract
+

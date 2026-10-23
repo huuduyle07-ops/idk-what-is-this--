@@ -1,0 +1,21 @@
+{
+  "audit_link": "premise_audit.json",
+  "candidate_rejection_recorded": false,
+  "closure": "CANDIDATE_A_CLOSURE_UNRESOLVED",
+  "future_epoch_rule": "Any later candidate rejection must be an additive new closure. Explicit evolution of architecture/profile, stream mapping, framing, semantics or cap requires a new epoch; this audit remains immutable historical evidence.",
+  "historical_candidate": "A",
+  "historical_classification": "PREFERRED_BUT_SELECTION_UNRESOLVED",
+  "historical_phase": "SYNTH.EXEC.PREP.CONTROLLER.TRANSPORT.1",
+  "new_evidence": [
+    "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+    "SYNTH.EXEC.PREP.CONTROLLER.KERNEL.IDENTITY.CONTRACT.1"
+  ],
+  "phase_completion_history_changed": false,
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.TRANSPORT.CANDIDATE_A.CLOSE.1",
+  "production_registry_changed": false,
+  "record_kind": "ADDITIVE_CANDIDATE_CLOSURE_AUDIT",
+  "replacement_selection": false,
+  "resolution_link": "closure.json",
+  "supersession": "No supersession activated: exact 637-byte minimum premise fails the source audit.",
+  "transport_status": "TRANSPORT_SELECTION_UNRESOLVED"
+}

@@ -1,0 +1,747 @@
+{
+  "apply_authority": false,
+  "author_calls": 0,
+  "backend_discovery": {
+    "authority": "report_only_no_runtime_policy_or_write_apply_authority",
+    "availability_timings_seconds": {
+      "docker_default_pipe_denied": 1.3032679,
+      "docker_escalated_local_version": 0.9342842,
+      "docker_explicit_desktop_pipe_denied": 0.8477859,
+      "docker_immutable_python_image_identity": 1.3262788,
+      "docker_info_first_attempt_requested_timeout": 4,
+      "docker_info_first_attempt_total_including_timeout_cleanup": 6.7000686,
+      "docker_info_success": 5.562235,
+      "docker_local_image_inventory": 0.8836268,
+      "wsl_distro_enumeration_denied": 0.3816565,
+      "wsl_version": 0.2772277
+    },
+    "docker": {
+      "api_version": "1.55",
+      "auto_review_rejections": 0,
+      "available_after_approved_read_only_escalation": true,
+      "available_from_default_coding_sandbox": false,
+      "cli_path": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe",
+      "client_git_commit": "8900f1d",
+      "client_version": "29.6.1",
+      "containerd_version": "v2.2.5",
+      "default_coding_sandbox_reason": "local_named_pipe_permission_denied",
+      "desktop_version": "4.82.0 (233772)",
+      "engine_architecture": "amd64",
+      "engine_kernel": "6.18.33.2-microsoft-standard-WSL2",
+      "engine_platform": "linux",
+      "image": {
+        "architecture": "amd64",
+        "downloaded": false,
+        "existing_reference": "python:3.12-slim",
+        "immutable_id": "sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+        "java_image_present_in_local_inventory": false,
+        "os": "linux",
+        "repo_digest": "python@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+        "size_bytes": 43200635
+      },
+      "local_endpoint": "npipe:////./pipe/dockerDesktopLinuxEngine",
+      "runc_version": "1.3.6",
+      "running_local_engine_present": true,
+      "security_options_reported": [
+        "name=seccomp,profile=builtin",
+        "name=cgroupns"
+      ],
+      "server_git_commit": "8ec5ab3",
+      "server_version": "29.6.1"
+    },
+    "existing_idle_footprint_snapshot": {
+      "aggregate_working_set_bytes": 724086784,
+      "aggregate_working_set_mib": 690.54296875,
+      "measured_process_names": [
+        "com.docker.backend",
+        "Docker Desktop",
+        "vmcompute",
+        "vmmemWSL",
+        "wslservice"
+      ],
+      "phase_added_persistent_processes": 0,
+      "process_count": 10,
+      "scope": "snapshot_of_preexisting_matching_processes_not_attributed_exclusively_to_this_phase",
+      "vmmem_wsl_working_set_bytes": 486445056
+    },
+    "existing_services_snapshot": {
+      "WslService": "running",
+      "com.docker.service": "stopped",
+      "hns": "running",
+      "vmcompute": "running"
+    },
+    "host_architecture": "amd64",
+    "host_os_version": "10.0.26300.9457",
+    "host_platform": "windows",
+    "notes": [
+      "Operational timings and process snapshots must be excluded from semantic capability identity.",
+      "Installed Docker and local Python image are feasible verification prerequisites, not measured enforcement evidence.",
+      "No Java candidate runtime claim follows from a Python fixture or image inventory alone.",
+      "Docker inspect Config.WorkingDir and Config.Entrypoint were absent and their metadata queries failed; the immutable identity query succeeded."
+    ],
+    "other_local_capabilities": {
+      "hcsdiag_cli_present": true,
+      "hcsdiag_file_version": "10.0.26100.9278",
+      "native_windows_verified_candidate_sandbox_adapter_present": false,
+      "podman_cli_present": false,
+      "runhcs_cli_present": false,
+      "vmcompute_file_version": "10.0.26100.9444",
+      "wsl_distro_enumeration_status": "permission_denied_in_default_coding_sandbox",
+      "wsl_kernel_version": "6.18.33.2-2",
+      "wsl_version": "2.7.10.0"
+    },
+    "phase_id": "RUNTIME.SANDBOX.1",
+    "record_type": "read_only_local_backend_discovery",
+    "report_only": true,
+    "repository_findings": {
+      "executor_history_modified": false,
+      "executor_owner": "core/behavioral_diagnostic_executor.py",
+      "legacy_backend": "docker_ubuntu",
+      "legacy_backend_eligible": false,
+      "legacy_gaps": [
+        "caller_supplied_command_string",
+        "mutable_image_tags",
+        "caller_configurable_network_and_resource_limits",
+        "host_staging_repository_mount",
+        "output_capture_capped_only_after_communicate",
+        "best_effort_cleanup",
+        "persistent_runtime_artifacts",
+        "no_adversarial_authenticated_verification_receipt"
+      ],
+      "legacy_owner": "core/sandbox_runner.py"
+    },
+    "scope_counters": {
+      "bank_execution": 0,
+      "candidate_execution": 0,
+      "host_repository_mounts": 0,
+      "hostile_probe_execution": 0,
+      "image_pulls": 0,
+      "installations": 0,
+      "java_execution": 0,
+      "remote_engine_connections": 0,
+      "service_starts": 0
+    },
+    "verification_status": "read_only_discovery_snapshot; final_verification_is_the_signed_local_receipt_export"
+  },
+  "backend_policy": {
+    "cap_drop": "ALL",
+    "descendants": "private PID/mount/network/ipc/cgroup namespaces, bounded cgroup, destroyed at teardown",
+    "environment": "closed explicitly supplied values; unknown image defaults rejected",
+    "host_mounts": [],
+    "host_network": false,
+    "host_pid": false,
+    "local_image_only": true,
+    "log_driver": "none",
+    "network": "none",
+    "no_new_privileges": true,
+    "privileged": false,
+    "pull": "never",
+    "repository_exposure": "none",
+    "resource_limit_exhaustion_verified": false,
+    "resource_settings": {
+      "cpus": 1,
+      "memory_bytes": 134217728,
+      "pids": 128
+    },
+    "root_filesystem": "read_only",
+    "shell_surface": false,
+    "socket_syscalls": "fixed_seccomp_deny",
+    "uid": "65534:65534",
+    "workspace": "32MiB tmpfs, removed after each probe"
+  },
+  "bank_execution_count": 0,
+  "behavioral_scenario_count": 0,
+  "candidate_java_containment_executed": false,
+  "descriptor": {
+    "apply_authority": false,
+    "arbitrary_command_authority": false,
+    "available": true,
+    "backend_identity": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+    "backend_kind": "docker_linux_local",
+    "backend_version": "29.6.1",
+    "child_process_policy": "descendants_confined_to_private_namespaces_and_cgroup_then_destroyed",
+    "child_process_policy_enforced": true,
+    "enforced_requirements": [
+      "ephemeral_working_directory",
+      "fixed_executable_and_arguments",
+      "exact_source_and_classpath",
+      "hard_wall_clock_timeout",
+      "hard_stdout_stderr_bounds",
+      "all_child_process_cleanup",
+      "no_persistent_diagnostic_artifacts",
+      "candidate_filesystem_isolation",
+      "candidate_network_isolation",
+      "candidate_environment_isolation",
+      "candidate_extra_process_prevention"
+    ],
+    "environment_isolation_enforced": true,
+    "host_filesystem_isolation_enforced": true,
+    "image_identity": "sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+    "network_isolation_enforced": true,
+    "persistent_artifact_policy_enforced": true,
+    "phase_id": "RUNTIME.SANDBOX.1",
+    "process_tree_cleanup_enforced": true,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "sandbox_descriptor_fingerprint": "4b36a9f12aa4411bc41f869f437d66a470b5eb36403b90147091d2555859bf9c",
+    "schema_version": "runtime_sandbox_1_v1",
+    "shell_available": false,
+    "stderr_bound_enforced": true,
+    "stdout_bound_enforced": true,
+    "supported_host_platform": "Windows-AMD64",
+    "timeout_enforced": true,
+    "verification_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+    "verified": true,
+    "workspace_filesystem_policy": "ephemeral_tmpfs_exact_inputs_only"
+  },
+  "determinism_scope": "same backend image/version, contract, canonical facts and bounds; excludes durations/temp/PID IDs",
+  "deterministic": true,
+  "effect_claim_scope": "configured OS/backend effect boundary passed these V1 synthetic probes only",
+  "executor_boundary_compatible": true,
+  "exported_json_authorizes_nothing": true,
+  "first_remaining_blocker": "executor_refresh_and_exact_java_runtime_integration_not_in_this_phase",
+  "java_candidate_execution_count": 0,
+  "java_runtime_in_image": false,
+  "model_calls": 0,
+  "operational_diagnostics": [
+    {
+      "boundary": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": null,
+        "measured_probe_and_teardown_seconds": 7.495750300004147,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_completed",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": false,
+        "termination_within_requested_deadline": true
+      },
+      "descendant": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": null,
+        "measured_probe_and_teardown_seconds": 7.71069079998415,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_completed",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": false,
+        "termination_within_requested_deadline": true
+      },
+      "stderr": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": 3819.441100000404,
+        "measured_probe_and_teardown_seconds": 9.824239399982616,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_output_limit_exceeded",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": true,
+        "termination_within_requested_deadline": true
+      },
+      "stdout": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": 3683.4301999770105,
+        "measured_probe_and_teardown_seconds": 9.753892399952747,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_output_limit_exceeded",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": true,
+        "termination_within_requested_deadline": true
+      },
+      "timeout": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": true,
+        "measured_confirmed_termination_ms": 7490.998899971601,
+        "measured_probe_and_teardown_seconds": 13.423173799994402,
+        "requested_timeout_ms": 10000,
+        "status": "sandbox_timeout",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": true,
+        "termination_within_requested_deadline": true
+      }
+    },
+    {
+      "boundary": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": null,
+        "measured_probe_and_teardown_seconds": 7.4551231999648735,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_completed",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": false,
+        "termination_within_requested_deadline": true
+      },
+      "descendant": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": null,
+        "measured_probe_and_teardown_seconds": 7.601332599995658,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_completed",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": false,
+        "termination_within_requested_deadline": true
+      },
+      "stderr": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": 4017.652599955909,
+        "measured_probe_and_teardown_seconds": 10.23850500001572,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_output_limit_exceeded",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": true,
+        "termination_within_requested_deadline": true
+      },
+      "stdout": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": false,
+        "measured_confirmed_termination_ms": 3887.8703999798745,
+        "measured_probe_and_teardown_seconds": 9.9671626999625,
+        "requested_timeout_ms": 5000,
+        "status": "sandbox_output_limit_exceeded",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": true,
+        "termination_within_requested_deadline": true
+      },
+      "timeout": {
+        "cleanup_verified": true,
+        "control_stderr": "",
+        "deadline_triggered": true,
+        "measured_confirmed_termination_ms": 7511.795400001574,
+        "measured_probe_and_teardown_seconds": 13.934749700012617,
+        "requested_timeout_ms": 10000,
+        "status": "sandbox_timeout",
+        "supervisor_abort_trigger_ms": 5000,
+        "termination_verified": true,
+        "termination_within_requested_deadline": true
+      }
+    }
+  ],
+  "performance": {
+    "backend_availability_seconds": {
+      "max_ms": 2298.341,
+      "median_ms": 2290.671
+    },
+    "descendant_seconds": {
+      "max_ms": 7710.696,
+      "median_ms": 7656.017
+    },
+    "environment_seconds": {
+      "max_ms": 7495.756,
+      "median_ms": 7475.442
+    },
+    "filesystem_seconds": {
+      "max_ms": 7495.756,
+      "median_ms": 7475.442
+    },
+    "network_seconds": {
+      "max_ms": 7495.756,
+      "median_ms": 7475.442
+    },
+    "probe_execution_seconds": {
+      "max_ms": 18752.4,
+      "median_ms": 18604.695
+    },
+    "sandbox_startup_seconds": {
+      "max_ms": 12457.25,
+      "median_ms": 12405.517
+    },
+    "stderr_seconds": {
+      "max_ms": 10238.509,
+      "median_ms": 10031.376
+    },
+    "stdout_seconds": {
+      "max_ms": 9967.168,
+      "median_ms": 9860.532
+    },
+    "teardown_seconds": {
+      "max_ms": 18086.034,
+      "median_ms": 17687.222
+    },
+    "timeout_seconds": {
+      "max_ms": 13934.754,
+      "median_ms": 13678.966
+    },
+    "total_seconds": {
+      "max_ms": 51520.711,
+      "median_ms": 51014.994
+    }
+  },
+  "phase_id": "RUNTIME.SANDBOX.1",
+  "public_adapter_surface": "authenticated proof handle; no consumer execution method; verifier backend invocation consumes closed typed phase-owned specs",
+  "repetitions_measured": 2,
+  "report_only": true,
+  "repository_traversals": 0,
+  "runtime_authority": false,
+  "semantic_fingerprints": [
+    "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9",
+    "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9"
+  ],
+  "source_mutation_count": 0,
+  "status": "RUNTIME_SANDBOX_1_COMPLETE_WITH_WARNINGS",
+  "validation": {
+    "adjacent_reflection_infrastructure": {
+      "bank_class_executions": 0,
+      "java_candidate_executions": 0,
+      "synthetic_java_fixture_executions": 1
+    },
+    "authority_and_path": {
+      "baseline_registry_sha256": "a9b557bfc9fe33a8e1ef421a5da3675bc852073b870f8c845e075844deddc999",
+      "failed": 3,
+      "failures": [
+        "human_approval_token_contract registry expects UX.RUN.1 instead of DOGFOOD.1B",
+        "human_approval_token_dry_run_validator registry expects HARDEN.CLOSE proposed instead of complete",
+        "human_authority_branch_checkpoint registry expects UX.RUN.1 instead of DOGFOOD.1B"
+      ],
+      "failures_preexisting": true,
+      "passed": 276,
+      "skipped": 2
+    },
+    "benchmarks_check": {
+      "cases": 54,
+      "errors": 0
+    },
+    "broad_adjacent_run": {
+      "collected": 347,
+      "complete": false,
+      "reason": "repeated reconstruction of unchanged frozen lineage; replaced by 21 scoped regressions",
+      "reported_as_passed": false,
+      "status": "superseded_and_stopped_after_verifying_owned_worker_identity"
+    },
+    "compileall": "passed",
+    "exact_frozen_bookkeeping": {
+      "passed": 5
+    },
+    "final_combined_focused_registry": {
+      "elapsed_seconds": 8.29,
+      "passed": 449
+    },
+    "final_phase_container_inventory": {
+      "query_exit_code": 0,
+      "query_seconds": 1.035,
+      "remaining_phase_containers": 0
+    },
+    "focused_tests": {
+      "passed": 150
+    },
+    "frozen_runtime_adjacent": {
+      "elapsed_seconds": 219.36,
+      "node_ids": [
+        "tests/test_patch_candidate_behavior_executor1.py::test_descriptor_truthfully_declares_required_isolation_unavailable",
+        "tests/test_patch_candidate_behavior_executor1.py::test_exact_synthetic_authority_reaches_only_capability_incomplete_boundary[successful_transfer]",
+        "tests/test_patch_candidate_behavior_executor1.py::test_real_BANK_without_operational_runtime_authority_is_authenticated_negative",
+        "tests/test_patch_candidate_behavior_executor1.py::test_rehashed_typed_forgery_reaches_fresh_validator_and_is_rejected[shell_grant]",
+        "tests/test_patch_candidate_behavior_executor1.py::test_unsigned_or_tampered_execution_receipt_never_authenticates[signature]",
+        "tests/test_patch_candidate_behavior_executor1.py::test_bookkeeping_reversal_preserves_exact_frozen_receipts",
+        "tests/test_preflight_runtime1.py::test_BANK_without_runtime_source_preserves_frozen_negative_authority",
+        "tests/test_preflight_runtime1.py::test_caller_JSON_approval_is_never_an_authenticated_source[explicit_human_runtime_authorization]",
+        "tests/test_preflight_runtime1.py::test_mandatory_effect_prohibition_cannot_be_removed[arbitrary_environment_inspection_forbidden]",
+        "tests/test_preflight_runtime1.py::test_false_authorities_and_unavailable_execution_cannot_be_escalated[apply_authority]",
+        "tests/test_preflight_runtime1.py::test_bookkeeping_reversal_preserves_frozen_receipts",
+        "tests/test_patch_candidate_behavior_exec_admit1.py::test_execution_eligibility_and_operational_grants_cannot_be_caller_authored[arbitrary_shell_authority]",
+        "tests/test_patch_candidate_behavior_exec_admit1.py::test_plan_and_descriptor_reconstruction_cannot_be_skipped",
+        "tests/test_patch_candidate_behavior_exec_admit1.py::test_runtime_isolation_is_required_without_claiming_implemented_enforcement",
+        "tests/test_patch_candidate_behavior_exec_admit1.py::test_interest_admission_cannot_omit_console_requirement",
+        "tests/test_patch_candidate_behavior_exec_admit1.py::test_bookkeeping_reversal_preserves_every_frozen_prerequisite_receipt",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_descriptor_reconstruction_improves_only_architecture_truth",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_java_adapter_has_one_exact_read_surface_and_prohibited_paths_are_absent",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_synthetic_exact_private_inherited_and_two_independently_bound_reads",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_bookkeeping_reversal_preserves_frozen_prerequisite_entry_receipts",
+        "tests/test_patch_candidate_behavior_reflect1.py::test_nonfinite_native_double_cannot_become_canonical_evidence[nan]"
+      ],
+      "passed": 21,
+      "scope": "focused pure blocked-authority, forgery, effect prohibition, missing console, exact history and existing synthetic reflection infrastructure",
+      "status": "passed"
+    },
+    "git_diff_check": "passed_existing_line_ending_warnings_only",
+    "optional_process_query_review": {
+      "action_completed_by_normal_verified_owned_process_control": true,
+      "blocked_work_remaining": false,
+      "status": "automatic_approval_review_timeout"
+    },
+    "registry_picker": {
+      "passed": 299
+    }
+  },
+  "verification_receipt": {
+    "apply_authority": false,
+    "author_calls": 0,
+    "authority": "infrastructure_effect_measurement_only",
+    "backend": {
+      "backend_available": true,
+      "backend_identity": "local-docker:npipe:////./pipe/dockerDesktopLinuxEngine",
+      "backend_kind": "docker_linux_local",
+      "backend_version": "29.6.1",
+      "cli_present": true,
+      "image_identity": "sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+      "reason": "backend_available_not_verified",
+      "supported_host_platform": "Windows-AMD64"
+    },
+    "bank_execution_count": 0,
+    "behavioral_scenario_count": 0,
+    "candidate_execution_count": 0,
+    "cleanup_outcome": "all_phase_resources_removed",
+    "java_execution_count": 0,
+    "missing_requirements": [],
+    "model_calls": 0,
+    "outcomes": [
+      {
+        "cleanup_verified": true,
+        "measured_facts": [
+          [
+            "capabilities_zero",
+            "true"
+          ],
+          [
+            "cleanup_control",
+            "{\"inspect_error\":\"error: no such object: <phase-container>\\n\",\"inspect_exit_code\":1,\"inspect_status\":\"sandbox_completed\",\"remove_exit_code\":0,\"remove_status\":\"sandbox_completed\"}"
+          ],
+          [
+            "environment",
+            "{\"GPG_KEY\":\"\",\"HOME\":\"/work\",\"HOSTNAME\":\"runtime-sandbox1\",\"LANG\":\"C.UTF-8\",\"PATH\":\"/usr/local/bin:/usr/bin:/bin\",\"PYTHON_SHA256\":\"\",\"PYTHON_VERSION\":\"\",\"SANDBOX_PUBLIC_SENTINEL\":\"phase-owned\"}"
+          ],
+          [
+            "external_read_denied",
+            "true"
+          ],
+          [
+            "external_write_denied",
+            "true"
+          ],
+          [
+            "host_secret_absent",
+            "true"
+          ],
+          [
+            "local_connect_denied",
+            "true"
+          ],
+          [
+            "manifest",
+            "[{\"path\":\"projection.txt\",\"sha256\":\"8dbe754d8c894788500505a0c4a0537f63cfb6439a9706853968474f5fabbd9b\",\"size_bytes\":45}]"
+          ],
+          [
+            "namespaces",
+            "[\"cgroup\",\"ipc\",\"mnt\",\"net\",\"pid\"]"
+          ],
+          [
+            "no_new_privileges",
+            "true"
+          ],
+          [
+            "pid_is_one",
+            "true"
+          ],
+          [
+            "root_write_denied",
+            "true"
+          ],
+          [
+            "socket_denials",
+            "{\"dns_udp\":true,\"ipv4_tcp\":true,\"ipv6_tcp\":true,\"unix_socket\":true}"
+          ],
+          [
+            "socketpair_denied",
+            "true"
+          ],
+          [
+            "termination_within_requested_deadline",
+            "true"
+          ],
+          [
+            "uid",
+            "65534"
+          ],
+          [
+            "workspace_write",
+            "true"
+          ]
+        ],
+        "passed_dimensions": [
+          "exact_source_and_classpath",
+          "fixed_executable_and_arguments",
+          "ephemeral_working_directory",
+          "candidate_filesystem_isolation",
+          "candidate_network_isolation",
+          "candidate_environment_isolation"
+        ],
+        "probe_id": "boundary",
+        "probe_sha256": "286f0d1a32c84d68ca8092454203a8a52fe89922058990db725449bc9c2256b6",
+        "status": "sandbox_completed",
+        "stderr_limit_bytes": 8192,
+        "stderr_size": 0,
+        "stdout_limit_bytes": 8192,
+        "stdout_size": 798,
+        "timeout_ms": 5000
+      },
+      {
+        "cleanup_verified": true,
+        "measured_facts": [
+          [
+            "child_alive",
+            "true"
+          ],
+          [
+            "child_spawned",
+            "true"
+          ],
+          [
+            "cleanup_control",
+            "{\"inspect_error\":\"error: no such object: <phase-container>\\n\",\"inspect_exit_code\":1,\"inspect_status\":\"sandbox_completed\",\"remove_exit_code\":0,\"remove_status\":\"sandbox_completed\"}"
+          ],
+          [
+            "pid_is_one",
+            "true"
+          ],
+          [
+            "same_cgroup",
+            "true"
+          ],
+          [
+            "same_namespaces",
+            "true"
+          ],
+          [
+            "termination_within_requested_deadline",
+            "true"
+          ]
+        ],
+        "passed_dimensions": [
+          "candidate_extra_process_prevention",
+          "all_child_process_cleanup"
+        ],
+        "probe_id": "descendant",
+        "probe_sha256": "286f0d1a32c84d68ca8092454203a8a52fe89922058990db725449bc9c2256b6",
+        "status": "sandbox_completed",
+        "stderr_limit_bytes": 8192,
+        "stderr_size": 0,
+        "stdout_limit_bytes": 8192,
+        "stdout_size": 111,
+        "timeout_ms": 5000
+      },
+      {
+        "cleanup_verified": true,
+        "measured_facts": [
+          [
+            "child_alive",
+            "true"
+          ],
+          [
+            "child_spawned",
+            "true"
+          ],
+          [
+            "cleanup_control",
+            "{\"inspect_error\":\"error: no such object: <phase-container>\\n\",\"inspect_exit_code\":1,\"inspect_status\":\"sandbox_completed\",\"remove_exit_code\":0,\"remove_status\":\"sandbox_completed\"}"
+          ],
+          [
+            "pid_is_one",
+            "true"
+          ],
+          [
+            "same_cgroup",
+            "true"
+          ],
+          [
+            "same_namespaces",
+            "true"
+          ],
+          [
+            "termination_within_requested_deadline",
+            "true"
+          ]
+        ],
+        "passed_dimensions": [
+          "hard_wall_clock_timeout",
+          "all_child_process_cleanup"
+        ],
+        "probe_id": "timeout",
+        "probe_sha256": "286f0d1a32c84d68ca8092454203a8a52fe89922058990db725449bc9c2256b6",
+        "status": "sandbox_timeout",
+        "stderr_limit_bytes": 8192,
+        "stderr_size": 0,
+        "stdout_limit_bytes": 8192,
+        "stdout_size": 111,
+        "timeout_ms": 10000
+      },
+      {
+        "cleanup_verified": true,
+        "measured_facts": [
+          [
+            "cleanup_control",
+            "{\"inspect_error\":\"error: no such object: <phase-container>\\n\",\"inspect_exit_code\":1,\"inspect_status\":\"sandbox_completed\",\"remove_exit_code\":0,\"remove_status\":\"sandbox_completed\"}"
+          ],
+          [
+            "termination_within_requested_deadline",
+            "true"
+          ]
+        ],
+        "passed_dimensions": [
+          "hard_stdout_stderr_bounds"
+        ],
+        "probe_id": "stdout",
+        "probe_sha256": "286f0d1a32c84d68ca8092454203a8a52fe89922058990db725449bc9c2256b6",
+        "status": "sandbox_output_limit_exceeded",
+        "stderr_limit_bytes": 8192,
+        "stderr_size": 0,
+        "stdout_limit_bytes": 8192,
+        "stdout_size": 8192,
+        "timeout_ms": 5000
+      },
+      {
+        "cleanup_verified": true,
+        "measured_facts": [
+          [
+            "cleanup_control",
+            "{\"inspect_error\":\"error: no such object: <phase-container>\\n\",\"inspect_exit_code\":1,\"inspect_status\":\"sandbox_completed\",\"remove_exit_code\":0,\"remove_status\":\"sandbox_completed\"}"
+          ],
+          [
+            "termination_within_requested_deadline",
+            "true"
+          ]
+        ],
+        "passed_dimensions": [
+          "hard_stdout_stderr_bounds"
+        ],
+        "probe_id": "stderr",
+        "probe_sha256": "286f0d1a32c84d68ca8092454203a8a52fe89922058990db725449bc9c2256b6",
+        "status": "sandbox_output_limit_exceeded",
+        "stderr_limit_bytes": 8192,
+        "stderr_size": 8192,
+        "stdout_limit_bytes": 8192,
+        "stdout_size": 0,
+        "timeout_ms": 5000
+      }
+    ],
+    "phase_id": "RUNTIME.SANDBOX.1",
+    "repository_traversals": 0,
+    "repository_write_authority": false,
+    "runtime_authority": false,
+    "schema_version": "runtime_sandbox_1_v1",
+    "seccomp_policy_sha256": "855462482bcdd76cd2b52d8cdd40683af1165a47c041d687bc64723acc4e1447",
+    "source_mutation": 0,
+    "status": "RUNTIME_SANDBOX_1_COMPLETE_WITH_WARNINGS",
+    "verification_contract_version": "candidate_runtime_effect_boundary_v1",
+    "verification_receipt_fingerprint": "53f7dcd60f46cda18adbd8037d996d7beb4e7fa7df4e6778cff69a82935426e9"
+  },
+  "warnings": [
+    "Python probe image only; Java integration and Java toolchain unavailable in this adapter",
+    "About 51 seconds per five-probe verification; existing Docker/WSL process footprint about 690.5 MiB",
+    "Only two timing samples under local load; dimension timings share the boundary probe and are not additive",
+    "Resource settings inspected; memory/CPU/PID exhaustion guarantees not stress-verified",
+    "Three preexisting stale registry snapshot test failures reproduced on exact pre-phase bytes"
+  ],
+  "write_authority": false
+}

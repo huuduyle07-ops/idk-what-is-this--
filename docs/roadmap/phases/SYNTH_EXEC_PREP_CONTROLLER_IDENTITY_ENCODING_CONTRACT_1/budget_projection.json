@@ -1,0 +1,355 @@
+{
+  "authority_flags": {
+    "capability_issuance": false,
+    "controller_implementation": false,
+    "identity_generator_implementation": false,
+    "owner_implementation": false,
+    "repin": false,
+    "runtime_activation": false,
+    "scenario_compilation": false,
+    "schema_change": false,
+    "source_materialization": false,
+    "transport_selection": false,
+    "workspace_issuance": false
+  },
+  "candidate_A_selected": false,
+  "cap_bytes": 8192,
+  "conditional_candidate_A_framed_total_bytes": 8340,
+  "conditional_candidate_A_framing_bytes": 8,
+  "conditional_response_payload_bytes": 8332,
+  "exact_execution_witness": false,
+  "excess_bytes": 148,
+  "family_ledger": [
+    {
+      "accepted_content_width_bytes": 17,
+      "compile_occurrences": 2,
+      "delta_from_one_byte_relaxation_bytes": 64,
+      "identity_family": "workspace_capability_id",
+      "materialize_occurrences": 2,
+      "paths_in_each_response": [
+        "/workspace_capability_id",
+        "/result/workspace_state/workspace_capability_id"
+      ],
+      "total_occurrences": 4
+    },
+    {
+      "accepted_content_width_bytes": 17,
+      "compile_occurrences": 1,
+      "delta_from_one_byte_relaxation_bytes": 32,
+      "identity_family": "controller_identity",
+      "materialize_occurrences": 1,
+      "paths_in_each_response": [
+        "/result/workspace_state/controller_identity"
+      ],
+      "total_occurrences": 2
+    },
+    {
+      "accepted_content_width_bytes": 17,
+      "compile_occurrences": 1,
+      "delta_from_one_byte_relaxation_bytes": 32,
+      "identity_family": "exclusive_owner_relation_id",
+      "materialize_occurrences": 1,
+      "paths_in_each_response": [
+        "/result/workspace_state/process_exclusivity_observation/exclusive_owner_relation_id"
+      ],
+      "total_occurrences": 2
+    },
+    {
+      "accepted_content_width_bytes": 17,
+      "alias_rule": "This field reuses the authenticated original exclusive owner relation identity; it is not a separately generated ID.",
+      "compile_occurrences": 1,
+      "delta_from_one_byte_relaxation_bytes": 32,
+      "identity_family": "writer.accounted_original_relation_id",
+      "materialize_occurrences": 1,
+      "paths_in_each_response": [
+        "/result/workspace_state/process_exclusivity_observation/writers/0/accounted_original_relation_id"
+      ],
+      "symbolic_identity_alias": "exclusive_owner_relation_id",
+      "total_occurrences": 2
+    },
+    {
+      "absence_rule": "Present once in each effect request and absent from the complete successful response envelope and result.",
+      "accepted_content_width_bytes": 17,
+      "compile_occurrences": 0,
+      "delta_from_one_byte_relaxation_bytes": 0,
+      "identity_family": "admission_relation_id",
+      "materialize_occurrences": 0,
+      "paths_in_each_response": [],
+      "request_occurrences": 2,
+      "total_occurrences": 0
+    },
+    {
+      "accepted_content_width_bytes": 17,
+      "compile_occurrences": 1,
+      "delta_from_one_byte_relaxation_bytes": 32,
+      "identity_family": "preparation_attempt_id",
+      "materialize_occurrences": 1,
+      "paths_in_each_response": [
+        "/result/preparation_attempt_id"
+      ],
+      "total_occurrences": 2
+    },
+    {
+      "accepted_content_width_bytes": 17,
+      "compile_occurrences": 1,
+      "delta_from_one_byte_relaxation_bytes": 32,
+      "distinct_exchange_symbols": [
+        "request_id.materialize",
+        "request_id.compile"
+      ],
+      "identity_family": "request_id",
+      "materialize_occurrences": 1,
+      "paths_in_each_response": [
+        "/request_id"
+      ],
+      "total_occurrences": 2
+    },
+    {
+      "accepted_content_width_bytes": 17,
+      "compile_occurrences": 1,
+      "delta_from_one_byte_relaxation_bytes": 32,
+      "distinct_exchange_symbols": [
+        "operation_id.materialize",
+        "operation_id.compile"
+      ],
+      "identity_family": "operation_id",
+      "materialize_occurrences": 1,
+      "paths_in_each_response": [
+        "/operation_id"
+      ],
+      "total_occurrences": 2
+    },
+    {
+      "accepted_content_width_bytes": 17,
+      "compile_occurrences": 1,
+      "delta_from_one_byte_relaxation_bytes": 16,
+      "identity_family": "deadline_identity",
+      "materialize_occurrences": 0,
+      "paths_in_compile_response": [
+        "/result/capture_and_reap/deadline_identity"
+      ],
+      "total_occurrences": 1
+    },
+    {
+      "budget_delta_bytes": 0,
+      "identity_family": "process.admitted_operation_id",
+      "nonnull_content_width_bytes": 17,
+      "nonnull_occurrences_in_budget_reference": 0,
+      "null_occurrences_per_response": 1,
+      "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/processes/0/admitted_operation_id"
+    },
+    {
+      "budget_delta_bytes": 0,
+      "identity_family": "writer_handle.admitted_operation_id",
+      "nonnull_content_width_bytes": 17,
+      "nonnull_occurrences_in_budget_reference": 0,
+      "null_occurrences_per_response": 2,
+      "paths_in_each_response": [
+        "/result/workspace_state/process_exclusivity_observation/writers/0/handles/0/admitted_operation_id",
+        "/result/workspace_state/process_exclusivity_observation/writers/0/handles/1/admitted_operation_id"
+      ]
+    },
+    {
+      "budget_delta_bytes": 0,
+      "identity_family": "active_operation_id",
+      "nonnull_content_width_bytes": 17,
+      "nonnull_occurrences_in_budget_reference": 0,
+      "null_occurrences_per_response": 1,
+      "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/active_operation_id"
+    },
+    {
+      "budget_delta_bytes": 0,
+      "identity_family": "authorized_borrower_relation_id",
+      "nonnull_encoding_selected": false,
+      "null_occurrences_per_response": 1,
+      "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/authorized_borrower_relation_id"
+    },
+    {
+      "budget_delta_bytes": 0,
+      "identity_family": "handoff_identity",
+      "nonnull_encoding_selected": false,
+      "null_occurrences_per_response": 1,
+      "path_in_each_response": "/result/workspace_state/process_exclusivity_observation/handoff_identity"
+    }
+  ],
+  "historical_proof_rerun": false,
+  "kernel_widths": "Previous unresolved lower placeholders unchanged; no new observation or serializer.",
+  "operational_effects": {
+    "Docker": 0,
+    "capability_issuance": 0,
+    "controller_execution": 0,
+    "identity_generation": 0,
+    "java": 0,
+    "javac": 0,
+    "live_kernel_inspection": 0,
+    "network": 0,
+    "owner_import": 0,
+    "source_materialization": 0
+  },
+  "other_widths": "All non-owner terms, writer topology, maximum class decimal width and Candidate-A-only generation/container/framing assumptions unchanged.",
+  "overall_budget_feasibility": "UNRESOLVED",
+  "phase_id": "SYNTH.EXEC.PREP.CONTROLLER.IDENTITY.ENCODING.CONTRACT.1",
+  "remaining_margin_bytes": -148,
+  "request_bytes_added_to_stdout": 0,
+  "responses": [
+    {
+      "baseline_payload_bytes": 3251,
+      "conditional_payload_bytes": 3379,
+      "delta_bytes": 128,
+      "operation": "MATERIALIZE_EXACT_SCENARIO_SOURCE",
+      "owner_occurrences": 8,
+      "substitutions": [
+        {
+          "delta_bytes": 16,
+          "family": "operation_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/operation_id",
+          "symbol": "operation_id.materialize"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "request_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/request_id",
+          "symbol": "request_id.materialize"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "preparation_attempt_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/result/preparation_attempt_id",
+          "symbol": "preparation_attempt_id"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "controller_identity",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/result/workspace_state/controller_identity",
+          "symbol": "controller_identity"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "exclusive_owner_relation_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/result/workspace_state/process_exclusivity_observation/exclusive_owner_relation_id",
+          "symbol": "exclusive_owner_relation_id"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "exclusive_owner_relation_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/accounted_original_relation_id",
+          "symbol": "exclusive_owner_relation_id"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "workspace_capability_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/result/workspace_state/workspace_capability_id",
+          "symbol": "workspace_capability_id"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "workspace_capability_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/workspace_capability_id",
+          "symbol": "workspace_capability_id"
+        }
+      ]
+    },
+    {
+      "baseline_payload_bytes": 4809,
+      "conditional_payload_bytes": 4953,
+      "delta_bytes": 144,
+      "operation": "COMPILE_EXACT_SCENARIO",
+      "owner_occurrences": 9,
+      "substitutions": [
+        {
+          "delta_bytes": 16,
+          "family": "operation_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/operation_id",
+          "symbol": "operation_id.compile"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "request_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/request_id",
+          "symbol": "request_id.compile"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "deadline_identity",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/result/capture_and_reap/deadline_identity",
+          "symbol": "deadline_identity"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "preparation_attempt_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/result/preparation_attempt_id",
+          "symbol": "preparation_attempt_id"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "controller_identity",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/result/workspace_state/controller_identity",
+          "symbol": "controller_identity"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "exclusive_owner_relation_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/result/workspace_state/process_exclusivity_observation/exclusive_owner_relation_id",
+          "symbol": "exclusive_owner_relation_id"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "exclusive_owner_relation_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/result/workspace_state/process_exclusivity_observation/writers/0/accounted_original_relation_id",
+          "symbol": "exclusive_owner_relation_id"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "workspace_capability_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/result/workspace_state/workspace_capability_id",
+          "symbol": "workspace_capability_id"
+        },
+        {
+          "delta_bytes": 16,
+          "family": "workspace_capability_id",
+          "new_content_bytes": 17,
+          "old_content_bytes": 1,
+          "path": "/workspace_capability_id",
+          "symbol": "workspace_capability_id"
+        }
+      ]
+    }
+  ],
+  "result_kind": "CONDITIONAL_OWNER_WIDTH_CONSEQUENCE_ONLY",
+  "source_ledger": "docs/roadmap/phases/SYNTH_EXEC_PREP_CONTROLLER_BUDGET_PROOF_1R/budget_witness.json",
+  "source_ledger_sha256": "33a3a8d9484e4d61991959dfb733e30db2e2b87ca0f436e22269d8515812d6fe",
+  "source_profile": "candidate_A_writer_lower_widths_class_5_digits",
+  "typed_result": "OWNER_ENCODING_ALONE_EXCEEDS_8192_FOR_CANDIDATE_A"
+}

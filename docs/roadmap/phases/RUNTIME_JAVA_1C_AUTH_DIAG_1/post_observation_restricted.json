@@ -1,0 +1,24 @@
+{
+  "config_absent_after": true,
+  "config_absent_before": true,
+  "context": "restricted",
+  "exact_image": {
+    "exit_code": 1,
+    "identity": "sha256:f6d7dc31a15bb37a618ebed6772beda3de95fdcc3394eb5a1def9b1d20673f7a",
+    "stderr": "permission denied while trying to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine\n",
+    "stdout": "\n"
+  },
+  "observed_utc": "2026-10-10T02:33:40.858435+00:00",
+  "phase_containers": {
+    "count": null,
+    "exit_code": 1,
+    "names": null,
+    "stderr": "permission denied while trying to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine\n"
+  },
+  "private_config_path": "C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{5dba0386-57b5-4f13-97d1-0cd92838ce99}\\AC\\Temp\\runtime-sandbox1-no-config-ba728f0b87ab6aec4beccc495f6779f0",
+  "processes_reaped_and_pipes_closed": true,
+  "provider_issuance": 0,
+  "read_only_Docker_controls": 2,
+  "scope": "Post-attempt read-only observations, not original standalone measurements.",
+  "standalone_owner_invocations": 0
+}

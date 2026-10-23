@@ -1,0 +1,12 @@
+{
+  "cached_diff_check_exit_code": 0,
+  "checks_identical": true,
+  "diff_check_exit_code": 0,
+  "fixed_read_only_checks_only": true,
+  "git_baseline_scope": "Original dirty worktree state, captured after creation of excluded additive validation helpers; no historical source had been changed.",
+  "passed": true,
+  "stash_reset_clean_used": false,
+  "status_identical": true,
+  "target_runtime_process_probe": false,
+  "whitespace_configuration": "blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol"
+}

@@ -1,0 +1,52 @@
+
+=================================== ERRORS ====================================
+_ ERROR collecting tests/test_synthetic_reflection_execution_lifecycle_pinned.py _
+tests\test_synthetic_reflection_execution_lifecycle_pinned.py:31: in <module>
+    with no_runtime_effects(strict=False):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+tests\_preflight_runtime1_guard.py:89: in no_runtime_effects
+    guards.enter_context(patch(target, side_effect=evidence.deny(target)))
+C:\Python314\Lib\contextlib.py:530: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+C:\Python314\Lib\unittest\mock.py:1494: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+C:\Python314\Lib\pkgutil.py:463: in resolve_name
+    mod = importlib.import_module(s)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:759: in exec_module
+    ???
+<frozen importlib._bootstrap>:491: in _call_with_frames_removed
+    ???
+core\pipeline.py:11: in <module>
+    from agents.deepseek_client import run_deepseek_review
+agents\deepseek_client.py:13: in <module>
+    from config import DEEPSEEK_MODELS
+config.py:133: in <module>
+    STORAGE_PATH.mkdir(exist_ok=True)
+C:\Python314\Lib\pathlib\__init__.py:1011: in mkdir
+    os.mkdir(self, mode)
+docs\roadmap\phases\SYNTH_REFLECT_LIFECYCLE_PINNED_1A\validate_pure.py:81: in audit
+    reject("repository_runtime_write_attempts", event + ":" + str(args))
+docs\roadmap\phases\SYNTH_REFLECT_LIFECYCLE_PINNED_1A\validate_pure.py:57: in reject
+    raise AssertionError("Pure reflection lifecycle audit denied: " + str(detail))
+E   AssertionError: Pure reflection lifecycle audit denied: os.mkdir:('C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\storage', 511, -1)
+=========================== short test summary info ===========================
+ERROR tests/test_synthetic_reflection_execution_lifecycle_pinned.py - Asserti...
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 6.99s

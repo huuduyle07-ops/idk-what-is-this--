@@ -1,0 +1,664 @@
+{
+  "absent_predicates": {
+    "issuing_pid_field": "No issuing PID field or explicit PID gate exists; process-local HMAC rejects the fresh child.",
+    "live_registry_membership": "No SANDBOX.2 registry or public registry validator exists.",
+    "object_original_identity": "No object identity gate in frozen owners; signed copies pass.",
+    "phase_schema_semantic_gate": "No independent phase/schema gate; unsigned changes fail HMAC, controlled re-signed changes pass."
+  },
+  "issuer_guard_terms": [
+    {
+      "expression": "status == COMPLETE",
+      "line": 156,
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "expression": "not result['cleanup_verified']",
+      "line": 156,
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "expression": "tuple((s['mode'] for s in result['stages'])) != LADDER",
+      "line": 157,
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "expression": "s['verdict'] != PASSED",
+      "line": 158,
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    }
+  ],
+  "ordering": "JAVA.1C _obtain_live_sandbox2: replay, disk-policy validation, issuer evidence-pair guard, authenticate_sandbox2 ordered ledger, then postauth fingerprint/digest/cleanup ledger. verify repeats authenticate_sandbox2 only after _obtain returns. It was NOT_REACHED in this live attempt.",
+  "pair_acceptance_predicates": [
+    {
+      "check_category": "type_identity",
+      "component": "sandbox2.validate_receipt",
+      "error": "sandbox2_receipt_unauthenticated",
+      "field_owner": "SANDBOX.2 receipt class",
+      "fields_inputs_consumed": [
+        "type(receipt)"
+      ],
+      "line": 137,
+      "predicate": "receipt_exact_type",
+      "rejection_expression": "type(receipt) is not ThreadCompatibleSandboxReceipt",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "HMAC_signature_process_local",
+      "component": "sandbox2.validate_receipt",
+      "error": "sandbox2_receipt_unauthenticated",
+      "field_owner": "SANDBOX.2 issuer",
+      "fields_inputs_consumed": [
+        "receipt._signature",
+        "_sign(receipt)"
+      ],
+      "line": 138,
+      "predicate": "receipt_hmac",
+      "rejection_expression": "not hmac.compare_digest(receipt._signature, _sign(receipt))",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "type_identity",
+      "component": "sandbox2.validate_descriptor",
+      "error": "sandbox2_descriptor_unauthenticated",
+      "field_owner": "SANDBOX.2 descriptor class",
+      "fields_inputs_consumed": [
+        "type(descriptor)"
+      ],
+      "line": 145,
+      "predicate": "descriptor_exact_type",
+      "rejection_expression": "type(descriptor) is not ThreadCompatibleSandboxDescriptor",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "HMAC_signature_process_local",
+      "component": "sandbox2.validate_descriptor",
+      "error": "sandbox2_descriptor_unauthenticated",
+      "field_owner": "SANDBOX.2 issuer",
+      "fields_inputs_consumed": [
+        "descriptor._signature",
+        "_sign(descriptor)"
+      ],
+      "line": 146,
+      "predicate": "descriptor_hmac",
+      "rejection_expression": "not hmac.compare_digest(descriptor._signature, _sign(descriptor))",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "receipt_fingerprint_binding",
+      "component": "sandbox2.validate_descriptor",
+      "error": "sandbox2_descriptor_unauthenticated",
+      "field_owner": "SANDBOX.2 pair",
+      "fields_inputs_consumed": [
+        "descriptor.verification_receipt_fingerprint",
+        "receipt.fingerprint"
+      ],
+      "line": 147,
+      "predicate": "descriptor_receipt_fingerprint",
+      "rejection_expression": "descriptor.verification_receipt_fingerprint != receipt.fingerprint",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "status_binding",
+      "component": "sandbox2.validate_descriptor",
+      "error": "sandbox2_descriptor_unauthenticated",
+      "field_owner": "SANDBOX.2 pair",
+      "fields_inputs_consumed": [
+        "descriptor.status",
+        "receipt.status"
+      ],
+      "line": 148,
+      "predicate": "descriptor_receipt_status",
+      "rejection_expression": "descriptor.status != receipt.status",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "semantic_eligibility_binding",
+      "component": "sandbox2.validate_descriptor",
+      "error": "sandbox2_descriptor_unauthenticated",
+      "field_owner": "SANDBOX.2 pair",
+      "fields_inputs_consumed": [
+        "descriptor.eligible_for_java1_continuation",
+        "receipt.status",
+        "sandbox2.COMPLETE"
+      ],
+      "line": 149,
+      "predicate": "descriptor_eligibility_equals_complete_status",
+      "rejection_expression": "descriptor.eligible_for_java1_continuation != (receipt.status == COMPLETE)",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "policy_SHA",
+      "component": "sandbox2.validate_policy_bytes",
+      "error": "historical_policy_identity_changed",
+      "field_owner": "SANDBOX.1 baseline and SANDBOX.2 pin",
+      "fields_inputs_consumed": [
+        "baseline._SECCOMP",
+        "BASELINE_POLICY_SHA256"
+      ],
+      "line": 59,
+      "predicate": "baseline_policy_identity",
+      "rejection_expression": "baseline._hash(baseline._SECCOMP) != BASELINE_POLICY_SHA256",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "type_identity",
+      "component": "sandbox2.validate_policy_bytes",
+      "error": "exact_sandbox2_canonical_policy_required",
+      "field_owner": "SANDBOX.2 canonical policy bytes",
+      "fields_inputs_consumed": [
+        "type(raw)"
+      ],
+      "line": 64,
+      "predicate": "canonical_policy_exact_type",
+      "rejection_expression": "type(raw) is not bytes",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "policy_bytes",
+      "component": "sandbox2.validate_policy_bytes",
+      "error": "exact_sandbox2_canonical_policy_required",
+      "field_owner": "SANDBOX.2 additive policy",
+      "fields_inputs_consumed": [
+        "raw",
+        "baseline._json(expected).encode()"
+      ],
+      "line": 64,
+      "predicate": "canonical_policy_bytes",
+      "rejection_expression": "raw != baseline._json(expected).encode()",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "policy_SHA",
+      "component": "sandbox2.validate_policy_bytes",
+      "error": "exact_sandbox2_canonical_policy_required",
+      "field_owner": "SANDBOX.2 additive policy",
+      "fields_inputs_consumed": [
+        "sha256(raw).hexdigest()",
+        "POLICY_SHA256"
+      ],
+      "line": 65,
+      "predicate": "canonical_policy_sha256",
+      "rejection_expression": "sha256(raw).hexdigest() != POLICY_SHA256",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "semantic_completion",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 descriptor; JAVA.1C acceptance",
+      "fields_inputs_consumed": [
+        "descriptor.status",
+        "sandbox2.COMPLETE"
+      ],
+      "line": 55,
+      "predicate": "descriptor_status_complete",
+      "rejection_expression": "descriptor.status != sandbox2.COMPLETE",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "semantic_completion",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 receipt; JAVA.1C acceptance",
+      "fields_inputs_consumed": [
+        "receipt.status",
+        "sandbox2.COMPLETE"
+      ],
+      "line": 55,
+      "predicate": "receipt_status_complete",
+      "rejection_expression": "receipt.status != sandbox2.COMPLETE",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "semantic_eligibility_exact_boolean",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 descriptor; JAVA.1C acceptance",
+      "fields_inputs_consumed": [
+        "descriptor.eligible_for_java1_continuation"
+      ],
+      "line": 56,
+      "predicate": "descriptor_java1_eligibility_is_true",
+      "rejection_expression": "descriptor.eligible_for_java1_continuation is not True",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "semantic_eligibility_classification",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 receipt; JAVA.1C acceptance",
+      "fields_inputs_consumed": [
+        "receipt.compatibility_classification"
+      ],
+      "line": 57,
+      "predicate": "receipt_java1_classification",
+      "rejection_expression": "receipt.compatibility_classification != 'eligible_for_JAVA_1_continuation_only'",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "cleanup_exact_boolean",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 receipt; JAVA.1C acceptance",
+      "fields_inputs_consumed": [
+        "receipt.cleanup_verified"
+      ],
+      "line": 58,
+      "predicate": "receipt_cleanup_is_true",
+      "rejection_expression": "receipt.cleanup_verified is not True",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "semantic_stage_results",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 fixed verification ladder",
+      "fields_inputs_consumed": [
+        "receipt.stage_results",
+        "sandbox2.LADDER",
+        "sandbox2.PASSED"
+      ],
+      "line": 59,
+      "predicate": "receipt_full_ladder_passed",
+      "rejection_expression": "receipt.stage_results != tuple(((m, sandbox2.PASSED) for m in sandbox2.LADDER))",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "receipt_fingerprint_binding",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 pair; JAVA.1C acceptance",
+      "fields_inputs_consumed": [
+        "descriptor.verification_receipt_fingerprint",
+        "receipt.fingerprint"
+      ],
+      "line": 60,
+      "predicate": "descriptor_receipt_fingerprint_java1c",
+      "rejection_expression": "descriptor.verification_receipt_fingerprint != receipt.fingerprint",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "policy_SHA_binding",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 pair",
+      "fields_inputs_consumed": [
+        "descriptor.seccomp_policy_sha256",
+        "receipt.seccomp_policy_sha256"
+      ],
+      "line": 61,
+      "predicate": "descriptor_receipt_policy_equal",
+      "rejection_expression": "descriptor.seccomp_policy_sha256 != receipt.seccomp_policy_sha256",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "policy_SHA",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 receipt and JAVA.1C pin",
+      "fields_inputs_consumed": [
+        "receipt.seccomp_policy_sha256",
+        "java1c.POLICY_SHA256"
+      ],
+      "line": 62,
+      "predicate": "receipt_policy_java1c",
+      "rejection_expression": "receipt.seccomp_policy_sha256 != POLICY_SHA256",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "policy_SHA",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 policy constant and JAVA.1C pin",
+      "fields_inputs_consumed": [
+        "sandbox2.POLICY_SHA256",
+        "java1c.POLICY_SHA256"
+      ],
+      "line": 63,
+      "predicate": "canonical_policy_sha_java1c",
+      "rejection_expression": "sandbox2.POLICY_SHA256 != POLICY_SHA256",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "image_identity",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 descriptor and JAVA.1C image pin",
+      "fields_inputs_consumed": [
+        "descriptor.image_identity",
+        "java1c.IMAGE"
+      ],
+      "line": 64,
+      "predicate": "descriptor_image_java1c",
+      "rejection_expression": "descriptor.image_identity != IMAGE",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "image_identity",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 receipt and JAVA.1C image pin",
+      "fields_inputs_consumed": [
+        "receipt.image_identity",
+        "java1c.IMAGE"
+      ],
+      "line": 64,
+      "predicate": "receipt_image_java1c",
+      "rejection_expression": "receipt.image_identity != IMAGE",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "authority_exact_false",
+      "component": "java1c.authenticate_sandbox2",
+      "error": "java1c_live_sandbox2_binding_rejected",
+      "field_owner": "SANDBOX.2 pair; JAVA.1C acceptance",
+      "fields_inputs_consumed": [
+        "descriptor/receipt.runtime_authority",
+        "descriptor/receipt.repository_write_authority",
+        "descriptor/receipt.apply_authority",
+        "descriptor/receipt.shell_available",
+        "descriptor/receipt.arbitrary_command_authority",
+        "descriptor/receipt.host_mount_authority",
+        "descriptor/receipt.network_authority"
+      ],
+      "line": 65,
+      "ordered_authority_subpredicates": [
+        {
+          "check_category": "authority_exact_false",
+          "field": "runtime_authority",
+          "field_owner": "SANDBOX.2 descriptor",
+          "object": "descriptor",
+          "rejection_expression": "descriptor.runtime_authority is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "repository_write_authority",
+          "field_owner": "SANDBOX.2 descriptor",
+          "object": "descriptor",
+          "rejection_expression": "descriptor.repository_write_authority is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "apply_authority",
+          "field_owner": "SANDBOX.2 descriptor",
+          "object": "descriptor",
+          "rejection_expression": "descriptor.apply_authority is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "shell_available",
+          "field_owner": "SANDBOX.2 descriptor",
+          "object": "descriptor",
+          "rejection_expression": "descriptor.shell_available is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "arbitrary_command_authority",
+          "field_owner": "SANDBOX.2 descriptor",
+          "object": "descriptor",
+          "rejection_expression": "descriptor.arbitrary_command_authority is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "host_mount_authority",
+          "field_owner": "SANDBOX.2 descriptor",
+          "object": "descriptor",
+          "rejection_expression": "descriptor.host_mount_authority is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "network_authority",
+          "field_owner": "SANDBOX.2 descriptor",
+          "object": "descriptor",
+          "rejection_expression": "descriptor.network_authority is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "runtime_authority",
+          "field_owner": "SANDBOX.2 receipt",
+          "object": "receipt",
+          "rejection_expression": "receipt.runtime_authority is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "repository_write_authority",
+          "field_owner": "SANDBOX.2 receipt",
+          "object": "receipt",
+          "rejection_expression": "receipt.repository_write_authority is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "apply_authority",
+          "field_owner": "SANDBOX.2 receipt",
+          "object": "receipt",
+          "rejection_expression": "receipt.apply_authority is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "shell_available",
+          "field_owner": "SANDBOX.2 receipt",
+          "object": "receipt",
+          "rejection_expression": "receipt.shell_available is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "arbitrary_command_authority",
+          "field_owner": "SANDBOX.2 receipt",
+          "object": "receipt",
+          "rejection_expression": "receipt.arbitrary_command_authority is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "host_mount_authority",
+          "field_owner": "SANDBOX.2 receipt",
+          "object": "receipt",
+          "rejection_expression": "receipt.host_mount_authority is not False"
+        },
+        {
+          "check_category": "authority_exact_false",
+          "field": "network_authority",
+          "field_owner": "SANDBOX.2 receipt",
+          "object": "receipt",
+          "rejection_expression": "receipt.network_authority is not False"
+        }
+      ],
+      "predicate": "all_authorities_false",
+      "rejection_expression": "any((getattr(value, key) is not False for value in (descriptor, receipt) for key in sandbox2.AUTHORITIES))",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "descriptor_fingerprint",
+      "component": "java1c._obtain_live_sandbox2",
+      "error": "java1c_live_sandbox2_fingerprint_mismatch",
+      "field_owner": "SANDBOX.2 replay report and reconstructed issuer descriptor",
+      "fields_inputs_consumed": [
+        "live['descriptor']['sandbox_descriptor_fingerprint']",
+        "descriptor.fingerprint"
+      ],
+      "line": 79,
+      "predicate": "live_descriptor_fingerprint",
+      "rejection_expression": "live['descriptor']['sandbox_descriptor_fingerprint'] != descriptor.fingerprint",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "receipt_fingerprint",
+      "component": "java1c._obtain_live_sandbox2",
+      "error": "java1c_live_sandbox2_fingerprint_mismatch",
+      "field_owner": "SANDBOX.2 replay report and reconstructed issuer receipt",
+      "fields_inputs_consumed": [
+        "live['verification_receipt']['verification_receipt_fingerprint']",
+        "receipt.fingerprint"
+      ],
+      "line": 80,
+      "predicate": "live_receipt_fingerprint",
+      "rejection_expression": "live['verification_receipt']['verification_receipt_fingerprint'] != receipt.fingerprint",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "evidence_digest",
+      "component": "java1c._obtain_live_sandbox2",
+      "error": "java1c_live_sandbox2_fingerprint_mismatch",
+      "field_owner": "SANDBOX.2 measured stages and issuer receipt",
+      "fields_inputs_consumed": [
+        "receipt.evidence_sha256",
+        "baseline._hash(live['stages'])"
+      ],
+      "line": 81,
+      "predicate": "live_receipt_evidence_digest",
+      "rejection_expression": "receipt.evidence_sha256 != baseline._hash(live['stages'])",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "cleanup_exact_boolean",
+      "component": "java1c._obtain_live_sandbox2",
+      "error": "java1c_live_sandbox2_fingerprint_mismatch",
+      "field_owner": "SANDBOX.2 replay report",
+      "fields_inputs_consumed": [
+        "live['cleanup_verified']"
+      ],
+      "line": 82,
+      "predicate": "live_cleanup_is_true",
+      "rejection_expression": "live['cleanup_verified'] is not True",
+      "source": "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py"
+    }
+  ],
+  "pre_pair_flow": [
+    {
+      "check_category": "policy_identity",
+      "expression": "validate_policy_bytes(POLICY_PATH.read_bytes())",
+      "field_owner": "SANDBOX.2",
+      "fields_inputs_consumed": "validate_policy_bytes(POLICY_PATH.read_bytes())",
+      "line": 328,
+      "meaning": "Disk policy validator uses the same four policy rejection terms as the canonical bytes check in the pair ledger.",
+      "order": 1,
+      "owner": "SANDBOX.2",
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "image_identity_or_eligibility",
+      "expression": "image.status == 'sandbox_completed' and image.exit_code == 0",
+      "field_owner": "SANDBOX.2",
+      "fields_inputs_consumed": "image.status == 'sandbox_completed' and image.exit_code == 0",
+      "line": 331,
+      "meaning": "Capture status and exit code select parsed metadata or empty dict. In this attempt status was sandbox_completed and exit code was 1, so metadata was empty.",
+      "order": 2,
+      "owner": "SANDBOX.2",
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "owner_operation_or_transport",
+      "expression": "not prefix",
+      "field_owner": "SANDBOX.2",
+      "fields_inputs_consumed": "not prefix",
+      "line": 332,
+      "meaning": "Exact local image eligibility gate before any ladder container; rejection raises exact_local_java_image_required.",
+      "order": 3,
+      "owner": "SANDBOX.2",
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "image_identity_or_eligibility",
+      "expression": "metadata.get('Id') != IMAGE",
+      "field_owner": "SANDBOX.2",
+      "fields_inputs_consumed": "metadata.get('Id') != IMAGE",
+      "line": 332,
+      "meaning": "Exact local image eligibility gate before any ladder container; rejection raises exact_local_java_image_required.",
+      "order": 4,
+      "owner": "SANDBOX.2",
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "image_identity_or_eligibility",
+      "expression": "metadata.get('Os') != 'linux'",
+      "field_owner": "SANDBOX.2",
+      "fields_inputs_consumed": "metadata.get('Os') != 'linux'",
+      "line": 332,
+      "meaning": "Exact local image eligibility gate before any ladder container; rejection raises exact_local_java_image_required.",
+      "order": 5,
+      "owner": "SANDBOX.2",
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "image_identity_or_eligibility",
+      "expression": "metadata.get('Architecture') != 'amd64'",
+      "field_owner": "SANDBOX.2",
+      "fields_inputs_consumed": "metadata.get('Architecture') != 'amd64'",
+      "line": 333,
+      "meaning": "Exact local image eligibility gate before any ladder container; rejection raises exact_local_java_image_required.",
+      "order": 6,
+      "owner": "SANDBOX.2",
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "image_identity_or_eligibility",
+      "expression": "metadata.get('Config', {}).get('Volumes')",
+      "field_owner": "SANDBOX.2",
+      "fields_inputs_consumed": "metadata.get('Config', {}).get('Volumes')",
+      "line": 333,
+      "meaning": "Exact local image eligibility gate before any ladder container; rejection raises exact_local_java_image_required.",
+      "order": 7,
+      "owner": "SANDBOX.2",
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "cleanup_and_completion",
+      "expression": "if verdict != PASSED: result['status'] = verdict; break",
+      "field_owner": "SANDBOX.2",
+      "fields_inputs_consumed": "if verdict != PASSED: result['status'] = verdict; break",
+      "line": 361,
+      "meaning": "Fixed eleven-stage ladder stops at first nonpassed verdict; all stages must pass for COMPLETE.",
+      "order": 8,
+      "owner": "SANDBOX.2",
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "cleanup_and_completion",
+      "expression": "count == 0 and result.get('temporary_workspace_removed') is True and all(s['cleanup_verified'] for s in result['stages'])",
+      "field_owner": "SANDBOX.2",
+      "fields_inputs_consumed": "count == 0 and result.get('temporary_workspace_removed') is True and all(s['cleanup_verified'] for s in result['stages'])",
+      "line": 375,
+      "meaning": "Final cleanup produces the boolean bound into the receipt; stage evidence can never bless unverified cleanup.",
+      "order": 9,
+      "owner": "SANDBOX.2",
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "cleanup_and_completion",
+      "expression": "status == COMPLETE and (not result['cleanup_verified'] or tuple((s['mode'] for s in result['stages'])) != LADDER or any((s['verdict'] != PASSED for s in result['stages'])))",
+      "field_owner": "SANDBOX.2",
+      "fields_inputs_consumed": "status == COMPLETE and (not result['cleanup_verified'] or tuple((s['mode'] for s in result['stages'])) != LADDER or any((s['verdict'] != PASSED for s in result['stages'])))",
+      "line": 156,
+      "meaning": "COMPLETE-only evidence guard. Blocked outcomes are signed too and derive eligible=False/classification blocked_no_java_capability.",
+      "order": 10,
+      "owner": "SANDBOX.2",
+      "source": "core/thread_compatible_runtime_sandbox.py"
+    },
+    {
+      "check_category": "policy_identity",
+      "expression": "sandbox2.validate_policy_bytes(sandbox2.POLICY_PATH.read_bytes())",
+      "field_owner": "JAVA.1C",
+      "fields_inputs_consumed": "sandbox2.validate_policy_bytes(sandbox2.POLICY_PATH.read_bytes())",
+      "line": 76,
+      "meaning": "The frozen owner checks disk bytes again after replay and before constructing its consumed pair.",
+      "order": 11,
+      "owner": "JAVA.1C",
+      "source": "core/sandboxed_java_positive_continuation.py"
+    },
+    {
+      "check_category": "owner_operation_or_transport",
+      "expression": "sandbox2._evidence_pair(live)",
+      "field_owner": "SANDBOX.2 called by JAVA.1C",
+      "fields_inputs_consumed": "sandbox2._evidence_pair(live)",
+      "line": 77,
+      "meaning": "Constructs the second signed pair in the same process; the observer captures this exact pair at authenticate call entry.",
+      "order": 12,
+      "owner": "SANDBOX.2 called by JAVA.1C",
+      "source": "core/sandboxed_java_positive_continuation.py"
+    }
+  ],
+  "public_authentication_and_semantics_distinct": true,
+  "source_hashes": {
+    "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\sandboxed_java_positive_continuation.py": "ec0f7a7a210fabca4d3df58323072829392bc3fcdb5b41213f5d56750af09f7f",
+    "C:\\Users\\Admin\\Documents\\Code\\J.A.R.V.I.S\\districts\\C.A.T.T.U.S\\core\\thread_compatible_runtime_sandbox.py": "8eea18d16c330dc7d116065ac9d23833bb2a0af58448b02438c26526141b1d45"
+  }
+}
