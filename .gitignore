@@ -73,3 +73,5 @@ pytest/
 .pytest_tmp/
 #tests
 #docs
+
+targeted_subject/
