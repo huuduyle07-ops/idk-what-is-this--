@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="cattus-csrf-token" content="{{ cattus_csrf_token() }}">
+    <meta name="cattus-auth-state" content="{{ cattus_auth_state() }}">
+    <meta name="color-scheme" content="light">
+    <title>Test Maker · C.A.T.T.U.S</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='learn.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='learning_test_maker.css') }}">
+    <script src="{{ url_for('static', filename='request_integrity.js') }}"></script>
+    <script src="{{ url_for('static', filename='learning_test_maker.js') }}" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#testMakerTitle">Đến đề luyện tập</a>
+    <div class="studio test-maker-studio">
+        <aside class="rail" aria-label="Điều hướng">
+            <a class="brand" href="/learn/chat"><span class="brand-mark" aria-hidden="true">c<span>·</span></span><span>C.A.T.T.U.S<small>Hiểu từ gốc.</small></span></a>
+            <nav class="mode-nav" aria-label="Không gian học">
+                <a class="mode-link" href="/learn/chat"><span aria-hidden="true">◇</span><span>Trò chuyện</span></a>
+                <a class="mode-link" href="/learn/materials"><span aria-hidden="true">▤</span><span>Tài liệu của tôi</span></a>
+                <a class="mode-link" href="/learn/practice"><span aria-hidden="true">✎</span><span>Practice</span></a>
+                <a class="mode-link active" href="/learn/test-maker" aria-current="page"><span aria-hidden="true">▦</span><span>Test Maker</span></a>
+                <a class="mode-link" href="/learn/flashcards"><span aria-hidden="true">▱</span><span>Flashcards</span></a>
+                <a class="mode-link" href="/learn"><span aria-hidden="true">↗</span><span>Thực hành Java</span></a>
+            </nav>
+            <div class="tm-history-heading"><h2>Đề đã lưu</h2><button id="refreshTestHistory" class="text-button" type="button">Đọc lại</button></div>
+            <p id="testHistoryStatus" class="tm-help">Đang đọc lịch sử…</p>
+            <ul id="testHistory" class="tm-history"></ul>
+            <button id="newTestButton" class="button button-secondary" type="button">Tạo đề mới</button>
+            <details class="privacy-details"><summary>Đề này đến từ đâu?</summary><p>Đề được tạo từ mẫu có phiên bản, với dữ liệu thay đổi theo seed. Không gọi AI hoặc đọc bài giảng bạn đã nhập.</p><p>Bài số và sơ đồ được chấm theo quy tắc. Tự luận cần người xem lại rubric, chưa tự chấm bằng AI.</p></details>
+        </aside>
+        <main class="main learning-main test-maker-main">
+            <header class="topbar"><p class="breadcrumb">Không gian học <span aria-hidden="true">/</span> <strong>Test Maker</strong></p><a class="text-button" href="/learn/practice">Practice từ bài giảng ↗</a></header>
+            <div class="lesson-heading"><div><p class="eyebrow">TÍNH · ĐIỀN · GIẢI THÍCH</p><h1 id="testMakerTitle" tabindex="-1">Tự làm một đề nhỏ.</h1><p class="lesson-subtitle">Chọn chủ đề, làm bài và đối chiếu sau khi nộp.</p></div><span class="lesson-badge">Seeded templates</span></div>
+            <section id="testNotice" class="notice" role="alert" hidden><p id="testNoticeText"></p><div class="tm-actions"><button id="retryTestRequest" class="text-button" type="button" hidden>Kiểm tra lại đúng yêu cầu</button><button id="reloadTestButton" class="text-button" type="button" hidden>Đọc bản đã lưu</button></div></section>
+            <p id="testStatus" class="tm-help" role="status" aria-live="polite"></p>
+            <section id="testCreate" class="tm-panel" aria-labelledby="testCreateTitle">
+                <p class="eyebrow">01 · CHỌN ĐỀ</p><h2 id="testCreateTitle">Bạn muốn luyện phần nào?</h2><p class="tm-help">Đề mẫu bao gồm Machine Learning, Operating Systems và Linear Algebra. Chọn một hoặc nhiều chủ đề; câu hỏi bằng tiếng Anh.</p>
+                <form id="testCreateForm"><div class="tm-seed-row"><label for="testSeed">Variant seed<input id="testSeed" type="number" min="0" max="2147483647" step="1" value="42" inputmode="numeric"></label><button id="randomizeTestSeed" class="text-button" type="button">Đổi dữ liệu ngẫu nhiên</button></div><div class="tm-catalog-tools"><button id="selectAllTestTopics" class="text-button" type="button">Chọn tất cả</button><button id="clearTestTopics" class="text-button" type="button">Bỏ chọn</button></div><p id="testCatalogStatus" class="tm-help">Đang đọc chủ đề…</p><div id="testTopics" class="tm-topics"></div><button id="createTestButton" class="button button-primary" type="submit" disabled>Create test</button></form>
+            </section>
+            <section id="testSession" class="tm-panel" aria-labelledby="testSessionTitle" hidden>
+                <div class="tm-session-heading"><div><p id="testSessionState" class="eyebrow"></p><h2 id="testSessionTitle" tabindex="-1"></h2></div><button id="deleteTestButton" class="text-button" type="button">Xóa đề này</button></div><p id="testMeta" class="tm-help"></p><p class="tm-trust">Đề mẫu được soạn sẵn; đáp án chỉ mở sau Submit. Điểm tự động không bao gồm chấm tự luận.</p>
+                <nav id="testQuestionNav" class="tm-question-nav" aria-label="Chọn câu hỏi"></nav><div id="testContent"></div>
+                <div id="testDraftActions" class="tm-actions"><button id="saveTestDraft" class="button button-secondary" type="button">Save draft</button><button id="discardTestDraft" class="text-button" type="button">Bỏ bản nháp chưa lưu</button><button id="reviewTestSubmit" class="button button-primary" type="button">Review & submit</button></div>
+            </section>
+            <section id="testConflict" class="notice tm-conflict" aria-labelledby="testConflictTitle" hidden><h2 id="testConflictTitle">Bản đã lưu thay đổi.</h2><p>Bản đang viết được giữ. Chọn dùng bài đã lưu hoặc giữ bản nháp dựa trên phiên bản mới.</p><div class="tm-comparison"><div><h3>Bản đang viết</h3><pre id="testDraftComparison"></pre></div><div><h3>Bản đã lưu</h3><pre id="testSavedComparison"></pre></div></div><div class="tm-actions"><button id="useSavedTest" class="button button-secondary" type="button">Use saved answers</button><button id="keepDraftTest" class="text-button" type="button">Keep my draft</button></div><p id="testConflictHelp" class="tm-help"></p></section>
+            <section id="testSubmitConfirm" class="notice" role="region" aria-labelledby="testSubmitConfirmTitle" hidden><h2 id="testSubmitConfirmTitle" tabindex="-1">Nộp toàn bộ đề?</h2><p id="testSubmitSummary"></p><p>Câu chưa có đáp án vẫn được nộp. Sau khi nộp, bài làm được giữ để đối chiếu; tự luận chờ người xem lại.</p><div class="tm-actions"><button id="confirmTestSubmit" class="button button-primary" type="button">Submit test</button><button id="cancelTestSubmit" class="text-button" type="button">Quay lại làm bài</button></div></section>
+            <section id="testDeleteConfirm" class="notice" role="region" aria-label="Xác nhận xóa đề" hidden><p>Xóa đề và bài làm này khỏi máy chủ C.A.T.T.U.S?</p><div class="tm-actions"><button id="confirmTestDelete" class="button button-secondary" type="button">Xóa đề và bài làm</button><button id="cancelTestDelete" class="text-button" type="button">Giữ lại</button></div></section>
+        </main>
+    </div>
+    <noscript><p>Bật JavaScript để tạo và làm đề mẫu. Trang này không gọi AI.</p></noscript>
+</body>
+</html>

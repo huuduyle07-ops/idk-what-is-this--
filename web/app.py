@@ -104,6 +104,11 @@ from web.routes.replay_routes import bp as replay_routes_bp
 from web.routes.history_routes import bp as history_routes_bp
 from web.routes.learning_routes import bp as learning_routes_bp
 from web.routes.learning_material_routes import bp as learning_material_routes_bp
+from web.routes.learning_chat_routes import bp as learning_chat_routes_bp
+from web.routes.learning_practice_routes import bp as learning_practice_routes_bp
+from web.routes.learning_flashcard_routes import bp as learning_flashcard_routes_bp
+from web.routes.learning_test_maker_routes import bp as learning_test_maker_routes_bp
+from web.routes.learning_source_visual_routes import bp as learning_source_visual_routes_bp
 from graph.builder import build_graph_from_repo
 from graph.exporter import safe_id, escape_mermaid_label
 from web.graph_evidence import (
@@ -123,6 +128,11 @@ app.register_blueprint(replay_routes_bp)
 app.register_blueprint(history_routes_bp)
 app.register_blueprint(learning_routes_bp)
 app.register_blueprint(learning_material_routes_bp)
+app.register_blueprint(learning_chat_routes_bp)
+app.register_blueprint(learning_practice_routes_bp)
+app.register_blueprint(learning_flashcard_routes_bp)
+app.register_blueprint(learning_test_maker_routes_bp)
+app.register_blueprint(learning_source_visual_routes_bp)
 
 import os as _os_gate
 

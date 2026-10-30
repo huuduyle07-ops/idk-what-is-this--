@@ -21,3 +21,4 @@
 .summary-stats dt{font-size:12px}
 .skip-link{visibility:hidden}
 .skip-link:focus{visibility:visible}
+@media(max-width:600px){.mode-nav{grid-column:1/-1;min-width:0;justify-content:flex-start;flex-wrap:wrap}}

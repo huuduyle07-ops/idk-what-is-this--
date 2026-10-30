@@ -279,6 +279,7 @@ def test_mixed_images_decode_zoom_and_description_survives_reload(live, tmp_path
     expect(page.locator("#imageDescriptionInput")).to_have_value(note)
     expect(page.locator("#imagePanel")).to_be_visible()
     assert save_description(page).status == 200
+    expect(page.locator("#descriptionStatus")).to_contain_text("Đã lưu mô tả")
     expect(page.locator("#saveDescriptionButton")).to_be_disabled()
     details = collection_details(context, base)
     source = next(source for source in details[0]["sources"] if diagram.name in source["original_names"])
@@ -297,13 +298,21 @@ def test_mixed_images_decode_zoom_and_description_survives_reload(live, tmp_path
     expect_loaded_image(page)
     expect(page.locator("#imageDescriptionInput")).to_have_value(note)
     assert page.evaluate("typeof window.__imageNoteXSS") == "undefined"
+    # Capture a normal learner note after checking hostile-looking text remains data.
+    page.locator("#imageDescriptionInput").fill("Cat kế thừa Animal. Tôi muốn hiểu khi nào phương thức của Cat được gọi.")
+    assert save_description(page).status == 200
     page.locator("#materialPreview").scroll_into_view_if_needed()
+    page.locator("#materialPreview").screenshot(path=str(ARTIFACTS / "image-panel.png"))
     page.screenshot(path=str(ARTIFACTS / "image-desktop.png"), full_page=True)
     page.set_viewport_size({"width": 390, "height": 844})
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
     page.screenshot(path=str(ARTIFACTS / "image-mobile.png"), full_page=True)
+    fit_width = page.locator("#materialImage").bounding_box()["width"]
+    assert fit_width < 390
     page.locator("#imageZoomButton").click()
     expect(page.locator("#imageZoomButton")).to_have_attribute("aria-pressed", "true")
+    assert page.locator("#materialImage").bounding_box()["width"] == 640
+    assert page.locator("#imageViewport").evaluate("element => element.scrollWidth > element.clientWidth")
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
     assert len(details) == 1 and details[0]["source_count"] == 4
 
@@ -348,3 +357,42 @@ def test_image_description_concurrent_edit_preserves_draft_until_explicit_merge(
     expect(peer.locator("#imageDescriptionInput")).to_have_value(draft)
     assert peer_errors == []
     peer.close()
+
+
+def test_image_description_lost_acknowledgment_retries_without_new_revision(live, tmp_path):
+    page, context, base, _ = live
+    diagram = tmp_path / "lost-response.png"
+    diagram.write_bytes(diagram_image())
+    open_materials(page, base)
+    page.locator("#materialsFilesInput").set_input_files(str(diagram))
+    page.locator("#importMaterialsButton").click()
+    expect_loaded_image(page)
+    note = "Giải thích của tôi: lớp con có thể thay đổi hành vi được kế thừa."
+    page.locator("#imageDescriptionInput").fill(note)
+    submissions = []
+
+    def lose_first_acknowledgment(route):
+        submissions.append(route.request.post_data_json)
+        if len(submissions) == 1:
+            response = route.fetch()  # Persist succeeds before its acknowledgment is lost.
+            assert response.status == 200
+            route.abort()
+        else:
+            route.continue_()
+
+    page.route("**/sources/*/description", lose_first_acknowledgment)
+    page.locator("#saveDescriptionButton").click()
+    expect(page.locator("#descriptionStatus")).to_contain_text("Chưa nhận được xác nhận")
+    expect(page.locator("#imageDescriptionInput")).to_have_value(note)
+    expect(page.locator("#saveDescriptionButton")).to_be_enabled()
+    persisted = collection_details(context, base)[0]["sources"][0]["description"]
+    assert persisted == {"text": note, "revision": 1, "origin": "user"}
+    assert save_description(page).status == 200
+    expect(page.locator("#descriptionStatus")).to_contain_text("Đã lưu mô tả")
+    expect(page.locator("#saveDescriptionButton")).to_be_disabled()
+    assert submissions == [{"text": note, "expected_revision": 0}] * 2
+    assert collection_details(context, base)[0]["sources"][0]["description"] == persisted
+    page.reload()
+    page.locator("#materialsCollections button").click()
+    expect_loaded_image(page)
+    expect(page.locator("#imageDescriptionInput")).to_have_value(note)

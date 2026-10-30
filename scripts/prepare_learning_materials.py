@@ -14,7 +14,7 @@ from core.learning.materials import MaterialsError, prepare_materials
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Chuẩn bị nguồn học từ PDF, PPTX và DOCX; không gọi AI hoặc huấn luyện model.")
+    parser = argparse.ArgumentParser(description="Chuẩn bị nguồn học từ PDF, PPTX, DOCX và ảnh PNG/JPEG; không gọi AI hoặc huấn luyện model.")
     parser.add_argument("--title", required=True, help="Tên môn học hoặc chương.")
     parser.add_argument("--output", required=True, help="Thư mục mới, nên nằm dưới .agent/learning/materials/.")
     parser.add_argument("--files", required=True, nargs="+", help="Các file được chọn rõ ràng; không quét thư mục.")
@@ -27,7 +27,9 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Đã chuẩn bị {manifest['source_count']} tài liệu, {manifest['unit_count']} phần nguồn, {manifest['chunk_count']} đoạn trích.")
     print(f"Thư mục: {Path(args.output).absolute()}")
     print("Trạng thái: cần kiểm tra preview.txt và đối chiếu file gốc. Chưa đưa vào Teacher hoặc tạo câu hỏi.")
-    if not manifest["chunk_count"]:
+    if any(source.get("image") for source in manifest["sources"]):
+        print("Ảnh được giữ nguyên để xem lại; chưa chạy OCR hoặc diễn giải sơ đồ.")
+    elif not manifest["chunk_count"]:
         print("Chưa trích được chữ để dùng. Tài liệu có thể cần OCR hoặc chuyển đổi định dạng.")
     return 0
 

@@ -215,7 +215,10 @@ class MaterialLibrary:
                 raise MaterialsError("write_failed", "Chưa lưu được ghi chú. Nội dung cũ vẫn được giữ; hãy thử lại.") from error
             finally:
                 if temporary is not None:
-                    temporary.unlink(missing_ok=True)
+                    try:
+                        temporary.unlink(missing_ok=True)
+                    except OSError:
+                        pass  # Preserve the write error; a confined temp is not published.
             return updated
 
     def import_files(self, owner: str, request_id: str, title: str,

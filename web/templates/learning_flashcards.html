@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="cattus-csrf-token" content="{{ cattus_csrf_token() }}">
+    <meta name="cattus-auth-state" content="{{ cattus_auth_state() }}">
+    <meta name="color-scheme" content="light">
+    <title>Flashcards · C.A.T.T.U.S</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='learn.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='learning_flashcards.css') }}">
+    <script src="{{ url_for('static', filename='request_integrity.js') }}"></script>
+    <script src="{{ url_for('static', filename='learning_flashcards.js') }}" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#flashcardsTitle">Đến thẻ ôn tập</a>
+    <div class="studio flashcard-studio">
+        <aside class="rail" aria-label="Điều hướng">
+            <a class="brand" href="/learn/chat"><span class="brand-mark" aria-hidden="true">c<span>·</span></span><span>C.A.T.T.U.S<small>Hiểu từ gốc.</small></span></a>
+            <nav class="mode-nav" aria-label="Không gian học">
+                <a class="mode-link" href="/learn/chat"><span aria-hidden="true">◇</span><span>Trò chuyện</span></a>
+                <a class="mode-link" href="/learn/materials"><span aria-hidden="true">▤</span><span>Tài liệu của tôi</span></a>
+                <a class="mode-link" href="/learn/practice"><span aria-hidden="true">✎</span><span>Practice</span></a>
+                <a class="mode-link" href="/learn/test-maker"><span aria-hidden="true">▦</span><span>Test Maker</span></a>
+                <a class="mode-link active" href="/learn/flashcards" aria-current="page"><span aria-hidden="true">▱</span><span>Flashcards</span></a>
+                <a class="mode-link" href="/learn"><span aria-hidden="true">↗</span><span>Thực hành Java</span></a>
+                <a class="mode-link" href="/?web_mode=instant"><span aria-hidden="true">{ }</span><span>Coding agent</span></a>
+            </nav>
+            <div class="flash-history-heading"><h2>Bộ thẻ của tôi</h2><button id="refreshFlashcardHistory" class="text-button" type="button">Đọc lại</button></div>
+            <p id="flashcardHistoryStatus" class="flash-help">Đang đọc lịch sử…</p>
+            <ul id="flashcardHistory" class="flash-history"></ul>
+            <button id="newFlashcardDeck" class="button button-secondary" type="button">Tạo bộ thẻ</button>
+            <details class="privacy-details"><summary>Thẻ này được tạo thế nào?</summary><p>Tái sử dụng câu hỏi, đáp án và nguồn đã lưu của một bài Practice hoàn thành. Không gọi AI thêm.</p><p>Again / Got it là tự đánh giá của bạn. Lịch ôn cố định chưa đo mức thành thạo.</p></details>
+        </aside>
+        <main class="main learning-main flashcards-main">
+            <header class="topbar"><p class="breadcrumb">Không gian học <span aria-hidden="true">/</span> <strong>Flashcards</strong></p><a class="text-button" href="/learn/practice">Về Practice ↗</a></header>
+            <div class="lesson-heading"><div><p class="eyebrow">ÔN LẠI ĐIỀU VỪA HỌC</p><h1 id="flashcardsTitle" tabindex="-1">Tự nhớ, rồi đối chiếu.</h1><p class="lesson-subtitle">Một câu hỏi mỗi lần. Bạn quyết định điều gì cần ôn tiếp.</p></div><span class="lesson-badge">Practice → Review</span></div>
+            <section id="flashcardNotice" class="notice" role="alert" hidden><p id="flashcardNoticeText"></p><div class="flash-actions"><button id="retryFlashcardRequest" class="text-button" type="button" hidden>Kiểm tra lại đúng yêu cầu</button><button id="reloadFlashcardDeck" class="text-button" type="button" hidden>Đọc bộ đã lưu</button></div></section>
+            <p id="flashcardStatus" class="flash-help" role="status" aria-live="polite"></p>
+            <section id="flashcardCreate" class="flash-panel" aria-labelledby="flashcardCreateTitle">
+                <p class="eyebrow">01 · CHỌN CÂU CẦN ÔN</p><h2 id="flashcardCreateTitle">Tạo thẻ từ một bài đã hoàn thành.</h2>
+                <p class="flash-help">Những câu cần trợ giúp hoặc chưa đúng ở lần đầu được chọn sẵn. Bạn có thể đổi lựa chọn; tạo thẻ không gọi AI.</p>
+                <form id="flashcardCreateForm"><label class="flash-select-label" for="flashcardPractice">Bài Practice đã hoàn thành<select id="flashcardPractice" disabled><option value="">Chọn bài Practice</option></select></label><p id="flashcardSelectionStatus" class="flash-help">Đang đọc bài đã hoàn thành…</p><div id="flashcardQuestions" class="flash-question-list" role="group" aria-label="Chọn câu hỏi để tạo thẻ"></div><button id="createFlashcardsButton" class="button button-primary" type="submit" disabled>Create flashcards</button></form>
+                <p class="flash-help">Chưa có bài hoàn thành? <a href="/learn/practice">Mở Practice</a>, làm hoặc xem lời giải để hoàn thành một bộ trước.</p>
+            </section>
+            <section id="flashcardDeck" class="flash-panel" aria-labelledby="flashcardDeckTitle" hidden>
+                <div class="flash-deck-heading"><div><p class="eyebrow">BỘ THẺ ĐÃ LƯU</p><h2 id="flashcardDeckTitle" tabindex="-1"></h2></div><button id="deleteFlashcardDeck" class="text-button" type="button">Xóa bộ thẻ</button></div>
+                <p id="flashcardScope" class="flash-help"></p><p class="flash-trust">Đáp án kế thừa từ model trong Practice. Mở nguồn để đối chiếu khi cần.</p>
+                <div class="flash-queue-toolbar"><label for="flashcardFilter">Danh sách ôn<select id="flashcardFilter"><option value="due">Due now</option><option value="needs_review">Needs review</option><option value="all">All cards</option></select></label><button id="refreshFlashcardDeck" class="text-button" type="button">Cập nhật lịch ôn</button></div>
+                <p id="flashcardCounts" class="flash-help"></p><div id="flashcardContent"></div>
+                <p class="flash-help">Lịch đơn giản: Again → 10 phút; Got it → 1, 3 rồi 7 ngày. Đây là tự đánh giá, không phải điểm số.</p>
+            </section>
+            <section id="flashcardDeleteConfirm" class="notice" role="region" aria-label="Xác nhận xóa bộ thẻ" hidden><p>Xóa bộ thẻ và lịch ôn này? Bài Practice và bài giảng gốc vẫn được giữ.</p><div class="flash-actions"><button id="confirmFlashcardDelete" class="button button-secondary" type="button">Xóa bộ thẻ này</button><button id="cancelFlashcardDelete" class="text-button" type="button">Giữ lại</button></div></section>
+        </main>
+    </div>
+    <noscript><p>Bật JavaScript để tạo và ôn thẻ. Trang này không gọi AI.</p></noscript>
+</body>
+</html>

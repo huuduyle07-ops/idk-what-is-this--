@@ -2,7 +2,7 @@
 
 Ngày lập kế hoạch: 2026-10-22. Trạng thái: **đang triển khai; đã có bản thử Teacher với nội dung soạn sẵn**.
 
-Định hướng tiếp theo đã chốt: [học qua trò chuyện dựa trên bài giảng của người học](user-grounded-learning-vi.md). Đã bổ sung bộ chuẩn bị nguồn PDF/PPTX/DOCX chạy cục bộ; hội thoại có nguồn và nhóm câu hỏi phù hợp là bước tích hợp tiếp theo, chưa có trong UI hiện tại.
+Định hướng tiếp theo đã chốt: [học qua trò chuyện dựa trên bài giảng của người học](user-grounded-learning-vi.md). Đã bổ sung bộ chuẩn bị nguồn PDF/PPTX/DOCX và ảnh PNG/JPEG chạy cục bộ, cùng lớp liên kết khái niệm do người dùng xác nhận để đi qua lại giữa các phần nguồn. [Chat theo bài giảng](learning-chat-vi.md) đã có chọn bộ tài liệu, truy xuất từ khóa và mở các đoạn nguồn; nhóm câu hỏi phù hợp và kiểm chứng diễn giải là bước tiếp theo.
 
 Cập nhật triển khai: [bài thử Teacher tại `/learn`](teacher-pilot-vi.md) đã có ba tình huống Java, gợi ý, phản hồi, lưu/tiếp tục và xuất/xóa bài làm. Bản thử này chưa gọi LLM, chưa dạy trên repository bất kỳ và chưa hoàn thành toàn bộ M1. Các mục bên dưới vẫn mô tả thiết kế và kế hoạch rộng hơn; tài liệu bản thử ghi phạm vi đã kiểm chứng.
 

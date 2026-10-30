@@ -7,8 +7,8 @@ The root `conftest.py` continues to apply to all subdirectories.
 | --- | --- |
 | `runtime/synthetic/` | Synthetic authorization, reflection, lifecycle, source contracts and replay controls: 14 migrated modules |
 | `architecture/` | Relocation integrity, unchanged runtime logic and detection of source tampering |
-| `learning/` | Teacher session behavior, lecture extraction, source snapshots, chunk provenance and owner-scoped material library |
-| `integration/test_learning_*.py` | Teacher web API, lecture upload boundaries and browser file/folder import flows |
+| `learning/` | Teacher sessions, lecture extraction, source snapshots, provenance, owner-scoped library and collection-scoped concept links |
+| `integration/test_learning_*.py` | Teacher API, lecture upload boundaries, images/notes and concept navigation through real browser flows |
 | Root `test_*.py` | Existing families awaiting extraction; these remain part of default pytest collection |
 | `fixtures/`, root maintenance helpers | Shared fixtures and historical reconstruction; retained at stable paths |
 
@@ -28,6 +28,58 @@ python -m pytest -q --basetemp=.tmp/pytest-full
 
 Use a different `--basetemp` for concurrent runs. Collection is not execution or
 proof that every test passes. No suite is excluded from default collection.
+
+The focused learning-graph suite is `learning/test_knowledge_graph.py`,
+`integration/test_learning_knowledge_web.py` and
+`integration/test_learning_knowledge_browser.py`. It uses temporary lecture
+fixtures and no model calls. Browser tests require Chromium and a loopback test
+listener. Symlink confinement cases skip explicitly on hosts without symlink
+creation rights; database/sidecar directory and access-error checks still run.
+
+General and lecture-grounded AI chat are checked by `learning/test_chat_store.py`,
+`learning/test_chat_provider.py`, `integration/test_learning_chat_web.py` and
+`integration/test_learning_chat_browser.py`. Provider transports are mocked in
+automated tests; Chromium uses a scripted responder with temporary storage.
+Retrieval is covered by `learning/test_chat_retrieval.py`; collection selection,
+source snapshots and citation handling by `integration/test_learning_chat_grounding_web.py`
+and `integration/test_learning_chat_grounding_browser.py`.
+Collection concept maps and their read-only boundary are covered by
+`learning/test_learning_concept_map.py`, `integration/test_learning_concept_map_web.py`
+and `integration/test_learning_concept_map_browser.py`. Exact source navigation
+is exercised by `integration/test_learning_material_links_browser.py`.
+Real-model smoke measurements are recorded separately in the chat architecture
+guide and must not be reported as part of the automated test count.
+
+File classification is covered by `learning/test_file_labels.py`,
+`learning/test_file_label_suggestions.py`, `integration/test_learning_file_labels_web.py`
+and `integration/test_learning_file_labels_browser.py`. They check typed metadata,
+bounded model proposals, ownership, revision conflicts and explicit human review;
+mocked classification does not measure model accuracy.
+
+Source-backed practice is covered by `learning/test_practice_generation.py`,
+`learning/test_practice_store.py`, `integration/test_learning_practice_web.py`
+and `integration/test_learning_practice_browser.py`. These separate exact source
+provenance, answer visibility and assistance-aware attempt records from model
+question/answer quality; real-model smoke results are recorded separately.
+
+Flashcards from completed Practice are covered by `learning/test_flashcard_store.py`,
+`integration/test_learning_flashcards_web.py` and `integration/test_learning_flashcards_browser.py`.
+They check hidden answers, source snapshots, self-rating schedule boundaries,
+request replay, ownership and browser recovery without additional model calls.
+
+Mixed-format authored tests are covered by `learning/test_test_maker.py`,
+`learning/test_test_maker_store.py`, `integration/test_learning_test_maker_web.py`
+and `integration/test_learning_test_maker_browser.py`. These check independent
+arithmetic across seeds, bounded numeric parsing, diagram aliases, partial credit,
+essay review boundaries, hidden keys, owner isolation and draft/submission recovery.
+They do not call models or measure learning outcomes.
+
+Source appearance and provenance are checked by `learning/test_source_visuals.py`,
+`learning/test_source_visual_store.py`, `integration/test_learning_source_visuals_web.py`
+and `integration/test_learning_source_visuals_browser.py`. Real PDF rendering is
+checked separately from mocked renderer/UI recovery. The opt-in PowerPoint smoke
+creates only its own hidden temporary presentation; skipped renderer or Windows
+permission checks must be reported separately from passed tests.
 
 New tests should follow their component's responsibility. Future families are
 `context/`, `coding/`, `workflows/`, `web/`, `benchmarks/` and

@@ -20,6 +20,38 @@ lecture-material preparation. Its local importer and browser-owner library prese
 source snapshots, page/slide/paragraph provenance and review status; the web upload
 adapter lives in `web/routes/learning_material_routes.py`. Existing flat `lesson_*`
 modules still own the agent's repair knowledge; they are not learner records.
+`learning/knowledge_graph.py` owns collection-scoped, user-confirmed concept links
+in a learner-owned SQLite store. It reuses `graph.schema.ProgramGraph` for bounded
+source/unit/concept views, without reusing code parsing, code weights or global
+graph caches. Concept links do not approve sources or establish learner mastery.
+`learning/chat_store.py` owns learner conversations, fixed collection scope,
+retrieval snapshots and idempotent turn reservations. `learning/chat_retrieval.py`
+selects bounded lexical excerpts from that owner's collection and resolves exact
+learner-linked concept aliases to their source units. `knowledge_graph.py` also
+projects a bounded collection map, with shared-unit associations explicitly
+distinguished from causal or prerequisite relationships.
+`learning/chat_provider.py` sends bounded history and optional source data to one
+configured Ollama or Gemini model; it cannot read files, call coding tools or
+grant access to authored answers. See [the chat guide](../docs/architecture/learning-chat-vi.md).
+`learning/file_labels.py` owns typed file metadata and pending model suggestions,
+separate from immutable source snapshots and per-unit concept links.
+`learning/file_label_suggestions.py` samples bounded excerpts and validates model
+label proposals before review. See [the file-label guide](../docs/architecture/file-labels-vi.md).
+`learning/practice_generation.py` creates bounded question proposals from explicitly
+selected lecture units. `learning/practice_store.py` pins source/answer snapshots,
+generation reservations, review exposure and deterministic multiple-choice attempts.
+It does not infer mastery or execute code. See [the practice guide](../docs/architecture/learning-practice-vi.md).
+`learning/flashcard_store.py` derives review cards from completed Practice,
+pins their answer/source snapshots and stores self-ratings with fixed due dates.
+It calls no model and makes no mastery claim. See [the flashcards guide](../docs/architecture/learning-flashcards-vi.md).
+`learning/test_maker.py` owns versioned seeded arithmetic, matrix, diagram and essay templates.
+`learning/test_maker_store.py` pins tests and student work, grading objective items
+only on explicit submission. Essays require human review and stay outside automatic
+points. See [the Test Maker guide](../docs/architecture/learning-test-maker-vi.md).
+`learning/source_visuals.py` captures selected source pages/slides or embedded raster
+images without OCR or model calls. `learning/source_visual_store.py` pins their
+owner-scoped provenance and raster hashes separately from the imported text corpus.
+See [the source-visuals guide](../docs/architecture/learning-source-visuals-vi.md).
 
 The remaining flat modules are still active. Their intended boundaries are:
 

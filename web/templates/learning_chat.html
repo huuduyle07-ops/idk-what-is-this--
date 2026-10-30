@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="cattus-csrf-token" content="{{ cattus_csrf_token() }}">
+    <meta name="cattus-auth-state" content="{{ cattus_auth_state() }}">
+    <meta name="color-scheme" content="light">
+    <title>Trò chuyện · C.A.T.T.U.S</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='learning_chat.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='learning_concept_map.css') }}">
+    <script src="{{ url_for('static', filename='request_integrity.js') }}"></script>
+    <script src="{{ url_for('static', filename='learning_concept_map.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='learning_chat.js') }}" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#chatInput">Đến ô trò chuyện</a>
+    <div class="chat-shell">
+        <aside class="chat-sidebar" aria-label="Hội thoại và điều hướng">
+            <a class="chat-brand" href="/learn/chat"><span class="brand-symbol" aria-hidden="true">c·</span><span>C.A.T.T.U.S<small>Hiểu từ gốc.</small></span></a>
+            <button id="newChatButton" class="new-chat" type="button"><span aria-hidden="true">＋</span> Cuộc trò chuyện mới</button>
+            <details class="conversation-drawer" open>
+                <summary>Hội thoại của tôi</summary>
+                <p id="chatListEmpty" class="small-note">Đang đọc hội thoại…</p>
+                <ul id="chatConversations" class="chat-conversations"></ul>
+            </details>
+            <nav class="chat-nav" aria-label="Không gian học">
+                <a href="/learn/materials"><span aria-hidden="true">▤</span> Tài liệu của tôi</a>
+                <a href="/learn/practice"><span aria-hidden="true">✎</span> Practice</a>
+                <a href="/learn/test-maker"><span aria-hidden="true">▦</span> Test Maker</a>
+                <a href="/learn/flashcards"><span aria-hidden="true">▱</span> Flashcards</a>
+                <a href="/learn"><span aria-hidden="true">↗</span> Thực hành Java</a>
+                <a href="/?web_mode=instant"><span aria-hidden="true">{ }</span> Coding agent</a>
+            </nav>
+            <details class="chat-privacy">
+                <summary>Dữ liệu trò chuyện</summary>
+                <p>Hội thoại được lưu trên máy chủ C.A.T.T.U.S này, gắn với trình duyệt của bạn. Khi gửi, nội dung chat và phần lịch sử gần đây được chuyển tới model đang hiển thị.</p>
+                <p>Khi chọn một bộ bài giảng, các đoạn liên quan trong bộ đó cũng được gửi tới model đang hiển thị. Với Gemini, nội dung này được gửi tới dịch vụ Gemini. Xóa hội thoại tại đây không xóa dữ liệu mà nhà cung cấp AI có thể lưu.</p>
+            </details>
+        </aside>
+
+        <main class="chat-main">
+            <header class="chat-topbar">
+                <div><p class="eyebrow">KHÔNG GIAN HỌC</p><h1 id="chatTitle">Cùng làm rõ một điều.</h1></div>
+                <div class="chat-tools"><button id="reloadChatButton" class="quiet-button" type="button">Đọc bản đã lưu</button><button id="deleteChatButton" class="quiet-button" type="button" disabled>Xóa hội thoại</button></div>
+            </header>
+            <div class="chat-context"><span id="chatScopeBadge" class="scope-badge">Kiến thức chung</span><span id="configStatus" class="small-note">Đang đọc cấu hình AI…</span></div>
+            <p class="chat-language-hint">Learning language: English · Bạn có thể yêu cầu giải thích bằng tiếng Việt hoặc ngôn ngữ khác. Thuật ngữ và đoạn trích giữ nguyên ngôn ngữ nguồn.</p>
+            <section class="chat-source-picker" aria-label="Chọn nguồn cho hội thoại mới">
+                <div class="source-picker-fields"><label for="chatCollection">Nguồn cho hội thoại mới</label><select id="chatCollection" aria-describedby="chatCollectionHelp" disabled><option value="">Kiến thức chung</option></select></div>
+                <button id="chatCollectionStart" class="quiet-button" type="button" disabled>Mở hội thoại với nguồn này</button>
+                <p id="chatCollectionHelp" class="small-note">Đang đọc kho bài giảng…</p>
+                <p id="chatScopeHelp" class="small-note">Chọn bài giảng để hỏi về nội dung đã lưu, hoặc bắt đầu bằng kiến thức chung.</p>
+            </section>
+            <div id="chatConceptMap" hidden></div>
+            <section id="chatNotice" class="chat-notice" role="alert" hidden><p id="chatNoticeText"></p><button id="retryChatButton" class="quiet-button" type="button" hidden>Thử lại đúng lượt gửi</button></section>
+            <section id="deleteChatConfirm" class="delete-confirm" role="region" aria-label="Xác nhận xóa hội thoại" hidden><p id="deleteChatText"></p><div><button id="confirmDeleteChatButton" class="danger-button" type="button">Xóa hội thoại này</button><button id="cancelDeleteChatButton" class="quiet-button" type="button">Giữ lại</button></div></section>
+            <section id="chatWelcome" class="chat-welcome" aria-labelledby="chatWelcomeTitle">
+                <span class="welcome-mark" aria-hidden="true">↗</span><p class="eyebrow">BẮT ĐẦU BẰNG MỘT CÂU HỎI</p>
+                <h2 id="chatWelcomeTitle">Điều gì đang làm bạn<br>chưa hiểu rõ?</h2>
+                <p>Một khái niệm, một đoạn code hay cách bạn đang suy nghĩ. Cứ trò chuyện trước, rồi cùng tìm cách nhìn dễ hiểu hơn.</p>
+                <div class="chat-starters"><button type="button" data-prompt="Help me understand inheritance and polymorphism in Java with a small example.">Hiểu một khái niệm<span>Inheritance and polymorphism in Java</span></button><button type="button" data-prompt="I want to practise tracing how code runs. Ask me what I understand before we begin.">Cùng đọc code<span>Start from how I think</span></button><button type="button" data-prompt="Compare overloading and overriding in a short table, then give an example.">Nhìn theo cách khác<span>Compare ideas with examples</span></button></div>
+            </section>
+            <section id="chatMessages" class="chat-messages" aria-label="Nội dung hội thoại" aria-busy="false"></section>
+            <div id="chatFollowups" class="chat-followups" hidden><span>Tiếp tục theo cách của bạn</span><button type="button" data-prompt="Explain this more simply, with a concrete example.">Giải thích đơn giản hơn</button><button type="button" data-prompt="Give another example.">Cho thêm ví dụ</button></div>
+            <div class="composer-area">
+                <p id="chatStatus" class="chat-status" role="status" aria-live="polite">Bạn chọn nhịp trò chuyện.</p>
+                <form id="chatForm" class="chat-composer">
+                    <label for="chatInput" class="visually-hidden">Tin nhắn của bạn</label>
+                    <textarea id="chatInput" rows="3" maxlength="8000" placeholder="Hỏi điều bạn muốn hiểu…" aria-describedby="chatInputHelp" disabled></textarea>
+                    <div class="composer-toolbar"><span id="chatInputCount" class="small-note">0 / 8.000</span><button id="discardChatDraftButton" class="quiet-button" type="button" disabled>Bỏ bản nháp</button><button id="sendChatButton" class="send-button" type="submit" disabled>Gửi <span aria-hidden="true">↑</span></button></div>
+                </form>
+                <p id="chatInputHelp" class="composer-note">Enter để gửi · Shift + Enter để xuống dòng. AI có thể nhầm; hãy mở các đoạn nguồn để đối chiếu khi học từ bài giảng.</p>
+            </div>
+        </main>
+    </div>
+    <noscript><p class="noscript">Bật JavaScript để trò chuyện. Chưa có nội dung nào được gửi tới AI.</p></noscript>
+</body>
+</html>

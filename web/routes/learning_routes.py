@@ -100,11 +100,11 @@ def _large_body(error):
     return jsonify(ok=False, error_code="request_too_large", error="Câu trả lời quá dài. Hãy rút gọn rồi gửi lại."), 413
 
 
-def _body(*, allowed: set[str], required: set[str] = frozenset()) -> dict:
+def _body(*, allowed: set[str], required: set[str] = frozenset(), maximum_bytes: int = _MAX_BODY) -> dict:
     if not request.is_json:
         raise UnsupportedMediaType()
-    raw = request.stream.read(_MAX_BODY + 1)
-    if len(raw) > _MAX_BODY:
+    raw = request.stream.read(maximum_bytes + 1)
+    if len(raw) > maximum_bytes:
         raise RequestEntityTooLarge()
     try:
         data = json.loads(raw)

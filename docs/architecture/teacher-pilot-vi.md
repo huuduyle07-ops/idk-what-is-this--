@@ -2,6 +2,8 @@
 
 Trạng thái: đã có vòng học chạy được tại `/learn`. Đây là bản thử trải nghiệm Teacher với ba tình huống Java về kế thừa và chọn method khi chạy. Chưa phải tutor tổng quát cho repository bất kỳ, và chưa hoàn thành toàn bộ M1 trong [kế hoạch Teacher](tutor-learning-plan-vi.md).
 
+Bổ sung 2026-10-28: [Practice từ bài giảng](learning-practice-vi.md) chạy riêng ở `/learn/practice`, tạo 3–5 câu từ các unit được chọn. Bài Java và đáp án soạn sẵn mô tả dưới đây giữ luồng riêng.
+
 ## Thử bài
 
 Trong web app đang chạy, mở `/learn` hoặc chọn **Học cùng C.A.T.T.U.S** từ trang chính. Nhấn **Bắt đầu bài học**, đọc code và chọn dự đoán. Có thể viết thêm cách suy nghĩ, xin gợi ý từng bước hoặc xem lời giải rồi tiếp tục.
