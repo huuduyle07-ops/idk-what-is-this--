@@ -9,7 +9,10 @@
     <title>Tài liệu của tôi — C.A.T.T.U.S</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='learn.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='learning_materials.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='learning_source_visuals.css') }}">
     <script src="{{ url_for('static', filename='request_integrity.js') }}"></script>
+    <script src="{{ url_for('static', filename='learning_file_labels.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='learning_source_visuals.js') }}" defer></script>
     <script src="{{ url_for('static', filename='learning_materials.js') }}" defer></script>
 </head>
 <body>
@@ -19,7 +22,11 @@
             <a class="brand" href="/learn" aria-label="C.A.T.T.U.S — Không gian học"><span class="brand-mark" aria-hidden="true">c<span>·</span></span><span>C.A.T.T.U.S<small>Hiểu từ gốc.</small></span></a>
             <nav class="mode-nav" aria-label="Chế độ làm việc">
                 <a class="mode-link" href="/learn"><span aria-hidden="true">↗</span><span>Học cùng tôi</span></a>
+                <a class="mode-link" href="/learn/chat"><span aria-hidden="true">◇</span><span>Trò chuyện</span></a>
                 <a class="mode-link active" href="/learn/materials" aria-current="page"><span aria-hidden="true">▤</span><span>Tài liệu của tôi</span><span class="nav-dot" aria-hidden="true"></span></a>
+                <a class="mode-link" href="/learn/practice"><span aria-hidden="true">✎</span><span>Practice</span></a>
+                <a class="mode-link" href="/learn/test-maker"><span aria-hidden="true">▦</span><span>Test Maker</span></a>
+                <a class="mode-link" href="/learn/flashcards"><span aria-hidden="true">▱</span><span>Flashcards</span></a>
                 <a class="mode-link" href="/?web_mode=instant"><span aria-hidden="true">{ }</span><span>Coding agent</span><span aria-hidden="true">↗</span></a>
             </nav>
             <div class="rail-note"><span class="small-leaf" aria-hidden="true">↗</span><p>Bắt đầu từ<br>điều bạn đang học.</p></div>
@@ -60,8 +67,23 @@
             <section id="materialPreview" class="material-card material-preview" aria-labelledby="previewHeading" hidden>
                 <div class="section-topline"><div><p class="eyebrow">XEM LẠI NGUỒN</p><h2 id="previewHeading" tabindex="-1"></h2></div><span id="collectionStatus" class="review-badge"></span></div>
                 <p class="material-help">Dùng file gốc để kiểm tra. Chưa có bước xác nhận đã duyệt hoặc trò chuyện với tài liệu trên trang này.</p>
+                <div class="file-label-filter"><label for="materialFileFilter">Find a file or confirmed label</label><input id="materialFileFilter" type="search" maxlength="120" placeholder="OS, synchronization, exercises…"><p id="materialFileFilterStatus" class="material-help"></p></div>
                 <div class="preview-controls"><div class="source-field"><label for="materialSourceSelect">File nguồn</label><select id="materialSourceSelect"></select></div><p id="sourceDetails" class="material-help"></p></div>
+                <details id="fileLabelsPanel" class="file-labels-panel">
+                    <summary>File labels <span id="fileLabelsBadge" class="file-labels-badge">Unclassified</span></summary>
+                    <p class="material-help">Phân loại file để tìm lại theo môn, chủ đề và loại tài liệu. Suggested labels cần bạn xem căn cứ trước khi xác nhận; không tự biến thành khái niệm trong graph.</p>
+                    <p id="fileLabelModel" class="material-help"></p>
+                    <form id="fileLabelsForm">
+                        <div class="file-label-grid"><label>Subject<input id="fileLabelSubject" type="text" maxlength="120" autocomplete="off" placeholder="Operating systems" disabled></label><label>Topics <small>One topic per line</small><textarea id="fileLabelTopics" rows="3" maxlength="800" placeholder="Synchronization&#10;Interrupt handling" disabled></textarea></label><label>Role<select id="fileLabelRole" disabled><option value="unknown">Unknown</option><option value="lecture">Lecture</option><option value="exercises">Exercises</option><option value="solutions">Solutions</option><option value="reference">Reference</option><option value="syllabus">Syllabus</option></select></label><label>Language<select id="fileLabelLanguage" disabled><option value="unknown">Unknown</option><option>English</option><option>Chinese</option><option>Korean</option><option>Vietnamese</option><option>Mixed</option><option>Other</option></select></label></div>
+                        <div class="file-label-actions"><button id="confirmFileLabels" class="button button-primary" type="submit" disabled>Confirm labels</button><button id="suggestFileLabels" class="button button-secondary" type="button" disabled>Suggest labels</button><button id="reloadFileLabels" class="text-button" type="button">Reload labels</button><button id="discardFileLabels" class="text-button" type="button" disabled>Bỏ thay đổi nhãn</button></div>
+                    </form>
+                    <p id="fileLabelsStatus" class="material-help" role="status"></p>
+                    <section id="fileLabelsConflict" class="description-conflict" hidden><p>Bản nháp của bạn được giữ. Nhãn hiện đã lưu:</p><pre id="fileLabelsSavedValues"></pre><button id="useSavedFileLabels" class="button button-secondary" type="button">Use saved labels</button><button id="keepDraftFileLabels" class="text-button" type="button">Keep my draft</button></section>
+                    <section id="fileLabelSuggestion" class="file-label-suggestion" hidden><h3>Suggested labels · chưa xác nhận</h3><p id="fileLabelSuggestionInfo" class="material-help"></p><p id="fileLabelStale" class="file-label-stale" hidden>Ghi chú ảnh đã thay đổi từ khi tạo gợi ý. Hãy Suggest labels lại để có căn cứ mới.</p><pre id="fileLabelSuggestedValues"></pre><div id="fileLabelEvidence"></div><button id="useFileLabelSuggestion" class="button button-secondary" type="button" disabled>Use suggestion in form</button></section>
+                    <h3 class="file-concept-heading">Concepts already linked to this file</h3><div id="fileConceptSummary" class="file-concept-summary"></div>
+                </details>
                 <ul id="sourceWarnings" class="material-warnings" aria-label="Lưu ý của file nguồn"></ul>
+                <p><a id="practiceFromUnit" class="text-button" href="/learn/practice" target="_blank" rel="noopener" hidden>Tạo câu hỏi từ phần nguồn này ↗</a></p>
                 <section id="imagePanel" class="image-panel" aria-labelledby="imageHeading" hidden>
                     <div class="image-toolbar"><div><h3 id="imageHeading">Ảnh nguồn</h3><p id="imageDimensions" class="material-help"></p></div><button id="imageZoomButton" class="text-button" type="button" aria-pressed="false" aria-controls="imageViewport">Xem kích thước gốc</button></div>
                     <p class="material-help">Ảnh chưa được OCR hoặc AI diễn giải. Bạn có thể xem hình và viết ghi chú riêng bên dưới.</p>
@@ -87,6 +109,37 @@
                 <pre id="unitText" class="unit-text" tabindex="0" aria-label="Văn bản trích xuất"></pre>
                 <p id="previewLimitNote" class="material-help" hidden></p>
                 </div>
+                <section id="sourceVisualsPanel" class="source-visuals-panel" aria-labelledby="sourceVisualsHeading" hidden>
+                    <div class="source-visuals-heading"><div><p class="eyebrow">ĐỐI CHIẾU BẢN HÌNH</p><h3 id="sourceVisualsHeading">Hình trong phần nguồn này</h3></div></div>
+                    <p id="sourceVisualsCitation" class="source-visual-citation"></p>
+                    <p class="source-visual-limit">Đây là bản hình để bạn xem và đối chiếu. Chưa OCR, phân loại hình hoặc diễn giải bằng AI. Word giữ vị trí đoạn/bảng trong file gốc; không suy đoán số trang.</p>
+                    <div class="source-visual-actions"><button id="prepareSourceVisuals" class="button button-secondary" type="button" disabled>Chuẩn bị hình của phần này</button><button id="reloadSourceVisuals" class="text-button" type="button" disabled>Đọc hình đã lưu</button></div>
+                    <p id="sourceVisualsStatus" class="material-help" role="status" aria-live="polite"></p>
+                    <ul id="sourceVisualsWarnings" class="material-warnings" aria-label="Lưu ý của bản hình"></ul>
+                    <p id="sourceVisualsEmpty" class="source-visuals-empty" hidden></p>
+                    <div id="sourceVisualsGallery" class="source-visual-gallery"></div>
+                </section>
+                <section id="knowledgePanel" class="knowledge-panel" aria-labelledby="knowledgeHeading" hidden>
+                    <div class="section-topline"><div><p class="eyebrow">KẾT NỐI NGUỒN HỌC</p><h3 id="knowledgeHeading">Khái niệm liên quan</h3></div><button id="reloadKnowledgeButton" class="text-button" type="button">Đọc liên kết đã lưu</button></div>
+                    <p id="knowledgeCitation" class="knowledge-citation"></p>
+                    <p id="conceptHelp" class="material-help">Gắn cùng một khái niệm vào các phần cùng chủ đề trong bộ tài liệu này để nối chúng với nhau. Liên kết do bạn chọn; chưa có nghĩa nội dung nguồn đã được kiểm chứng.</p>
+                    <ul id="conceptTags" class="concept-tags" aria-label="Khái niệm đã gắn"></ul>
+                    <form id="conceptForm" class="concept-form">
+                        <label for="conceptInput">Khái niệm ở phần nguồn này</label>
+                        <div class="concept-entry"><input id="conceptInput" type="text" maxlength="80" autocomplete="off" placeholder="Ví dụ: Kế thừa" aria-describedby="conceptHelp conceptLimit"><button id="addConceptButton" class="button button-secondary" type="submit">Gắn khái niệm</button></div>
+                        <p id="conceptLimit" class="material-help">Tối đa 12 khái niệm mỗi phần, 80 ký tự mỗi tên. Chỉ kết nối trong bộ tài liệu đang mở.</p>
+                    </form>
+                    <p id="knowledgeStatus" class="material-help" role="status"></p>
+                    <div class="knowledge-actions"><button id="retryKnowledgeButton" class="text-button" type="button" hidden>Thử lại đúng lượt lưu</button><button id="discardKnowledgeButton" class="text-button" type="button" disabled>Bỏ thay đổi khái niệm chưa xác nhận</button></div>
+                    <section id="knowledgeConflict" class="description-conflict" aria-label="Đối chiếu liên kết khái niệm" hidden>
+                        <p>Liên kết đã thay đổi ở nơi khác. Danh sách bạn vừa chọn vẫn được giữ; hãy đối chiếu trước khi lưu tiếp.</p>
+                        <p class="material-help">Danh sách bạn vừa chọn:</p><p id="pendingConceptLabels" class="concept-comparison"></p>
+                        <div id="latestKnowledgePanel" hidden><p class="material-help">Danh sách hiện đã lưu:</p><p id="latestConceptLabels" class="concept-comparison"></p><div class="description-actions"><button id="useSavedKnowledgeButton" class="button button-secondary" type="button">Dùng liên kết đã lưu</button><button id="applyDraftKnowledgeButton" class="text-button" type="button">Thay bằng danh sách tôi vừa chọn</button></div></div>
+                    </section>
+                    <div class="related-heading"><h3>Nguồn liên quan</h3><p id="relatedSourcesSummary" class="material-help"></p></div>
+                    <p id="relatedSourcesEmpty" class="material-help">Gắn một khái niệm để tìm các phần nguồn có cùng khái niệm.</p>
+                    <ul id="relatedSources" class="related-sources" aria-label="Các phần nguồn có cùng khái niệm"></ul>
+                </section>
             </section>
             <footer class="studio-footer"><span>C.A.T.T.U.S / Learning studio</span><span>Nguồn rõ ràng. Học theo nhịp của bạn.</span></footer>
         </main>

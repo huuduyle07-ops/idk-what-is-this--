@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path, PurePosixPath
+from threading import BoundedSemaphore
 
 from flask import Blueprint, current_app, jsonify, render_template, request, url_for
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge, UnsupportedMediaType
@@ -14,6 +15,10 @@ from werkzeug.wrappers import Response
 from werkzeug.wsgi import LimitedStream
 
 from core.learning.material_library import MaterialLibrary, MaterialsError
+from core.learning.knowledge_graph import LearningKnowledgeGraph
+from core.learning.file_labels import FileLabelStore
+from core.learning.file_label_suggestions import suggest_file_labels
+from core.learning.chat_provider import ChatResponder
 from core.learning.store import LearningError
 from web.routes.learning_routes import _body, _learning_error, _owner, _private_response, _require_read_access
 
@@ -26,6 +31,7 @@ MAX_REQUEST_BYTES = 65 * 1024 * 1024
 MAX_PATHS_FIELD = 16 * 1024
 _IMPORT_PATH = "/learn/api/materials"
 _DEFAULT_ROOT = Path(__file__).resolve().parents[2] / "targeted_subject"
+_LABEL_SUGGESTION_SLOT = BoundedSemaphore(1)
 
 
 def _early_error(code: str, message: str, status: int):
@@ -84,9 +90,11 @@ def _materials_error(error):
     status = {
         "not_found": 404, "collection_not_found": 404,
         "request_collision": 409, "import_incomplete": 409, "output_exists": 409,
-        "description_conflict": 409,
+        "description_conflict": 409, "knowledge_conflict": 409,
+        "label_conflict": 409, "file_labels_conflict": 409,
         "document_limit": 413, "file_too_large": 413, "text_limit": 413,
-        "collection_too_large": 413, "library_limit": 429,
+        "collection_too_large": 413, "file_labels_limit": 413,
+        "library_limit": 429, "knowledge_limit": 429,
         "write_failed": 500, "invalid_storage": 500, "invalid_collection": 500,
     }.get(error.code, 400)
     return jsonify(ok=False, error_code=error.code, error=str(error)), status
@@ -192,3 +200,71 @@ def describe_image(collection_id, digest):
     body = _body(allowed={"text", "expected_revision"}, required={"text", "expected_revision"})
     description = _library().describe_image(owner, collection_id, digest, body["text"], body["expected_revision"])
     return jsonify(ok=True, description=description)
+
+
+@bp.get("/api/materials/<collection_id>/units/<unit_id>/knowledge")
+def unit_knowledge(collection_id, unit_id):
+    knowledge = LearningKnowledgeGraph(_library()).get(_owner(), collection_id, unit_id)
+    return jsonify(ok=True, knowledge=knowledge)
+
+
+@bp.get("/api/materials/<collection_id>/map")
+def collection_map(collection_id):
+    view = LearningKnowledgeGraph(_library()).collection_map(_owner(), collection_id)
+    return jsonify(ok=True, map=view)
+
+
+@bp.put("/api/materials/<collection_id>/units/<unit_id>/knowledge/concepts")
+def set_unit_concepts(collection_id, unit_id):
+    owner = _owner()
+    body = _body(allowed={"labels", "expected_revision"}, required={"labels", "expected_revision"})
+    knowledge = LearningKnowledgeGraph(_library()).set_concepts(
+        owner, collection_id, unit_id, body["labels"], body["expected_revision"],
+    )
+    return jsonify(ok=True, knowledge=knowledge)
+
+
+def _label_responder():
+    return current_app.config.get("LEARNING_CHAT_RESPONDER") or ChatResponder()
+
+
+@bp.get("/api/materials/<collection_id>/labels")
+def file_labels(collection_id):
+    files = FileLabelStore(_library()).list(_owner(), collection_id)
+    return jsonify(ok=True, files=files, model=_label_responder().public_config())
+
+
+@bp.put("/api/materials/<collection_id>/sources/<digest>/labels")
+def save_file_labels(collection_id, digest):
+    owner = _owner()
+    body = _body(allowed={"labels", "expected_revision"}, required={"labels", "expected_revision"})
+    record = FileLabelStore(_library()).save(owner, collection_id, digest, body["labels"], body["expected_revision"])
+    return jsonify(ok=True, file=record)
+
+
+@bp.post("/api/materials/<collection_id>/sources/<digest>/labels/suggest")
+def suggest_labels(collection_id, digest):
+    owner = _owner()
+    body = _body(allowed={"expected_revision"}, required={"expected_revision"})
+    expected = body["expected_revision"]
+    if type(expected) is not int or expected < 0:
+        raise LearningError("invalid_labels", "Phiên bản nhãn không hợp lệ.", 400)
+    library = _library()
+    store = FileLabelStore(library)
+    current = store.get(owner, collection_id, digest)
+    if current["revision"] != expected:
+        raise LearningError("label_conflict", "Nhãn đã thay đổi. Tải lại nhãn để xem bản đã lưu trước khi đề xuất tiếp.", 409)
+    # Bound model work in the local app. No queue or automatic retry can silently
+    # spend another model call; a lost response is recovered with a read.
+    if not _LABEL_SUGGESTION_SLOT.acquire(blocking=False):
+        raise LearningError("labels_busy", "Đang tạo một đề xuất nhãn. Hãy đợi lượt đó hoàn tất rồi thử lại.", 429)
+    try:
+        if store.get(owner, collection_id, digest)["revision"] != expected:
+            raise LearningError("label_conflict", "Nhãn đã thay đổi. Hãy tải lại nhãn trước khi tiếp tục.", 409)
+        proposal = suggest_file_labels(library, owner, collection_id, digest, _label_responder())
+        # The long model call holds no storage lock. Compare-and-swap prevents a
+        # late proposal from overwriting a user's edit in another tab.
+        record = store.save_suggestion(owner, collection_id, digest, proposal, expected)
+        return jsonify(ok=True, file=record)
+    finally:
+        _LABEL_SUGGESTION_SLOT.release()

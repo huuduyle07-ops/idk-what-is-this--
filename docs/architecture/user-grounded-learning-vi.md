@@ -1,14 +1,22 @@
 # Teacher dựa trên bài giảng của người học
 
-Mục tiêu: bắt đầu bằng trò chuyện về tài liệu của người học, rồi đề xuất một nhóm câu hỏi có mục đích rõ. Ưu tiên đúng phạm vi môn học và truy lại được nguồn trước khi mở rộng thành tutor tổng quát. Người dùng đã chọn PowerPoint, PDF và Word làm nguồn; chưa cung cấp file hoặc đường dẫn bài giảng thực tế.
+Mục tiêu: bắt đầu bằng trò chuyện về tài liệu của người học, rồi đề xuất một nhóm câu hỏi có mục đích rõ. Ưu tiên đúng phạm vi môn học và truy lại được nguồn trước khi mở rộng thành tutor tổng quát. Người dùng đã chọn PowerPoint, PDF và Word làm nguồn, sau đó bổ sung nhu cầu giữ hình ảnh/sơ đồ để học.
 
 ## Phạm vi triển khai
 
-Nền tảng nhập tài liệu cục bộ được đặt tại [`scripts/prepare_learning_materials.py`](../../scripts/prepare_learning_materials.py): nhận `.pptx`, `.pdf`, `.docx`, lưu bản sao nguồn và SHA-256 của byte nguồn; trích xuất thành đơn vị có vị trí, rồi chia đoạn với offset đối chiếu được trong văn bản đã trích xuất. Mỗi lần nhập phải qua trạng thái `review_required` trước khi được coi là tài liệu đã duyệt. Offset không phải vị trí byte trong file Office/PDF.
+Bản [chat tại `/learn/chat`](learning-chat-vi.md) có lưu hội thoại và trình bày giải thích/code/bảng, ưu tiên Ollama. Người học chọn kiến thức chung hoặc một bộ bài giảng cố định cho hội thoại mới. Chat theo bài giảng truy xuất từ khóa, giữ snapshot các đoạn đã gửi và hiển thị nguồn để đối chiếu; chưa có tìm kiếm ngữ nghĩa hay kiểm chứng diễn giải tự động.
+
+Nền tảng nhập tài liệu cục bộ được đặt tại [`scripts/prepare_learning_materials.py`](../../scripts/prepare_learning_materials.py): nhận `.pptx`, `.pdf`, `.docx`, `.png`, `.jpg` và `.jpeg`, lưu bản sao nguồn và SHA-256 của byte nguồn; tài liệu chữ được trích xuất thành đơn vị có vị trí, rồi chia đoạn với offset đối chiếu được trong văn bản đã trích xuất. Mỗi lần nhập phải qua trạng thái `review_required` trước khi được coi là tài liệu đã duyệt. Offset không phải vị trí byte trong file Office/PDF.
 
 Trang **Tài liệu của tôi** tại `/learn/materials` đã hỗ trợ chọn hoặc kéo thả file/thư mục, đặt tên bộ tài liệu, nhập và xem lại từng trang/slide/đoạn/bảng. Thư mục con được duyệt trong trình duyệt; file không được hỗ trợ được báo bỏ qua. Chỉ gửi sau khi người dùng nhấn **Nhập tài liệu**, không tự đồng bộ thư mục. Nội dung trích xuất được hiển thị như văn bản cùng cảnh báo, không diễn giải thành HTML.
 
-Đường nhập này xử lý cục bộ, giới hạn kích thước/số lượng đầu vào và độ dài văn bản, không gọi model. Chưa có sandbox giới hạn CPU/RAM cho parser PDF; chưa dùng bộ nhập này làm dịch vụ upload công khai. Nó chuẩn bị corpus để kiểm tra; chưa có hội thoại dựa trên nguồn, sinh câu hỏi hay nút xác nhận nguồn đã duyệt. [Teacher pilot hiện tại](teacher-pilot-vi.md) vẫn sử dụng ba bài Java soạn sẵn. Những mục hội thoại bên dưới là kế hoạch, không phải chức năng đã chạy.
+Ảnh PNG/JPEG độc lập đã có xem vừa khung/kích thước gốc và mô tả do người dùng viết. Kiểm tra signature, định dạng và giải mã bằng Pillow; giới hạn 12 triệu pixel, 10.000 pixel mỗi chiều, một khung hình và 20 MiB/file. APNG/MPO nhiều khung bị từ chối. `.jpg`/`.jpeg` cùng nội dung được gộp, bản gốc được giữ nguyên byte. Đường xem ảnh yêu cầu đúng cookie người học và quyền truy cập hiện có, kiểm tra hash trước khi trả ảnh, không công khai cả thư mục nguồn. Ảnh không có OCR mang trạng thái `needs_visual_review`, không bị coi là nguồn rỗng hoặc nguồn đã hiểu.
+
+Mô tả giới hạn 4.000 ký tự, lưu riêng trong `annotations.json` với `origin: user` và revision, không sửa manifest/chunks/ảnh gốc hoặc tự kích hoạt tutor. Ghi nguyên tử và kiểm tra revision ngăn tab cũ ghi đè bản mới; gửi lại đúng nội dung sau khi mất phản hồi không tăng revision lần nữa. UI giữ bản đang viết khi lỗi, chặn chuyển nguồn khi chưa giải quyết ghi chú và cho đọc/đối chiếu bản đã lưu trước khi thay thế. Đây chưa phải lịch sử ghi chú nhiều phiên bản hoặc cơ chế phối hợp nhiều worker.
+
+Chưa chạy OCR, chưa diễn giải sơ đồ bằng model, chưa trích ảnh nhúng hoặc render toàn trang PDF/Office. Bước kế tiếp là bản xem trang PDF giữ cả hình và ngữ cảnh, sau đó OCR/diễn giải trên phần được chọn. Nội dung ảnh gốc, chữ OCR và lời diễn giải phải tách nguồn gốc; lời diễn giải chưa duyệt không tự thành đáp án chuẩn.
+
+Đường nhập này xử lý cục bộ, giới hạn kích thước/số lượng đầu vào và độ dài văn bản, không gọi model. Chưa có sandbox giới hạn CPU/RAM cho parser PDF; chưa dùng bộ nhập này làm dịch vụ upload công khai. Chat có thể dùng bản trích xuất theo lựa chọn rõ ràng của người học, luôn giữ cảnh báo chưa duyệt. Chưa có sinh/chấm câu hỏi từ tài liệu hay nút xác nhận nguồn đã duyệt. [Teacher pilot hiện tại](teacher-pilot-vi.md) vẫn sử dụng ba bài Java soạn sẵn. Các mục bên dưới là thiết kế dài hạn; phạm vi thực chạy theo tài liệu chat được liên kết ở trên.
 
 Thư mục gốc [`targeted_subject/`](../../targeted_subject/README.md) đã được tạo và bỏ qua nội dung cá nhân trong Git. Bản nhập từ web nằm trong `targeted_subject/<owner>/<collection-id>/`; tên môn/chương và đường dẫn tương đối của file nằm trong metadata. Người dùng có thể đặt các thư mục môn học ở đây, nhưng cần chọn/kéo chúng vào trang để nhập; server không tự quét. Đường dẫn phía trình duyệt không được dùng làm đường dẫn ghi trên máy chủ. Các bộ tài liệu được phân tách theo cookie người học và giữ cơ chế xác thực, Origin/CSRF hiện có. Xóa/đổi cookie có thể mất liên kết truy cập qua web, không đồng nghĩa xóa dữ liệu trên đĩa.
 
@@ -31,7 +39,21 @@ Mỗi bundle có `grounding_ready: false`; đây là dữ liệu chờ xem lại
 | Hội thoại và bài làm | Câu hỏi của người học, câu trả lời, trợ giúp đã nhận, kết quả và nguồn được sử dụng | Tách khỏi corpus và lịch sử sửa code của agent; không tự trở thành đáp án chuẩn. |
 | Dữ liệu huấn luyện | Tập ví dụ được chọn và cho phép sử dụng cho việc cập nhật model | Chưa cần cho bước này; không tự gom bài giảng hay bài làm vào tập huấn luyện. |
 
-Ban đầu dùng file có cấu trúc và chức năng tra cứu đơn giản. Chưa cần graph tri thức, vector database hay framework nhiều agent mới để thử vòng học đầu tiên.
+Corpus tiếp tục dùng file có cấu trúc. Lớp liên kết nhỏ dưới đây tận dụng biểu diễn graph hiện có; chưa thêm vector database hay framework nhiều agent để thử vòng học đầu tiên.
+
+## Liên kết nguồn và khái niệm
+
+`core/learning/knowledge_graph.py` dùng lại `graph.schema.ProgramGraph` để trả về một graph nhỏ quanh phần nguồn đang xem. Cấu trúc gồm **nguồn → trang/slide/đoạn/bảng/ảnh → khái niệm**. Quan hệ `contains` được lấy từ corpus; quan hệ `related_to_concept` do người dùng gắn và có `origin: user`, `status: user_confirmed`. Gắn khái niệm chỉ xác nhận một liên hệ, không duyệt nguồn hoặc đánh giá mức hiểu của người học.
+
+Trong `/learn/materials`, mục **Khái niệm liên quan** cho gắn/bỏ nhãn trên phần nguồn hiện tại. **Nguồn liên quan** liệt kê các phần cùng khái niệm và mở đúng nguồn, đúng vị trí khi chọn. Nhãn được chuẩn hóa Unicode, khoảng trắng và chữ hoa/thường, giữ dấu tiếng Việt. Một bộ tài liệu là một phạm vi khái niệm: cùng tên ở hai bộ không tự hợp nhất. Nhập lại file thành bộ mới cũng chưa tự chuyển nhãn.
+
+Từ 2026-10-26, chat theo bài giảng có **Concept map** tương tác ở cấp bộ tài liệu: bấm nút để đọc nguồn, lọc nút, tô sáng khái niệm chung một phần nguồn và điền câu hỏi tiếng Anh. Nhãn khái niệm vẫn do người dùng gắn, chưa tự khai thác bằng AI. Liên kết từ sơ đồ mở đúng collection/unit trong Materials. Chat nhận diện tên nhãn chính xác để dùng nguồn đã gắn, kể cả alias như ISR. Xem [phạm vi và giới hạn hiện tại](learning-chat-vi.md).
+
+SQLite tại `targeted_subject/<owner>/knowledge.sqlite3` chỉ giữ khái niệm, liên kết và revision; bản sao nguồn, manifest, units và chunks không bị sửa. Đọc không tạo database. Ghi dùng transaction và kiểm tra revision để hai tab không âm thầm ghi đè nhau; gửi lại cùng tập nhãn sau khi mất phản hồi có thể trả bản đã lưu. Nhãn gỡ khỏi mọi phần sẽ được dọn khỏi chỉ mục. Đây chưa phải lịch sử chỉnh sửa có thể khôi phục.
+
+Giới hạn: 12 nhãn/phần, 80 ký tự/nhãn, 500 khái niệm và 5.000 liên kết/bộ. Truy vấn trả tối đa 30 nguồn liên quan, mỗi trích đoạn tối đa 300 ký tự; ưu tiên số khái niệm chung rồi thứ tự nguồn. Graph chỉ gồm phần đang xem và các kết quả đó. API đọc/ghi giữ phân tách người học, auth và Origin/CSRF hiện có; dữ liệu không đi vào cache graph của coding harness.
+
+Chưa tự suy ra quan hệ tiên quyết, đồng nghĩa, mâu thuẫn hay mức thành thạo; chưa tự gắn nhãn bằng AI. `grounding_ready` vẫn là `false`. Lớp liên kết không khôi phục hình nhúng còn thiếu và chưa tạo bài học/câu hỏi từ nguồn. Bước tích hợp tiếp theo là chọn phạm vi đã kiểm tra để hội thoại có thể dẫn lại đúng nguồn.
 
 ## Giữ đúng nội dung nguồn
 
@@ -70,11 +92,17 @@ Lời giải thích trôi chảy trong chat và câu “tôi hiểu rồi” kh�
 
 ## Kiểm tra nền tảng nhập liệu
 
+Cập nhật 2026-10-24 cho liên kết khái niệm: **112 kiểm tra vượt qua, 4 bỏ qua** trong lượt tích hợp này: 30 kiểm tra domain graph, 13 API graph, 58 hồi quy API tài liệu/ảnh/Teacher, 1 cổng bảo vệ mọi route ghi và 10 Chromium (4 graph mới, 6 nhập liệu/ảnh hiện có). Bốn kiểm tra symlink bị bỏ qua vì Windows không cho tạo symlink; kiểm tra đường database/sidecar bị chiếm bởi thư mục và lỗi truy cập vẫn chạy. Không chạy lại toàn repository.
+
+Các kiểm tra graph xác nhận phân tách owner/bộ tài liệu, liên kết đúng bản nguồn và vị trí của PDF/PPTX/DOCX/ảnh, đọc không ghi, giới hạn kết quả, transaction/quota, gửi lại, hai lượt ghi cạnh tranh và bỏ/gắn lại nhãn. Chromium kiểm tra chuyển đúng đoạn Word ↔ ảnh, giữ ghi chú chưa lưu, hiển thị nhãn giống HTML như văn bản, màn hình 390 px, xung đột hai tab có đối chiếu, mất phản hồi sau khi server lưu và phản hồi đọc đến muộn không thay phần đang xem. Đây là kiểm tra kết nối và thao tác, chưa đánh giá chất lượng học hoặc tốc độ trên thư viện lớn.
+
+Cập nhật 2026-10-24 cho ảnh độc lập: **153 kiểm tra vượt qua** trong phạm vi nhập liệu/Teacher liên quan (67 extractor, 80 kiểm tra corpus/thư viện/API ảnh/API tài liệu/Teacher/cổng bảo vệ, 6 Chromium). `tests/integration/test_learning_images_web.py` kiểm tra ảnh gốc và MIME, quyền xem, hash nguồn, JPEG alias, ghi chú tách nguồn, revision/retry, dữ liệu sai và lỗi ghi. Ba kiểm tra ảnh trong browser bổ sung xem PNG/JPEG thật, zoom, ghi chú có nội dung giống HTML vẫn là dữ liệu, mở lại, xung đột hai tab và mất phản hồi sau khi lưu. Các fixture đều tự tạo trong kho tạm; chưa đánh giá khả năng đọc hiểu sơ đồ hoặc chất lượng học từ bài giảng thật. Phần ghi chú và ảnh không gọi model.
+
 Ngày 2026-10-23: **110 kiểm tra vượt qua**, gồm 98 kiểm tra nền tảng nhập tài liệu và 12 kiểm tra hồi quy Teacher/cổng bảo vệ hiện có. Chạy các file `tests/learning/test_document_extractors.py`, `test_materials.py`, `test_material_library.py`, `tests/integration/test_learning_materials_web.py`, `test_learning_materials_browser.py`, `test_learning_web.py` và test `test_every_mutating_route_is_decided_by_the_gate_before_its_handler` trong `tests/test_auth_web1.py`.
 
 Các fixture tự tạo kiểm tra thứ tự trang/slide, Word có bảng xen đoạn văn, nguồn mã hóa/lỗi, liên kết slide không hợp lệ, giới hạn kích thước, hash/bản sao nguồn, offset, chống ghi đè, lỗi ghi giữa chừng và CLI chạy từ thư mục khác. Kiểm tra web bao gồm owner/auth/Origin/CSRF, đường dẫn tương đối, giới hạn body trước đọc form, lượt gửi lại và tài liệu nhiều đoạn trống. Giới hạn 32 MiB cho đơn vị nguồn đã được thống nhất giữa ghi/đọc, kiểm tra trước khi tạo bundle để không xuất hiện bản đã lưu nhưng không mở được.
 
-Ba kiểm tra Chromium dùng kho tạm đã xác nhận chọn file, chọn thư mục con, kéo thả thư mục qua nhiều batch, hiển thị nội dung có HTML như văn bản, chuyển phần nguồn, tải lại, màn hình rộng 390 px và gửi lại sau khi server đã lưu nhưng phản hồi bị mất. Chưa có bài giảng thật của người dùng để đánh giá chất lượng trích xuất; chưa chạy lại toàn repository.
+Ba kiểm tra Chromium ban đầu dùng kho tạm đã xác nhận chọn file, chọn thư mục con, kéo thả thư mục qua nhiều batch, hiển thị nội dung có HTML như văn bản, chuyển phần nguồn, tải lại, màn hình rộng 390 px và gửi lại sau khi server đã lưu nhưng phản hồi bị mất. Các kết quả này không thay cho đánh giá chất lượng trích xuất trên bài giảng thật; chưa chạy lại toàn repository.
 
 ## Thứ tự thực hiện và điều kiện chuyển bước
 
@@ -85,4 +113,4 @@ Ba kiểm tra Chromium dùng kho tạm đã xác nhận chọn file, chọn thư
 | 3. Nhóm câu hỏi nhỏ | Chọn câu hỏi/rubric đã duyệt, kiểm chứng đáp án, tách nội dung công khai khỏi đáp án; lưu trợ giúp cùng bài làm. |
 | 4. Đánh giá vòng học | Thử với người học đầu tiên: câu trả lời có ích đến đâu, nguồn có đúng chỗ, có vận dụng được bài mới và phải chờ bao lâu. Ghi số liệu thực tế trước khi đặt mục tiêu hoặc thêm hạ tầng. |
 
-Đầu vào còn cần từ người dùng là **một bộ bài giảng thực tế**, có thể kéo file/thư mục vào `/learn/materials`. Nếu tiện, bổ sung tên môn/chủ đề đang học và phần muốn ưu tiên; chưa cần chuẩn bị một bộ dữ liệu huấn luyện lớn. Bắt đầu với một chương nhỏ có cả văn bản, code và một vài hình/bảng để biết việc trích xuất đang thiếu gì.
+Với bộ bài giảng đã nhập, bước thử tiếp theo là **chọn một chương nhỏ**, đối chiếu phần chữ/code/hình quan trọng và gắn vài khái niệm chung để kiểm tra việc nối nguồn. Chưa cần chuẩn bị một bộ dữ liệu huấn luyện lớn. Các phần đã kiểm tra sẽ làm đầu vào cho hội thoại có nguồn ở bước sau.

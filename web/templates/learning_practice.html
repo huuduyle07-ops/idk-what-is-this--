@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="cattus-csrf-token" content="{{ cattus_csrf_token() }}">
+    <meta name="cattus-auth-state" content="{{ cattus_auth_state() }}">
+    <meta name="color-scheme" content="light">
+    <title>Practice · C.A.T.T.U.S</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='learn.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='learning_practice.css') }}">
+    <script src="{{ url_for('static', filename='request_integrity.js') }}"></script>
+    <script src="{{ url_for('static', filename='learning_practice.js') }}" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#practiceTitle">Đến bài thực hành</a>
+    <div class="studio">
+        <aside class="rail" aria-label="Điều hướng">
+            <a class="brand" href="/learn/chat"><span class="brand-mark" aria-hidden="true">c<span>·</span></span><span>C.A.T.T.U.S<small>Hiểu từ gốc.</small></span></a>
+            <nav class="mode-nav" aria-label="Không gian học">
+                <a class="mode-link" href="/learn/chat"><span aria-hidden="true">◇</span><span>Trò chuyện</span></a>
+                <a class="mode-link" href="/learn/materials"><span aria-hidden="true">▤</span><span>Tài liệu của tôi</span></a>
+                <a class="mode-link active" href="/learn/practice" aria-current="page"><span aria-hidden="true">✎</span><span>Practice</span></a>
+                <a class="mode-link" href="/learn/test-maker"><span aria-hidden="true">▦</span><span>Test Maker</span></a>
+                <a class="mode-link" href="/learn/flashcards"><span aria-hidden="true">▱</span><span>Flashcards</span></a>
+                <a class="mode-link" href="/learn"><span aria-hidden="true">↗</span><span>Thực hành Java</span></a>
+                <a class="mode-link" href="/?web_mode=instant"><span aria-hidden="true">{ }</span><span>Coding agent</span></a>
+            </nav>
+            <div class="practice-history-heading"><h2>Bộ câu hỏi đã lưu</h2><button id="reloadPracticeHistory" class="text-button" type="button">Đọc lại</button></div>
+            <p id="practiceHistoryStatus" class="practice-help">Đang đọc lịch sử…</p>
+            <ul id="practiceHistory" class="practice-history"></ul>
+            <button id="newPracticeButton" class="button button-secondary" type="button">Tạo bộ câu hỏi mới</button>
+            <details class="privacy-details"><summary>Dữ liệu được dùng thế nào?</summary><p>Chỉ Generate questions mới gửi các đoạn nguồn đã chọn tới model đang hiển thị. Bài làm và đáp án được lưu trên máy chủ C.A.T.T.U.S này, gắn với trình duyệt của bạn.</p><p>Đáp án do model đề xuất có thể sai. Xem nguồn trước khi tin; kết quả thực hành không chứng minh bạn đã thành thạo.</p></details>
+        </aside>
+        <main class="main learning-main practice-main">
+            <header class="topbar"><p class="breadcrumb">Không gian học <span aria-hidden="true">/</span> <strong>Practice</strong></p><a class="text-button" href="/learn/materials">Mở kho bài giảng ↗</a></header>
+            <div class="lesson-heading"><div><p class="eyebrow">TỪ BÀI GIẢNG ĐẾN THỰC HÀNH</p><h1 id="practiceTitle" tabindex="-1">Thử điều bạn vừa hiểu.</h1><p class="lesson-subtitle">Một bộ nhỏ, một phạm vi rõ. Câu hỏi bằng tiếng Anh, từ những đoạn nguồn bạn chọn.</p></div><span class="lesson-badge">3–5 questions</span></div>
+            <section id="practiceNotice" class="notice" role="alert" hidden><p id="practiceNoticeText"></p><div class="practice-actions"><button id="retryPracticeRequest" class="text-button" type="button" hidden>Kiểm tra lại đúng yêu cầu</button><button id="reloadPracticeButton" class="text-button" type="button" hidden>Đọc bản đã lưu</button></div></section>
+            <p id="practiceStatus" class="practice-help" role="status" aria-live="polite"></p>
+            <section id="practiceCreate" class="practice-card" aria-labelledby="practiceCreateHeading">
+                <p class="eyebrow">01 · CHỌN PHẠM VI</p><h2 id="practiceCreateHeading">Học từ đoạn nào?</h2>
+                <p id="practiceModel" class="practice-help">Đang đọc cấu hình AI…</p>
+                <form id="practiceGenerateForm">
+                    <div class="practice-setup"><label for="practiceCollection">Bộ bài giảng<select id="practiceCollection" disabled><option value="">Chọn một bộ bài giảng</option></select></label><label for="practiceCount">Số câu hỏi<select id="practiceCount"><option value="3">3 questions</option><option value="4">4 questions</option><option value="5">5 questions</option></select></label></div>
+                    <p class="practice-help">Chọn 1–8 phần nguồn. Mỗi phần chỉ dùng tối đa 1.000 ký tự đầu; các đoạn dưới đây cho biết phạm vi gửi tới model. Ảnh chỉ dùng ghi chú bạn đã lưu, không chạy OCR.</p>
+                    <p id="practiceUnitStatus" class="practice-help">Chưa chọn bộ bài giảng.</p>
+                    <div id="practiceUnits" class="practice-units" role="group" aria-label="Chọn phần nguồn để tạo câu hỏi"></div>
+                    <div class="practice-actions"><button id="generatePracticeButton" class="button button-primary" type="submit" disabled>Generate questions</button><span class="practice-help">Chưa gọi AI cho đến khi bạn nhấn nút này.</span></div>
+                </form>
+            </section>
+            <section id="practiceSession" class="practice-card" aria-labelledby="practiceSessionTitle" hidden>
+                <div class="practice-session-heading"><div><p id="practiceSessionState" class="eyebrow"></p><h2 id="practiceSessionTitle" tabindex="-1"></h2></div><button id="deletePracticeButton" class="text-button" type="button">Xóa bộ này</button></div>
+                <p id="practiceScope" class="practice-help"></p>
+                <p class="practice-trust-note">Đáp án do model đề xuất; đã xem hoặc đã làm đúng không có nghĩa đáp án được kiểm chứng. Gợi ý, xem lời giải và lần trả lời đầu được ghi riêng.</p>
+                <div id="practiceContent"></div>
+            </section>
+            <section id="practiceDeleteConfirm" class="notice" role="region" aria-label="Xác nhận xóa bộ thực hành" hidden><p>Xóa bộ câu hỏi và bài làm này khỏi máy chủ C.A.T.T.U.S? File bài giảng được giữ.</p><div class="practice-actions"><button id="confirmPracticeDelete" class="button button-secondary" type="button">Xóa bộ thực hành</button><button id="cancelPracticeDelete" class="text-button" type="button">Giữ lại</button></div></section>
+        </main>
+    </div>
+    <noscript><p>Bật JavaScript để tạo và làm bài thực hành. Chưa có nội dung nào được gửi tới AI.</p></noscript>
+</body>
+</html>
